@@ -22,6 +22,8 @@ class MonacEditorIframe {
   // Whether the panel has sent its css yet; the first send seeds the
   // editor rather than being an edit the user could undo away.
   populated = false;
+  // Set while the panel's css is written in, so only typing is reported back.
+  applyingParentCss = false;
   // Decoration ids of the lines marked by stylebotHighlightLines.
   highlights: Array<string> = [];
   // Seeded from the url, then kept current from the very first message, so
@@ -152,6 +154,13 @@ class MonacEditorIframe {
     this.editor = window.monaco.editor.create(container, editorOptions);
     this.editor.onDidChangeModelContent(() => {
       this.clearHighlights();
+
+      // A late echo of css the panel has since replaced would be applied
+      // over the newer css, as when a chat reply streams edits.
+      if (this.applyingParentCss) {
+        return;
+      }
+
       this.postMessage({
         css: this.editor.getValue(),
         type: 'stylebotMonacoIframeCssUpdated',
@@ -230,15 +239,21 @@ class MonacEditorIframe {
   handleStylebotCssUpdate(css: string, selector?: string, focus = true): void {
     const model = this.editor.getModel();
 
-    if (!this.populated) {
-      this.populated = true;
-      this.editor.setValue(css);
-    } else if (model.getValue() !== css) {
-      this.editor.pushUndoStop();
-      this.editor.executeEdits('stylebot', [
-        { range: model.getFullModelRange(), text: css },
-      ]);
-      this.editor.pushUndoStop();
+    this.applyingParentCss = true;
+
+    try {
+      if (!this.populated) {
+        this.populated = true;
+        this.editor.setValue(css);
+      } else if (model.getValue() !== css) {
+        this.editor.pushUndoStop();
+        this.editor.executeEdits('stylebot', [
+          { range: model.getFullModelRange(), text: css },
+        ]);
+        this.editor.pushUndoStop();
+      }
+    } finally {
+      this.applyingParentCss = false;
     }
 
     if (focus) {

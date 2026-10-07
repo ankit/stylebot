@@ -45,8 +45,8 @@ export default Vue.extend({
       // What the iframe last showed, whether it reported it or we sent it.
       iframeCss: null,
       applyTypedCss: debounce((css: string) => {
-        // Skips Monaco's echo of a setValue: re-saving it would stamp a fresh
-        // modifiedTime on a just-pulled style, as if this device edited it.
+        // Skips typing undone back to the store's css: re-saving it would stamp
+        // a fresh modifiedTime on a just-pulled style, as if this device edited it.
         if (css !== this.$store.state.css) {
           this.$store.dispatch('applyCss', { css, source: 'code' });
         }

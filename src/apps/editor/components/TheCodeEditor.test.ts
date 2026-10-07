@@ -70,7 +70,7 @@ describe('TheCodeEditor.vue', () => {
     ]);
   });
 
-  it('does not re-apply text that matches the store, such as Monaco echoing a setValue', () => {
+  it('does not re-apply text that matches the store, such as typing undone back to it', () => {
     type('a { color: red; }');
     jest.advanceTimersByTime(200);
 
