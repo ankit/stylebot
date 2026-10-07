@@ -99,6 +99,30 @@ yarn stylebot css set news.ycombinator.com --profile Dark < dark.css
 
 Every command takes `--json` to print the raw response instead of text.
 
+## Claude Code
+
+The Stylebot plugin teaches Claude Code to restyle pages with the CLI: open the page, read its outline, write CSS, fix what the page check reports, then look at a screenshot. It doesn't contain the CLI; its `stylebot` command runs the one on your `PATH`.
+
+To try it in one session:
+
+```bash
+claude --plugin-dir tools/claude-plugin
+```
+
+Or install it from this repo's marketplace so every session has it:
+
+```bash
+claude plugin marketplace add ./
+```
+
+```bash
+claude plugin install stylebot@stylebot
+```
+
+Then ask for a look, such as "give Hacker News a dark theme", and Claude picks the plugin up on its own; or run `/stylebot <site> <what to change>`. Without saying what to change, it offers the suggestions Chat shows for the page. The skill holds the styling guidance, adapted from Chat's.
+
+It runs without permission prompts: the skill pre-approves `stylebot` commands and reading and writing files in `~/.stylebot/work/`, where it keeps its CSS and screenshots. Its changes go into a new profile named after the look, such as "Claude: Dark", so switching back to your own style is one profile change.
+
 ## A second browser
 
 A test, or a second worktree, can run its own dev browser beside yours without taking over your CLI connection: give it its own profile and socket.
@@ -118,6 +142,6 @@ Development builds add the `nativeMessaging` permission for the host and `<all_u
 ## Before it can ship
 
 - An opt-in setting, with `nativeMessaging` as an optional permission so existing users aren't asked to re-approve the extension
-- Publishing the CLI to npm
+- Publishing the CLI to npm, for the plugin to fall back to, and the plugin through a public marketplace
 - Install support for Edge's store id, other Chromium browsers, Windows and Firefox
 - A visible sign that the CLI is connected, and a separate opt-in for reading pages (outlines and screenshots), since any local process can use the socket

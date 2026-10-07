@@ -1,0 +1,14 @@
+{
+  "name": "stylebot",
+  "description": "Stylebot's Claude Code plugins",
+  "owner": {
+    "name": "Ankit Ahuja"
+  },
+  "plugins": [
+    {
+      "name": "stylebot",
+      "source": "./tools/claude-plugin",
+      "description": "Restyle any website in your browser through the Stylebot extension"
+    }
+  ]
+}

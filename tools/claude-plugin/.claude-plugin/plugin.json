@@ -1,0 +1,11 @@
+{
+  "name": "stylebot",
+  "displayName": "Stylebot",
+  "description": "Restyle any website in your browser through the Stylebot extension",
+  "version": "0.1.0",
+  "author": {
+    "name": "Ankit Ahuja"
+  },
+  "homepage": "https://stylebot.dev",
+  "license": "MIT"
+}

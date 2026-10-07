@@ -56,6 +56,7 @@ export const addPageCommands = program => {
       const dataUrl = await request('screenshot', { tab });
       const out = path.resolve(options.out ?? `stylebot-${Date.now()}.png`);
 
+      fs.mkdirSync(path.dirname(out), { recursive: true });
       fs.writeFileSync(out, Buffer.from(dataUrl.split(',')[1], 'base64'));
       console.log(out);
     });
