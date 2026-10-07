@@ -328,6 +328,10 @@ const clientConfig = {
     'monaco-editor/iframe/options-index':
       './apps/monaco-iframe/options-index.ts',
     'readability/reader': './apps/reader/reader.ts',
+    // The CLI's page inspector, dev-only until the CLI ships behind a setting.
+    ...(process.env.NODE_ENV === 'development' && {
+      'editor/inspector': './apps/editor/inspector.ts',
+    }),
   },
   // Webpack's `global` shim falls back to `new Function` in the bundles loaded
   // with import(), which a strict page CSP blocks and reports as an issue.

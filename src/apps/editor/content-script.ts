@@ -10,9 +10,9 @@ import type { TabMessage } from '@stylebot/types';
 
 import { REMOTE_PAGE_BRIDGE_PORT } from '@stylebot/page-bridge';
 
-import { inspectPage } from './inspect-page';
 import type { EditorApp } from './load-editor';
 import { isEditorLoading, loadEditor } from './load-editor';
+import { loadInspector } from './load-inspector';
 import { getIsEditorWindowOpen, getStylesForPage } from './utils/chrome';
 
 const EDITOR_MESSAGES: Array<TabMessage['name']> = [
@@ -106,15 +106,15 @@ const listen = (): void => {
         return;
       }
 
-      // Only dev builds ask, and the check keeps the page readers out of release bundles.
+      // Only dev builds ask, and only they build the inspector bundle.
       if (
         process.env.NODE_ENV === 'development' &&
         message.name === 'InspectPage'
       ) {
         whenDomReady(() =>
-          inspectPage(message.inspection).then(sendResponse, error =>
-            sendResponse({ error: String(error) })
-          )
+          loadInspector()
+            .then(inspectPage => inspectPage(message.inspection))
+            .then(sendResponse, error => sendResponse({ error: String(error) }))
         );
         return true;
       }

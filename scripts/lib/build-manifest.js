@@ -59,7 +59,7 @@ const buildSafariManifest = manifest => ({
  */
 const buildChromeManifest = (manifest, { nodeEnv, preview }) => {
   /*
-   * The CLI's native host, and screenshots for it; dev builds only until it ships opt-in.
+   * The CLI's native host, screenshots and page inspector; dev builds only until it ships opt-in.
    * <all_urls> also lifts CORS on the background's fetches, which release builds keep.
    */
   if (nodeEnv === 'development') {
@@ -68,6 +68,10 @@ const buildChromeManifest = (manifest, { nodeEnv, preview }) => {
       ...readManifest('manifest-dev.json'),
       permissions: [...manifest.permissions, 'nativeMessaging'],
       host_permissions: [...manifest.host_permissions, '<all_urls>'],
+      web_accessible_resources: [
+        ...manifest.web_accessible_resources,
+        { resources: ['editor/inspector.js'], matches: ['<all_urls>'] },
+      ],
     };
   }
 
