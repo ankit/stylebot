@@ -8,18 +8,22 @@ import {
 
 // Three ways a page ends up with shadow roots: attached by an inline script,
 // upgraded from parsed markup once a late component definition runs, and
-// nested inside another root. Each root's own CSS colors its text red.
+// nested inside another root. Each root's own CSS colors its text red. The
+// padded host leaves room to point at the host itself before its content.
 const PAGE_HTML = `
   <!doctype html>
   <html>
     <body>
       <div id="plain"></div>
+      <div id="padded" style="padding: 40px"></div>
       <late-card></late-card>
       <script>
         const ownCss = '<style>p { color: rgb(255, 0, 0); }</style>';
 
         document.getElementById('plain').attachShadow({ mode: 'open' })
           .innerHTML = ownCss + '<p class="plain-text">Plain</p>';
+        document.getElementById('padded').attachShadow({ mode: 'open' })
+          .innerHTML = '<span class="padded-text">Padded</span>';
 
         setTimeout(() => {
           customElements.define('late-card', class extends HTMLElement {
@@ -128,4 +132,27 @@ test('an element inside a shadow root can be picked and styled in the editor', a
     'color',
     'rgb(255, 0, 0)'
   );
+});
+
+test('the inspector follows the pointer from a shadow host onto its content', async ({
+  context,
+  openPopup,
+}) => {
+  const page = await context.newPage();
+  await page.goto(server.baseUrl);
+
+  const editorRoot = await openEditor(page, openPopup);
+  await expect(editorRoot.locator('.stylebot-inspector')).toHaveClass(/active/);
+
+  const host = (await page.locator('#padded').boundingBox())!;
+  const text = (await page.locator('.padded-text').boundingBox())!;
+
+  await page.mouse.move(host.x + 10, host.y + 10);
+  await page.mouse.move(text.x + text.width / 2, text.y + text.height / 2);
+  await page.mouse.down();
+  await page.mouse.up();
+
+  await expect(
+    editorRoot.locator('.autocomplete-chips .part').first()
+  ).toHaveText(/\.padded-text$/);
 });

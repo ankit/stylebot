@@ -44,6 +44,10 @@ class Highlighter {
   getExistingSelector?: (el: HTMLElement) => string | null;
   getMountRoot?: () => HTMLElement | undefined;
   currentElement: HTMLElement | null;
+  /**
+   * The element last found under the pointer, which drilling leaves behind.
+   */
+  pointerElement: HTMLElement | null;
   drillStack: Array<HTMLElement>;
   /**
    * Element/value currently suppressed by suppressTitle, if any.
@@ -84,6 +88,7 @@ class Highlighter {
     this.getExistingSelector = getExistingSelector;
     this.getMountRoot = getMountRoot;
     this.currentElement = null;
+    this.pointerElement = null;
     this.drillStack = [];
     this.titleSuppressedElement = null;
     this.suppressedTitleValue = null;
@@ -108,6 +113,7 @@ class Highlighter {
     this.removeWindowListeners();
     this.drillStack = [];
     this.currentElement = null;
+    this.pointerElement = null;
     this.restoreSuppressedTitle();
     this.restoreCursor();
   };
@@ -219,6 +225,7 @@ class Highlighter {
     window.addEventListener('mouseup', this.onMouseEvent, true);
     window.addEventListener('pointerdown', this.onPointerDown, true);
     window.addEventListener('pointerover', this.onPointerOver, true);
+    window.addEventListener('pointermove', this.onPointerMove, true);
     window.addEventListener('pointerup', this.onPointerUp, true);
     window.addEventListener('keydown', this.onKeyDown, true);
   };
@@ -230,6 +237,7 @@ class Highlighter {
     window.removeEventListener('mouseup', this.onMouseEvent, true);
     window.removeEventListener('pointerdown', this.onPointerDown, true);
     window.removeEventListener('pointerover', this.onPointerOver, true);
+    window.removeEventListener('pointermove', this.onPointerMove, true);
     window.removeEventListener('pointerup', this.onPointerUp, true);
     window.removeEventListener('keydown', this.onKeyDown, true);
   };
@@ -335,7 +343,27 @@ class Highlighter {
     event.preventDefault();
     event.stopPropagation();
 
+    this.hoverElement(getComposedTarget(event));
+  };
+
+  /**
+   * Moving from a shadow host onto something in its shadow tree fires no
+   * pointerover outside that tree, so only the move shows the pointer arrived.
+   */
+  onPointerMove = (event: MouseEvent): void => {
+    if (this.isStylebotElement(event.target)) {
+      return;
+    }
+
     const el = getComposedTarget(event);
+
+    if (el !== this.pointerElement) {
+      this.hoverElement(el);
+    }
+  };
+
+  hoverElement = (el: HTMLElement): void => {
+    this.pointerElement = el;
 
     if (el !== this.currentElement) {
       this.drillStack = [];
