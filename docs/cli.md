@@ -1,6 +1,6 @@
 # Stylebot CLI
 
-A command line for driving Stylebot in a running browser: list tabs, read a page's outline, get and set styles, and take screenshots. It's meant for scripting and for coding agents such as Claude Code, which can restyle a page and check the result without the editor open.
+A command line for driving Stylebot in a running browser: list tabs, read and inspect pages, get and set styles, and take screenshots. It's meant for scripting and for coding agents such as Claude Code, which can restyle a page and check the result without the editor open.
 
 For now it only works with development builds of the extension on Chrome and Edge.
 
@@ -32,7 +32,7 @@ The extension connects to the host when it starts. The host runs only while the 
 
 ### Naming the target
 
-Commands that only read default to the active tab. Commands that change a style or take a screenshot (`css set`, `profile`, `screenshot`) need the site or tab named, because an agent runs its commands over several steps and the active tab can change in between.
+Commands that only read default to the active tab, or take `--tab` when their arguments are selectors. Commands that change a style or take a screenshot (`css set`, `profile`, `screenshot`) need the site or tab named, because an agent runs its commands over several steps and the active tab can change in between.
 
 - A **tab** is a tab id, from `tabs` or `open`.
 - A **target** is a tab id or a site, such as `news.ycombinator.com`.
@@ -52,6 +52,24 @@ yarn stylebot done
 - `outline` prints the page's visible elements as an indented outline.
 - `screenshot` saves a PNG of a tab. A hidden tab is shown for a moment to capture it, then the window switches back.
 - `done` closes the CLI's window.
+
+### Inspecting a page
+
+```bash
+yarn stylebot suggestions 54432929
+yarn stylebot css-variables 54432929
+yarn stylebot page-rules '.titleline > a' --tab 54432929
+yarn stylebot computed-styles body color font-size --tab 54432929
+yarn stylebot match-count '.titleline > a' '.subline' --tab 54432929
+```
+
+These read the page the way Chat does, so an agent can look at a page before styling it without another browser tool.
+
+- `suggestions` prints the three requests Chat's empty state would offer for the page: up to two that suit it, and a creative look.
+- `css-variables` prints the page's css variables, as the `:root` and `body` rules that set them, so a style can override them.
+- `page-rules` prints the page's own rules for the elements a selector matches (the first five). Cross-origin stylesheets can't be read, so they're only counted.
+- `computed-styles` prints computed values on the first element a selector matches: the properties named, or common layout, color and type ones.
+- `match-count` prints how many elements each selector matches, and `invalid` for one that doesn't parse.
 
 ### Styles
 

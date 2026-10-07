@@ -17,7 +17,14 @@ export const getPageBridge = (): PageBridge => {
 export { LocalPageBridge } from './LocalPageBridge';
 export { RemotePageBridge } from './remote-page-bridge/RemotePageBridge';
 export { emptyPageSnapshot } from './utils';
-export { getPageOutline } from './chat';
+export {
+  countMatches,
+  getPageOutline,
+  getPageRulesCss,
+  getPageSignals,
+  getPageVariablesCss,
+} from './chat';
+export { getComputedStyles } from './computed-styles';
 export type {
   PageBridge,
   PageBridgeEvents,

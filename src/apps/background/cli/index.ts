@@ -1,3 +1,4 @@
+import { inspectCommands } from './inspect';
 import { pageCommands } from './pages';
 import { profileCommands } from './profiles';
 import { styleCommands } from './styles';
@@ -7,6 +8,7 @@ const HOST_NAME = 'dev.stylebot.cli';
 
 const commands: CliCommands = {
   ...pageCommands,
+  ...inspectCommands,
   ...styleCommands,
   ...profileCommands,
 };

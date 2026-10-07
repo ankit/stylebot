@@ -69,7 +69,13 @@ export type ReadabilityStateChanged = {
 };
 
 // What the background can ask a page about itself.
-export type PageInspection = { kind: 'outline' };
+export type PageInspection =
+  | { kind: 'outline' }
+  | { kind: 'suggestionContext' }
+  | { kind: 'cssVariables' }
+  | { kind: 'pageRules'; selector: string }
+  | { kind: 'computedStyles'; selector: string; properties: Array<string> }
+  | { kind: 'matchCount'; selectors: Array<string> };
 
 export type InspectPage = {
   name: 'InspectPage';

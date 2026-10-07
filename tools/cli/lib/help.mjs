@@ -7,9 +7,10 @@ const subcommandTerm = command =>
     ? `${command.name()} <command>`
     : [
         command.name(),
-        ...command.registeredArguments.map(argument =>
-          argument.required ? `<${argument.name()}>` : `[${argument.name()}]`
-        ),
+        ...command.registeredArguments.map(argument => {
+          const name = `${argument.name()}${argument.variadic ? '...' : ''}`;
+          return argument.required ? `<${name}>` : `[${name}]`;
+        }),
       ].join(' ');
 
 const bold = text => `\x1b[1m${text}\x1b[22m`;

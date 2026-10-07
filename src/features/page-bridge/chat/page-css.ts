@@ -122,7 +122,7 @@ const section = (title: string, rules: Array<string>, budget: number) => {
  * The page's CSS variables, written as the rules that would override them
  * (`:root { … }`, `body { … }`), within their own budget.
  */
-const variablesSection = (): string => {
+export const getPageVariablesCss = (): string => {
   const lines: Array<string> = [];
   const variables = getCssVariables();
   let used = 0;
@@ -162,7 +162,7 @@ const variablesSection = (): string => {
  * stylesheets the page lets scripts read (inline and same-origin); the
  * rest are counted.
  */
-const pickedSection = (selector: string): string => {
+export const getPageRulesCss = (selector: string): string => {
   let elements: Array<Element> = [];
 
   try {
@@ -208,6 +208,6 @@ const pickedSection = (selector: string): string => {
  * first), and the page's own rules for the picked element, if any.
  */
 export const getPageCssContext = (selector = ''): string =>
-  [variablesSection(), selector ? pickedSection(selector) : '']
+  [getPageVariablesCss(), selector ? getPageRulesCss(selector) : '']
     .filter(Boolean)
     .join('\n\n');

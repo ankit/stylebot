@@ -1,10 +1,11 @@
 /**
  * Drives Stylebot in a running browser from the command line: lists tabs,
- * reads a page's outline, gets and sets styles, takes screenshots. Talks to
+ * reads and inspects pages, gets and sets styles, takes screenshots. Talks to
  * the extension through the native host (host.mjs) that `install` registers.
  */
 import { Command } from 'commander';
 
+import { addInspectCommands } from './commands/inspect.mjs';
 import { addPageCommands } from './commands/pages.mjs';
 import { addProfileCommands } from './commands/profiles.mjs';
 import { addStyleCommands } from './commands/styles.mjs';
@@ -27,7 +28,8 @@ addHelpSections(program, {
     "name      A profile's name or id",
     '',
     'Commands that change a style or take a screenshot need the tab or',
-    'site named. The rest default to the active tab.',
+    'site named. The rest default to the active tab; ones that take',
+    'selectors name a tab with --tab.',
   ],
   Examples: [
     '$ stylebot open news.ycombinator.com',
@@ -37,6 +39,7 @@ addHelpSections(program, {
 });
 
 addPageCommands(program);
+addInspectCommands(program);
 addStyleCommands(program);
 addProfileCommands(program);
 

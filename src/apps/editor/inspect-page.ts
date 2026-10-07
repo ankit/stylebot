@@ -1,4 +1,13 @@
-import { getPageOutline } from '@stylebot/page-bridge';
+import type { ChatSuggestionContext } from '@stylebot/chat';
+import {
+  countMatches,
+  getComputedStyles,
+  getPageOutline,
+  getPageRulesCss,
+  getPageSignals,
+  getPageVariablesCss,
+} from '@stylebot/page-bridge';
+import { isReaderable } from '@stylebot/readability';
 import type { PageInspection } from '@stylebot/types';
 
 /**
@@ -7,9 +16,28 @@ import type { PageInspection } from '@stylebot/types';
  */
 export const inspectPage = async (
   inspection: PageInspection
-): Promise<string> => {
+): Promise<
+  string | ChatSuggestionContext | Record<string, string> | Array<number | null>
+> => {
   switch (inspection.kind) {
     case 'outline':
       return getPageOutline();
+    case 'suggestionContext':
+      return { signals: getPageSignals(), article: isReaderable() };
+    case 'cssVariables':
+      return getPageVariablesCss();
+    case 'pageRules':
+      return getPageRulesCss(inspection.selector);
+    case 'computedStyles': {
+      const { styles, unwatch } = getComputedStyles(
+        inspection.selector,
+        inspection.properties
+      );
+      // Only the editor needs to hear when a hovered element is left.
+      unwatch?.();
+      return styles;
+    }
+    case 'matchCount':
+      return countMatches(inspection.selectors);
   }
 };
