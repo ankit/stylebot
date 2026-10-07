@@ -10,6 +10,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
+const { buildManifest } = require('./scripts/lib/build-manifest');
 const { parseLocaleConfig } = require('./scripts/lib/parse-locale-config');
 const { SRC_DIR, packageDirs } = require('./scripts/lib/src-packages');
 
@@ -251,72 +252,16 @@ const config = {
           from: 'assets/manifest/manifest.json',
           to: 'manifest.json',
 
-          transform: content => {
-            let jsonContent = JSON.parse(content);
-
-            if (process.env.BROWSER === 'firefox') {
-              const firefoxJsonContent = JSON.parse(
-                fs.readFileSync(
-                  `${__dirname}/src/assets/manifest/manifest-firefox.json`
-                )
-              );
-              jsonContent = { ...jsonContent, ...firefoxJsonContent };
-              // Firefox has no per-tab side panel and warns on the unknown permission.
-              jsonContent.permissions = jsonContent.permissions.filter(
-                permission => permission !== 'sidePanel'
-              );
-            } else if (process.env.BROWSER === 'safari') {
-              // Safari draws the toolbar icon at 19pt and blurs anything smaller.
-              jsonContent.action.default_icon = {
-                ...jsonContent.action.default_icon,
-                19: 'img/icon19.png',
-                38: 'img/icon38.png',
-              };
-
-              /*
-               * Safari has no identity API, so Drive sign-in runs in a tab: Google's
-               * loopback redirect is rerouted to an extension page, and tokens refresh by fetch.
-               */
-              jsonContent.permissions = [
-                ...jsonContent.permissions.filter(
-                  permission =>
-                    permission !== 'sidePanel' && permission !== 'identity'
-                ),
-                'declarativeNetRequestWithHostAccess',
-              ];
-              jsonContent.host_permissions = [
-                ...jsonContent.host_permissions,
-                'https://oauth2.googleapis.com/*',
-                'http://127.0.0.1/*',
-              ];
-              jsonContent.web_accessible_resources = [
-                ...jsonContent.web_accessible_resources,
-                {
-                  resources: ['google-sign-in/index.html'],
-                  matches: [
-                    'https://accounts.google.com/*',
-                    'http://127.0.0.1/*',
-                  ],
-                },
-              ];
-            } else if (
-              !process.env.BROWSER &&
-              (process.env.NODE_ENV === 'development' || isPreview)
-            ) {
-              /*
-               * Chrome Web Store public key, for the store id that Drive sign-in's OAuth redirect needs.
-               * Release builds leave it out: the store rejects an uploaded manifest with a `key`.
-               */
-              const devJsonContent = JSON.parse(
-                fs.readFileSync(
-                  `${__dirname}/src/assets/manifest/manifest-dev.json`
-                )
-              );
-              jsonContent = { ...jsonContent, ...devJsonContent };
-            }
-
-            return JSON.stringify(jsonContent, null, 2);
-          },
+          transform: content =>
+            JSON.stringify(
+              buildManifest(JSON.parse(content), {
+                browser: process.env.BROWSER,
+                nodeEnv: process.env.NODE_ENV,
+                preview: isPreview,
+              }),
+              null,
+              2
+            ),
         },
         // The Safari Xcode project reads its app and extension version from here.
         ...(process.env.BROWSER === 'safari'
