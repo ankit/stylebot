@@ -1,5 +1,6 @@
 import Overlay from './Overlay';
 import { getSelector, splitSelectorList } from '@stylebot/css';
+import { queryWithShadowRoots } from '@stylebot/stylesheets';
 
 // What the inspector takes from the keyboard: climb, descend and pick.
 export const INSPECT_KEYS = [
@@ -14,6 +15,26 @@ const WHOLE_PAGE_SELECTORS = ['*', 'body', 'html', ':root'];
 
 const isWholePageSelector = (selector: string): boolean =>
   splitSelectorList(selector).some(part => WHOLE_PAGE_SELECTORS.includes(part));
+
+/**
+ * The element the pointer is really over. Window listeners see an event from
+ * inside an open shadow tree retargeted to its host.
+ */
+const getComposedTarget = (event: Event): HTMLElement =>
+  (event.composedPath()[0] ?? event.target) as HTMLElement;
+
+/**
+ * The parent to climb to, stepping out of a shadow tree onto its host.
+ */
+const getParentElement = (el: HTMLElement): HTMLElement | null => {
+  if (el.parentElement) {
+    return el.parentElement;
+  }
+
+  const root = el.getRootNode();
+
+  return root instanceof ShadowRoot ? (root.host as HTMLElement) : null;
+};
 
 class Highlighter {
   overlay: Overlay | null;
@@ -169,10 +190,10 @@ class Highlighter {
   };
 
   // Elements that aren't rendered (display: none) have nothing to outline
-  // and don't count as matches.
+  // and don't count as matches. Styles reach open shadow roots, so do matches.
   queryMatches = (selector: string): Array<HTMLElement> => {
-    return Array.from(document.querySelectorAll<HTMLElement>(selector)).filter(
-      el => el.checkVisibility()
+    return queryWithShadowRoots<HTMLElement>(selector).filter(el =>
+      el.checkVisibility()
     );
   };
 
@@ -235,7 +256,7 @@ class Highlighter {
 
     // Left/Right mirror Up/Down as alternate keys for the same climb/descend.
     if (key === 'ArrowUp' || key === 'ArrowLeft') {
-      const parent = this.currentElement.parentElement;
+      const parent = getParentElement(this.currentElement);
 
       if (!parent || this.isStylebotElement(parent)) {
         return false;
@@ -279,7 +300,7 @@ class Highlighter {
     // one" — the hovered element, never the overlay itself.
     const el = this.isStylebotElement(event.target)
       ? this.currentElement
-      : this.currentElement ?? (event.target as HTMLElement);
+      : this.currentElement ?? getComposedTarget(event);
 
     if (el) {
       this.selectElement(el);
@@ -314,7 +335,7 @@ class Highlighter {
     event.preventDefault();
     event.stopPropagation();
 
-    const el = event.target as HTMLElement;
+    const el = getComposedTarget(event);
 
     if (el !== this.currentElement) {
       this.drillStack = [];
@@ -354,7 +375,8 @@ class Highlighter {
 
   // In the extension the panel's shadow root retargets events to the
   // #stylebot host itself; anywhere it renders inline, the host is an
-  // ancestor instead.
+  // ancestor instead. Checked on the retargeted event.target on purpose:
+  // closest() can't climb out of the panel's shadow tree.
   isStylebotPanel = (el: EventTarget | null): boolean => {
     return (el as HTMLElement | null)?.closest?.('#stylebot') != null;
   };

@@ -149,6 +149,22 @@ every transform untouched. Stylebot treats nested rules as opaque:
   depth; only descriptor at-rules such as `@font-face` and `@keyframes`, where
   `!important` is invalid, are left alone.
 
+## Shadow DOM
+
+A stylesheet on the page never applies inside a shadow tree, so on sites built
+from web components custom CSS would reach nothing. Stylebot hands the same
+prepared CSS to every open shadow root as well: the roots present when a style
+is injected, roots attached later, roots belonging to markup whose component is
+only defined after the page has parsed, and roots nested inside other roots.
+The copies stay in step with the original, so an edit or a toggle reaches them
+all at once. Closed shadow roots are invisible to an extension and can't be
+reached; Stylebot's own editor and reader are shadow roots too, and are left
+out so page CSS can't bleed into them.
+
+Because every root gets the same CSS, a selector for an element inside a shadow
+tree is written relative to that tree, and matches the same element in every
+instance of that component.
+
 ## Where `!important` comes from
 
 Styles are stored exactly as the user wrote them. The CSS that reaches the

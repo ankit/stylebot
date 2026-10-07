@@ -1,17 +1,19 @@
+import { queryWithShadowRoots } from '@stylebot/stylesheets';
+
 import { withoutStatePseudos } from './state-pseudos';
 
 /**
- * The page's elements the selector matches, leaving out Stylebot's own UI,
- * up to a limit, or null for a selector the page can't parse.
+ * The page's elements the selector matches, in open shadow roots too,
+ * leaving out Stylebot's own UI, up to a limit, or null for a selector the page can't parse.
  */
 export const queryPage = (
   selector: string,
   limit = Infinity
 ): Array<Element> | null => {
-  let all: NodeListOf<Element>;
+  let all: Array<Element>;
 
   try {
-    all = document.querySelectorAll(selector);
+    all = queryWithShadowRoots(selector);
   } catch {
     return null;
   }

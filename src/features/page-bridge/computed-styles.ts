@@ -1,3 +1,5 @@
+import { queryWithShadowRoots } from '@stylebot/stylesheets';
+
 /**
  * Calls back once the pointer leaves an element that's hovered now, so its
  * :hover rules can be read away. The editor's own ancestors stay hovered
@@ -33,7 +35,7 @@ export const getComputedStyles = (
 ): { styles: Record<string, string>; unwatch: (() => void) | null } => {
   if (!element) {
     try {
-      element = Array.from(document.querySelectorAll(selector)).find(
+      element = queryWithShadowRoots(selector).find(
         el => !el.closest('#stylebot')
       );
     } catch {

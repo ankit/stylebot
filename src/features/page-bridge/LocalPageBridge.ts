@@ -22,7 +22,12 @@ import type {
   ChatStyleProblem,
   CssDeclaration,
 } from '@stylebot/types';
-import { injectStylesheet, readCache, writeCache } from '@stylebot/stylesheets';
+import {
+  injectStylesheet,
+  queryWithShadowRoots,
+  readCache,
+  writeCache,
+} from '@stylebot/stylesheets';
 
 import type {
   PageBridge,
@@ -295,7 +300,7 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
       el => el?.isConnected && el.matches(selector)
     );
 
-    return known ?? document.querySelector<HTMLElement>(selector);
+    return known ?? queryWithShadowRoots<HTMLElement>(selector)[0] ?? null;
   }
 
   getAppliedDeclarations(selector: string): Promise<Array<AppliedDeclaration>> {
@@ -306,7 +311,7 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
         ? getAppliedDeclarations(
             el,
             this.getStylebotCss(),
-            Array.from(document.querySelectorAll(selector))
+            queryWithShadowRoots(selector)
           )
         : []
     );

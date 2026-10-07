@@ -1,5 +1,6 @@
 import { loadCachedFonts, watchBlockedFonts } from './blocked-fonts';
 import { fetchImportCss } from './import-cache';
+import { setShadowRootCSS } from './shadow-roots';
 
 const getStylesheetId = (id: string) => {
   return `stylebot-css-${id}`;
@@ -76,6 +77,19 @@ const setContent = (style: HTMLStyleElement, css: string): void => {
   }
 };
 
+/**
+ * Mirrors a style and its imports into open shadow roots, read back from the
+ * page's <style> elements that every bundle of this module writes.
+ */
+const syncShadowRoots = (id: string): void => {
+  const css = [getImportsStylesheetId(id), getStylesheetId(id)]
+    .map(stylesheetId => document.getElementById(stylesheetId)?.textContent)
+    .filter(Boolean)
+    .join('\n\n');
+
+  setShadowRootCSS(id, css);
+};
+
 const setStylesheetContent = (id: string, css: string): void => {
   const el = document.getElementById(getStylesheetId(id));
 
@@ -130,8 +144,11 @@ export const injectStylesheet = (
 
   if (importUrls.length === 0) {
     setImportsContent(id, '');
+    syncShadowRoots(id);
     return;
   }
+
+  syncShadowRoots(id);
 
   watchBlockedFonts();
 
@@ -140,6 +157,7 @@ export const injectStylesheet = (
       const merged = values.join('\n\n');
 
       setImportsContent(id, merged);
+      syncShadowRoots(id);
       loadCachedFonts(merged);
     }
   });
@@ -155,4 +173,6 @@ export const removeStylesheet = (id: string): void => {
       el.textContent = '';
     }
   });
+
+  setShadowRootCSS(id, '');
 };

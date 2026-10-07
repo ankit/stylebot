@@ -1,3 +1,4 @@
+import { queryWithShadowRoots } from '@stylebot/stylesheets';
 import { splitCommaList } from '@stylebot/utils';
 
 import { getSubjectCompound } from './get-subject-compound';
@@ -64,7 +65,7 @@ export const getNameBasedSelector = (el: HTMLElement): string | null => {
 
 const countMatches = (selector: string): number => {
   try {
-    return document.querySelectorAll(selector).length;
+    return queryWithShadowRoots(selector).length;
   } catch {
     return 0;
   }
@@ -400,7 +401,7 @@ const getMeaningfulTagSelector = (el: HTMLElement): string | null => {
 
 const matchesOf = (selector: string): Array<Element> => {
   try {
-    return Array.from(document.querySelectorAll(selector));
+    return queryWithShadowRoots(selector);
   } catch {
     return [];
   }
