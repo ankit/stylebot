@@ -1,5 +1,12 @@
 <template>
   <div class="sync-tab">
+    <sync-status-banner v-if="migrationsFailed" variant="error">
+      {{ t('some_of_your_saved_data_could_not_be_updated') }}
+      <s-link-button @click="reportIssue">
+        {{ t('report_an_issue') }}
+      </s-link-button>
+    </sync-status-banner>
+
     <sync-status-banner v-if="showRestoreSuccess">
       {{ t('restore_success') }}
     </sync-status-banner>
@@ -37,9 +44,14 @@
       <div class="buttons">
         <s-button @click="exportJson">{{ t('export') }}</s-button>
         <s-button @click="importJson">{{ t('import') }}</s-button>
-        <s-button v-if="stylesBeforeV4" @click="restoreStylesBeforeV4">
-          {{ t('restore_styles_from_before_4_0') }}
-        </s-button>
+        <template v-if="stylesBeforeV4">
+          <s-button @click="restoreStylesBeforeV4">
+            {{ t('restore_styles_from_before_4_0') }}
+          </s-button>
+          <s-text as="span" size="caption" variant="muted">
+            {{ t('backed_up_time', [backedUpTime]) }}
+          </s-text>
+        </template>
       </div>
     </div>
   </div>
@@ -48,7 +60,9 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { SHeading, SText, SButton } from '@stylebot/components';
+import { SHeading, SText, SButton, SLinkButton } from '@stylebot/components';
+import { formatSyncTime } from '@stylebot/sync';
+import { openReportIssuePage } from '@stylebot/utils';
 import TheGoogleDriveSync from './sync/TheGoogleDriveSync.vue';
 import SyncStatusBanner from './sync/SyncStatusBanner.vue';
 
@@ -56,9 +70,10 @@ import {
   importStylesWithFilePicker,
   exportAsJSONFile,
   getStylesBeforeV4,
+  getMigrationsFailed,
 } from '../utils';
+import type { StylesBeforeV4 } from '../utils';
 import type { SyncStatus } from '../store/index';
-import type { StyleMap } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'TheSyncTab',
@@ -67,6 +82,7 @@ export default Vue.extend({
     SHeading,
     SText,
     SButton,
+    SLinkButton,
     TheGoogleDriveSync,
     SyncStatusBanner,
   },
@@ -76,7 +92,8 @@ export default Vue.extend({
     showImportSuccessAlert: boolean;
     importError: string | DOMException | null;
     showRestoreSuccess: boolean;
-    stylesBeforeV4: StyleMap | null;
+    stylesBeforeV4: StylesBeforeV4 | null;
+    migrationsFailed: boolean;
   } {
     return {
       importError: null,
@@ -84,6 +101,7 @@ export default Vue.extend({
       showImportSuccessAlert: false,
       showRestoreSuccess: false,
       stylesBeforeV4: null,
+      migrationsFailed: false,
     };
   },
 
@@ -91,10 +109,17 @@ export default Vue.extend({
     syncStatus(): SyncStatus {
       return this.$store.state.syncStatus;
     },
+
+    backedUpTime(): string {
+      return formatSyncTime(this.stylesBeforeV4?.createdAt);
+    },
   },
 
   async created(): Promise<void> {
-    this.stylesBeforeV4 = await getStylesBeforeV4();
+    [this.stylesBeforeV4, this.migrationsFailed] = await Promise.all([
+      getStylesBeforeV4(),
+      getMigrationsFailed(),
+    ]);
   },
 
   methods: {
@@ -102,12 +127,16 @@ export default Vue.extend({
       exportAsJSONFile(this.$store.state.styles);
     },
 
+    reportIssue(): void {
+      openReportIssuePage();
+    },
+
     onRestored(): void {
       this.showRestoreSuccess = true;
     },
 
     restoreStylesBeforeV4(): void {
-      this.$store.dispatch('setAllStyles', this.stylesBeforeV4);
+      this.$store.dispatch('setAllStyles', this.stylesBeforeV4?.styles);
 
       this.showImportErrorAlert = false;
       this.showImportSuccessAlert = false;
@@ -148,6 +177,7 @@ export default Vue.extend({
 
 .buttons {
   display: flex;
+  align-items: center;
   gap: 8px;
   margin-top: 14px;
 }

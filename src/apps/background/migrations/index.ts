@@ -1,10 +1,10 @@
+import { MIGRATION_ERRORS_KEY } from '@stylebot/saved-styles';
+
 import BackupBeforeV4 from './backup-before-v4';
 import CommandsToBrowser from './commands-to-browser';
 import StylesMetadataUpdate from './styles-metadata-update';
 import StylesModifiedTimeUpdate from './styles-modified-time-update';
 import SyncStorageUpdate from './sync-storage-update';
-
-export const MIGRATION_ERRORS_KEY = 'migration_errors';
 
 export type Migration = {
   name: string;

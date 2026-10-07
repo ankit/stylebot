@@ -157,3 +157,28 @@ export const RestoringStylesFromBeforeV4: StoryObj = {
     },
   },
 };
+
+export const FailedMigrationsShowABanner: StoryObj = {
+  ...optionsPage('Sync', {}, async root => {
+    const canvas = within(root);
+
+    await waitFor(() =>
+      expect(
+        canvas.getByText(
+          "Some of your saved data couldn't be updated to this version."
+        )
+      ).toBeVisible()
+    );
+    await expect(
+      canvas.getByRole('button', { name: 'Report an issue' })
+    ).toBeVisible();
+  }),
+  name: 'a failed migration shows a banner with a way to report it',
+  parameters: {
+    chrome: {
+      storage: {
+        migration_errors: { 'styles-metadata-update': 'quota' },
+      },
+    },
+  },
+};

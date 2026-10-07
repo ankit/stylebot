@@ -27,3 +27,9 @@ export type BackupBeforeV4 = {
   createdAt: Timestamp;
   items: Record<string, unknown>;
 };
+
+/**
+ * The migrations that failed on the last background start, by name, with
+ * their error messages. Absent once every migration runs cleanly.
+ */
+export const MIGRATION_ERRORS_KEY = 'migration_errors';

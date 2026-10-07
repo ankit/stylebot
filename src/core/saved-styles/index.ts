@@ -12,6 +12,7 @@ export {
   COMPILED_STYLES_KEY,
   COMPILED_STYLES_VERSION,
   BACKUP_BEFORE_V4_KEY,
+  MIGRATION_ERRORS_KEY,
   isCompiledStylesCurrent,
 } from './storage';
 export type { BackupBeforeV4 } from './storage';

@@ -16,10 +16,12 @@ import type {
   ScanVersionHistoryResponse,
   RestoreVersion,
   RestoreVersionResponse,
+  Timestamp,
 } from '@stylebot/types';
 import { t } from '@stylebot/i18n';
 import {
   BACKUP_BEFORE_V4_KEY,
+  MIGRATION_ERRORS_KEY,
   isStyleMap,
   sanitizeStyleMap,
 } from '@stylebot/saved-styles';
@@ -138,19 +140,34 @@ export const restoreVersion = async (
   return Boolean(response?.ok);
 };
 
+export type StylesBeforeV4 = { styles: StyleMap; createdAt: Timestamp };
+
 /**
- * The styles stored before 4.0's migrations ran, or null when there are none
- * to restore: a fresh install, or a backup that is not a style map.
+ * The styles stored before 4.0's migrations ran and when they were backed up,
+ * or null when there are none to restore: a fresh install, or a backup that
+ * is not a style map.
  */
-export const getStylesBeforeV4 = async (): Promise<StyleMap | null> => {
+export const getStylesBeforeV4 = async (): Promise<StylesBeforeV4 | null> => {
   const { [BACKUP_BEFORE_V4_KEY]: backup } = await chrome.storage.local.get(
     BACKUP_BEFORE_V4_KEY
   );
-  const styles = (backup as BackupBeforeV4 | undefined)?.items?.styles;
+  const { createdAt, items } = (backup as BackupBeforeV4 | undefined) ?? {};
+  const styles = items?.styles;
 
-  return isStyleMap(styles) && Object.keys(styles).length > 0
-    ? sanitizeStyleMap(styles)
+  return createdAt && isStyleMap(styles) && Object.keys(styles).length > 0
+    ? { styles: sanitizeStyleMap(styles), createdAt }
     : null;
+};
+
+/**
+ * Whether a migration failed on the background's last start.
+ */
+export const getMigrationsFailed = async (): Promise<boolean> => {
+  const { [MIGRATION_ERRORS_KEY]: errors } = await chrome.storage.local.get(
+    MIGRATION_ERRORS_KEY
+  );
+
+  return Boolean(errors) && Object.keys(errors).length > 0;
 };
 
 export const importStylesWithFilePicker = (): Promise<StyleMap> => {
