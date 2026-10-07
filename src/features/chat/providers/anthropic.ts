@@ -21,7 +21,7 @@ import {
 } from '../apply-css-tool';
 import type { EditStream } from '../apply-css-tool';
 import { finishEdits, startEdits } from './edits';
-import { userMessageText } from '../prompt';
+import { userMessageText, withRecentImages } from '../prompt';
 
 export const anthropic: ChatProviderInfo = {
   id: 'anthropic',
@@ -62,14 +62,18 @@ export const anthropic: ChatProviderInfo = {
 const API = 'https://api.anthropic.com/v1';
 const MAX_TOKENS = 16000;
 
-type ContentBlock =
-  | { type: 'text'; text: string }
-  | {
-      type: 'image';
-      source: { type: 'base64'; media_type: string; data: string };
-    }
-  | { type: 'tool_use'; id: string; name: string; input: unknown }
-  | { type: 'tool_result'; tool_use_id: string; content: string };
+type CacheControl = { cache_control?: { type: 'ephemeral' } };
+
+type ContentBlock = CacheControl &
+  (
+    | { type: 'text'; text: string }
+    | {
+        type: 'image';
+        source: { type: 'base64'; media_type: string; data: string };
+      }
+    | { type: 'tool_use'; id: string; name: string; input: unknown }
+    | { type: 'tool_result'; tool_use_id: string; content: string }
+  );
 
 type Message = { role: 'user' | 'assistant'; content: Array<ContentBlock> };
 
@@ -98,7 +102,7 @@ export const toAnthropicMessages = (turns: Array<ChatTurn>): Array<Message> => {
     }
   };
 
-  turns.forEach(turn => {
+  withRecentImages(turns).forEach(turn => {
     if (turn.role === 'user') {
       messages.push({
         role: 'user',
@@ -164,17 +168,55 @@ export const toAnthropicMessages = (turns: Array<ChatTurn>): Array<Message> => {
   return messages;
 };
 
+const EPHEMERAL = { type: 'ephemeral' } as const;
+
+/**
+ * The thread followed by the page context. The thread is marked for the
+ * cache up to its end, so the next reply reads it back cheaply; the
+ * context after the mark changes every reply, and is left out of later ones.
+ */
+export const withPageContext = (
+  messages: Array<Message>,
+  context: string
+): Array<Message> => {
+  const last = messages[messages.length - 1];
+  const contextBlock: ContentBlock = { type: 'text', text: context };
+
+  if (!last) {
+    return [{ role: 'user', content: [contextBlock] }];
+  }
+
+  const earlier = messages.slice(0, -1);
+  const lastBlock = last.content[last.content.length - 1];
+  const markedContent = [
+    ...last.content.slice(0, -1),
+    { ...lastBlock, cache_control: EPHEMERAL },
+  ];
+
+  if (last.role === 'user') {
+    return [
+      ...earlier,
+      { role: 'user', content: [...markedContent, contextBlock] },
+    ];
+  }
+
+  const marked: Message = { role: 'assistant', content: markedContent };
+  const contextMessage: Message = { role: 'user', content: [contextBlock] };
+
+  return [...earlier, marked, contextMessage];
+};
+
 const requestBody = (
   model: ChatModel,
   system: string,
+  context: string,
   turns: Array<ChatTurn>
 ) => ({
   model: model.id,
   max_tokens: MAX_TOKENS,
   stream: true,
-  cache_control: { type: 'ephemeral' },
-  system,
-  messages: toAnthropicMessages(turns),
+  system: [{ type: 'text', text: system, cache_control: EPHEMERAL }],
+  messages: withPageContext(toAnthropicMessages(turns), context),
   tools: [
     {
       name: TOOL_NAME,
@@ -335,6 +377,7 @@ export const anthropicProvider: ChatProvider = {
     key,
     model,
     system,
+    context,
     turns,
     signal,
     onEvent,
@@ -344,7 +387,7 @@ export const anthropicProvider: ChatProvider = {
         method: 'POST',
         headers: headers(key),
         signal,
-        body: JSON.stringify(requestBody(model, system, turns)),
+        body: JSON.stringify(requestBody(model, system, context, turns)),
       });
 
       if (!response.body) {

@@ -1,12 +1,11 @@
 import type { ChatPageContext } from '../types';
 
-import { INSTRUCTIONS } from './instructions';
-
 /**
- * The system prompt for one reply: what Stylebot is and how to answer,
- * then the page as it stands, since each reply sees it anew.
+ * The page as it stands, sent after the thread's latest message rather
+ * than in the system prompt: it changes with every reply, and anything
+ * after a change can't be read from the provider's cache.
  */
-export const buildSystemPrompt = ({
+export const buildPageContext = ({
   url,
   title,
   outline,
@@ -25,7 +24,5 @@ export const buildSystemPrompt = ({
     ? `The user has picked the element matching \`${selector}\`; unless they say otherwise, the request is about it.`
     : '';
 
-  return [INSTRUCTIONS, page, pageStyles, stylesheet, picked]
-    .filter(Boolean)
-    .join('\n\n');
+  return [page, pageStyles, stylesheet, picked].filter(Boolean).join('\n\n');
 };

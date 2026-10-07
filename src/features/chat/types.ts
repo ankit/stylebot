@@ -1,7 +1,7 @@
 import type { ChatModel, ChatStreamEvent, ChatTurn } from '@stylebot/types';
 
 /**
- * What the system prompt tells the model about the page.
+ * What the model is told about the page with each reply.
  */
 export type ChatPageContext = {
   url: string;
@@ -30,6 +30,8 @@ export type ChatStreamArgs = {
   key: string;
   model: ChatModel;
   system: string;
+  // The page as it stands, see buildPageContext.
+  context: string;
   turns: Array<ChatTurn>;
   signal: AbortSignal;
   onEvent: (event: ChatStreamEvent) => void;

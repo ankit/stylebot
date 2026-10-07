@@ -211,9 +211,10 @@ const requestText = step =>
 
 /**
  * The thread as one prompt, since headless Claude Code takes a single
- * message: each turn as the extension would replay it, then the ask.
+ * message: each turn as the extension would replay it, the page as it
+ * stands for versions that send it after the thread, then the ask.
  */
-const transcriptFor = (ref, turns) => {
+const transcriptFor = (ref, turns, context) => {
   const { userMessageText, tool } = ref.node;
   const parts = turns.flatMap(turn => {
     if (turn.role === 'user') {
@@ -241,7 +242,7 @@ const transcriptFor = (ref, turns) => {
   });
 
   return [
-    tag('conversation', parts.join('\n')),
+    tag('conversation', [...parts, ...(context ? [context] : [])].join('\n')),
     'Continue as the assistant from the end of the conversation. Reply as JSON: "text" is what you say to the user, and "edits" are the edits of your apply_css call, or an empty list when you make no call.',
   ].join('\n\n');
 };
@@ -395,11 +396,15 @@ const runCase = async ({
         }),
         step.scope ?? ''
       );
-      const system = ref.node.buildSystemPrompt({
+      const pageFacts = {
         ...facts,
         css,
         ...(step.scope ? { selector: step.scope } : {}),
-      });
+      };
+      // Newer versions send the page after the thread instead of in the system prompt.
+      const system = ref.node.buildPageContext
+        ? ref.node.INSTRUCTIONS
+        : ref.node.buildSystemPrompt(pageFacts);
       const replyTurn = rounds.length
         ? {
             ...assistant,
@@ -409,7 +414,8 @@ const runCase = async ({
         : null;
       const prompt = transcriptFor(
         ref,
-        replyTurn ? [...turns, replyTurn] : turns
+        replyTurn ? [...turns, replyTurn] : turns,
+        ref.node.buildPageContext?.(pageFacts)
       );
 
       const reply = await askClaude({

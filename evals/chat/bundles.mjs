@@ -111,7 +111,8 @@ export const buildRef = async (root, outDir, nodeModules) => {
   fs.writeFileSync(
     nodeEntry,
     [
-      `export { buildSystemPrompt, userMessageText } from '${root}/src/features/chat/prompt';`,
+      // Older versions describe the page in buildSystemPrompt, newer ones in buildPageContext.
+      `export * from '${root}/src/features/chat/prompt';`,
       `export * as tool from '${root}/src/features/chat/apply-css-tool';`,
       `export { applyEdits } from '${root}/src/features/chat/edits';`,
       // Which model Chat calls by default, and how; older versions lack it.

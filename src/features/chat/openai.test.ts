@@ -63,6 +63,7 @@ describe('openAiProvider (Responses API)', () => {
       key: 'sk-test',
       model: getModel('openai', 'gpt-6-luna'),
       system: 'system prompt',
+      context: 'page context',
       turns: [{ role: 'user', id: 'u1', text: 'Dark please' }],
       signal: new AbortController().signal,
       onEvent: e => events.push(e),
@@ -96,6 +97,10 @@ describe('openAiProvider (Responses API)', () => {
       name: 'apply_css',
       strict: true,
     });
+    expect(body.input[body.input.length - 1]).toEqual({
+      role: 'user',
+      content: [{ type: 'input_text', text: 'page context' }],
+    });
   });
 
   it('reports a failed response with its message', async () => {
@@ -114,6 +119,7 @@ describe('openAiProvider (Responses API)', () => {
       key: 'sk-test',
       model: getModel('openai', 'gpt-6.1-sol'),
       system: '',
+      context: 'page context',
       turns: [],
       signal: new AbortController().signal,
       onEvent: e => events.push(e),

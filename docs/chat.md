@@ -12,7 +12,7 @@ sequenceDiagram
     participant M as Model API
     E->>P: read outline, CSS variables, picked element's rules
     P-->>E: page context
-    E->>B: system prompt + thread (over a port)
+    E->>B: instructions, thread, page context (over a port)
     B->>M: request with the key and model
     M-->>B: streamed text, then one apply_css call
     B-->>E: text, each edit as it completes, usage, done
@@ -34,7 +34,7 @@ sequenceDiagram
 
 ## What the model sees
 
-Each reply's system prompt has four parts, rebuilt every turn since the page may have changed:
+Each request has four parts. The instructions are the system prompt; the rest, the page context, is rebuilt for every call since the page may have changed:
 
 | Part         | What                                                         | Budget                     |
 | :----------- | :----------------------------------------------------------- | :------------------------- |
@@ -42,6 +42,10 @@ Each reply's system prompt has four parts, rebuilt every turn since the page may
 | Page outline | the visible elements, compactly                              | 400 lines / 16k characters |
 | Page CSS     | the page's CSS variables, and the picked element's own rules | 4k + 8k characters         |
 | Stylesheet   | the site's current Stylebot CSS                              | whole                      |
+
+**The page context goes after the thread, not in the system prompt.** Providers cache a request's unchanged start, and the page context changes with every reply, so anything after it was billed in full each time. With the context last and left out of earlier messages, the instructions and the thread stay the same from one call to the next, and later turns and fix calls read them from the cache at a tenth of the price. Claude needs explicit cache marks for this, one after the instructions and one at the end of the thread. OpenAI and Gemini cache on their own.
+
+**Only the most recent image is sent.** Older ones become a note that an image was attached, since each costs about as much as a page of text on every later call.
 
 ### The outline
 

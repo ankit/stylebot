@@ -24,7 +24,7 @@ import {
 } from '../apply-css-tool';
 import type { EditStream } from '../apply-css-tool';
 import { finishEdits, startEdits } from './edits';
-import { userMessageText } from '../prompt';
+import { userMessageText, withRecentImages } from '../prompt';
 
 export const gemini: ChatProviderInfo = {
   id: 'gemini',
@@ -157,7 +157,7 @@ const roundSteps = (
  * reply made becomes a function call followed by its result.
  */
 export const toInteractionSteps = (turns: Array<ChatTurn>): Array<InputStep> =>
-  turns.flatMap((turn): Array<InputStep> => {
+  withRecentImages(turns).flatMap((turn): Array<InputStep> => {
     if (turn.role === 'user') {
       return [
         {
@@ -188,13 +188,18 @@ export const toInteractionSteps = (turns: Array<ChatTurn>): Array<InputStep> =>
 const requestBody = (
   model: ChatModel,
   system: string,
+  context: string,
   turns: Array<ChatTurn>
 ) => ({
   model: model.id,
   stream: true,
   store: false,
   system_instruction: system,
-  input: toInteractionSteps(turns),
+  // The page context goes last, so the thread before it is a cacheable prefix.
+  input: [
+    ...toInteractionSteps(turns),
+    { type: 'user_input', content: [{ type: 'text', text: context }] },
+  ],
   tools: [
     {
       type: 'function',
@@ -429,6 +434,7 @@ export const geminiProvider: ChatProvider = {
     key,
     model,
     system,
+    context,
     turns,
     signal,
     onEvent,
@@ -440,7 +446,7 @@ export const geminiProvider: ChatProvider = {
           method: 'POST',
           headers: headers(key),
           signal,
-          body: JSON.stringify(requestBody(model, system, turns)),
+          body: JSON.stringify(requestBody(model, system, context, turns)),
         },
         classifyError
       );

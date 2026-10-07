@@ -239,11 +239,13 @@ export type ChatStatus = {
 };
 
 /**
- * Sent over the chat port to start a reply. The system prompt is built in
+ * Sent over the chat port to start a reply. The page context is built in
  * the editor, which has the page at hand.
  */
 export type ChatStreamRequest = {
   type: 'send';
   system: string;
+  // The page as it stands, sent after the thread.
+  context: string;
   turns: Array<ChatTurn>;
 };

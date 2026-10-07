@@ -25,26 +25,28 @@ const edit = {
 };
 
 describe('getStreamRequest', () => {
-  it('describes the page in the system prompt', () => {
-    const { system } = getStreamRequest(page, []);
+  it('describes the page after the thread, not in the system prompt', () => {
+    const { system, context } = getStreamRequest(page, []);
 
-    expect(system).toContain(
+    expect(system).not.toContain('<page url');
+
+    expect(context).toContain(
       `<page url="https://example.com/post" title="A 'quoted' post">`
     );
-    expect(system).toContain(':root { --fg: #111 }');
-    expect(system).toContain('a { color: red; }');
+    expect(context).toContain(':root { --fg: #111 }');
+    expect(context).toContain('a { color: red; }');
   });
 
   it('names the picked element', () => {
-    const { system } = getStreamRequest({ ...page, selector: 'h1.title' }, []);
+    const { context } = getStreamRequest({ ...page, selector: 'h1.title' }, []);
 
-    expect(system).toContain('`h1.title`');
+    expect(context).toContain('`h1.title`');
   });
 
   it('falls back to the site when the page has no address', () => {
-    const { system } = getStreamRequest({ ...page, href: '' }, []);
+    const { context } = getStreamRequest({ ...page, href: '' }, []);
 
-    expect(system).toContain('<page url="example.com"');
+    expect(context).toContain('<page url="example.com"');
   });
 
   it('sends plain copies of the turns', () => {

@@ -4,7 +4,11 @@ import type {
   ChatTurn,
 } from '@stylebot/types';
 
-import { anthropicProvider, toAnthropicMessages } from './providers/anthropic';
+import {
+  anthropicProvider,
+  toAnthropicMessages,
+  withPageContext,
+} from './providers/anthropic';
 import { getModel } from './providers';
 import { sse, streamResponse } from './stream.fixtures';
 
@@ -23,6 +27,7 @@ const run = async (response: Response, turns: Array<ChatTurn> = []) => {
     key: 'sk-ant-test',
     model: getModel('anthropic', 'claude-sonnet-5-5'),
     system: 'system prompt',
+    context: 'page context',
     turns,
     signal: new AbortController().signal,
     onEvent: event => events.push(event),
@@ -125,7 +130,13 @@ describe('anthropicProvider.stream', () => {
     );
     expect(body.model).toBe('claude-sonnet-5-5');
     expect(body.stream).toBe(true);
-    expect(body.system).toBe('system prompt');
+    expect(body.system).toEqual([
+      {
+        type: 'text',
+        text: 'system prompt',
+        cache_control: { type: 'ephemeral' },
+      },
+    ]);
     expect(body.tools[0].name).toBe('apply_css');
     expect(body.tools[0].eager_input_streaming).toBe(true);
     expect(body.output_config).toEqual({ effort: 'low' });
@@ -158,6 +169,7 @@ describe('anthropicProvider.stream', () => {
       key: 'sk-ant-test',
       model: getModel('anthropic', 'claude-sonnet-5-5'),
       system: '',
+      context: 'page context',
       turns: [],
       signal: new AbortController().signal,
       onEvent: event => events.push(event),
@@ -224,6 +236,7 @@ describe('anthropicProvider.stream', () => {
       key: 'sk-ant-test',
       model: getModel('anthropic', 'claude-sonnet-5-5'),
       system: '',
+      context: 'page context',
       turns: [],
       signal: new AbortController().signal,
       onEvent: event => {
@@ -489,6 +502,57 @@ describe('toAnthropicMessages with an image', () => {
         source: { type: 'base64', media_type: 'image/png', data: 'AAAA' },
       },
       { type: 'text', text: 'Match this' },
+    ]);
+  });
+});
+
+describe('withPageContext', () => {
+  const cached = { cache_control: { type: 'ephemeral' } };
+
+  it('marks the thread for the cache and adds the page after the mark', () => {
+    const messages = withPageContext(
+      toAnthropicMessages([{ role: 'user', id: 'u1', text: 'Dark mode' }]),
+      '<page>'
+    );
+
+    expect(messages).toEqual([
+      {
+        role: 'user',
+        content: [
+          { type: 'text', text: 'Dark mode', ...cached },
+          { type: 'text', text: '<page>' },
+        ],
+      },
+    ]);
+  });
+
+  it('leaves the page out of earlier messages, so they stay cached', () => {
+    const first = withPageContext(
+      toAnthropicMessages([{ role: 'user', id: 'u1', text: 'Dark mode' }]),
+      '<page v1>'
+    );
+    const second = withPageContext(
+      toAnthropicMessages([
+        { role: 'user', id: 'u1', text: 'Dark mode' },
+        {
+          role: 'assistant',
+          id: 'a1',
+          text: 'Done.',
+          edits,
+          previous: [],
+          applied: true,
+          model: 'claude-sonnet-5-5',
+        },
+        { role: 'user', id: 'u2', text: 'Bigger titles' },
+      ]),
+      '<page v2>'
+    );
+
+    expect(second[0].content[0]).toEqual({ type: 'text', text: 'Dark mode' });
+    expect(first[0].content[0]).toMatchObject({ text: 'Dark mode' });
+    expect(JSON.stringify(second.slice(0, -1))).not.toContain('<page');
+    expect(second[2].content.slice(-1)).toEqual([
+      { type: 'text', text: '<page v2>' },
     ]);
   });
 });

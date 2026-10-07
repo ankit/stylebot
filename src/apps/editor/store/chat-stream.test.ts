@@ -22,7 +22,12 @@ const fakePort = () => {
   };
 };
 
-const request: ChatStreamRequest = { type: 'send', system: 'sys', turns: [] };
+const request: ChatStreamRequest = {
+  type: 'send',
+  system: 'sys',
+  context: 'page',
+  turns: [],
+};
 
 const edit = {
   selector: 'a',

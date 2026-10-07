@@ -109,6 +109,7 @@ describe('geminiProvider (Interactions API)', () => {
       key: 'AQ.good',
       model: getModel('gemini', 'gemini-3.8-flash'),
       system: 'sys',
+      context: 'page context',
       turns: [{ role: 'user', id: 'u1', text: 'Red title' }],
       signal: new AbortController().signal,
       onEvent: e => events.push(e),
@@ -156,6 +157,10 @@ describe('geminiProvider (Interactions API)', () => {
       generation_config: { thinking_level: 'low' },
     });
     expect(JSON.stringify(body.tools)).not.toContain('additionalProperties');
+    expect(body.input[body.input.length - 1]).toEqual({
+      type: 'user_input',
+      content: [{ type: 'text', text: 'page context' }],
+    });
   });
 
   it('takes arguments that arrive whole on the start step', async () => {
@@ -184,6 +189,7 @@ describe('geminiProvider (Interactions API)', () => {
       key: 'AQ.good',
       model: getModel('gemini', 'gemini-3.8-flash'),
       system: '',
+      context: 'page context',
       turns: [],
       signal: new AbortController().signal,
       onEvent: e => events.push(e),
@@ -280,6 +286,7 @@ describe('thought steps', () => {
       key: 'AQ.good',
       model: getModel('gemini', 'gemini-3.8-flash'),
       system: '',
+      context: 'page context',
       turns: [],
       signal: new AbortController().signal,
       onEvent: e => events.push(e),

@@ -21,7 +21,7 @@ import {
 } from '../apply-css-tool';
 import type { EditStream } from '../apply-css-tool';
 import { finishEdits, startEdits } from './edits';
-import { userMessageText } from '../prompt';
+import { userMessageText, withRecentImages } from '../prompt';
 
 export const openai: ChatProviderInfo = {
   id: 'openai',
@@ -84,7 +84,7 @@ const headers = (key: string): Record<string, string> => ({
  * reply made becomes a function call followed by its output.
  */
 export const toResponsesInput = (turns: Array<ChatTurn>): Array<InputItem> =>
-  turns.flatMap((turn): Array<InputItem> => {
+  withRecentImages(turns).flatMap((turn): Array<InputItem> => {
     if (turn.role === 'user') {
       return [
         {
@@ -134,6 +134,7 @@ export const toResponsesInput = (turns: Array<ChatTurn>): Array<InputItem> =>
 const requestBody = (
   model: ChatModel,
   system: string,
+  context: string,
   turns: Array<ChatTurn>
 ) => ({
   model: model.id,
@@ -141,7 +142,11 @@ const requestBody = (
   store: false,
   max_output_tokens: MAX_OUTPUT_TOKENS,
   instructions: system,
-  input: toResponsesInput(turns),
+  // The page context goes last, so the thread before it is a cacheable prefix.
+  input: [
+    ...toResponsesInput(turns),
+    { role: 'user', content: [{ type: 'input_text', text: context }] },
+  ],
   tools: [
     {
       type: 'function',
@@ -284,6 +289,7 @@ export const openAiProvider: ChatProvider = {
     key,
     model,
     system,
+    context,
     turns,
     signal,
     onEvent,
@@ -293,7 +299,7 @@ export const openAiProvider: ChatProvider = {
         method: 'POST',
         headers: headers(key),
         signal,
-        body: JSON.stringify(requestBody(model, system, turns)),
+        body: JSON.stringify(requestBody(model, system, context, turns)),
       });
 
       if (!response.body) {

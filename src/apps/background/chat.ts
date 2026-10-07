@@ -209,6 +209,7 @@ const streamReply = async (
     key: active.storedKey,
     model: active.model,
     system: request.system,
+    context: request.context,
     turns: request.turns,
     signal,
     onEvent: post,

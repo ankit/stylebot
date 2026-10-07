@@ -1,4 +1,4 @@
-import { buildSystemPrompt } from '@stylebot/chat';
+import { CHAT_INSTRUCTIONS, buildPageContext } from '@stylebot/chat';
 import type {
   ChatAssistantTurn,
   ChatCssPreviousValue,
@@ -45,15 +45,16 @@ export const getPlainTurns = (turns: Array<ChatTurn>): Array<ChatTurn> =>
   JSON.parse(JSON.stringify(turns));
 
 /**
- * The request for the next reply: the thread so far, and a system prompt
- * describing the page as it stands.
+ * The request for the next reply: the thread so far, and the page as it
+ * stands.
  */
 export const getStreamRequest = (
   { url, href, title, css, outline, pageCss, selector }: ChatRequestPage,
   turns: Array<ChatTurn>
 ): ChatStreamRequest => ({
   type: 'send',
-  system: buildSystemPrompt({
+  system: CHAT_INSTRUCTIONS,
+  context: buildPageContext({
     url: href || url,
     title,
     outline,
