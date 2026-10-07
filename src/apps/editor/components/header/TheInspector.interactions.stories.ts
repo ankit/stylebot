@@ -63,6 +63,25 @@ export const ButtonAndShortcutToggle: StoryObj = {
   },
 };
 
+export const SwitchingModeStops: StoryObj = {
+  ...editor({ inspecting: true }),
+  name: 'switching to Chat stops inspecting, and picking again in Chat keeps it on',
+  play: async ({ canvasElement }) => {
+    const store = storeOf(canvasElement);
+    const button = inspector(canvasElement);
+
+    await store.dispatch('setMode', 'chat');
+    await expect(store.state.inspecting).toBe(false);
+    await waitFor(() => expect(button).not.toHaveClass('active'));
+
+    await user.click(button);
+    await expect(store.state.inspecting).toBe(true);
+
+    await store.dispatch('setMode', 'basic');
+    await expect(store.state.inspecting).toBe(true);
+  },
+};
+
 export const PickSetsSelector: StoryObj = {
   ...editor({ inspecting: true }),
   name: 'picking an element sets the selector and leaves inspecting',
