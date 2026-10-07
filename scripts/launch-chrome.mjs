@@ -34,12 +34,15 @@ const channel = process.env.STYLEBOT_BROWSER === 'edge' ? 'msedge' : 'chrome';
 // the default one.
 const locale = process.env.STYLEBOT_LOCALE;
 const lang = locale?.replace('_', '-');
-const userDataDir = path.join(
-  rootDir,
-  `${channel === 'msedge' ? '.edge-dev-profile' : '.chrome-dev-profile'}${
-    locale ? `-${locale}` : ''
-  }`
-);
+// Set for a browser beside the usual one, such as one tests drive.
+const userDataDir = process.env.STYLEBOT_PROFILE_DIR
+  ? path.resolve(process.env.STYLEBOT_PROFILE_DIR)
+  : path.join(
+      rootDir,
+      `${channel === 'msedge' ? '.edge-dev-profile' : '.chrome-dev-profile'}${
+        locale ? `-${locale}` : ''
+      }`
+    );
 
 // Set by `yarn dev:chrome`: wait for a build that finishes after this script
 // starts, rather than trusting a marker left over from a previous run.

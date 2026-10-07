@@ -5,6 +5,7 @@
 - [Development](development.md) — setup, dev builds, lint, tests
 - [Releases](releases.md) — cutting a release
 - [Translation](translation.md) — adding or improving a locale
+- [CLI](cli.md) — driving a dev build from the command line or a coding agent
 
 ## Testing
 

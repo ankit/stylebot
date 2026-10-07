@@ -68,6 +68,14 @@ export type ReadabilityStateChanged = {
   value: boolean;
 };
 
+// What the background can ask a page about itself.
+export type PageInspection = { kind: 'outline' };
+
+export type InspectPage = {
+  name: 'InspectPage';
+  inspection: PageInspection;
+};
+
 type TabMessage =
   | ToggleStylebot
   | RunCommand
@@ -81,6 +89,7 @@ type TabMessage =
   | GetIsPageReaderable
   | GetIsReadabilityActive
   | UpdateReader
-  | ReadabilityStateChanged;
+  | ReadabilityStateChanged
+  | InspectPage;
 
 export default TabMessage;

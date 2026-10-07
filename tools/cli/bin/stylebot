@@ -1,0 +1,3 @@
+#!/bin/sh
+# realpath, so a symlinked copy (npm link, a PATH entry) still finds lib/.
+exec node "$(dirname "$(realpath "$0")")/../lib/cli.mjs" "$@"

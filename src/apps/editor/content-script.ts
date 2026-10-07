@@ -10,6 +10,7 @@ import type { TabMessage } from '@stylebot/types';
 
 import { REMOTE_PAGE_BRIDGE_PORT } from '@stylebot/page-bridge';
 
+import { inspectPage } from './inspect-page';
 import type { EditorApp } from './load-editor';
 import { isEditorLoading, loadEditor } from './load-editor';
 import { getIsEditorWindowOpen, getStylesForPage } from './utils/chrome';
@@ -100,9 +101,22 @@ const handlePageMessage = (
  */
 const listen = (): void => {
   chrome.runtime.onMessage.addListener(
-    (message: TabMessage, _, sendResponse: (response: boolean) => void) => {
+    (message: TabMessage, _, sendResponse: (response: unknown) => void) => {
       if (window !== window.top) {
         return;
+      }
+
+      // Only dev builds ask, and the check keeps the page readers out of release bundles.
+      if (
+        process.env.NODE_ENV === 'development' &&
+        message.name === 'InspectPage'
+      ) {
+        whenDomReady(() =>
+          inspectPage(message.inspection).then(sendResponse, error =>
+            sendResponse({ error: String(error) })
+          )
+        );
+        return true;
       }
 
       // A global shortcut, which the browser catches wherever focus is.

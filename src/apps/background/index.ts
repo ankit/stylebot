@@ -1,3 +1,4 @@
+import { initCliBridge } from './cli';
 import { ContextMenu } from './contextmenu';
 import { initListeners } from './listeners';
 import { runMigrations } from './migrations';
@@ -16,3 +17,7 @@ chrome.action.setBadgeBackgroundColor({
 });
 
 ContextMenu.init();
+
+if (process.env.NODE_ENV === 'development') {
+  initCliBridge();
+}

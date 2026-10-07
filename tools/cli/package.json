@@ -1,0 +1,16 @@
+{
+  "name": "stylebot-cli",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Drive the Stylebot browser extension from the command line",
+  "type": "module",
+  "bin": {
+    "stylebot": "bin/stylebot"
+  },
+  "dependencies": {
+    "commander": "^14.0.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
