@@ -121,6 +121,40 @@ describe('a reply streaming its edits', () => {
     expect(store.state.css).toBe('');
   });
 
+  it('marks the reply undone and applied again as the editor undoes and redoes it', async () => {
+    handlers.onEdit(dark);
+    handlers.onDone({});
+    await flush();
+    await flush();
+
+    await store.dispatch('undo');
+    expect(store.state.css).toBe('');
+    expect(lastTurn()).toMatchObject({ applied: false });
+
+    await store.dispatch('redo');
+    expect(store.state.css).toContain('#111');
+    expect(lastTurn()).toMatchObject({ applied: true });
+  });
+
+  it('keeps each card click its own step, so undo follows them back one at a time', async () => {
+    handlers.onEdit(dark);
+    handlers.onDone({});
+    await flush();
+    await flush();
+
+    await store.dispatch('chat/toggleTurn', lastTurn().id);
+    await store.dispatch('chat/toggleTurn', lastTurn().id);
+    expect(store.state.undoStack.past).toHaveLength(3);
+
+    await store.dispatch('undo');
+    expect(store.state.css).toBe('');
+    expect(lastTurn()).toMatchObject({ applied: false });
+
+    await store.dispatch('undo');
+    expect(store.state.css).toContain('#111');
+    expect(lastTurn()).toMatchObject({ applied: true });
+  });
+
   it('applies every edit before finishing, even when done arrives first', async () => {
     handlers.onEdit(dark);
     handlers.onEdit(links);

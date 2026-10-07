@@ -177,6 +177,21 @@ describe('actions', () => {
       });
     });
 
+    it('flips the chat reply whose change it steps over', () => {
+      const state = {
+        ...mockState,
+        css: 'current',
+        undoStack: {
+          past: [{ css: 'older', source: 'chat:r1', at: 1 }],
+          future: [],
+        },
+      };
+
+      actions.undo({ state, commit: mockCommit, dispatch: mockDispatch });
+
+      expect(mockDispatch).toBeCalledWith('chat/flipTurn', 'r1');
+    });
+
     it('does nothing with an empty stack', () => {
       actions.undo({
         state: mockState,
@@ -210,6 +225,21 @@ describe('actions', () => {
         css: 'newer',
         record: false,
       });
+    });
+
+    it('flips the chat reply whose change it steps over', () => {
+      const state = {
+        ...mockState,
+        css: 'current',
+        undoStack: {
+          past: [],
+          future: [{ css: 'newer', source: 'chat:r1', at: 0 }],
+        },
+      };
+
+      actions.redo({ state, commit: mockCommit, dispatch: mockDispatch });
+
+      expect(mockDispatch).toBeCalledWith('chat/flipTurn', 'r1');
     });
 
     it('does nothing with nothing undone', () => {

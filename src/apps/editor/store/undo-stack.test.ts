@@ -1,5 +1,7 @@
 import {
   COALESCE_WINDOW_MS,
+  getChatSourceId,
+  getChatTurnId,
   UNDO_LIMIT,
   discardChange,
   emptyUndoStack,
@@ -42,7 +44,7 @@ describe('undo stack', () => {
 
     it('extends the latest step for a grouped change from the same source, however late', () => {
       const first = recordChange(emptyUndoStack(), 'a', 'chat:r1', 1000);
-      const second = recordChange(first, 'b', 'chat:r1', 60000, true);
+      const second = recordChange(first, 'b', 'chat:r1', 60000, 'always');
 
       expect(second.past).toEqual([{ css: 'a', source: 'chat:r1', at: 60000 }]);
     });
@@ -59,6 +61,13 @@ describe('undo stack', () => {
       expect(second.past).toEqual([
         { css: 'a', source: 'slider', at: 1000 + COALESCE_WINDOW_MS - 1 },
       ]);
+    });
+
+    it('keeps a change that must never merge as its own step, however quick', () => {
+      const first = recordChange(emptyUndoStack(), 'a', 'chat:r1', 1000);
+      const second = recordChange(first, 'b', 'chat:r1', 1001, 'never');
+
+      expect(second.past).toHaveLength(2);
     });
 
     it('measures the window from the latest change, so a long drag stays one step', () => {
@@ -126,6 +135,7 @@ describe('undo stack', () => {
           future: [{ css: 'b', source: 'edit', at: 0 }],
         },
         css: 'a',
+        source: 'edit',
       });
     });
   });
@@ -147,6 +157,7 @@ describe('undo stack', () => {
           future: [],
         },
         css: 'b',
+        source: 'edit',
       });
     });
 
@@ -159,6 +170,13 @@ describe('undo stack', () => {
       const next = recordChange(redone!.undoStack, 'b', 'edit', Date.now());
 
       expect(next.past.map(entry => entry.css)).toEqual(['a', 'b']);
+    });
+  });
+
+  describe('getChatTurnId', () => {
+    it('reads the reply back from its source, and nothing from any other', () => {
+      expect(getChatTurnId(getChatSourceId('r1'))).toBe('r1');
+      expect(getChatTurnId('slider')).toBeNull();
     });
   });
 

@@ -38,6 +38,7 @@ import { streamReply } from './chat-stream';
 import type { ChatStreamHandlers } from './chat-stream';
 import { applyChatCss, createLiveEdits } from './chat-live-edits';
 import type { LiveEdits } from './chat-live-edits';
+import { getChatSourceId } from './undo-stack';
 
 /**
  * Where a reply is: reading the page before the model answers, writing
@@ -630,11 +631,17 @@ export const createChatModule = (): Module<ChatState, State> => {
           return;
         }
 
+        // Each click is its own step, which undo flips the card back over.
+        const options = {
+          source: getChatSourceId(id),
+          merge: 'never' as const,
+        };
+
         if (turn.applied) {
           const css = revertReply(rootState.css, turn.previous);
 
           commit('updateTurn', { id, patch: { applied: false } });
-          await applyChatCss(context, css, [], { source: `chat:${id}` });
+          await applyChatCss(context, css, [], options);
         } else {
           const result = applyEdits(rootState.css, turn.edits);
 
@@ -642,11 +649,27 @@ export const createChatModule = (): Module<ChatState, State> => {
             id,
             patch: { applied: true, previous: result.previous },
           });
-          await applyChatCss(context, result.css, turn.edits, {
-            source: `chat:${id}`,
-          });
+          await applyChatCss(context, result.css, turn.edits, options);
         }
 
+        save(context);
+      },
+
+      /**
+       * Marks a reply undone, or applied again, after the editor's own undo
+       * or redo stepped over its change.
+       */
+      flipTurn(context: Context, id: string): void {
+        const turn = context.state.turns.find(
+          (item): item is ChatAssistantTurn =>
+            item.id === id && item.role === 'assistant'
+        );
+
+        if (!turn) {
+          return;
+        }
+
+        context.commit('updateTurn', { id, patch: { applied: !turn.applied } });
         save(context);
       },
 

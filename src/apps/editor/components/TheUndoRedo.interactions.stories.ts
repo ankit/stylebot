@@ -154,3 +154,21 @@ export const UndoRedoButtons: StoryObj = {
     });
   },
 };
+
+export const UndoRedoButtonsInCodeMode: StoryObj = {
+  ...editor({ ...WITH_RULE, options: { mode: 'code' } }),
+  name: 'undo and redo buttons stay in the header outside Basic mode',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const before = store.state.css;
+
+    typeInCodeEditor('');
+    await waitFor(() => expect(store.state.css).toBe(''));
+
+    await user.click(await canvas.findByRole('button', { name: 'Undo' }));
+
+    await expect(store.state.css).toBe(before);
+    await expect(canvas.getByRole('button', { name: 'Redo' })).toBeEnabled();
+  },
+};

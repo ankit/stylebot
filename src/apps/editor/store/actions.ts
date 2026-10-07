@@ -63,7 +63,9 @@ import {
   recordChange,
   undoChange,
   redoChange,
+  getChatTurnId,
 } from './undo-stack';
+import type { UndoMerge, UndoMove } from './undo-stack';
 
 export type ApplyCssArgs = {
   css: string;
@@ -73,14 +75,36 @@ export type ApplyCssArgs = {
   // False for housekeeping (empty-rule shuffling, import cleanup) and for
   // undo/redo itself, which must not become steps of their own.
   record?: boolean;
-  // Extends the latest step from the same source however long ago it was.
-  group?: boolean;
+  // Whether the change can join the latest step from the same source.
+  merge?: UndoMerge;
   // False to apply to the page without saving yet, as a chat reply does
   // while its edits stream in; it saves once at the end.
   save?: boolean;
 };
 
 const RECENT_FONTS_LIMIT = 10;
+
+/**
+ * Applies an undo or redo move, flipping the chat reply it stepped over so
+ * the reply's card reads undone or applied to match.
+ */
+const stepHistory = (
+  { commit, dispatch }: { commit: Commit; dispatch: Dispatch },
+  move: UndoMove | null
+): void => {
+  if (!move) {
+    return;
+  }
+
+  commit('setUndoStack', move.undoStack);
+  dispatch('applyCss', { css: move.css, record: false });
+
+  const turnId = getChatTurnId(move.source);
+
+  if (turnId) {
+    dispatch('chat/flipTurn', turnId);
+  }
+};
 
 // Bumped per apply/preview so that, after its awaits, a call superseded by a
 // newer one does nothing: the latest one owns the stylesheet.
@@ -355,7 +379,7 @@ export default {
       css,
       source = 'edit',
       record = true,
-      group = false,
+      merge = 'recent',
       save = true,
     }: ApplyCssArgs
   ): void {
@@ -387,7 +411,7 @@ export default {
       if (record && css !== state.css) {
         commit(
           'setUndoStack',
-          recordChange(state.undoStack, state.css, source, Date.now(), group)
+          recordChange(state.undoStack, state.css, source, Date.now(), merge)
         );
       }
 
@@ -589,14 +613,7 @@ export default {
     commit: Commit;
     dispatch: Dispatch;
   }): void {
-    const move = undoChange(state.undoStack, state.css);
-
-    if (!move) {
-      return;
-    }
-
-    commit('setUndoStack', move.undoStack);
-    dispatch('applyCss', { css: move.css, record: false });
+    stepHistory({ commit, dispatch }, undoChange(state.undoStack, state.css));
   },
 
   redo({
@@ -608,14 +625,7 @@ export default {
     commit: Commit;
     dispatch: Dispatch;
   }): void {
-    const move = redoChange(state.undoStack, state.css);
-
-    if (!move) {
-      return;
-    }
-
-    commit('setUndoStack', move.undoStack);
-    dispatch('applyCss', { css: move.css, record: false });
+    stepHistory({ commit, dispatch }, redoChange(state.undoStack, state.css));
   },
 
   applyDeclaration(

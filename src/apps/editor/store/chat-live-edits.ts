@@ -11,7 +11,8 @@ import type {
 import type { State } from './';
 import type { ChatState } from './chat';
 import { addFontImports, revertReply } from './chat-fonts';
-import { discardChange } from './undo-stack';
+import { getChatSourceId, discardChange } from './undo-stack';
+import type { UndoMerge } from './undo-stack';
 
 type Context = ActionContext<ChatState, State>;
 
@@ -24,7 +25,7 @@ export const applyChatCss = async (
   { dispatch, rootState }: Context,
   css: string,
   edits: Array<ChatCssEdit>,
-  options: { source: string; group?: boolean; save?: boolean }
+  options: { source: string; merge?: UndoMerge; save?: boolean }
 ): Promise<void> => {
   await dispatch('applyCss', { css, ...options }, { root: true });
 
@@ -74,7 +75,7 @@ export const createLiveEdits = (
 ) => {
   const { rootState, dispatch, commit } = context;
   const bridge = getPageBridge();
-  const source = `chat:${id}`;
+  const source = getChatSourceId(id);
   const edits: Array<ChatCssEdit> = [];
   let previous: Array<ChatCssPreviousValue> = [];
   let waiting: Array<ChatCssEdit> = [];
@@ -138,7 +139,7 @@ export const createLiveEdits = (
 
     await applyChatCss(context, result.css, stable, {
       source,
-      group: true,
+      merge: 'always',
       save: false,
     });
     onApplied(edits);

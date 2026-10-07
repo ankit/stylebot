@@ -157,6 +157,41 @@ export const UndoesAndReapplies: StoryObj = {
   },
 };
 
+export const HeaderUndoMarksTheReply: StoryObj = {
+  ...chat({ connected: ['anthropic'] }),
+  name: 'the header’s Undo takes a reply back out and its row reads Styles undone, and Redo puts both back',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    await send(canvas, 'Make the text easier to read');
+    await waitFor(() =>
+      expect(summary(canvasElement)).toBe('Updated styles +2')
+    );
+    const header = within(
+      canvasElement.querySelector('.header') as HTMLElement
+    );
+
+    await step('Undo', async () => {
+      await user.click(header.getByRole('button', { name: 'Undo' }));
+
+      await waitFor(() => expect(store.state.css).not.toContain('18px'));
+      await (
+        await replyCard(canvas)
+      ).findByRole('button', {
+        name: 'Reapply',
+      });
+    });
+
+    await step('Redo', async () => {
+      await user.click(header.getByRole('button', { name: 'Redo' }));
+
+      await waitFor(() => expect(store.state.css).toContain('font-size: 18px'));
+      await (await replyCard(canvas)).findByRole('button', { name: 'Undo' });
+    });
+  },
+};
+
 export const StopsAReply: StoryObj = {
   ...chat({ connected: ['anthropic'], hold: true }),
   name: 'Stop ends a reply midway, keeping what came in and changing nothing',

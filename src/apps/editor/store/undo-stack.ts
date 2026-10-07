@@ -18,21 +18,45 @@ export const COALESCE_WINDOW_MS = 500;
 
 export const emptyUndoStack = (): UndoStack => ({ past: [], future: [] });
 
+const CHAT_SOURCE = 'chat:';
+
+/**
+ * The undo source for a chat reply's changes, made and taken back.
+ */
+export const getChatSourceId = (turnId: string): string =>
+  `${CHAT_SOURCE}${turnId}`;
+
+/**
+ * The chat reply an undo source belongs to; null for any other source.
+ */
+export const getChatTurnId = (source: string): string | null =>
+  source.startsWith(CHAT_SOURCE) ? source.slice(CHAT_SOURCE.length) : null;
+
+/**
+ * When a change joins the latest step from the same source: within the
+ * coalescing window, always (a chat reply whose edits stream in), or never
+ * (a click that must stay its own step).
+ */
+export type UndoMerge = 'recent' | 'always' | 'never';
+
 /**
  * Records the css a change is about to replace, extending the latest step
- * when the same source repeats within the coalescing window, or at any
- * time for a grouped change (a chat reply whose edits stream in).
+ * when the same source repeats and the merge rule allows it.
  */
 export const recordChange = (
   stack: UndoStack,
   css: string,
   source: string,
   at = Date.now(),
-  group = false
+  merge: UndoMerge = 'recent'
 ): UndoStack => {
   const last = stack.past[stack.past.length - 1];
+  const merges =
+    last?.source === source &&
+    (merge === 'always' ||
+      (merge === 'recent' && at - last.at < COALESCE_WINDOW_MS));
 
-  if (last?.source === source && (group || at - last.at < COALESCE_WINDOW_MS)) {
+  if (merges) {
     return {
       past: [...stack.past.slice(0, -1), { ...last, at }],
       future: [],
@@ -57,6 +81,8 @@ export const discardChange = (stack: UndoStack, source: string): UndoStack =>
 export type UndoMove = {
   undoStack: UndoStack;
   css: string;
+  // The source of the change stepped over.
+  source: string;
 };
 
 /**
@@ -79,6 +105,7 @@ export const undoChange = (
       future: [...stack.future, { css: current, source: entry.source, at: 0 }],
     },
     css: entry.css,
+    source: entry.source,
   };
 };
 
@@ -102,6 +129,7 @@ export const redoChange = (
       future: stack.future.slice(0, -1),
     },
     css: entry.css,
+    source: entry.source,
   };
 };
 
