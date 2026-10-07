@@ -1,4 +1,5 @@
 import messages from 'virtual:stylebot-locale';
+import { fn } from '@storybook/test';
 
 import {
   add as addRecentColor,
@@ -45,6 +46,8 @@ export type ChromeShimOptions = {
   googleDriveSync?: Pending<RunGoogleDriveSyncResponse>;
   versionHistory?: Pending<VersionHistory>;
   chat?: ChatShimOptions;
+  // Optional permissions already granted, and how the prompt answers a request.
+  permissions?: { granted?: boolean; allowRequest?: boolean };
 };
 
 type Callback = (response?: unknown) => void;
@@ -107,6 +110,11 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
   };
 
   const chat = createChatShim(overrides.chat);
+  const permissions = {
+    granted: false,
+    allowRequest: true,
+    ...overrides.permissions,
+  };
 
   const runtimeResponses: Record<
     string,
@@ -245,6 +253,20 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
       setOptions: () => Promise.resolve(),
       open: () => Promise.resolve(),
       close: () => Promise.resolve(),
+    },
+
+    permissions: {
+      contains: fn((_permissions: unknown, callback?: Callback) =>
+        respond(callback, permissions.granted)
+      ),
+      request: fn((_permissions: unknown, callback?: Callback) => {
+        permissions.granted = permissions.allowRequest;
+        return respond(callback, permissions.allowRequest);
+      }),
+      remove: fn((_permissions: unknown, callback?: Callback) => {
+        permissions.granted = false;
+        return respond(callback, true);
+      }),
     },
 
     // The browser owns the global shortcuts; this one reports the seeded ones.

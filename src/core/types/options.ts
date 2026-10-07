@@ -37,4 +37,6 @@ export type StylebotOptions = {
   appearance: StylebotAppearance;
   // Key of the last-picked Palette option — a built-in set, or a scheme name from color-schemes.ts.
   lastColorSet: string;
+  // Lets the stylebot CLI connect, while its optional permissions are granted too.
+  cliAccess: boolean;
 };

@@ -24,7 +24,7 @@ export const request = (command, args = {}) =>
       if (error.code === 'ENOENT' || error.code === 'ECONNREFUSED') {
         reject(
           new Error(
-            'Stylebot is not connected. Run `stylebot install`, then start or reload a dev build of the extension.'
+            'Stylebot is not connected. Run `stylebot install`, start a dev build of the extension, and turn on "Let apps on this computer control Stylebot" in its options.'
           )
         );
       } else {

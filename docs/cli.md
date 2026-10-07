@@ -24,7 +24,7 @@ This copies the CLI's native messaging host into `~/.stylebot/` and registers it
 yarn dev:chrome
 ```
 
-The extension connects to the host when it starts. The host runs only while the browser does.
+Then turn on **Let apps on this computer control Stylebot** in Stylebot's options, under Basics, and allow what the browser asks for. The extension connects to the host while the setting is on; turning it off disconnects it and gives back the permission to talk to the host. The host runs only while the browser does.
 
 ## Commands
 
@@ -139,11 +139,11 @@ The browser starts the native host when the extension connects to it, and keeps 
 
 The code that reads a page loads into it the first time the CLI asks about that page, so pages the CLI never touches don't carry it.
 
-Development builds add the `nativeMessaging` permission for the host and `<all_urls>` for screenshots. `<all_urls>` also lifts CORS on the background's own requests, so a cross-origin fetch that works in a dev build can still fail in a release build.
+The extension connects only while the setting is on and the browser has granted its two optional permissions: `nativeMessaging` for the host, and `<all_urls>` for screenshots. Development builds declare them; release builds don't yet. Once granted, `<all_urls>` also lifts CORS on the background's own requests, so a cross-origin fetch that works there can still fail for someone who never turned the setting on. Chrome won't let the extension give `<all_urls>` back, since its content scripts already match every site, so turning the setting off removes only `nativeMessaging`.
 
 ## Before it can ship
 
-- An opt-in setting, with `nativeMessaging` as an optional permission so existing users aren't asked to re-approve the extension
+- Declaring the optional permissions and showing the setting in release builds
 - Publishing the CLI to npm, for the plugin to fall back to, and the plugin through a public marketplace
 - Install support for Edge's store id, other Chromium browsers, Windows and Firefox
-- A visible sign that the CLI is connected, and a separate opt-in for reading pages (outlines and screenshots), since any local process can use the socket
+- A visible sign that the CLI is connected, since any local process can use the socket

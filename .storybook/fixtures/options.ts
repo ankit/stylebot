@@ -1,9 +1,11 @@
 import type { StoryObj } from '@storybook/vue';
 
 import App from '@/apps/options/App.vue';
+import TheCliAccess from '@/apps/options/components/basics/TheCliAccess.vue';
 import { createRouter } from '@/apps/options/router';
-import type { OptionsStateOverrides } from './options-store';
+import type { OptionsState, OptionsStateOverrides } from './options-store';
 import { createOptionsStore } from './options-store';
+import type { Store } from 'vuex';
 import { expect, waitFor } from '@storybook/test';
 import { user } from '../story-helpers';
 
@@ -69,3 +71,29 @@ export const optionsPage = (
     await afterNavigate?.(canvasElement);
   },
 });
+
+/**
+ * Renders the CLI access card on its own, since the Basics tab shows it only
+ * in development builds. The play gets the store, to read what was saved.
+ */
+export const cliAccessCard = (
+  overrides: OptionsStateOverrides = {},
+  play?: (root: HTMLElement, store: Store<OptionsState>) => Promise<void>
+): StoryObj => {
+  let store: Store<OptionsState>;
+
+  return {
+    render: () => {
+      store = createOptionsStore(overrides);
+
+      return {
+        components: { TheCliAccess },
+        store,
+        template: '<the-cli-access />',
+      };
+    },
+    play: async ({ canvasElement }) => {
+      await play?.(canvasElement, store);
+    },
+  };
+};

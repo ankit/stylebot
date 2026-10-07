@@ -230,8 +230,16 @@ const reloadTabs = () =>
 await loadExtension();
 const extensionId = await loadExtension();
 
-// Navigate after installing so the content script injects on load.
 const page = context.pages()[0] ?? (await context.newPage());
+
+// Without developer mode, chrome.runtime.reload() (which the CLI opt-in uses) disables
+// a CDP-loaded extension as one the Web Store can't review.
+await page.goto('chrome://extensions');
+await page.evaluate(() =>
+  chrome.developerPrivate.updateProfileConfiguration({ inDeveloperMode: true })
+);
+
+// Navigate after installing so the content script injects on load.
 await page.goto(startUrl);
 
 console.log(

@@ -121,3 +121,18 @@ describe('release manifest', () => {
     }
   );
 });
+
+describe('development manifest', () => {
+  it('asks for the CLI permissions only as optional', () => {
+    const manifest = buildManifest(base, {
+      browser: undefined,
+      nodeEnv: 'development',
+      preview: false,
+    });
+
+    expect(manifest.permissions).toEqual(base.permissions);
+    expect(manifest.host_permissions).toEqual(base.host_permissions);
+    expect(manifest.optional_permissions).toEqual(['nativeMessaging']);
+    expect(manifest.optional_host_permissions).toEqual(['<all_urls>']);
+  });
+});

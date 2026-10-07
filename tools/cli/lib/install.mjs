@@ -100,5 +100,7 @@ export const install = () => {
     console.log(`Registered in ${dir}`);
   }
 
-  console.log('Reload the extension (or restart yarn dev:chrome) to connect.');
+  console.log(
+    'Reload the extension (or restart yarn dev:chrome), then turn on "Let apps on this computer control Stylebot" in its options to connect.'
+  );
 };

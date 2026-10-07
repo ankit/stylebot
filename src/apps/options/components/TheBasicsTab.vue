@@ -4,6 +4,7 @@
 
     <the-theme />
     <the-context-menu />
+    <the-cli-access v-if="showCliAccess" />
 
     <div class="section">
       <the-keyboard-shortcuts />
@@ -17,6 +18,7 @@ import Vue from 'vue';
 import { SHeading } from '@stylebot/components';
 import TheTheme from './basics/TheTheme.vue';
 import TheContextMenu from './basics/TheContextMenu.vue';
+import TheCliAccess from './basics/TheCliAccess.vue';
 import TheKeyboardShortcuts from './basics/TheKeyboardShortcuts.vue';
 
 export default Vue.extend({
@@ -26,10 +28,16 @@ export default Vue.extend({
     SHeading,
     TheTheme,
     TheContextMenu,
+    TheCliAccess,
     TheKeyboardShortcuts,
   },
 
   computed: {
+    // Dev builds only until the CLI ships.
+    showCliAccess(): boolean {
+      return process.env.NODE_ENV === 'development';
+    },
+
     optionsLoaded(): boolean {
       return !!this.$store.state.options;
     },

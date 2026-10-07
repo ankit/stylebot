@@ -21,7 +21,7 @@ Read and check pages only through `stylebot`, never another browser tool (browse
 If a command says Stylebot is not connected:
 
 1. Run `stylebot install` once, which registers the CLI with the user's browsers.
-2. Ask the user to reload the Stylebot extension, or restart the browser, then try again.
+2. Ask the user to turn on **Let apps on this computer control Stylebot** in Stylebot's options, under Basics, and allow what the browser asks for. If it's already on, ask them to reload the Stylebot extension or restart the browser. Then try again.
 
 If `stylebot` isn't found, the CLI isn't installed: tell the user, and point them to Stylebot's `docs/cli.md`.
 
