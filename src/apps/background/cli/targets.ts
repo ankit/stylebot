@@ -82,3 +82,26 @@ export const inspectTab = <T>(
       }
     });
   });
+
+/**
+ * A tab showing a page the style for a url pattern applies to, to check it
+ * on: the one the target names, else an active one, else any.
+ */
+export const findTabShowing = async (
+  url: string,
+  target: unknown
+): Promise<chrome.tabs.Tab | undefined> => {
+  const tabId = /^\d+$/.test(String(target)) ? Number(target) : undefined;
+  const showing = (await chrome.tabs.query({})).filter(
+    tab =>
+      tab.url &&
+      getStylesForPage(tab.url, { [url]: { css: '' } }).defaultStyle?.url ===
+        url
+  );
+
+  if (tabId !== undefined) {
+    return showing.find(tab => tab.id === tabId);
+  }
+
+  return showing.find(tab => tab.active) ?? showing[0];
+};

@@ -18,11 +18,13 @@ export { LocalPageBridge } from './LocalPageBridge';
 export { RemotePageBridge } from './remote-page-bridge/RemotePageBridge';
 export { emptyPageSnapshot } from './utils';
 export {
+  checkStyle,
   countMatches,
   getPageOutline,
   getPageRulesCss,
   getPageSignals,
   getPageVariablesCss,
+  startStyleCheck,
 } from './chat';
 export { getComputedStyles } from './computed-styles';
 export type {

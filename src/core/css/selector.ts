@@ -1,4 +1,5 @@
 import { queryWithShadowRoots } from '@stylebot/stylesheets';
+import type { FragileSelector } from '@stylebot/types';
 import { splitCommaList } from '@stylebot/utils';
 
 import { getSubjectCompound } from './get-subject-compound';
@@ -139,11 +140,13 @@ export const getStableClassPartsSelector = (el: HTMLElement): string | null => {
 };
 
 /**
- * `selector` with each partly hashed class swapped for its stable matcher,
- * e.g. `nav .Header_nav__a1B2c a` → `nav [class*="Header_nav__"] a`. Classes
- * inside quoted attribute values are left alone.
+ * `selector` with each class swapped for what `replace` returns, or kept
+ * when it returns null. Classes inside quoted attribute values are skipped.
  */
-export const getStableSelector = (selector: string): string => {
+const replaceClasses = (
+  selector: string,
+  replace: (className: string) => string | null
+): string => {
   let result = '';
   let quote: string | null = null;
 
@@ -179,11 +182,50 @@ export const getStableSelector = (selector: string): string => {
     }
 
     const className = token[0].replace(/\\(.)/g, '$1');
-    result += getStableClassMatcher(className) ?? `.${token[0]}`;
+    result += replace(className) ?? `.${token[0]}`;
     i += token[0].length;
   }
 
   return result;
+};
+
+/**
+ * `selector` with each partly hashed class swapped for its stable matcher,
+ * e.g. `nav .Header_nav__a1B2c a` → `nav [class*="Header_nav__"] a`. Classes
+ * inside quoted attribute values are left alone.
+ */
+export const getStableSelector = (selector: string): string =>
+  replaceClasses(selector, className => getStableClassMatcher(className));
+
+/**
+ * The selector's generated class names, which change when the site rebuilds,
+ * with a version that matches the partly generated ones by their stable
+ * parts; null when it has none.
+ */
+export const getFragileSelector = (
+  selector: string
+): FragileSelector | null => {
+  const hashed: Array<string> = [];
+
+  replaceClasses(selector, className => {
+    if (looksHashed(className)) {
+      hashed.push(className);
+    }
+
+    return null;
+  });
+
+  if (!hashed.length) {
+    return null;
+  }
+
+  const stable = getStableSelector(selector);
+
+  return {
+    selector,
+    stable: stable === selector ? null : stable,
+    unstable: hashed.filter(className => !getStableClassMatcher(className)),
+  };
 };
 
 export const getIdBasedSelector = (el: HTMLElement): string | null => {

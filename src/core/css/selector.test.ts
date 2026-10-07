@@ -6,6 +6,7 @@ import {
   getNonHashedClassBasedSelector,
   getStableClassPartsSelector,
   getStableSelector,
+  getFragileSelector,
   getClassBasedSelector,
   getIdBasedSelector,
   getTagNameBasedSelector,
@@ -256,6 +257,21 @@ describe('selector', () => {
       expect(getStableSelector('.Header_nav__a1B2c')).toBe(
         '.Header_nav__a1B2c'
       );
+    });
+  });
+
+  describe('getFragileSelector', () => {
+    it('offers a stable version and lists classes with no stable part', () => {
+      expect(getFragileSelector('.Header_nav__a1B2c .css-1a0ymrn a')).toEqual({
+        selector: '.Header_nav__a1B2c .css-1a0ymrn a',
+        stable: '[class*="Header_nav__"] .css-1a0ymrn a',
+        unstable: ['css-1a0ymrn'],
+      });
+    });
+
+    it('returns null for a selector of authored classes', () => {
+      expect(getFragileSelector('nav .menu > a.link')).toBeNull();
+      expect(getFragileSelector('a[href=".css-1a0ymrn"]')).toBeNull();
     });
   });
 

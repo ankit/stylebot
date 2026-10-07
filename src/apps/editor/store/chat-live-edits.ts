@@ -1,6 +1,7 @@
 import type { ActionContext } from 'vuex';
 
 import { applyEdits } from '@stylebot/chat';
+import { addGoogleFontImports } from '@stylebot/google-fonts';
 import { getPageBridge } from '@stylebot/page-bridge';
 import type {
   ChatCssEdit,
@@ -10,7 +11,7 @@ import type {
 
 import type { State } from './';
 import type { ChatState } from './chat';
-import { addFontImports, revertReply } from './chat-fonts';
+import { revertReply } from './chat-fonts';
 import { getChatSourceId, discardChange } from './undo-stack';
 import type { UndoMerge } from './undo-stack';
 
@@ -29,7 +30,7 @@ export const applyChatCss = async (
 ): Promise<void> => {
   await dispatch('applyCss', { css, ...options }, { root: true });
 
-  const withImports = await addFontImports(rootState.css, edits);
+  const withImports = await addGoogleFontImports(rootState.css, edits);
 
   if (withImports !== rootState.css) {
     await dispatch(

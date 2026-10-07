@@ -14,7 +14,7 @@ export {
 } from './edits';
 export type { ChatChangeSummary, ChatRuleChange } from './edits';
 export { INSTRUCTIONS as CHAT_INSTRUCTIONS, buildPageContext } from './prompt';
-export { MAX_FIX_ROUNDS, needsFix } from './apply-css-tool';
+export { describeStyleCheck, MAX_FIX_ROUNDS, needsFix } from './apply-css-tool';
 export { readEventStream } from './read-event-stream';
 export { parseMarkdown } from './markdown';
 export type { MarkdownBlock, MarkdownInline, MarkdownLine } from './markdown';

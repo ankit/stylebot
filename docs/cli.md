@@ -81,6 +81,8 @@ yarn stylebot css set news.ycombinator.com < hn.css
 - `styles` lists saved styles.
 - `css get` prints a style's css.
 - `css set` saves css from stdin or `--file` and applies it to open tabs right away. Empty css deletes the style.
+  - It refuses css that doesn't parse, saying at which line, and adds Google Fonts imports for the families the css names, as Chat does.
+  - When the profile it saves is the one in use and an open tab shows the site (the tab named, else an active one), it checks the page and reports back as Chat's model is told after each edit: how many elements each selector matched, text the change made hard to read, and surfaces a theme change missed. It also flags selectors built on class names the site generates, with stable versions where it can find them. With no such tab, it says the style wasn't checked.
 
 ### Profiles
 

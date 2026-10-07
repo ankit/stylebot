@@ -3,8 +3,61 @@ import fs from 'node:fs';
 import { addHelpSections } from '../help.mjs';
 import { createPrinter, fail, request } from '../request.mjs';
 
-const describeSave = ({ url, deleted }) =>
-  deleted ? `Deleted the style for ${url}` : `Saved ${url}`;
+const oneLine = selector => selector.replace(/\s*\n\s*/g, ' ');
+
+/**
+ * What css set did: where it saved, the fonts it imported, and, when a tab
+ * shows the site, how the page took it, worded as Chat's model is told.
+ */
+const describeSave = ({
+  url,
+  deleted,
+  fonts,
+  checkedTab,
+  check,
+  fragileSelectors,
+}) => {
+  if (deleted) {
+    return `Deleted the style for ${url}`;
+  }
+
+  const lines = [`Saved ${url}`];
+
+  if (fonts.length) {
+    lines.push(`Imported from Google Fonts: ${fonts.join(', ')}`);
+  }
+
+  if (check === null) {
+    lines.push(
+      'Not checked: no open tab shows a page this style applies to. Open one with `stylebot open` and save again to check it.'
+    );
+    return lines.join('\n');
+  }
+
+  lines.push(`Checked on tab ${checkedTab}.`);
+
+  if (check) {
+    lines.push(check);
+  }
+
+  if (fragileSelectors.length) {
+    lines.push(
+      'Fragile selectors, built on class names the site generates and can change on its next build:',
+      ...fragileSelectors.map(({ selector, stable, unstable }) => {
+        const use = stable ? `: use ${oneLine(stable)}` : '';
+        const rest = unstable.length
+          ? `${stable ? ', and' : ':'} ${unstable.join(', ')} ${
+              unstable.length === 1 ? 'has' : 'have'
+            } no stable part, so select by something else`
+          : '';
+
+        return `- ${oneLine(selector)}${use}${rest}`;
+      })
+    );
+  }
+
+  return lines.join('\n');
+};
 
 const readStdin = async () => {
   if (process.stdin.isTTY) {
@@ -74,7 +127,7 @@ export const addStyleCommands = program => {
   css
     .command('set')
     .description(
-      'Save css from stdin and apply it; empty css deletes the style'
+      'Save css from stdin, apply it and check the page; empty css deletes the style'
     )
     .argument('<target>', 'A tab id or site')
     .option('-f, --file <path>', 'Read the css from a file instead')

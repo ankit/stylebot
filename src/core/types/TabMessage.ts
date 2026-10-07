@@ -1,6 +1,7 @@
 import type { Style } from './styles';
 import type { ReadabilitySettings } from './readability';
 import type { StylebotCommandName } from './commands';
+import type { ChatCssEdit, ChatStyleProblem } from './chat';
 
 export type ToggleStylebot = {
   name: 'ToggleStylebot';
@@ -75,7 +76,24 @@ export type PageInspection =
   | { kind: 'cssVariables' }
   | { kind: 'pageRules'; selector: string }
   | { kind: 'computedStyles'; selector: string; properties: Array<string> }
-  | { kind: 'matchCount'; selectors: Array<string> };
+  | { kind: 'matchCount'; selectors: Array<string> }
+  | { kind: 'startCheck'; edits: Array<ChatCssEdit> }
+  | { kind: 'finishCheck'; selectors: Array<string> };
+
+// A selector built on class names the site generates, which change when it rebuilds.
+export type FragileSelector = {
+  selector: string;
+  // The selector with each partly generated class matched by its stable part.
+  stable: string | null;
+  // Generated classes with no stable part to match instead.
+  unstable: Array<string>;
+};
+
+export type StyleCheckReport = {
+  matchCounts: Array<number | null>;
+  styleProblems: Array<ChatStyleProblem>;
+  fragileSelectors: Array<FragileSelector>;
+};
 
 export type InspectPage = {
   name: 'InspectPage';

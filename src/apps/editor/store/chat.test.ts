@@ -18,7 +18,7 @@ import * as chromeUtils from '../utils/chrome';
 jest.mock('./chat-stream');
 jest.mock('../utils/chrome');
 jest.mock('@stylebot/google-fonts', () => ({
-  resolveGoogleFont: jest.fn(() => Promise.resolve(null)),
+  addGoogleFontImports: jest.fn((css: string) => Promise.resolve(css)),
 }));
 
 const status: ChatStatus = {

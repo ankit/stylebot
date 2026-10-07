@@ -8,6 +8,7 @@ export {
 export { createEditStream } from './edit-stream';
 export type { EditStream } from './edit-stream';
 export {
+  describeStyleCheck,
   MAX_FIX_ROUNDS,
   needsFix,
   roundCallId,

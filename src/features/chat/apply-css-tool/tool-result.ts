@@ -48,6 +48,32 @@ const describeProblem = (problem: ChatStyleProblem): string => {
 };
 
 /**
+ * What the page check found once css applied, as the model is told it: how
+ * many elements each selector matched, and the problems it made. Empty when
+ * nothing was checked.
+ */
+export const describeStyleCheck = (
+  selectors: Array<string>,
+  matches?: Array<number | null>,
+  problems?: Array<ChatStyleProblem>
+): string =>
+  [
+    matches?.length ? 'Elements each selector matched:' : '',
+    ...(matches
+      ? selectors.map(
+          (selector, index) => `- ${selector}: ${describeCount(matches[index])}`
+        )
+      : []),
+    matches?.some(count => !count)
+      ? 'Edits whose selector matched nothing changed nothing.'
+      : '',
+    problems?.length ? 'Problems the page check found:' : '',
+    ...(problems ?? []).map(describeProblem),
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+/**
  * How many more apply_css calls a reply may make, after its first, to fix
  * what the previous call left wrong.
  */
@@ -99,21 +125,13 @@ export const toolResultFor = (
     return TOOL_RESULT_UNDONE;
   }
 
-  const { matches, problems } = round;
-  const lines = matches
-    ? round.edits.map(
-        (edit, index) => `- ${edit.selector}: ${describeCount(matches[index])}`
-      )
-    : [];
-  const missed = matches?.some(count => !count);
-
   return [
     TOOL_RESULT_APPLIED,
-    lines.length ? 'Elements each selector matched:' : '',
-    ...lines,
-    missed ? 'Edits whose selector matched nothing changed nothing.' : '',
-    problems?.length ? 'Problems the page check found:' : '',
-    ...(problems ?? []).map(describeProblem),
+    describeStyleCheck(
+      round.edits.map(edit => edit.selector),
+      round.matches,
+      round.problems
+    ),
   ]
     .filter(Boolean)
     .join('\n');
