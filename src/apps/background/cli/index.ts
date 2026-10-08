@@ -8,7 +8,7 @@ import { pageCommands } from './pages';
 import { pointerCommands } from './pointer';
 import { profileCommands } from './profiles';
 import { CLI_PROTOCOL } from './protocol';
-import { restoreOpenTabs } from './restore-tabs';
+import { findOpenEditors, restoreOpenTabs } from './restore-tabs';
 import { styleCommands } from './styles';
 import type { CliCommands, CliRequest, CliResponse } from './types';
 
@@ -93,7 +93,9 @@ let reloadedForGrant = Promise.resolve(false);
  * a grant to a running worker needs a reload. Options reopens after it.
  */
 const reloadForGrant = async (): Promise<void> => {
-  await chrome.storage.local.set({ [RELOADED_FOR_GRANT_KEY]: true });
+  await chrome.storage.local.set({
+    [RELOADED_FOR_GRANT_KEY]: await findOpenEditors(),
+  });
   chrome.runtime.reload();
 };
 
@@ -110,7 +112,7 @@ const resumeAfterGrantReload = async (): Promise<boolean> => {
   }
 
   await chrome.storage.local.remove(RELOADED_FOR_GRANT_KEY);
-  await restoreOpenTabs();
+  await restoreOpenTabs(items[RELOADED_FOR_GRANT_KEY]);
   OpenOptionsPage({ route: '/basics' });
   return true;
 };

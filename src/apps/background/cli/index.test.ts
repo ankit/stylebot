@@ -12,7 +12,10 @@ jest.mock('./pages', () => ({
 }));
 jest.mock('./pointer', () => ({ pointerCommands: {} }));
 jest.mock('./profiles', () => ({ profileCommands: {} }));
-jest.mock('./restore-tabs', () => ({ restoreOpenTabs: jest.fn() }));
+jest.mock('./restore-tabs', () => ({
+  findOpenEditors: jest.fn(async () => ({ 7: 'window' })),
+  restoreOpenTabs: jest.fn(),
+}));
 jest.mock('./styles', () => ({ styleCommands: {} }));
 
 type Listener = (...args: Array<unknown>) => void;
@@ -201,17 +204,17 @@ describe('initCliBridge', () => {
     await flush();
 
     expect(chrome.runtime.reload).toBeCalledTimes(1);
-    expect(storage).toEqual({ 'cli-reloaded-for-grant': true });
+    expect(storage).toEqual({ 'cli-reloaded-for-grant': { 7: 'window' } });
   });
 
   it('connects, restores open tabs and reopens Options on Basics after that reload', async () => {
-    storage['cli-reloaded-for-grant'] = true;
+    storage['cli-reloaded-for-grant'] = { 7: 'window' };
     setOption(true);
 
     await restart({ connectNative } as never);
 
     expect(connectNative).toBeCalledTimes(1);
-    expect(restoreOpenTabs).toBeCalledTimes(1);
+    expect(restoreOpenTabs).toBeCalledWith({ 7: 'window' });
     expect(OpenOptionsPage).toBeCalledWith({ route: '/basics' });
     expect(storage).toEqual({});
   });
