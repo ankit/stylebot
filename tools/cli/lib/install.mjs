@@ -101,6 +101,6 @@ export const install = () => {
   }
 
   console.log(
-    'Reload the extension (or restart yarn dev:chrome), then turn on "Let apps on this computer control Stylebot" in its options to connect.'
+    'Turn on "Let apps on this computer control Stylebot" in Stylebot\'s options to connect. If it\'s already on, reload the extension or restart the browser.'
   );
 };

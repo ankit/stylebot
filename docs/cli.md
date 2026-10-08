@@ -2,7 +2,7 @@
 
 A command line for driving Stylebot in a running browser: list tabs, read and inspect pages, get and set styles, and take screenshots. It's meant for scripting and for coding agents such as Claude Code, which can restyle a page and check the result without the editor open.
 
-For now it only works with development builds of the extension on Chrome and Edge.
+It works with Stylebot on Chrome and Edge, once turned on in Stylebot's options. Firefox and Safari aren't supported yet.
 
 ## Setup
 
@@ -18,13 +18,9 @@ Then register it with your browsers, from the repo so it finds the dev profiles:
 yarn stylebot install
 ```
 
-This copies the CLI's native messaging host into `~/.stylebot/` and registers it with the dev profiles `yarn dev:chrome` launches, and with your installed Chrome and Edge. Then start (or reload) a dev build:
+This copies the CLI's native messaging host into `~/.stylebot/` and registers it with your installed Chrome and Edge, and with the dev profiles `yarn dev:chrome` launches.
 
-```bash
-yarn dev:chrome
-```
-
-Then turn on **Let apps on this computer control Stylebot** in Stylebot's options, under Basics, and allow what the browser asks for. The extension connects to the host while the setting is on; turning it off disconnects it and gives back the permission to talk to the host. The host runs only while the browser does.
+Then turn on **Let apps on this computer control Stylebot** in Stylebot's options, under Basics, and allow what the browser asks for. The extension connects to the host while the setting is on; turning it off disconnects it and gives back the permission to talk to the host. If it was already on before you installed, reload the extension or restart the browser. The host runs only while the browser does.
 
 ## Commands
 
@@ -133,13 +129,15 @@ STYLEBOT_PROFILE_DIR=.chrome-dev-profile-test STYLEBOT_SOCKET=~/.stylebot/test.s
 
 Run `yarn stylebot install` once the profile folder exists, and run the CLI with the same `STYLEBOT_SOCKET` to drive that browser.
 
+To try the CLI against a release-like build, run `yarn build:preview` and add `STYLEBOT_EXTENSION_DIR=preview-dist`. It carries the store's key, so it gets the extension id the host allows.
+
 ## How it works
 
 The browser starts the native host when the extension connects to it, and keeps it running while the connection is open. The host listens on a Unix socket in `~/.stylebot/`, readable only by you, and relays each CLI command to the extension and its answer back.
 
 The code that reads a page loads into it the first time the CLI asks about that page, so pages the CLI never touches don't carry it.
 
-The extension connects only while the setting is on and the browser has granted its two optional permissions: `nativeMessaging` for the host, and `<all_urls>` for screenshots. Development builds declare them; release builds don't yet. Once granted, `<all_urls>` also lifts CORS on the background's own requests, so a cross-origin fetch that works there can still fail for someone who never turned the setting on. Chrome won't let the extension give `<all_urls>` back, since its content scripts already match every site, so turning the setting off removes only `nativeMessaging`.
+The extension connects only while the setting is on and the browser has granted its two optional permissions: `nativeMessaging` for the host, and `<all_urls>` for screenshots. Once granted, `<all_urls>` also lifts CORS on the background's own requests, so a cross-origin fetch that works there can still fail for someone who never turned the setting on. Chrome won't let the extension give `<all_urls>` back, since its content scripts already match every site, so turning the setting off removes only `nativeMessaging`.
 
 ## The setup page
 
@@ -167,7 +165,6 @@ The page ignores a reply unless it comes from its own window and origin and ever
 
 ## Before it can ship
 
-- Declaring the optional permissions and showing the setting in release builds
 - Publishing the CLI to npm, for the plugin to fall back to, and the plugin through a public marketplace
 - Install support for Edge's store id, other Chromium browsers, Windows and Firefox
 - A visible sign that the CLI is connected, since any local process can use the socket

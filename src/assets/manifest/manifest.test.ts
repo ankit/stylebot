@@ -122,12 +122,16 @@ describe('release manifest', () => {
   );
 });
 
-describe('development manifest', () => {
-  it('asks for the CLI permissions only as optional', () => {
+describe('CLI permissions', () => {
+  it.each([
+    ['release', 'production', false],
+    ['preview', 'production', true],
+    ['development', 'development', false],
+  ])('are only optional in the %s Chrome manifest', (_, nodeEnv, preview) => {
     const manifest = buildManifest(base, {
       browser: undefined,
-      nodeEnv: 'development',
-      preview: false,
+      nodeEnv,
+      preview,
     });
 
     expect(manifest.permissions).toEqual(base.permissions);
@@ -135,4 +139,14 @@ describe('development manifest', () => {
     expect(manifest.optional_permissions).toEqual(['nativeMessaging']);
     expect(manifest.optional_host_permissions).toEqual(['<all_urls>']);
   });
+
+  it.each(['firefox', 'safari'] as const)(
+    'are left out of the %s manifest',
+    browser => {
+      const manifest = releaseManifest(browser);
+
+      expect(manifest).not.toHaveProperty('optional_permissions');
+      expect(manifest).not.toHaveProperty('optional_host_permissions');
+    }
+  );
 });

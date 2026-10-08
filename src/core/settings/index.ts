@@ -66,6 +66,7 @@ export {
 
 export {
   CLI_PERMISSIONS,
+  supportsCLI,
   hasCliPermissions,
   requestCliPermissions,
   removeCliPermissions,

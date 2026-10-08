@@ -106,9 +106,9 @@ const listen = (): void => {
         return;
       }
 
-      // Only dev builds ask, and only they build the inspector bundle.
+      // supportsCLI() inlined, since its module would load on every page.
       if (
-        process.env.NODE_ENV === 'development' &&
+        process.env.STYLEBOT_CLI === 'true' &&
         message.name === 'InspectPage'
       ) {
         whenDomReady(() =>

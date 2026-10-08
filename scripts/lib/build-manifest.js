@@ -52,27 +52,39 @@ const buildSafariManifest = manifest => ({
   ],
 });
 
+// Chrome and Edge share one build, which runs with no BROWSER set.
+const CHROME = 'chrome';
+
+// The browsers the CLI ships in. Firefox and Safari don't get it yet.
+const CLI_BROWSERS = [CHROME];
+
+/**
+ * Whether the build for a browser (a BROWSER value, undefined for Chrome and
+ * Edge) carries the CLI.
+ */
+const supportsCLI = browser => CLI_BROWSERS.includes(browser ?? CHROME);
+
+/**
+ * Adds the CLI's permissions, requested only when it's turned on, and its
+ * page inspector.
+ */
+const addCli = manifest => ({
+  ...manifest,
+  optional_permissions: ['nativeMessaging'],
+  optional_host_permissions: ['<all_urls>'],
+  web_accessible_resources: [
+    ...manifest.web_accessible_resources,
+    { resources: ['editor/inspector.js'], matches: ['<all_urls>'] },
+  ],
+});
+
 /**
  * Adds the Chrome Web Store public key, for the store id that Drive sign-in's
  * OAuth redirect needs. Release builds leave it out: the store rejects an
  * uploaded manifest with a `key`.
  */
 const buildChromeManifest = (manifest, { nodeEnv, preview }) => {
-  // The CLI's permissions, requested when it's turned on, and its page inspector; dev only until it ships.
-  if (nodeEnv === 'development') {
-    return {
-      ...manifest,
-      ...readManifest('manifest-dev.json'),
-      optional_permissions: ['nativeMessaging'],
-      optional_host_permissions: ['<all_urls>'],
-      web_accessible_resources: [
-        ...manifest.web_accessible_resources,
-        { resources: ['editor/inspector.js'], matches: ['<all_urls>'] },
-      ],
-    };
-  }
-
-  if (preview) {
+  if (nodeEnv === 'development' || preview) {
     return { ...manifest, ...readManifest('manifest-dev.json') };
   }
 
@@ -84,15 +96,17 @@ const buildChromeManifest = (manifest, { nodeEnv, preview }) => {
  * which share one build) from the base manifest.
  */
 const buildManifest = (base, { browser, nodeEnv, preview }) => {
+  let manifest;
+
   if (browser === 'firefox') {
-    return buildFirefoxManifest(base);
+    manifest = buildFirefoxManifest(base);
+  } else if (browser === 'safari') {
+    manifest = buildSafariManifest(base);
+  } else {
+    manifest = buildChromeManifest(base, { nodeEnv, preview });
   }
 
-  if (browser === 'safari') {
-    return buildSafariManifest(base);
-  }
-
-  return buildChromeManifest(base, { nodeEnv, preview });
+  return supportsCLI(browser) ? addCli(manifest) : manifest;
 };
 
-module.exports = { buildManifest };
+module.exports = { buildManifest, supportsCLI };

@@ -10,11 +10,16 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 
-const { buildManifest } = require('./scripts/lib/build-manifest');
+const { buildManifest, supportsCLI } = require('./scripts/lib/build-manifest');
 const { parseLocaleConfig } = require('./scripts/lib/parse-locale-config');
 const { SRC_DIR, packageDirs } = require('./scripts/lib/src-packages');
 
 const isPreview = process.env.STYLEBOT_PREVIEW === '1';
+const isCLISupported = supportsCLI(process.env.BROWSER);
+// Lets app code check for the CLI, and minifying drops it where it's false.
+const cliDefinitions = {
+  'process.env.STYLEBOT_CLI': JSON.stringify(String(isCLISupported)),
+};
 
 // Safari's Drive sign-in can't exchange codes without it, so a release
 // built without it would ship with sign-in broken.
@@ -306,6 +311,7 @@ const backgroundPageConfig = {
     new WriteBuildMarkerPlugin('background'),
     new webpack.DefinePlugin({
       global: 'this',
+      ...cliDefinitions,
       // Safari's Google sign-in client secret, kept out of the repo.
       'process.env.STYLEBOT_GOOGLE_CLIENT_SECRET': JSON.stringify(
         process.env.STYLEBOT_GOOGLE_CLIENT_SECRET ?? ''
@@ -328,8 +334,8 @@ const clientConfig = {
     'monaco-editor/iframe/options-index':
       './apps/monaco-iframe/options-index.ts',
     'readability/reader': './apps/reader/reader.ts',
-    // The CLI's page inspector, dev-only until the CLI ships behind a setting.
-    ...(process.env.NODE_ENV === 'development' && {
+    // The CLI's page inspector, loaded on demand.
+    ...(isCLISupported && {
       'editor/inspector': './apps/editor/inspector.ts',
     }),
   },
@@ -338,7 +344,10 @@ const clientConfig = {
   node: { global: false },
   plugins: [
     ...config.plugins,
-    new webpack.DefinePlugin({ global: 'globalThis' }),
+    new webpack.DefinePlugin({
+      global: 'globalThis',
+      ...cliDefinitions,
+    }),
   ],
 };
 

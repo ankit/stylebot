@@ -15,7 +15,7 @@ import { fail } from './request.mjs';
 
 const program = new Command('stylebot')
   .usage('<command> [flags]')
-  .description('Restyle pages in a running dev build of Stylebot.')
+  .description('Restyle pages in a browser running Stylebot.')
   .configureHelp(helpConfiguration)
   .helpOption('-h, --help', 'Show help')
   .option('--json', 'Print the raw JSON response')
@@ -47,7 +47,7 @@ program.commandsGroup('Setup');
 
 program
   .command('install')
-  .description('Register the CLI with your dev browsers')
+  .description('Register the CLI with your browsers')
   .action(install);
 
 program.helpCommand('help [command]', 'Show help for a command');

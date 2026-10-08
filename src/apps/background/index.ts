@@ -1,3 +1,5 @@
+import { supportsCLI } from '@stylebot/settings';
+
 import { initCliBridge } from './cli';
 import { ContextMenu } from './contextmenu';
 import { initListeners } from './listeners';
@@ -18,6 +20,6 @@ chrome.action.setBadgeBackgroundColor({
 
 ContextMenu.init();
 
-if (process.env.NODE_ENV === 'development') {
+if (supportsCLI()) {
   initCliBridge();
 }

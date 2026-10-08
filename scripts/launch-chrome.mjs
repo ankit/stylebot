@@ -20,7 +20,12 @@ const rootDir = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '..'
 );
-const extensionPath = path.join(rootDir, 'dist');
+// Set to load another build, such as `yarn build:preview`'s preview-dist.
+const extensionPath = path.resolve(
+  rootDir,
+  process.env.STYLEBOT_EXTENSION_DIR || 'dist'
+);
+const extensionDirName = path.relative(rootDir, extensionPath);
 // Written by WriteBuildMarkerPlugin (webpack.config.js) after each successful build.
 const buildMarkerPath = path.join(extensionPath, '.build-complete');
 const startUrl = 'https://news.ycombinator.com';
@@ -85,7 +90,7 @@ const waitForBuild = async () => {
   console.log(
     waitForFreshBuild
       ? '⏳ Waiting for the initial build from `yarn watch`...'
-      : '⏳ Waiting for the build (dist/) — run `yarn build` or `yarn watch`...'
+      : `⏳ Waiting for the build (${extensionDirName}/) — run \`yarn build\` or \`yarn watch\`...`
   );
   await waitForMarkerChange(baseline);
 };
@@ -248,7 +253,7 @@ console.log(
   }) — extension id: ${extensionId}`
 );
 console.log(
-  '👀 Watching ./dist — the extension hot-reloads in place on rebuild.'
+  `👀 Watching ./${extensionDirName} — the extension hot-reloads in place on rebuild.`
 );
 console.log(
   headless

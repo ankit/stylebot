@@ -16,6 +16,7 @@
 import Vue from 'vue';
 
 import { SHeading } from '@stylebot/components';
+import { supportsCLI } from '@stylebot/settings';
 import TheTheme from './basics/TheTheme.vue';
 import TheContextMenu from './basics/TheContextMenu.vue';
 import TheCliAccess from './basics/TheCliAccess.vue';
@@ -33,9 +34,8 @@ export default Vue.extend({
   },
 
   computed: {
-    // Dev builds only until the CLI ships.
     showCliAccess(): boolean {
-      return process.env.NODE_ENV === 'development';
+      return supportsCLI();
     },
 
     optionsLoaded(): boolean {

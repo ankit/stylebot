@@ -59,6 +59,8 @@ const config: StorybookConfig = {
       /* vite-plugin-vue2 compiles SFCs with the same vue-template-compiler
          2.6 that webpack's vue-loader uses; @vitejs/plugin-vue2 needs Vue 2.7. */
       plugins: [createVuePlugin(), localePlugin()],
+      // Stories show the Chrome and Edge build, which carries the CLI.
+      define: { 'process.env.STYLEBOT_CLI': JSON.stringify('true') },
       resolve: {
         alias: [
           { find: '@stylebot/storybook', replacement: __dirname },

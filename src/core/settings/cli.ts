@@ -7,6 +7,11 @@ export const CLI_PERMISSIONS: chrome.permissions.Permissions = {
   origins: ['<all_urls>'],
 };
 
+/**
+ * Whether this build carries the CLI, which only Chrome and Edge do for now.
+ */
+export const supportsCLI = (): boolean => process.env.STYLEBOT_CLI === 'true';
+
 type PermissionsCall = (
   permissions: chrome.permissions.Permissions,
   callback: (result: boolean) => void
