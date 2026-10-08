@@ -4,9 +4,13 @@ const NODE = process.execPath;
  * Loads register.mjs as it runs on a platform, with a home folder in which
  * only the given paths exist, and returns it with the mocks it wrote through.
  */
-const load = async (platform, { home, cwd, existing = [], dirs = [] }) => {
+const load = async (
+  platform,
+  { home, cwd, existing = [], dirs = [], contents = {} }
+) => {
   const fs = {
-    existsSync: jest.fn(file => existing.includes(file)),
+    existsSync: jest.fn(file => existing.includes(file) || file in contents),
+    readFileSync: jest.fn(file => contents[file]),
     readdirSync: jest.fn(() => dirs),
     mkdirSync: jest.fn(),
     writeFileSync: jest.fn(),
@@ -218,6 +222,81 @@ describe('registerHost on Windows', () => {
           'HKCU\\Software\\Google\\Chrome\\NativeMessagingHosts\\dev.stylebot.cli',
       },
     ]);
+  });
+});
+
+describe('isHostRegistered', () => {
+  const home = '/Users/ankit';
+  const launcher = `${home}/.stylebot/native-host`;
+  const chrome = `${home}/Library/Application Support/Google/Chrome`;
+  const manifest = `${chrome}/NativeMessagingHosts/dev.stylebot.cli.json`;
+
+  it('is true with the launcher and a browser manifest', async () => {
+    const { isHostRegistered } = await load('darwin', {
+      home,
+      cwd: '/tmp',
+      existing: [launcher, chrome, manifest],
+    });
+
+    expect(isHostRegistered()).toBe(true);
+  });
+
+  it('is false without a manifest where install writes one', async () => {
+    const { isHostRegistered } = await load('darwin', {
+      home,
+      cwd: '/tmp',
+      existing: [launcher, chrome],
+    });
+
+    expect(isHostRegistered()).toBe(false);
+  });
+
+  it('is false without the launcher', async () => {
+    const { isHostRegistered } = await load('darwin', {
+      home,
+      cwd: '/tmp',
+      existing: [chrome, manifest],
+    });
+
+    expect(isHostRegistered()).toBe(false);
+  });
+
+  it("reads Windows' manifest from ~/.stylebot", async () => {
+    const userProfile = 'C:\\Users\\ankit';
+    const { isHostRegistered } = await load('win32', {
+      home: userProfile,
+      cwd: 'C:\\',
+      existing: [
+        `${userProfile}\\.stylebot\\native-host.cmd`,
+        `${userProfile}\\.stylebot\\dev.stylebot.cli.json`,
+      ],
+    });
+
+    expect(isHostRegistered()).toBe(true);
+  });
+});
+
+describe('launcherNode', () => {
+  it('reads the node the launcher is pinned to', async () => {
+    const home = '/Users/ankit';
+    const { launcherNode } = await load('darwin', {
+      home,
+      cwd: '/tmp',
+      contents: {
+        [`${home}/.stylebot/native-host`]: `#!/bin/sh\nexec "/nvm/node" "${home}/.stylebot/host/host.mjs"\n`,
+      },
+    });
+
+    expect(launcherNode()).toBe('/nvm/node');
+  });
+
+  it('is undefined without a launcher', async () => {
+    const { launcherNode } = await load('darwin', {
+      home: '/Users/ankit',
+      cwd: '/tmp',
+    });
+
+    expect(launcherNode()).toBeUndefined();
   });
 });
 

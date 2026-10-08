@@ -7,7 +7,12 @@ import fs from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
 
-import { IS_WINDOWS, SOCKET_PATH } from './paths.mjs';
+import {
+  HOST_STARTED_PATH,
+  IS_WINDOWS,
+  SOCKET_PATH,
+  STATE_DIR,
+} from './paths.mjs';
 
 const pending = new Map();
 let nextId = 1;
@@ -56,10 +61,9 @@ const server = net.createServer(client => {
     }
 
     const id = nextId++;
-    const { command, args } = JSON.parse(input.slice(0, newline));
 
     pending.set(id, client);
-    send({ id, command, args });
+    send({ ...JSON.parse(input.slice(0, newline)), id });
   });
 
   client.on('close', () => {
@@ -85,6 +89,14 @@ const cleanup = () => {
 process.stdin.on('end', cleanup);
 process.on('SIGTERM', cleanup);
 process.on('SIGINT', cleanup);
+
+// Tells the CLI the browser has started the host, so the setting is on.
+try {
+  fs.mkdirSync(STATE_DIR, { recursive: true, mode: 0o700 });
+  fs.writeFileSync(HOST_STARTED_PATH, `${new Date().toISOString()}\n`);
+} catch {
+  // Only the CLI's error messages need it.
+}
 
 if (IS_WINDOWS) {
   // A pipe can't be taken over, so the first browser to start the host keeps it.

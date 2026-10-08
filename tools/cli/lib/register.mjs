@@ -134,7 +134,7 @@ const installedBrowsers = () => {
  * Writes the launcher the browser starts the host with, pinned to this
  * node because browsers start it without the shell's PATH.
  */
-const writeLauncher = () => {
+export const writeLauncher = () => {
   const host = join(HOST_DIR, 'host.mjs');
 
   if (IS_WINDOWS) {
@@ -149,6 +149,17 @@ const writeLauncher = () => {
       { mode: 0o755 }
     );
   }
+};
+
+/**
+ * The node the launcher is pinned to, or undefined without a launcher.
+ */
+export const launcherNode = () => {
+  if (!fs.existsSync(HOST_LAUNCHER_PATH)) {
+    return undefined;
+  }
+
+  return fs.readFileSync(HOST_LAUNCHER_PATH, 'utf8').match(/"([^"]+)"/)?.[1];
 };
 
 /**
@@ -169,6 +180,19 @@ const writeManifest = dir => {
 
   return file;
 };
+
+/**
+ * The folders registerHost writes host manifests to on macOS and Linux,
+ * per browser.
+ */
+const manifestFolders = () =>
+  [
+    ...devProfileDirs().map(dir => ({ name: 'Dev profile', dir })),
+    ...installedBrowsers(),
+  ].map(({ name, dir }) => ({
+    browser: name,
+    location: join(dir, 'NativeMessagingHosts'),
+  }));
 
 /**
  * Registers the host copied into HOST_DIR with the checkout's dev profiles
@@ -194,15 +218,27 @@ export const registerHost = () => {
     return registrations;
   }
 
-  return [
-    ...devProfileDirs().map(dir => ({ name: 'Dev profile', dir })),
-    ...installedBrowsers(),
-  ].map(({ name, dir }) => {
-    const location = join(dir, 'NativeMessagingHosts');
+  const registrations = manifestFolders();
 
+  for (const { location } of registrations) {
     writeManifest(location);
-    return { browser: name, location };
-  });
+  }
+
+  return registrations;
+};
+
+/**
+ * Whether `install` has registered the host where browsers look for it.
+ */
+export const isHostRegistered = () => {
+  const folders = IS_WINDOWS
+    ? [STATE_DIR]
+    : manifestFolders().map(({ location }) => location);
+
+  return (
+    fs.existsSync(HOST_LAUNCHER_PATH) &&
+    folders.some(dir => fs.existsSync(join(dir, `${HOST_NAME}.json`)))
+  );
 };
 
 /**

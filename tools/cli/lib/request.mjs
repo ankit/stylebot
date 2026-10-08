@@ -1,6 +1,9 @@
 import net from 'node:net';
 
+import { diagnoseConnection } from './diagnose.mjs';
+import { refreshHost } from './install.mjs';
 import { SOCKET_PATH } from './paths.mjs';
+import { cliStamp, incompatibility } from './protocol.mjs';
 
 export const fail = message => {
   console.error(`stylebot: ${message}`);
@@ -13,20 +16,17 @@ export const fail = message => {
  */
 export const request = (command, args = {}) =>
   new Promise((resolve, reject) => {
+    const { repinned } = refreshHost();
     const socket = net.connect(SOCKET_PATH);
     let output = '';
 
     socket.on('connect', () =>
-      socket.write(`${JSON.stringify({ command, args })}\n`)
+      socket.write(`${JSON.stringify({ command, args, ...cliStamp() })}\n`)
     );
     socket.on('data', chunk => (output += chunk));
     socket.on('error', error => {
       if (error.code === 'ENOENT' || error.code === 'ECONNREFUSED') {
-        reject(
-          new Error(
-            'Stylebot is not connected. Run `stylebot install`, open the browser with Stylebot, and turn on "Let apps on this computer control Stylebot" in its options.'
-          )
-        );
+        reject(new Error(diagnoseConnection({ code: error.code, repinned })));
       } else {
         reject(error);
       }
@@ -38,8 +38,11 @@ export const request = (command, args = {}) =>
       }
 
       const response = JSON.parse(output);
+      const problem = incompatibility(response);
 
-      if ('error' in response) {
+      if (problem) {
+        reject(new Error(problem));
+      } else if ('error' in response) {
         reject(new Error(response.error));
       } else {
         resolve(response.result);

@@ -6,6 +6,7 @@ import { get as getOption } from '../options';
 import { inspectCommands } from './inspect';
 import { pageCommands } from './pages';
 import { profileCommands } from './profiles';
+import { CLI_PROTOCOL } from './protocol';
 import { styleCommands } from './styles';
 import type { CliCommands, CliRequest, CliResponse } from './types';
 
@@ -39,19 +40,31 @@ const connect = (): void => {
   });
 
   connected.onMessage.addListener(async (request: CliRequest) => {
+    const stamp = {
+      id: request.id,
+      protocol: CLI_PROTOCOL,
+      version: chrome.runtime.getManifest().version,
+    };
     let response: CliResponse;
 
     try {
       const run = commands[request.command];
 
+      // The CLI explains a mismatch, from the protocol on the response.
+      if (request.protocol !== undefined && request.protocol !== CLI_PROTOCOL) {
+        throw new Error(
+          `The stylebot CLI speaks protocol ${request.protocol}, not ${CLI_PROTOCOL}`
+        );
+      }
+
       if (!run) {
         throw new Error(`Unknown command: ${request.command}`);
       }
 
-      response = { id: request.id, result: await run(request.args ?? {}) };
+      response = { ...stamp, result: await run(request.args ?? {}) };
     } catch (e) {
       response = {
-        id: request.id,
+        ...stamp,
         error: e instanceof Error ? e.message : String(e),
       };
     }

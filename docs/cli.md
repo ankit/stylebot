@@ -35,6 +35,16 @@ A browser counts as installed once it has created its user data folder, so run `
 
 Then turn on **Let apps on this computer control Stylebot** in Stylebot's options, under Basics, and allow what the browser asks for. The extension connects to the host while the setting is on; turning it off disconnects it and gives back the permission to talk to the host. If it was already on before you installed, reload the extension or restart the browser. The host runs only while the browser does.
 
+### When it can't connect
+
+A command that can't reach the host works out why and prints one fix:
+
+- No browser has the host registered: run `stylebot install`.
+- The host is registered but no browser has ever started it, so the setting is almost certainly off: turn it on. The host leaves a timestamp in `~/.stylebot/` each time a browser starts it, one per socket, so a test browser's doesn't count for yours.
+- A browser has started it before: the browser is closed, or Stylebot isn't running in it. Open it.
+
+The Claude Code skill relays these messages to you as they are, and runs `stylebot install` itself.
+
 ## Commands
 
 `yarn stylebot --help` lists every command, and `yarn stylebot <command> --help` describes one.
@@ -151,6 +161,14 @@ The browser starts the native host when the extension connects to it, and keeps 
 The code that reads a page loads into it the first time the CLI asks about that page, so pages the CLI never touches don't carry it.
 
 The extension connects only while the setting is on and the browser has granted its two optional permissions: `nativeMessaging` for the host, and `<all_urls>` for screenshots. Once granted, `<all_urls>` also lifts CORS on the background's own requests, so a cross-origin fetch that works there can still fail for someone who never turned the setting on. Chrome won't let the extension give `<all_urls>` back, since its content scripts already match every site, so turning the setting off removes only `nativeMessaging`.
+
+### Versions
+
+After it's published, the extension updates from the browser's store and the CLI from npm, so they can drift apart. Each request carries the CLI's protocol number and version, and each response the extension's. They work together only when the protocol numbers are equal: the extension refuses a request in another protocol without running it, and the CLI says which side to update, the CLI with npm or Stylebot in the browser. An extension that sends no protocol predates the check, so the CLI asks for Stylebot to be updated. The check rides on every command, with no extra round trip.
+
+Bump the protocol, in the CLI and the extension together, when a change to a command's arguments or result would break the other side: renaming or removing a command or a field, or changing what one means. Adding a command or an optional field doesn't need a bump.
+
+The host copy in `~/.stylebot/` records the CLI version that installed it. When a different version of the CLI runs, it copies the host again first, and when the node the launcher is pinned to is gone, such as after a node upgrade, it pins the launcher to its own. Both happen quietly before the command runs. A browser keeps running the host it started until the extension reconnects, which is harmless while the host only relays; after a repin, though, the browser couldn't start the host at all, so the CLI asks for a browser restart if it then can't connect.
 
 ### Windows
 

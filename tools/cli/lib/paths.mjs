@@ -34,3 +34,10 @@ export const HOST_LAUNCHER_PATH = join(
   STATE_DIR,
   IS_WINDOWS ? 'native-host.cmd' : 'native-host'
 );
+// Named after the socket, so a test browser's host doesn't mark yours as started.
+export const HOST_STARTED_PATH = join(
+  STATE_DIR,
+  `${basename(SOCKET_PATH)}.started`
+);
+// The CLI version that copied the host, to copy it again after an update.
+export const HOST_VERSION_PATH = join(HOST_DIR, 'version');

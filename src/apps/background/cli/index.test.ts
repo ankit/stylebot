@@ -1,11 +1,14 @@
 import { OpenOptionsPage } from '../messages';
 import { get as getOption } from '../options';
 import { initCliBridge, updateCliBridge } from './index';
+import { pageCommands } from './pages';
 
 jest.mock('../messages', () => ({ OpenOptionsPage: jest.fn() }));
 jest.mock('../options', () => ({ get: jest.fn() }));
 jest.mock('./inspect', () => ({ inspectCommands: {} }));
-jest.mock('./pages', () => ({ pageCommands: {} }));
+jest.mock('./pages', () => ({
+  pageCommands: { tabs: jest.fn(async () => ['tab']) },
+}));
 jest.mock('./profiles', () => ({ profileCommands: {} }));
 jest.mock('./styles', () => ({ styleCommands: {} }));
 
@@ -21,7 +24,8 @@ let storage: Record<string, unknown>;
 let port: {
   disconnect: jest.Mock;
   onDisconnect: { addListener: (l: Listener) => void };
-  onMessage: { addListener: () => void };
+  onMessage: { addListener: (l: Listener) => void };
+  postMessage: jest.Mock;
 };
 
 const flush = () => new Promise(resolve => setTimeout(resolve, 0));
@@ -44,7 +48,8 @@ const connectNative = jest.fn(() => {
   port = {
     disconnect: jest.fn(),
     onDisconnect: listen('portDisconnected'),
-    onMessage: { addListener: jest.fn() },
+    onMessage: listen('portMessage'),
+    postMessage: jest.fn(),
   };
   return port;
 });
@@ -59,6 +64,7 @@ beforeEach(async () => {
       lastError: undefined,
       connectNative,
       reload: jest.fn(),
+      getManifest: () => ({ version: '4.0.0' }),
     },
     permissions: {
       contains: jest.fn((_permissions, callback) => callback(granted)),
@@ -215,5 +221,42 @@ describe('initCliBridge', () => {
 
     expect(chrome.runtime.reload).not.toBeCalled();
     expect(console.error).toBeCalled();
+  });
+});
+
+describe('CLI requests', () => {
+  /**
+   * Sends a request through the connected port and resolves to the response.
+   */
+  const send = async (request: Record<string, unknown>) => {
+    await changeOption(false, true);
+    await listeners.portMessage({
+      id: 7,
+      command: 'tabs',
+      args: {},
+      ...request,
+    });
+    return port.postMessage.mock.calls[0][0];
+  };
+
+  it('runs a request in its protocol and stamps the response with its own', async () => {
+    expect(await send({ protocol: 1, version: '0.1.0' })).toEqual({
+      id: 7,
+      protocol: 1,
+      version: '4.0.0',
+      result: ['tab'],
+    });
+  });
+
+  it('refuses a request in another protocol without running it', async () => {
+    const response = await send({ protocol: 2, version: '0.9.0' });
+
+    expect(response).toMatchObject({ id: 7, protocol: 1, version: '4.0.0' });
+    expect(response.error).toMatch(/protocol 2/);
+    expect(pageCommands.tabs).not.toBeCalled();
+  });
+
+  it('runs a request from before the handshake', async () => {
+    expect(await send({})).toMatchObject({ protocol: 1, result: ['tab'] });
   });
 });
