@@ -175,7 +175,18 @@ const listen = (): void => {
   });
 };
 
+/**
+ * Removes what an earlier copy of this script left on the page: after
+ * Stylebot reloads it runs again here, and the old copy no longer responds.
+ * A panel left behind would also stop the new one from mounting.
+ */
+const removeDeadEditor = (): void =>
+  ['stylebot', 'stylebot-overlay', 'stylebot-inspect-cursor'].forEach(id =>
+    document.getElementById(id)?.remove()
+  );
+
 // A PDF, JSON or XML file gets nothing; its viewer breaks under the editor.
 if (isStylableDocument(document.contentType)) {
+  removeDeadEditor();
   listen();
 }

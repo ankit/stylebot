@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, waitFor, within } from '@storybook/test';
-import { CLI_PERMISSIONS } from '@stylebot/settings';
 
 import TheCliAccess from './TheCliAccess.vue';
 import { cliAccessCard } from '@stylebot/storybook/fixtures/options';
@@ -19,12 +18,17 @@ const toggle = (root: HTMLElement) =>
     name: /Let apps on this computer control Stylebot/,
   });
 
+const CLI_REQUEST = {
+  permissions: ['nativeMessaging', 'scripting'],
+  origins: ['<all_urls>'],
+};
+
 export const SavesOnceGranted: StoryObj = {
   ...cliAccessCard({}, async (root, store) => {
     await user.click(toggle(root));
 
     await expect(chrome.permissions.request).toHaveBeenCalledWith(
-      CLI_PERMISSIONS,
+      CLI_REQUEST,
       expect.any(Function)
     );
     await waitFor(() => expect(store.state.options?.cliAccess).toBe(true));
@@ -39,7 +43,7 @@ export const StaysOffWhenDenied: StoryObj = {
     await user.click(toggle(root));
 
     await expect(chrome.permissions.request).toHaveBeenCalledWith(
-      CLI_PERMISSIONS,
+      CLI_REQUEST,
       expect.any(Function)
     );
     await waitFor(() => expect(toggle(root)).not.toBeChecked());

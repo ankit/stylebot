@@ -184,6 +184,8 @@ The code that reads a page loads into it the first time the CLI asks about that 
 
 The extension connects only while the setting is on and the browser has granted its two optional permissions: `nativeMessaging` for the host, and `<all_urls>` for screenshots. Once granted, `<all_urls>` also lifts CORS on the background's own requests, so a cross-origin fetch that works there can still fail for someone who never turned the setting on. Chrome won't let the extension give `<all_urls>` back, since its content scripts already match every site, so turning the setting off removes only `nativeMessaging`.
 
+Chrome lets the background reach the native host only once it starts again after the grant, so turning the setting on restarts the extension once. A restart cuts off the content scripts already running in open tabs, and Chrome only injects into pages that load afterwards. So the setting also asks for `scripting`, which has no install warning, and after the restart Stylebot runs its content scripts again in the open tabs. The fresh copy removes the panel the old one left, which no longer responds.
+
 ### Versions
 
 After it's published, the extension updates from the browser's store and the CLI from npm, so they can drift apart. Each request carries the CLI's protocol number and version, and each response the extension's. They work together only when the protocol numbers are equal: the extension refuses a request in another protocol without running it, and the CLI says which side to update, the CLI with npm or Stylebot in the browser. An extension that sends no protocol predates the check, so the CLI asks for Stylebot to be updated. The check rides on every command, with no extra round trip.

@@ -2,6 +2,7 @@ import { OpenOptionsPage } from '../messages';
 import { get as getOption } from '../options';
 import { initCliBridge, updateCliBridge } from './index';
 import { pageCommands } from './pages';
+import { restoreOpenTabs } from './restore-tabs';
 
 jest.mock('../messages', () => ({ OpenOptionsPage: jest.fn() }));
 jest.mock('../options', () => ({ get: jest.fn() }));
@@ -11,6 +12,7 @@ jest.mock('./pages', () => ({
 }));
 jest.mock('./pointer', () => ({ pointerCommands: {} }));
 jest.mock('./profiles', () => ({ profileCommands: {} }));
+jest.mock('./restore-tabs', () => ({ restoreOpenTabs: jest.fn() }));
 jest.mock('./styles', () => ({ styleCommands: {} }));
 
 type Listener = (...args: Array<unknown>) => void;
@@ -202,15 +204,24 @@ describe('initCliBridge', () => {
     expect(storage).toEqual({ 'cli-reloaded-for-grant': true });
   });
 
-  it('connects and reopens Options on Basics after that reload', async () => {
+  it('connects, restores open tabs and reopens Options on Basics after that reload', async () => {
     storage['cli-reloaded-for-grant'] = true;
     setOption(true);
 
     await restart({ connectNative } as never);
 
     expect(connectNative).toBeCalledTimes(1);
+    expect(restoreOpenTabs).toBeCalledTimes(1);
     expect(OpenOptionsPage).toBeCalledWith({ route: '/basics' });
     expect(storage).toEqual({});
+  });
+
+  it('leaves open tabs alone on an ordinary start', async () => {
+    setOption(true);
+
+    await restart({ connectNative } as never);
+
+    expect(restoreOpenTabs).not.toBeCalled();
   });
 
   it("doesn't reload again when connectNative is still missing after it", async () => {

@@ -66,11 +66,12 @@ const supportsCLI = browser => CLI_BROWSERS.includes(browser ?? CHROME);
 
 /**
  * Adds the CLI's permissions, requested only when it's turned on, and its
- * page inspector.
+ * page inspector. Scripting puts Stylebot back into the tabs open during the
+ * restart that turning it on takes.
  */
 const addCli = manifest => ({
   ...manifest,
-  optional_permissions: ['nativeMessaging'],
+  optional_permissions: ['nativeMessaging', 'scripting'],
   optional_host_permissions: ['<all_urls>'],
   web_accessible_resources: [
     ...manifest.web_accessible_resources,

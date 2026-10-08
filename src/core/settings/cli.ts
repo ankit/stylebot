@@ -8,6 +8,15 @@ export const CLI_PERMISSIONS: chrome.permissions.Permissions = {
 };
 
 /**
+ * What turning the CLI on asks for: its permissions, and scripting to put
+ * Stylebot back into open tabs after the restart the grant takes.
+ */
+const CLI_REQUEST: chrome.permissions.Permissions = {
+  ...CLI_PERMISSIONS,
+  permissions: ['nativeMessaging', 'scripting'],
+};
+
+/**
  * Whether this build carries the CLI, which only Chrome and Edge do for now.
  */
 export const supportsCLI = (): boolean => process.env.STYLEBOT_CLI === 'true';
@@ -44,7 +53,7 @@ export const hasCliPermissions = (): Promise<boolean> =>
  * await, since the browser only prompts during a user gesture.
  */
 export const requestCliPermissions = (): Promise<boolean> =>
-  callPermissions(chrome.permissions.request, CLI_PERMISSIONS);
+  callPermissions(chrome.permissions.request, CLI_REQUEST);
 
 /**
  * Gives back the native host, which cuts the CLI off. Chrome refuses to remove

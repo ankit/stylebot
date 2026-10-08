@@ -22,16 +22,23 @@ beforeEach(() => {
 });
 
 describe('CLI permissions', () => {
-  it('checks and requests the native host and every site', async () => {
+  it('checks for the native host and every site', async () => {
     await expect(hasCliPermissions()).resolves.toBe(true);
-    await expect(requestCliPermissions()).resolves.toBe(true);
 
     expect(chrome.permissions.contains).toBeCalledWith(
       CLI_PERMISSIONS,
       expect.any(Function)
     );
+  });
+
+  it('asks for scripting too, to restore open tabs after the restart', async () => {
+    await expect(requestCliPermissions()).resolves.toBe(true);
+
     expect(chrome.permissions.request).toBeCalledWith(
-      CLI_PERMISSIONS,
+      {
+        permissions: ['nativeMessaging', 'scripting'],
+        origins: ['<all_urls>'],
+      },
       expect.any(Function)
     );
   });

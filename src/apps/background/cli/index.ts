@@ -8,6 +8,7 @@ import { pageCommands } from './pages';
 import { pointerCommands } from './pointer';
 import { profileCommands } from './profiles';
 import { CLI_PROTOCOL } from './protocol';
+import { restoreOpenTabs } from './restore-tabs';
 import { styleCommands } from './styles';
 import type { CliCommands, CliRequest, CliResponse } from './types';
 
@@ -97,8 +98,9 @@ const reloadForGrant = async (): Promise<void> => {
 };
 
 /**
- * Reopens Options after a reload for a grant, and reports whether this start
- * followed one, so a browser that still lacks connectNative isn't reloaded again.
+ * Restores open tabs and reopens Options after a reload for a grant, and
+ * reports whether this start followed one, so a browser that still lacks
+ * connectNative isn't reloaded again.
  */
 const resumeAfterGrantReload = async (): Promise<boolean> => {
   const items = await chrome.storage.local.get(RELOADED_FOR_GRANT_KEY);
@@ -108,6 +110,7 @@ const resumeAfterGrantReload = async (): Promise<boolean> => {
   }
 
   await chrome.storage.local.remove(RELOADED_FOR_GRANT_KEY);
+  await restoreOpenTabs();
   OpenOptionsPage({ route: '/basics' });
   return true;
 };

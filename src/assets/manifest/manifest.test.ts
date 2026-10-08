@@ -141,7 +141,10 @@ describe('CLI permissions', () => {
 
     expect(manifest.permissions).toEqual(base.permissions);
     expect(manifest.host_permissions).toEqual(base.host_permissions);
-    expect(manifest.optional_permissions).toEqual(['nativeMessaging']);
+    expect(manifest.optional_permissions).toEqual([
+      'nativeMessaging',
+      'scripting',
+    ]);
     expect(manifest.optional_host_permissions).toEqual(['<all_urls>']);
   });
 
