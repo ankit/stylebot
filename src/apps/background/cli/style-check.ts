@@ -1,5 +1,6 @@
 import * as postcss from 'postcss';
 
+import { getStableSelector } from '@stylebot/css';
 import type { ChatCssEdit } from '@stylebot/types';
 
 const KEYFRAMES = /keyframes$/i;
@@ -113,6 +114,27 @@ export const ruleSelectors = (root: postcss.Root): Array<string> => {
   const selectors: Array<string> = [];
   walkStyleRules(root, rule => selectors.push(rule.selector));
   return selectors;
+};
+
+/**
+ * Swaps each partly hashed class in the css's style rules for its stable
+ * matcher, as Chat does when it saves, and lists the selectors it changed.
+ */
+export const useStableSelectors = (
+  root: postcss.Root
+): Array<{ from: string; to: string }> => {
+  const swapped: Array<{ from: string; to: string }> = [];
+
+  walkStyleRules(root, rule => {
+    const to = getStableSelector(rule.selector);
+
+    if (to !== rule.selector) {
+      swapped.push({ from: rule.selector, to });
+      rule.selector = to;
+    }
+  });
+
+  return swapped;
 };
 
 /**

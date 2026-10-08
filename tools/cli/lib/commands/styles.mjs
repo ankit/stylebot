@@ -13,6 +13,7 @@ const describeSave = ({
   url,
   deleted,
   fonts,
+  swappedSelectors,
   checkedTab,
   check,
   fragileSelectors,
@@ -25,6 +26,15 @@ const describeSave = ({
 
   if (fonts.length) {
     lines.push(`Imported from Google Fonts: ${fonts.join(', ')}`);
+  }
+
+  if (swappedSelectors.length) {
+    lines.push(
+      "Saved these selectors by the stable part of their generated class names, so they outlive the site's next build:",
+      ...swappedSelectors.map(
+        ({ from, to }) => `- ${oneLine(from)} → ${oneLine(to)}`
+      )
+    );
   }
 
   if (check === null) {

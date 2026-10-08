@@ -12,6 +12,7 @@ import {
   parseCss,
   parseSavedCss,
   ruleSelectors,
+  useStableSelectors,
 } from './style-check';
 import {
   findTabShowing,
@@ -132,8 +133,11 @@ export const styleCommands: CliCommands = {
       return { url, deleted: true };
     }
 
-    const { css: next, fonts } = await addFontImports(String(css));
-    const after = parseCss(next);
+    const withFonts = await addFontImports(String(css));
+    const after = parseCss(withFonts.css);
+    const swappedSelectors = useStableSelectors(after);
+    const { fonts } = withFonts;
+    const next = swappedSelectors.length ? after.toString() : withFonts.css;
     const selectors = ruleSelectors(after);
     const edits = changedDeclarations(
       parseSavedCss(sheets[id]?.css ?? ''),
@@ -154,6 +158,7 @@ export const styleCommands: CliCommands = {
       url,
       deleted: false,
       fonts,
+      swappedSelectors,
       checkedTab: report ? tabId : null,
       selectors,
       matchCounts: report?.matchCounts ?? null,

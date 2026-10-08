@@ -5,6 +5,7 @@ import {
   parseCss,
   parseSavedCss,
   ruleSelectors,
+  useStableSelectors,
 } from './style-check';
 
 describe('changedDeclarations', () => {
@@ -80,5 +81,38 @@ describe('parseCss', () => {
 describe('parseSavedCss', () => {
   it('reads css that does not parse as empty', () => {
     expect(parseSavedCss('a { color: red;').nodes).toEqual([]);
+  });
+});
+
+describe('useStableSelectors', () => {
+  it('swaps partly hashed classes for their stable matchers in place', () => {
+    const root = parseCss(
+      '.Header_nav__a1B2c a { color: red; }\n@media (max-width: 600px) { .Header_nav__a1B2c { margin: 0; } }'
+    );
+
+    expect(useStableSelectors(root)).toEqual([
+      {
+        from: '.Header_nav__a1B2c a',
+        to: '[class*="Header_nav__"] a',
+      },
+      {
+        from: '.Header_nav__a1B2c',
+        to: '[class*="Header_nav__"]',
+      },
+    ]);
+    expect(root.toString()).toBe(
+      '[class*="Header_nav__"] a { color: red; }\n@media (max-width: 600px) { [class*="Header_nav__"] { margin: 0; } }'
+    );
+  });
+
+  it('leaves authored selectors and classes with no stable part alone', () => {
+    const root = parseCss(
+      '.menu a { color: red; } .css-1a0ymrn { margin: 0; }'
+    );
+
+    expect(useStableSelectors(root)).toEqual([]);
+    expect(root.toString()).toBe(
+      '.menu a { color: red; } .css-1a0ymrn { margin: 0; }'
+    );
   });
 });

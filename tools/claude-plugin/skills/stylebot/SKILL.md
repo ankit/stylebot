@@ -37,7 +37,7 @@ If `stylebot` isn't found, the CLI isn't installed: tell the user to install it 
    - Fix the cause, not the symptom. When only some of a selector's elements are hard to read, or one of your selectors painted a background, that selector is probably too broad (`tr:first-child td` matches the first row of every table): narrow it or take it back rather than recoloring text everywhere.
    - When one of your variables set the text's color, change that variable once instead of recoloring each element that uses it.
    - Replace a selector that matched nothing with one from the outline, unless it's meant for another page of the site. One that matched hundreds of elements is probably too broad.
-   - Swap a fragile selector for the stable version it suggests, or select by something else.
+   - When `css set` reports selectors it saved by the stable part of a class name, keep them that way. Replace a fragile selector left in the report, built on a class name with no stable part, with one that selects by something else.
 7. **Look at it**: `stylebot screenshot <tab> -o ~/.stylebot/work/<site>-<n>.png`, then open the image and look at it; never report a change you haven't seen. Run `stylebot outline <tab>` again too: it shows the colors and sizes as they are now, so it confirms a selector took effect and catches dark text on a dark background. Fix what's off and repeat.
 8. **Close up**: run `stylebot done` to close Stylebot's window.
 9. **Tell the user** in a sentence or two what changed, that it's saved in the "Claude: <look>" profile, and that `stylebot profile use <their profile> <site>` (or the profile menu in Stylebot) switches back. Don't paste the CSS unless they ask.
