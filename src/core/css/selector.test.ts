@@ -9,6 +9,7 @@ import {
   getFragileSelector,
   getClassBasedSelector,
   getIdBasedSelector,
+  getLabelBasedSelector,
   getTagNameBasedSelector,
   getAncestorBasedSelector,
   validateSelector,
@@ -320,6 +321,51 @@ describe('selector', () => {
     });
   });
 
+  describe('getLabelBasedSelector', () => {
+    const page = (html: string) => {
+      document.body.innerHTML = html;
+      return document.body.firstElementChild as HTMLElement;
+    };
+
+    it('selects a link by its path', () => {
+      const el = page('<a class="css-abc12d" href="/section/world">');
+
+      expect(getLabelBasedSelector(el)).toBe('a[href="/section/world"]');
+    });
+
+    it('skips a link with a query or hash', () => {
+      expect(getLabelBasedSelector(page('<a href="/s?x=1">'))).toBeNull();
+      expect(getLabelBasedSelector(page('<a href="/s#top">'))).toBeNull();
+    });
+
+    it('skips a link path with an id or date in it', () => {
+      const el = page('<a href="/2026/10/08/story.html">');
+
+      expect(getLabelBasedSelector(el)).toBeNull();
+    });
+
+    it('skips the home link and non-page schemes', () => {
+      expect(getLabelBasedSelector(page('<a href="/">'))).toBeNull();
+      expect(getLabelBasedSelector(page('<a href="mailto:a@b.c">'))).toBeNull();
+    });
+
+    it('selects an element by its aria-label', () => {
+      const el = page('<button class="css-abc12d" aria-label="Search">');
+
+      expect(getLabelBasedSelector(el)).toBe('button[aria-label="Search"]');
+    });
+
+    it('is null while it would match more than the own class does', () => {
+      document.body.innerHTML =
+        '<button class="css-abc12d" aria-label="Next"></button>' +
+        '<button class="css-other1" aria-label="Next"></button>';
+
+      expect(
+        getLabelBasedSelector(document.body.firstElementChild as HTMLElement)
+      ).toBeNull();
+    });
+  });
+
   describe('getTagNameBasedSelector', () => {
     it('returns just the tag name when there is no parent', () => {
       const el = document.createElement('div');
@@ -446,6 +492,22 @@ describe('selector', () => {
       el.setAttribute('class', 'bar');
 
       expect(getSelector(el)).toBe('div.bar');
+    });
+
+    it('prefers an aria-label over a hashed class', () => {
+      document.body.innerHTML = '<button class="WwrzSb" aria-label="Search">';
+
+      expect(getSelector(document.body.firstElementChild as HTMLElement)).toBe(
+        'button[aria-label="Search"]'
+      );
+    });
+
+    it('prefers a real class over an aria-label', () => {
+      const el = document.createElement('button');
+      el.setAttribute('class', 'search');
+      el.setAttribute('aria-label', 'Search');
+
+      expect(getSelector(el)).toBe('button.search');
     });
 
     it('prefers a test-id over a hashed class', () => {
