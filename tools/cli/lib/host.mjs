@@ -1,13 +1,13 @@
 /**
  * The native messaging host the browser starts for Stylebot. Relays each
- * request from the `stylebot` CLI, which arrives on a Unix socket, to the
- * extension over stdio, and its response back.
+ * request from the `stylebot` CLI, which arrives on a Unix socket (a named
+ * pipe on Windows), to the extension over stdio, and its response back.
  */
 import fs from 'node:fs';
 import net from 'node:net';
 import path from 'node:path';
 
-import { SOCKET_PATH } from './paths.mjs';
+import { IS_WINDOWS, SOCKET_PATH } from './paths.mjs';
 
 const pending = new Map();
 let nextId = 1;
@@ -73,7 +73,11 @@ const server = net.createServer(client => {
 
 const cleanup = () => {
   server.close();
-  fs.rmSync(SOCKET_PATH, { force: true });
+
+  if (!IS_WINDOWS) {
+    fs.rmSync(SOCKET_PATH, { force: true });
+  }
+
   process.exit(0);
 };
 
@@ -82,7 +86,16 @@ process.stdin.on('end', cleanup);
 process.on('SIGTERM', cleanup);
 process.on('SIGINT', cleanup);
 
-fs.mkdirSync(path.dirname(SOCKET_PATH), { recursive: true, mode: 0o700 });
-// The newest browser to start the host takes over the socket.
-fs.rmSync(SOCKET_PATH, { force: true });
-server.listen(SOCKET_PATH, () => fs.chmodSync(SOCKET_PATH, 0o600));
+if (IS_WINDOWS) {
+  // A pipe can't be taken over, so the first browser to start the host keeps it.
+  server.on('error', error => {
+    console.error(`stylebot: can't listen on ${SOCKET_PATH}: ${error.message}`);
+    process.exit(1);
+  });
+  server.listen(SOCKET_PATH);
+} else {
+  fs.mkdirSync(path.dirname(SOCKET_PATH), { recursive: true, mode: 0o700 });
+  // The newest browser to start the host takes over the socket.
+  fs.rmSync(SOCKET_PATH, { force: true });
+  server.listen(SOCKET_PATH, () => fs.chmodSync(SOCKET_PATH, 0o600));
+}

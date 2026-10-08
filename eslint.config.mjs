@@ -190,5 +190,12 @@ export default tseslint.config(
     // createRequire() is the ESM-correct way to load these CommonJS helpers.
     files: ['scripts/**/*.mjs', 'evals/**/*.mjs'],
     rules: { '@typescript-eslint/no-require-imports': 'off' },
+  },
+
+  {
+    // Jest loads mocked modules fresh through require() in isolateModules().
+    files: ['**/*.test.mjs'],
+    languageOptions: { globals: globals.jest },
+    rules: { '@typescript-eslint/no-require-imports': 'off' },
   }
 );

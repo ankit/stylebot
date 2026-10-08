@@ -17,7 +17,7 @@
     "build:preview": "cross-env NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=production STYLEBOT_PREVIEW=1 webpack --hide-modules",
     "build:firefox": "cross-env NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=production BROWSER=firefox webpack --hide-modules",
     "build:safari": "cross-env NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=production BROWSER=safari webpack --hide-modules",
-    "stylebot": "tools/cli/bin/stylebot",
+    "stylebot": "node tools/cli/lib/cli.mjs",
     "watch": "cross-env NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=development webpack --hide-modules --watch",
     "watch:firefox": "cross-env NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=development BROWSER=firefox webpack --hide-modules --watch",
     "watch:safari": "cross-env NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=development BROWSER=safari webpack --hide-modules --watch",
@@ -49,10 +49,12 @@
   },
   "jest": {
     "roots": [
-      "<rootDir>/src"
+      "<rootDir>/src",
+      "<rootDir>/tools"
     ],
     "moduleFileExtensions": [
       "js",
+      "mjs",
       "ts",
       "json",
       "vue"
@@ -60,11 +62,19 @@
     "setupFiles": [
       "<rootDir>/jest/setup.js"
     ],
-    "testRegex": "\\.(test|spec)\\.(jsx?|tsx?)$",
+    "testRegex": "\\.(test|spec)\\.(m?jsx?|tsx?)$",
     "transform": {
       ".*\\.(vue)$": "@vue/vue2-jest",
       "^.+\\.ts$": "ts-jest",
-      "^.+\\.js$": "babel-jest"
+      "^.+\\.js$": "babel-jest",
+      "^.+\\.mjs$": [
+        "babel-jest",
+        {
+          "plugins": [
+            "@babel/plugin-transform-modules-commonjs"
+          ]
+        }
+      ]
     },
     "moduleNameMapper": {
       "^@stylebot/inject-css$": "<rootDir>/src/apps/content/index",
@@ -119,6 +129,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.10.1",
+    "@babel/plugin-transform-modules-commonjs": "^7.27.1",
     "@eslint/js": "^9",
     "@playwright/test": "1.63.0",
     "@storybook/addon-controls": "~7.6.20",

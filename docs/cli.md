@@ -2,15 +2,17 @@
 
 A command line for driving Stylebot in a running browser: list tabs, read and inspect pages, get and set styles, and take screenshots. It's meant for scripting and for coding agents such as Claude Code, which can restyle a page and check the result without the editor open.
 
-It works with Stylebot on Chrome and Edge, once turned on in Stylebot's options. Firefox and Safari aren't supported yet.
+It works with Stylebot on Chrome, Edge and the other Chromium browsers listed below, on macOS, Linux and Windows, once turned on in Stylebot's options. Firefox and Safari aren't supported yet.
 
 ## Setup
 
-The CLI needs Node 20 or later. Inside this repo, `yarn stylebot` runs it. To run it as `stylebot` from anywhere, link it onto your `PATH`:
+The CLI needs Node 20 or later. Inside this repo, `yarn stylebot` runs it. To run it as `stylebot` from anywhere on macOS or Linux, link it onto your `PATH`:
 
 ```bash
 ln -s "$PWD/tools/cli/bin/stylebot" ~/bin/stylebot
 ```
+
+On Windows, run `yarn stylebot` or `node tools\cli\lib\cli.mjs`.
 
 Then register it with your browsers, from the repo so it finds the dev profiles:
 
@@ -18,7 +20,18 @@ Then register it with your browsers, from the repo so it finds the dev profiles:
 yarn stylebot install
 ```
 
-This copies the CLI's native messaging host into `~/.stylebot/` and registers it with your installed Chrome and Edge, and with the dev profiles `yarn dev:chrome` launches.
+This copies the CLI's native messaging host into `~/.stylebot/` and registers it with each installed browser, listing where. On macOS and Linux it also registers with the dev profiles `yarn dev:chrome` launches, which keep their own list of hosts; on Windows the browser's registration covers them.
+
+| Browser  | macOS | Linux | Windows |
+| -------- | ----- | ----- | ------- |
+| Chrome   | ✓     | ✓     | ✓       |
+| Edge     | ✓     | ✓     | ✓       |
+| Brave    | ✓     | ✓     | ✓       |
+| Chromium | ✓     | ✓     | ✓       |
+| Vivaldi  | ✓     | ✓     | ✓       |
+| Arc      | ✓     |       |         |
+
+A browser counts as installed once it has created its user data folder, so run `install` again after installing a new browser.
 
 Then turn on **Let apps on this computer control Stylebot** in Stylebot's options, under Basics, and allow what the browser asks for. The extension connects to the host while the setting is on; turning it off disconnects it and gives back the permission to talk to the host. If it was already on before you installed, reload the extension or restart the browser. The host runs only while the browser does.
 
@@ -139,6 +152,52 @@ The code that reads a page loads into it the first time the CLI asks about that 
 
 The extension connects only while the setting is on and the browser has granted its two optional permissions: `nativeMessaging` for the host, and `<all_urls>` for screenshots. Once granted, `<all_urls>` also lifts CORS on the background's own requests, so a cross-origin fetch that works there can still fail for someone who never turned the setting on. Chrome won't let the extension give `<all_urls>` back, since its content scripts already match every site, so turning the setting off removes only `nativeMessaging`.
 
+### Windows
+
+Windows has no Unix sockets, so there the host listens on a named pipe for your user, and a `STYLEBOT_SOCKET` path names a pipe after its file. A pipe can't be taken over, so on Windows the first browser to connect keeps the CLI until it quits.
+
+### Where browsers find the host
+
+Browsers find the host through a manifest that names its launcher and allows Stylebot's Chrome Web Store and Edge Add-ons ids. On macOS and Linux the manifest goes in a `NativeMessagingHosts` folder in the browser's user data folder, and the dev profiles get their own. On Windows one manifest in `~/.stylebot/` is registered under a `NativeMessagingHosts` key in `HKCU\Software`.
+
+#### Chrome
+
+- macOS: `~/Library/Application Support/Google/Chrome`
+- Linux: `~/.config/google-chrome`
+- Windows: `HKCU\Software\Google\Chrome`
+
+#### Edge
+
+- macOS: `~/Library/Application Support/Microsoft Edge`
+- Linux: `~/.config/microsoft-edge`
+- Windows: `HKCU\Software\Microsoft\Edge`
+
+#### Brave
+
+Brave reads Chrome's hosts on macOS and Windows, so it shares Chrome's registration there.
+
+- macOS: `~/Library/Application Support/Google/Chrome`
+- Linux: `~/.config/BraveSoftware/Brave-Browser`
+- Windows: `HKCU\Software\Google\Chrome`
+
+#### Chromium
+
+- macOS: `~/Library/Application Support/Chromium`
+- Linux: `~/.config/chromium`
+- Windows: `HKCU\Software\Chromium`
+
+#### Vivaldi
+
+Vivaldi reads Chrome's key on Windows.
+
+- macOS: `~/Library/Application Support/Vivaldi`
+- Linux: `~/.config/vivaldi`
+- Windows: `HKCU\Software\Google\Chrome`
+
+#### Arc
+
+- macOS: `~/Library/Application Support/Arc/User Data`
+
 ## The setup page
 
 stylebot.dev/cli walks someone through setup, with a checklist that follows along live. The extension can't learn about the CLI before the setting is on, so the page asks the extension instead, through `window.postMessage` on the page itself. Until the extension answers, the page shows only the steps, without checkmarks.
@@ -166,5 +225,5 @@ The page ignores a reply unless it comes from its own window and origin and ever
 ## Before it can ship
 
 - Publishing the CLI to npm, for the plugin to fall back to, and the plugin through a public marketplace
-- Install support for Edge's store id, other Chromium browsers, Windows and Firefox
+- Install support for Firefox
 - A visible sign that the CLI is connected, since any local process can use the socket
