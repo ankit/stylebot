@@ -38,6 +38,11 @@ describe('hashed-class', () => {
       ['page-module__E0kJGG__navItem', ['page-module__', '__navItem']],
       ['_card_1wfme_1', ['_card_']],
       ['caa-button-label-_R_93adeslcldcpbn6b5ipam_', ['caa-button-label-']],
+      ['ZcdlOG_nav', ['_nav']],
+      ['Wr7_RG_mastheadContainer', ['_mastheadContainer']],
+      ['jXhsNG_dividerLeft', ['_dividerLeft']],
+      ['_5zuA3W_topDivider', ['_topDivider']],
+      ['w7VYaa_topBorder', ['_topBorder']],
     ])('keeps the authored parts of %s', (className, expected) => {
       expect(getStableClassParts(className)).toEqual(expected);
     });
@@ -54,6 +59,10 @@ describe('hashed-class', () => {
       'Card-Title-Large',
       'bg-red-500',
       '__a1B2c',
+      'navBar_item',
+      'Header_nav',
+      'button_primary',
+      'IconButton_label',
     ])('finds no hash in %s', className => {
       expect(getStableClassParts(className)).toBeNull();
     });

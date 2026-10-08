@@ -88,6 +88,10 @@ partly hashed, in which case the authored part is kept:
   changes. The parts on either side are kept, so Turbopack's
   `page-module__E0kJGG__main` becomes
   `[class*="page-module__"][class*="__main"]`.
+- a 6-character hash at the start, as the New York Times names them
+  (`ZcdlOG_nav`, `Wr7_RG_mastheadContainer`), which keeps the authored part,
+  `[class*="_nav"]`. The hash must mix letters with digits or have several
+  capitals, so a camelCase word like `navBar_item` stays authored.
 - styled-components' `Name-sc-hash-0`, which keeps `Name-sc-`.
 - Vite's `_card_1wfme_1`, which keeps `_card_`.
 - a React id suffix, as in `button-label-_R_93ades_`, which keeps

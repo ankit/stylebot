@@ -46,6 +46,35 @@ function isDashedHash(hash: string): boolean {
 }
 
 /**
+ * Whether a 6-character head reads like a build hash, e.g. `ZcdlOG` or
+ * `w7VYaa`, rather than a camelCase or PascalCase word like `navBar`.
+ */
+function isLeadingHash(head: string): boolean {
+  const letters = head.replace(/_/g, '');
+
+  if (hasDigitAmongLetters(letters)) {
+    return true;
+  }
+
+  return (
+    /[a-z]/.test(letters) &&
+    (letters.match(/[A-Z]/g) ?? []).length >= 2 &&
+    !/^[a-z]{2,}([A-Z][a-z]+)+$/.test(letters) &&
+    !/^([A-Z][a-z]+)+$/.test(letters)
+  );
+}
+
+/**
+ * The authored part of a class that starts with a 6-character hash, as the
+ * New York Times names them: `_mastheadContainer` from `Wr7_RG_mastheadContainer`.
+ */
+function getLeadingHashParts(className: string): Array<string> | null {
+  const match = className.match(/^_?(\w{6})(_[A-Za-z][\w-]{2,})$/);
+
+  return match && isLeadingHash(match[1]) ? [match[2]] : null;
+}
+
+/**
  * The authored parts of a class a build tool combined with a hash, e.g.
  * `Header_nav__` from CSS Modules' `Header_nav__a1B2c`, `prc-TopicTag-` from
  * Primer's `prc-TopicTag-LS-jX`, or `Nav-sc-` from styled-components'
@@ -93,7 +122,7 @@ export function getStableClassParts(className: string): Array<string> | null {
     (segment, i) => i > 0 && isHashSegment(segment)
   );
   if (hashAt === -1) {
-    return null;
+    return getLeadingHashParts(className);
   }
 
   const before = segments.slice(0, hashAt).join('__');
