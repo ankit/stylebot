@@ -33,16 +33,21 @@ Each strategy is tried in turn; the first one that returns something wins.
 6. **Own `#id`** — ranks below anything genuinely authored (its own or an
    ancestor's) since ids are often generated, but above a hashed class since
    it's still far more reliable than a random hash.
-7. **Own class, hashed or not** — the first class, whatever it looks like.
+7. **Own address or aria-label** — `a[href="/section/world"]` for a link, or
+   `button[aria-label="Search"]`, for an element whose classes are all
+   generated. A link's address is used only when it has no query, hash, id or
+   date in it, and neither is used while it matches more elements than the
+   element's own class does.
+8. **Own class, hashed or not** — the first class, whatever it looks like.
    Still much more specific than a bare tag chain.
-8. **Nearest ancestor's class, hashed or not** — the same 2-level climb as
+9. **Nearest ancestor's class, hashed or not** — the same 2-level climb as
    step 5, but accepting a hashed class.
-9. **Bare tag chain** — `parent-parent parent tag`, up to 2 levels.
-10. **Only this element** — when the tag chain would sweep the page, the
+10. **Bare tag chain** — `parent-parent parent tag`, up to 2 levels.
+11. **Only this element** — when the tag chain would sweep the page, the
     selector matching just this element (see below), so picking one element
     never targets most of the page.
 
-Steps 5, 8 and 9 are skipped when they'd sweep the page: a bare `div` or
+Steps 5, 9 and 10 are skipped when they'd sweep the page: a bare `div` or
 `span` matching at least 50 elements and over half of that tag on the page,
 like `div.app div div`. Other tags never count, since styling every link or
 date is a real choice. Sweeping selectors are also left out of the list

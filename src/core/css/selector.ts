@@ -72,6 +72,42 @@ const countMatches = (selector: string): number => {
   }
 };
 
+/**
+ * A link's path, when it names a place rather than a page: a relative or
+ * absolute address with no query or hash, and no id or date in it.
+ */
+const getLinkPath = (el: HTMLElement): string | null => {
+  const href = el.getAttribute('href');
+
+  return href && href !== '/' && !/[?#]|\d{4,}|^[a-z]+:(?!\/\/)/i.test(href)
+    ? href
+    : null;
+};
+
+/**
+ * A link by its address or any element by its aria-label, e.g.
+ * `a[href="/section/world"]` or `button[aria-label="Search"]`, for elements
+ * with only generated classes. Null while it would match more of the page
+ * than the element's own class does.
+ */
+export const getLabelBasedSelector = (el: HTMLElement): string | null => {
+  const tag = el.tagName.toLowerCase();
+  const path = tag === 'a' ? getLinkPath(el) : null;
+  const label = el.getAttribute('aria-label');
+  const candidates = [
+    path && `${tag}[href="${escapeAttributeValue(path)}"]`,
+    label && `${tag}[aria-label="${escapeAttributeValue(label)}"]`,
+  ].filter((selector): selector is string => Boolean(selector));
+  const own = getClassBasedSelector(el);
+  const reach = own ? countMatches(own) : Infinity;
+
+  return (
+    candidates.find(
+      selector => el.matches(selector) && countMatches(selector) <= reach
+    ) ?? null
+  );
+};
+
 const getClassNames = (el: HTMLElement): Array<string> =>
   (el.getAttribute('class') ?? '').split(/\s+/).filter(Boolean);
 
@@ -348,6 +384,7 @@ export const getSelector = (el: HTMLElement): string =>
   getGoodOwnSelector(el) ??
   unlessSweeping(getAncestorBasedSelector(el)) ??
   getIdBasedSelector(el) ??
+  getLabelBasedSelector(el) ??
   getClassBasedSelector(el) ??
   unlessSweeping(getAncestorHashedClassSelector(el)) ??
   unlessSweeping(getTagNameBasedSelector(el)) ??
@@ -550,6 +587,7 @@ export const getSelectorCandidates = (el: HTMLElement): Array<string> =>
     getAncestorBasedSelector(el),
     ...getAncestorScopedSelectors(el),
     getIdBasedSelector(el),
+    getLabelBasedSelector(el),
     getClassBasedSelector(el),
     getAncestorHashedClassSelector(el),
     getMeaningfulTagSelector(el),
