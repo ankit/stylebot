@@ -1,12 +1,15 @@
 import net from 'node:net';
 
 import { diagnoseConnection } from './diagnose.mjs';
-import { refreshHost } from './install.mjs';
+import { prepareHost } from './install.mjs';
 import { SOCKET_PATH } from './paths.mjs';
 import { cliStamp, incompatibility } from './protocol.mjs';
+import { isStyled, linkify } from './style.mjs';
 
 export const fail = message => {
-  console.error(`stylebot: ${message}`);
+  console.error(
+    `stylebot: ${isStyled(process.stderr) ? linkify(message) : message}`
+  );
   process.exit(1);
 };
 
@@ -16,7 +19,7 @@ export const fail = message => {
  */
 export const request = (command, args = {}) =>
   new Promise((resolve, reject) => {
-    const { repinned } = refreshHost();
+    const { repinned } = prepareHost();
     const socket = net.connect(SOCKET_PATH);
     let output = '';
 

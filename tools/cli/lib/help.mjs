@@ -1,3 +1,5 @@
+import { banner, bold } from './style.mjs';
+
 /**
  * How a command reads in its parent's list: its name and arguments, without
  * the [options] Commander adds.
@@ -12,26 +14,6 @@ const subcommandTerm = command =>
           return argument.required ? `<${name}>` : `[${name}]`;
         }),
       ].join(' ');
-
-const bold = text => `\x1b[1m${text}\x1b[22m`;
-const dim = text => `\x1b[2m${text}\x1b[22m`;
-const rgb = (hex, text) => {
-  const [r, g, b] = hex.match(/\w\w/g).map(pair => parseInt(pair, 16));
-  return `\x1b[38;2;${r};${g};${b}m${text}\x1b[39m`;
-};
-
-/**
- * The extension's icon, its three bars and cursor, beside the name and
- * description. Only drawn in color, so piped help stays plain text.
- */
-const banner = description => [
-  '',
-  `  ${rgb('#ec4d86', '▀'.repeat(16))}`,
-  `  ${rgb('#1c9fc4', '▀'.repeat(11))}         ${bold('stylebot')}`,
-  `  ${rgb('#e0a218', '▀'.repeat(13))} ${rgb('#2563eb', '▌')}     ${dim(
-    description
-  )}`,
-];
 
 // Sections a command's help ends with, after its flags, by title.
 const helpSections = new Map();
@@ -70,7 +52,7 @@ const formatHelp = (command, helper) => {
 
   return [
     ...(!command.parent && helper.outputHasColors
-      ? banner(helper.commandDescription(command))
+      ? banner('stylebot', helper.commandDescription(command))
       : [
           helper.boxWrap(
             helper.commandDescription(command),

@@ -18,10 +18,9 @@ Read and check pages only through `stylebot`, never another browser tool (browse
 
 ## Setup
 
-When a command can't reach Stylebot, or says the CLI and Stylebot don't match, its message names the one thing to do:
+The first command sets the CLI up with the user's browsers on its own. When a command can't reach Stylebot, or says the CLI and Stylebot don't match, its message names the one thing to do, such as turning on the setting, opening or restarting the browser, or updating Stylebot or the CLI. Tell the user the message as it is, and try again once they say it's done.
 
-- **Run `stylebot install`**: run it yourself, then try again.
-- **Anything else**, such as turning on the setting, opening or restarting the browser, or updating Stylebot or the CLI: tell the user the message as it is, and try again once they say it's done.
+To see everything that's left, run `stylebot install`: it prints a checklist. Tell the user each step not yet done (marked ○) as written.
 
 If `stylebot` isn't found, the CLI isn't installed: tell the user to install it with `npm install -g @stylebot/cli`, as https://stylebot.dev/cli describes.
 

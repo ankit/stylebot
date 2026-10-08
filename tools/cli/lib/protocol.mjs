@@ -25,10 +25,10 @@ export const incompatibility = ({ protocol, version }) => {
 
   // An extension from before the handshake sends no protocol.
   if (typeof protocol !== 'number' || protocol < PROTOCOL) {
-    return `Stylebot${
-      version ? ` ${version}` : ''
-    } in your browser is too old for this stylebot CLI (${CLI_VERSION}). Update Stylebot in your browser.`;
+    return `Your browser's Stylebot${
+      version ? ` (${version})` : ''
+    } is too old for this CLI (${CLI_VERSION}). Update Stylebot in your browser.`;
   }
 
-  return `This stylebot CLI (${CLI_VERSION}) is too old for Stylebot ${version}. Update the stylebot CLI: npm update -g ${NPM_PACKAGE}`;
+  return `This CLI (${CLI_VERSION}) is too old for your browser's Stylebot (${version}). Update it: npm update -g ${NPM_PACKAGE}`;
 };

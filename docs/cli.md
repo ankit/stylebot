@@ -19,13 +19,15 @@ To run this checkout's CLI instead, use `yarn stylebot` inside the repo. To run 
 ln -s "$PWD/tools/cli/bin/stylebot.mjs" ~/bin/stylebot
 ```
 
-On Windows, run `yarn stylebot` or `node tools\cli\lib\cli.mjs`. Then register it with your browsers, from the repo so it finds the dev profiles:
+On Windows, run `yarn stylebot` or `node tools\cli\lib\cli.mjs`.
+
+The first command sets the CLI up with your browsers on its own, saying which. To check setup, or after installing another browser, run `install`; for this checkout's CLI, run it from the repo so it finds the dev profiles:
 
 ```bash
 yarn stylebot install
 ```
 
-This copies the CLI's native messaging host into `~/.stylebot/` and registers it with each installed browser, listing where. On macOS and Linux it also registers with the dev profiles `yarn dev:chrome` launches, which keep their own list of hosts; on Windows the browser's registration covers them.
+This copies the CLI's native messaging host into `~/.stylebot/` and registers it with each installed browser, then prints a checklist of what's done and what's left: the browsers it found, whether Stylebot is in one of them, and whether it's connected. Run it again any time to check. On macOS and Linux it also registers with the dev profiles `yarn dev:chrome` launches, which keep their own list of hosts; on Windows the browser's registration covers them.
 
 | Browser  | macOS | Linux | Windows |
 | -------- | ----- | ----- | ------- |
@@ -36,7 +38,7 @@ This copies the CLI's native messaging host into `~/.stylebot/` and registers it
 | Vivaldi  | ✓     | ✓     | ✓       |
 | Arc      | ✓     |       |         |
 
-A browser counts as installed once it has created its user data folder, so run `install` again after installing a new browser.
+A browser counts as installed once it has run, which leaves a `Local State` file in its user data folder, so run `install` again after installing a new browser.
 
 Then turn on **Let apps on this computer control Stylebot** in Stylebot's options, under Basics, and allow what the browser asks for. The extension connects to the host while the setting is on; turning it off disconnects it and gives back the permission to talk to the host. If it was already on before you installed, reload the extension or restart the browser. The host runs only while the browser does.
 
@@ -44,11 +46,12 @@ Then turn on **Let apps on this computer control Stylebot** in Stylebot's option
 
 A command that can't reach the host works out why and prints one fix:
 
-- No browser has the host registered: run `stylebot install`.
+- No browser could be set up: install Chrome or Edge.
+- No browser profile has Stylebot: add it. The CLI looks for Stylebot's store ids in each profile's extensions and preferences, which covers unpacked dev builds too, and says this only when it found profiles to look in.
 - The host is registered but no browser has ever started it, so the setting is almost certainly off: turn it on. The host leaves a timestamp in `~/.stylebot/` each time a browser starts it, one per socket, so a test browser's doesn't count for yours.
 - A browser has started it before: the browser is closed, or Stylebot isn't running in it. Open it.
 
-The Claude Code skill relays these messages to you as they are, and runs `stylebot install` itself.
+The Claude Code skill relays these messages to you as they are.
 
 ## Commands
 
@@ -155,7 +158,7 @@ A test, or a second worktree, can run its own dev browser beside yours without t
 STYLEBOT_PROFILE_DIR=.chrome-dev-profile-test STYLEBOT_SOCKET=~/.stylebot/test.sock yarn start:chrome
 ```
 
-Run `yarn stylebot install` once the profile folder exists, and run the CLI with the same `STYLEBOT_SOCKET` to drive that browser.
+Run `yarn stylebot install` once the profile folder exists, so it's registered there too, and run the CLI with the same `STYLEBOT_SOCKET` to drive that browser.
 
 To try the CLI against a release-like build, run `yarn build:preview` and add `STYLEBOT_EXTENSION_DIR=preview-dist`. It carries the store's key, so it gets the extension id the host allows.
 

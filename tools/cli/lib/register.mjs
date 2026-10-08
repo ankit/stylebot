@@ -107,7 +107,8 @@ const devProfileDirs = () => {
 
 /**
  * The installed browsers on this platform, with the folder their native
- * hosts go in (or, on Windows, their user data folder).
+ * hosts go in (or, on Windows, their user data folder). A browser writes
+ * Local State on its first run; its folder alone can be just our manifest.
  */
 const installedBrowsers = () => {
   const platform = os.platform();
@@ -120,9 +121,12 @@ const installedBrowsers = () => {
 
   return BROWSERS.filter(
     browser =>
-      root && browser[platform] && fs.existsSync(join(root, browser[platform]))
+      root &&
+      browser[platform] &&
+      fs.existsSync(join(root, browser[platform], 'Local State'))
   ).map(browser => ({
     ...browser,
+    dataDir: join(root, browser[platform]),
     dir: join(
       root,
       (platform === 'darwin' && browser.darwinHosts) || browser[platform]
@@ -242,30 +246,63 @@ export const isHostRegistered = () => {
 };
 
 /**
- * What `stylebot install` prints for the registrations made.
+ * The browsers Stylebot's CLI supports on this platform, by name.
  */
-export const describeRegistrations = registrations => {
-  const width = Math.max(...registrations.map(r => r.browser.length));
-  const lines = registrations.length
-    ? [
-        'Registered the native host with:',
-        ...registrations.map(
-          ({ browser, location }) => `  ${browser.padEnd(width)}  ${location}`
-        ),
-      ]
-    : [];
+export const supportedBrowsers = () =>
+  BROWSERS.filter(browser => browser[os.platform()]).map(
+    browser => browser.name
+  );
 
-  if (!registrations.some(r => r.browser !== 'Dev profile')) {
-    const names = BROWSERS.filter(browser => browser[os.platform()]).map(
-      browser => browser.name
-    );
+/**
+ * Whether a browser profile has Stylebot. A store install unpacks into its
+ * Extensions folder, and every install, unpacked ones too, keeps settings
+ * in its preferences.
+ */
+const profileHasStylebot = profile =>
+  EXTENSION_IDS.some(id => fs.existsSync(join(profile, 'Extensions', id))) ||
+  ['Preferences', 'Secure Preferences'].some(file => {
+    try {
+      const { extensions } = JSON.parse(
+        fs.readFileSync(join(profile, file), 'utf8')
+      );
 
-    lines.push(
-      `No supported browser found (${names.join(
-        ', '
-      )}). Install one, then run \`stylebot install\` again.`
-    );
+      return EXTENSION_IDS.some(id => id in (extensions?.settings ?? {}));
+    } catch {
+      return false;
+    }
+  });
+
+/**
+ * The browsers, and dev profiles, with Stylebot in one of their profiles,
+ * or undefined when there was no profile to look in.
+ */
+export const findStylebot = () => {
+  const browsers = [
+    ...devProfileDirs().map(dir => ({ name: 'Dev profile', dataDir: dir })),
+    ...installedBrowsers(),
+  ];
+  const found = new Set();
+  let profiles = 0;
+
+  for (const { name, dataDir } of browsers) {
+    let entries;
+
+    try {
+      entries = fs.readdirSync(dataDir);
+    } catch {
+      continue;
+    }
+
+    for (const profile of entries.map(entry => join(dataDir, entry))) {
+      if (fs.existsSync(join(profile, 'Preferences'))) {
+        profiles++;
+
+        if (profileHasStylebot(profile)) {
+          found.add(name);
+        }
+      }
+    }
   }
 
-  return lines.join('\n');
+  return profiles ? [...found] : undefined;
 };

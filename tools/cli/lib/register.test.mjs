@@ -11,7 +11,17 @@ const load = async (
   const fs = {
     existsSync: jest.fn(file => existing.includes(file) || file in contents),
     readFileSync: jest.fn(file => contents[file]),
-    readdirSync: jest.fn(() => dirs),
+    readdirSync: jest.fn(dir => {
+      if (Array.isArray(dirs)) {
+        return dirs;
+      }
+
+      if (!(dir in dirs)) {
+        throw new Error(`ENOENT: ${dir}`);
+      }
+
+      return dirs[dir];
+    }),
     mkdirSync: jest.fn(),
     writeFileSync: jest.fn(),
   };
@@ -55,9 +65,9 @@ describe('registerHost on macOS', () => {
       cwd: '/code/stylebot/tools',
       existing: [
         '/code/stylebot/src/assets/manifest/manifest-dev.json',
-        `${support}/Google/Chrome`,
-        `${support}/BraveSoftware/Brave-Browser`,
-        `${support}/Arc/User Data`,
+        `${support}/Google/Chrome/Local State`,
+        `${support}/BraveSoftware/Brave-Browser/Local State`,
+        `${support}/Arc/User Data/Local State`,
       ],
       dirs: ['.edge-dev-profile', 'src', '.chrome-dev-profile-test'],
     });
@@ -115,7 +125,7 @@ describe('registerHost on macOS', () => {
     const { registerHost, fs } = await load('darwin', {
       home,
       cwd: '/tmp',
-      existing: [`${support}/Microsoft Edge`],
+      existing: [`${support}/Microsoft Edge/Local State`],
     });
 
     expect(registerHost()).toEqual([
@@ -126,6 +136,20 @@ describe('registerHost on macOS', () => {
     ]);
     expect(fs.readdirSync).not.toHaveBeenCalled();
   });
+
+  it('skips a browser that has never run, whose folder holds only our manifest', async () => {
+    const { registerHost } = await load('darwin', {
+      home,
+      cwd: '/tmp',
+      existing: [
+        `${support}/Microsoft Edge/Local State`,
+        `${support}/Vivaldi`,
+        `${support}/Vivaldi/NativeMessagingHosts`,
+      ],
+    });
+
+    expect(registerHost().map(({ browser }) => browser)).toEqual(['Edge']);
+  });
 });
 
 describe('registerHost on Linux', () => {
@@ -135,12 +159,12 @@ describe('registerHost on Linux', () => {
       home,
       cwd: '/tmp',
       existing: [
-        `${home}/.config/google-chrome`,
-        `${home}/.config/microsoft-edge`,
-        `${home}/.config/BraveSoftware/Brave-Browser`,
-        `${home}/.config/chromium`,
-        `${home}/.config/vivaldi`,
-        `${home}/Library/Application Support/Arc/User Data`,
+        `${home}/.config/google-chrome/Local State`,
+        `${home}/.config/microsoft-edge/Local State`,
+        `${home}/.config/BraveSoftware/Brave-Browser/Local State`,
+        `${home}/.config/chromium/Local State`,
+        `${home}/.config/vivaldi/Local State`,
+        `${home}/Library/Application Support/Arc/User Data/Local State`,
       ],
     });
 
@@ -173,9 +197,9 @@ describe('registerHost on Windows', () => {
       cwd: 'C:\\code\\stylebot',
       existing: [
         'C:\\code\\stylebot\\src\\assets\\manifest\\manifest-dev.json',
-        `${local}\\Google\\Chrome\\User Data`,
-        `${local}\\Microsoft\\Edge\\User Data`,
-        `${local}\\BraveSoftware\\Brave-Browser\\User Data`,
+        `${local}\\Google\\Chrome\\User Data\\Local State`,
+        `${local}\\Microsoft\\Edge\\User Data\\Local State`,
+        `${local}\\BraveSoftware\\Brave-Browser\\User Data\\Local State`,
       ],
     });
     const key = browser =>
@@ -212,7 +236,7 @@ describe('registerHost on Windows', () => {
     const { registerHost } = await load('win32', {
       home,
       cwd: home,
-      existing: [`${local}\\Vivaldi\\User Data`],
+      existing: [`${local}\\Vivaldi\\User Data\\Local State`],
     });
 
     expect(registerHost()).toEqual([
@@ -235,7 +259,7 @@ describe('isHostRegistered', () => {
     const { isHostRegistered } = await load('darwin', {
       home,
       cwd: '/tmp',
-      existing: [launcher, chrome, manifest],
+      existing: [launcher, `${chrome}/Local State`, manifest],
     });
 
     expect(isHostRegistered()).toBe(true);
@@ -245,7 +269,7 @@ describe('isHostRegistered', () => {
     const { isHostRegistered } = await load('darwin', {
       home,
       cwd: '/tmp',
-      existing: [launcher, chrome],
+      existing: [launcher, `${chrome}/Local State`],
     });
 
     expect(isHostRegistered()).toBe(false);
@@ -255,7 +279,7 @@ describe('isHostRegistered', () => {
     const { isHostRegistered } = await load('darwin', {
       home,
       cwd: '/tmp',
-      existing: [chrome, manifest],
+      existing: [`${chrome}/Local State`, manifest],
     });
 
     expect(isHostRegistered()).toBe(false);
@@ -300,32 +324,106 @@ describe('launcherNode', () => {
   });
 });
 
-describe('describeRegistrations', () => {
-  it('lists each registration by browser', async () => {
-    const { describeRegistrations } = await load('linux', {
-      home: '/home/ankit',
-      cwd: '/tmp',
-    });
-
-    expect(
-      describeRegistrations([
-        { browser: 'Dev profile', location: '/a' },
-        { browser: 'Chrome', location: '/b' },
-      ])
-    ).toBe(
-      'Registered the native host with:\n  Dev profile  /a\n  Chrome       /b'
-    );
-  });
-
-  it('says when no browser was found', async () => {
-    const { describeRegistrations } = await load('win32', {
+describe('supportedBrowsers', () => {
+  it('names the browsers supported on the platform', async () => {
+    const { supportedBrowsers } = await load('win32', {
       home: 'C:\\Users\\ankit',
       cwd: 'C:\\',
     });
 
-    expect(describeRegistrations([])).toBe(
-      'No supported browser found (Chrome, Edge, Brave, Chromium, Vivaldi). Install one, then run `stylebot install` again.'
-    );
+    expect(supportedBrowsers()).toEqual([
+      'Chrome',
+      'Edge',
+      'Brave',
+      'Chromium',
+      'Vivaldi',
+    ]);
+  });
+});
+
+describe('findStylebot', () => {
+  const home = '/Users/ankit';
+  const support = `${home}/Library/Application Support`;
+  const chrome = `${support}/Google/Chrome`;
+  const edge = `${support}/Microsoft Edge`;
+  const checkout = '/code/stylebot';
+  const dev = `${checkout}/.chrome-dev-profile`;
+  const settings = id =>
+    JSON.stringify({ extensions: { settings: { [id]: {} } } });
+
+  /**
+   * Loads register.mjs with Chrome and Edge installed, each with the given
+   * profile folders and files.
+   */
+  const find = async ({ dirs, existing = [], contents = {}, cwd = '/tmp' }) => {
+    const { findStylebot } = await load('darwin', {
+      home,
+      cwd,
+      existing: [
+        `${chrome}/Local State`,
+        `${edge}/Local State`,
+        `${checkout}/src/assets/manifest/manifest-dev.json`,
+        ...existing,
+      ],
+      dirs: { [checkout]: [], ...dirs },
+      contents,
+    });
+
+    return findStylebot();
+  };
+
+  it('finds a store install in a profile', async () => {
+    expect(
+      await find({
+        dirs: { [chrome]: ['Profile 3', 'Local State'], [edge]: ['Default'] },
+        existing: [
+          `${chrome}/Profile 3/Preferences`,
+          `${chrome}/Profile 3/Extensions/oiaejidbmkiecgbjeifoejpgmdaleoha`,
+          `${edge}/Default/Preferences`,
+        ],
+      })
+    ).toEqual(['Chrome']);
+  });
+
+  it("finds an unpacked install in a dev profile's preferences", async () => {
+    expect(
+      await find({
+        cwd: checkout,
+        dirs: { [chrome]: [], [edge]: [], [dev]: ['Default'] },
+        contents: {
+          [`${dev}/Default/Preferences`]: '{}',
+          [`${dev}/Default/Secure Preferences`]: settings(
+            'oiaejidbmkiecgbjeifoejpgmdaleoha'
+          ),
+        },
+      })
+    ).toEqual(['Dev profile']);
+  });
+
+  it("finds Edge's store install in its preferences", async () => {
+    expect(
+      await find({
+        dirs: { [chrome]: [], [edge]: ['Default'] },
+        contents: {
+          [`${edge}/Default/Preferences`]: settings(
+            'mjolbpfednnbebfapicajpifliopnnai'
+          ),
+        },
+      })
+    ).toEqual(['Edge']);
+  });
+
+  it('finds none when profiles lack it', async () => {
+    expect(
+      await find({
+        dirs: { [chrome]: ['Default'], [edge]: [] },
+        contents: { [`${chrome}/Default/Preferences`]: 'not json' },
+      })
+    ).toEqual([]);
+  });
+
+  it('is undefined with no profile to look in', async () => {
+    expect(await find({ dirs: { [chrome]: ['Crashpad'] } })).toBeUndefined();
   });
 });
 
