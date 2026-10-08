@@ -26,4 +26,8 @@ export const LINKS = {
   privacy: '/privacy',
   author: 'https://ankitahuja.com',
   feedbackEmail: 'stylebot+ahuja.ankit@gmail.com',
+  cli: '/cli',
 };
+
+// Placeholder until the CLI's npm package name is decided.
+export const CLI_PACKAGE = 'stylebot-cli';

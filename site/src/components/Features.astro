@@ -1,12 +1,6 @@
 ---
 import CarouselNav from './CarouselNav.astro';
 import { ChevronDown } from './icons';
-import {
-  ChatComposer,
-  ChatEmpty,
-  FIRST_DECK,
-  MORNING_NEWSPAPER,
-} from './chat/Chat';
 ---
 
 <section id="features" class="section features">
@@ -110,31 +104,6 @@ import {
           <p>
             Every change to your styles is kept, newest first. Open an entry to
             see what changed and restore it in one click.
-          </p>
-        </div>
-      </article>
-
-      <article class="feature">
-        <div class="feature-mock" aria-hidden="true">
-          <div data-ed class="mock-card chat-mock">
-            <div class="chat-mock-body">
-              <ChatEmpty
-                decks={[[FIRST_DECK[0], FIRST_DECK[1], MORNING_NEWSPAPER]]}
-                hoverable
-              />
-            </div>
-            <div class="chat-mock-compose">
-              <ChatComposer short />
-            </div>
-          </div>
-        </div>
-        <div class="feature-text">
-          <h3>Stylebot agent</h3>
-          <p>
-            Describe the change you want. The agent finds the right elements,
-            writes the CSS, and adds it to the site's style, where you can undo
-            it or edit it by hand. Bring your own Claude, OpenAI or Gemini key;
-            it stays in your browser.
           </p>
         </div>
       </article>
@@ -403,26 +372,6 @@ import {
     display: flex;
     justify-content: flex-end;
     color: var(--faint);
-  }
-
-  .chat-mock {
-    --ui: 'Geist', system-ui, sans-serif;
-    --mono: 'Geist Mono', ui-monospace, monospace;
-
-    display: flex;
-    flex-direction: column;
-  }
-
-  .chat-mock-body {
-    padding: 14px 14px 12px 16px;
-  }
-
-  .chat-mock-body :global(.chat-empty) {
-    gap: 12px;
-  }
-
-  .chat-mock-compose {
-    padding: 0 16px 10px;
   }
 
   .preset-list {

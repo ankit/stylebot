@@ -81,7 +81,7 @@ const WABI_SABI: Suggestion = [
   </>,
 ];
 
-export const MORNING_NEWSPAPER: Suggestion = [
+const MORNING_NEWSPAPER: Suggestion = [
   'Morning newspaper',
   '#f2ead8',
   <span style="display:flex;gap:5px;width:100%;padding:0 10px;box-sizing:border-box">
@@ -148,7 +148,6 @@ export const SECOND_DECK: Suggestion[] = [
 
 type EmptyProps = {
   decks: Suggestion[][];
-  hoverable?: boolean;
   moreStyle?: string;
   moreIconStyle?: string;
   cardStyle?: (deck: number, card: number) => string;
@@ -160,7 +159,6 @@ type EmptyProps = {
  */
 export function ChatEmpty({
   decks,
-  hoverable,
   moreStyle,
   moreIconStyle,
   cardStyle,
@@ -201,7 +199,7 @@ export function ChatEmpty({
                 <div
                   key={label}
                   data-t={`card-${d}${i}`}
-                  class={`chat-sug${hoverable ? ' is-hoverable' : ''}`}
+                  class="chat-sug"
                   style={cardStyle?.(d, i)}
                 >
                   <span class="chat-art" style={`background:${bg}`}>
@@ -221,19 +219,16 @@ export function ChatEmpty({
 type ComposerProps = {
   tokens?: string;
   thinking?: boolean;
-  short?: boolean;
 };
 
 /**
  * Chat's message box with its toolbar: image attach, model, token count, and
  * a send button that turns into stop while a reply is coming in.
  */
-export function ChatComposer({ tokens, thinking, short }: ComposerProps) {
+export function ChatComposer({ tokens, thinking }: ComposerProps) {
   return (
     <div data-t="chat-input" class="chat-composer">
-      <span class={`chat-placeholder${short ? ' is-short' : ''}`}>
-        Describe a change…
-      </span>
+      <span class="chat-placeholder">Describe a change…</span>
       <div class="chat-tools">
         <svg
           width="16"

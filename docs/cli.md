@@ -141,6 +141,30 @@ The code that reads a page loads into it the first time the CLI asks about that 
 
 The extension connects only while the setting is on and the browser has granted its two optional permissions: `nativeMessaging` for the host, and `<all_urls>` for screenshots. Development builds declare them; release builds don't yet. Once granted, `<all_urls>` also lifts CORS on the background's own requests, so a cross-origin fetch that works there can still fail for someone who never turned the setting on. Chrome won't let the extension give `<all_urls>` back, since its content scripts already match every site, so turning the setting off removes only `nativeMessaging`.
 
+## The setup page
+
+stylebot.dev/cli walks someone through setup, with a checklist that follows along live. The extension can't learn about the CLI before the setting is on, so the page asks the extension instead, through `window.postMessage` on the page itself. Until the extension answers, the page shows only the steps, without checkmarks.
+
+The page sends, to its own origin:
+
+- `{ source: 'stylebot-site', type: 'status' }` when it loads, every two seconds while it's visible, and when it becomes visible again.
+- `{ source: 'stylebot-site', type: 'open-cli-settings' }` when someone clicks **Turn it on**. The extension opens its options at the setting.
+
+The extension answers each status request with:
+
+```js
+{
+  source: 'stylebot-extension',
+  type: 'status',
+  installed: true,
+  version: '4.0.0', // the extension's version, digits and dots only
+  cliEnabled: false, // the setting is on and its permissions are granted
+  cliConnected: false, // the extension is connected to the native host
+}
+```
+
+The page ignores a reply unless it comes from its own window and origin and every field has exactly that shape, so a missing or mistyped field hides the checklist rather than showing a wrong one. The extension should answer only on stylebot.dev, ignore every other message, answer within a second, and send nothing else: the page is public, so the reply says only what the checklist needs.
+
 ## Before it can ship
 
 - Declaring the optional permissions and showing the setting in release builds

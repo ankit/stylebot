@@ -3,9 +3,11 @@ import Base from '../layouts/Base.astro';
 import Demo from '../components/demo/Demo';
 import Gallery from '../components/Gallery.astro';
 import Features from '../components/Features.astro';
+import CliCommand from '../components/cli/CliCommand.astro';
+import CliSection from '../components/cli/CliSection.astro';
 import Footer from '../components/Footer.astro';
 import StoreLink from '../components/StoreLink.astro';
-import { LINKS } from '../lib/links';
+import { CLI_PACKAGE, LINKS } from '../lib/links';
 ---
 
 <Base footer={false} storeCta>
@@ -43,6 +45,7 @@ import { LINKS } from '../lib/links';
       <Demo client:visible />
     </div>
 
+    <CliSection />
     <Gallery />
     <Features />
 
@@ -57,6 +60,12 @@ import { LINKS } from '../lib/links';
           <StoreLink index={0} format="add" class="btn btn-primary" />
           <StoreLink index={1} format="name" class="btn btn-outline" />
           <StoreLink index={2} format="name" class="btn btn-outline" />
+        </div>
+        <div class="install-cli">
+          <span>
+            Using a coding agent? Add the <a href="#cli">CLI</a>:
+          </span>
+          <CliCommand lines={[`npm install -g ${CLI_PACKAGE}`]} boxed />
         </div>
         <Footer />
       </div>
@@ -192,6 +201,21 @@ import { LINKS } from '../lib/links';
     flex-wrap: wrap;
     gap: 10px;
     margin-top: 6px;
+  }
+
+  .install-cli {
+    margin-top: 10px;
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font: 400 14px/1.4 var(--ui);
+    color: var(--muted);
+  }
+
+  .install-cli a {
+    color: var(--link, var(--ink));
   }
 
   .install :global(.site-footer) {

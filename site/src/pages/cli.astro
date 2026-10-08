@@ -1,0 +1,368 @@
+---
+import Base from '../layouts/Base.astro';
+import CliCommand from '../components/cli/CliCommand.astro';
+import CliStatus from '../components/CliStatus';
+import { CLI_PACKAGE, STORES } from '../lib/links';
+
+const examples = [
+  [
+    'stylebot open news.ycombinator.com',
+    'Opens the page in a window behind yours and prints its tab id.',
+  ],
+  [
+    'stylebot outline 54432929',
+    'Prints the page’s visible elements as an outline.',
+  ],
+  [
+    'stylebot css set news.ycombinator.com < dark.css',
+    'Saves the CSS as the site’s style, applies it, and checks the page.',
+  ],
+  ['stylebot screenshot 54432929 -o page.png', 'Saves a picture of the tab.'],
+];
+---
+
+<Base
+  title="Command line"
+  description="Control Stylebot from your terminal, or let a coding agent like Claude Code, Codex or Cursor restyle sites in your browser on your own subscription."
+>
+  <main class="cli">
+    <div class="cli-intro">
+      <h1>Stylebot from your terminal</h1>
+      <p>
+        Control Stylebot from the command line, or let a coding agent like
+        Claude Code, Codex or Cursor do it. The agent restyles sites right in
+        your browser, using your own subscription instead of an API key.
+      </p>
+    </div>
+
+    <CliStatus client:load />
+
+    <section>
+      <h2>Set it up</h2>
+      <ol class="cli-steps">
+        <li>
+          <h3>Install Stylebot</h3>
+          <p>
+            For Chrome or Edge. The command line doesn't work on Firefox yet.
+          </p>
+          <div class="cli-stores">
+            <a href={STORES.chrome.href} class="btn btn-outline">
+              Add to {STORES.chrome.name}
+            </a>
+            <a href={STORES.edge.href} class="btn btn-outline">
+              Add to {STORES.edge.name}
+            </a>
+          </div>
+        </li>
+        <li>
+          <h3>Install the CLI</h3>
+          <p>It needs Node 20 or later.</p>
+          <CliCommand lines={[`npm install -g ${CLI_PACKAGE}`]} />
+        </li>
+        <li>
+          <h3>Connect it to your browsers</h3>
+          <p>
+            This registers the CLI with Chrome and Edge, so Stylebot can reach
+            it.
+          </p>
+          <CliCommand lines={['stylebot install']} />
+        </li>
+        <li>
+          <h3>Turn on command line access</h3>
+          <p>
+            In Stylebot's options, under Basics, turn on{' '}
+            <strong>Let apps on this computer control Stylebot</strong> and
+            allow what the browser asks for.
+          </p>
+        </li>
+        <li>
+          <h3>
+            Add the Claude Code plugin{' '}
+            <span class="cli-optional">Optional</span>
+          </h3>
+          <p>In Claude Code, run:</p>
+          <CliCommand lines={['/plugin marketplace add ankit/stylebot']} />
+          <CliCommand lines={['/plugin install stylebot@stylebot']} />
+          <p>Then try it:</p>
+          <CliCommand
+            lines={['/stylebot news.ycombinator.com give it a dark theme']}
+          />
+        </li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Commands</h2>
+      <p>
+        An agent runs these for you, but you can run them yourself too.{' '}
+        <code>stylebot --help</code> lists them all.
+      </p>
+      <dl class="cli-examples">
+        {examples.map(([command, what]) => (
+          <div>
+            <dt>
+              <CliCommand lines={[command]} copy={false} />
+            </dt>
+            <dd>{what}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+
+    <section>
+      <h2>Privacy</h2>
+      <p>
+        Command line access is off until you turn it on. While it's on, apps on
+        this computer can read your open pages, take screenshots and change your
+        styles. Turn it off in Stylebot's options at any time.
+      </p>
+      <p>
+        Stylebot and the CLI talk only to each other, on this computer, and send
+        nothing anywhere. An agent sends what it reads to its own provider, as
+        Claude Code does to Anthropic.
+      </p>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .cli {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 64px 24px 0;
+  }
+
+  .cli-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+
+  h1 {
+    margin: 0;
+    font: 700 clamp(34px, 4.6vw, 48px) / 1.05 var(--display);
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+
+  .cli-intro p {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--muted);
+    text-wrap: pretty;
+  }
+
+  section {
+    padding: 40px 0;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  h2 {
+    margin: 0;
+    font: 700 26px/1.2 var(--display);
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  h3 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font: 600 16px/1.3 var(--ui);
+    color: var(--ink);
+  }
+
+  p {
+    margin: 0;
+    font: 400 16px/1.65 var(--ui);
+    color: var(--ink2);
+    text-wrap: pretty;
+  }
+
+  code {
+    padding: 1px 6px;
+    border-radius: 5px;
+    background: var(--fill);
+    border: 1px solid var(--border);
+    font: 400 0.88em/1.5 var(--mono);
+  }
+
+  .cli-steps {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .cli-steps li {
+    position: relative;
+    padding-left: 38px;
+    counter-increment: step;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .cli-steps li::before {
+    content: counter(step);
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 12px;
+    background: var(--fill);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: 600 12px/1 var(--ui);
+    color: var(--muted);
+  }
+
+  .cli-steps p {
+    font-size: 15px;
+    color: var(--muted);
+  }
+
+  .cli-steps p strong {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .cli-optional {
+    padding: 3px 7px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    font: 500 11px/1 var(--ui);
+    color: var(--muted);
+  }
+
+  .cli-stores {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .cli-examples {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .cli-examples dt {
+    min-width: 0;
+  }
+
+  .cli-examples dd {
+    margin: 8px 0 0 12px;
+    font: 400 14px/1.5 var(--ui);
+    color: var(--muted);
+  }
+
+  .cli :global(.cli-status) {
+    margin-bottom: 40px;
+    padding: 16px 18px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .cli :global(.cli-status-head) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+    font: 400 13.5px/1.4 var(--ui);
+    color: var(--muted);
+  }
+
+  .cli :global(.cli-status-head strong) {
+    font: 600 15px/1.3 var(--ui);
+    color: var(--ink);
+  }
+
+  .cli :global(.cli-status ul) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cli :global(.cli-status li) {
+    min-height: 44px;
+    padding: 6px 0;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+  }
+
+  .cli :global(.cli-status-mark) {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 11px;
+    border: 1px solid var(--strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: 600 12px/1 var(--ui);
+    color: var(--faint);
+  }
+
+  .cli :global(.is-done .cli-status-mark) {
+    border-color: var(--acc);
+    background: var(--acc);
+    color: var(--surface);
+  }
+
+  .cli :global(.cli-status-label) {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font: 500 14.5px/1.3 var(--ui);
+    color: var(--ink);
+  }
+
+  .cli :global(.cli-status-detail) {
+    font: 400 12.5px/1 var(--mono);
+    color: var(--faint);
+  }
+
+  .cli :global(.cli-status-btn) {
+    padding: 8px 12px;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+  }
+
+  .cli :global(.cli-status-hint) {
+    font: 400 13px/1.4 var(--ui);
+    color: var(--muted);
+  }
+
+  @media (max-width: 760px) {
+    .cli {
+      padding-top: 40px;
+    }
+  }
+</style>

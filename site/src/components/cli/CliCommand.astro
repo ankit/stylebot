@@ -1,0 +1,145 @@
+---
+import { Check, Copy } from '../icons';
+
+type Props = {
+  lines: string[];
+  copy?: boolean;
+  boxed?: boolean;
+  class?: string;
+};
+
+const { lines, copy = true, boxed = false, class: className } = Astro.props;
+---
+
+<div
+  class:list={['cli-cmd', { 'is-static': !copy, 'is-boxed': boxed }, className]}
+>
+  <span class="cli-cmd-lines">
+    {lines.map((line) => (
+      <span class="cli-cmd-line">
+        <span class="cli-cmd-prompt">$ </span>
+        {line}
+      </span>
+    ))}
+  </span>
+  {copy && (
+    <button
+      type="button"
+      class="cli-cmd-copy"
+      data-copy={lines.join(' && ')}
+      title="Copy"
+      aria-label={`Copy ${lines.join(' && ')}`}
+    >
+      <span class="cli-cmd-idle">
+        <Copy size={14} />
+      </span>
+      <span class="cli-cmd-ok">
+        <Check size={14} />
+      </span>
+    </button>
+  )}
+</div>
+
+<script>
+  document
+    .querySelectorAll<HTMLButtonElement>('.cli-cmd-copy')
+    .forEach((button) => {
+      let timer: ReturnType<typeof setTimeout>;
+      button.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(button.dataset.copy!);
+        } catch {
+          return;
+        }
+        button.classList.add('is-copied');
+        button.title = 'Copied';
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+          button.classList.remove('is-copied');
+          button.title = 'Copy';
+        }, 1600);
+      });
+    });
+</script>
+
+<style>
+  .cli-cmd {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    padding: 5px 5px 5px 12px;
+    border-radius: 8px;
+    background: var(--fill);
+    font: 400 13px/1.4 var(--mono);
+    color: var(--ink);
+  }
+
+  .cli-cmd.is-boxed {
+    padding: 6px 6px 6px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    font-size: 14px;
+  }
+
+  .cli-cmd.is-static {
+    padding: 10px 12px;
+  }
+
+  .cli-cmd-lines {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .cli-cmd-line {
+    overflow-wrap: anywhere;
+  }
+
+  .cli-cmd-prompt {
+    color: var(--faint);
+    user-select: none;
+  }
+
+  .cli-cmd-copy {
+    flex: none;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+    border: 1px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    color: var(--muted);
+  }
+
+  .cli-cmd-copy:hover {
+    border-color: var(--strong);
+    background: var(--surface);
+    color: var(--ink);
+  }
+
+  .cli-cmd-idle,
+  .cli-cmd-ok {
+    display: flex;
+  }
+
+  .cli-cmd-ok,
+  .is-copied .cli-cmd-idle {
+    display: none;
+  }
+
+  .is-copied .cli-cmd-ok {
+    display: flex;
+  }
+
+  .cli-cmd-copy.is-copied {
+    color: var(--acc);
+  }
+</style>

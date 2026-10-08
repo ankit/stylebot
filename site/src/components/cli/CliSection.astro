@@ -1,0 +1,94 @@
+---
+import CliCommand from './CliCommand.astro';
+import CliDemo from './CliDemo';
+import { CLI_PACKAGE, LINKS } from '../../lib/links';
+---
+
+<section id="cli" class="section">
+  <div class="section-inner cli-inner">
+    <div class="cli-head">
+      <div class="cli-intro">
+        <h2 class="section-title">Works with your coding agent</h2>
+        <p>
+          Claude Code, Codex, Cursor or any agent that runs commands can use
+          Stylebot from the terminal. It opens the page, reads its outline,
+          writes the CSS and takes a screenshot to check the result, in a
+          background window that leaves your tabs alone.
+        </p>
+      </div>
+      <div class="cli-setup">
+        <CliCommand lines={[`npm install -g ${CLI_PACKAGE}`]} boxed />
+        <a href={LINKS.cli} class="cli-guide">
+          Set up the CLI →
+        </a>
+      </div>
+    </div>
+    <CliDemo client:visible />
+  </div>
+</section>
+
+<style>
+  .cli-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+  }
+
+  .cli-head {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+    gap: 28px 56px;
+    align-items: end;
+  }
+
+  .cli-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .cli-intro h2 {
+    text-wrap: balance;
+  }
+
+  .cli-intro p {
+    font: 400 16px/1.6 var(--ui);
+    color: var(--muted);
+    margin: 0;
+    max-width: 56ch;
+    text-wrap: pretty;
+  }
+
+  .cli-setup {
+    width: 100%;
+    max-width: 440px;
+    justify-self: end;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .cli-guide {
+    align-self: flex-end;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--strong);
+    background: var(--surface);
+    font: 600 14px/1 var(--ui);
+    color: var(--ink);
+  }
+
+  .cli-guide:hover {
+    background: var(--hover);
+    color: var(--ink);
+  }
+
+  @media (max-width: 800px) {
+    .cli-setup {
+      justify-self: start;
+    }
+  }
+</style>
