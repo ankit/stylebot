@@ -98,3 +98,25 @@ checks. The state checks don't auto-wait, so pair them with `expect.poll`.
 
 Shared helpers cover serving local test pages, seeding styles and opening the editor. The
 shared browser keeps connections alive, so close any test server after the suite.
+
+## The CLI
+
+The CLI spec drives the real `stylebot` command, as a child process, through the native
+host to the extension and the page. It's the one spec with its own browser, launched for
+the file and closed after it, on Chrome and Edge only.
+
+It never touches your own setup. The CLI, the browser and the host the browser starts all
+get a temporary `HOME`, and the browser's user data folder sits where that `HOME` says the
+browser keeps it, so `stylebot install` registers the host there and nowhere else. The
+whole folder is deleted after the run.
+
+Two things a release build can't do on its own are set up from outside it, in the test:
+
+- **The store id.** The host allows only Stylebot's store ids, so the spec loads a copy of
+  the build with the store's public key, as `yarn build:preview` does.
+- **The permissions.** Turning the setting on asks for two optional permissions, and
+  headless Chrome can't show that prompt. Before the real build, the spec loads a copy
+  that requires them; Chrome keeps them granted when the next version makes them optional,
+  so the Options toggle's request then succeeds without a prompt. Nothing in the extension
+  changes for this. As the grant doesn't survive turning the setting off, the spec turns it
+  on once.

@@ -13,6 +13,8 @@ export type LaunchOptions = {
   headless: boolean;
   viewport: null;
   colorScheme: null;
+  // The browser's environment, which the processes it starts, such as a native host, inherit.
+  env?: Record<string, string | undefined>;
 };
 
 export type Extension = {
