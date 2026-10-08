@@ -113,7 +113,9 @@ const listen = (): void => {
       ) {
         whenDomReady(() =>
           loadInspector()
-            .then(inspectPage => inspectPage(message.inspection))
+            .then(inspectPage =>
+              inspectPage(message.inspection, { reapplySavedStyles })
+            )
             .then(sendResponse, error => sendResponse({ error: String(error) }))
         );
         return true;

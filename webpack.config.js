@@ -336,7 +336,7 @@ const clientConfig = {
     'readability/reader': './apps/reader/reader.ts',
     // The CLI's page inspector, loaded on demand.
     ...(isCLISupported && {
-      'editor/inspector': './apps/editor/inspector.ts',
+      'cli-inspector/index': './apps/cli-inspector/index.ts',
     }),
   },
   // Webpack's `global` shim falls back to `new Function` in the bundles loaded

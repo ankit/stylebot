@@ -78,7 +78,53 @@ export type PageInspection =
   | { kind: 'computedStyles'; selector: string; properties: Array<string> }
   | { kind: 'matchCount'; selectors: Array<string> }
   | { kind: 'startCheck'; edits: Array<ChatCssEdit> }
-  | { kind: 'finishCheck'; selectors: Array<string> };
+  | { kind: 'finishCheck'; selectors: Array<string> }
+  | { kind: 'pointer'; action: PointerAction };
+
+// What the content script lends the inspector bundle, which can't import it.
+export type InspectorHost = {
+  reapplySavedStyles: () => Promise<void>;
+};
+
+// Answers a page inspection; the CLI's inspector bundle provides it.
+export type PageInspector = (
+  inspection: PageInspection,
+  host: InspectorHost
+) => Promise<unknown>;
+
+// The inspector bundle sets stylebotInspectPage once it has run.
+export type InspectorWindow = Window & {
+  stylebotInspectPage?: PageInspector;
+};
+
+// Where the CLI's pointer goes: the middle of a selector's first match, or a
+// point in screenshot pixels, which are css pixels times the device pixel ratio.
+export type PointerAction = {
+  kind: 'hover' | 'inspect';
+  selector?: string;
+  // For an inspect, the style's css, whose selectors it prefers.
+  css?: string;
+  x?: number;
+  y?: number;
+};
+
+export type InspectedSelector = {
+  selector: string;
+  matches: number | null;
+  // The style's css already has a rule with this selector.
+  saved: boolean;
+};
+
+export type PointerResult = {
+  x: number;
+  y: number;
+  // A selector for the element the pointer ended up over.
+  selector: string;
+  // For an inspect: how many elements the selector matches, and other
+  // selectors for the element, as the editor's selector menu offers them.
+  matches?: number | null;
+  alternatives?: Array<InspectedSelector>;
+};
 
 // A selector built on class names the site generates, which change when it rebuilds.
 export type FragileSelector = {

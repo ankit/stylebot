@@ -27,6 +27,7 @@ export {
   startStyleCheck,
 } from './chat';
 export { getComputedStyles } from './computed-styles';
+export { getSelectorAlternatives } from './selector-alternatives';
 export type {
   PageBridge,
   PageBridgeEvents,

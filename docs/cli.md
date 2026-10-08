@@ -1,6 +1,6 @@
 # Stylebot CLI
 
-A command line for driving Stylebot in a running browser: list tabs, read and inspect pages, get and set styles, and take screenshots. It's meant for scripting and for coding agents such as Claude Code, which can restyle a page and check the result without the editor open.
+A command line for driving Stylebot in a running browser: list tabs, read and inspect pages, hover and pick elements, get and set styles, and take screenshots. It's meant for scripting and for coding agents such as Claude Code, which can restyle a page and check the result without the editor open.
 
 It works with Stylebot on Chrome, Edge and the other Chromium browsers listed below, on macOS, Linux and Windows, once turned on in Stylebot's options. Firefox and Safari aren't supported yet.
 
@@ -59,7 +59,7 @@ The Claude Code skill relays these messages to you as they are.
 
 ### Naming the target
 
-Commands that only read default to the active tab, or take `--tab` when their arguments are selectors. Commands that change a style or take a screenshot (`css set`, `profile`, `screenshot`) need the site or tab named, because an agent runs its commands over several steps and the active tab can change in between.
+Commands that only read default to the active tab, or take `--tab` when their arguments are selectors. Commands that change a style, take a screenshot or move the pointer (`css set`, `profile`, `screenshot`, `hover`, `inspect`) need the site or tab named, because an agent runs its commands over several steps and the active tab can change in between.
 
 - A **tab** is a tab id, from `tabs` or `open`.
 - A **target** is a tab id or a site, such as `news.ycombinator.com`.
@@ -97,6 +97,20 @@ These read the page the way Chat does, so an agent can look at a page before sty
 - `page-rules` prints the page's own rules for the elements a selector matches (the first five). Cross-origin stylesheets can't be read, so they're only counted.
 - `computed-styles` prints computed values on the first element a selector matches: the properties named, or common layout, color and type ones.
 - `match-count` prints how many elements each selector matches, and `invalid` for one that doesn't parse.
+
+### Pointer
+
+```bash
+yarn stylebot hover 54432929 '#nav .menu'
+yarn stylebot inspect 54432929 120,340
+```
+
+These point at the page, so an agent can open what only shows on hover, and find the selector for an element it sees in a screenshot. Neither clicks anything or draws on the page, so screenshots stay clean. Each needs the tab named.
+
+- `hover` moves the pointer onto an element, or a point given as `x,y` in the pixels of a `screenshot` of the tab. A selector aims at the middle of its first visible match, scrolled into view.
+- `inspect` prints the selector Stylebot's inspector would pick for an element or point, preferring one the site's style already has rules for. Below it come the other selectors the editor's selector menu would offer for the element, each with how many elements it matches, so an agent can pick a narrower or broader one. It sends the page no events and doesn't open the editor.
+
+Hover's events are synthetic: the page's own handlers run, but CSS `:hover` doesn't apply, and a site that checks for a real user can ignore them.
 
 ### Styles
 

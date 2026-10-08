@@ -9,6 +9,7 @@ jest.mock('./inspect', () => ({ inspectCommands: {} }));
 jest.mock('./pages', () => ({
   pageCommands: { tabs: jest.fn(async () => ['tab']) },
 }));
+jest.mock('./pointer', () => ({ pointerCommands: {} }));
 jest.mock('./profiles', () => ({ profileCommands: {} }));
 jest.mock('./styles', () => ({ styleCommands: {} }));
 

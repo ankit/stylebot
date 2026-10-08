@@ -1,6 +1,5 @@
 import type { ChatSuggestionContext } from '@stylebot/chat';
 import { getFragileSelector } from '@stylebot/css';
-import { reapplySavedStyles } from '@stylebot/inject-css';
 import {
   checkStyle,
   countMatches,
@@ -14,19 +13,24 @@ import {
 import { isReaderable } from '@stylebot/readability';
 import type {
   FragileSelector,
+  InspectorHost,
   PageInspection,
+  PointerResult,
   StyleCheckReport,
 } from '@stylebot/types';
+
+import { usePointer } from './pointer';
 
 /**
  * Once a saved style has applied: how many elements each selector matches,
  * what the page check found since startCheck, and fragile selectors.
  */
 const finishCheck = async (
-  selectors: Array<string>
+  selectors: Array<string>,
+  host: InspectorHost
 ): Promise<StyleCheckReport> => {
   // The background's own reapply may not have landed yet.
-  await reapplySavedStyles();
+  await host.reapplySavedStyles();
 
   return {
     matchCounts: countMatches(selectors),
@@ -42,13 +46,15 @@ const finishCheck = async (
  * the editor and Chat use.
  */
 export const inspectPage = async (
-  inspection: PageInspection
+  inspection: PageInspection,
+  host: InspectorHost
 ): Promise<
   | string
   | ChatSuggestionContext
   | Record<string, string>
   | Array<number | null>
   | StyleCheckReport
+  | PointerResult
   | null
 > => {
   switch (inspection.kind) {
@@ -75,6 +81,8 @@ export const inspectPage = async (
       startStyleCheck(inspection.edits);
       return null;
     case 'finishCheck':
-      return finishCheck(inspection.selectors);
+      return finishCheck(inspection.selectors, host);
+    case 'pointer':
+      return usePointer(inspection.action);
   }
 };

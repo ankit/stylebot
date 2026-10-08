@@ -7,6 +7,7 @@ import { Command } from 'commander';
 
 import { addInspectCommands } from './commands/inspect.mjs';
 import { addPageCommands } from './commands/pages.mjs';
+import { addPointerCommands } from './commands/pointer.mjs';
 import { addProfileCommands } from './commands/profiles.mjs';
 import { addStyleCommands } from './commands/styles.mjs';
 import { addHelpSections, helpConfiguration } from './help.mjs';
@@ -29,9 +30,9 @@ addHelpSections(program, {
     'target    A tab id, or a site such as news.ycombinator.com',
     "name      A profile's name or id",
     '',
-    'Commands that change a style or take a screenshot need the tab or',
-    'site named. The rest default to the active tab; ones that take',
-    'selectors name a tab with --tab.',
+    'Commands that change a style, take a screenshot or move the pointer',
+    'need the tab or site named. The rest default to the active tab; ones',
+    'that take selectors name a tab with --tab.',
   ],
   Examples: [
     '$ stylebot open news.ycombinator.com',
@@ -42,6 +43,7 @@ addHelpSections(program, {
 
 addPageCommands(program);
 addInspectCommands(program);
+addPointerCommands(program);
 addStyleCommands(program);
 addProfileCommands(program);
 

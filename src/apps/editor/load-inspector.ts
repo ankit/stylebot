@@ -1,28 +1,23 @@
-import type { inspectPage } from './inspect-page';
+import type { InspectorWindow, PageInspector } from '@stylebot/types';
 
-export type InspectPage = typeof inspectPage;
-
-// The inspector bundle sets stylebotInspectPage once it has run.
-export type InspectorWindow = Window & {
-  stylebotInspectPage?: InspectPage;
-};
-
-let loading: Promise<InspectPage> | null = null;
+let loading: Promise<PageInspector> | null = null;
 
 /**
  * Loads the CLI's page inspector bundle on its first request. A failed load
  * is forgotten, so the next request tries again.
  */
-export const loadInspector = (): Promise<InspectPage> => {
+export const loadInspector = (): Promise<PageInspector> => {
   if (!loading) {
-    const url = chrome.runtime.getURL('editor/inspector.js');
+    const url = chrome.runtime.getURL('cli-inspector/index.js');
 
     loading = import(/* webpackIgnore: true */ url).then(
       () => {
         const inspect = (window as InspectorWindow).stylebotInspectPage;
 
         if (!inspect) {
-          throw new Error('editor/inspector.js did not register the inspector');
+          throw new Error(
+            'cli-inspector/index.js did not register the inspector'
+          );
         }
 
         return inspect;

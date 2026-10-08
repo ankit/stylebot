@@ -5,6 +5,7 @@ import { OpenOptionsPage } from '../messages';
 import { get as getOption } from '../options';
 import { inspectCommands } from './inspect';
 import { pageCommands } from './pages';
+import { pointerCommands } from './pointer';
 import { profileCommands } from './profiles';
 import { CLI_PROTOCOL } from './protocol';
 import { styleCommands } from './styles';
@@ -15,6 +16,7 @@ const RELOADED_FOR_GRANT_KEY = 'cli-reloaded-for-grant';
 
 const commands: CliCommands = {
   ...pageCommands,
+  ...pointerCommands,
   ...inspectCommands,
   ...styleCommands,
   ...profileCommands,

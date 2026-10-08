@@ -74,7 +74,7 @@ const addCli = manifest => ({
   optional_host_permissions: ['<all_urls>'],
   web_accessible_resources: [
     ...manifest.web_accessible_resources,
-    { resources: ['editor/inspector.js'], matches: ['<all_urls>'] },
+    { resources: ['cli-inspector/index.js'], matches: ['<all_urls>'] },
   ],
 });
 

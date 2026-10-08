@@ -5,7 +5,7 @@ Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of
 ## Structure
 
 - `src/` — extension source, grouped into tiers. Each folder directly inside a tier is a package, imported as `@stylebot/<folder>` (resolved by `scripts/lib/src-packages.js`; `@stylebot/inject-css` keeps its old name for `apps/content`):
-  - `src/apps/` — webpack entries and HTML pages: `background`, `popup`, `options`, `editor` (with the pop-out window in `editor/window`), `content` (the content script), `reader` (the readability UI bundle), `monaco-iframe`
+  - `src/apps/` — webpack entries and HTML pages: `background`, `popup`, `options`, `editor` (with the pop-out window in `editor/window`), `content` (the content script), `reader` (the readability UI bundle), `cli-inspector` (what the CLI reads and does on a page, loaded on its first request), `monaco-iframe`
   - `src/features/` — capabilities shared by apps: `chat`, `sync`, `history`, `page-bridge`, `highlighter`, `google-fonts`, `readability` (eligibility and reader lifecycle), `monaco-editor`
   - `src/ui/` — `components`, `icons`, `scss`
   - `src/core/` — `css`, `stylesheets`, `saved-styles`, `types`, `settings`, `i18n`, `utils`
