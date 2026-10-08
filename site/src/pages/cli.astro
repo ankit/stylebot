@@ -1,7 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
 import CliCommand from '../components/cli/CliCommand.astro';
-import CliStatus from '../components/CliStatus';
 import { CLI_PACKAGE, STORES } from '../lib/links';
 
 const examples = [
@@ -34,8 +33,6 @@ const examples = [
         your browser, using your own subscription instead of an API key.
       </p>
     </div>
-
-    <CliStatus client:load />
 
     <section>
       <h2>Set it up</h2>
@@ -268,95 +265,6 @@ const examples = [
   .cli-examples dd {
     margin: 8px 0 0 12px;
     font: 400 14px/1.5 var(--ui);
-    color: var(--muted);
-  }
-
-  .cli :global(.cli-status) {
-    margin-bottom: 40px;
-    padding: 16px 18px;
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-
-  .cli :global(.cli-status-head) {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 4px 10px;
-    font: 400 13.5px/1.4 var(--ui);
-    color: var(--muted);
-  }
-
-  .cli :global(.cli-status-head strong) {
-    font: 600 15px/1.3 var(--ui);
-    color: var(--ink);
-  }
-
-  .cli :global(.cli-status ul) {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .cli :global(.cli-status li) {
-    min-height: 44px;
-    padding: 6px 0;
-    border-top: 1px solid var(--border);
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px 12px;
-  }
-
-  .cli :global(.cli-status-mark) {
-    flex: none;
-    width: 22px;
-    height: 22px;
-    border-radius: 11px;
-    border: 1px solid var(--strong);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font: 600 12px/1 var(--ui);
-    color: var(--faint);
-  }
-
-  .cli :global(.is-done .cli-status-mark) {
-    border-color: var(--acc);
-    background: var(--acc);
-    color: var(--surface);
-  }
-
-  .cli :global(.cli-status-label) {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    align-items: baseline;
-    gap: 8px;
-    font: 500 14.5px/1.3 var(--ui);
-    color: var(--ink);
-  }
-
-  .cli :global(.cli-status-detail) {
-    font: 400 12.5px/1 var(--mono);
-    color: var(--faint);
-  }
-
-  .cli :global(.cli-status-btn) {
-    padding: 8px 12px;
-    border: none;
-    cursor: pointer;
-    font-size: 13px;
-  }
-
-  .cli :global(.cli-status-hint) {
-    font: 400 13px/1.4 var(--ui);
     color: var(--muted);
   }
 
