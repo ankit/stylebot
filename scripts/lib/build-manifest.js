@@ -91,6 +91,24 @@ const buildChromeManifest = (manifest, { nodeEnv, preview }) => {
   return manifest;
 };
 
+const SITE_BRIDGE_SCRIPT = 'site-bridge/index.js';
+
+// Where `yarn dev` in site/ serves stylebot.dev, on whichever port is free.
+const SITE_DEV_SERVER = 'http://localhost/*';
+
+/**
+ * Lets the site's dev server use the stylebot.dev bridge in development
+ * builds, to try gallery installs locally.
+ */
+const addSiteDevServer = manifest => ({
+  ...manifest,
+  content_scripts: manifest.content_scripts.map(script =>
+    script.js.includes(SITE_BRIDGE_SCRIPT)
+      ? { ...script, matches: [...script.matches, SITE_DEV_SERVER] }
+      : script
+  ),
+});
+
 /**
  * Builds the extension manifest for a browser (undefined for Chrome and Edge,
  * which share one build) from the base manifest.
@@ -104,6 +122,10 @@ const buildManifest = (base, { browser, nodeEnv, preview }) => {
     manifest = buildSafariManifest(base);
   } else {
     manifest = buildChromeManifest(base, { nodeEnv, preview });
+  }
+
+  if (nodeEnv === 'development') {
+    manifest = addSiteDevServer(manifest);
   }
 
   return supportsCLI(browser) ? addCli(manifest) : manifest;

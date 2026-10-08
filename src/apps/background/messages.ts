@@ -15,6 +15,7 @@ import {
   ensureCompiledStyles,
   setActiveProfile,
   createProfile,
+  installProfile,
   renameProfile,
   deleteProfile,
 } from './styles';
@@ -37,6 +38,8 @@ import type {
   SetActiveProfile as SetActiveProfileType,
   CreateProfile as CreateProfileType,
   CreateProfileResponse,
+  InstallStyle as InstallStyleType,
+  InstallStyleResponse,
   RenameProfile as RenameProfileType,
   DeleteProfile as DeleteProfileType,
   MoveStyle as MoveStyleType,
@@ -157,6 +160,62 @@ export const CreateProfile = async (
   });
 
   sendResponse({ profileId });
+  return applyStylesToAllTabs();
+};
+
+/**
+ * Whether a page may install styles: stylebot.dev, or in development builds
+ * the site's dev server on any localhost port, to try installs locally.
+ */
+const canInstallFrom = (url: string | undefined): boolean => {
+  if (!url) {
+    return false;
+  }
+
+  const { origin, protocol, hostname } = new URL(url);
+
+  return (
+    origin === 'https://stylebot.dev' ||
+    (process.env.NODE_ENV === 'development' &&
+      protocol === 'http:' &&
+      hostname === 'localhost')
+  );
+};
+
+const MAX_INSTALL_CSS_LENGTH = 100_000;
+const MAX_INSTALL_NAME_LENGTH = 60;
+
+const isNonEmptyString = (value: unknown, maxLength: number) =>
+  typeof value === 'string' &&
+  value.trim().length > 0 &&
+  value.length <= maxLength;
+
+/**
+ * Installs a gallery style from stylebot.dev as a new profile of its site's
+ * style. Anything not sent from the site's bridge is refused.
+ */
+export const InstallStyle = async (
+  message: InstallStyleType,
+  sender: chrome.runtime.MessageSender,
+  sendResponse: (response: InstallStyleResponse) => void
+): Promise<void> => {
+  if (
+    sender.id !== chrome.runtime.id ||
+    !canInstallFrom(sender.url) ||
+    !isNonEmptyString(message.url, 2048) ||
+    !isNonEmptyString(message.profileName, MAX_INSTALL_NAME_LENGTH) ||
+    !isNonEmptyString(message.css, MAX_INSTALL_CSS_LENGTH)
+  ) {
+    sendResponse({});
+    return;
+  }
+
+  const profileName = await installProfile(message.url.trim(), {
+    name: message.profileName.trim(),
+    css: message.css,
+  });
+
+  sendResponse({ profileName });
   return applyStylesToAllTabs();
 };
 

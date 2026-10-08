@@ -1,6 +1,7 @@
 ---
 import { Image, getImage } from 'astro:assets';
 import CarouselNav from './CarouselNav.astro';
+import SbIcon from './SbIcon';
 import { Check, Copy } from './icons';
 import { GALLERY } from '../lib/gallery';
 
@@ -33,6 +34,7 @@ const items = await Promise.all(
         <figure
           class="gallery-item"
           data-gallery={item.id}
+          data-site={item.site}
           data-note={item.note}
         >
           <div class="gallery-shot">
@@ -51,19 +53,36 @@ const items = await Promise.all(
               />
             </button>
             {item.css && (
-              <button
-                class="gallery-copy"
-                data-copy
-                title="Copy CSS"
-                aria-label={`Copy CSS for ${item.name}`}
-              >
-                <span class="gallery-copy-idle">
-                  <Copy />
-                </span>
-                <span class="gallery-copy-ok">
-                  <Check />
-                </span>
-              </button>
+              <div class="gallery-actions">
+                <button
+                  class="gallery-action gallery-install"
+                  data-install
+                  title="Install in Stylebot"
+                  aria-label={`Install ${item.name} in Stylebot`}
+                >
+                  <span class="gallery-action-idle">
+                    <SbIcon size={13} />
+                    Install
+                  </span>
+                  <span class="gallery-action-ok">
+                    <Check size={12} />
+                    Installed
+                  </span>
+                </button>
+                <button
+                  class="gallery-action gallery-copy"
+                  data-copy
+                  title="Copy CSS"
+                  aria-label={`Copy CSS for ${item.name}`}
+                >
+                  <span class="gallery-action-idle">
+                    <Copy />
+                  </span>
+                  <span class="gallery-action-ok">
+                    <Check />
+                  </span>
+                </button>
+              </div>
             )}
           </div>
           <figcaption class="gallery-caption">
@@ -84,6 +103,9 @@ const items = await Promise.all(
       <span class="lightbox-name"></span>
       <span class="lightbox-site"></span>
       <span class="lightbox-note" hidden></span>
+      <button class="lightbox-install" data-lightbox-install hidden>
+        Install
+      </button>
       <button class="lightbox-copy" data-lightbox-copy>
         Copy CSS
       </button>
@@ -133,6 +155,11 @@ const items = await Promise.all(
   const lightboxCopy = dialog.querySelector<HTMLButtonElement>(
     '[data-lightbox-copy]',
   )!;
+  const lightboxInstall = dialog.querySelector<HTMLButtonElement>(
+    '[data-lightbox-install]',
+  )!;
+  const gallery = document.getElementById('gallery')!;
+  const INSTALL_TIMEOUT_MS = 5000;
 
   function markCopied(item: HTMLElement) {
     document
@@ -152,6 +179,83 @@ const items = await Promise.all(
   async function copyItem(item: HTMLElement) {
     await copyText(cssOf(item));
     markCopied(item);
+  }
+
+  /*
+   * Stylebot's content script on this site answers the ping, so the install
+   * buttons only show when there's an extension to install into.
+   */
+  window.addEventListener('message', (e) => {
+    if (e.source === window && e.data?.type === 'stylebot:pong') {
+      gallery.classList.add('can-install');
+      if (lightboxItem) show(lightboxItem);
+    }
+  });
+  window.postMessage({ type: 'stylebot:ping' }, location.origin);
+
+  /**
+   * Asks Stylebot to add the item's css as a new profile for its site, and
+   * resolves with the profile's name, or null if it wasn't installed.
+   */
+  function requestInstall(item: HTMLElement): Promise<string | null> {
+    const id = crypto.randomUUID();
+
+    return new Promise((resolve) => {
+      const done = (name: string | null) => {
+        window.removeEventListener('message', onMessage);
+        clearTimeout(timer);
+        resolve(name);
+      };
+      const onMessage = (e: MessageEvent) => {
+        if (
+          e.source === window &&
+          e.data?.type === 'stylebot:installed' &&
+          e.data.id === id
+        ) {
+          done(e.data.profileName ?? null);
+        }
+      };
+      const timer = setTimeout(() => done(null), INSTALL_TIMEOUT_MS);
+
+      window.addEventListener('message', onMessage);
+      window.postMessage(
+        {
+          type: 'stylebot:install',
+          id,
+          url: item.dataset.site,
+          name: item.querySelector('.gallery-name')!.textContent,
+          css: cssOf(item),
+        },
+        location.origin,
+      );
+    });
+  }
+
+  function installLabel(item: HTMLElement) {
+    if (item.dataset.installed) return `Installed as ${item.dataset.installed}`;
+    if (item.dataset.installFailed) return 'Couldn’t install';
+    return 'Install';
+  }
+
+  async function installItem(item: HTMLElement) {
+    const name = await requestInstall(item);
+
+    if (name) {
+      item.dataset.installed = name;
+      delete item.dataset.installFailed;
+      item.classList.add('is-installed', 'is-just-installed');
+      setTimeout(
+        () => item.classList.remove('is-just-installed'),
+        COPIED_MS,
+      );
+      item
+        .querySelector('[data-install]')!
+        .setAttribute('title', `Installed as ${name}`);
+    } else {
+      item.dataset.installFailed = 'true';
+    }
+
+    if (lightboxItem === item) lightboxInstall.textContent = installLabel(item);
   }
 
   const items = [...document.querySelectorAll<HTMLElement>('.gallery-item')];
@@ -196,6 +300,8 @@ const items = await Promise.all(
     noteEl.textContent = note ?? '';
     noteEl.hidden = !note;
     lightboxCopy.hidden = !!note;
+    lightboxInstall.hidden = !!note || !gallery.classList.contains('can-install');
+    lightboxInstall.textContent = installLabel(item);
     lightboxCopy.textContent = item.classList.contains('is-copied')
       ? 'Copied'
       : 'Copy CSS';
@@ -205,6 +311,9 @@ const items = await Promise.all(
     item
       .querySelector('[data-copy]')
       ?.addEventListener('click', () => copyItem(item));
+    item
+      .querySelector('[data-install]')
+      ?.addEventListener('click', () => installItem(item));
     item
       .querySelector<HTMLButtonElement>('[data-open]')!
       .addEventListener('click', () => {
@@ -222,6 +331,11 @@ const items = await Promise.all(
     const next =
       (items.indexOf(lightboxItem) + dir + items.length) % items.length;
     show(items[next]);
+  });
+
+  lightboxInstall.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (lightboxItem && !lightboxItem.dataset.note) installItem(lightboxItem);
   });
 
   lightboxCopy.addEventListener('click', (e) => {
@@ -289,11 +403,16 @@ const items = await Promise.all(
     object-position: top left;
   }
 
-  .gallery-copy {
+  .gallery-actions {
     position: absolute;
     top: 8px;
     right: 8px;
     z-index: 2;
+    display: flex;
+    gap: 6px;
+  }
+
+  .gallery-action {
     width: 28px;
     height: 28px;
     padding: 0;
@@ -315,29 +434,49 @@ const items = await Promise.all(
       background 0.15s;
   }
 
-  .gallery-shot:hover .gallery-copy,
-  .gallery-copy:focus-visible,
-  .is-copied .gallery-copy {
+  .gallery-install {
+    display: none;
+    width: auto;
+    padding: 0 10px 0 8px;
+    font: 600 12px/1 var(--ui);
+  }
+
+  .gallery-install span {
+    gap: 5px;
+    align-items: center;
+  }
+
+  .can-install .gallery-install {
+    display: flex;
+  }
+
+  .gallery-shot:hover .gallery-action,
+  .gallery-action:focus-visible,
+  .is-copied .gallery-copy,
+  .is-just-installed .gallery-action {
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
   }
 
-  .is-copied .gallery-copy {
+  .is-copied .gallery-copy,
+  .is-installed .gallery-install {
     background: rgba(31, 138, 76, 0.85);
   }
 
-  .gallery-copy-idle,
-  .gallery-copy-ok {
+  .gallery-action-idle,
+  .gallery-action-ok {
     display: flex;
   }
 
-  .gallery-copy-ok,
-  .is-copied .gallery-copy-idle {
+  .gallery-action-ok,
+  .is-copied .gallery-copy .gallery-action-idle,
+  .is-installed .gallery-install .gallery-action-idle {
     display: none;
   }
 
-  .is-copied .gallery-copy-ok {
+  .is-copied .gallery-copy .gallery-action-ok,
+  .is-installed .gallery-install .gallery-action-ok {
     display: flex;
   }
 
@@ -414,6 +553,21 @@ const items = await Promise.all(
     margin-left: 6px;
     font: 400 12.5px/1.3 var(--ui);
     opacity: 0.7;
+  }
+
+  .lightbox-install {
+    margin-left: 6px;
+    padding: 7px 12px;
+    border-radius: 8px;
+    border: none;
+    background: var(--acc);
+    color: #fff;
+    cursor: pointer;
+    font: 600 12.5px/1 var(--ui);
+  }
+
+  .lightbox-install:hover {
+    filter: brightness(1.08);
   }
 
   .lightbox-copy {

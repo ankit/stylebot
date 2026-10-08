@@ -13,6 +13,7 @@ import {
   setReadability,
   setActiveProfile,
   createProfile,
+  installProfile,
   renameProfile,
   deleteProfile,
   getGoogleWebFontExists,
@@ -123,6 +124,7 @@ describe('style edits', () => {
     enabled: boolean;
     readability: boolean;
     modifiedTime: string;
+    profiles?: Record<string, { name: string; css?: string }>;
   };
 
   let store: { styles: Record<string, StoredStyle> };
@@ -282,6 +284,53 @@ describe('style edits', () => {
     await deleteProfile('example.com', 'default');
 
     expect(writes()).toBe(0);
+  });
+
+  it('installs css as a new active profile, keeping the existing css and turning the style on', async () => {
+    store.styles['example.com'].enabled = false;
+
+    const name = await installProfile('example.com', {
+      name: 'Dracula',
+      css: 'a { color: purple; }',
+    });
+
+    expect(name).toBe('Dracula');
+    expect(writes()).toBe(1);
+    expect(stored('example.com')).toMatchObject({
+      css: 'a { color: purple; }',
+      enabled: true,
+      profiles: { default: { name: '', css: 'body { color: red; }' } },
+    });
+  });
+
+  it('switches back to an installed profile rather than adding the same one twice', async () => {
+    const css = 'a { color: purple; }';
+    await installProfile('example.com', { name: 'Dracula', css });
+    await setActiveProfile('example.com', 'default');
+
+    expect(await installProfile('example.com', { name: 'Dracula', css })).toBe(
+      'Dracula'
+    );
+    expect(stored('example.com')).toMatchObject({ css });
+    expect(Object.keys(stored('example.com').profiles ?? {})).toHaveLength(2);
+
+    const before = writes();
+    await installProfile('example.com', { name: 'Dracula', css });
+    expect(writes()).toBe(before);
+  });
+
+  it('installs different css under a free name when the name is taken', async () => {
+    await installProfile('example.com', { name: 'Dracula', css: 'a {}' });
+
+    expect(
+      await installProfile('example.com', { name: 'Dracula', css: 'b {}' })
+    ).toBe('Dracula 2');
+  });
+
+  it('creates the style when installing for a url with none', async () => {
+    await installProfile('new.com', { name: 'Dark', css: 'a {}' });
+
+    expect(stored('new.com')).toMatchObject({ css: 'a {}', enabled: true });
   });
 
   it('saves css to the profile it names, and keeps a style whose active profile is blank', async () => {

@@ -22,6 +22,7 @@ import {
   DisableStyle,
   SetActiveProfile,
   CreateProfile,
+  InstallStyle,
   RenameProfile,
   DeleteProfile,
   SetReadability,
@@ -256,6 +257,9 @@ export const initListeners = (): void => {
           break;
         case 'CreateProfile':
           CreateProfile(message, sendResponse);
+          break;
+        case 'InstallStyle':
+          InstallStyle(message, sender, sendResponse);
           break;
         case 'RenameProfile':
           RenameProfile(message);

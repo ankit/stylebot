@@ -29,6 +29,14 @@ export type CreateProfile = {
   activate: boolean;
 };
 
+// Sent by the stylebot.dev bridge to add a gallery style as a new profile.
+export type InstallStyle = {
+  name: 'InstallStyle';
+  url: string;
+  profileName: string;
+  css: string;
+};
+
 export type RenameProfile = {
   name: 'RenameProfile';
   url: string;
@@ -260,6 +268,7 @@ type BackgroundPageMessage =
   | GetStylesForPage
   | SetActiveProfile
   | CreateProfile
+  | InstallStyle
   | RenameProfile
   | DeleteProfile
   | GetAllOptions

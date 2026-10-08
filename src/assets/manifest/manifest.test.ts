@@ -13,7 +13,12 @@ const GOOGLE_HOSTS = [
   'https://fonts.googleapis.com/*',
 ];
 
-const CONTENT_SCRIPT_MATCHES = [['<all_urls>'], ['<all_urls>']];
+// The stylebot.dev bridge is covered by <all_urls>, so it adds no warning.
+const CONTENT_SCRIPT_MATCHES = [
+  ['<all_urls>'],
+  ['<all_urls>'],
+  ['https://stylebot.dev/*'],
+];
 
 const RELEASE_INSTALL_WARNING_FIELDS = {
   chrome: {

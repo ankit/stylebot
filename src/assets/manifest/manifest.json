@@ -26,6 +26,11 @@
       "matches": ["<all_urls>"],
       "exclude_matches": ["*://*/*.xml"],
       "run_at": "document_start"
+    },
+    {
+      "js": ["site-bridge/index.js"],
+      "matches": ["https://stylebot.dev/*"],
+      "run_at": "document_start"
     }
   ],
   "action": {

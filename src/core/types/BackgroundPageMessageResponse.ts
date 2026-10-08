@@ -17,6 +17,11 @@ export type CreateProfileResponse = {
   profileId: string;
 };
 
+// Left out when the install was refused.
+export type InstallStyleResponse = {
+  profileName?: string;
+};
+
 export type GetStylesForPageResponse = {
   styles: Array<Style>;
   defaultStyle?: Style;
@@ -68,6 +73,7 @@ type BackgroundPageMessageResponse =
   | GetAllStylesResponse
   | GetStylesForPageResponse
   | CreateProfileResponse
+  | InstallStyleResponse
   | GetCommandsResponse
   | GetReadabilitySettingsResponse
   | GetImportCssResponse

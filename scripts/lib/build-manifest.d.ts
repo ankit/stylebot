@@ -2,7 +2,7 @@ export type Manifest = {
   key?: string;
   permissions: Array<string>;
   host_permissions: Array<string>;
-  content_scripts: Array<{ matches: Array<string> }>;
+  content_scripts: Array<{ js: Array<string>; matches: Array<string> }>;
   [field: string]: unknown;
 };
 

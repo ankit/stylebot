@@ -17,6 +17,7 @@ import {
   renameProfile as renameStyleProfile,
   removeProfile,
   expandProfiles,
+  freeProfileName,
 } from '@stylebot/saved-styles';
 
 import type {
@@ -443,6 +444,63 @@ export const createProfile = async (
   });
 
   return id;
+};
+
+/**
+ * Adds css as a new, active profile of a url's style, under the name or the
+ * first free variant of it, and turns the style on. Installing the same css
+ * under the same name again switches back to that profile instead.
+ */
+export const installProfile = async (
+  url: string,
+  { name, css }: { name: string; css: string }
+): Promise<string> => {
+  let installedName = name;
+
+  await update(styles => {
+    const existing = styles[url] ?? {
+      css: '',
+      readability: false,
+      enabled: true,
+      modifiedTime: getCurrentTimestamp(),
+    };
+
+    const profiles = listProfiles(existing);
+    const { sheets } = expandProfiles(existing);
+    const installed = profiles.find(
+      profile => profile.name === name && sheets[profile.id].css === css
+    );
+
+    if (installed) {
+      const style = activateProfile(existing, installed.id);
+
+      if (style === existing && existing.enabled) {
+        return undefined;
+      }
+
+      styles[url] = { ...style, enabled: true };
+      return styles;
+    }
+
+    installedName = freeProfileName(
+      name,
+      profiles.map(profile => profile.name)
+    );
+
+    styles[url] = editStyle(
+      addProfile(existing, {
+        id: crypto.randomUUID(),
+        name: installedName,
+        css,
+        activate: true,
+      }),
+      { enabled: true }
+    );
+
+    return styles;
+  });
+
+  return installedName;
 };
 
 /**
