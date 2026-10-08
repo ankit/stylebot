@@ -1,0 +1,150 @@
+---
+import { LONG_QUOTE, QUOTES } from '../lib/quotes';
+---
+
+<section id="voices" class="section">
+  <div class="section-inner quotes-inner">
+    <div class="section-head">
+      <h2 class="section-title">People love Stylebot</h2>
+    </div>
+    <div class="quotes">
+      {QUOTES.slice(0, 3).map((quote) => (
+        <figure class="quote">
+          <blockquote
+            class:list={[
+              'quote-text',
+              { long: quote.text.length > LONG_QUOTE },
+            ]}
+          >
+            “{quote.text}”
+          </blockquote>
+          <figcaption class="quote-by">
+            <span class="quote-name" hidden={!quote.name}>
+              {quote.name}
+            </span>
+            <span class="quote-from">{quote.from}</span>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .quotes-inner {
+    padding-bottom: 64px;
+  }
+
+  .quotes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .quote {
+    margin: 0;
+    min-height: 236px;
+    box-sizing: border-box;
+    padding: 22px 22px 18px;
+    border-radius: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    transition:
+      opacity 0.45s ease,
+      transform 0.45s ease;
+  }
+
+  .quote.fading {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  .quote-text {
+    margin: 0;
+    font:
+      400 20px/1.45 'Newsreader',
+      Georgia,
+      serif;
+    letter-spacing: -0.005em;
+    color: var(--ink);
+    text-wrap: pretty;
+  }
+
+  .quote-text.long {
+    font-size: 18.5px;
+  }
+
+  .quote-by {
+    margin-top: auto;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 8px;
+    font: 400 13px/1.3 var(--ui);
+    color: var(--muted);
+  }
+
+  .quote-name {
+    font: 600 14px/1.2 var(--ui);
+    color: var(--ink);
+  }
+
+  .quote-name[hidden] {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .quote {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  import { LONG_QUOTE, QUOTES } from '../lib/quotes';
+
+  const ROTATE_MS = 4200;
+  const FADE_MS = 450;
+
+  const grid = document.querySelector<HTMLElement>('#voices .quotes')!;
+  const cards = [...grid.querySelectorAll<HTMLElement>('.quote')];
+  const shown = cards.map((_, i) => i);
+  let turn = 0;
+  let next = cards.length;
+  let held = false;
+
+  /**
+   * Fades out one card, in turn, and brings it back with the next quote that
+   * isn't already on screen.
+   */
+  function rotate() {
+    if (held || document.hidden) return;
+    const slot = turn % cards.length;
+    while (shown.includes(next % QUOTES.length)) next++;
+    const index = next % QUOTES.length;
+    const card = cards[slot];
+    card.classList.add('fading');
+    setTimeout(() => {
+      const quote = QUOTES[index];
+      const text = card.querySelector<HTMLElement>('.quote-text')!;
+      const name = card.querySelector<HTMLElement>('.quote-name')!;
+      text.textContent = `“${quote.text}”`;
+      text.classList.toggle('long', quote.text.length > LONG_QUOTE);
+      name.textContent = quote.name;
+      name.hidden = !quote.name;
+      card.querySelector<HTMLElement>('.quote-from')!.textContent = quote.from;
+      card.classList.remove('fading');
+      shown[slot] = index;
+      next = (index + 1) % QUOTES.length;
+      turn++;
+    }, FADE_MS);
+  }
+
+  grid.addEventListener('mouseenter', () => (held = true));
+  grid.addEventListener('mouseleave', () => (held = false));
+  setInterval(rotate, ROTATE_MS);
+</script>
