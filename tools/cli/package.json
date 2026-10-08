@@ -1,16 +1,43 @@
 {
-  "name": "stylebot-cli",
-  "version": "0.1.0",
-  "private": true,
-  "description": "Drive the Stylebot browser extension from the command line",
+  "name": "@stylebot/cli",
+  "version": "1.0.0",
+  "description": "Restyle websites in your browser from the command line with the Stylebot extension",
+  "keywords": [
+    "stylebot",
+    "css",
+    "browser-extension",
+    "chrome",
+    "edge",
+    "cli",
+    "claude-code"
+  ],
+  "homepage": "https://stylebot.dev/cli",
+  "bugs": {
+    "url": "https://github.com/ankit/stylebot/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ankit/stylebot.git",
+    "directory": "tools/cli"
+  },
+  "license": "MIT",
+  "author": "Ankit Ahuja",
   "type": "module",
   "bin": {
-    "stylebot": "bin/stylebot"
+    "stylebot": "bin/stylebot.mjs"
   },
+  "files": [
+    "bin",
+    "lib",
+    "!lib/**/*.test.mjs"
+  ],
   "dependencies": {
     "commander": "^14.0.3"
   },
   "engines": {
     "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

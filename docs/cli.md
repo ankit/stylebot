@@ -6,15 +6,20 @@ It works with Stylebot on Chrome, Edge and the other Chromium browsers listed be
 
 ## Setup
 
-The CLI needs Node 20 or later. Inside this repo, `yarn stylebot` runs it. To run it as `stylebot` from anywhere on macOS or Linux, link it onto your `PATH`:
+The CLI needs Node 20 or later, and Stylebot 4 or later in the browser. It's published to npm as `@stylebot/cli`:
 
 ```bash
-ln -s "$PWD/tools/cli/bin/stylebot" ~/bin/stylebot
+npm install -g @stylebot/cli
+stylebot install
 ```
 
-On Windows, run `yarn stylebot` or `node tools\cli\lib\cli.mjs`.
+To run this checkout's CLI instead, use `yarn stylebot` inside the repo. To run it as `stylebot` from anywhere on macOS or Linux, link it onto your `PATH`:
 
-Then register it with your browsers, from the repo so it finds the dev profiles:
+```bash
+ln -s "$PWD/tools/cli/bin/stylebot.mjs" ~/bin/stylebot
+```
+
+On Windows, run `yarn stylebot` or `node tools\cli\lib\cli.mjs`. Then register it with your browsers, from the repo so it finds the dev profiles:
 
 ```bash
 yarn stylebot install
@@ -120,7 +125,7 @@ Every command takes `--json` to print the raw response instead of text.
 
 ## Claude Code
 
-The Stylebot plugin teaches Claude Code to restyle pages with the CLI: open the page, read its outline, write CSS, fix what the page check reports, then look at a screenshot. It doesn't contain the CLI; its `stylebot` command runs the one on your `PATH`.
+The Stylebot plugin teaches Claude Code to restyle pages with the CLI: open the page, read its outline, write CSS, fix what the page check reports, then look at a screenshot. It doesn't contain the CLI; its `stylebot` command runs the one on your `PATH`, or the published one through `npx` when there's none.
 
 To try it in one session:
 
@@ -218,6 +223,6 @@ Vivaldi reads Chrome's key on Windows.
 
 ## Before it can ship
 
-- Publishing the CLI to npm, for the plugin to fall back to, and the plugin through a public marketplace
+- Publishing the CLI to npm, with the v4 store release, and the plugin through a public marketplace
 - Install support for Firefox
 - A visible sign that the CLI is connected, since any local process can use the socket

@@ -17,3 +17,18 @@ Day-to-day pull requests target `v4`. 3.x releases ship from `main`, and the rel
   - Open `safari/Stylebot/Stylebot.xcodeproj` and choose Product → Archive. The app and extension take their version and build number from the manifest, so there's nothing to bump in Xcode — but App Store Connect rejects a second upload of the same version, so a rebuilt upload needs a new version
   - In the Organizer, choose Distribute App → App Store Connect, which signs with the team set in the project and uploads the build
   - In App Store Connect, try the build through TestFlight, then add it to the new version and submit it for review
+
+## CLI
+
+The CLI is published to npm as `@stylebot/cli`, from `tools/cli`, with its own version. Publish its first version at the same time as the v4 store release, once that's live in the Chrome Web Store and Edge Add-ons: earlier versions of the extension can't talk to it.
+
+- Bump `version` in `tools/cli/package.json`: patch for fixes, minor for new commands or flags, major for a change that breaks scripts using it. The host in `~/.stylebot/` is copied again whenever the version changes, so bump it for any release that changes the host
+- Bump the protocol, in the CLI and the extension together, only when a command's arguments or result change incompatibly; `docs/cli.md` describes when. A protocol bump means the CLI and the extension release at the same time
+- Check what ships with `npm pack --dry-run` in `tools/cli`
+- Publish from `tools/cli`, signed in to npm as a member of the `stylebot` org, entering the 2FA code when asked:
+
+```bash
+npm publish --access public
+```
+
+npm's trusted publishing from GitHub Actions could replace this manual step later.

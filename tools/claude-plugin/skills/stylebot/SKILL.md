@@ -23,7 +23,7 @@ When a command can't reach Stylebot, or says the CLI and Stylebot don't match, i
 - **Run `stylebot install`**: run it yourself, then try again.
 - **Anything else**, such as turning on the setting, opening or restarting the browser, or updating Stylebot or the CLI: tell the user the message as it is, and try again once they say it's done.
 
-If `stylebot` isn't found, the CLI isn't installed: tell the user, and point them to Stylebot's `docs/cli.md`.
+If `stylebot` isn't found, the CLI isn't installed: tell the user to install it with `npm install -g @stylebot/cli`, as https://stylebot.dev/cli describes.
 
 ## Workflow
 

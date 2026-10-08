@@ -1,6 +1,6 @@
 #!/bin/sh
-# Runs the stylebot CLI installed elsewhere on PATH, skipping this launcher.
-# The CLI isn't on npm yet, so without one there's nothing to fall back to.
+# Runs the stylebot CLI installed elsewhere on PATH, skipping this launcher,
+# or else the published one through npx.
 self=$(realpath "$0")
 IFS=:
 for dir in $PATH; do
@@ -9,5 +9,9 @@ for dir in $PATH; do
     exec "$candidate" "$@"
   fi
 done
-echo "stylebot: the Stylebot CLI isn't installed. Set it up from a Stylebot checkout as docs/cli.md describes, then try again." >&2
+unset IFS
+if command -v npx >/dev/null 2>&1; then
+  exec npx --yes @stylebot/cli "$@"
+fi
+echo "stylebot: the Stylebot CLI isn't installed. Install Node 20 or later and run npm install -g @stylebot/cli, then try again." >&2
 exit 127

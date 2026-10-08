@@ -29,5 +29,4 @@ export const LINKS = {
   cli: '/cli',
 };
 
-// Placeholder until the CLI's npm package name is decided.
-export const CLI_PACKAGE = 'stylebot-cli';
+export const CLI_PACKAGE = '@stylebot/cli';

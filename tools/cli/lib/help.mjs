@@ -107,7 +107,7 @@ const formatHelp = (command, helper) => {
     ),
     ...section('Learn more', [
       '  Use `stylebot <command> --help` for more about a command.',
-      '  Read docs/cli.md for setup and how the CLI works.',
+      '  Read https://stylebot.dev/cli for setup and how the CLI works.',
     ]),
   ]
     .join('\n')

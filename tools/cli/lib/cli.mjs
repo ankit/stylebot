@@ -11,6 +11,7 @@ import { addProfileCommands } from './commands/profiles.mjs';
 import { addStyleCommands } from './commands/styles.mjs';
 import { addHelpSections, helpConfiguration } from './help.mjs';
 import { install } from './install.mjs';
+import { CLI_VERSION } from './package.mjs';
 import { fail } from './request.mjs';
 
 const program = new Command('stylebot')
@@ -18,6 +19,7 @@ const program = new Command('stylebot')
   .description('Restyle pages in a browser running Stylebot.')
   .configureHelp(helpConfiguration)
   .helpOption('-h, --help', 'Show help')
+  .version(CLI_VERSION, '-v, --version', 'Show the version')
   .option('--json', 'Print the raw JSON response')
   .showHelpAfterError('(run stylebot --help for usage)');
 
