@@ -2,6 +2,47 @@ import * as postcss from 'postcss';
 import { findRule, splitSelectorFromGroup } from './rule';
 
 /**
+ * Whether `shorthand` also sets `property`, as `background` does
+ * `background-color`.
+ */
+const isShorthandOf = (shorthand: string, property: string): boolean =>
+  property.startsWith(`${shorthand}-`);
+
+/**
+ * Removes the property from the selector's top-level rules after `rule`,
+ * which would otherwise win the cascade over it, and drops rules this empties.
+ */
+const removeFromLaterRules = (
+  root: postcss.Root,
+  rule: postcss.Rule,
+  selector: string,
+  property: string
+): void => {
+  let after = false;
+
+  root.each(node => {
+    if (node === rule) {
+      after = true;
+      return;
+    }
+
+    if (!after || node.type !== 'rule' || node.selector !== selector) {
+      return;
+    }
+
+    node.each(child => {
+      if (child.type === 'decl' && child.prop === property) {
+        child.remove();
+      }
+    });
+
+    if (!node.some(child => !!child)) {
+      node.remove();
+    }
+  });
+};
+
+/**
  * Add declaration for given selector and css. Only the rule's own
  * declarations are touched: nested rules keep theirs, and a rule left with
  * nothing but nested rules stays.
@@ -34,6 +75,8 @@ export const addDeclaration = (
     return css;
   }
 
+  removeFromLaterRules(root, rule, selector, property);
+
   const declarationExists = rule.some(
     decl => decl.type === 'decl' && decl.prop === property
   );
@@ -51,6 +94,21 @@ export const addDeclaration = (
       }
     });
 
+    const declarations = (rule.nodes ?? []).filter(
+      (node): node is postcss.Declaration => node.type === 'decl'
+    );
+    const last = declarations.filter(decl => decl.prop === property).pop();
+
+    if (
+      last &&
+      declarations
+        .slice(declarations.indexOf(last) + 1)
+        .some(decl => isShorthandOf(decl.prop, property))
+    ) {
+      rule.append(last);
+      rule.raws.semicolon = true;
+    }
+
     if (!rule.some(decl => !!decl)) {
       rule.remove();
     }
@@ -63,10 +121,9 @@ export const addDeclaration = (
     // A rule that ended in a nested block has no trailing-semicolon raw, so
     // the new last declaration would otherwise be printed without one.
     rule.raws.semicolon = true;
-    return root.toString();
   }
 
-  return css;
+  return root.toString();
 };
 
 /**

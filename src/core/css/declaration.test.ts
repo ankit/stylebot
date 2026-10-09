@@ -360,6 +360,113 @@ describe('declaration', () => {
         `);
       });
     });
+
+    describe('when later css would override it', () => {
+      it('removes the property from later rules for the same selector', () => {
+        const css = dedent`
+          .a {
+            color: red;
+          }
+
+          .a {
+            color: green;
+            margin: 0;
+          }
+
+          .a {
+            color: pink;
+          }`;
+        const output = addDeclaration('color', 'blue', '.a', css);
+
+        expect(output).toBe(dedent`
+          .a {
+            color: blue;
+          }
+
+          .a {
+            margin: 0;
+          }`);
+      });
+
+      it('removes it from the rule split out of a later group', () => {
+        const css = dedent`
+          .a {
+            margin: 0;
+          }
+
+          .a, .b {
+            color: red;
+          }`;
+        const output = addDeclaration('color', 'blue', '.a', css);
+
+        expect(output).toBe(dedent`
+          .a {
+            margin: 0;
+            color: blue;
+          }
+
+          .b {
+            color: red;
+          }`);
+      });
+
+      it('clears the property from later rules too', () => {
+        const css = dedent`
+          .a {
+            margin: 0;
+          }
+
+          .a {
+            color: green;
+          }`;
+        const output = addDeclaration('color', '', '.a', css);
+
+        expect(output).toBe(dedent`
+          .a {
+            margin: 0;
+          }`);
+      });
+
+      it('moves the declaration after a shorthand that sets it', () => {
+        const css = dedent`
+          .a {
+            background-color: red;
+            background: white;
+          }`;
+        const output = addDeclaration('background-color', 'blue', '.a', css);
+
+        expect(output).toBe(dedent`
+          .a {
+            background: white;
+            background-color: blue;
+          }`);
+      });
+
+      it('leaves rules inside @media alone', () => {
+        const css = dedent`
+          .a {
+            color: red;
+          }
+
+          @media (min-width: 600px) {
+            .a {
+              color: green;
+            }
+          }`;
+        const output = addDeclaration('color', 'blue', '.a', css);
+
+        expect(output).toBe(dedent`
+          .a {
+            color: blue;
+          }
+
+          @media (min-width: 600px) {
+            .a {
+              color: green;
+            }
+          }`);
+      });
+    });
   });
 
   describe('markDeclarationsImportant', () => {
