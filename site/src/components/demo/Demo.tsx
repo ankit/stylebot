@@ -4,15 +4,18 @@ import { ChevronDown, Close, EyeOff } from '../icons';
 import './demo.css';
 import { isDarkTheme } from '../../lib/themes';
 import { currentTheme } from '../../lib/theme-state';
+import type { DemoMessages } from '../../i18n';
+import { fmt } from '../../i18n/format';
 import {
+  DEFAULT_PROFILE,
   INIT,
   LOOKS,
   LOOK_STEPS,
   NEW_PROFILE,
   QUOTE_CSS,
   QUOTE_TOTAL,
-  PIN_SCENE,
-  SCENES,
+  pinScene,
+  scenes,
   type Scene,
   type DemoState,
   type Patch,
@@ -45,6 +48,7 @@ type Line = { style: string; toks: Token[] };
 const PANE_WIDTH = 980;
 const MIN_FIT_SCALE = 0.6;
 const SPLIT_QUERY = '(min-width: 1100px)';
+const PROFILE_TYPING_MS = 1000;
 const PLAYBACK_KEYS = new Set(['cur', 'click', 'qType', 'profType']);
 
 const CODE_COLORS: Record<string, string> = {
@@ -74,13 +78,20 @@ function PickCard({ selector, dark }: { selector: string; dark: boolean }) {
   );
 }
 
-const EXTENSIONS: [string, string][] = [
-  ['Ad blocker', '#c9473f'],
-  ['Password manager', '#3f67c9'],
-  ['Stylebot', ''],
-  ['Translate', '#4f8a5b'],
-  ['Web archive', '#6b6f76'],
-];
+/**
+ * The browser's extensions menu: made-up extensions around Stylebot, each with
+ * its icon color.
+ */
+function extensions(m: DemoMessages): [string, string][] {
+  const other = m.browser.otherExtensions;
+  return [
+    [other.adBlocker, '#c9473f'],
+    [other.passwordManager, '#3f67c9'],
+    ['Stylebot', ''],
+    [other.translate, '#4f8a5b'],
+    [other.webArchive, '#6b6f76'],
+  ];
+}
 
 const Gear = () => (
   <svg
@@ -102,6 +113,7 @@ type Props = {
   variant?: 'landing' | 'welcome';
   intro?: ComponentChildren;
   children?: ComponentChildren;
+  messages: DemoMessages;
 };
 
 /**
@@ -111,12 +123,23 @@ type Props = {
  * looping.
  */
 export default class Demo extends Component<Props, State> {
+  get m() {
+    return this.props.messages;
+  }
+
   get welcome() {
     return this.props.variant === 'welcome';
   }
 
+  get newProfile() {
+    return this.state.dark
+      ? this.m.editor.newProfileDark
+      : this.m.editor.newProfile;
+  }
+
   get scenes(): Scene[] {
-    return this.welcome ? [PIN_SCENE, ...SCENES] : SCENES;
+    const all = scenes(this.m, this.state.dark);
+    return this.welcome ? [pinScene(this.m), ...all] : all;
   }
 
   get init(): DemoState {
@@ -263,8 +286,10 @@ export default class Demo extends Component<Props, State> {
       }
     }
     if (patch.profType) {
-      for (let i = 1; i <= NEW_PROFILE.length; i++) {
-        this.later(i * 70 * k, () => this.setState({ profLen: i }));
+      const name = this.newProfile;
+      const step = Math.min(70, PROFILE_TYPING_MS / name.length);
+      for (let i = 1; i <= name.length; i++) {
+        this.later(i * step * k, () => this.setState({ profLen: i }));
       }
     }
     const next: Partial<State> = {};
@@ -355,7 +380,7 @@ export default class Demo extends Component<Props, State> {
     const s: Record<string, unknown> = { ...this.baseline(i) };
     const typed: Record<string, () => Partial<DemoState>> = {
       qType: () => ({ qChars: QUOTE_TOTAL }),
-      profType: () => ({ profLen: NEW_PROFILE.length }),
+      profType: () => ({ profLen: this.newProfile.length }),
     };
     let cur: string | null = null;
     sc.acts.forEach(([t, p]) => {
@@ -428,7 +453,10 @@ export default class Demo extends Component<Props, State> {
       decls.forEach((toks) => lines.push({ style: indent, toks }));
       lines.push({ style: '', toks: [tk('}', 'br')] });
     } else if (!typed.length && !S.lookDone) {
-      lines.push({ style: '', toks: [tk('/* No styles yet */', 'com')] });
+      lines.push({
+        style: '',
+        toks: [tk(`/* ${this.m.editor.code.noStyles} */`, 'com')],
+      });
     }
     if (typed.length) {
       const caret = {
@@ -505,7 +533,7 @@ export default class Demo extends Component<Props, State> {
    * styles, and the new profile starts clean and gets the look.
    */
   profileView(state: State): State {
-    return state.profile === 'Default'
+    return state.profile === DEFAULT_PROFILE
       ? { ...state, lookDone: false, lookStep: 0 }
       : { ...state, h1Size: 32, h1Color: null, qChars: 0 };
   }
@@ -523,6 +551,14 @@ export default class Demo extends Component<Props, State> {
     const step = S.lookDone ? LOOK_STEPS : S.lookStep;
     const at = (n: number) => step >= n;
     const dk = S.dark;
+    const m = this.m;
+    const { basic, presets } = m.editor;
+    const profileName = (name: string) =>
+      name === DEFAULT_PROFILE
+        ? m.editor.defaultProfile
+        : name === NEW_PROFILE
+          ? this.newProfile
+          : name;
     const look = LOOKS[dk ? 'dark' : 'light'];
     const np = look.colors;
     const ink = at(1) ? np.ink : 'var(--page-ink)';
@@ -567,7 +603,7 @@ export default class Demo extends Component<Props, State> {
     const readTog = toggle(read);
     const grayTog = toggle(S.gray);
     const selected = !S.inspecting && !!S.sel;
-    const selText = selected ? 'article h1' : 'Pick an element';
+    const selText = selected ? 'article h1' : m.editor.pickAnElement;
 
     const quote =
       'margin:4px 0 18px;transition:all .35s' +
@@ -664,15 +700,13 @@ export default class Demo extends Component<Props, State> {
             }
           >
             <div class="demo-menu-head">
-              <span>Extensions</span>
+              <span>{m.browser.extensions}</span>
             </div>
             <div class="demo-menu-note">
-              <strong>Full access</strong>
-              <span>
-                These extensions can see and change information on this site.
-              </span>
+              <strong>{m.browser.fullAccess}</strong>
+              <span>{m.browser.fullAccessNote}</span>
             </div>
-            {EXTENSIONS.map(([name, bg]) => {
+            {extensions(m).map(([name, bg]) => {
               const sb = !bg;
               const on = sb && S.pinned;
               return (
@@ -724,7 +758,7 @@ export default class Demo extends Component<Props, State> {
             <div class="demo-pop-sep" />
             <div style="padding:8px 6px">
               <div class="demo-pop-row">
-                <span style="flex:1;min-width:0">Readability</span>
+                <span style="flex:1;min-width:0">{m.popup.readability}</span>
                 <span style="width:28px;height:16px;border-radius:8px;background:var(--strong);position:relative;flex:none">
                   <span style="position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:6px;background:#fff" />
                 </span>
@@ -738,7 +772,7 @@ export default class Demo extends Component<Props, State> {
                 style={`background:${S.popHover ? (S.clicking ? 'var(--track)' : 'var(--hover)') : 'var(--surface)'}`}
               >
                 <span />
-                <span style="text-align:center">Style this page</span>
+                <span style="text-align:center">{m.popup.styleThisPage}</span>
                 <span
                   class="demo-shortcut"
                   style={`opacity:${S.popHover ? 1 : 0}`}
@@ -770,9 +804,9 @@ export default class Demo extends Component<Props, State> {
                   The Harbour Post
                 </span>
                 <span style="margin-left:auto;display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px 16px;opacity:.75;white-space:nowrap">
-                  <span>News</span>
-                  <span>Travel</span>
-                  <span>Sign in</span>
+                  <span>{m.article.nav.news}</span>
+                  <span>{m.article.nav.travel}</span>
+                  <span>{m.article.nav.signIn}</span>
                 </span>
                 {S.inspecting && S.hover === 'header' && (
                   <PickCard selector="header.site-header" dark={dk} />
@@ -789,7 +823,7 @@ export default class Demo extends Component<Props, State> {
                       ';transition:color .5s'
                     }
                   >
-                    Travel · Long read
+                    {m.article.kicker}
                   </div>
                   <div style="position:relative">
                     <h2
@@ -807,7 +841,7 @@ export default class Demo extends Component<Props, State> {
                         mark('h1')
                       }
                     >
-                      The quiet return of the night ferry
+                      {m.article.headline}
                     </h2>
                     {S.inspecting && S.hover === 'h1' && (
                       <PickCard selector="h1.headline" dark={dk} />
@@ -816,8 +850,7 @@ export default class Demo extends Component<Props, State> {
                   <div
                     style={`margin:0 0 16px;font:400 16px/1.5 ${serif};color:${muted};transition:color .5s`}
                   >
-                    Three operators are betting that travelers will trade speed
-                    for a cabin, a sea view and no airport.
+                    {m.article.dek}
                   </div>
                   <div style="display:flex;align-items:center;gap:10px;margin:0 0 18px">
                     <span
@@ -830,14 +863,11 @@ export default class Demo extends Component<Props, State> {
                       ML
                     </span>
                     <span style={`font:400 12.5px/1.4 ${serif};color:${muted}`}>
-                      Marta Linde · Sep 24 · 6 min read
+                      {m.article.byline}
                     </span>
                   </div>
                   <p style={this.paragraph(read, serif, ink, tr)}>
-                    Twenty years after the last overnight crossing was cut,
-                    three operators are putting cabins back on the water. The
-                    pitch is simple: board after dinner, sleep through the
-                    crossing, and wake up in another country.
+                    {m.article.paragraphs[0]}
                   </p>
                   <div data-t="quote" style={quote}>
                     <div
@@ -846,20 +876,16 @@ export default class Demo extends Component<Props, State> {
                         `line-height:1.45;text-wrap:pretty;color:${ink};transition:all .35s`
                       }
                     >
-                      “Nobody books this to save time. They book it to lose a
-                      little.”
+                      {m.article.quote}
                     </div>
                     <div
                       style={`margin-top:8px;font:400 12.5px/1.3 ${serif};color:${muted}`}
                     >
-                      — Ines Varga, route planner
+                      {m.article.quoteBy}
                     </div>
                   </div>
                   <p style={this.paragraph(read, serif, ink, tr)}>
-                    Bookings on the first reopened line sold out for the summer
-                    within a week. Most passengers are under forty, and many
-                    have never taken a sleeper of any kind. Operators say the
-                    cabins fill first, then the reclining seats, then the deck.
+                    {m.article.paragraphs[1]}
                   </p>
                 </div>
               </div>
@@ -906,7 +932,7 @@ export default class Demo extends Component<Props, State> {
                         class="demo-prof-btn"
                         style={S.profMenu ? 'background:var(--hover)' : ''}
                       >
-                        {S.profile}
+                        {profileName(S.profile)}
                         <span style="display:flex;color:var(--muted)">
                           <ChevronDown />
                         </span>
@@ -949,14 +975,14 @@ export default class Demo extends Component<Props, State> {
                                   <path d="M2.5 6.2 5 8.6 9.5 3.5" />
                                 </svg>
                               </span>
-                              <span>{name}</span>
+                              <span>{profileName(name)}</span>
                             </div>
                           );
                         })}
                         <div class="demo-prof-sep" />
                         {S.profCreating ? (
                           <div class="demo-prof-input">
-                            <span>{NEW_PROFILE.slice(0, S.profLen)}</span>
+                            <span>{this.newProfile.slice(0, S.profLen)}</span>
                             <span class="demo-caret" />
                           </div>
                         ) : (
@@ -965,7 +991,7 @@ export default class Demo extends Component<Props, State> {
                             class="demo-prof-row"
                             style="padding-left:32px;color:var(--muted)"
                           >
-                            Create profile
+                            {m.editor.createProfile}
                           </div>
                         )}
                       </div>
@@ -1034,16 +1060,16 @@ export default class Demo extends Component<Props, State> {
 
                   <div style="flex:none;display:flex;align-items:flex-end;gap:6px;padding:16px 16px 0;border-bottom:1px solid var(--border)">
                     <span data-t="tab-basic" style={tab('basic')}>
-                      Basic
+                      {m.editor.tabs.basic}
                     </span>
                     <span data-t="tab-code" style={tab('code')}>
-                      Code
+                      {m.editor.tabs.code}
                     </span>
                     <span data-t="tab-presets" style={tab('presets')}>
-                      Presets
+                      {m.editor.tabs.presets}
                     </span>
                     <span data-t="tab-chat" style={tab('chat')}>
-                      Chat
+                      {m.editor.tabs.chat}
                     </span>
                   </div>
 
@@ -1056,24 +1082,24 @@ export default class Demo extends Component<Props, State> {
                             style={`color:${hasSel ? 'var(--ink2)' : 'var(--faint)'}`}
                           >
                             <EyeOff size={12} />
-                            Hide
+                            {basic.hide}
                           </span>
                           <span
                             class="demo-small-btn"
                             style={`color:${hasSel ? 'var(--ink2)' : 'var(--faint)'}`}
                           >
-                            Reset
+                            {basic.reset}
                           </span>
                         </div>
                         <div class="demo-card" style="padding:0 14px 8px">
                           <div style="display:flex;align-items:center;height:42px;font:600 13.5px/1 var(--ui);color:var(--ink2)">
-                            <span style="flex:1">Text</span>
+                            <span style="flex:1">{basic.text}</span>
                             <span style="color:var(--muted);display:flex;transform:rotate(180deg)">
                               <ChevronDown />
                             </span>
                           </div>
                           <div class="demo-row">
-                            <span class="demo-label">Font</span>
+                            <span class="demo-label">{basic.font}</span>
                             <div
                               data-t="font-field"
                               class="demo-field"
@@ -1082,13 +1108,13 @@ export default class Demo extends Component<Props, State> {
                               <span class="demo-field-text">
                                 {hasSel
                                   ? serif.split(',')[0].replace(/'/g, '')
-                                  : 'Default'}
+                                  : basic.defaultFont}
                               </span>
                               <ChevronDown />
                             </div>
                           </div>
                           <div class="demo-row">
-                            <span class="demo-label">Size</span>
+                            <span class="demo-label">{basic.size}</span>
                             <div data-t="size" style={field('size')}>
                               <span
                                 style={`flex:1;padding:0 10px;font:400 12.5px/1 var(--ui);color:${sizeSet ? 'var(--ink)' : 'var(--faint)'}`}
@@ -1099,7 +1125,7 @@ export default class Demo extends Component<Props, State> {
                             </div>
                           </div>
                           <div class="demo-row">
-                            <span class="demo-label">Line Height</span>
+                            <span class="demo-label">{basic.lineHeight}</span>
                             <div style={field('lh')}>
                               <span style="flex:1;padding:0 10px;font:400 12.5px/1 var(--ui);color:var(--faint)">
                                 {hasSel
@@ -1110,7 +1136,7 @@ export default class Demo extends Component<Props, State> {
                             </div>
                           </div>
                           <div class="demo-row">
-                            <span class="demo-label">Color</span>
+                            <span class="demo-label">{basic.color}</span>
                             <div data-t="color" style={field('color')}>
                               <span
                                 class="demo-swatch"
@@ -1124,7 +1150,7 @@ export default class Demo extends Component<Props, State> {
                             </div>
                           </div>
                           <div class="demo-row">
-                            <span class="demo-label">Decoration</span>
+                            <span class="demo-label">{basic.decoration}</span>
                             <div
                               class="demo-seg"
                               style="font:400 12.5px/1 var(--ui)"
@@ -1138,11 +1164,11 @@ export default class Demo extends Component<Props, State> {
                               <span style="padding:6px 8px;text-decoration:overline">
                                 A
                               </span>
-                              <span style="padding:6px 8px">None</span>
+                              <span style="padding:6px 8px">{basic.none}</span>
                             </div>
                           </div>
                           <div class="demo-row">
-                            <span class="demo-label">Alignment</span>
+                            <span class="demo-label">{basic.alignment}</span>
                             <div class="demo-seg">
                               {[
                                 'M1 1.5h11M1 5.5h7M1 9.5h9',
@@ -1170,10 +1196,10 @@ export default class Demo extends Component<Props, State> {
                           </div>
                         </div>
                         {[
-                          'Background',
-                          'Box',
-                          'Effects',
-                          'More properties',
+                          basic.background,
+                          basic.box,
+                          basic.effects,
+                          basic.moreProperties,
                         ].map((g) => (
                           <div key={g} class="demo-card demo-group">
                             <span style="flex:1">{g}</span>
@@ -1203,32 +1229,30 @@ export default class Demo extends Component<Props, State> {
                         <div class="demo-card" style="padding:14px 16px">
                           <div style="display:flex;align-items:center;gap:12px">
                             <span style="font:600 14px/1.2 var(--ui);color:var(--ink)">
-                              Readability
+                              {presets.readability}
                             </span>
                             <span style={readTog.track}>
                               <span style={readTog.knob} />
                             </span>
                             <span style="margin-left:auto;font:400 12px/1 var(--ui);color:var(--muted)">
-                              Articles only
+                              {presets.articlesOnly}
                             </span>
                           </div>
                           <div class="demo-card-body">
-                            Turn this site's articles into a clean,
-                            distraction-free reading view, with your choice of
-                            theme, font, and size.
+                            {presets.readabilityDescription}
                           </div>
                         </div>
                         <div class="demo-card" style="padding:14px 16px">
                           <div style="display:flex;align-items:center;gap:12px">
                             <span style="font:600 14px/1.2 var(--ui);color:var(--ink)">
-                              Grayscale
+                              {presets.grayscale}
                             </span>
                             <span style={grayTog.track}>
                               <span style={grayTog.knob} />
                             </span>
                           </div>
                           <div class="demo-card-body">
-                            Apply grayscale to the page.
+                            {presets.grayscaleDescription}
                           </div>
                         </div>
                       </div>
@@ -1241,7 +1265,10 @@ export default class Demo extends Component<Props, State> {
 
           <div class="demo-caption">
             <span class="demo-step-label">
-              {S.scene + 1} / {this.scenes.length}
+              {fmt(m.steps.counter, {
+                current: S.scene + 1,
+                total: this.scenes.length,
+              })}
             </span>
             <span aria-live="polite" style="flex:1;min-width:0">
               {this.keysText(S.caption, S.mac)}
@@ -1288,7 +1315,7 @@ export default class Demo extends Component<Props, State> {
           {stage}
         </div>
         <div ref={this.stepsRef} class="demo-steps-wrap" style={fitted}>
-          <div class="demo-steps-head">How it works</div>
+          <div class="demo-steps-head">{m.steps.heading}</div>
           <ol
             class="demo-steps"
             style={
@@ -1305,7 +1332,7 @@ export default class Demo extends Component<Props, State> {
               >
                 <div
                   class="demo-step-bar"
-                  title="Jump to this point"
+                  title={m.steps.jump}
                   onClick={(ev: MouseEvent) => this.seekFromBar(i, ev)}
                 >
                   <div class="demo-step-track">

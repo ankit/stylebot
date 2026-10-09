@@ -1,0 +1,138 @@
+---
+import Base from '../../layouts/Base.astro';
+import { LINKS } from '../../lib/links';
+import {
+  DEFAULT_LOCALE,
+  fmt,
+  htmlLang,
+  localeStaticPaths,
+  messagesFor,
+  rich,
+} from '../../i18n';
+
+export const getStaticPaths = localeStaticPaths;
+
+const {
+  locale,
+  site: { privacy: t },
+} = messagesFor(Astro.url);
+
+const updated = new Intl.DateTimeFormat(htmlLang(locale), {
+  dateStyle: 'long',
+  timeZone: 'UTC',
+}).format(Date.UTC(2026, 9, 8));
+
+const sections = [
+  t.browser,
+  t.sync,
+  t.chat,
+  t.cli,
+  t.fonts,
+  t.site,
+  t.sharing,
+  t.contact,
+];
+
+const vars = {
+  history: `${LINKS.github}/commits/v4/site/src/i18n/en/site.ts`,
+  email: LINKS.feedbackEmail,
+  issues: LINKS.issues,
+};
+---
+
+<Base title={t.title} description={t.description}>
+  <main class="privacy">
+    <div class="privacy-intro">
+      <h1>{t.title}</h1>
+      <p>{t.lede}</p>
+      <p class="updated">{fmt(t.updated, { date: updated })}</p>
+      {locale !== DEFAULT_LOCALE && (
+        <p
+          class="translated"
+          set:html={rich(t.translation, { original: '/privacy' })}
+        />
+      )}
+    </div>
+
+    {sections.map((section) => (
+      <section>
+        <h2>{section.title}</h2>
+        {section.body.map((paragraph) => (
+          <p set:html={rich(paragraph, vars)} />
+        ))}
+      </section>
+    ))}
+  </main>
+</Base>
+
+<style>
+  .privacy {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 64px 24px 0;
+  }
+
+  .privacy-intro {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 36px;
+  }
+
+  h1 {
+    margin: 0;
+    font: 700 clamp(34px, 4.6vw, 48px) / 1.05 var(--display);
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+
+  .privacy-intro p {
+    font-size: 18px;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .privacy-intro .updated,
+  .privacy-intro .translated {
+    font-size: 14px;
+    color: var(--faint);
+  }
+
+  section {
+    padding: 40px 0;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  h2 {
+    margin: 0;
+    font: 700 26px/1.2 var(--display);
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  p {
+    margin: 0;
+    font: 400 16px/1.65 var(--ui);
+    color: var(--ink2);
+    text-wrap: pretty;
+  }
+
+  p :global(code) {
+    padding: 1px 6px;
+    border-radius: 5px;
+    background: var(--fill);
+    border: 1px solid var(--border);
+    font: 400 0.88em/1.5 var(--mono);
+  }
+
+  @media (max-width: 760px) {
+    .privacy {
+      padding-top: 40px;
+    }
+  }
+</style>

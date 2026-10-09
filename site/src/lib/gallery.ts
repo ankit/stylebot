@@ -26,7 +26,10 @@ export type GalleryTheme = {
   name: string;
   colors: [string, string];
   image: ImageMetadata;
-} & ({ css: string; file: string; note?: never } | { note: string; css?: never; file?: never });
+} & (
+  | { css: string; file: string; note?: never }
+  | { note: string; css?: never; file?: never }
+);
 
 export type GallerySite = {
   id: string;

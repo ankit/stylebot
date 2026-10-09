@@ -1,37 +1,39 @@
 ---
-import Base from '../layouts/Base.astro';
-import Demo from '../components/demo/Demo';
-import CliCommand from '../components/cli/CliCommand.astro';
-import { CLI_PACKAGE, LINKS } from '../lib/links';
+import { localeStaticPaths, localizePath, messagesFor } from '../../i18n';
+import Base from '../../layouts/Base.astro';
+import Demo from '../../components/demo/Demo';
+import CliCommand from '../../components/cli/CliCommand.astro';
+import { CLI_PACKAGE } from '../../lib/links';
+
+export const getStaticPaths = localeStaticPaths;
+
+const {
+  locale,
+  site: { welcome: t, cli },
+  demo,
+} = messagesFor(Astro.url);
 ---
 
-<Base
-  title="Welcome"
-  description="How Stylebot works, start to finish, in about a minute."
-  install={false}
-  noindex
->
+<Base title={t.title} description={t.description} install={false} noindex>
   <main>
     <div class="demo-wrap">
-      <Demo client:load variant="welcome">
+      <Demo client:load variant="welcome" messages={demo}>
         <div slot="intro" class="hero">
-          <h1>Stylebot is installed.</h1>
+          <h1>{t.heading}</h1>
         </div>
         <div class="your-turn">
           <div class="your-turn-text">
-            <strong>Your turn.</strong>
-            <span>
-              Open any site and press the shortcut. Nothing changes until you
-              do.
-            </span>
+            <strong>{t.yourTurn}</strong>
+            <span>{t.yourTurnBody}</span>
           </div>
           <span class="your-turn-keys">
             <kbd data-mac="⌥ Option">Alt</kbd>
             <kbd data-mac="⇧ Shift">Shift</kbd>
             <kbd>M</kbd>
           </span>
-          <a href="/manual" class="your-turn-link">
-            Manual<span>›</span>
+          <a href={localizePath(locale, '/manual')} class="your-turn-link">
+            {t.manual}
+            <span>›</span>
           </a>
         </div>
       </Demo>
@@ -39,24 +41,21 @@ import { CLI_PACKAGE, LINKS } from '../lib/links';
     <section class="agent">
       <div class="agent-inner">
         <div class="agent-text">
-          <h2>Connect your coding agent</h2>
-          <p>
-            Claude Code, Codex, Cursor or any agent that runs commands can use
-            Stylebot from the terminal.
-          </p>
+          <h2>{t.agentTitle}</h2>
+          <p>{t.agentBody}</p>
           <div class="agent-setup">
             <CliCommand lines={[`npm install -g ${CLI_PACKAGE}`]} boxed />
-            <a href={LINKS.cli} class="agent-guide">
-              Set up the CLI →
+            <a href={localizePath(locale, '/cli')} class="agent-guide">
+              {cli.guide}
             </a>
           </div>
         </div>
         <div class="agent-term" aria-hidden="true">
-          <div class="agent-term-title">Terminal · coding agent</div>
+          <div class="agent-term-title">{cli.demo.terminal}</div>
           <div class="agent-term-body">
             <div class="agent-term-ask">
               <span class="agent-term-dim">&gt;</span>
-              <span>give this site an Everforest theme with nicer fonts</span>
+              <span>{t.agentPrompt}</span>
             </div>
             <div class="agent-term-run">
               <span class="agent-term-cmd">stylebot outline 54432929</span>
@@ -68,9 +67,7 @@ import { CLI_PACKAGE, LINKS } from '../lib/links';
               </span>
               <span class="agent-term-dim">Saved · applied to 1 tab</span>
             </div>
-            <div class="agent-term-reply">
-              Switched to Everforest colors with Lora and Newsreader.
-            </div>
+            <div class="agent-term-reply">{t.agentReply}</div>
           </div>
         </div>
       </div>

@@ -1,11 +1,28 @@
 import { useEffect, useState } from 'preact/hooks';
+import type { SiteMessages } from '../i18n';
+import { fmt } from '../i18n/format';
+import {
+  DEFAULT_LOCALE,
+  htmlLang,
+  localeOf,
+  localizePath,
+  type Locale,
+} from '../i18n/locales';
+
+type Messages = SiteMessages['notFound'];
 
 const FADE_MS = 180;
 
 /**
  * A 404 page styled like a bare server error, with a button that makes it nice.
  */
-export default function NotFound() {
+export default function NotFound({
+  messages,
+}: {
+  messages: Record<Locale, Messages>;
+}) {
+  const [locale, setLocale] = useState<Locale>(DEFAULT_LOCALE);
+  const t = messages[locale];
   const [nice, setNice] = useState(false);
   const [fading, setFading] = useState(false);
   const [path, setPath] = useState('/this-page-does-not-exist');
@@ -13,6 +30,15 @@ export default function NotFound() {
   useEffect(() => {
     if (location.pathname !== '/404' && location.pathname !== '/404.html') {
       setPath(location.pathname);
+    }
+    const found = localeOf(location.pathname);
+    if (found !== DEFAULT_LOCALE) {
+      setLocale(found);
+      document.documentElement.lang = htmlLang(found);
+      document.documentElement.translate = false;
+      document.title = fmt('{title} - Stylebot', {
+        title: messages[found].title,
+      });
     }
   }, []);
 
@@ -39,15 +65,14 @@ export default function NotFound() {
   return (
     <div class="nf">
       <div class="nf-intro">
-        <h1>This page doesn't exist, and it looks terrible.</h1>
+        <h1>{t.heading}</h1>
         {nice ? (
           <p class="nf-done" role="status">
-            Much better. The page still doesn’t exist, but at least it looks
-            good now.
+            {t.done}
           </p>
         ) : (
           <button class="nf-nice" disabled={fading} onClick={makeNice}>
-            ✨ Just make it nice
+            {t.nice}
           </button>
         )}
       </div>
@@ -72,12 +97,10 @@ export default function NotFound() {
               `;transition:opacity ${FADE_MS}ms;opacity:${fading ? 0 : 1}`
             }
           >
-            <h1 style={style.h1}>404 Not Found</h1>
-            <p style={style.p}>
-              The requested URL was not found on this server.
-            </p>
-            <a href="/" style={style.a}>
-              Go to the homepage
+            <h1 style={style.h1}>{t.pageTitle}</h1>
+            <p style={style.p}>{t.pageBody}</p>
+            <a href={localizePath(locale, '/')} style={style.a}>
+              {t.pageLink}
             </a>
             {!nice && (
               <>

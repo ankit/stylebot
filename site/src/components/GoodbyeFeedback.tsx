@@ -1,19 +1,13 @@
 import { useState } from 'preact/hooks';
 import { LINKS } from '../lib/links';
+import type { SiteMessages } from '../i18n';
 
-const REASONS = [
-  'Didn’t need it anymore',
-  'Hard to use',
-  'It broke a site',
-  'Missing a feature',
-  'Too slow',
-  'Something else',
-];
+type Props = { messages: SiteMessages['goodbye']['feedback'] };
 
 /**
  * Optional uninstall survey: pick any reasons, add a note, and send it.
  */
-export default function GoodbyeFeedback() {
+export default function GoodbyeFeedback({ messages: t }: Props) {
   const [picked, setPicked] = useState<string[]>([]);
   const [note, setNote] = useState('');
   const [sent, setSent] = useState(false);
@@ -36,16 +30,16 @@ export default function GoodbyeFeedback() {
   };
 
   if (sent) {
-    return <div class="gb-thanks">Thank you. Every note gets read.</div>;
+    return <div class="gb-thanks">{t.thanks}</div>;
   }
 
   return (
     <div class="gb-form">
       <div class="gb-q">
-        Why did you uninstall? <span>Optional, takes a second.</span>
+        {t.question} <span>{t.optional}</span>
       </div>
       <div class="gb-reasons">
-        {REASONS.map((reason) => (
+        {t.reasons.map((reason) => (
           <button
             key={reason}
             class={`gb-chip${picked.includes(reason) ? ' is-on' : ''}`}
@@ -58,16 +52,16 @@ export default function GoodbyeFeedback() {
       </div>
       <textarea
         rows={3}
-        placeholder="Anything else? (optional)"
-        aria-label="Anything else? (optional)"
+        placeholder={t.placeholder}
+        aria-label={t.placeholder}
         value={note}
         onInput={(e) => setNote((e.target as HTMLTextAreaElement).value)}
       />
       <div class="gb-send">
         <button class="btn btn-primary" disabled={!ready} onClick={send}>
-          Send feedback
+          {t.send}
         </button>
-        <span>Goes straight to the maintainer.</span>
+        <span>{t.sendNote}</span>
       </div>
     </div>
   );

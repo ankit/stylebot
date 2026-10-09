@@ -1,0 +1,49 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { LINKS } from '../../../lib/links';
+import { fmt, localeStaticPaths, messagesFor, rich } from '../../../i18n';
+
+export const getStaticPaths = localeStaticPaths;
+
+const {
+  site: { releases: t },
+} = messagesFor(Astro.url);
+const r = t.r31;
+const title = fmt(t.title, { version: '3.1' });
+---
+
+<Base title={title} description={r.description}>
+  <main class="prose">
+    <h1>{title}</h1>
+
+    <h2>{r.syncTitle}</h2>
+    <figure>
+      <img src="/images/releases/3.1/sync.gif" height="400" alt={r.syncAlt} />
+    </figure>
+    {r.syncBody.map((p) => (
+      <p set:html={p} />
+    ))}
+
+    <h2>{r.resizeTitle}</h2>
+    <figure>
+      <img
+        src="/images/releases/3.1/resize.gif"
+        height="400"
+        alt={r.resizeAlt}
+      />
+    </figure>
+    <p>{r.resizeBody}</p>
+
+    <h2>{r.colorsTitle}</h2>
+    <figure>
+      <img
+        src="/images/releases/3.1/colors.gif"
+        height="400"
+        alt={r.colorsAlt}
+      />
+    </figure>
+    <p>{r.colorsBody}</p>
+
+    <h2 set:html={rich(t.bugFixes, { changelog: LINKS.changelog })} />
+  </main>
+</Base>

@@ -1,6 +1,12 @@
-<dialog class="zoom" aria-label="Enlarged screenshot">
+---
+import { messagesFor } from '../i18n';
+
+const { site: t } = messagesFor(Astro.url);
+---
+
+<dialog class="zoom" aria-label={t.zoom.label}>
   <img class="zoom-img" alt="" />
-  <button class="zoom-close" aria-label="Close">
+  <button class="zoom-close" aria-label={t.zoom.close}>
     <svg
       width="14"
       height="14"

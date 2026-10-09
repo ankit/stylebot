@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'preact/hooks';
 import { STORAGE_KEY, THEMES, THEME_KEYS, type ThemeKey } from '../lib/themes';
 import { currentTheme } from '../lib/theme-state';
+import { fmt } from '../i18n/format';
 
-export default function ThemeMenu() {
+type Labels = { title: string; names: Record<ThemeKey, string> };
+
+export default function ThemeMenu({ labels }: { labels: Labels }) {
   const [theme, setTheme] = useState<ThemeKey>('light');
   const [open, setOpen] = useState(false);
 
@@ -27,7 +30,7 @@ export default function ThemeMenu() {
     setOpen(false);
   };
 
-  const title = `Theme: ${THEMES[theme].label}`;
+  const title = fmt(labels.title, { theme: labels.names[theme] });
 
   return (
     <div class="theme-menu">
@@ -79,7 +82,7 @@ export default function ThemeMenu() {
                     }}
                   />
                   <span class="theme-name" style={{ fontFamily: t.ui }}>
-                    {t.label}
+                    {labels.names[key]}
                   </span>
                   <span class="theme-check">✓</span>
                 </button>

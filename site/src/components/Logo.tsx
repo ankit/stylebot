@@ -61,7 +61,7 @@ function PaintSplat({ x, y, size, rot, color, delay, drops }: Splat) {
  * it splatters paint across the page instead of reloading. The paint is drawn
  * into a layer on <body> so it scrolls with the page while it fades.
  */
-export default function Logo() {
+export default function Logo({ href, label }: { href: string; label: string }) {
   const [hover, setHover] = useState(false);
   const [splats, setSplats] = useState<Splat[]>([]);
   const nextId = useRef(0);
@@ -120,9 +120,9 @@ export default function Logo() {
   return (
     <>
       <a
-        href="/"
+        href={href}
         class="logo"
-        aria-label="Stylebot home"
+        aria-label={label}
         onClick={splash}
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}

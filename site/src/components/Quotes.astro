@@ -1,11 +1,16 @@
 ---
 import { LONG_QUOTE, QUOTES } from '../lib/quotes';
+import { messagesFor } from '../i18n';
+
+const {
+  site: { quotes: t },
+} = messagesFor(Astro.url);
 ---
 
 <section id="voices" class="section">
   <div class="section-inner quotes-inner">
     <div class="section-head">
-      <h2 class="section-title">People love Stylebot</h2>
+      <h2 class="section-title">{t.title}</h2>
     </div>
     <div class="quotes">
       {QUOTES.slice(0, 3).map((quote) => (

@@ -4,6 +4,19 @@ import SbIcon from './SbIcon';
 import { Check, Copy } from './icons';
 import { GALLERY } from '../lib/gallery';
 import { LINKS } from '../lib/links';
+import { fmt, messagesFor } from '../i18n';
+
+const {
+  site: { gallery: t },
+} = messagesFor(Astro.url);
+const strings = {
+  alt: t.alt,
+  install: t.install,
+  installedAs: t.installedAs,
+  installFailed: t.installFailed,
+  copy: t.copy,
+  copied: t.copied,
+};
 
 const SOURCE_BASE = `${LINKS.github}/blob/v4/site/src/assets/gallery/`;
 
@@ -27,14 +40,12 @@ const sites = await Promise.all(
 );
 ---
 
-<section id="gallery" class="section">
+<section id="gallery" class="section" data-strings={JSON.stringify(strings)}>
   <div class="section-inner">
     <div class="section-head">
       <div>
-        <h2 class="section-title">Styles to start from</h2>
-        <p class="section-lede">
-          Copy one and tweak it, or start from scratch.
-        </p>
+        <h2 class="section-title">{t.title}</h2>
+        <p class="section-lede">{t.lede}</p>
       </div>
     </div>
     <div class="gallery-grid">
@@ -54,14 +65,17 @@ const sites = await Promise.all(
                 data-theme={i}
                 data-full={theme.full}
                 hidden={i !== 0}
-                aria-label={`Enlarge ${site.site}: ${theme.name}`}
+                aria-label={fmt(t.enlarge, {
+                  site: site.site,
+                  name: theme.name,
+                })}
               >
                 <Image
                   src={theme.image}
                   widths={[480, 720, 960]}
                   sizes="(min-width: 1180px) 360px, (min-width: 700px) 45vw, 100vw"
                   loading={i === 0 ? 'eager' : 'lazy'}
-                  alt={`${site.site} restyled with Stylebot: ${theme.name}`}
+                  alt={fmt(t.alt, { site: site.site, name: theme.name })}
                 />
               </button>
             ))}
@@ -69,22 +83,22 @@ const sites = await Promise.all(
               <button
                 class="gallery-action gallery-install"
                 data-install
-                title="Install in Stylebot"
+                title={t.installTitle}
               >
                 <span class="gallery-action-idle">
                   <SbIcon size={13} />
-                  Install
+                  {t.install}
                 </span>
                 <span class="gallery-action-ok">
                   <Check size={12} />
-                  Installed
+                  {t.installed}
                 </span>
               </button>
               <button
                 class="gallery-action gallery-copy"
                 data-copy
-                title="Copy CSS"
-                aria-label="Copy CSS"
+                title={t.copy}
+                aria-label={t.copy}
               >
                 <span class="gallery-action-idle">
                   <Copy />
@@ -111,9 +125,7 @@ const sites = await Promise.all(
                 </button>
               ))}
             </div>
-            <p class="gallery-hint">
-              Paste it into the Code tab on {site.url}.
-            </p>
+            <p class="gallery-hint">{fmt(t.hint, { site: site.url })}</p>
           </figcaption>
           {site.themes.map((theme, i) => (
             <template
@@ -130,7 +142,7 @@ const sites = await Promise.all(
   </div>
 </section>
 
-<dialog class="lightbox" aria-label="Restyled site">
+<dialog class="lightbox" aria-label={t.lightbox}>
   <div class="lightbox-body" data-close>
     <img class="lightbox-img" alt="" />
     <div class="lightbox-bar">
@@ -138,10 +150,10 @@ const sites = await Promise.all(
       <div class="lightbox-chips"></div>
       <span class="lightbox-note" hidden></span>
       <button class="lightbox-install" data-lightbox-install hidden>
-        Install
+        {t.install}
       </button>
       <button class="lightbox-copy" data-lightbox-copy>
-        Copy CSS
+        {t.copy}
       </button>
       <a
         class="lightbox-source"
@@ -150,11 +162,11 @@ const sites = await Promise.all(
         rel="noopener"
         hidden
       >
-        View on GitHub
+        {t.source}
       </a>
     </div>
   </div>
-  <button class="lightbox-close" data-close aria-label="Close">
+  <button class="lightbox-close" data-close aria-label={t.close}>
     <svg
       width="14"
       height="14"
@@ -171,6 +183,8 @@ const sites = await Promise.all(
 </dialog>
 
 <script>
+  import { fmt } from '../i18n/format';
+
   const COPIED_MS = 1600;
   const INSTALL_TIMEOUT_MS = 5000;
   let resetTimer: ReturnType<typeof setTimeout> | undefined;
@@ -188,6 +202,10 @@ const sites = await Promise.all(
   )!;
   const lightboxChips = dialog.querySelector<HTMLElement>('.lightbox-chips')!;
   const gallery = document.getElementById('gallery')!;
+  const strings: Record<
+    'alt' | 'install' | 'installedAs' | 'installFailed' | 'copy' | 'copied',
+    string
+  > = JSON.parse(gallery.dataset.strings!);
   const items = [...document.querySelectorAll<HTMLElement>('.gallery-item')];
   const installed = new Map<string, string>();
   const failed = new Set<string>();
@@ -229,9 +247,9 @@ const sites = await Promise.all(
 
   function installLabel(item: HTMLElement) {
     const name = installed.get(keyOf(item));
-    if (name) return `Installed as ${name}`;
-    if (failed.has(keyOf(item))) return 'Couldn’t install';
-    return 'Install';
+    if (name) return fmt(strings.installedAs, { name });
+    if (failed.has(keyOf(item))) return strings.installFailed;
+    return strings.install;
   }
 
   /**
@@ -256,7 +274,7 @@ const sites = await Promise.all(
     item.classList.toggle('is-installed', installed.has(key));
     item
       .querySelector('[data-copy]')!
-      .setAttribute('title', copied.has(key) ? 'Copied' : 'Copy CSS');
+      .setAttribute('title', copied.has(key) ? strings.copied : strings.copy);
     item
       .querySelector('[data-install]')!
       .setAttribute('title', installLabel(item));
@@ -381,7 +399,7 @@ const sites = await Promise.all(
     const noteEl = dialog.querySelector<HTMLElement>('.lightbox-note')!;
     const key = keyOf(item);
     img.src = fullSrc(item);
-    img.alt = `${siteOf(item)} restyled with Stylebot: ${nameOf(item)}`;
+    img.alt = fmt(strings.alt, { site: siteOf(item), name: nameOf(item) });
     dialog.querySelector('.lightbox-site')!.textContent = siteOf(item);
     const refocus = lightboxChips.contains(document.activeElement);
     lightboxChips.replaceChildren(
@@ -407,7 +425,7 @@ const sites = await Promise.all(
     lightboxInstall.hidden =
       !!note || !gallery.classList.contains('can-install');
     lightboxInstall.textContent = installLabel(item);
-    lightboxCopy.textContent = copied.has(key) ? 'Copied' : 'Copy CSS';
+    lightboxCopy.textContent = copied.has(key) ? strings.copied : strings.copy;
   }
 
   function open(item: HTMLElement) {

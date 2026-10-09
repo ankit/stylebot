@@ -1,86 +1,70 @@
 ---
-import Base from '../layouts/Base.astro';
-import CliCommand from '../components/cli/CliCommand.astro';
-import { CLI_PACKAGE, STORES } from '../lib/links';
+import Base from '../../layouts/Base.astro';
+import CliCommand from '../../components/cli/CliCommand.astro';
+import { CLI_PACKAGE, STORES } from '../../lib/links';
+import { fmt, localeStaticPaths, messagesFor, rich } from '../../i18n';
+
+export const getStaticPaths = localeStaticPaths;
+
+const {
+  site: {
+    cli: { page: t },
+    store,
+  },
+} = messagesFor(Astro.url);
 
 const examples = [
-  [
-    'stylebot open news.ycombinator.com',
-    'Opens the page in a window behind yours and prints its tab id.',
-  ],
-  [
-    'stylebot outline 54432929',
-    'Prints the page’s visible elements as an outline.',
-  ],
-  [
-    'stylebot css set news.ycombinator.com < dark.css',
-    'Saves the CSS as the site’s style, applies it, and checks the page.',
-  ],
-  ['stylebot screenshot 54432929 -o page.png', 'Saves a picture of the tab.'],
+  ['stylebot open news.ycombinator.com', t.examples.open],
+  ['stylebot outline 54432929', t.examples.outline],
+  ['stylebot css set news.ycombinator.com < dark.css', t.examples.css],
+  ['stylebot screenshot 54432929 -o page.png', t.examples.screenshot],
 ];
 ---
 
-<Base
-  title="Command line"
-  description="Control Stylebot from your terminal, or let a coding agent like Claude Code, Codex or Cursor restyle sites in your browser on your own subscription."
->
+<Base title={t.title} description={t.description}>
   <main class="cli">
     <div class="cli-intro">
-      <h1>Stylebot from your terminal</h1>
-      <p>
-        Control Stylebot from the command line, or let a coding agent like
-        Claude Code, Codex or Cursor do it. The agent restyles sites right in
-        your browser, using your own subscription instead of an API key.
-      </p>
+      <h1>{t.heading}</h1>
+      <p>{t.lede}</p>
     </div>
 
     <section>
-      <h2>Set it up</h2>
+      <h2>{t.setup}</h2>
       <ol class="cli-steps">
         <li>
-          <h3>Install Stylebot</h3>
-          <p>
-            For Chrome or Edge. The command line doesn't work on Firefox yet.
-          </p>
+          <h3>{t.install}</h3>
+          <p>{t.installBody}</p>
           <div class="cli-stores">
             <a href={STORES.chrome.href} class="btn btn-outline">
-              Add to {STORES.chrome.name}
+              {fmt(store.add, { store: STORES.chrome.name })}
             </a>
             <a href={STORES.edge.href} class="btn btn-outline">
-              Add to {STORES.edge.name}
+              {fmt(store.add, { store: STORES.edge.name })}
             </a>
           </div>
         </li>
         <li>
-          <h3>Install the CLI</h3>
-          <p>It needs Node 20 or later.</p>
+          <h3>{t.cli}</h3>
+          <p>{t.cliBody}</p>
           <CliCommand lines={[`npm install -g ${CLI_PACKAGE}`]} />
         </li>
         <li>
-          <h3>Connect it to your browsers</h3>
-          <p>
-            This registers the CLI with Chrome and Edge, so Stylebot can reach
-            it.
-          </p>
+          <h3>{t.connect}</h3>
+          <p>{t.connectBody}</p>
           <CliCommand lines={['stylebot install']} />
         </li>
         <li>
-          <h3>Turn on command line access</h3>
-          <p>
-            In Stylebot's options, under Basics, turn on{' '}
-            <strong>Let apps on this computer control Stylebot</strong> and
-            allow what the browser asks for.
-          </p>
+          <h3>{t.access}</h3>
+          <p set:html={rich(t.accessBody)} />
         </li>
         <li>
           <h3>
-            Add the Claude Code plugin{' '}
-            <span class="cli-optional">Optional</span>
+            {t.plugin} <span class="cli-optional">{t.optional}</span>
           </h3>
-          <p>In Claude Code, run:</p>
+          <p>{t.pluginBody}</p>
           <CliCommand lines={['/plugin marketplace add ankit/stylebot']} />
           <CliCommand lines={['/plugin install stylebot@stylebot']} />
-          <p>Then try it:</p>
+          <p>{t.tryIt}</p>
           <CliCommand
             lines={['/stylebot news.ycombinator.com give it a dark theme']}
           />
@@ -89,11 +73,8 @@ const examples = [
     </section>
 
     <section>
-      <h2>Commands</h2>
-      <p>
-        An agent runs these for you, but you can run them yourself too.{' '}
-        <code>stylebot --help</code> lists them all.
-      </p>
+      <h2>{t.commands}</h2>
+      <p set:html={rich(t.commandsBody)} />
       <dl class="cli-examples">
         {examples.map(([command, what]) => (
           <div>
@@ -107,17 +88,10 @@ const examples = [
     </section>
 
     <section>
-      <h2>Privacy</h2>
-      <p>
-        Command line access is off until you turn it on. While it's on, apps on
-        this computer can read your open pages, take screenshots and change your
-        styles. Turn it off in Stylebot's options at any time.
-      </p>
-      <p>
-        Stylebot and the CLI talk only to each other, on this computer, and send
-        nothing anywhere. An agent sends what it reads to its own provider, as
-        Claude Code does to Anthropic.
-      </p>
+      <h2>{t.privacy}</h2>
+      {t.privacyBody.map((paragraph) => (
+        <p>{paragraph}</p>
+      ))}
     </section>
   </main>
 </Base>
@@ -183,7 +157,7 @@ const examples = [
     text-wrap: pretty;
   }
 
-  code {
+  p :global(code) {
     padding: 1px 6px;
     border-radius: 5px;
     background: var(--fill);
@@ -232,7 +206,7 @@ const examples = [
     color: var(--muted);
   }
 
-  .cli-steps p strong {
+  .cli-steps p :global(strong) {
     font-weight: 600;
     color: var(--ink);
   }

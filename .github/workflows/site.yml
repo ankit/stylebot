@@ -1,0 +1,53 @@
+name: site
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'site/**'
+      - 'src/assets/_locales/**'
+      - 'scripts/lib/parse-locale-config.js'
+      - '.github/workflows/site.yml'
+  pull_request:
+    paths:
+      - 'site/**'
+      - 'src/assets/_locales/**'
+      - 'scripts/lib/parse-locale-config.js'
+      - '.github/workflows/site.yml'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: site
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node from site/.nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: site/.nvmrc
+
+      - name: Use cached node_modules
+        uses: actions/cache@v4
+        with:
+          path: site/node_modules
+          key: siteNodeModules-${{ hashFiles('site/yarn.lock') }}
+          restore-keys: |
+            siteNodeModules-
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      # Type check, translations against English, and extension wording.
+      - name: Check
+        run: yarn run check
+
+      - name: Check formatting
+        run: npx prettier --check "src/**/*.{ts,tsx,astro}" "scripts/*.ts" astro.config.mjs
+
+      - name: Build
+        run: npx astro build

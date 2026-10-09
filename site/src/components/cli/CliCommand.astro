@@ -1,5 +1,6 @@
 ---
 import { Check, Copy } from '../icons';
+import { fmt, messagesFor } from '../../i18n';
 
 type Props = {
   lines: string[];
@@ -9,6 +10,10 @@ type Props = {
 };
 
 const { lines, copy = true, boxed = false, class: className } = Astro.props;
+const {
+  site: { cli: t },
+} = messagesFor(Astro.url);
+const command = lines.join(' && ');
 ---
 
 <div
@@ -26,9 +31,11 @@ const { lines, copy = true, boxed = false, class: className } = Astro.props;
     <button
       type="button"
       class="cli-cmd-copy"
-      data-copy={lines.join(' && ')}
-      title="Copy"
-      aria-label={`Copy ${lines.join(' && ')}`}
+      data-copy={command}
+      data-copy-label={t.copy}
+      data-copied-label={t.copied}
+      title={t.copy}
+      aria-label={fmt(t.copyCommand, { command })}
     >
       <span class="cli-cmd-idle">
         <Copy size={14} />
@@ -52,11 +59,11 @@ const { lines, copy = true, boxed = false, class: className } = Astro.props;
           return;
         }
         button.classList.add('is-copied');
-        button.title = 'Copied';
+        button.title = button.dataset.copiedLabel!;
         clearTimeout(timer);
         timer = setTimeout(() => {
           button.classList.remove('is-copied');
-          button.title = 'Copy';
+          button.title = button.dataset.copyLabel!;
         }, 1600);
       });
     });

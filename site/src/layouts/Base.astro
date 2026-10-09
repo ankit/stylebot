@@ -1,8 +1,17 @@
 ---
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import LocaleSuggestion from '../components/LocaleSuggestion.astro';
 import { STORAGE_KEY, THEME_KEYS, themeStylesheet } from '../lib/themes';
-import { SITE_DESCRIPTION } from '../lib/site';
+import {
+  DEFAULT_LOCALE,
+  LOCALES,
+  fmt,
+  htmlLang,
+  localizePath,
+  messagesFor,
+  unlocalizedPath,
+} from '../i18n';
 import '../styles/global.css';
 
 type Props = {
@@ -13,37 +22,58 @@ type Props = {
   storeCta?: boolean;
   install?: boolean;
   noindex?: boolean;
+  alternates?: boolean;
 };
+
+const { locale, site: t } = messagesFor(Astro.url);
 
 const {
   title,
-  description = SITE_DESCRIPTION,
+  description = t.meta.description,
   footer = true,
   current,
   storeCta,
   install,
   noindex,
+  alternates = true,
 } = Astro.props;
 
-const fullTitle = title
-  ? `${title} - Stylebot`
-  : 'Stylebot - Restyle any website';
+const fullTitle = title ? fmt(t.meta.titleSuffix, { title }) : t.meta.title;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const path = unlocalizedPath(Astro.url.pathname);
+const altUrl = (code: (typeof LOCALES)[number]['code']) =>
+  new URL(localizePath(code, path), Astro.site);
 ---
 
 <!doctype html>
-<html lang="en">
+<html
+  lang={htmlLang(locale)}
+  translate={locale === DEFAULT_LOCALE ? undefined : 'no'}
+>
   <head>
     <meta charset="utf-8" />
+    {locale !== DEFAULT_LOCALE && <meta name="google" content="notranslate" />}
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     {noindex && <meta name="robots" content="noindex" />}
+    {alternates &&
+      LOCALES.map((l) => (
+        <link rel="alternate" hreflang={l.lang} href={altUrl(l.code)} />
+      ))}
+    {alternates && (
+      <link
+        rel="alternate"
+        hreflang="x-default"
+        href={altUrl(DEFAULT_LOCALE)}
+      />
+    )}
     <meta name="theme-color" content="#f7f8fa" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Stylebot" />
+    <meta property="og:locale" content={htmlLang(locale).replace('-', '_')} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
@@ -91,6 +121,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     )}
   </head>
   <body>
+    {alternates && <LocaleSuggestion />}
     <Header current={current} storeCta={storeCta} install={install} />
     <slot />
     {footer && (

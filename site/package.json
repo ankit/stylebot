@@ -9,7 +9,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check",
+    "check": "astro check && node scripts/check-messages.ts && node scripts/extension-terms.ts",
     "deploy": "astro build && gh-pages -d dist -b gh-pages -t"
   },
   "dependencies": {

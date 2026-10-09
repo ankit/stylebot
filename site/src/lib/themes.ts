@@ -1,6 +1,6 @@
 export type ThemeKey = 'light' | 'dark' | 'stylebot' | 'newsprint';
 
-type Theme = { label: string } & Record<string, string>;
+type Theme = Record<string, string>;
 
 const geist = "'Geist',system-ui,sans-serif";
 const geistMono = "'Geist Mono',ui-monospace,monospace";
@@ -16,7 +16,6 @@ const lightCode = {
 
 export const THEMES: Record<ThemeKey, Theme> = {
   light: {
-    label: 'Light',
     ui: geist,
     display: geist,
     mono: geistMono,
@@ -37,7 +36,6 @@ export const THEMES: Record<ThemeKey, Theme> = {
     ...lightCode,
   },
   dark: {
-    label: 'Dark',
     ui: geist,
     display: geist,
     mono: geistMono,
@@ -63,7 +61,6 @@ export const THEMES: Record<ThemeKey, Theme> = {
     ccom: '#7d8593',
   },
   stylebot: {
-    label: 'Stylebot',
     ui: geist,
     display: "'Gabarito','Geist',system-ui,sans-serif",
     mono: geistMono,
@@ -90,7 +87,6 @@ export const THEMES: Record<ThemeKey, Theme> = {
     ccom: '#7d776d',
   },
   newsprint: {
-    label: 'Newsprint',
     ui: geist,
     display: "'Newsreader',Georgia,serif",
     mono: geistMono,
@@ -128,7 +124,6 @@ export function isDarkTheme(key: string): boolean {
 
 function vars(theme: Theme): string {
   return Object.entries(theme)
-    .filter(([name]) => name !== 'label')
     .map(([name, value]) => `--${name}:${value}`)
     .join(';');
 }

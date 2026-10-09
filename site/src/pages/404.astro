@@ -1,11 +1,17 @@
 ---
 import Base from '../layouts/Base.astro';
 import NotFound from '../components/NotFound';
+import { LOCALES, messages, type Locale, type SiteMessages } from '../i18n';
+
+const all = Object.fromEntries(
+  LOCALES.map((l) => [l.code, messages(l.code).site.notFound]),
+) as Record<Locale, SiteMessages['notFound']>;
+const t = all.en;
 ---
 
-<Base title="Page not found" description="This page doesn't exist." noindex>
+<Base title={t.title} description={t.description} alternates={false} noindex>
   <main class="nf-wrap">
-    <NotFound client:load />
+    <NotFound client:load messages={all} />
   </main>
 </Base>
 
@@ -21,7 +27,6 @@ import NotFound from '../components/NotFound';
     margin-bottom: 28px;
   }
 
-
   .nf-intro h1 {
     margin: 0;
     font: 700 clamp(26px, 3.2vw, 34px) / 1.15 var(--display);
@@ -29,8 +34,6 @@ import NotFound from '../components/NotFound';
     color: var(--ink);
     text-wrap: balance;
   }
-
-
 
   .nf-window {
     border: 1px solid var(--border);

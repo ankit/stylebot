@@ -1,29 +1,28 @@
 ---
-import Base from '../layouts/Base.astro';
-import GoodbyeFeedback from '../components/GoodbyeFeedback';
-import StoreLink from '../components/StoreLink.astro';
+import Base from '../../layouts/Base.astro';
+import GoodbyeFeedback from '../../components/GoodbyeFeedback';
+import StoreLink from '../../components/StoreLink.astro';
+import { localeStaticPaths, messagesFor } from '../../i18n';
+
+export const getStaticPaths = localeStaticPaths;
+
+const {
+  site: { goodbye: t },
+} = messagesFor(Astro.url);
 ---
 
-<Base title="Goodbye" description="Thanks for using Stylebot." noindex>
+<Base title={t.title} description={t.description} noindex>
   <main class="gb">
-    <div
-      class="gb-panda"
-      role="img"
-      aria-label="A pixel panda waving goodbye"
-    ></div>
-    <h1>Thanks for using Stylebot.</h1>
-    <p class="gb-lede">
-      Your styles were removed from this browser. If you turned on sync, a
-      backup is still in your Google Drive.
-    </p>
-    <GoodbyeFeedback client:visible />
+    <div class="gb-panda" role="img" aria-label={t.panda}></div>
+    <h1>{t.heading}</h1>
+    <p class="gb-lede">{t.lede}</p>
+    <GoodbyeFeedback client:visible messages={t.feedback} />
     <div class="gb-reinstall">
-      <span>Changed your mind?</span>
+      <span>{t.changedMind}</span>
       <StoreLink index={0} format="reinstall" class="btn btn-outline" />
     </div>
     <p class="gb-note">
-      I’ve been working on Stylebot since 2011. Thanks for giving it a try, and
-      for any feedback you leave. <span>— Ankit</span>
+      {t.note} <span>{t.signature}</span>
     </p>
   </main>
 </Base>

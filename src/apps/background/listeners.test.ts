@@ -72,6 +72,7 @@ const makeChrome = (version: string) => {
       onChanged: event(),
     },
     contextMenus: { onClicked: event() },
+    i18n: { getMessage: () => 'en' },
   };
 
   global.chrome = api as unknown as typeof chrome;

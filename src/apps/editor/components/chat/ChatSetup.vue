@@ -83,7 +83,7 @@
         size="label"
         variant="muted"
         class="chat-setup-cli-guide"
-        href="https://stylebot.dev/cli"
+        :href="cliGuideUrl"
         target="_blank"
         rel="noopener noreferrer"
       >
@@ -118,6 +118,7 @@ import {
 import { ArrowUpRightIcon } from '@stylebot/icons';
 import { chatProviders, getProviderInfo } from '@stylebot/chat';
 import { supportsCLI } from '@stylebot/settings';
+import { getSiteUrl } from '@stylebot/utils';
 import type { ChatProviderId, ChatProviderInfo } from '@stylebot/types';
 
 import ChatCliSteps from './ChatCliSteps.vue';
@@ -154,6 +155,10 @@ export default Vue.extend({
   computed: {
     cli(): boolean {
       return supportsCLI();
+    },
+
+    cliGuideUrl(): string {
+      return getSiteUrl('/cli');
     },
 
     info(): ChatProviderInfo {

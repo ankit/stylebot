@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'preact/hooks';
+import type { SiteMessages } from '../../i18n';
+import { fmt } from '../../i18n/format';
 import './cli-demo.css';
 
 const SITE = 'harbourpost.example';
 const TAB = '54432929';
-const PROMPT = `make ${SITE} easier to read at night`;
 const STEP_MS = 800;
 const STEPS = 17;
 const LAST = STEPS - 1;
@@ -19,7 +20,11 @@ const COMMANDS = [
  * A coding agent restyling a page through the CLI: a terminal running the
  * commands beside the page they change. It loops while it's on screen.
  */
-export default function CliDemo() {
+export default function CliDemo({
+  messages: t,
+}: {
+  messages: SiteMessages['cli']['demo'];
+}) {
   const root = useRef<HTMLDivElement>(null);
   const [step, setStep] = useState(0);
 
@@ -52,11 +57,11 @@ export default function CliDemo() {
   return (
     <div ref={root} class="cli-demo" aria-hidden="true">
       <div class="cli-term">
-        <div class="cli-term-title">Terminal · coding agent</div>
+        <div class="cli-term-title">{t.terminal}</div>
         <div class="cli-term-body">
           <div class="cli-term-ask">
             <span class="cli-term-caret">&gt;</span>
-            <Typer text={PROMPT} on={at(1)} />
+            <Typer text={fmt(t.prompt, { site: SITE })} on={at(1)} />
           </div>
           {COMMANDS.map(([command, output], i) => {
             const start = 2 + i * 2;
@@ -75,7 +80,7 @@ export default function CliDemo() {
             );
           })}
           <div class={`cli-term-row cli-term-done${at(10) ? ' is-on' : ''}`}>
-            Dark background, warmer text, larger serif body. Ad removed.
+            {t.done}
           </div>
         </div>
       </div>
@@ -83,23 +88,16 @@ export default function CliDemo() {
       <div class={`cli-page${after ? ' is-after' : ''}`}>
         <div class="cli-page-bar">
           <div class="cli-page-url">{SITE}/travel/night-ferry</div>
-          <span class="cli-page-badge">{after ? 'After' : 'Before'}</span>
+          <span class="cli-page-badge">{after ? t.after : t.before}</span>
         </div>
         <div class="cli-page-body">
           <div class="cli-page-col">
-            <div class="cli-page-kicker">Travel</div>
-            <div class="cli-page-h1">The quiet return of the night ferry</div>
-            <div class="cli-page-dek">
-              Three operators are betting that travelers will trade speed for a
-              cabin, a sea view and no airport.
-            </div>
-            <div class="cli-page-text">
-              The 22:40 from Rostock leaves without fanfare. By the time the
-              port lights fall behind, most passengers have found their cabins
-              and the bar has settled into a low murmur.
-            </div>
+            <div class="cli-page-kicker">{t.kicker}</div>
+            <div class="cli-page-h1">{t.headline}</div>
+            <div class="cli-page-dek">{t.dek}</div>
+            <div class="cli-page-text">{t.text}</div>
           </div>
-          <div class="cli-page-ad">Ad</div>
+          <div class="cli-page-ad">{t.ad}</div>
         </div>
         <div class={`cli-page-flash${step === 9 ? ' is-on' : ''}`} />
       </div>

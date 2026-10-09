@@ -1,3 +1,6 @@
+import type { DemoMessages } from '../../i18n';
+import { fmt } from '../../i18n/format';
+
 export type Patch = Record<string, unknown> & {
   cur?: string;
   click?: number;
@@ -12,6 +15,16 @@ export type Scene = {
   acts: [number, Patch][];
 };
 
+/**
+ * The default profile's internal name; the demo shows it as
+ * `editor.defaultProfile`.
+ */
+export const DEFAULT_PROFILE = 'Default';
+
+/**
+ * The internal name of the profile the visitor creates; the demo shows it as
+ * `editor.newProfile`.
+ */
 export const NEW_PROFILE = 'Newspaper';
 
 export const INIT = {
@@ -33,8 +46,8 @@ export const INIT = {
   caption: '',
   tab: 'basic',
   focus: null as string | null,
-  profile: 'Default',
-  profiles: ['Default'],
+  profile: DEFAULT_PROFILE,
+  profiles: [DEFAULT_PROFILE],
   profMenu: false,
   profCreating: false,
   profLen: 0,
@@ -42,153 +55,153 @@ export const INIT = {
 
 export type DemoState = typeof INIT;
 
-export const SCENES: Scene[] = [
-  {
-    title: 'Open the editor',
-    body: 'Click the icon, or press {keys}.',
-    dur: 4600,
-    acts: [
-      [
-        0,
-        {
-          caption: 'Click the Stylebot icon, then Style this page.',
-          cur: 'sbicon',
-        },
+/**
+ * The walkthrough's scenes, with their text from the demo messages.
+ */
+export function scenes(m: DemoMessages, dark = false): Scene[] {
+  const { open, pick, style, profiles } = m.scenes;
+  const defaultProfile = m.editor.defaultProfile;
+  return [
+    {
+      title: open.title,
+      body: open.keysBody,
+      dur: 4600,
+      acts: [
+        [0, { caption: open.captions.iconThenStyle, cur: 'sbicon' }],
+        [1100, { click: 1, popOpen: true }],
+        [1900, { cur: 'style-btn', popHover: true }],
+        [
+          2900,
+          {
+            click: 1,
+            popOpen: false,
+            popHover: false,
+            editorOpen: true,
+            inspecting: true,
+            caption: open.captions.orKeys,
+          },
+        ],
       ],
-      [1100, { click: 1, popOpen: true }],
-      [1900, { cur: 'style-btn', popHover: true }],
-      [
-        2900,
-        {
-          click: 1,
-          popOpen: false,
-          popHover: false,
-          editorOpen: true,
-          inspecting: true,
-          caption: 'Or press {keys} to open it directly.',
-        },
+    },
+    {
+      title: pick.title,
+      body: pick.fieldsBody,
+      dur: 5000,
+      acts: [
+        [
+          0,
+          {
+            inspecting: true,
+            caption: pick.captions.hoverToSee,
+            cur: 'header',
+          },
+        ],
+        [600, { hover: 'header' }],
+        [1300, { cur: 'h1' }],
+        [1700, { hover: 'h1' }],
+        [
+          2500,
+          {
+            click: 1,
+            sel: 'h1',
+            hover: null,
+            inspecting: false,
+            caption: pick.captions.select,
+          },
+        ],
+        [3500, { cur: 'font-field', caption: pick.captions.computed }],
       ],
-    ],
-  },
-  {
-    title: 'Pick an element',
-    body: 'Click to select. Fields show its current styles.',
-    dur: 5000,
-    acts: [
-      [
-        0,
-        {
-          inspecting: true,
-          caption: 'Hover to see what can be styled.',
-          cur: 'header',
-        },
+    },
+    {
+      title: style.title,
+      body: style.body,
+      dur: 13800,
+      acts: [
+        [0, { caption: style.captions.size, cur: 'size' }],
+        [800, { click: 1, focus: 'size' }],
+        [1200, { h1Size: 36 }],
+        [1450, { h1Size: 40 }],
+        [1700, { h1Size: 44 }],
+        [2400, { cur: 'color', caption: style.captions.color }],
+        [3200, { click: 1, focus: 'color' }],
+        [3600, { h1Color: '#b0303a' }],
+        [
+          4400,
+          {
+            focus: null,
+            cur: 'tab-code',
+            caption: style.captions.plainCss,
+          },
+        ],
+        [5200, { click: 1, tab: 'code' }],
+        [6200, { caption: style.captions.byHand, cur: 'code' }],
+        [7000, { click: 1, qType: true }],
+        [10400, { cur: 'quote', caption: style.captions.live }],
       ],
-      [600, { hover: 'header' }],
-      [1300, { cur: 'h1' }],
-      [1700, { hover: 'h1' }],
-      [
-        2500,
-        {
-          click: 1,
-          sel: 'h1',
-          hover: null,
-          inspecting: false,
-          caption: 'Click to select. The selector fills in for you.',
-        },
+    },
+    {
+      title: profiles.title,
+      body: profiles.looksBody,
+      dur: 10000,
+      acts: [
+        [0, { caption: profiles.looksBody, cur: 'prof-btn' }],
+        [800, { click: 1, profMenu: true }],
+        [
+          1600,
+          { cur: 'prof-create', caption: profiles.captions.createForLook },
+        ],
+        [2300, { click: 1, profCreating: true, profType: true }],
+        [
+          3500,
+          {
+            profMenu: false,
+            profile: NEW_PROFILE,
+            lookDone: false,
+            lookStep: 0,
+            caption: fmt(profiles.captions.created, {
+              profile: dark ? m.editor.newProfileDark : m.editor.newProfile,
+              defaultProfile,
+            }),
+          },
+        ],
+        [
+          3900,
+          {
+            profCreating: false,
+            profLen: 0,
+            profiles: [DEFAULT_PROFILE, NEW_PROFILE],
+          },
+        ],
+        [
+          4600,
+          {
+            lookStep: 1,
+            caption: dark
+              ? profiles.captions.darkLook
+              : profiles.captions.newspaperLook,
+          },
+        ],
+        [4900, { lookStep: 2 }],
+        [5200, { lookStep: 3 }],
+        [5500, { lookStep: 4 }],
+        [5800, { lookStep: 5 }],
+        [6100, { lookDone: true }],
+        [6800, { cur: 'prof-btn', caption: profiles.captions.switchAnytime }],
+        [7400, { click: 1, profMenu: true }],
+        [8000, { cur: `prof-${DEFAULT_PROFILE}` }],
+        [
+          8500,
+          {
+            click: 1,
+            profMenu: false,
+            profile: DEFAULT_PROFILE,
+            caption: fmt(profiles.captions.backToDefault, { defaultProfile }),
+          },
+        ],
       ],
-      [
-        3500,
-        {
-          cur: 'font-field',
-          caption: 'Each field shows the element’s current computed value.',
-        },
-      ],
-    ],
-  },
-  {
-    title: 'Style it',
-    body: 'Use the Basic controls or write CSS.',
-    dur: 13800,
-    acts: [
-      [0, { caption: 'Set the size…', cur: 'size' }],
-      [800, { click: 1, focus: 'size' }],
-      [1200, { h1Size: 36 }],
-      [1450, { h1Size: 40 }],
-      [1700, { h1Size: 44 }],
-      [2400, { cur: 'color', caption: '…and the color.' }],
-      [3200, { click: 1, focus: 'color' }],
-      [3600, { h1Color: '#b0303a' }],
-      [
-        4400,
-        {
-          focus: null,
-          cur: 'tab-code',
-          caption: 'Every change is plain CSS, saved for this site.',
-        },
-      ],
-      [5200, { click: 1, tab: 'code' }],
-      [6200, { caption: 'Or write CSS by hand.', cur: 'code' }],
-      [7000, { click: 1, qType: true }],
-      [10400, { cur: 'quote', caption: 'The page updates as you type.' }],
-    ],
-  },
-  {
-    title: 'Profiles',
-    body: 'Save different looks for the same site.',
-    dur: 10000,
-    acts: [
-      [
-        0,
-        {
-          caption: 'Save different looks for the same site.',
-          cur: 'prof-btn',
-        },
-      ],
-      [800, { click: 1, profMenu: true }],
-      [
-        1600,
-        { cur: 'prof-create', caption: 'Create a profile for a new look.' },
-      ],
-      [2300, { click: 1, profCreating: true, profType: true }],
-      [
-        3500,
-        {
-          profMenu: false,
-          profile: NEW_PROFILE,
-          lookDone: false,
-          lookStep: 0,
-          caption: 'Newspaper starts clean. Default is still saved.',
-        },
-      ],
-      [
-        3900,
-        {
-          profCreating: false,
-          profLen: 0,
-          profiles: ['Default', NEW_PROFILE],
-        },
-      ],
-      [4600, { lookStep: 1, caption: 'Give it a newspaper look.' }],
-      [4900, { lookStep: 2 }],
-      [5200, { lookStep: 3 }],
-      [5500, { lookStep: 4 }],
-      [5800, { lookStep: 5 }],
-      [6100, { lookDone: true }],
-      [6800, { cur: 'prof-btn', caption: 'Switch between them anytime.' }],
-      [7400, { click: 1, profMenu: true }],
-      [8000, { cur: 'prof-Default' }],
-      [
-        8500,
-        {
-          click: 1,
-          profMenu: false,
-          profile: 'Default',
-          caption: 'Back to Default. One site, two looks.',
-        },
-      ],
-    ],
-  },
-];
+    },
+  ];
+}
 
 /**
  * How many steps the look lands in: page and text, then the header and fonts,
@@ -345,22 +358,28 @@ export const LOOKS: Record<'light' | 'dark', Look> = {
   },
 };
 
-export const PIN_SCENE: Scene = {
-  title: 'Pin it to the toolbar',
-  body: 'Keep Stylebot one click away.',
-  dur: 6000,
-  acts: [
-    [0, { caption: 'Stylebot starts in the extensions menu.', cur: 'puzzle' }],
-    [900, { click: 1, menuOpen: true }],
-    [1800, { cur: 'pin' }],
-    [2700, { click: 1, pinned: true }],
-    [
-      3400,
-      {
-        menuOpen: false,
-        cur: 'sbicon',
-        caption: 'Pinned. Stylebot is now in your toolbar.',
-      },
+/**
+ * The welcome page's first scene, pinning Stylebot to the toolbar.
+ */
+export function pinScene(m: DemoMessages): Scene {
+  const { pin } = m.scenes;
+  return {
+    title: pin.title,
+    body: pin.body,
+    dur: 6000,
+    acts: [
+      [0, { caption: pin.captions.menu, cur: 'puzzle' }],
+      [900, { click: 1, menuOpen: true }],
+      [1800, { cur: 'pin' }],
+      [2700, { click: 1, pinned: true }],
+      [
+        3400,
+        {
+          menuOpen: false,
+          cur: 'sbicon',
+          caption: pin.captions.pinned,
+        },
+      ],
     ],
-  ],
-};
+  };
+}

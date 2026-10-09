@@ -1,0 +1,48 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../../layouts/Base.astro';
+import { LINKS } from '../../../lib/links';
+import readability from '../../../assets/releases/3.2/readability.png';
+import popup from '../../../assets/releases/3.2/popup.png';
+import { fmt, localeStaticPaths, messagesFor, rich } from '../../../i18n';
+
+export const getStaticPaths = localeStaticPaths;
+
+const {
+  site: { releases: t },
+} = messagesFor(Astro.url);
+const r = t.r32;
+const title = fmt(t.title, { version: '3.2' });
+---
+
+<Base title={title} description={r.description}>
+  <main class="prose">
+    <h1>{title}</h1>
+    <p class="lede">{r.lede}</p>
+
+    <h2>{r.fasterTitle}</h2>
+    <p>{r.fasterBody}</p>
+
+    <h2>{r.readabilityTitle}</h2>
+    <figure>
+      <Image src={readability} height={400} alt={r.readabilityAlt} />
+    </figure>
+    <ul>
+      {r.readabilityItems.map((item) => (
+        <li>{item}</li>
+      ))}
+    </ul>
+
+    <h2>{r.popupTitle}</h2>
+    <figure>
+      <Image src={popup} height={400} alt={r.popupAlt} />
+    </figure>
+    <ul>
+      {r.popupItems.map((item) => (
+        <li>{item}</li>
+      ))}
+    </ul>
+
+    <h2 set:html={rich(t.bugFixes, { changelog: LINKS.changelog })} />
+  </main>
+</Base>

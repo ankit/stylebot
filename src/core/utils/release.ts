@@ -1,4 +1,5 @@
 import type { NotificationId } from './notification';
+import { getSiteUrl } from './site-url';
 
 export const getExtensionVersion = (): string =>
   chrome.runtime.getManifest().version;
@@ -11,7 +12,7 @@ export const getReleaseNotificationId = (): NotificationId =>
   `release/${getReleaseVersion()}`;
 
 export const getReleaseUrl = (): string =>
-  `https://stylebot.dev/releases/${getReleaseVersion()}`;
+  getSiteUrl(`/releases/${getReleaseVersion()}`);
 
 const getMajorVersion = (version?: string): number | undefined => {
   const match = /^(\d+)(\.\d+)*$/.exec(version?.trim() ?? '');

@@ -76,6 +76,7 @@ import {
   getReleaseUrl,
   isMajorUpdate,
   recordInstallTime,
+  getSiteUrl,
 } from '@stylebot/utils';
 
 /**
@@ -95,7 +96,7 @@ export const initListeners = (): void => {
 
       if (reason === 'install') {
         chrome.tabs.create({
-          url: 'https://stylebot.dev/welcome',
+          url: getSiteUrl('/welcome'),
         });
 
         setNotification(getReleaseNotificationId(), true);

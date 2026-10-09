@@ -1,10 +1,10 @@
 ---
-type Props = { target: string; label: string };
-const { target, label } = Astro.props;
+type Props = { target: string; previous: string; next: string };
+const { target, previous, next } = Astro.props;
 ---
 
 <div class="carousel-nav" data-carousel-nav={target}>
-  <button class="round-btn" data-dir="-1" aria-label={`Previous ${label}`}>
+  <button class="round-btn" data-dir="-1" aria-label={previous}>
     <svg
       width="14"
       height="14"
@@ -19,7 +19,7 @@ const { target, label } = Astro.props;
       <path d="M8.5 2.5 4 7l4.5 4.5"></path>
     </svg>
   </button>
-  <button class="round-btn" data-dir="1" aria-label={`Next ${label}`}>
+  <button class="round-btn" data-dir="1" aria-label={next}>
     <svg
       width="14"
       height="14"

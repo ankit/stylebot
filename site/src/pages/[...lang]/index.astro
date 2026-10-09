@@ -1,0 +1,654 @@
+---
+import Base from '../../layouts/Base.astro';
+import Demo from '../../components/demo/Demo';
+import Gallery from '../../components/Gallery.astro';
+import Features from '../../components/Features.astro';
+import CliCommand from '../../components/cli/CliCommand.astro';
+import CliSection from '../../components/cli/CliSection.astro';
+import Quotes from '../../components/Quotes.astro';
+import Footer from '../../components/Footer.astro';
+import StoreLink from '../../components/StoreLink.astro';
+import { CLI_PACKAGE, LINKS, STORES } from '../../lib/links';
+import {
+  htmlLang,
+  localeStaticPaths,
+  localizePath,
+  messagesFor,
+  parts,
+} from '../../i18n';
+
+export const getStaticPaths = localeStaticPaths;
+
+const { locale, site: t, demo } = messagesFor(Astro.url);
+
+type RestyleFont = {
+  family: string;
+  generic: 'serif' | 'monospace' | 'sans-serif';
+  italic?: boolean;
+  weight?: number;
+  size?: string;
+  spacing?: string;
+  shift?: string;
+};
+
+type RestyleScript =
+  | 'latin'
+  | 'latin-ext'
+  | 'vietnamese'
+  | 'cyrillic'
+  | 'ja'
+  | 'ko'
+  | 'zh-cn'
+  | 'zh-tw';
+
+const LATIN_FONTS: RestyleFont[] = [
+  {
+    family: 'DM Serif Display',
+    generic: 'serif',
+    italic: true,
+    spacing: '-0.02em',
+    shift: '0.027em',
+  },
+  {
+    family: 'JetBrains Mono',
+    generic: 'monospace',
+    weight: 500,
+    size: '0.94em',
+    spacing: '-0.06em',
+    shift: '0.034em',
+  },
+  {
+    family: 'Silkscreen',
+    generic: 'monospace',
+    size: '0.72em',
+    spacing: '0',
+    shift: '0.15em',
+  },
+  {
+    family: 'Libre Caslon Text',
+    generic: 'serif',
+    weight: 700,
+    size: '0.95em',
+    spacing: '-0.02em',
+    shift: '0.039em',
+  },
+];
+
+/*
+ * The headline word's four styles, per script: each font is a Google Font
+ * that covers the whole word, so no letter falls back to another font.
+ */
+const RESTYLE_FONTS: Record<RestyleScript, RestyleFont[]> = {
+  latin: LATIN_FONTS,
+  'latin-ext': [
+    LATIN_FONTS[0],
+    LATIN_FONTS[1],
+    {
+      family: 'Pixelify Sans',
+      generic: 'monospace',
+      weight: 500,
+      size: '0.9em',
+      spacing: '0',
+      shift: '0.08em',
+    },
+    LATIN_FONTS[3],
+  ],
+  vietnamese: [
+    {
+      family: 'Playfair Display',
+      generic: 'serif',
+      italic: true,
+      spacing: '-0.02em',
+      shift: '-0.06em',
+    },
+    {
+      family: 'JetBrains Mono',
+      generic: 'monospace',
+      weight: 500,
+      size: '0.88em',
+      spacing: '-0.06em',
+      shift: '0em',
+    },
+    {
+      family: 'VT323',
+      generic: 'monospace',
+      size: '1.1em',
+      spacing: '0',
+      shift: '-0.06em',
+    },
+    {
+      family: 'Old Standard TT',
+      generic: 'serif',
+      weight: 700,
+      size: '0.95em',
+      spacing: '-0.02em',
+      shift: '0.094em',
+    },
+  ],
+  cyrillic: [
+    {
+      family: 'Playfair Display',
+      generic: 'serif',
+      italic: true,
+      spacing: '-0.02em',
+      shift: '0.02em',
+    },
+    {
+      family: 'JetBrains Mono',
+      generic: 'monospace',
+      weight: 500,
+      size: '0.94em',
+      spacing: '-0.06em',
+      shift: '0.034em',
+    },
+    {
+      family: 'Pixelify Sans',
+      generic: 'monospace',
+      weight: 500,
+      size: '0.9em',
+      spacing: '0',
+      shift: '0.08em',
+    },
+    {
+      family: 'Old Standard TT',
+      generic: 'serif',
+      weight: 700,
+      size: '0.95em',
+      spacing: '-0.02em',
+      shift: '0.03em',
+    },
+  ],
+  ja: [
+    { family: 'Yuji Syuku', generic: 'serif', size: '0.96em', spacing: '0' },
+    {
+      family: 'M PLUS 1 Code',
+      generic: 'monospace',
+      weight: 500,
+      size: '0.94em',
+      spacing: '0',
+    },
+    {
+      family: 'DotGothic16',
+      generic: 'sans-serif',
+      size: '0.94em',
+      spacing: '0',
+    },
+    {
+      family: 'Shippori Mincho',
+      generic: 'serif',
+      weight: 700,
+      size: '0.95em',
+      spacing: '0',
+    },
+  ],
+  ko: [
+    { family: 'Song Myung', generic: 'serif', size: '0.94em', spacing: '0' },
+    {
+      family: 'Nanum Gothic Coding',
+      generic: 'monospace',
+      size: '0.84em',
+      spacing: '0',
+    },
+    {
+      family: 'Do Hyeon',
+      generic: 'sans-serif',
+      size: '0.94em',
+      spacing: '0',
+    },
+    {
+      family: 'Nanum Myeongjo',
+      generic: 'serif',
+      weight: 800,
+      size: '0.87em',
+      spacing: '0',
+    },
+  ],
+  'zh-cn': [
+    {
+      family: 'Ma Shan Zheng',
+      generic: 'serif',
+      spacing: '0',
+    },
+    {
+      family: 'Noto Sans SC',
+      generic: 'sans-serif',
+      weight: 500,
+      size: '0.94em',
+      spacing: '0',
+    },
+    {
+      family: 'ZCOOL QingKe HuangYou',
+      generic: 'sans-serif',
+      size: '0.94em',
+      spacing: '0',
+    },
+    {
+      family: 'Noto Serif SC',
+      generic: 'serif',
+      weight: 700,
+      size: '0.95em',
+      spacing: '0',
+    },
+  ],
+  'zh-tw': [
+    {
+      family: 'LXGW WenKai TC',
+      generic: 'serif',
+      spacing: '0',
+    },
+    {
+      family: 'Noto Sans TC',
+      generic: 'sans-serif',
+      weight: 500,
+      size: '0.94em',
+      spacing: '0',
+    },
+    {
+      family: 'LXGW Marker Gothic',
+      generic: 'sans-serif',
+      size: '0.94em',
+      spacing: '0',
+    },
+    {
+      family: 'Noto Serif TC',
+      generic: 'serif',
+      weight: 700,
+      size: '0.95em',
+      spacing: '0',
+    },
+  ],
+};
+
+/**
+ * Which set of fonts covers a word: by its letters, and for Chinese
+ * characters, which are shared with Japanese, by the page's locale.
+ */
+function restyleScript(word: string): RestyleScript {
+  if (/\p{Script=Hangul}/u.test(word)) return 'ko';
+  if (/[\p{Script=Hiragana}\p{Script=Katakana}]/u.test(word)) return 'ja';
+  if (/\p{Script=Han}/u.test(word)) {
+    return locale === 'ja' || locale === 'ko' || locale === 'zh-tw'
+      ? locale
+      : 'zh-cn';
+  }
+  if (/\p{Script=Cyrillic}/u.test(word)) return 'cyrillic';
+  if (
+    /[\u01a0\u01a1\u01af\u01b0\u0300-\u036f\u1ea0-\u1ef9]/u.test(
+      word.normalize('NFC'),
+    )
+  ) {
+    return 'vietnamese';
+  }
+  return /[\u0100-\u024f]/u.test(word.normalize('NFC')) ? 'latin-ext' : 'latin';
+}
+
+const restyleFonts = RESTYLE_FONTS[restyleScript(t.home.titleWord)];
+
+const restyleFamilies = restyleFonts.map(({ family, italic, weight }) => {
+  const axes = italic ? 'ital@1' : weight ? `wght@${weight}` : '';
+  return `family=${family.replace(/ /g, '+')}${axes && `:${axes}`}`;
+});
+
+const restyleHref = `https://fonts.googleapis.com/css2?${restyleFamilies.join('&')}&display=swap&text=${encodeURIComponent(t.home.titleWord)}`;
+
+const restyleLoads = restyleFonts.map(
+  ({ family, italic, weight }) =>
+    `${italic ? 'italic ' : ''}${weight ?? 400} 1em '${family}'`,
+);
+
+const restyleVars = restyleFonts
+  .map((font, i) =>
+    [
+      `--family-${i + 1}: '${font.family}', ${font.generic}`,
+      `--style-${i + 1}: ${font.italic ? 'italic' : 'normal'}`,
+      `--weight-${i + 1}: ${font.weight ?? 400}`,
+      `--size-${i + 1}: ${font.size ?? '1em'}`,
+      `--spacing-${i + 1}: ${font.spacing ?? 'normal'}`,
+      `--shift-${i + 1}: ${font.shift ?? '0em'}`,
+    ].join('; '),
+  )
+  .join('; ');
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Stylebot',
+  url: new URL(localizePath(locale, '/'), Astro.site).href,
+  description: t.meta.description,
+  inLanguage: htmlLang(locale),
+  applicationCategory: 'BrowserApplication',
+  operatingSystem: 'Chrome, Firefox, Edge',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  downloadUrl: Object.values(STORES).map((store) => store.href),
+  sameAs: [LINKS.github, ...Object.values(STORES).map((store) => store.href)],
+  author: { '@type': 'Person', name: 'Ankit Ahuja', url: LINKS.author },
+};
+---
+
+<Base footer={false} storeCta>
+  <script
+    slot="head"
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify(structuredData)}
+  />
+  <link slot="head" href={restyleHref} rel="stylesheet" />
+  <main>
+    <div class="hero">
+      <h1>
+        {parts(t.home.title).map((part) =>
+          part === '{word}' ? (
+            <button
+              class="restyle"
+              type="button"
+              title={t.home.titleWordHint}
+              data-fonts={JSON.stringify(restyleLoads)}
+            >
+              {t.home.titleWord}
+              <span
+                class="restyle-cycle"
+                aria-hidden="true"
+                style={restyleVars}
+              >
+                {t.home.titleWord}
+              </span>
+            </button>
+          ) : (
+            part
+          ),
+        )}
+      </h1>
+      <p>{t.home.lede}</p>
+      <div class="cta">
+        <div class="cta-row">
+          <StoreLink index={0} format="add-free" class="btn btn-primary" />
+          <span class="cta-also">
+            {parts(t.home.also).map((part) =>
+              part === '{first}' ? (
+                <StoreLink index={1} format="name" class="ink-link" />
+              ) : part === '{second}' ? (
+                <StoreLink index={2} format="name" class="ink-link" />
+              ) : (
+                part
+              ),
+            )}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-wrap">
+      <Demo client:visible messages={demo} />
+    </div>
+
+    <CliSection />
+    <Gallery />
+    <Features />
+    <Quotes />
+
+    <section id="install" class="section">
+      <div class="install">
+        <h2>{t.home.installTitle}</h2>
+        <p>{t.home.installBody}</p>
+        <div class="install-buttons">
+          <StoreLink index={0} format="add" class="btn btn-primary" />
+          <StoreLink index={1} format="name" class="btn btn-outline" />
+          <StoreLink index={2} format="name" class="btn btn-outline" />
+        </div>
+        <div class="install-cli">
+          <span set:html={t.home.cli} />
+          <CliCommand lines={[`npm install -g ${CLI_PACKAGE}`]} boxed />
+        </div>
+        <Footer />
+      </div>
+    </section>
+  </main>
+</Base>
+
+<script>
+  const STEPS = 5;
+  const PLAY = [0, 350, 700, 1050, 1450];
+
+  const button = document.querySelector<HTMLButtonElement>('.restyle')!;
+  const word = button.querySelector<HTMLElement>('.restyle-cycle')!;
+
+  for (const font of JSON.parse(button.dataset.fonts!) as string[]) {
+    document.fonts.load(font, word.textContent!.trim());
+  }
+  let step = 0;
+  let timers: number[] = [];
+
+  function show(next: number) {
+    step = next;
+    word.dataset.step = String(step);
+  }
+
+  function stopPlaying() {
+    timers.forEach(clearTimeout);
+    timers = [];
+    delete word.dataset.playing;
+  }
+
+  button.addEventListener('click', () => {
+    stopPlaying();
+    show((step + 1) % STEPS);
+  });
+
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    timers = PLAY.map((at, i) =>
+      window.setTimeout(() => {
+        const last = i === PLAY.length - 1;
+        word.toggleAttribute('data-playing', !last);
+        show(last ? 0 : i + 1);
+      }, 400 + at),
+    );
+  }
+</script>
+
+<style>
+  .hero {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 64px 24px 36px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .hero h1 {
+    font: 700 clamp(36px, 5.4vw, 58px) / 1.04 var(--display);
+    letter-spacing: -0.035em;
+    margin: 0;
+    text-wrap: balance;
+  }
+
+  .restyle {
+    position: relative;
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    letter-spacing: inherit;
+    color: transparent;
+    cursor: pointer;
+  }
+
+  .restyle:focus-visible {
+    outline: none;
+  }
+
+  .restyle-cycle {
+    position: absolute;
+    right: -4px;
+    top: 50%;
+    translate: 0 -50%;
+    padding: 0 4px;
+    border-radius: 4px;
+    color: var(--ink);
+    white-space: nowrap;
+    user-select: none;
+    pointer-events: none;
+    outline: 1.5px dashed transparent;
+    outline-offset: 4px;
+  }
+
+  .restyle:hover .restyle-cycle,
+  .restyle:focus-visible .restyle-cycle,
+  .restyle-cycle[data-playing] {
+    outline-color: color-mix(in srgb, var(--acc) 45%, transparent);
+  }
+
+  .restyle-cycle[data-step='1'] {
+    translate: 0 calc(-50% + var(--shift-1));
+    font-family: var(--family-1);
+    font-size: var(--size-1);
+    font-style: var(--style-1);
+    font-weight: var(--weight-1);
+    letter-spacing: var(--spacing-1);
+    color: var(--acc);
+  }
+
+  .restyle-cycle[data-step='2'] {
+    translate: 0 calc(-50% + var(--shift-2));
+    font-family: var(--family-2);
+    font-size: var(--size-2);
+    font-style: var(--style-2);
+    font-weight: var(--weight-2);
+    letter-spacing: var(--spacing-2);
+    color: #191b1f;
+    background: #fde68a;
+  }
+
+  .restyle-cycle[data-step='3'] {
+    translate: 0 calc(-50% + var(--shift-3));
+    font-family: var(--family-3);
+    font-size: var(--size-3);
+    font-style: var(--style-3);
+    font-weight: var(--weight-3);
+    letter-spacing: var(--spacing-3);
+    color: var(--acc);
+    background: var(--accline);
+  }
+
+  .restyle-cycle[data-step='4'] {
+    translate: 0 calc(-50% + var(--shift-4));
+    font-family: var(--family-4);
+    font-size: var(--size-4);
+    font-style: var(--style-4);
+    font-weight: var(--weight-4);
+    letter-spacing: var(--spacing-4);
+    color: #191b1f;
+    background: #e7e4dc;
+  }
+
+  .hero p {
+    font: 400 18px/1.55 var(--ui);
+    color: var(--muted);
+    margin: 0;
+    max-width: 48ch;
+    text-wrap: pretty;
+  }
+
+  .cta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+
+  .cta-also {
+    font: 400 13px/1.4 var(--ui);
+    color: var(--muted);
+  }
+
+  .cta-also :global(.ink-link) {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--strong);
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1.5px;
+  }
+
+  .cta-also :global(.ink-link:hover) {
+    color: var(--link, var(--ink));
+    text-decoration-color: var(--ink);
+  }
+
+  .demo-wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px 88px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+
+  .install {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 80px 24px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+  }
+
+  .install h2 {
+    font: 700 clamp(28px, 3.4vw, 40px) / 1.1 var(--display);
+    letter-spacing: -0.03em;
+    margin: 0;
+  }
+
+  .install p {
+    font: 400 16px/1.55 var(--ui);
+    color: var(--muted);
+    margin: 0;
+    max-width: 52ch;
+  }
+
+  .install-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 6px;
+  }
+
+  .install-cli {
+    margin-top: 10px;
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font: 400 14px/1.4 var(--ui);
+    color: var(--muted);
+  }
+
+  .install-cli :global(a) {
+    color: var(--link, var(--ink));
+  }
+
+  .install :global(.site-footer) {
+    width: 100%;
+  }
+
+  @media (max-width: 600px) {
+    .hero {
+      padding-top: 56px;
+    }
+
+    .demo-wrap {
+      padding-bottom: 64px;
+    }
+  }
+</style>

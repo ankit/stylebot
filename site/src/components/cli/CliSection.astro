@@ -2,26 +2,29 @@
 import CliCommand from './CliCommand.astro';
 import CliDemo from './CliDemo';
 import { CLI_PACKAGE, LINKS } from '../../lib/links';
+import { localizePath, messagesFor } from '../../i18n';
+
+const {
+  locale,
+  site: { cli: t },
+} = messagesFor(Astro.url);
 ---
 
 <section id="cli" class="section">
   <div class="section-inner cli-inner">
     <div class="cli-head">
       <div class="cli-intro">
-        <h2 class="section-title">Works with your coding agent</h2>
-        <p>
-          Claude Code, Codex, Cursor or any agent that runs commands can use
-          Stylebot from the terminal.
-        </p>
+        <h2 class="section-title">{t.title}</h2>
+        <p>{t.body}</p>
       </div>
       <div class="cli-setup">
         <CliCommand lines={[`npm install -g ${CLI_PACKAGE}`]} boxed />
-        <a href={LINKS.cli} class="cli-guide">
-          Set up the CLI →
+        <a href={localizePath(locale, LINKS.cli)} class="cli-guide">
+          {t.guide}
         </a>
       </div>
     </div>
-    <CliDemo client:visible />
+    <CliDemo client:visible messages={t.demo} />
   </div>
 </section>
 

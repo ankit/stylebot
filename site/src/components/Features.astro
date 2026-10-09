@@ -1,15 +1,24 @@
 ---
 import CarouselNav from './CarouselNav.astro';
 import { ChevronDown } from './icons';
+import { messagesFor } from '../i18n';
+
+const {
+  site: { features: t },
+} = messagesFor(Astro.url);
 ---
 
 <section id="features" class="section features">
   <div class="section-inner">
     <div class="section-head">
       <h2 class="section-title" style="max-width:22ch">
-        Everything else you get.
+        {t.title}
       </h2>
-      <CarouselNav target="features-track" label="feature" />
+      <CarouselNav
+        target="features-track"
+        previous={t.previous}
+        next={t.next}
+      />
     </div>
     <div id="features-track" class="carousel features-track">
       <article class="feature">
@@ -17,9 +26,10 @@ import { ChevronDown } from './icons';
           <div data-ed class="mock-card">
             <div class="sync-head">
               <div class="sync-status">
-                <span class="mock-title">Connected to Google Drive</span>
+                <span class="mock-title">{t.sync.connected}</span>
                 <span class="sync-pill">
-                  <span class="dot"></span>Synced 2 minutes ago
+                  <span class="dot"></span>
+                  {t.sync.synced}
                 </span>
               </div>
               <span class="mock-btn sync-now">
@@ -36,63 +46,58 @@ import { ChevronDown } from './icons';
                   <path d="M12 5.5A5 5 0 0 0 3 4M2 8.5A5 5 0 0 0 11 10"></path>
                   <path d="M3 1.5V4h2.5M11 12.5V10H8.5"></path>
                 </svg>
-                Sync now
+                {t.sync.syncNow}
               </span>
             </div>
             <div class="sync-grid">
-              <span class="muted">Saved to</span>
+              <span class="muted">{t.sync.savedTo}</span>
               <span class="sync-path">
                 you@gmail.com <span class="faint">›</span>
               </span>
-              <span class="mock-link">Disconnect</span>
+              <span class="mock-link">{t.sync.disconnect}</span>
               <span class="sync-file">stylebot/stylebot_v3_backup.json ↗</span>
-              <span class="muted">Schedule</span>
-              <span class="sync-schedule">
-                Every 30 minutes, and right after you edit a style
-              </span>
+              <span class="muted">{t.sync.schedule}</span>
+              <span class="sync-schedule">{t.sync.scheduleValue}</span>
             </div>
           </div>
         </div>
         <div class="feature-text">
-          <h3>Sync</h3>
-          <p>
-            Connect Google Drive and your styles follow you to every computer
-            you sign in to. Stylebot syncs every 30 minutes and right after you
-            edit.
-          </p>
+          <h3>{t.sync.title}</h3>
+          <p>{t.sync.body}</p>
         </div>
       </article>
 
       <article class="feature">
         <div class="feature-mock" aria-hidden="true">
           <div data-ed class="mock-card">
-            <div class="hist-day">Today, Sep 25</div>
+            <div class="hist-day">{t.history.today}</div>
             <div class="hist-row">
-              <span class="hist-time">1:04 AM</span>
+              <span class="hist-time">{t.history.times[0]}</span>
               <span class="hist-what">
-                <span style="color:var(--ink2)">No changes</span>
+                <span style="color:var(--ink2)">{t.history.noChanges}</span>
               </span>
-              <span class="faint">10 sites</span>
-              <span class="hist-current">Current</span>
+              <span class="faint hist-sites">{t.history.sites}</span>
+              <span class="hist-current">{t.history.current}</span>
             </div>
             <div class="hist-row">
-              <span class="hist-time">12:41 AM</span>
+              <span class="hist-time">{t.history.times[1]}</span>
               <span class="hist-what">
-                <span class="acc">Edited</span>&nbsp; <b>github.com</b>
+                <span class="acc">{t.history.edited}</span>&nbsp;{' '}
+                <b>github.com</b>
               </span>
-              <span class="faint">10 sites</span>
+              <span class="faint hist-sites">{t.history.sites}</span>
               <span class="hist-chev">
                 <ChevronDown />
               </span>
             </div>
-            <div class="hist-day">Yesterday, Sep 24</div>
+            <div class="hist-day">{t.history.yesterday}</div>
             <div class="hist-row last">
-              <span class="hist-time">11:41 PM</span>
+              <span class="hist-time">{t.history.times[2]}</span>
               <span class="hist-what">
-                <span class="acc">Edited</span>&nbsp;{' '}
+                <span class="acc">{t.history.edited}</span>&nbsp;{' '}
                 <b>news.ycombinator.com</b>
               </span>
-              <span class="faint">10 sites</span>
+              <span class="faint hist-sites">{t.history.sites}</span>
               <span class="hist-chev">
                 <ChevronDown />
               </span>
@@ -100,11 +105,8 @@ import { ChevronDown } from './icons';
           </div>
         </div>
         <div class="feature-text">
-          <h3>Version history</h3>
-          <p>
-            Every change to your styles is kept, newest first. Open an entry to
-            see what changed and restore it in one click.
-          </p>
+          <h3>{t.history.title}</h3>
+          <p>{t.history.body}</p>
         </div>
       </article>
 
@@ -113,33 +115,28 @@ import { ChevronDown } from './icons';
           <div data-ed class="preset-list">
             <div class="mock-card preset">
               <div class="preset-head">
-                <span class="mock-title">Readability</span>
+                <span class="mock-title">{t.presets.readability}</span>
                 <span class="switch on">
                   <span></span>
                 </span>
-                <span class="preset-note">Articles only</span>
+                <span class="preset-note">{t.presets.articlesOnly}</span>
               </div>
-              <div class="preset-body">
-                A clean reading view, with your choice of theme, font, and size.
-              </div>
+              <div class="preset-body">{t.presets.readabilityBody}</div>
             </div>
             <div class="mock-card preset">
               <div class="preset-head">
-                <span class="mock-title">Grayscale</span>
+                <span class="mock-title">{t.presets.grayscale}</span>
                 <span class="switch">
                   <span></span>
                 </span>
               </div>
-              <div class="preset-body">Apply grayscale to the page.</div>
+              <div class="preset-body">{t.presets.grayscaleBody}</div>
             </div>
           </div>
         </div>
         <div class="feature-text">
-          <h3>Presets</h3>
-          <p>
-            Readability and grayscale work on any site, and they stack with your
-            own changes.
-          </p>
+          <h3>{t.presets.title}</h3>
+          <p>{t.presets.body}</p>
         </div>
       </article>
 
@@ -147,14 +144,9 @@ import { ChevronDown } from './icons';
         <div class="feature-mock" aria-hidden="true">
           <div data-ed class="mock-card chat-card">
             <div class="chat-thread">
-              <div class="chat-msg">
-                Make the article easier to read at night
-              </div>
+              <div class="chat-msg">{t.chat.prompt}</div>
               <div class="chat-reply">
-                <p>
-                  Switched to a dark background with warmer text, and set the
-                  body in a larger serif with more line spacing.
-                </p>
+                <p>{t.chat.reply}</p>
                 <div class="chat-change">
                   <svg viewBox="0 0 28 24" width="12" height="10">
                     <rect width="24" height="5" rx="2.5" fill="#ec4d86" />
@@ -181,7 +173,7 @@ import { ChevronDown } from './icons';
                       fill="#2563eb"
                     />
                   </svg>
-                  <span class="chat-change-label">Updated styles</span>
+                  <span class="chat-change-label">{t.chat.updated}</span>
                   <span class="chat-diff">
                     <span class="chat-added">+14</span>
                     <span class="chat-diff-open">
@@ -213,14 +205,14 @@ import { ChevronDown } from './icons';
                       <path d="M6 3L3 6l3 3" />
                       <path d="M3 6h6.5a3.5 3.5 0 0 1 0 7H7" />
                     </svg>
-                    Undo
+                    {t.chat.undo}
                   </span>
                 </div>
               </div>
             </div>
             <div class="chat-composer">
               <div class="chat-input">
-                <div class="chat-placeholder">Describe a change</div>
+                <div class="chat-placeholder">{t.chat.placeholder}</div>
                 <div class="chat-tools">
                   <span class="chat-attach">
                     <svg
@@ -273,12 +265,8 @@ import { ChevronDown } from './icons';
           </div>
         </div>
         <div class="feature-text">
-          <h3>Chat</h3>
-          <p>
-            No coding agent? Describe a change in the Chat tab and Stylebot
-            writes the CSS. Bring your own Claude, OpenAI or Gemini key. It
-            stays in your browser.
-          </p>
+          <h3>{t.chat.title}</h3>
+          <p>{t.chat.body}</p>
         </div>
       </article>
     </div>
@@ -731,5 +719,19 @@ import { ChevronDown } from './icons';
     border-radius: 7px;
     background: color-mix(in srgb, var(--faint) 55%, transparent);
     color: var(--surface);
+  }
+
+  @media (max-width: 420px) {
+    .hist-row {
+      gap: 10px;
+    }
+
+    .hist-sites {
+      display: none;
+    }
+
+    .hist-chev {
+      width: auto;
+    }
   }
 </style>

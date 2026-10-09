@@ -26,6 +26,7 @@ export {
   getReleaseUrl,
   isMajorUpdate,
 } from './release';
+export { getSiteUrl } from './site-url';
 export {
   openOptionsPage,
   openShortcutsPage,

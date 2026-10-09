@@ -1,111 +1,101 @@
 ---
 import { Image } from 'astro:assets';
-import Base from '../../layouts/Base.astro';
-import ImageZoom from '../../components/ImageZoom.astro';
-import CliCommand from '../../components/cli/CliCommand.astro';
-import { CLI_PACKAGE, LINKS } from '../../lib/links';
-import { crisp } from '../../lib/screenshots';
-import agent from '../../assets/manual/agent-chat.png';
-import profiles from '../../assets/manual/popup-profiles.png';
-import agentDark from '../../assets/manual/agent-chat-dark.png';
-import profilesDark from '../../assets/manual/popup-profiles-dark.png';
-import editor from '../../assets/manual/editor-panel.png';
-import editorDark from '../../assets/manual/editor-panel-dark.png';
-import sync from '../../assets/manual/sync.png';
-import syncDark from '../../assets/manual/sync-dark.png';
-import position from '../../assets/manual/position-menu.png';
-import positionDark from '../../assets/manual/position-menu-dark.png';
-import history from '../../assets/manual/history.png';
-import historyDark from '../../assets/manual/history-dark.png';
+import Base from '../../../layouts/Base.astro';
+import ImageZoom from '../../../components/ImageZoom.astro';
+import CliCommand from '../../../components/cli/CliCommand.astro';
+import { CLI_PACKAGE, LINKS } from '../../../lib/links';
+import { crisp } from '../../../lib/screenshots';
+import agent from '../../../assets/manual/agent-chat.png';
+import profiles from '../../../assets/manual/popup-profiles.png';
+import agentDark from '../../../assets/manual/agent-chat-dark.png';
+import profilesDark from '../../../assets/manual/popup-profiles-dark.png';
+import editor from '../../../assets/manual/editor-panel.png';
+import editorDark from '../../../assets/manual/editor-panel-dark.png';
+import sync from '../../../assets/manual/sync.png';
+import syncDark from '../../../assets/manual/sync-dark.png';
+import position from '../../../assets/manual/position-menu.png';
+import positionDark from '../../../assets/manual/position-menu-dark.png';
+import history from '../../../assets/manual/history.png';
+import historyDark from '../../../assets/manual/history-dark.png';
+import {
+  fmt,
+  localeStaticPaths,
+  localizePath,
+  messagesFor,
+  rich,
+} from '../../../i18n';
 
-const toc = [
-  ['editor', 'Redesigned editor'],
-  ['cli', 'Command line'],
-  ['profiles', 'Profiles'],
-  ['panel', 'Side panel'],
-  ['history', 'Version history'],
-  ['sync', 'Sync'],
-  ['chat', 'Chat'],
-  ['more', 'And more'],
-];
+export const getStaticPaths = localeStaticPaths;
+
+const {
+  locale,
+  site: { releases: t, manual: m, cli },
+} = messagesFor(Astro.url);
+const r = t.r40;
+const title = fmt(t.title, { version: '4.0' });
 
 const commands = [
-  [
-    'Opens the page in a window behind yours and prints its tab id.',
-    'stylebot open news.ycombinator.com',
-  ],
-  [
-    'Prints the page’s visible elements as an outline.',
-    'stylebot outline 54432929',
-  ],
-  [
-    'Saves the CSS as the site’s style, applies it, and checks the page.',
-    'stylebot css set news.ycombinator.com < dark.css',
-  ],
-  ['Saves a picture of the tab.', 'stylebot screenshot 54432929 -o page.png'],
+  [cli.page.examples.open, 'stylebot open news.ycombinator.com'],
+  [cli.page.examples.outline, 'stylebot outline 54432929'],
+  [cli.page.examples.css, 'stylebot css set news.ycombinator.com < dark.css'],
+  [cli.page.examples.screenshot, 'stylebot screenshot 54432929 -o page.png'],
 ];
 
 const cards = [
   {
     id: 'profiles',
-    title: 'Profiles',
-    body: 'Keep several looks for a site and switch between them from the editor or the popup.',
+    title: r.profilesTitle,
+    body: r.profilesBody,
     light: profiles,
     dark: profilesDark,
-    alt: 'The popup on a site with two profiles, Dracula and Gruvbox',
+    alt: r.profilesAlt,
   },
   {
     id: 'panel',
-    title: 'The side panel, or its own window',
-    body: 'In Chrome and Edge the editor opens in the side panel. Or pop it out into its own window, from <strong>Position</strong> in the editor’s <strong>⋯</strong> menu.',
+    title: r.panelTitle,
+    body: r.panelBody,
     light: position,
     dark: positionDark,
-    alt: 'The editor’s menu, with Position set to the side panel',
+    alt: r.panelAlt,
     small: true,
   },
   {
     id: 'history',
-    title: 'Version history',
-    body: 'Every change is kept, and you can restore any earlier version.',
+    title: r.historyTitle,
+    body: r.historyBody,
     light: history,
     dark: historyDark,
-    alt: 'Version history in Options, newest change first',
+    alt: m.sync.historyShot,
     wide: true,
   },
   {
     id: 'sync',
-    title: 'Sync',
-    body: 'Google Drive sync is more robust. Edits from different computers are merged, so none get lost. It runs on its own every 30 minutes and right after you edit.',
+    title: r.syncTitle,
+    body: r.syncBody,
     light: sync,
     dark: syncDark,
-    alt: 'Options, connected to Google Drive and synced',
+    alt: m.sync.shot,
     wide: true,
   },
   {
     id: 'chat',
-    title: 'Chat',
-    body: 'No coding agent? Describe what you want, or pick a suggested look, and Stylebot writes the CSS. Bring your own Claude, OpenAI or Gemini key.',
+    title: r.chatTitle,
+    body: r.chatBody,
     light: agent,
     dark: agentDark,
-    alt: 'The Chat tab suggesting looks for the page: Cozy, Calm, and Only the links in color',
+    alt: r.chatAlt,
   },
 ];
 ---
 
-<Base
-  title="What's new in 4.0"
-  description="Stylebot 4.0 brings a redesigned editor, a command line for coding agents, profiles, a side panel, Chat, version history and sync."
->
+<Base title={title} description={r.description}>
   <main class="release">
     <div class="release-intro">
-      <h1>What's new in 4.0</h1>
-      <p>
-        A redesigned editor, a command line for coding agents, profiles, and a
-        side panel.
-      </p>
+      <h1>{title}</h1>
+      <p>{r.lede}</p>
     </div>
-    <nav class="release-toc" aria-label="Sections">
-      {toc.map(([id, label]) => (
+    <nav class="release-toc" aria-label={t.sections}>
+      {Object.entries(r.toc).map(([id, label]) => (
         <a href={`#${id}`}>{label}</a>
       ))}
     </nav>
@@ -113,19 +103,12 @@ const cards = [
     <div class="release-body">
       <section id="editor" class="release-split">
         <div class="release-text">
-          <h2>A redesigned editor</h2>
-          <p>Rebuilt from the ground up, now with dark mode.</p>
+          <h2>{r.editorTitle}</h2>
+          <p>{r.editorBody}</p>
           <ul>
-            <li>Grouped controls that show the page's own values</li>
-            <li>
-              Better selector generation, with selectors that keep working when
-              a site updates and others to choose from
-            </li>
-            <li>Shows when another rule overrides a value</li>
-            <li>Color palettes and an eyedropper</li>
-            <li>Preview a color or font on the page by hovering it</li>
-            <li>Edit any other CSS property in place under More properties</li>
-            <li>Undo support</li>
+            {r.editorItems.map((item) => (
+              <li>{item}</li>
+            ))}
           </ul>
         </div>
         <div class="release-shot">
@@ -135,7 +118,7 @@ const cards = [
             width={290}
             densities={[1, 2]}
             {...crisp(editor)}
-            alt="The redesigned Basic tab, styling Hacker News with a Newspaper profile"
+            alt={r.editorAlt}
           />
           <Image
             class="shot-image is-dark"
@@ -143,7 +126,7 @@ const cards = [
             width={290}
             densities={[1, 2]}
             {...crisp(editorDark)}
-            alt="The redesigned Basic tab, styling Hacker News with a Newspaper profile"
+            alt={r.editorAlt}
           />
         </div>
       </section>
@@ -152,21 +135,15 @@ const cards = [
 
       <section id="cli" class="release-split release-cli">
         <div class="release-text">
-          <h2>Stylebot from your terminal</h2>
-          <p>
-            Control Stylebot from the command line, or let a coding agent like
-            Claude Code, Codex or Cursor do it. The agent restyles sites right
-            in your browser, using your own subscription instead of an API key.
-          </p>
+          <h2>{cli.page.heading}</h2>
+          <p>{cli.page.lede}</p>
           <div class="release-cli-setup">
             <CliCommand lines={[`npm install -g ${CLI_PACKAGE}`]} boxed />
-            <a href={LINKS.cli} class="btn btn-primary">
-              Set up the CLI →
+            <a href={localizePath(locale, LINKS.cli)} class="btn btn-primary">
+              {cli.guide}
             </a>
           </div>
-          <p class="release-note">
-            For Chrome or Edge. The command line doesn't work on Firefox yet.
-          </p>
+          <p class="release-note">{cli.page.installBody}</p>
         </div>
         <div class="release-term" aria-hidden="true">
           <div class="release-term-bar">
@@ -223,24 +200,16 @@ const cards = [
           </article>
         ))}
         <article id="more" class="release-card release-more">
-          <h3>And more</h3>
+          <h3>{r.moreTitle}</h3>
           <ul>
-            <li>A new stylebot.dev</li>
-            <li>A new Stylebot icon</li>
-            <li>
-              Styles now apply inside shadow DOM, so they work on sites built
-              with web components
-            </li>
-            <li>
-              Stylebot's shortcuts now live in your browser's shortcut settings.
-              In Chrome and Edge, any you changed are back to their defaults, so
-              set them again there.
-            </li>
-            <li>Stylebot is now available in Vietnamese</li>
+            {r.moreItems.map((item) => (
+              <li>{item}</li>
+            ))}
           </ul>
-          <p class="release-fixes">
-            And lots of <a href={LINKS.changelog}>bug fixes</a>
-          </p>
+          <p
+            class="release-fixes"
+            set:html={rich(t.bugFixes, { changelog: LINKS.changelog })}
+          />
         </article>
       </section>
     </div>

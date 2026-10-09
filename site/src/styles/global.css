@@ -531,4 +531,13 @@ a.icon-btn:hover {
   .logo-name {
     display: none;
   }
+
+  .header-actions {
+    gap: 2px;
+  }
+
+  .header-actions .btn-sm {
+    margin-left: 6px;
+    padding: 9px 12px;
+  }
 }
