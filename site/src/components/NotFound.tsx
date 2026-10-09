@@ -25,7 +25,7 @@ const FONT_OPTIONS: [Font, string][] = [
 
 const COLORS = [null, '#191b1f', '#e5487f', '#2a5fd6', '#1f8a4c'];
 
-const EASE = ';transition:all .35s cubic-bezier(.3,.7,.2,1)';
+const EASE = ';transition:all .35s cubic-bezier(.3,.7,.2,1),outline 0s,outline-offset 0s';
 
 /**
  * A 404 page styled like a bare server error, next to a small Stylebot panel

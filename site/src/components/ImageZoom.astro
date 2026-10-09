@@ -29,8 +29,18 @@
     return last || img.currentSrc || img.src;
   }
 
+  /**
+   * Caps the zoomed image at the file's own pixel size on this screen, so a
+   * retina display never stretches it.
+   */
+  function fit(img: HTMLImageElement) {
+    const width = Number(img.dataset.fullWidth) / devicePixelRatio;
+    zoomed.style.maxWidth = width ? `min(1400px, 100%, ${width}px)` : '';
+  }
+
   function open(img: HTMLImageElement) {
     zoomed.src = img.dataset.full || largest(img);
+    fit(img);
     zoomed.alt = img.alt;
     dialog.showModal();
   }

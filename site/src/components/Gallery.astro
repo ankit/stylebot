@@ -489,8 +489,8 @@ const sites = await Promise.all(
   }
 
   .gallery-shot:has(.gallery-open:focus-visible) {
-    outline: 2px solid var(--ink);
-    outline-offset: 3px;
+    outline: 2px solid var(--acc);
+    outline-offset: 2px;
   }
 
   .gallery-shot:hover {
@@ -554,11 +554,6 @@ const sites = await Promise.all(
       opacity 0.15s,
       transform 0.15s,
       background 0.15s;
-  }
-
-  .gallery-action:focus-visible {
-    outline: 2px solid #fff;
-    outline-offset: -2px;
   }
 
   .gallery-install {
@@ -639,11 +634,6 @@ const sites = await Promise.all(
     font: 400 13px/1.2 var(--ui);
     color: var(--muted);
     transition: color 0.15s;
-  }
-
-  .gallery-chip:focus-visible {
-    outline: 2px solid var(--ink);
-    outline-offset: 2px;
   }
 
   .gallery-chip:hover,
@@ -745,8 +735,6 @@ const sites = await Promise.all(
   }
 
   .lightbox-chip:focus-visible {
-    outline: 2px solid rgba(255, 255, 255, 0.85);
-    outline-offset: 1px;
     color: #fff;
   }
 
@@ -808,11 +796,6 @@ const sites = await Promise.all(
 
   .lightbox-source:hover {
     color: #fff;
-  }
-
-  .lightbox-source:focus-visible {
-    outline: 2px solid rgba(255, 255, 255, 0.85);
-    outline-offset: 1px;
   }
 
   .lightbox-close {

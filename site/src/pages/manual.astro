@@ -6,8 +6,8 @@ import Keys from '../components/manual/Keys.astro';
 import Shot from '../components/manual/Shot.astro';
 import Term from '../components/manual/Term.astro';
 import Terms from '../components/manual/Terms.astro';
-import agentShot from '../assets/manual/agent-chat.png';
-import agentDarkShot from '../assets/manual/agent-chat-dark.png';
+import chatShot from '../assets/manual/chat.webp';
+import chatDarkShot from '../assets/manual/chat-dark.webp';
 import basicShot from '../assets/manual/basic-editor.webp';
 import basicDarkShot from '../assets/manual/basic-editor-dark.webp';
 import popupProfilesShot from '../assets/manual/popup-profiles.png';
@@ -23,7 +23,8 @@ import { LINKS } from '../lib/links';
 const toc = [
   ['start', 'Getting started'],
   ['profiles', 'Profiles'],
-  ['agent', 'Stylebot agent'],
+  ['cli', 'Command line'],
+  ['chat', 'Chat'],
   ['presets', 'Readability and grayscale'],
   ['sync', 'Sync, backup and history'],
   ['urls', 'URL rules'],
@@ -93,15 +94,14 @@ const shortcutGroups = [
 
 <Base
   title="Manual"
-  description="How to use Stylebot: styling a site, profiles, the agent, sync, URL rules and shortcuts."
+  description="How to use Stylebot: styling a site, profiles, the command line, Chat, sync, URL rules and shortcuts."
   current="manual"
 >
   <div class="manual">
     <div class="manual-intro">
       <h1>Manual</h1>
       <p>
-        How Stylebot works, from your first style to profiles, the agent and
-        sync.
+        How Stylebot works, from your first style to profiles, Chat and sync.
       </p>
     </div>
 
@@ -128,7 +128,7 @@ const shortcutGroups = [
             element and choose <strong>Stylebot → Style Element</strong>.
           </p>
           <Shot
-            label="The Basic tab, picking a search result heading on Google"
+            label="The Basic tab, picking a link in a Wikipedia article"
             src={basicShot}
             dark={basicDarkShot}
           />
@@ -172,7 +172,7 @@ const shortcutGroups = [
             at a time, and every site starts with Default.
           </p>
           <Shot
-            label="The popup on a site with two profiles, Dracula and Gruvbox"
+            label="The popup on Hacker News with four profiles: Violet Hour, Everforest, Hearth and Newspaper"
             src={popupProfilesShot}
             dark={popupProfilesDarkShot}
           />
@@ -184,18 +184,47 @@ const shortcutGroups = [
           </p>
         </section>
 
-        <section id="agent">
-          <h2>Stylebot agent</h2>
+        <section id="cli">
+          <h2>Command line</h2>
           <p>
-            Describe the change you want in the Chat tab and the agent writes
-            the CSS, from small fixes to a whole new theme. Pick an element
-            first to point it at something, or attach a screenshot to show what
-            you mean.
+            The <code>stylebot</code> command lets a coding agent like Claude
+            Code, Codex or Cursor restyle sites right in your browser, using
+            your own subscription instead of an API key. It's the best way to
+            have an agent style a site, and you can run the commands yourself
+            too.
+          </p>
+          <Terms>
+            <Term term="Setup">
+              Install the CLI, connect it to your browsers, then turn on{' '}
+              <strong>Let apps on this computer control Stylebot</strong> in
+              Options. The <a href={LINKS.cli}>command line page</a> walks
+              through each step. Chrome and Edge only for now.
+            </Term>
+            <Term term="Claude Code">
+              Add the Stylebot plugin and ask for a change with{' '}
+              <code>/stylebot</code>, such as a dark theme for a site.
+            </Term>
+            <Term term="Privacy">
+              Command line access is off until you turn it on. Stylebot and the
+              CLI talk only to each other, on this computer; an agent sends what
+              it reads to its own provider.
+            </Term>
+          </Terms>
+        </section>
+
+        <section id="chat">
+          <h2>Chat</h2>
+          <p>
+            Chat is ideal for quick fixes. Describe the change you want in the
+            Chat tab and Stylebot writes the CSS. You can pick an element to
+            point it at something, or attach a screenshot to show what you mean.
+            For bigger changes, like a whole new theme, use the{' '}
+            <a href="#cli">command line</a>.
           </p>
           <Shot
-            label="The Chat tab after asking the agent for a calmer, Everforest-themed Google"
-            src={agentShot}
-            dark={agentDarkShot}
+            label="The Chat tab after asking for a forest theme with a readable serif font on Hacker News"
+            src={chatShot}
+            dark={chatDarkShot}
           />
           <Terms>
             <Term term="Bring your own key">
@@ -225,7 +254,7 @@ const shortcutGroups = [
             removes color from the site, at any strength.
           </p>
           <Shot
-            label="The Wikipedia article on Typography in the Readability view, Sepia theme, with Reading settings open"
+            label="The Wikipedia article on Mathematics in the Readability view, with Reading settings open"
             src={readabilityShot}
             dark={readabilityDarkShot}
           />

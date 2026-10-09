@@ -112,7 +112,10 @@ import StoreLink from '../components/StoreLink.astro';
     border: 1px solid var(--strong);
     background: var(--surface);
     color: var(--ink2);
-    transition: all 0.12s;
+    transition:
+      border-color 0.12s,
+      background 0.12s,
+      color 0.12s;
   }
 
   .gb-chip.is-on {
@@ -130,11 +133,6 @@ import StoreLink from '../components/StoreLink.astro';
     background: var(--sunken);
     color: var(--ink);
     font: 400 14px/1.5 var(--ui);
-    outline: none;
-  }
-
-  .gb-form textarea:focus {
-    border-color: var(--acc);
   }
 
   .gb-send {

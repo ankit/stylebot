@@ -3,7 +3,6 @@ import shotGithubSolarized from '../assets/gallery/github/solarized.png';
 import shotGithubTerminal from '../assets/gallery/github/terminal.png';
 import shotGithubDracula from '../assets/gallery/github/dracula.png';
 import shotGmail from '../assets/gallery/gmail/midnight.png';
-import shotGoogleEspresso from '../assets/gallery/google/espresso.png';
 import shotHnHearth from '../assets/gallery/hn/hearth.png';
 import shotHn from '../assets/gallery/hn/violet.png';
 import shotNytimesMorning from '../assets/gallery/nytimes/morning.png';
@@ -21,7 +20,6 @@ import cssNytimesMorning from '../assets/gallery/nytimes/morning.css?raw';
 import cssNytimesNight from '../assets/gallery/nytimes/night.css?raw';
 import cssHn from '../assets/gallery/hn/violet.css?raw';
 import cssHnHearth from '../assets/gallery/hn/hearth.css?raw';
-import cssGoogleEspresso from '../assets/gallery/google/espresso.css?raw';
 import cssGmail from '../assets/gallery/gmail/midnight.css?raw';
 
 export type GalleryTheme = {
@@ -133,20 +131,6 @@ export const GALLERY: GallerySite[] = [
         image: shotHnHearth,
         css: cssHnHearth,
         file: 'hn/hearth.css',
-      },
-    ],
-  },
-  {
-    id: 'google',
-    site: 'Google',
-    url: 'google.com',
-    themes: [
-      {
-        name: 'Espresso Search',
-        colors: ['#29231f', '#f0a85a'],
-        image: shotGoogleEspresso,
-        css: cssGoogleEspresso,
-        file: 'google/espresso.css',
       },
     ],
   },

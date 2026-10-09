@@ -5,6 +5,11 @@ import { crisp } from '../../lib/screenshots';
 
 type Props = { label: string; src?: ImageMetadata; dark?: ImageMetadata };
 const { label, src, dark } = Astro.props;
+
+// The manual's column width, so 2x screens don't shrink the image and blur its text.
+const COLUMN_WIDTH = 720;
+const widthOf = (image: ImageMetadata) =>
+  Math.min(image.width / 2, COLUMN_WIDTH);
 ---
 
 {src ? (
@@ -13,7 +18,7 @@ const { label, src, dark } = Astro.props;
       class:list={['shot-image', { 'is-light': dark }]}
       src={src}
       alt={label}
-      width={src.width / 2}
+      width={widthOf(src)}
       densities={[1, 2]}
       {...crisp(src)}
     />
@@ -22,7 +27,7 @@ const { label, src, dark } = Astro.props;
         class="shot-image is-dark"
         src={dark}
         alt={label}
-        width={dark.width / 2}
+        width={widthOf(dark)}
         densities={[1, 2]}
         {...crisp(dark)}
       />

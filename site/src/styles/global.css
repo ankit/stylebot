@@ -8,6 +8,10 @@ html {
   color-scheme: light;
 }
 
+html:has(dialog:modal) {
+  overflow: hidden;
+}
+
 :root[data-theme='dark'],
 :root[data-theme='stylebot'] {
   color-scheme: dark;
@@ -26,6 +30,11 @@ body {
 a {
   color: var(--acc);
   text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
 }
 
 a:hover {
@@ -357,8 +366,6 @@ a.icon-btn:hover {
 }
 
 .carousel:focus-visible {
-  outline: 2px solid var(--acc);
-  outline-offset: 6px;
   border-radius: 12px;
 }
 
