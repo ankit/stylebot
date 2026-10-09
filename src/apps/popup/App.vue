@@ -53,7 +53,6 @@
           :tab="tab"
           :initial-readability="readability"
           :shortcut="readabilityShortcut"
-          :indent="hasProfiles"
           @change="readability = $event"
         />
 

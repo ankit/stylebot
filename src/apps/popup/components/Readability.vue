@@ -1,6 +1,5 @@
 <template>
   <popup-row hover>
-    <span v-if="indent" class="check-slot" />
     <s-toggle-switch v-model="readability" track-end @change="onChange">
       <span class="readability-label">
         <s-text as="span" size="large">{{ t('readability') }}</s-text>
@@ -35,8 +34,6 @@ export default Vue.extend({
     },
 
     initialReadability: Boolean,
-    // Lines the label up with the profile names above it.
-    indent: Boolean,
     shortcut: {
       type: String,
       default: '',
@@ -74,11 +71,6 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.check-slot {
-  flex: none;
-  width: 14px;
-}
-
 .readability-label {
   display: flex;
   align-items: center;
