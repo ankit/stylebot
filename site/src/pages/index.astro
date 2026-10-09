@@ -49,17 +49,6 @@ const structuredData = {
             <StoreLink index={2} format="name" class="ink-link" />
           </span>
         </div>
-        <div class="stats">
-          <span>
-            <strong>200,000+</strong> users
-          </span>
-          <span class="sep">·</span>
-          <a href={LINKS.github}>
-            <strong>1.6k</strong> stars on GitHub
-          </a>
-          <span class="sep">·</span>
-          <span>Open source since 2011</span>
-        </div>
       </div>
     </div>
 
@@ -138,8 +127,7 @@ const structuredData = {
     gap: 16px;
   }
 
-  .cta-also,
-  .stats {
+  .cta-also {
     font: 400 13px/1.4 var(--ui);
     color: var(--muted);
   }
@@ -155,36 +143,6 @@ const structuredData = {
   .cta-also :global(.ink-link:hover) {
     color: var(--link, var(--ink));
     text-decoration-color: var(--ink);
-  }
-
-  .stats {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 6px 12px;
-    max-width: 100%;
-  }
-
-  .stats > * {
-    white-space: nowrap;
-  }
-
-  .stats strong {
-    color: var(--ink);
-    font-weight: 600;
-  }
-
-  .stats a {
-    color: var(--muted);
-  }
-
-  .stats a:hover {
-    color: var(--link, var(--ink));
-  }
-
-  .stats .sep {
-    color: var(--faint);
   }
 
   .demo-wrap {
