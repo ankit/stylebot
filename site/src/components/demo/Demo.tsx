@@ -1,4 +1,4 @@
-import { Component, createRef } from 'preact';
+import { Component, createRef, type ComponentChildren } from 'preact';
 import SbIcon from '../SbIcon';
 import { ChevronDown, Close, EyeOff } from '../icons';
 import {
@@ -41,6 +41,8 @@ type State = DemoState & {
   dark: boolean;
   mac: boolean;
   scale: number;
+  paneWidth: number;
+  fitWidth: number;
   stageHeight: number;
 };
 
@@ -48,6 +50,7 @@ type Token = { text: string; style: string };
 type Line = { style: string; toks: Token[] };
 
 const PANE_WIDTH = 980;
+const MIN_FIT_SCALE = 0.6;
 const PLAYBACK_KEYS = new Set(['cur', 'click', 'keyType', 'qType', 'profType']);
 
 const CODE_COLORS: Record<string, string> = {
@@ -107,6 +110,7 @@ const Gear = () => (
 
 type Props = {
   variant?: 'landing' | 'welcome';
+  children?: ComponentChildren;
 };
 
 /**
@@ -130,6 +134,8 @@ export default class Demo extends Component<Props, State> {
 
   paneRef = createRef<HTMLDivElement>();
   stageRef = createRef<HTMLDivElement>();
+  stepsRef = createRef<HTMLOListElement>();
+  rootRef = createRef<HTMLDivElement>();
   resizeObserver?: ResizeObserver;
   timers: ReturnType<typeof setTimeout>[] = [];
   scene = 0;
@@ -153,6 +159,8 @@ export default class Demo extends Component<Props, State> {
     dark: false,
     mac: false,
     scale: 1,
+    paneWidth: PANE_WIDTH,
+    fitWidth: 0,
     stageHeight: 0,
   };
 
@@ -160,14 +168,34 @@ export default class Demo extends Component<Props, State> {
 
   /**
    * Below the pane's natural width, the demo is laid out at a fixed width and
-   * scaled down as a whole, so the page and editor keep their proportions.
+   * scaled down as a whole, so the page and editor keep their proportions. The
+   * welcome variant also shrinks, steps and all, to keep them on the first screen,
+   * and anything passed in below the steps narrows with them.
    */
   fit = () => {
     const stage = this.stageRef.current;
     const pane = this.paneRef.current;
-    if (!stage || !pane) return;
-    const scale = Math.min(1, stage.clientWidth / PANE_WIDTH);
-    this.setState({ scale, stageHeight: pane.offsetHeight * scale });
+    const steps = this.stepsRef.current;
+    const root = this.rootRef.current;
+    if (!stage || !pane || !steps || !root) return;
+    const full = root.clientWidth;
+    let scale = Math.min(1, full / PANE_WIDTH);
+    const paneWidth = full / scale;
+    if (this.welcome) {
+      const top = stage.getBoundingClientRect().top + window.scrollY;
+      const below =
+        steps.getBoundingClientRect().bottom -
+        stage.getBoundingClientRect().bottom;
+      const room = window.innerHeight - top - below - 24;
+      scale = Math.min(scale, Math.max(MIN_FIT_SCALE, room / pane.offsetHeight));
+    }
+    const width = paneWidth * scale;
+    this.setState({
+      scale,
+      paneWidth,
+      fitWidth: width < full - 1 ? width : 0,
+      stageHeight: pane.offsetHeight * scale,
+    });
   };
 
   componentDidMount() {
@@ -176,8 +204,9 @@ export default class Demo extends Component<Props, State> {
     window.addEventListener('themechange', this.onTheme);
     this.fit();
     this.resizeObserver = new ResizeObserver(this.fit);
-    if (this.stageRef.current)
-      this.resizeObserver.observe(this.stageRef.current);
+    if (this.rootRef.current)
+      this.resizeObserver.observe(this.rootRef.current);
+    if (this.welcome) window.addEventListener('resize', this.fit);
     const pane = this.paneRef.current;
     if (pane) {
       this.setState({
@@ -195,6 +224,7 @@ export default class Demo extends Component<Props, State> {
     this.clear();
     window.removeEventListener('themechange', this.onTheme);
     this.resizeObserver?.disconnect();
+    window.removeEventListener('resize', this.fit);
   }
 
   clear() {
@@ -639,14 +669,17 @@ export default class Demo extends Component<Props, State> {
       <div
         ref={this.stageRef}
         class="demo-stage"
-        style={S.scale < 1 ? `height:${S.stageHeight}px` : ''}
+        style={
+          (S.scale < 1 ? `height:${S.stageHeight}px;` : '') +
+          (S.fitWidth ? `width:${S.fitWidth}px;align-self:center` : '')
+        }
       >
         <div
           ref={this.paneRef}
           class="demo-pane"
           style={
             S.scale < 1
-              ? `width:${PANE_WIDTH}px;transform:scale(${S.scale})`
+              ? `width:${S.paneWidth}px;transform:scale(${S.scale})`
               : ''
           }
         >
@@ -1468,9 +1501,17 @@ export default class Demo extends Component<Props, State> {
     );
 
     return (
-      <>
+      <div ref={this.rootRef} class="demo">
         {stage}
-        <ol class="demo-steps">
+        <ol
+          ref={this.stepsRef}
+          class="demo-steps"
+          style={
+            S.fitWidth
+              ? `width:${S.fitWidth}px;align-self:center;grid-template-columns:repeat(${steps.length},minmax(0,1fr))`
+              : ''
+          }
+        >
           {steps.map((s, i) => (
             <li key={s.title} class="demo-step" onClick={() => this.jump(i)}>
               <div
@@ -1489,7 +1530,14 @@ export default class Demo extends Component<Props, State> {
             </li>
           ))}
         </ol>
-      </>
+        {this.props.children && (
+          <div
+            style={S.fitWidth ? `width:${S.fitWidth}px;align-self:center` : ''}
+          >
+            {this.props.children}
+          </div>
+        )}
+      </div>
     );
   }
 

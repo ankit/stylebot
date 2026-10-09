@@ -70,7 +70,8 @@ const { lines, copy = true, boxed = false, class: className } = Astro.props;
     min-width: 0;
     padding: 5px 5px 5px 12px;
     border-radius: 8px;
-    background: var(--fill);
+    border: 1px solid var(--border);
+    background: var(--surface);
     font: 400 13px/1.4 var(--mono);
     color: var(--ink);
   }
@@ -78,8 +79,6 @@ const { lines, copy = true, boxed = false, class: className } = Astro.props;
   .cli-cmd.is-boxed {
     padding: 6px 6px 6px 14px;
     border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--surface);
     font-size: 14px;
   }
 
@@ -121,7 +120,7 @@ const { lines, copy = true, boxed = false, class: className } = Astro.props;
 
   .cli-cmd-copy:hover {
     border-color: var(--strong);
-    background: var(--surface);
+    background: var(--hover);
     color: var(--ink);
   }
 

@@ -12,7 +12,7 @@ import { LINKS } from '../lib/links';
       <h1>Privacy</h1>
       <p>
         Stylebot has no server, no account and no analytics. Your styles stay in
-        your browser unless you turn on sync, the agent or the command line, and then
+        your browser unless you turn on sync, chat or the command line, and then
         they go straight to a service you chose or an app you allowed.
       </p>
       <p class="updated">Last updated October 8, 2026</p>
@@ -21,31 +21,22 @@ import { LINKS } from '../lib/links';
     <section>
       <h2>What stays in your browser</h2>
       <p>
-        Your styles, profiles, settings, version history, chat conversations
-        and API keys are saved in your browser's extension storage on this
-        computer. Uninstalling Stylebot removes them.
-      </p>
-      <p>
-        Stylebot can read and change the pages you visit, since that's how it
-        applies your styles. What it reads there is used to style the page, and
-        isn't sent anywhere unless you use the agent or the command line.
+        Your styles, profiles, settings, history, chat conversations and API
+        keys are saved in your browser's extension storage, and uninstalling
+        Stylebot removes them. Stylebot reads the pages you visit to style
+        them, and sends nothing from them unless you use chat or the command
+        line.
       </p>
     </section>
 
     <section>
       <h2>Google Drive sync</h2>
       <p>
-        Sync is off until you connect Google Drive in Options. Your styles,
-        including profiles, are then saved to a file in your own Google Drive.
-        Stylebot asks only for access to the files it creates, so it can't see
-        anything else in your Drive.
-      </p>
-      <p>
-        The access token Google issues is kept in your browser and expires
-        after an hour. Disconnect in Options, or remove Stylebot's access in
-        your <a href="https://myaccount.google.com/connections">Google account</a>.
-        Google's <a href="https://policies.google.com/privacy">privacy policy</a>{' '}
-        applies to what's stored in your Drive.
+        When you connect Google Drive in Options, your styles are saved to a
+        file in your own Drive. Stylebot can only see the files it creates. Its
+        access token stays in your browser and expires after an hour.
+        Disconnect in Options or in your{' '}
+        <a href="https://myaccount.google.com/connections">Google account</a>.
       </p>
       <p>
         Stylebot's use of information received from Google APIs adheres to the{' '}
@@ -57,20 +48,16 @@ import { LINKS } from '../lib/links';
     </section>
 
     <section>
-      <h2>Stylebot agent</h2>
+      <h2>Chat</h2>
       <p>
-        The agent is off until you add an API key. When you send a message, your
-        browser sends it straight to the provider you picked, with your key.
-        The request includes your message, any screenshot you attach, the page's
-        address and title, an outline of the text and elements visible on the
-        page, and the site's CSS and your Stylebot styles for it.
-      </p>
-      <p>
-        Page text can include personal information, such as your name or
-        messages on the page. Don't use the agent on pages you wouldn't share
-        with the provider. Their policy covers what happens next:{' '}
+        When you add an API key and send a message, your browser sends it
+        straight to that provider with your message, any screenshot you
+        attach, the page's address and title, an outline of what's visible on
+        the page, and its CSS and your styles. That can include personal
+        information shown on the page, so don't use chat on pages you wouldn't
+        share with the provider. Their policy applies:{' '}
         <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>,{' '}
-        <a href="https://openai.com/policies/privacy-policy/">OpenAI</a> and{' '}
+        <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>,{' '}
         <a href="https://ai.google.dev/gemini-api/terms">Google</a>.
       </p>
     </section>
@@ -78,49 +65,39 @@ import { LINKS } from '../lib/links';
     <section>
       <h2>Command line</h2>
       <p>
-        The command line is off until you turn on{' '}
-        <q>Let apps on this computer control Stylebot</q> in Options. Stylebot
-        then connects to a small program on your computer, and any app running
-        as you can use it to list your tabs, read and inspect pages, take
-        screenshots, and read and change your styles and profiles. It talks
-        through a local socket only you can read, and Stylebot sends nothing
-        to a server of its own.
-      </p>
-      <p>
-        What an app does with that is up to the app. Page outlines, screenshots
-        and styles it reads can reach whatever service it uses, such as the
-        model behind a coding agent, under that service's policy. Turn the
-        setting off in Options to disconnect.
+        When you turn on{' '}
+        <q>Let apps on this computer control Stylebot</q> in Options, apps
+        running as you can list your tabs, read pages, take screenshots, and
+        read and change your styles, through a local connection only you can
+        use. What they read can reach the services they use, such as the model
+        behind a coding agent. Turn the setting off to disconnect.
       </p>
     </section>
 
     <section>
       <h2>Fonts and imported CSS</h2>
       <p>
-        When a style uses a Google Font, it's downloaded from Google Fonts, which
-        sees your IP address as with any web font. When a style uses{' '}
-        <code>@import</code>, Stylebot fetches that stylesheet from its address.
+        Google Fonts in your styles are downloaded from Google, which sees your
+        IP address. Stylesheets you <code>@import</code> are fetched from their
+        address.
       </p>
     </section>
 
     <section>
       <h2>This website</h2>
       <p>
-        stylebot.dev has no ads or cookies, and is hosted on GitHub Pages,
-        which keeps standard server logs. It counts visits with Plausible,
-        which records the page, referrer, country and device type without
-        cookies or anything that identifies you. Your theme choice is saved in
-        your browser. The feedback form on the uninstall page opens your email
-        app, and nothing is sent unless you send that email.
+        stylebot.dev has no ads or cookies and is hosted on GitHub Pages, which
+        keeps standard server logs. Plausible counts visits by page, referrer,
+        country and device type, without cookies or anything that identifies
+        you.
       </p>
     </section>
 
     <section>
       <h2>Sharing</h2>
       <p>
-        Stylebot doesn't collect, sell or share your data. Data only leaves your
-        browser for the services above, when you use the features that need
-        them.
+        Stylebot doesn't collect, sell or share your data. It only leaves your
+        browser for the services above, when you use them.
       </p>
     </section>
 

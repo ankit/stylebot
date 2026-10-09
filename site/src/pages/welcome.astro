@@ -16,19 +16,35 @@ import Keys from '../components/manual/Keys.astro';
       <p>Here's how it works, start to finish, in about a minute.</p>
     </div>
     <div class="demo-wrap">
-      <Demo client:load variant="welcome" />
-      <div class="your-turn">
-        <div class="your-turn-text">
-          <strong>Your turn.</strong>
-          <span>
-            Open any site and press the shortcut. Nothing changes until you do.
-          </span>
+      <Demo client:load variant="welcome">
+        <div class="your-turn">
+          <div class="your-turn-row">
+            <div class="your-turn-text">
+              <strong>Your turn.</strong>
+              <span>
+                Open any site and press the shortcut. Nothing changes until you
+                do.
+              </span>
+            </div>
+            <Keys keys={['alt', 'shift', 'M']} />
+            <a href="/manual" class="your-turn-link">
+              Manual<span>›</span>
+            </a>
+          </div>
+          <div class="your-turn-row your-turn-cli">
+            <div class="your-turn-text">
+              <strong>Or let your agent do it.</strong>
+              <span>
+                Claude Code, Codex or Cursor can restyle sites in your browser
+                through Stylebot's command line.
+              </span>
+            </div>
+            <a href="/cli" class="your-turn-link">
+              Command line<span>›</span>
+            </a>
+          </div>
         </div>
-        <Keys keys={['alt', 'shift', 'M']} />
-        <a href="/manual" class="your-turn-link">
-          Manual<span>›</span>
-        </a>
-      </div>
+      </Demo>
     </div>
   </main>
 </Base>
@@ -37,7 +53,7 @@ import Keys from '../components/manual/Keys.astro';
   .hero {
     max-width: 760px;
     margin: 0 auto;
-    padding: 88px 24px 44px;
+    padding: 56px 24px 36px;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -71,14 +87,23 @@ import Keys from '../components/manual/Keys.astro';
 
   .your-turn {
     margin-top: 20px;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 14px 24px;
     padding: 18px 22px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
+  }
+
+  .your-turn-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 24px;
+  }
+
+  .your-turn-cli {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
   }
 
   .your-turn-text {
@@ -137,10 +162,6 @@ import Keys from '../components/manual/Keys.astro';
   }
 
   @media (max-width: 600px) {
-    .hero {
-      padding-top: 56px;
-    }
-
     .demo-wrap {
       padding-bottom: 64px;
     }

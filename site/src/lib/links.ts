@@ -23,7 +23,6 @@ export const LINKS = {
   changelog: 'https://github.com/ankit/stylebot/blob/v4/CHANGELOG.md',
   donate: 'https://ko-fi.com/stylebot',
   manual: '/manual',
-  privacy: '/privacy',
   author: 'https://ankitahuja.com',
   feedbackEmail: 'stylebot+ahuja.ankit@gmail.com',
   cli: '/cli',
