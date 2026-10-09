@@ -2,6 +2,7 @@
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { STORAGE_KEY, THEME_KEYS, themeStylesheet } from '../lib/themes';
+import { SITE_DESCRIPTION } from '../lib/site';
 import '../styles/global.css';
 
 type Props = {
@@ -11,15 +12,17 @@ type Props = {
   current?: 'manual';
   storeCta?: boolean;
   install?: boolean;
+  noindex?: boolean;
 };
 
 const {
   title,
-  description = 'Point at something on a page and change it, or describe what you want. Stylebot writes the CSS. Free and open source for Chrome, Firefox and Edge.',
+  description = SITE_DESCRIPTION,
   footer = true,
   current,
   storeCta,
   install,
+  noindex,
 } = Astro.props;
 
 const fullTitle = title
@@ -36,6 +39,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
     <meta name="theme-color" content="#f7f8fa" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta property="og:type" content="website" />
@@ -47,6 +51,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta name="twitter:site" content="@stylebot" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
+    <slot name="head" />
     <script is:inline define:vars={{ STORAGE_KEY, THEME_KEYS }}>
       try {
         var saved = localStorage.getItem(STORAGE_KEY);

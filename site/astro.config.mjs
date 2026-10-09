@@ -14,5 +14,5 @@ export default defineConfig({
       filter: (page) => !UNLISTED.includes(new URL(page).pathname),
     }),
   ],
-  redirects: { '/help': '/manual' },
+  redirects: { '/help': '/manual/' },
 });

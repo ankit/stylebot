@@ -8,10 +8,31 @@ import CliSection from '../components/cli/CliSection.astro';
 import Quotes from '../components/Quotes.astro';
 import Footer from '../components/Footer.astro';
 import StoreLink from '../components/StoreLink.astro';
-import { CLI_PACKAGE, LINKS } from '../lib/links';
+import { CLI_PACKAGE, LINKS, STORES } from '../lib/links';
+import { SITE_DESCRIPTION } from '../lib/site';
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: 'Stylebot',
+  url: Astro.site?.href,
+  description: SITE_DESCRIPTION,
+  applicationCategory: 'BrowserApplication',
+  operatingSystem: 'Chrome, Firefox, Edge',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  downloadUrl: Object.values(STORES).map((store) => store.href),
+  sameAs: [LINKS.github, ...Object.values(STORES).map((store) => store.href)],
+  author: { '@type': 'Person', name: 'Ankit Ahuja', url: LINKS.author },
+};
 ---
 
 <Base footer={false} storeCta>
+  <script
+    slot="head"
+    type="application/ld+json"
+    is:inline
+    set:html={JSON.stringify(structuredData)}
+  />
   <main>
     <div class="hero">
       <h1>Restyle any website.</h1>
