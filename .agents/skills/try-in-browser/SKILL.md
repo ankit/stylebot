@@ -1,9 +1,9 @@
 ---
-name: validate-stylebot
+name: try-in-browser
 description: Launch Stylebot in a real, headed Chrome window (via `yarn dev:chrome`) so the user can manually eyeball a change — in whatever checkout the current session is in, worktree or main. Use when the user wants to "try this out", "see it in the browser", "manually test/validate", "load the extension so I can look at it", or "smoke test this change" themselves, as opposed to running the automated e2e suite.
 ---
 
-# Validate Stylebot manually
+# Try Stylebot in the browser
 
 Stylebot's AGENTS.md defaults to Playwright e2e for verifying changes — use that
 (`yarn e2e`) when the goal is confirming correctness. Reach for this skill instead
