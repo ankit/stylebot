@@ -23,6 +23,8 @@ export {
   getExtensionVersion,
   getReleaseVersion,
   getReleaseNotificationId,
+  getReleaseUrl,
+  isMajorUpdate,
 } from './release';
 export {
   openOptionsPage,

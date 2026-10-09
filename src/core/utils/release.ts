@@ -9,3 +9,25 @@ export const getReleaseVersion = (): string =>
 
 export const getReleaseNotificationId = (): NotificationId =>
   `release/${getReleaseVersion()}`;
+
+export const getReleaseUrl = (): string =>
+  `https://stylebot.dev/releases/${getReleaseVersion()}`;
+
+const getMajorVersion = (version?: string): number | undefined => {
+  const match = /^(\d+)(\.\d+)*$/.exec(version?.trim() ?? '');
+  return match ? Number(match[1]) : undefined;
+};
+
+/**
+ * Whether going from previousVersion to currentVersion crosses into a new
+ * major version. A missing or unparseable version never counts as one.
+ */
+export const isMajorUpdate = (
+  previousVersion: string | undefined,
+  currentVersion: string
+): boolean => {
+  const previous = getMajorVersion(previousVersion);
+  const current = getMajorVersion(currentVersion);
+
+  return previous !== undefined && current !== undefined && current > previous;
+};

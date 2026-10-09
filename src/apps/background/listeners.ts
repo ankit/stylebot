@@ -75,7 +75,10 @@ import type {
 
 import {
   setNotification,
+  getExtensionVersion,
   getReleaseNotificationId,
+  getReleaseUrl,
+  isMajorUpdate,
   recordInstallTime,
 } from '@stylebot/utils';
 
@@ -84,26 +87,34 @@ import {
  * synchronously when the service worker starts, for Chrome to wake it for them.
  */
 export const initListeners = (): void => {
-  // Set up side panels and open the welcome page on install; clean up retired options on update.
-  chrome.runtime.onInstalled.addListener(async ({ reason }) => {
-    configureSidePanelTabs();
+  // Set up side panels and open the welcome page on install; clean up retired
+  // options on update, and show what's new after a major update.
+  chrome.runtime.onInstalled.addListener(
+    async ({ reason, previousVersion }) => {
+      configureSidePanelTabs();
 
-    if (reason === 'install' || reason === 'update') {
-      recordInstallTime();
+      if (reason === 'install' || reason === 'update') {
+        recordInstallTime();
+      }
+
+      if (reason === 'install') {
+        chrome.tabs.create({
+          url: 'https://stylebot.dev/welcome',
+        });
+
+        setNotification(getReleaseNotificationId(), true);
+      }
+
+      if (reason === 'update') {
+        pruneRetired();
+
+        if (isMajorUpdate(previousVersion, getExtensionVersion())) {
+          chrome.tabs.create({ url: getReleaseUrl(), active: false });
+          setNotification(getReleaseNotificationId(), true);
+        }
+      }
     }
-
-    if (reason === 'install') {
-      chrome.tabs.create({
-        url: 'https://stylebot.dev/welcome',
-      });
-
-      setNotification(getReleaseNotificationId(), true);
-    }
-
-    if (reason === 'update') {
-      pruneRetired();
-    }
-  });
+  );
 
   chrome.commands.onCommand.addListener(handleCommand);
   initSidePanelTabs();

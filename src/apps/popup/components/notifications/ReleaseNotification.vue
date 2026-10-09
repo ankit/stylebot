@@ -32,6 +32,7 @@ import {
   setNotification,
   getReleaseVersion,
   getReleaseNotificationId,
+  getReleaseUrl,
 } from '@stylebot/utils';
 
 import { onEnterOrSpace } from '../../utils';
@@ -64,7 +65,7 @@ export default Vue.extend({
   methods: {
     open(): void {
       chrome.tabs.create({
-        url: `https://stylebot.dev/releases/${this.version}`,
+        url: getReleaseUrl(),
       });
 
       window.close();
