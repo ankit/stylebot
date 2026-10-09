@@ -12,6 +12,7 @@ const oneLine = selector => selector.replace(/\s*\n\s*/g, ' ');
 const describeSave = ({
   url,
   deleted,
+  notInUse,
   fonts,
   swappedSelectors,
   checkedTab,
@@ -35,6 +36,13 @@ const describeSave = ({
         ({ from, to }) => `- ${oneLine(from)} → ${oneLine(to)}`
       )
     );
+  }
+
+  if (notInUse) {
+    lines.push(
+      `Not checked: ${notInUse} isn't the profile in use, so the page doesn't show it. \`stylebot profile use\` switches to it.`
+    );
+    return lines.join('\n');
   }
 
   if (check === null) {

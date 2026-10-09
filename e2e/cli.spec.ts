@@ -340,6 +340,22 @@ test('profiles switch which css the page gets', async () => {
 
   await ok(['profile', 'use', 'Default', 'localhost']);
   await expect(page.locator('h1')).toHaveCSS('color', PINK);
+
+  fs.writeFileSync(file, `h1 { color: ${BLACK}; }`);
+  const report = await ok([
+    'css',
+    'set',
+    'localhost',
+    '--file',
+    file,
+    '--profile',
+    'Dark',
+  ]);
+  expect(report).toContain("Not checked: Dark isn't the profile in use");
+  await expect(page.locator('h1')).toHaveCSS('color', PINK);
+  expect(await ok(['css', 'get', 'localhost', '--profile', 'Dark'])).toContain(
+    `color: ${BLACK}`
+  );
 });
 
 test("screenshot saves a png, and done closes the CLI's window", async () => {

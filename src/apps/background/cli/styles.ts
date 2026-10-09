@@ -157,6 +157,7 @@ export const styleCommands: CliCommands = {
     return {
       url,
       deleted: false,
+      notInUse: id === active ? null : String(profile),
       fonts,
       swappedSelectors,
       checkedTab: report ? tabId : null,

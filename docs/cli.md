@@ -123,7 +123,7 @@ yarn stylebot css set news.ycombinator.com < hn.css
 - `css get` prints a style's css.
 - `css set` saves css from stdin or `--file` and applies it to open tabs right away. Empty css deletes the style.
   - It refuses css that doesn't parse, saying at which line, and adds Google Fonts imports for the families the css names, as Chat does. It also saves a selector's partly generated class names by their stable part, as Chat does, and says which it changed.
-  - When the profile it saves is the one in use and an open tab shows the site (the tab named, else an active one), it checks the page and reports back as Chat's model is told after each edit: how many elements each selector matched, text the change made hard to read, and surfaces a theme change missed. It also flags selectors still built on class names the site generates, which have no stable part. With no such tab, it says the style wasn't checked.
+  - When the profile it saves is the one in use and an open tab shows the site (the tab named, else an active one), it checks the page and reports back as Chat's model is told after each edit: how many elements each selector matched, text the change made hard to read, and surfaces a theme change missed. It also flags selectors still built on class names the site generates, which have no stable part. With no such tab, or when the profile isn't in use, it says the style wasn't checked and why.
 
 ### Profiles
 
@@ -134,7 +134,7 @@ yarn stylebot css set news.ycombinator.com --profile Dark < dark.css
 
 - `profiles` lists a style's profiles, starring the one in use.
 - `profile create`, `use`, `rename` and `delete` manage them.
-- `css get` and `css set` take `--profile` for a profile that isn't in use.
+- `css get` and `css set` take `--profile` to name the profile rather than use the active one. The `/stylebot` skill always passes it, so a profile switch mid-session can't send its css into your own style.
 
 ### Output
 
@@ -162,7 +162,7 @@ claude plugin install stylebot@stylebot
 
 Then ask for a look, such as "give Hacker News a dark theme", and Claude picks the plugin up on its own; or run `/stylebot <site> <what to change>`. Without saying what to change, it offers the suggestions Chat shows for the page. The skill holds the styling guidance, adapted from Chat's.
 
-It runs without permission prompts: the skill pre-approves `stylebot` commands and reading and writing files in `~/.stylebot/work/`, where it keeps its CSS and screenshots. Its changes go into a new profile named after the look, such as "Claude: Dark", so switching back to your own style is one profile change.
+It runs without permission prompts: the skill pre-approves `stylebot` commands and reading and writing files in `~/.stylebot/work/`, where it keeps its CSS and screenshots. When you name a profile, it updates that one; otherwise its changes go into a new profile named after the look, such as "Claude: Dark", so switching back to your own style is one profile change.
 
 ## A second browser
 
