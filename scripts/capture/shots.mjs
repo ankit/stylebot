@@ -28,7 +28,7 @@ const THEMES_DIR = path.join(
 export const theme = name =>
   fs.readFileSync(path.join(THEMES_DIR, `${name}.css`), 'utf8');
 
-const gallery = (site, name) =>
+export const gallery = (site, name) =>
   fs.readFileSync(
     path.join(rootDir, 'site/src/assets/gallery', site, `${name}.css`),
     'utf8'
@@ -40,10 +40,10 @@ const GITHUB_WIDTH = 1012;
 
 const hackerNews = active => {
   const list = [
-    { name: 'Night Shift', css: theme('hn-night-shift') },
+    { name: 'Night Shift', css: gallery('hn', 'night-shift') },
     { name: 'Modern', css: theme('hn-modern') },
-    { name: 'Newspaper', css: theme('hn-newspaper') },
-    { name: 'Newspaper Dark', css: theme('hn-newspaper-dark') },
+    { name: 'Newspaper', css: gallery('hn', 'newspaper') },
+    { name: 'Newspaper Dark', css: gallery('hn', 'newspaper-dark') },
   ];
   const index = list.findIndex(({ name }) => name === active);
   return {
@@ -149,7 +149,7 @@ export const SHOTS = [
     appearance: 'light',
     // Runs its own browser, set up for the CLI.
     standalone: true,
-    run: file => captureCli(file, theme('hn-newspaper')),
+    run: file => captureCli(file, gallery('hn', 'newspaper')),
   },
   {
     name: '4-profiles',

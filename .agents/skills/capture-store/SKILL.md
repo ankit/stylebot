@@ -41,11 +41,12 @@ Send the user the images in order, then commit them once they're happy.
 
 ## Changing a shot
 
-Each shot is an entry in `scripts/capture-store/shots.mjs`: the site, the theme it's seeded
-with, and what's opened or hovered. Gallery themes come from `site/src/assets/gallery/`;
-the Hacker News profiles are the user's own, kept in `scripts/capture-store/themes/`. When
-the user updates one in their browser, refresh its copy with
-`yarn stylebot css get news.ycombinator.com --profile "<name>"`.
+Each shot is an entry in `scripts/capture/shots.mjs`: the site, the theme it's seeded
+with, and what's opened or hovered. Gallery themes come from `site/src/assets/gallery/`,
+including the Hacker News profiles the gallery also lists; Modern, which it doesn't, is kept
+in `scripts/capture/themes/`. When the user updates one in their browser, refresh its
+copy with `yarn stylebot css get news.ycombinator.com --profile "<name>"`, keeping the
+gallery file's `/* Site: Name */` first line, then retake the shots and, with the `capture-gallery` skill, the gallery image.
 
 Choosing what to show:
 
@@ -55,3 +56,4 @@ Choosing what to show:
   NYTimes block it; Gmail needs a sign-in.
 - **Keep Chat honest**: the shot shows its suggestions, never a reply, since a reply needs a
   real API key. The key the script seeds is a placeholder that is never sent anywhere.
+

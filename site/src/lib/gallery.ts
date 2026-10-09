@@ -3,8 +3,9 @@ import shotGithubSolarized from '../assets/gallery/github/solarized.png';
 import shotGithubTerminal from '../assets/gallery/github/terminal.png';
 import shotGithubDracula from '../assets/gallery/github/dracula.png';
 import shotGmail from '../assets/gallery/gmail/midnight.png';
-import shotHnHearth from '../assets/gallery/hn/hearth.png';
-import shotHn from '../assets/gallery/hn/violet.png';
+import shotHnNewspaper from '../assets/gallery/hn/newspaper.png';
+import shotHnNewspaperDark from '../assets/gallery/hn/newspaper-dark.png';
+import shotHnNightShift from '../assets/gallery/hn/night-shift.png';
 import shotNytimesMorning from '../assets/gallery/nytimes/morning.png';
 import shotNytimesNight from '../assets/gallery/nytimes/night.png';
 import shotNytimes from '../assets/gallery/nytimes/midnight.png';
@@ -18,8 +19,9 @@ import cssGithubTerminal from '../assets/gallery/github/terminal.css?raw';
 import cssNytimes from '../assets/gallery/nytimes/midnight.css?raw';
 import cssNytimesMorning from '../assets/gallery/nytimes/morning.css?raw';
 import cssNytimesNight from '../assets/gallery/nytimes/night.css?raw';
-import cssHn from '../assets/gallery/hn/violet.css?raw';
-import cssHnHearth from '../assets/gallery/hn/hearth.css?raw';
+import cssHnNewspaper from '../assets/gallery/hn/newspaper.css?raw';
+import cssHnNewspaperDark from '../assets/gallery/hn/newspaper-dark.css?raw';
+import cssHnNightShift from '../assets/gallery/hn/night-shift.css?raw';
 import cssGmail from '../assets/gallery/gmail/midnight.css?raw';
 
 export type GalleryTheme = {
@@ -122,18 +124,25 @@ export const GALLERY: GallerySite[] = [
     url: 'news.ycombinator.com',
     themes: [
       {
-        name: 'Violet Hour',
-        colors: ['#282a36', '#bd93f9'],
-        image: shotHn,
-        css: cssHn,
-        file: 'hn/violet.css',
+        name: 'Newspaper',
+        colors: ['#e9e6df', '#3a3f4b'],
+        image: shotHnNewspaper,
+        css: cssHnNewspaper,
+        file: 'hn/newspaper.css',
       },
       {
-        name: 'Hacker Hearth',
-        colors: ['#fdf1e1', '#d9773b'],
-        image: shotHnHearth,
-        css: cssHnHearth,
-        file: 'hn/hearth.css',
+        name: 'Newspaper Dark',
+        colors: ['#171d2b', '#9b8f6e'],
+        image: shotHnNewspaperDark,
+        css: cssHnNewspaperDark,
+        file: 'hn/newspaper-dark.css',
+      },
+      {
+        name: 'Night Shift',
+        colors: ['#282a36', '#bd93f9'],
+        image: shotHnNightShift,
+        css: cssHnNightShift,
+        file: 'hn/night-shift.css',
       },
     ],
   },
