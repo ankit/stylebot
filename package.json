@@ -42,6 +42,7 @@
     "test:coverage": "jest --coverage",
     "test:storybook": "node scripts/storybook-test.mjs",
     "e2e": "node scripts/e2e.mjs",
+    "capture:store": "node scripts/capture-store/index.mjs",
     "storybook": "storybook dev -p 6006 --no-open",
     "eval:chat": "node evals/chat/run.mjs",
     "build-storybook": "storybook build --quiet",

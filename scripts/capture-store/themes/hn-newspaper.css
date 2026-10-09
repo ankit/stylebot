@@ -1,0 +1,287 @@
+@import url(https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+@import url(https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+@import url(https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  background: #e9e6df;
+  color: #3a3f4b;
+}
+
+body,
+td,
+input,
+textarea {
+  font-family: 'Old Standard TT';
+}
+
+center {
+  color: #3a3f4b;
+}
+
+/* The broadsheet */
+table#hnmain {
+  background: #f4f1ea;
+  color: #3a3f4b;
+  width: 860px;
+  max-width: 96%;
+  margin: 24px auto;
+  padding: 18px 28px 24px;
+  border: 1px solid #dcd7cc;
+  box-shadow: 0 2px 14px rgba(40, 50, 70, 0.1);
+}
+
+#hnmain tbody,
+#hnmain tr,
+#hnmain td {
+  background: transparent;
+  color: #3a3f4b;
+}
+
+/* Masthead */
+#hnmain td[bgcolor='#ff6600'] {
+  background: transparent;
+  border-top: 1px solid #c9bd9a;
+  border-bottom: 4px double #c9bd9a;
+  padding: 6px 0 4px;
+}
+
+#hnmain td[bgcolor='#ff6600'] img {
+  display: none;
+}
+
+.pagetop {
+  color: #626879;
+  font-family: 'Old Standard TT';
+  font-size: 13px;
+  font-variant: small-caps;
+  letter-spacing: 0.06em;
+}
+
+td:has(> .pagetop > .hnname) {
+  text-align: center;
+}
+
+.pagetop a,
+.pagetop a:visited {
+  color: #3a3f4b;
+}
+
+.hnname {
+  display: block;
+  text-align: center;
+  margin: 2px 0 6px;
+}
+
+.hnname a,
+.hnname a:visited {
+  font-family: 'Playfair Display';
+  font-size: 60px;
+  font-weight: 900;
+  font-style: italic;
+  font-variant: normal;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  color: #2e3442;
+}
+
+.hnname::before {
+  content: 'Vol. XIX · Est. 2007 · San Francisco, California · Written in Arc';
+  display: block;
+  font-family: 'Old Standard TT';
+  font-style: italic;
+  font-size: 12px;
+  font-weight: normal;
+  letter-spacing: 0.04em;
+  color: #626879;
+  border-bottom: 1px solid #c9bd9a;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+}
+
+/* Stories */
+#bigbox > td {
+  padding-top: 10px;
+}
+
+.rank {
+  color: #626879;
+  font-family: 'Playfair Display';
+  font-style: italic;
+  font-size: 15px;
+  position: relative;
+  top: 3px;
+}
+
+.votearrow {
+  filter: grayscale(1) brightness(0.5);
+  margin: 9px 7px 6px 4px;
+}
+
+.titleline {
+  color: #3a3f4b;
+}
+
+.titleline > a,
+.titleline > a:visited {
+  font-family: 'Playfair Display';
+  font-weight: 700;
+  font-size: 19px;
+  line-height: 1.25;
+  color: #474d5b;
+}
+
+.titleline > a:visited {
+  color: #8a8f9c;
+}
+
+.titleline > a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+}
+
+.sitebit,
+.sitebit a,
+.sitestr {
+  font-family: 'Old Standard TT';
+  font-style: italic;
+  font-size: 12px;
+  color: #626879;
+}
+
+.subtext,
+.subline {
+  font-family: 'Old Standard TT';
+  font-size: 12px;
+  color: #626879;
+}
+
+.subtext {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e2ddd2;
+}
+
+.subtext a,
+.subtext a:visited,
+.score {
+  font-family: 'Old Standard TT';
+  color: #4f5565;
+}
+
+.score {
+  font-size: 12px;
+  font-variant: small-caps;
+  font-weight: 700;
+}
+
+.hnuser {
+  font-style: italic;
+}
+
+tr.spacer {
+  height: 10px;
+}
+
+a.morelink {
+  font-family: 'Playfair Display';
+  font-style: italic;
+  font-size: 16px;
+  color: #3a3f4b;
+}
+
+/* Footer */
+#hnmain tr:last-child td[bgcolor='#ff6600'] {
+  border-top: 4px double #b3a888;
+  border-bottom: none;
+  padding: 0;
+}
+
+.yclinks,
+.yclinks a {
+  font-family: 'Old Standard TT';
+  font-variant: small-caps;
+  font-size: 13px;
+  color: #4f5565;
+}
+
+#hnmain center > a,
+#hnmain center > a u {
+  color: #4f5565;
+}
+
+#hnmain input,
+#hnmain textarea {
+  background: #faf8f3;
+  color: #3a3f4b;
+  border: 1px solid #c9bd9a;
+}
+
+/* Comments and item pages */
+.fatitem .titleline > a {
+  font-size: 30px;
+}
+
+.commtext,
+.commtext a,
+.toptext {
+  font-family: 'Libre Caslon Text';
+  font-size: 14px;
+  line-height: 1.55;
+  color: #3a3f4b;
+}
+
+.commtext.cdd,
+.c5a,
+.c73,
+.c82,
+.c88,
+.c9c,
+.cae,
+.cbe,
+.cce,
+.cdd {
+  color: #626879;
+}
+
+.reply u {
+  text-decoration: none;
+}
+
+.reply a,
+.reply a:visited {
+  font-family: 'Old Standard TT';
+  font-size: 12px;
+  font-variant: small-caps;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  color: #626879;
+}
+
+.reply a:hover {
+  text-decoration: underline;
+}
+
+.comment-tree .comhead {
+  font-size: 13px;
+}
+
+.fatitem .votearrow {
+  margin: 16px 7px 6px 4px;
+}
+
+.comment-tree .votearrow {
+  margin: 5px 7px 6px 4px;
+}
+
+.comhead,
+.comhead a {
+  font-family: 'Old Standard TT';
+  font-style: italic;
+  color: #626879;
+}

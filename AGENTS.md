@@ -17,7 +17,7 @@ Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of
 - `e2e/` — Playwright end-to-end tests, driven against a real built extension: via CDP (`Extensions.loadUnpacked`) on Chrome/Edge, via Firefox's remote debugging protocol on Firefox; engine-specific code lives in `e2e/chromium/` and `e2e/firefox/` behind the `e2e/engine.ts` contract
 - `jest/` — Jest setup and the stylesheet stub
 - `dist/` — Chrome/Edge build output; `firefox-dist/` — Firefox build output; `preview-dist/` — `yarn build:preview` output
-- `store/` — store listing art (promo tiles, screenshots) per store; not part of the build
+- `store/` — store listing art (promo tiles, screenshots) per store; not part of the build. `yarn capture:store` retakes the screenshots
 - `site/` — stylebot.dev static site
 - `docs/` — developer docs: setup, releases, translation, e2e, architecture (editor, selectors and CSS, readability, profiles, sync, chat)
 - `patches/` — patch-package patches applied to dependencies on install
@@ -40,6 +40,7 @@ session is already inside a worktree.
 - `yarn test` — Jest unit tests
 - `yarn e2e` — builds the extension then runs the Playwright e2e suite headless on Chrome, as CI does. `--edge` / `--firefox` switch browser, `--headed` / `--ui` / `--debug` switch mode, `--no-build` skips the rebuild; see `docs/e2e.md`.
 - `yarn test:storybook` — builds Storybook and runs every story headless with `@storybook/test-runner`, asserting the `play` functions. `--no-build` reuses `storybook-static`; `--dev --watch <path>` runs against a `yarn storybook` already on :6006.
+- `yarn capture:store` — builds the extension and retakes the store screenshots in `store/screenshots/` on live sites, headless; `--only <name>` retakes some. Use the `capture-store` skill, which checks each image.
 - `yarn storybook` — Storybook 7.6 (last line with Vue 2 support) for the shared primitives and popup/options/editor composites, with a light/dark toolbar
 
 ## Validation

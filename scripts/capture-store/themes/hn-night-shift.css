@@ -1,0 +1,268 @@
+@import url(https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+@import url(https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap);
+
+@import url(https://fonts.googleapis.com/css2?family=Fira+Code:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap);
+
+/* Hacker News — Dracula Theme */
+
+body {
+  background-color: #282a36 !important;
+  color: #f8f8f2;
+}
+
+td {
+  background-color: #282a36;
+  color: #f8f8f2;
+  padding: 0px;
+}
+
+table {
+  background-color: #282a36;
+  color: #f8f8f2;
+}
+
+tr {
+  background-color: #282a36;
+  color: #f8f8f2;
+}
+
+#hnmain {
+  background-color: #282a36;
+  border: 1px solid #44475a;
+}
+
+/* top bar */
+#hnmain > tbody > tr:first-child td {
+  background-color: #bd93f9;
+  border-bottom: 2px solid #ff79c6;
+}
+.pagetop a:visited {
+  color: #282a36;
+  font-weight: 600;
+}
+.pagetop {
+  font-weight: 300;
+  color: #a064f5;
+}
+.pagetop a {
+  color: #282a36;
+  font-weight: 500;
+  padding: 4px 0px;
+}
+.pagetop a:hover {
+  color: #44475a;
+}
+
+/* story titles */
+.athing .titleline a:visited {
+  text-decoration: none;
+  color: #f8f8f2;
+}
+.athing .titleline a {
+  color: #eaecf4;
+  font-family: JetBrains Mono;
+}
+.athing .titleline a:visited {
+  color: #bfc6e0;
+}
+.athing .titleline a:hover {
+  color: #ff79c6;
+  text-decoration: underline;
+}
+.athing .titleline {
+  line-height: 1.5;
+}
+
+/* site link (domain) */
+.sitestr {
+  color: #8be9fd;
+}
+
+/* rank numbers */
+.rank {
+  color: #9580d4;
+  display: inline-block;
+  padding: 0px 8px;
+}
+
+/* subtext row: points, author, time, comments — bumped for contrast */
+.subtext,
+.subtext a,
+.age a,
+.age {
+  color: #b3bce0;
+}
+.subline {
+  color: #b3bce0;
+  font-size: 10px;
+}
+.subtext a:hover {
+  color: #ff79c6;
+}
+.score {
+  color: #50fa7b;
+  font-weight: 500;
+  font-family: Space Mono;
+  font-size: 11px;
+}
+.hnuser {
+  color: #ffb86c;
+}
+
+/* separators and "hide" link specifically */
+.subtext > span::before,
+.subline > span::before {
+  color: #6272a4;
+}
+
+/* upvote arrows */
+.votearrow {
+  filter: invert(70%) sepia(60%) saturate(600%) hue-rotate(200deg);
+  margin-right: 2px;
+}
+
+/* row spacing — a little breathing room between stories */
+tr.athing > td.votelinks {
+  padding-top: 4px;
+  padding-bottom: 2px;
+}
+tr.athing > td.title {
+  padding-top: 4px;
+  padding-bottom: 2px;
+}
+tr.athing > td.votelinks {
+  padding-right: 8px;
+}
+.subtext {
+  display: inline-block;
+}
+tr.spacer {
+  height: 10px;
+}
+
+/* comment page */
+.comment,
+.commtext {
+  color: #f8f8f2;
+}
+.comhead a,
+.comhead a:visited {
+  color: #b3bce0;
+}
+.comhead {
+  color: #b3bce0;
+}
+.comhead .hnuser {
+  color: #ffb86c;
+}
+.comment a,
+.commtext a {
+  color: #8be9fd;
+}
+.commtext a:hover {
+  color: #ff79c6;
+}
+
+/* quoted text in comments */
+.commtext .quote,
+.commtext font[color] {
+  color: #f1fa8c;
+}
+
+/* code blocks in comments */
+.commtext pre,
+.commtext code,
+.commtext tt {
+  font-family: Fira Code;
+  background-color: #21222c;
+  color: #50fa7b;
+  border: 1px solid #44475a;
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+.commtext pre {
+  padding: 10px;
+  overflow-x: auto;
+  display: block;
+}
+
+/* indent guides for comment tree */
+table.comment-tree img[src='s.gif'] {
+  filter: invert(40%) sepia(40%) saturate(1000%) hue-rotate(220deg);
+  opacity: 0.5;
+}
+
+/* reply / more links */
+.togg,
+.reply a,
+a.togg {
+  color: #bd93f9;
+}
+.togg:hover,
+.reply a:hover {
+  color: #ff79c6;
+}
+
+/* input fields, textareas, buttons */
+input,
+textarea,
+select {
+  background-color: #44475a;
+  color: #f8f8f2;
+  border: 1px solid #6272a4;
+  border-radius: 3px;
+}
+* {
+  font-family: Fira Code;
+  color: #bfc6e0;
+}
+input[type='submit'] {
+  background-color: #bd93f9;
+  color: #282a36;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+input[type='submit']:hover {
+  background-color: #ff79c6;
+}
+
+/* dead/flagged comments */
+.comhead .dead,
+.comment .dead {
+  color: #44475a;
+}
+
+/* yc footer links */
+.yclinks a,
+.yclinks a:visited {
+  color: #b3bce0;
+}
+.yclinks a:hover {
+  color: #ff79c6;
+}
+
+/* scrollbar */
+::-webkit-scrollbar {
+  background: #282a36;
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-thumb {
+  background: #44475a;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #6272a4;
+}
+b.hnname a {
+  padding-left: 26px;
+  padding-right: 16px;
+}
+tbody tr td {
+  padding-top: 2px;
+}
+td a img {
+  margin-left: 12px;
+}

@@ -1,0 +1,287 @@
+@import url(https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+@import url(https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+@import url(https://fonts.googleapis.com/css2?family=Old+Standard+TT:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: #171d2b;
+  color: #d3cfc5;
+}
+
+body,
+td,
+input,
+textarea {
+  font-family: 'Old Standard TT';
+}
+
+center {
+  color: #d3cfc5;
+}
+
+/* The broadsheet */
+table#hnmain {
+  background: #1e2638;
+  color: #d3cfc5;
+  width: 860px;
+  max-width: 96%;
+  margin: 24px auto;
+  padding: 18px 28px 24px;
+  border: 1px solid #2a3247;
+  box-shadow: 0 2px 18px rgba(0, 0, 0, 0.5);
+}
+
+#hnmain tbody,
+#hnmain tr,
+#hnmain td {
+  background: transparent;
+  color: #d3cfc5;
+}
+
+/* Masthead */
+#hnmain td[bgcolor='#ff6600'] {
+  background: transparent;
+  border-top: 1px solid #9b8f6e;
+  border-bottom: 4px double #9b8f6e;
+  padding: 6px 0 4px;
+}
+
+#hnmain td[bgcolor='#ff6600'] img {
+  display: none;
+}
+
+.pagetop {
+  color: #a3abbc;
+  font-family: 'Old Standard TT';
+  font-size: 13px;
+  font-variant: small-caps;
+  letter-spacing: 0.06em;
+}
+
+td:has(> .pagetop > .hnname) {
+  text-align: center;
+}
+
+.pagetop a,
+.pagetop a:visited {
+  color: #d3cfc5;
+}
+
+.hnname {
+  display: block;
+  text-align: center;
+  margin: 2px 0 6px;
+}
+
+.hnname a,
+.hnname a:visited {
+  font-family: 'Playfair Display';
+  font-size: 60px;
+  font-weight: 900;
+  font-style: italic;
+  font-variant: normal;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  color: #e2ddd2;
+}
+
+.hnname::before {
+  content: 'Vol. XIX · Est. 2007 · San Francisco, California · Written in Arc';
+  display: block;
+  font-family: 'Old Standard TT';
+  font-style: italic;
+  font-size: 12px;
+  font-weight: normal;
+  letter-spacing: 0.04em;
+  color: #a3abbc;
+  border-bottom: 1px solid #9b8f6e;
+  padding-bottom: 6px;
+  margin-bottom: 4px;
+}
+
+/* Stories */
+#bigbox > td {
+  padding-top: 10px;
+}
+
+.rank {
+  color: #a3abbc;
+  font-family: 'Playfair Display';
+  font-style: italic;
+  font-size: 15px;
+  position: relative;
+  top: 3px;
+}
+
+.votearrow {
+  filter: grayscale(1) invert(1) brightness(0.8);
+  margin: 9px 7px 6px 4px;
+}
+
+.titleline {
+  color: #d3cfc5;
+}
+
+.titleline > a,
+.titleline > a:visited {
+  font-family: 'Playfair Display';
+  font-weight: 700;
+  font-size: 19px;
+  line-height: 1.25;
+  color: #bfbbb1;
+}
+
+.titleline > a:visited {
+  color: #7a8399;
+}
+
+.titleline > a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+}
+
+.sitebit,
+.sitebit a,
+.sitestr {
+  font-family: 'Old Standard TT';
+  font-style: italic;
+  font-size: 12px;
+  color: #a3abbc;
+}
+
+.subtext,
+.subline {
+  font-family: 'Old Standard TT';
+  font-size: 12px;
+  color: #a3abbc;
+}
+
+.subtext {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #2c3549;
+}
+
+.subtext a,
+.subtext a:visited,
+.score {
+  font-family: 'Old Standard TT';
+  color: #a7adba;
+}
+
+.score {
+  font-size: 12px;
+  font-variant: small-caps;
+  font-weight: 700;
+}
+
+.hnuser {
+  font-style: italic;
+}
+
+tr.spacer {
+  height: 10px;
+}
+
+a.morelink {
+  font-family: 'Playfair Display';
+  font-style: italic;
+  font-size: 16px;
+  color: #d3cfc5;
+}
+
+/* Footer */
+#hnmain tr:last-child td[bgcolor='#ff6600'] {
+  border-top: 4px double #9b8f6e;
+  border-bottom: none;
+  padding: 0;
+}
+
+.yclinks,
+.yclinks a {
+  font-family: 'Old Standard TT';
+  font-variant: small-caps;
+  font-size: 13px;
+  color: #c3c8d3;
+}
+
+#hnmain center > a,
+#hnmain center > a u {
+  color: #c3c8d3;
+}
+
+#hnmain input,
+#hnmain textarea {
+  background: #262f43;
+  color: #d3cfc5;
+  border: 1px solid #9b8f6e;
+}
+
+/* Comments and item pages */
+.fatitem .titleline > a {
+  font-size: 30px;
+}
+
+.commtext,
+.commtext a,
+.toptext {
+  font-family: 'Libre Caslon Text';
+  font-size: 14px;
+  line-height: 1.55;
+  color: #d3cfc5;
+}
+
+.commtext.cdd,
+.c5a,
+.c73,
+.c82,
+.c88,
+.c9c,
+.cae,
+.cbe,
+.cce,
+.cdd {
+  color: #a3abbc;
+}
+
+.reply u {
+  text-decoration: none;
+}
+
+.reply a,
+.reply a:visited {
+  font-family: 'Old Standard TT';
+  font-size: 12px;
+  font-variant: small-caps;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  color: #a3abbc;
+}
+
+.reply a:hover {
+  text-decoration: underline;
+}
+
+.comment-tree .comhead {
+  font-size: 13px;
+}
+
+.fatitem .votearrow {
+  margin: 16px 7px 6px 4px;
+}
+
+.comment-tree .votearrow {
+  margin: 5px 7px 6px 4px;
+}
+
+.comhead,
+.comhead a {
+  font-family: 'Old Standard TT';
+  font-style: italic;
+  color: #a3abbc;
+}
