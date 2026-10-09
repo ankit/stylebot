@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@astrojs/preact": "^6.0.5",
+    "@astrojs/sitemap": "^3.7.4",
     "astro": "^7.3.5",
     "preact": "^10.29.8"
   },
