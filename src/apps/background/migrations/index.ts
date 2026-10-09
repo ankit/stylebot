@@ -32,7 +32,7 @@ export const migrations: Array<Migration> = [
  * half done. The record is cleared once a start runs them all cleanly.
  * Never rejects.
  */
-export const runMigrations = async (): Promise<void> => {
+const runAll = async (): Promise<void> => {
   const errors: Record<string, string> = {};
 
   for (const migration of migrations) {
@@ -53,4 +53,16 @@ export const runMigrations = async (): Promise<void> => {
   } catch (e) {
     console.error('Could not record migration errors', e);
   }
+};
+
+let migrated: Promise<void> | undefined;
+
+/**
+ * Runs the migrations once per background start, and resolves when they are
+ * done. Anything that reads styles to write or sync them awaits this, so it
+ * never sees data a migration is about to repair.
+ */
+export const runMigrations = (): Promise<void> => {
+  migrated = migrated ?? runAll();
+  return migrated;
 };

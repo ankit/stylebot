@@ -171,6 +171,15 @@ const writeToStorage = async (
 let pendingWrite = Promise.resolve();
 
 /**
+ * Queues every later write behind `ready`, so none reads styles before it
+ * resolves. `ready` must never reject, and must not write through this chain
+ * itself, or it would wait on its own write.
+ */
+export const holdWritesUntil = (ready: Promise<void>): void => {
+  pendingWrite = pendingWrite.then(() => ready);
+};
+
+/**
  * Replaces the entire style map. Sync passes fromSync so the write it makes
  * while pulling is not itself queued up as an edit to push. A restore names
  * the version it put back, since that is its own act rather than a

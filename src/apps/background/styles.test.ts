@@ -19,6 +19,7 @@ import {
   getGoogleWebFontExists,
   getGoogleFontFile,
   ensureCompiledStyles,
+  holdWritesUntil,
 } from './styles';
 import { scheduleSyncAfterEdit } from './sync-scheduler';
 import * as compiledStylesModule from './compiled-styles';
@@ -538,5 +539,52 @@ describe('compiled styles', () => {
 
     expect(compiled).toMatchObject({ version: 1, revision: 'rev-1' });
     expect(Object.keys(compiled.styles)).toEqual(['a.com']);
+  });
+});
+
+describe('holdWritesUntil', () => {
+  it('reads styles for a write only once the hold is released', async () => {
+    const store: Record<string, unknown> = {
+      styles: { 'example.com': { css: 'a {}', enabled: false } },
+    };
+
+    global.chrome = {
+      storage: {
+        local: {
+          get: jest.fn(async (keys: string | Array<string>) =>
+            JSON.parse(
+              JSON.stringify(
+                Object.fromEntries([keys].flat().map(key => [key, store[key]]))
+              )
+            )
+          ),
+          set: jest.fn(async (items: Record<string, unknown>) => {
+            Object.assign(store, items);
+          }),
+          remove: jest.fn(async () => undefined),
+        },
+      },
+    } as unknown as typeof chrome;
+
+    let release = (): void => undefined;
+    holdWritesUntil(new Promise<void>(resolve => (release = resolve)));
+
+    const write = enable('example.com');
+    await new Promise(resolve => setTimeout(resolve, 10));
+    expect(chrome.storage.local.get).not.toBeCalled();
+
+    // What a migration repairs while the write waits.
+    store.styles = {
+      'example.com': { css: 'a {}', enabled: false },
+      'repaired.com': { css: 'b {}', enabled: true },
+    };
+    release();
+    await write;
+
+    expect(store.styles).toMatchObject({
+      'example.com': { enabled: true },
+      'repaired.com': { css: 'b {}' },
+    });
+    expect(chrome.storage.local.get).toBeCalled();
   });
 });

@@ -89,7 +89,8 @@ import type {
   ChatConnectResponse,
   ChatGetThreadResponse,
 } from '@stylebot/types';
-import { runGoogleDriveSync, completeTabSignIn } from '@stylebot/sync';
+import { completeTabSignIn } from '@stylebot/sync';
+import { syncStyles } from './sync';
 
 import { scanVersionHistory, restoreVersion } from '@stylebot/history';
 
@@ -439,7 +440,7 @@ export const GoogleSignInRedirect = async (
   sender: chrome.runtime.MessageSender
 ): Promise<void> => {
   if (await completeTabSignIn(message.url, sender.tab?.id)) {
-    runGoogleDriveSync(styleStorage, { interactive: false });
+    syncStyles({ interactive: false });
   }
 };
 
@@ -449,7 +450,7 @@ export const RunGoogleDriveSync = async (
 ): Promise<void> => {
   try {
     sendResponse(
-      await runGoogleDriveSync(styleStorage, {
+      await syncStyles({
         interactive: message.interactive ?? true,
       })
     );
