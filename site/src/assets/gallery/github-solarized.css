@@ -1,0 +1,360 @@
+/* GitHub: Solarized Light */
+@import url(https://fonts.googleapis.com/css2?family=Fira+Code:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+@import url(https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+:root {
+  --fgColor-default: #657b83;
+  --fgColor-muted: #93a1a1;
+  --bgColor-default: #fdf6e3;
+  --bgColor-muted: #eee8dc;
+  --bgColor-emphasis: #002b36;
+  --fgColor-onEmphasis: #fdf6e3;
+  --bgColor-accent-emphasis: #268bd2;
+  --fgColor-accent: #268bd2;
+  --borderColor-default: #d6cfc4;
+  --borderColor-muted: #e0d8cc;
+  --button-default-borderColor-rest: #d6cfc4;
+  --button-default-borderColor-hover: #c8bfb0;
+  --page-header-bgColor: #eee8dc;
+  --header-bgColor: #002b36;
+  --header-fgColor-default: #93a1a166;
+  --headerSearch-bgColor: #073642;
+  --bgColor-black: #002b36;
+  --fgColor-black: #fdf6e3;
+  --bgColor-white: #fdf6e3;
+  --fgColor-open-emphasis: #859900;
+  --bgColor-open-emphasis: #859900;
+  --bgColor-open-muted: #f4f1e8;
+  --fgColor-closed-emphasis: #dc322f;
+  --bgColor-closed-emphasis: #dc322f;
+  --bgColor-closed-muted: #faf8f4;
+  --fgColor-draft-emphasis: #93a1a1;
+  --bgColor-draft-emphasis: #93a1a1;
+  --bgColor-draft-muted: #f1ede6;
+}
+
+body {
+  font-family: JetBrains Mono;
+  background-color: #fdf6e3;
+  color: #657b83;
+  font-size: 14px;
+}
+
+html {
+  background-color: #fdf6e3;
+}
+
+.prc-Avatar-Avatar-0xaUi, .prc-Button-ButtonContent-Iohp5, .prc-Label-Label-qG-Zu, .prc-Button-Visual-YNt2F, .prc-Button-LeadingVisual-UySKu, .prc-Button-VisualWrap-E4cnq, .prc-components-Input-IwWrt, .prc-components-Chord-DdhWN {
+  font-family: JetBrains Mono;
+}
+
+.prc-Truncate-Truncate-2G1eo {
+  font-family: JetBrains Mono;
+}
+
+.prc-Button-Label-FWkx3 {
+  font-family: JetBrains Mono;
+}
+
+.prc-Text-Text-9mHv3 {
+  font-family: JetBrains Mono;
+  font-size: 14px;
+}
+
+.prc-Heading-Heading-MtWFE {
+  font-family: JetBrains Mono;
+}
+
+.prc-Button-ButtonBase-9n-Xk {
+  font-family: JetBrains Mono;
+  font-size: 12px;
+  margin-left: 0px;
+  border-color: #586e75;
+  border-width: 0px;
+}
+
+.prc-Link-Link-9ZwDx {
+  font-family: JetBrains Mono;
+  color: #586e75;
+}
+
+a.color-fg-default {
+  color: #657b83;
+}
+
+button.prc-Button-ButtonBase-9n-Xk {
+  background-color: #eee8dc;
+  color: #657b83;
+  border-color: #d6cfc4;
+}
+
+button.prc-Button-ButtonBase-9n-Xk:hover {
+  background-color: #e8ddd0;
+}
+
+#_R_3idahlik5_.prc-Button-ButtonBase-9n-Xk {
+  background-color: #b58900;
+  color: #fdf6e3;
+}
+
+.bgColor-muted {
+  background-color: #eee8dc;
+  color: #657b83;
+  padding: 0px 4px;
+}
+
+.color-border-muted {
+  border-color: #d6cfc4;
+}
+
+.Table-module__Box__HZKiQ thead {
+  background-color: #eee8dc;
+}
+
+span.text-bold {
+  color: #657b83;
+}
+
+input.prc-components-Input-IwWrt {
+  background-color: #fdf6e3;
+  color: #657b83;
+  border-color: #d6cfc4;
+}
+
+.TextInput-wrapper {
+  background-color: #fdf6e3;
+}
+
+svg.octicon {
+  width: 16px;
+  height: 16px;
+}
+
+svg.octicon-star-fill {
+  color: #b58900;
+}
+
+a.prc-TopicTag-TopicTag-LS-jX {
+  background-color: #eee8dc;
+  font-size: 12px;
+  font-family: JetBrains Mono;
+  color: #657b83;
+}
+
+a.SidebarSection-module__headingLink__H7omT span {
+  font-size: 17px;
+}
+
+h2.SidebarSection-module__sectionHeading__TG36m span {
+  font-size: 15px;
+}
+
+a.Link--secondary {
+  color: #586e75;
+}
+
+bdi.markdown-title {
+  font-size: 18px;
+}
+
+span.HeaderViewer-module__issueNumberText__MEUhM {
+  font-size: 18px;
+}
+
+div.markdown-body p {
+  font-family: Fira Code;
+}
+
+span.prc-Token-TokenTextContainer-cOUaD span {
+  font-size: 10px;
+}
+
+div.react-directory-commit-age relative-time {
+  font-size: 12px;
+  color: #586e75;
+}
+
+article.markdown-body ul li {
+  font-family: Fira Code;
+  font-size: 14px;
+}
+
+a.prc-components-UnderlineItem-7fP-n span {
+  font-size: 12px;
+  color: #586e75;
+}
+
+a.prc-components-UnderlineItem-7fP-n {
+  height: 16px;
+  padding-bottom: 0px;
+  margin-top: 16px;
+  padding-top: 0px;
+}
+
+div.timeline-comment-header {
+  background-color: #eee8dc;
+  border-width: 0px;
+}
+
+div.comment-body {
+  border-color: #d6cfc4;
+  outline-color: #d6cfc4;
+}
+
+div.comment-body:focus {
+  outline-color: #268bd2;
+}
+
+div.comment-body:focus-within {
+  outline: 2px solid #d6cfc4;
+  box-shadow: inset 0 0 0 1px #d6cfc4;
+}
+
+div.bgColor-success-emphasis {
+  background-color: #a7c080;
+}
+
+.timeline-comment {
+  border-color: rgba(129, 139, 152, 0.12);
+}
+
+.timeline-comment-header::before {
+  display: none;
+  content: none;
+}
+
+.timeline-comment-header ::before {
+  display: none;
+}
+
+span.pl-2 {
+  font-size: 14px;
+}
+
+div.prc-PageHeader-TitleArea-2n2J0 button.prc-Button-ButtonBase-9n-Xk {
+  margin-left: 13px;
+}
+
+a.PullRequestBranchName-module__branchName__SCtl2 {
+  color: #fdf6e3;
+  background-color: #657b83;
+}
+
+button[data-testid="commit-row-show-description-button"] {
+  margin-left: 10px;
+}
+
+div.comment-body ul li {
+  font-family: Fira Code;
+}
+
+span.prc-StateLabel-StateLabel-Iawzp {
+  background-color: #b58900;
+  box-shadow: none;
+}
+
+button.Button--secondary {
+  background-color: #d6cfc4;
+}
+
+a.Title-module__anchor__dBbYy span span {
+  font-size: 14px;
+}
+
+div.SectionFilterLink-module__title__VRe9O {
+  font-size: 14px;
+}
+
+a[data-testid="fork-button"] {
+  background-color: #eee8dc;
+}
+
+span.Truncate-text a {
+  font-size: 13px;
+}
+
+div.react-directory-commit-message a {
+  font-size: 13px;
+}
+
+article.markdown-body p {
+  font-family: JetBrains Mono;
+  font-size: 14px;
+}
+
+h2.heading-element {
+  font-family: JetBrains Mono;
+  font-size: 18px;
+  
+}
+
+h1.heading-element {
+  font-size: 24px;
+  font-family: JetBrains Mono;
+  
+}
+
+#_r_1s_ {
+  background-color: #b58900;
+  color: #fdf6e3;
+}
+
+span.d-flex relative-time {
+  color: #586e75;
+}
+
+h1.h3 div {
+  font-size: 18px;
+}
+
+tbody tr td {
+  font-family: JetBrains Mono;
+}
+
+span.commit-ref {
+  font-family: JetBrains Mono;
+  background-color: #d6cfc4;
+  color: #586e75;
+}
+
+div.TimelineItem-body form button {
+  background-color: #eee8dc;
+}
+
+button.js-details-target {
+  background-color: #eee8dc;
+}
+
+a.Link--inTextBlock {
+  color: #586e75;
+}
+
+div.protip {
+  font-size: 13px;
+}
+
+div.prc-AnchoredOverlay-AnchoredOverlay-fYg9Z {
+  background-color: #fdf6e3;
+}
+
+a.PullRequestHeaderTabNav-module__TabNavLink__JCc1O {
+  font-size: 12px;
+}
+
+.valid-filter-value {
+  color: #fdf6e3;
+  background-color: #657b83;
+}
+
+td.react-directory-row-name-cell-large-screen path {
+  color: #d6cfc4;
+}
+
+a.Link--secondary:hover {
+  color: #586e75;
+}
+
+div[class*="quick-search-overlay-module__Panel__"] {
+  background-color: #eee8dc;
+}

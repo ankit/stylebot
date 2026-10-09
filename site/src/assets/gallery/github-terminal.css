@@ -1,0 +1,334 @@
+/* GitHub: Terminal */
+@import url(https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+:root {
+  color-scheme: dark;
+  --fgColor-default: #33ff66;
+  --fgColor-muted: #22b84c;
+  --bgColor-default: #050805;
+  --bgColor-muted: #0a140a;
+  --bgColor-neutral-muted: #0f1f0f;
+  --bgColor-emphasis: #144a22;
+  --borderColor-default: #1a6b2c;
+  --borderColor-muted: #124d20;
+  --page-header-bgColor: #050805;
+  --headerSearch-bgColor: #050805;
+  --header-fgColor-logo: #33ff66;
+  --header-fgColor-default: #33ff66;
+  --bgColor-accent-emphasis: #1a6b2c;
+  --bgColor-success-emphasis: #1fae45;
+  --bgColor-open-emphasis: #1fae45;
+  --borderColor-accent-emphasis: #1a6b2c;
+  --fontStack-sansSerif: "IBM Plex Mono";
+  --fontStack-system: "IBM Plex Mono";
+  --brand-body-fontFamily: "IBM Plex Mono";
+  --brand-heading-fontFamily: "IBM Plex Mono";
+  --fgColor-success: #33ff66;
+  --fgColor-danger: #ff5f56;
+  --bgColor-danger-emphasis: #c2413a;
+  --bgColor-closed-emphasis: #c2413a;
+  --diffBlob-addition-bgColor-line: #0b2a14;
+  --diffBlob-addition-bgColor-word: #17592b;
+  --diffBlob-addition-bgColor-num: #0f3a1c;
+  --diffBlob-addition-fgColor-text: #8dffa8;
+  --diffBlob-deletion-bgColor-line: #2a0d0d;
+  --diffBlob-deletion-bgColor-word: #5c1b1b;
+  --diffBlob-deletion-bgColor-num: #3a1212;
+  --diffBlob-deletion-fgColor-text: #ff9a94;
+  --diffBlob-hunk-bgColor-line: #0f1f0f;
+  --diffBlob-hunk-bgColor-num: #144a22;
+  --diffBlob-expander-iconColor: #22b84c;
+  --bgColor-success-muted: #0b2a14;
+  --bgColor-open-muted: #0b2a14;
+  --bgColor-danger-muted: #2a0d0d;
+  --bgColor-closed-muted: #2a0d0d;
+  --bgColor-accent-muted: #0f1f0f;
+  --fgColor-accent: #22b84c;
+  --bgColor-attention-muted: #1f1a05;
+  --borderColor-attention-muted: #9a6700;
+  --fgColor-attention: #e3b341;
+}
+
+html, body {
+  background: #ffffff;
+  color: #222222;
+}
+
+#repository-container-header {
+  background: #ffffff;
+}
+
+.btn, .Button, .Counter, .TextInput-wrapper {
+  background-color: #f0f0f0;
+  color: #222222;
+}
+
+[class*="prc-Button-ButtonBase-"] {
+  background-color: #f0f0f0;
+  color: #222222;
+  padding: 4px;
+  height: 24px;
+}
+
+#_R_3idahlik5_ {
+  background-color: #144a22;
+  color: #33ff66;
+}
+
+[class*="DirectoryContent-module__Box_3__"], th {
+  background-color: #f0f0f0;
+  color: #222222;
+}
+
+svg.octicon {
+  color: #22b84c;
+  fill: currentColor;
+}
+
+img {
+  filter: grayscale(1) sepia(1) hue-rotate(60deg);
+}
+
+a, a span, a strong, .author a, .Link--secondary, .issue-link {
+  color: #8dffa8;
+  text-decoration: underline;
+}
+
+html, body, #repository-container-header {
+  background: #050805;
+  color: #33ff66;
+  font-family: IBM Plex Mono;
+}
+
+.btn, .Button, .Counter, .TextInput-wrapper, [class*="DirectoryContent-module__Box_3__"], th {
+  background-color: #0a140a;
+  color: #33ff66;
+  border-color: #1a6b2c;
+  font-family: IBM Plex Mono;
+}
+
+[class*="prc-Button-ButtonBase-"] {
+  background-color: #0a140a;
+  color: #33ff66;
+  border-color: #1a6b2c;
+  font-family: IBM Plex Mono;
+  font-size: 13px;
+}
+
+input, [class*="prc-components-Input-"], .Label, .Counter {
+  background-color: transparent;
+  color: #33ff66;
+  font-family: IBM Plex Mono;
+  border-color: #1a6b2c;
+}
+
+bdi.js-issue-title {
+  font-size: 20px;
+}
+
+span.f1-light {
+  font-size: 20px;
+}
+
+.blob-code-addition, .blob-code-deletion, .blob-code-inner, .blob-code-hunk, .blob-num-hunk {
+  font-family: IBM Plex Mono;
+}
+
+.blob-num {
+  font-family: IBM Plex Mono;
+  color: #22b84c;
+}
+
+.blob-code-context, .blob-code-inner, .blob-num-context {
+  background-color: #050805;
+  color: #33ff66;
+}
+
+.file-header, .diff-table .blob-code-hunk, .blob-num-expandable, .blob-code-expandable {
+  background-color: #0a140a;
+  color: #22b84c;
+  border-color: #1a6b2c;
+}
+
+td.addition, .diff-text-cell.addition, .diff-line-number.addition {
+  background-color: #0b2a14;
+  color: #8dffa8;
+}
+
+td.deletion, .diff-text-cell.deletion, .diff-line-number.deletion {
+  background-color: #2a0d0d;
+  color: #ff9a94;
+}
+
+.addition .diff-text-inner span {
+  color: #8dffa8;
+}
+
+.addition .diff-text-inner {
+  color: #8dffa8;
+}
+
+.deletion .diff-text-inner, .deletion .diff-text-inner span {
+  color: #ff9a94;
+}
+
+.addition .diff-text-inner .pl-s, .addition .diff-text-inner .pl-c1 {
+  color: #33ff66;
+}
+
+.addition .diff-text-inner .pl-k, .addition .diff-text-inner .pl-c, .addition .diff-text-inner .pl-kos, .addition .diff-text-inner .pl-v, .addition .diff-text-inner .pl-s1, .addition .diff-text-inner .pl-ent, .addition .diff-text-inner .pl-en, .addition .diff-text-inner .pl-smi {
+  color: #8dffa8;
+}
+
+.diff-text-inner .pl-c {
+  color: #22b84c;
+}
+
+.diff-text-inner .pl-k {
+  color: #ff9a94;
+}
+
+.diff-text-inner .pl-en, .diff-text-inner .pl-ent {
+  color: #b6a2ff;
+}
+
+.diff-text-inner .pl-c1, .diff-text-inner .pl-s, .diff-text-inner .pl-v {
+  color: #7fd4ff;
+}
+
+section[class*="prc-Banner-Banner-"] {
+  background-color: #1f1a05;
+  border-color: #9a6700;
+  color: #33ff66;
+  font-family: IBM Plex Mono;
+}
+
+td.diff-hunk-cell, td.diff-line-number.diff-line-number-hunk, td.focusable-grid-cell[class*="hunk"] {
+  background-color: #0f1f0f;
+  color: #22b84c;
+}
+
+td.diff-line-number {
+  background-color: #050805;
+  color: #22b84c;
+}
+
+td.diff-line-number[class*="addition"], td.diff-line-number[class*="Addition"] {
+  background-color: #0f3a1c;
+  color: #8dffa8;
+}
+
+td.diff-line-number[class*="deletion"], td.diff-line-number[class*="Deletion"] {
+  background-color: #3a1212;
+  color: #ff9a94;
+}
+
+td.diff-text-cell[class*="addition"], td.diff-text-cell[class*="Addition"] {
+  background-color: #0b2a14;
+}
+
+td.diff-text-cell[class*="deletion"], td.diff-text-cell[class*="Deletion"] {
+  background-color: #2a0d0d;
+}
+
+td.diff-text-cell {
+  color: #33ff66;
+}
+
+span.f1 {
+  font-size: 18px;
+}
+
+span[class*="prc-Button-Label-"] {
+  font-size: 12px;
+}
+
+div[class*="Search-module__searchButtonGroup__"] button[class*="prc-Button-ButtonBase-"] {
+  margin-top: 4px;
+}
+
+span[class*="prc-Token-TokenBase-"] {
+  background: #0a140a;
+  color: #33ff66;
+  border-color: #1a6b2c;
+  font-family: IBM Plex Mono;
+  font-weight: 500;
+  border-radius: 4px;
+}
+
+span[class*="prc-Token-IssueLabel-"] {
+  background: #0a140a;
+  color: #33ff66;
+  border-color: #1a6b2c;
+}
+
+a[data-testid="issue-listitem-title-link"] span span {
+  font-size: 14px;
+}
+
+span[class*="prc-Token-TokenTextContainer-"] span {
+  font-size: 11px;
+}
+
+td.focusable-grid-cell.new-diff-line-number {
+  background-color: #050805;
+  color: #22b84c;
+}
+
+td.focusable-grid-cell.new-new-diff-line-number[class*="ddition"] {
+  background-color: #0f3a1c;
+  color: #8dffa8;
+}
+
+td.focusable-grid-cell.new-diff-line-number[class*="deletion"] {
+  background-color: #3a1212;
+  color: #ff9a94;
+}
+
+td.focusable-grid-cell.new-diff-line-number[class*="unk"] {
+  background-color: #144a22;
+  color: #8dffa8;
+}
+
+td.focusable-grid-cell.new-diff-line-number[class*="elected"], td.focusable-grid-cell.new-diff-line-number[class*="ighlight"] {
+  background-color: #1a6b2c;
+  color: #ffffff;
+}
+
+.addition .diff-text-inner [class*="marker"], .addition .diff-text-inner [class*="Marker"], .addition .diff-text-inner [class*="word"], .addition .diff-text-inner mark {
+  background-color: #17592b;
+  color: #8dffa8;
+}
+
+.deletion .diff-text-inner [class*="marker"], .deletion .diff-text-inner [class*="Marker"], .deletion .diff-text-inner [class*="word"], .deletion .diff-text-inner mark {
+  background-color: #5c1b1b;
+  color: #ff9a94;
+}
+
+.addition .diff-text-inner > span:not([class*="pl-"]), .addition .diff-text-inner span[class*="diff"], .addition .diff-text-inner span[class*="Diff"] {
+  background-color: #17592b;
+  color: #8dffa8;
+}
+
+.deletion .diff-text-inner > span:not([class*="pl-"]), .deletion .diff-text-inner span[class*="diff"], .deletion .diff-text-inner span[class*="Diff"] {
+  background-color: #5c1b1b;
+  color: #ff9a94;
+}
+
+.deletion .x {
+  background-color: #672424;
+  
+}
+
+.addition .x {
+  background-color: #145825;
+  
+}
+
+div.hunk-kebab-icon {
+  background-color: #050805;
+}
+
+span.h2 {
+  font-size: 22px;
+}

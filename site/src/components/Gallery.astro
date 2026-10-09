@@ -1,21 +1,28 @@
 ---
 import { Image, getImage } from 'astro:assets';
-import CarouselNav from './CarouselNav.astro';
 import SbIcon from './SbIcon';
 import { Check, Copy } from './icons';
 import { GALLERY } from '../lib/gallery';
+import { LINKS } from '../lib/links';
 
-const items = await Promise.all(
-  GALLERY.map(async (item) => ({
-    ...item,
-    full: (
-      await getImage({
-        src: item.image,
-        width: item.image.width,
-        format: 'webp',
-        quality: 90,
-      })
-    ).src,
+const SOURCE_BASE = `${LINKS.github}/blob/v4/site/src/assets/gallery/`;
+
+const sites = await Promise.all(
+  GALLERY.map(async (site) => ({
+    ...site,
+    themes: await Promise.all(
+      site.themes.map(async (theme) => ({
+        ...theme,
+        full: (
+          await getImage({
+            src: theme.image,
+            width: theme.image.width,
+            format: 'webp',
+            quality: 90,
+          })
+        ).src,
+      })),
+    ),
   })),
 );
 ---
@@ -24,72 +31,90 @@ const items = await Promise.all(
   <div class="section-inner">
     <div class="section-head">
       <div>
-        <h2 class="section-title">What people make with it</h2>
-        <p class="section-lede">Real sites, restyled with Stylebot.</p>
+        <h2 class="section-title">Styles to start from</h2>
+        <p class="section-lede">
+          A few example styles to get you started. Copy one and adjust it to
+          your liking, or create your own from scratch.
+        </p>
       </div>
-      <CarouselNav target="gallery-track" label="example" />
     </div>
-    <div id="gallery-track" class="carousel gallery-track">
-      {items.map((item) => (
-        <figure
-          class="gallery-item"
-          data-gallery={item.id}
-          data-site={item.site}
-          data-note={item.note}
-        >
+    <div class="gallery-grid">
+      {sites.map((site) => (
+        <figure class="gallery-item" data-gallery={site.id} data-site={site.url} data-active="0">
           <div class="gallery-shot">
-            <button
-              class="gallery-open"
-              data-open
-              data-full={item.full}
-              aria-label={`Enlarge ${item.site}: ${item.name}`}
-            >
-              <Image
-                src={item.image}
-                widths={[480, 720, 960]}
-                sizes="(min-width: 1180px) 265px, (min-width: 700px) 25vw, 240px"
-                loading="eager"
-                alt={`${item.site} restyled with Stylebot: ${item.name}`}
-              />
-            </button>
-            {item.css && (
-              <div class="gallery-actions">
-                <button
-                  class="gallery-action gallery-install"
-                  data-install
-                  title="Install in Stylebot"
-                  aria-label={`Install ${item.name} in Stylebot`}
-                >
-                  <span class="gallery-action-idle">
-                    <SbIcon size={13} />
-                    Install
-                  </span>
-                  <span class="gallery-action-ok">
-                    <Check size={12} />
-                    Installed
-                  </span>
-                </button>
-                <button
-                  class="gallery-action gallery-copy"
-                  data-copy
-                  title="Copy CSS"
-                  aria-label={`Copy CSS for ${item.name}`}
-                >
-                  <span class="gallery-action-idle">
-                    <Copy />
-                  </span>
-                  <span class="gallery-action-ok">
-                    <Check />
-                  </span>
-                </button>
-              </div>
-            )}
+            {site.themes.map((theme, i) => (
+              <button
+                class="gallery-open"
+                data-open
+                data-theme={i}
+                data-full={theme.full}
+                hidden={i !== 0}
+                aria-label={`Enlarge ${site.site}: ${theme.name}`}
+              >
+                <Image
+                  src={theme.image}
+                  widths={[480, 720, 960]}
+                  sizes="(min-width: 1180px) 360px, (min-width: 700px) 45vw, 100vw"
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  alt={`${site.site} restyled with Stylebot: ${theme.name}`}
+                />
+              </button>
+            ))}
+            <div class="gallery-actions">
+              <button
+                class="gallery-action gallery-install"
+                data-install
+                title="Install in Stylebot"
+              >
+                <span class="gallery-action-idle">
+                  <SbIcon size={13} />
+                  Install
+                </span>
+                <span class="gallery-action-ok">
+                  <Check size={12} />
+                  Installed
+                </span>
+              </button>
+              <button
+                class="gallery-action gallery-copy"
+                data-copy
+                title="Copy CSS"
+                aria-label="Copy CSS"
+              >
+                <span class="gallery-action-idle">
+                  <Copy />
+                </span>
+                <span class="gallery-action-ok">
+                  <Check />
+                </span>
+              </button>
+            </div>
           </div>
           <figcaption class="gallery-caption">
-            <span class="gallery-name">{item.name}</span>
-            <span class="gallery-site">{item.site}</span>
+            <span class="gallery-site">{site.site}</span>
+            <div class="gallery-chips">
+              {site.themes.map((theme, i) => (
+                <button
+                  class="gallery-chip"
+                  data-chip={i}
+                  aria-pressed={i === 0}
+                >
+                  <span
+                    class="gallery-dot"
+                    style={`background: linear-gradient(135deg, ${theme.colors[0]} 0 50%, ${theme.colors[1]} 50% 100%)`}
+                  />
+                  <span class="gallery-name">{theme.name}</span>
+                </button>
+              ))}
+            </div>
           </figcaption>
-          {item.css && <template data-css>{item.css}</template>}
+          {site.themes.map((theme, i) => (
+            <template
+              data-theme-data={i}
+              data-note={theme.note}
+              data-source={theme.file && SOURCE_BASE + theme.file}
+            >{theme.css}</template>
+          ))}
         </figure>
       ))}
     </div>
@@ -100,8 +125,8 @@ const items = await Promise.all(
   <div class="lightbox-body" data-close>
     <img class="lightbox-img" alt="" />
     <div class="lightbox-bar">
-      <span class="lightbox-name"></span>
       <span class="lightbox-site"></span>
+      <div class="lightbox-chips"></div>
       <span class="lightbox-note" hidden></span>
       <button class="lightbox-install" data-lightbox-install hidden>
         Install
@@ -109,6 +134,15 @@ const items = await Promise.all(
       <button class="lightbox-copy" data-lightbox-copy>
         Copy CSS
       </button>
+      <a
+        class="lightbox-source"
+        data-lightbox-source
+        target="_blank"
+        rel="noopener"
+        hidden
+      >
+        View on GitHub
+      </a>
     </div>
   </div>
   <button class="lightbox-close" data-close aria-label="Close">
@@ -129,12 +163,43 @@ const items = await Promise.all(
 
 <script>
   const COPIED_MS = 1600;
+  const INSTALL_TIMEOUT_MS = 5000;
   let resetTimer: ReturnType<typeof setTimeout> | undefined;
   let lightboxItem: HTMLElement | null = null;
 
-  const cssOf = (item: HTMLElement) =>
-    item.querySelector<HTMLTemplateElement>('template[data-css]')!.content
-      .textContent ?? '';
+  const dialog = document.querySelector<HTMLDialogElement>('.lightbox')!;
+  const lightboxCopy = dialog.querySelector<HTMLButtonElement>(
+    '[data-lightbox-copy]',
+  )!;
+  const lightboxInstall = dialog.querySelector<HTMLButtonElement>(
+    '[data-lightbox-install]',
+  )!;
+  const lightboxSource = dialog.querySelector<HTMLAnchorElement>(
+    '[data-lightbox-source]',
+  )!;
+  const lightboxChips = dialog.querySelector<HTMLElement>('.lightbox-chips')!;
+  const gallery = document.getElementById('gallery')!;
+  const items = [...document.querySelectorAll<HTMLElement>('.gallery-item')];
+  const installed = new Map<string, string>();
+  const failed = new Set<string>();
+  const copied = new Set<string>();
+
+  const activeOf = (item: HTMLElement) => Number(item.dataset.active);
+  const keyOf = (item: HTMLElement) => `${item.dataset.gallery}:${activeOf(item)}`;
+  const themeData = (item: HTMLElement) =>
+    item.querySelector<HTMLTemplateElement>(
+      `template[data-theme-data="${activeOf(item)}"]`,
+    )!;
+  const cssOf = (item: HTMLElement) => themeData(item).content.textContent ?? '';
+  const noteOf = (item: HTMLElement) => themeData(item).dataset.note;
+  const nameOf = (item: HTMLElement) =>
+    item.querySelectorAll('.gallery-name')[activeOf(item)].textContent ?? '';
+  const siteOf = (item: HTMLElement) =>
+    item.querySelector('.gallery-site')!.textContent ?? '';
+  const fullSrc = (item: HTMLElement) =>
+    item.querySelector<HTMLButtonElement>(
+      `[data-open][data-theme="${activeOf(item)}"]`,
+    )!.dataset.full!;
 
   async function copyText(text: string) {
     try {
@@ -151,28 +216,56 @@ const items = await Promise.all(
     }
   }
 
-  const dialog = document.querySelector<HTMLDialogElement>('.lightbox')!;
-  const lightboxCopy = dialog.querySelector<HTMLButtonElement>(
-    '[data-lightbox-copy]',
-  )!;
-  const lightboxInstall = dialog.querySelector<HTMLButtonElement>(
-    '[data-lightbox-install]',
-  )!;
-  const gallery = document.getElementById('gallery')!;
-  const INSTALL_TIMEOUT_MS = 5000;
+  function installLabel(item: HTMLElement) {
+    const name = installed.get(keyOf(item));
+    if (name) return `Installed as ${name}`;
+    if (failed.has(keyOf(item))) return 'Couldn’t install';
+    return 'Install';
+  }
+
+  /**
+   * Brings a card's buttons in line with its selected theme: which
+   * screenshot shows, whether it has CSS to copy, and what is already done.
+   */
+  function render(item: HTMLElement) {
+    const active = activeOf(item);
+    const key = keyOf(item);
+    const hasCss = !noteOf(item);
+    item.querySelectorAll<HTMLElement>('[data-open]').forEach((el) => {
+      el.hidden = Number(el.dataset.theme) !== active;
+    });
+    item.querySelectorAll<HTMLElement>('[data-chip]').forEach((el) => {
+      el.setAttribute(
+        'aria-pressed',
+        String(Number(el.dataset.chip) === active),
+      );
+    });
+    item.querySelector<HTMLElement>('.gallery-actions')!.hidden = !hasCss;
+    item.classList.toggle('is-copied', copied.has(key));
+    item.classList.toggle('is-installed', installed.has(key));
+    item
+      .querySelector('[data-copy]')!
+      .setAttribute('title', copied.has(key) ? 'Copied' : 'Copy CSS');
+    item
+      .querySelector('[data-install]')!
+      .setAttribute('title', installLabel(item));
+    if (lightboxItem === item) renderLightbox(item);
+  }
+
+  function select(item: HTMLElement, index: number) {
+    item.dataset.active = String(index);
+    render(item);
+  }
 
   function markCopied(item: HTMLElement) {
-    document
-      .querySelectorAll('.gallery-item.is-copied')
-      .forEach((el) => el.classList.remove('is-copied'));
-    item.classList.add('is-copied');
-    item.querySelector('[data-copy]')!.setAttribute('title', 'Copied');
-    if (lightboxItem === item) lightboxCopy.textContent = 'Copied';
+    const key = keyOf(item);
+    copied.clear();
+    copied.add(key);
+    items.forEach(render);
     clearTimeout(resetTimer);
     resetTimer = setTimeout(() => {
-      item.classList.remove('is-copied');
-      item.querySelector('[data-copy]')!.setAttribute('title', 'Copy CSS');
-      lightboxCopy.textContent = 'Copy CSS';
+      copied.delete(key);
+      items.forEach(render);
     }, COPIED_MS);
   }
 
@@ -188,7 +281,7 @@ const items = await Promise.all(
   window.addEventListener('message', (e) => {
     if (e.source === window && e.data?.type === 'stylebot:pong') {
       gallery.classList.add('can-install');
-      if (lightboxItem) show(lightboxItem);
+      if (lightboxItem) renderLightbox(lightboxItem);
     }
   });
   window.postMessage({ type: 'stylebot:ping' }, location.origin);
@@ -223,7 +316,7 @@ const items = await Promise.all(
           type: 'stylebot:install',
           id,
           url: item.dataset.site,
-          name: item.querySelector('.gallery-name')!.textContent,
+          name: nameOf(item),
           css: cssOf(item),
         },
         location.origin,
@@ -231,45 +324,30 @@ const items = await Promise.all(
     });
   }
 
-  function installLabel(item: HTMLElement) {
-    if (item.dataset.installed) return `Installed as ${item.dataset.installed}`;
-    if (item.dataset.installFailed) return 'Couldn’t install';
-    return 'Install';
-  }
-
   async function installItem(item: HTMLElement) {
+    const key = keyOf(item);
     const name = await requestInstall(item);
 
     if (name) {
-      item.dataset.installed = name;
-      delete item.dataset.installFailed;
-      item.classList.add('is-installed', 'is-just-installed');
-      setTimeout(
-        () => item.classList.remove('is-just-installed'),
-        COPIED_MS,
-      );
-      item
-        .querySelector('[data-install]')!
-        .setAttribute('title', `Installed as ${name}`);
+      installed.set(key, name);
+      failed.delete(key);
+      item.classList.add('is-just-installed');
+      setTimeout(() => item.classList.remove('is-just-installed'), COPIED_MS);
     } else {
-      item.dataset.installFailed = 'true';
+      failed.add(key);
     }
 
-    if (lightboxItem === item) lightboxInstall.textContent = installLabel(item);
+    render(item);
   }
 
-  const items = [...document.querySelectorAll<HTMLElement>('.gallery-item')];
-  const fullSrc = (item: HTMLElement) =>
-    item.querySelector<HTMLButtonElement>('[data-open]')!.dataset.full!;
-
   /**
-   * Fetches the full-size screenshots once the gallery is near the viewport,
-   * so opening one shows it immediately.
+   * Fetches the full-size screenshots of each card's selected theme once the
+   * gallery is near the viewport, so opening one shows it immediately.
    */
   const preloaded = new Set<string>();
-  function preload() {
-    items.forEach((item) => {
-      const src = fullSrc(item);
+  function preload(item?: HTMLElement) {
+    (item ? [item] : items).forEach((el) => {
+      const src = fullSrc(el);
       if (preloaded.has(src)) return;
       preloaded.add(src);
       const img = new Image();
@@ -284,63 +362,92 @@ const items = await Promise.all(
       preload();
     },
     { rootMargin: '600px 0px' },
-  ).observe(document.getElementById('gallery')!);
+  ).observe(gallery);
 
-  function show(item: HTMLElement) {
+  function renderLightbox(item: HTMLElement) {
     const img = dialog.querySelector<HTMLImageElement>('.lightbox-img')!;
-    img.src = fullSrc(item);
-    img.alt = item.querySelector('[data-open] img')!.getAttribute('alt') ?? '';
-    dialog.querySelector('.lightbox-name')!.textContent =
-      item.querySelector('.gallery-name')!.textContent;
-    dialog.querySelector('.lightbox-site')!.textContent =
-      item.querySelector('.gallery-site')!.textContent;
-    lightboxItem = item;
-    const note = item.dataset.note;
+    const note = noteOf(item);
     const noteEl = dialog.querySelector<HTMLElement>('.lightbox-note')!;
+    const key = keyOf(item);
+    img.src = fullSrc(item);
+    img.alt = `${siteOf(item)} restyled with Stylebot: ${nameOf(item)}`;
+    dialog.querySelector('.lightbox-site')!.textContent = siteOf(item);
+    const refocus = lightboxChips.contains(document.activeElement);
+    lightboxChips.replaceChildren(
+      ...[...item.querySelectorAll<HTMLElement>('[data-chip]')].map((chip) => {
+        const copy = chip.cloneNode(true) as HTMLElement;
+        copy.className = 'lightbox-chip';
+        copy.querySelector('.gallery-dot')!.className = 'lightbox-dot';
+        copy.querySelector('.gallery-name')!.className = 'lightbox-chip-name';
+        return copy;
+      }),
+    );
+    const source = themeData(item).dataset.source;
+    lightboxSource.hidden = !source;
+    if (source) lightboxSource.href = source;
+    if (refocus) {
+      lightboxChips
+        .querySelectorAll<HTMLElement>('[data-chip]')
+        [activeOf(item)]?.focus();
+    }
     noteEl.textContent = note ?? '';
     noteEl.hidden = !note;
     lightboxCopy.hidden = !!note;
     lightboxInstall.hidden = !!note || !gallery.classList.contains('can-install');
     lightboxInstall.textContent = installLabel(item);
-    lightboxCopy.textContent = item.classList.contains('is-copied')
-      ? 'Copied'
-      : 'Copy CSS';
+    lightboxCopy.textContent = copied.has(key) ? 'Copied' : 'Copy CSS';
+  }
+
+  function open(item: HTMLElement) {
+    lightboxItem = item;
+    preload(item);
+    renderLightbox(item);
+    if (!dialog.open) dialog.showModal();
   }
 
   items.forEach((item) => {
     item
-      .querySelector('[data-copy]')
-      ?.addEventListener('click', () => copyItem(item));
+      .querySelector('[data-copy]')!
+      .addEventListener('click', () => copyItem(item));
     item
-      .querySelector('[data-install]')
-      ?.addEventListener('click', () => installItem(item));
-    item
-      .querySelector<HTMLButtonElement>('[data-open]')!
-      .addEventListener('click', () => {
-        preload();
-        show(item);
-        dialog.showModal();
-      });
+      .querySelector('[data-install]')!
+      .addEventListener('click', () => installItem(item));
+    item.querySelectorAll<HTMLElement>('[data-open]').forEach((el) => {
+      el.addEventListener('click', () => open(item));
+    });
+    item.querySelectorAll<HTMLElement>('[data-chip]').forEach((chip) => {
+      chip.addEventListener('click', () => select(item, Number(chip.dataset.chip)));
+    });
+    render(item);
+  });
+
+  lightboxChips.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const chip = (e.target as HTMLElement).closest<HTMLElement>('[data-chip]');
+    if (chip && lightboxItem) select(lightboxItem, Number(chip.dataset.chip));
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && dialog.open) dialog.close();
   });
 
   dialog.addEventListener('keydown', (e) => {
     if (!lightboxItem || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight'))
       return;
     e.preventDefault();
+    const count = lightboxItem.querySelectorAll('[data-chip]').length;
     const dir = e.key === 'ArrowRight' ? 1 : -1;
-    const next =
-      (items.indexOf(lightboxItem) + dir + items.length) % items.length;
-    show(items[next]);
+    select(lightboxItem, (activeOf(lightboxItem) + dir + count) % count);
   });
 
   lightboxInstall.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (lightboxItem && !lightboxItem.dataset.note) installItem(lightboxItem);
+    if (lightboxItem && !noteOf(lightboxItem)) installItem(lightboxItem);
   });
 
   lightboxCopy.addEventListener('click', (e) => {
     e.stopPropagation();
-    if (lightboxItem && !lightboxItem.dataset.note) copyItem(lightboxItem);
+    if (lightboxItem && !noteOf(lightboxItem)) copyItem(lightboxItem);
   });
 
   dialog.addEventListener('click', (e) => {
@@ -354,13 +461,14 @@ const items = await Promise.all(
 </script>
 
 <style>
-  .gallery-track {
-    padding-bottom: 8px;
+  .gallery-grid {
+    display: grid;
+    gap: 32px 24px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }
 
   .gallery-item {
-    flex: 0 0 max(240px, calc((100% - 72px) / 4));
-    scroll-snap-align: start;
+    min-width: 0;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -380,6 +488,11 @@ const items = await Promise.all(
       box-shadow 0.2s;
   }
 
+  .gallery-shot:has(.gallery-open:focus-visible) {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+  }
+
   .gallery-shot:hover {
     transform: translateY(-2px);
     box-shadow: 0 14px 32px rgba(25, 27, 31, 0.14);
@@ -395,12 +508,21 @@ const items = await Promise.all(
     cursor: zoom-in;
   }
 
+  .gallery-open:focus-visible {
+    outline: none;
+  }
+
   .gallery-open img {
     display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    object-position: top left;
+    object-position: top center;
+  }
+
+  .gallery-open[hidden],
+  .gallery-actions[hidden] {
+    display: none;
   }
 
   .gallery-actions {
@@ -432,6 +554,11 @@ const items = await Promise.all(
       opacity 0.15s,
       transform 0.15s,
       background 0.15s;
+  }
+
+  .gallery-action:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: -2px;
   }
 
   .gallery-install {
@@ -482,20 +609,66 @@ const items = await Promise.all(
 
   .gallery-caption {
     display: flex;
-    align-items: baseline;
-    gap: 8px;
+    flex-direction: column;
+    gap: 10px;
     padding: 0 2px;
-    flex-wrap: wrap;
-  }
-
-  .gallery-name {
-    font: 600 14px/1.3 var(--ui);
-    color: var(--ink);
   }
 
   .gallery-site {
-    font: 400 12.5px/1.3 var(--mono);
-    color: var(--faint);
+    font: 500 13px/1.3 var(--ui);
+    color: var(--muted);
+  }
+
+  .gallery-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 14px;
+  }
+
+  .gallery-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 6px;
+    margin: 0 -6px;
+    border: none;
+    border-radius: 7px;
+    background: none;
+    cursor: pointer;
+    white-space: nowrap;
+    font: 400 13px/1.2 var(--ui);
+    color: var(--muted);
+    transition: color 0.15s;
+  }
+
+  .gallery-chip:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  .gallery-chip:hover,
+  .gallery-chip[aria-pressed='true'] {
+    color: var(--ink);
+  }
+
+  .gallery-chip[aria-pressed='true'] .gallery-name {
+    text-decoration: underline;
+    text-decoration-color: var(--strong);
+    text-underline-offset: 5px;
+    text-decoration-thickness: 1.5px;
+  }
+
+  .gallery-dot,
+  .lightbox-dot {
+    width: 10px;
+    height: 10px;
+    flex: none;
+    border-radius: 5px;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18);
+  }
+
+  .lightbox-dot {
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
   }
 
   .lightbox {
@@ -540,13 +713,46 @@ const items = await Promise.all(
     color: #fff;
   }
 
-  .lightbox-name {
-    font: 600 14px/1.3 var(--ui);
+  .lightbox-site {
+    font: 500 13px/1.3 var(--ui);
+    opacity: 0.7;
   }
 
-  .lightbox-site {
-    font: 400 12.5px/1.3 var(--mono);
-    opacity: 0.7;
+  .lightbox-chips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px 14px;
+  }
+
+  .lightbox-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 8px;
+    margin: 0 -8px;
+    border: none;
+    border-radius: 8px;
+    background: none;
+    cursor: pointer;
+    white-space: nowrap;
+    font: 400 14px/1.2 var(--ui);
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .lightbox-chip:hover {
+    color: #fff;
+  }
+
+  .lightbox-chip:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.85);
+    outline-offset: 1px;
+    color: #fff;
+  }
+
+  .lightbox-chip[aria-pressed='true'] {
+    color: #fff;
+    font-weight: 600;
   }
 
   .lightbox-note {
@@ -583,6 +789,30 @@ const items = await Promise.all(
 
   .lightbox-copy:hover {
     background: #e9eaee;
+  }
+
+  .lightbox-source {
+    margin-left: 4px;
+    padding: 7px 4px;
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.7);
+    font: 500 12.5px/1 var(--ui);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(255, 255, 255, 0.35);
+  }
+
+  .lightbox-source[hidden] {
+    display: none;
+  }
+
+  .lightbox-source:hover {
+    color: #fff;
+  }
+
+  .lightbox-source:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.85);
+    outline-offset: 1px;
   }
 
   .lightbox-close {

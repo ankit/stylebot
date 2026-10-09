@@ -1,0 +1,150 @@
+/* NYTimes: Morning Edition */
+@import url(https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+@import url(https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+:root {
+  --color-background-primary: #f6efdd;
+  --tpl-color-background-primary: #f6efdd;
+  --color-background-elevated: #f6efdd;
+  --color-background-secondary: #efe6cf;
+  --tpl-color-background-secondary: #efe6cf;
+  --color-background-tertiary: #e6dcc2;
+  --g-body-color: #111111;
+  --g-color-copy: #111111;
+  --color-content-tertiary: #3d3a33;
+  --tpl-color-content-secondary: #3d3a33;
+  --g-color-caption: #4a463d;
+  --g-color-leadin: #4a463d;
+  --g-body-font-family: Lora;
+  --tpl-font-family-imperial: Lora;
+  --tpl-font-family-cheltenham-cond: Libre Baskerville;
+  --tpl-font-family-cheltenham-sh: Libre Baskerville;
+  --tpl-font-family-cheltenham-text-cond: Libre Baskerville;
+  --g-hp-strip_border: 1px solid #cfc4a6;
+  --tpl-theme-tile-border-color: #cfc4a6;
+  color-scheme: light;
+  --tpl-color-background-tertiary: #e6dcc2;
+  --g-color-loading-background: #e6dcc2;
+  --color-stroke-tertiary: #ddd3b8;
+  --tpl-color-background-elevated: #f6efdd;
+  --tpl-color-background-primary-always-light: #f6efdd;
+  --g-lwp_theme-background-color: #f6efdd;
+}
+
+html {
+  background: #f6efdd;
+}
+
+body {
+  background: #f6efdd;
+  color: #111111;
+  font-family: Lora;
+}
+
+a.css-kgn7zc, section#masthead-bar-one, .Wr7_RG_floatingMiniNavCover, nav.ZcdlOG_nav, button.css-1q4czh7 {
+  background: #f6efdd;
+}
+
+.css-cfnhvx, .css-cfnhvx p {
+  font-family: Libre Baskerville;
+  color: #111111;
+  line-height: 1.25;
+}
+
+.css-sarx3u, p.summary-class {
+  font-family: Lora;
+  color: #2b2924;
+}
+
+main#site-content {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.jXhsNG_gridCell.jXhsNG_dividerLeft, .TAm62a_border {
+  border-color: #d6ccb0;
+  border-width: 1px;
+}
+
+._5zuA3W_topDivider, .w7VYaa_topBorder {
+  border-top: 1px solid #d6ccb0;
+}
+
+header.Wr7_RG_mastheadWrapper {
+  border-bottom: 3px double #cfc4a6;
+  padding-bottom: 6px;
+}
+
+div.WvEB8a_signalSlotWithoutKebab p, div.WvEB8a_signalSlotWithoutKebab a p, span.css-1j306sm, p.m-9-4W_cta, figcaption.WGkc3a_promoGridCredit, figcaption.css-1p5yz2j {
+  color: #4a463d;
+}
+
+span.g-change-value {
+  color: #2a6b2d;
+}
+
+#google-one-tap-container, #google-one-tap-prompt {
+  display: none;
+}
+
+#top-wrapper, #ad-top, #dfp-ad-top, .ad.top-wrapper, [data-testid='top-wrapper'], [id^='google_ads_iframe'], [data-testid='StandardAd'], .NYTAppHideMasthead + div:empty {
+  display: none;
+  min-height: 0;
+  height: 0;
+}
+
+section.Wr7_RG_mastheadSection {
+  background: #f6efdd;
+  color: #111111;
+  border-bottom: none;
+}
+
+section.Wr7_RG_mastheadSection button, section.Wr7_RG_mastheadSection a {
+  color: #111111;
+}
+
+section.Wr7_RG_mastheadSection svg {
+  fill: #111111;
+}
+
+div.e1xxpj0j1 {
+  display: none;
+}
+
+.a75Wga_logoContainer {
+  padding-top: 14px;
+}
+
+.PMn1ia_container.PMn1ia_gradient::after {
+  background-image: linear-gradient(to right, rgba(246,239,221,0), #f6efdd);
+}
+
+div:has(> .Wr7_RG_floatingMiniNav), .Wr7_RG_floatingMiniNav {
+  display: none;
+}
+
+div.Wr7_RG_miniNavContainer {
+  border-bottom-color: #cfc4a6;
+}
+
+div.Wr7_RG_miniNavContainer::before, div.Wr7_RG_miniNavContainer::after, nav.css-ii3p4j::before, nav.css-ii3p4j::after, ._5zuA3W_topDivider::before, ._5zuA3W_topDivider::after {
+  border-color: #d6ccb0;
+  background-color: #d6ccb0;
+}
+
+hr.nEtvdG_hRule {
+  border-top-color: #d6ccb0;
+}
+
+nav.ZcdlOG_nav::before, nav.ZcdlOG_nav::after, div.O8nPlG_storylineMenu::before, div.O8nPlG_storylineMenu::after {
+  border-color: #d6ccb0;
+}
+
+li.css-r0w6eq > div {
+  background: #f6efdd;
+  color: #111111;
+  border-top: 1px solid #cfc4a6;
+  border-bottom: 3px double #cfc4a6;
+  box-shadow: none;
+}

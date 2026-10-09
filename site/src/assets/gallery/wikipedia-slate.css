@@ -1,0 +1,385 @@
+/* Wikipedia: Slate & Ash */
+@import url(https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+@import url(https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+:root {
+  --background-color-base: #16181c;
+  --background-color-base-fixed: #16181c;
+  --background-color-interactive-subtle: #1d2025;
+  --background-color-interactive: #252930;
+  --color-base: #bcbcb8;
+  --color-emphasized: #d4d4d0;
+  --color-link: #bcbcb8;
+  --color-link--hover: #e0a0a0;
+  --color-link--visited: #b8b8c8;
+  --color-subtle: #a0a4aa;
+  --border-color-subtle: #343840;
+  --border-color-muted: #2c3036;
+  --color-progressive: #7d90b8;
+  --color-link--focus: #7d90b8;
+  --color-link--active: #97a8cc;
+  --accent-color-base: #7d90b8;
+  color-scheme: dark;
+  --color-base--hover: #d4d4d0;
+  --color-neutral: #a0a4aa;
+}
+
+html, body {
+  background: #16181c;
+  color: #d8d8d4;
+  font-family: Libre Baskerville;
+}
+
+.mw-page-container, .vector-header-container, #vector-toc-pinned-container, #vector-appearance-pinned-container, .vector-dropdown-content, #searchform, #searchInput {
+  background: #16181c;
+  color: #d8d8d4;
+}
+
+header.vector-header {
+  background: #f4ecd8;
+  color: #111;
+  display: none;
+}
+
+#mw-content-text, .mw-body-content, .vector-menu-content, .vector-toc, .vector-pinnable-header-label {
+  font-family: Libre Baskerville;
+}
+
+#firstHeading, .mw-first-heading, .mw-body h2, .mw-body h3 {
+  font-family: Playfair Display;
+  color: #000;
+  border-bottom: 1px solid #b5ae9a;
+}
+
+#mw-content-text .mw-parser-output {
+  column-count: 2;
+  column-gap: 2em;
+  column-rule: 1px solid #343840;
+  text-align: justify;
+  line-height: 1.6;
+}
+
+#mw-content-text .mw-parser-output .mw-heading2, #mw-content-text .mw-parser-output .toc {
+  column-span: all;
+}
+
+#mw-content-text .mw-parser-output .infobox {
+  column-span: none;
+  background-color: #efe5cc;
+  color: #111;
+  border: 1px solid #b5ae9a;
+  font-family: Libre Baskerville;
+  line-height: 1.4;
+  break-inside: avoid;
+  page-break-inside: avoid;
+  float: none;
+  clear: none;
+  width: 100%;
+  margin: 0 0 1em 0;
+}
+
+.vector-page-toolbar, .vector-header-container {
+  border-bottom: 1px solid #b5ae9a;
+  border-bottom-color: #343840;
+}
+
+#mw-content-text .mw-parser-output .infobox th, #mw-content-text .mw-parser-output .infobox td {
+  background-color: transparent;
+  color: #111;
+  border-bottom: 1px solid #d0c9b5;
+}
+
+#mw-content-text .mw-parser-output .infobox a, #mw-content-text .mw-parser-output .infobox a span {
+  color: #111;
+}
+
+#mw-content-text .mw-parser-output .wikitable {
+  background-color: #16181c;
+  color: #d8d8d4;
+  border: 1px solid #b5ae9a;
+  font-family: Libre Baskerville;
+  line-height: 1.4;
+  column-span: none;
+  border-color: #343840;
+}
+
+#mw-content-text .mw-parser-output .wikitable th {
+  background-color: #e8dcc0;
+  color: #000;
+  border: 1px solid #b5ae9a;
+}
+
+#mw-content-text .mw-parser-output .wikitable td {
+  background-color: #efe5cc;
+  color: #111;
+  border: 1px solid #d0c9b5;
+}
+
+#mw-content-text .mw-parser-output .wikitable a, #mw-content-text .mw-parser-output .wikitable a span {
+  color: #111;
+}
+
+#mw-content-text .mw-parser-output .wikitable caption {
+  font-family: Playfair Display;
+  color: #000;
+}
+
+#mw-content-text .mw-parser-output .navbox, #mw-content-text .mw-parser-output .navbox-subgroup, #mw-content-text .mw-parser-output #catlinks, #catlinks {
+  background-color: #efe5cc;
+  color: #111;
+  border: 1px solid #b5ae9a;
+  font-family: Libre Baskerville;
+  column-span: all;
+}
+
+#mw-content-text .mw-parser-output .navbox-title, #mw-content-text .mw-parser-output .navbox-abovebelow, #mw-content-text .mw-parser-output .navbox-group {
+  background-color: #e8dcc0;
+  color: #000;
+}
+
+#mw-content-text .mw-parser-output .navbox-list, #mw-content-text .mw-parser-output .navbox-even, #mw-content-text .mw-parser-output .navbox-odd {
+  background-color: #efe5cc;
+  color: #111;
+}
+
+#mw-content-text .mw-parser-output .navbox a, #mw-content-text .mw-parser-output .navbox a span, #catlinks a {
+  color: #111;
+}
+
+#catlinks .mw-normal-catlinks, #catlinks ul, #catlinks li {
+  background-color: transparent;
+  color: #d8d8d4;
+}
+
+div.vector-appearance {
+  display: none;
+}
+
+button.vector-pinnable-header-toggle-button {
+  display: none;
+}
+
+input.vector-dropdown-checkbox {
+  display: none;
+}
+
+label.vector-dropdown-label {
+  display: none;
+}
+
+table.box-Multiple_issues {
+  background-color: #efe5cc;
+  color: #111;
+  border-left: 6px solid #7a1c1c;
+  font-family: Libre Baskerville;
+  column-span: all;
+  break-inside: avoid;
+  border-top: 1px solid #b5ae9a;
+  border-right: 1px solid #b5ae9a;
+  border-bottom: 1px solid #b5ae9a;
+}
+
+table.box-Multiple_issues td, table.box-Multiple_issues th, table.box-Multiple_issues .ambox, table.box-Multiple_issues .mbox-text {
+  background-color: transparent;
+  color: #111;
+  border-color: #d0c9b5;
+}
+
+table.box-Multiple_issues a, table.box-Multiple_issues a span {
+  color: #111;
+}
+
+table.box-Multiple_issues .mw-collapsible-text, table.box-Multiple_issues .mw-collapsible-toggle a {
+  color: #111;
+}
+
+div.frb-inline-bottombar {
+  display: none;
+  
+}
+
+div.frb-inline-main {
+  display: none;
+  
+}
+
+#mw-content-text .mw-parser-output a:not(.new) {
+  color: #5c6275;
+}
+
+.vector-toc-link, #p-views a, #p-associated-pages a, #p-tb a, #p-coll-print_export a, #p-wikibase-otherprojects a, .mw-editsection a {
+  color: #5c6275;
+}
+
+#mw-content-text .mw-parser-output .infobox a, #mw-content-text .mw-parser-output .infobox a span, #mw-content-text .mw-parser-output .wikitable a, #mw-content-text .mw-parser-output .wikitable a span, #mw-content-text .mw-parser-output .navbox a, #mw-content-text .mw-parser-output .navbox a span {
+  color: #111;
+}
+
+a.frb-mini-banner-link {
+  display: none;
+}
+
+a.cdx-button {
+  display: none;
+}
+
+table.vgr-aggregators caption {
+  background-color: #b5ae9a;
+}
+
+caption.vgr-stacked {
+  background-color: #b5ae9a;
+}
+
+.mwe-popups .mwe-popups-extract::after, .mwe-popups .mwe-popups-extract:after {
+  display: none;
+  background: none;
+}
+
+ol.mw-references li {
+  background-color: rgba(0, 0, 0, 0);
+}
+
+#mw-content-text a[href$='.pdf'].external, #mw-content-text a[href*='.pdf#'].external, #mw-content-text a.external[href$='.PDF'] {
+  filter: saturate(0.2) contrast(0.85);
+  background-blend-mode: luminosity;
+}
+
+ul.noprint {
+  background-color: transparent;
+}
+
+#mw-content-text .mw-parser-output .portalbox {
+  display: block;
+}
+
+#mw-content-text .mw-parser-output .portalbox {
+  float: none;
+  clear: both;
+  width: 100%;
+  margin: 0.5em 0;
+  box-sizing: border-box;
+  break-inside: avoid;
+}
+
+#mw-content-text .mw-parser-output .portalbox {
+  text-align: left;
+  text-justify: none;
+}
+
+#mw-content-text .mw-parser-output .portalbox {
+  float: none;
+  clear: both;
+  width: 100%;
+  margin: 0.5em 0;
+  box-sizing: border-box;
+  break-inside: avoid;
+}
+
+#mw-content-text .mw-parser-output .portalbox {
+  text-align: left;
+  text-justify: none;
+}
+
+#mw-content-text .mw-parser-output table.sortable, #mw-content-text .mw-parser-output .multicol, #mw-content-text .mw-parser-output .navbox, #mw-content-text .mw-parser-output .infobox-wide {
+  column-span: all;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 1em 0;
+  break-inside: avoid;
+}
+
+#mw-content-text .mw-parser-output .wikitable {
+  column-span: all;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 1em 0;
+  break-inside: avoid;
+}
+
+#mw-content-text .mw-parser-output table:not(.infobox) {
+  column-span: all;
+  max-width: 100%;
+  box-sizing: border-box;
+  break-inside: avoid;
+  margin: 16px;
+}
+
+#mw-content-text .mw-parser-output .navbox, #mw-content-text .mw-parser-output .multicol {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+#mw-content-text .mw-parser-output .wikitable {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+td.largestCities-cell-background {
+  background-color: transparent;
+}
+
+div.navbar {
+  margin-right: 12px;
+}
+
+#firstHeading, .mw-first-heading, .mw-body h2, .mw-body h3, .vector-pinnable-header-label, #mw-content-text .mw-parser-output .wikitable caption {
+  color: #d4d4d0;
+  border-bottom-color: #343840;
+}
+
+#mw-content-text .mw-parser-output .infobox, #mw-content-text .mw-parser-output .navbox, #mw-content-text .mw-parser-output .navbox-subgroup, #catlinks, table.box-Multiple_issues {
+  background-color: #1d2025;
+  color: #d8d8d4;
+  border-color: #343840;
+}
+
+#mw-content-text .mw-parser-output .infobox th, #mw-content-text .mw-parser-output .infobox td, table.box-Multiple_issues td, table.box-Multiple_issues th {
+  color: #d8d8d4;
+  border-color: #2c3036;
+}
+
+#mw-content-text .mw-parser-output .wikitable th, #mw-content-text .mw-parser-output .navbox-title, #mw-content-text .mw-parser-output .navbox-abovebelow, #mw-content-text .mw-parser-output .navbox-group {
+  background-color: #252930;
+  color: #d4d4d0;
+  border-color: #343840;
+}
+
+#mw-content-text .mw-parser-output .wikitable td, #mw-content-text .mw-parser-output .navbox-list, #mw-content-text .mw-parser-output .navbox-even, #mw-content-text .mw-parser-output .navbox-odd {
+  background-color: #1d2025;
+  color: #d8d8d4;
+  border-color: #2c3036;
+}
+
+#mw-content-text .mw-parser-output a:not(.new), .vector-toc-link, #p-views a, #p-associated-pages a, #p-tb a, #p-coll-print_export a, #p-wikibase-otherprojects a, .mw-editsection a, .mw-jump-link {
+  color: #7d90b8;
+}
+
+#mw-content-text .mw-parser-output .infobox a, #mw-content-text .mw-parser-output .infobox a span, #mw-content-text .mw-parser-output .wikitable a, #mw-content-text .mw-parser-output .wikitable a span, #mw-content-text .mw-parser-output .navbox a, #mw-content-text .mw-parser-output .navbox a span, #catlinks a, table.box-Multiple_issues a, table.box-Multiple_issues a span {
+  color: #8e9fc4;
+}
+
+.vector-menu-heading {
+  color: #a0a4aa;
+}
+
+table.vgr-aggregators caption, caption.vgr-stacked {
+  background-color: #252930;
+}
+
+.vector-icon {
+  filter: invert(0.85);
+}
+
+html, body, .mw-page-container, .vector-header-container, #vector-toc-pinned-container, #vector-appearance-pinned-container, .vector-dropdown-content, #searchform, #searchInput {
+  color: #bcbcb8;
+}
+
+#mw-content-text .mw-parser-output .infobox, #mw-content-text .mw-parser-output .navbox, #mw-content-text .mw-parser-output .navbox-subgroup, #catlinks, table.box-Multiple_issues, #mw-content-text .mw-parser-output .wikitable {
+  color: #bcbcb8;
+}
+
+#mw-content-text .mw-parser-output .infobox th, #mw-content-text .mw-parser-output .infobox td, table.box-Multiple_issues td, table.box-Multiple_issues th, #mw-content-text .mw-parser-output .wikitable td, #mw-content-text .mw-parser-output .navbox-list, #mw-content-text .mw-parser-output .navbox-even, #mw-content-text .mw-parser-output .navbox-odd, #catlinks .mw-normal-catlinks, #catlinks ul, #catlinks li {
+  color: #bcbcb8;
+}

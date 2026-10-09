@@ -1,0 +1,211 @@
+/* Hacker News: Hacker Hearth */
+@import url(https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+@import url(https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+body {
+  background: #eadcc6;
+  font-family: 'Source Serif 4';
+  color: #6b5444;
+  -webkit-font-smoothing: antialiased;
+  padding: 24px 0 48px;
+  margin: 0;
+}
+
+#hnmain {
+  width: 860px;
+  max-width: 94%;
+  background: #fbf1de;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(90,50,20,.10), 0 14px 44px rgba(110,60,20,.18);
+}
+
+#hnmain > tbody > tr:first-child > td[bgcolor="#ff6600"] {
+  background: #d9763a;
+  padding: 12px 20px;
+}
+
+.pagetop {
+  font-family: 'Source Serif 4';
+  font-size: 15px;
+  color: rgba(58,32,18,.8);
+  line-height: 1.4;
+}
+
+.pagetop a {
+  color: #1c1917;
+  font-weight: 500;
+}
+
+.hnname a {
+  font-family: Fraunces;
+  font-size: 19px;
+  font-weight: 700;
+  margin-right: 10px;
+  letter-spacing: -0.01em;
+}
+
+#bigbox > td {
+  padding: 20px 28px 12px 12px;
+}
+
+td.title {
+  padding-top: 2px;
+  vertical-align: baseline;
+}
+
+.rank {
+  font-family: 'Source Serif 4';
+  font-size: 16px;
+  color: #78716c;
+  font-variant-numeric: tabular-nums;
+  font-style: italic;
+}
+
+.titleline {
+  line-height: 1.35;
+}
+
+.titleline > a {
+  font-family: 'Source Serif 4';
+  font-size: 19px;
+  font-weight: 600;
+  color: #3a2416;
+  letter-spacing: -0.005em;
+}
+
+.titleline > a:visited {
+  color: #9a8472;
+}
+
+.titleline > a:hover {
+  color: #d9531e;
+}
+
+.comhead {
+  font-family: 'Source Serif 4';
+  font-size: 14px;
+  color: #736b64;
+  margin-left: 4px;
+  font-style: italic;
+}
+
+.comhead a {
+  color: #736b64;
+}
+
+td.subtext {
+  font-family: 'Source Serif 4';
+  font-size: 14px;
+  color: #736b64;
+  padding-top: 4px;
+  line-height: 1.5;
+}
+
+.subtext a {
+  color: #78716c;
+}
+
+.subtext a:hover {
+  color: #d9531e;
+}
+
+.score {
+  color: #d9531e;
+  font-weight: 500;
+}
+
+tr.spacer {
+  height: 18px;
+}
+
+.votearrow {
+  opacity: 0.45;
+  margin-top: 8px;
+}
+
+.morelink {
+  font-family: 'Source Serif 4';
+  font-size: 16px;
+  font-weight: 600;
+  color: #d9531e;
+}
+
+td[bgcolor="#ff6600"] {
+  background: #e6d3b3;
+}
+
+.yclinks {
+  font-family: 'Source Serif 4';
+  font-size: 14px;
+  line-height: 2;
+  color: #78716c;
+}
+
+.yclinks a, #hnmain center > a {
+  color: #78716c;
+}
+
+#hnmain form {
+  font-family: 'Source Serif 4';
+  font-size: 14px;
+  margin: 12px 0 28px;
+}
+
+#hnmain form input {
+  font-family: 'Source Serif 4';
+  font-size: 14px;
+  padding: 6px 10px;
+  border: 1px solid #d9c5a3;
+  border-radius: 8px;
+  background: #fff8ea;
+  color: #3a2416;
+}
+
+td.votelinks {
+  vertical-align: top;
+  padding: 2px 4px 0 2px;
+}
+
+html {
+  background: #eadcc6;
+}
+
+.pagetop a, .hnname a {
+  color: #3a2012;
+}
+
+.titleline > a:hover, .subtext a:hover {
+  color: #b8481a;
+}
+
+.rank, .subtext a, .yclinks, .yclinks a, #hnmain center > a {
+  color: #7d6451;
+}
+
+.comhead, .comhead a, td.subtext {
+  color: #745e4d;
+}
+
+.score, .morelink {
+  color: #b8481a;
+}
+
+textarea[name="text"] {
+  background: #fff8ea;
+  color: #3a2416;
+  font-family: 'Source Serif 4';
+  font-size: 15px;
+  line-height: 1.5;
+  padding: 10px 12px;
+  border: 1px solid #d9c5a3;
+  border-radius: 10px;
+  outline: none;
+  box-shadow: inset 0 1px 2px rgba(90,50,20,.08);
+}
+
+textarea[name="text"]:focus {
+  border-color: #d9763a;
+  box-shadow: 0 0 0 3px rgba(217,118,58,.2);
+}

@@ -1,0 +1,246 @@
+/* NYTimes: Midnight Edition */
+
+iframe#mnet, div.ad, [id^="story-ad-"], [id*="story-ad-"][class*="css-10gheg7"], .css-10gheg7, #top-wrapper, #sponsor-wrapper, [id$="-slug"], a.css-777zgl, #google_ads_iframe_\/29390238\/nyt\/us\/politics_0__container__, div[id^="google_ads_iframe"] { display: none !important; }
+
+div.css-17bp1td { display: none !important; }
+
+html, body, body.gps-show, #app, #site-content, main, article, .meteredContent, .css-6wov7h, .css-vi-gateway-container, .vi-gateway-container {
+  background-color: #1a1b26 !important;
+  color: #a9b1d6 !important;
+  --grid-cell-divider-color: #2a2e42 !important;
+}
+
+div.css-8oogi6, div.css-1k6xcqw {
+  background-color: #16161e !important;
+  color: #a9b1d6 !important;
+  border-color: #2a2e42 !important;
+}
+
+.styln-edit-storyline, .css-1doru00 {
+  color: #7aa2f7 !important;
+}
+
+p, span, li, div, figcaption, time, td, th, blockquote {
+  color: #a9b1d6 !important;
+}
+
+h1, h2, h3, h4, h5, h6, .css-ibqknj, .css-1b9pdj9, #article-summary {
+  color: #c0caf5 !important;
+}
+
+a, a span {
+  color: #7aa2f7 !important;
+}
+
+a:hover, a:hover span {
+  color: #bb9af7 !important;
+}
+
+.css-1ukf1n3, .e6idgb70, p.css-1ukf1n3 {
+  color: #7dcfff !important;
+}
+
+header, .Wr7_RG_mastheadWrapper, .Wr7_RG_mastheadSection, #masthead-bar-one, .Wr7_RG_mastheadContainer {
+  background-color: #16161e !important;
+  color: #a9b1d6 !important;
+  border-color: #2a2e42 !important;
+}
+
+.CgJuwW_logoContainer, .CgJuwW_defaultLink {
+  filter: invert(1) sepia(1) saturate(3) hue-rotate(190deg) brightness(0.95) !important;
+}
+
+div.a75Wga_logoContainer, div.a75Wga_logoContainer a {
+  filter: invert(1) sepia(0.4) saturate(2) hue-rotate(190deg) brightness(2.4) !important;
+}
+
+li.css-1bo3wsb {
+  background-color: transparent !important;
+  color: #a9b1d6 !important;
+}
+
+li.css-1bo3wsb a.css-lb9z05, li.css-1bo3wsb a.css-lb9z05 span {
+  color: #c0caf5 !important;
+}
+
+li.css-1bo3wsb a.css-lb9z05:hover, li.css-1bo3wsb a.css-lb9z05:hover span {
+  color: #bb9af7 !important;
+}
+
+button.css-19wyrnd {
+  color: #c0caf5 !important;
+  fill: #c0caf5 !important;
+  background-color: transparent !important;
+}
+
+button.css-19wyrnd svg, button.css-19wyrnd path {
+  fill: #c0caf5 !important;
+  stroke: #c0caf5 !important;
+}
+
+div[id^="nav-dropdown-"], div.css-676whe, div.css-gwbfi {
+  background-color: #16161e !important;
+  color: #a9b1d6 !important;
+  border-color: #2a2e42 !important;
+}
+
+div.css-1l5m5s2 {
+  background-color: #16161e !important;
+  color: #a9b1d6 !important;
+  border-color: #2a2e42 !important;
+}
+
+div.css-1l5m5s2 a, div.css-1l5m5s2 a span {
+  color: #7aa2f7 !important;
+}
+
+div.css-1l5m5s2 a:hover, div.css-1l5m5s2 a:hover span {
+  color: #bb9af7 !important;
+}
+
+div.Wr7_RG_floatingMiniNav, div.Wr7_RG_floatingMiniNavContainer {
+  background-color: #16161e !important;
+  color: #a9b1d6 !important;
+  border-color: #2a2e42 !important;
+}
+
+div.Wr7_RG_floatingMiniNav a, div.Wr7_RG_floatingMiniNav a span {
+  color: #7aa2f7 !important;
+}
+
+div.Wr7_RG_floatingMiniNav a:hover, div.Wr7_RG_floatingMiniNav a:hover span {
+  color: #bb9af7 !important;
+}
+
+nav.css-1nblseu.er7xine0 {
+  background-color: #16161e !important;
+  color: #a9b1d6 !important;
+  border-color: #2a2e42 !important;
+}
+
+nav.css-1nblseu.er7xine0 a, nav.css-1nblseu.er7xine0 a span {
+  color: #7aa2f7 !important;
+}
+
+nav.css-1nblseu.er7xine0 a:hover, nav.css-1nblseu.er7xine0 a:hover span {
+  color: #bb9af7 !important;
+}
+
+nav.css-1nblseu.er7xine0 h1, nav.css-1nblseu.er7xine0 h2, nav.css-1nblseu.er7xine0 h3, nav.css-1nblseu.er7xine0 h4 {
+  color: #c0caf5 !important;
+}
+
+dialog#mobile-hamburger, nav.css-10klw3m, ul#mobile-hamburger-list {
+  background-color: #16161e !important;
+  color: #a9b1d6 !important;
+}
+
+button {
+  color: #c0caf5 !important;
+}
+
+figcaption span, .css-1y6rqsj, .css-3hmc0r {
+  color: #565f89 !important;
+}
+
+time, .css-1sbuyqj, .css-epvm6 {
+  color: #565f89 !important;
+}
+
+hr, .css-hsn83p, .bottom-of-article, .css-c8qh27 {
+  border-color: #2a2e42 !important;
+}
+
+div.css-17ih8de.interactive-body {
+  display: none;
+}
+
+div.css-1e0p32k {
+  background-color: #16161e !important;
+}
+
+#storyline-menu-title {
+  background-color: #16161e !important;
+}
+
+span.css-wilhna {
+  background-color: #16161e !important;
+}
+
+section.css-2ypnkk {
+  background-color: #1a1b26 !important;
+  color: #a9b1d6 !important;
+  border-color: #2a2e42 !important;
+}
+
+section.css-2ypnkk h1, section.css-2ypnkk h2, section.css-2ypnkk h3, section.css-2ypnkk h4 {
+  color: #c0caf5 !important;
+}
+
+section.css-2ypnkk a, section.css-2ypnkk a span {
+  color: #7aa2f7 !important;
+}
+
+section.css-1e6xlac {
+  background-color: #1a1b26 !important;
+  color: #a9b1d6 !important;
+  border-color: #2a2e42 !important;
+}
+
+section.css-1e6xlac h1, section.css-1e6xlac h2, section.css-1e6xlac h3, section.css-1e6xlac h4 {
+  color: #c0caf5 !important;
+}
+
+section.css-1e6xlac a, section.css-1e6xlac a span {
+  color: #7aa2f7 !important;
+}
+
+div a svg {
+  fill: beige;
+}
+
+#top-wrapper {
+  display: none;
+}
+
+.css-v2w0j8 {
+  display: none;
+}
+
+* {
+  border-color: #2a2e42 !important;
+  --grid-cell-divider-color: #2a2e42 !important;
+}
+
+div.css-ga17g1.e1ppw5w20 {
+  color: #a9b1d6 !important;
+}
+
+article[data-testid="feed-item"] {
+  color: #a9b1d6 !important;
+}
+
+a.nytcp-opt span {
+  display: none;
+  
+}
+
+li[data-testid="nav-item-Lifestyle"] button {
+  background-color: #16161e;
+}
+
+li button {
+  background-color: #16161e;
+}
+
+nav.ZcdlOG_nav {
+  background-color: #1a1b26;
+}
+
+img.j6zhuW_lazyLoaded {
+  filter: brightness(0.75) saturate(1.1);
+}
+
+img.j6zhuW_loaded {
+  filter: brightness(0.75) saturate(1.1);
+}

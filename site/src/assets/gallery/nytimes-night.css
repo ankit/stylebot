@@ -1,0 +1,398 @@
+/* NYTimes: Night Edition */
+@import url(https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+@import url(https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+@import url(https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+/* ads */
+div.e1xxpj0j1, div.dfp-ad-top-wrapper, #dfp-ad-top, #after-dfp-ad-top,
+div.ad, [id^="google_ads_iframe"], #google-one-tap-container,
+a[href="#site-content"],
+[data-testid="StandardAd"], iframe[src*="doubleclick"],
+#top-wrapper, #bottom-wrapper, [id$="-wrapper"]:has(> [id$="-slug"]),
+[id$="-slug"], a[href^="#after-"], #dock-container {
+  display: none;
+}
+
+/* newsprint paper */
+:root {
+  color-scheme: dark;
+}
+/* paper goes on html only: NYT layers some images beneath body/main,
+   so an opaque background there hides them */
+html {
+  background: #171512;
+}
+body {
+  background: transparent;
+  color: #e6dfd0;
+}
+#app, main#site-content {
+  background: transparent;
+}
+div[class*="_mastheadContainer"], #masthead-bar-one,
+div[class*="_floatingMiniNavCover"], div[class*="_floatingMiniNav"],
+nav[class*="_nav"], [class*="_miniNavContainer"] nav,
+[class*="_floatingMiniNav"] nav {
+  background: #171512;
+}
+div[class*="_mastheadContainer"] div[class=""] {
+  background: #171512;
+}
+
+/* masthead: double rule like the print edition */
+
+[class*="_miniNavContainer"] {
+  border-top: 1px solid #4a443a;
+  border-bottom: 3px double #4a443a;
+  padding: 2px 0;
+}
+li[class*="_editionMenuItem"] > a,
+[class*="_miniNavContainer"] nav li > a,
+[class*="_floatingMiniNav"] nav li > a {
+  color: #e6dfd0;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.css-h7bynl {
+  background: #e6dfd0;
+  color: #171512;
+  border-radius: 0;
+  display: none;
+}
+
+/* headlines and body in a book serif */
+a.tpl-lbl, a.tpl-lbl p, a.tpl-lbl span {
+  font-family: "Playfair Display";
+  font-size: 20px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #f4eddf;
+}
+p.summary-class {
+  font-family: "Lora";
+  font-size: 14px;
+  line-height: 1.45;
+  color: #bab2a2;
+}
+div[class*="_footer"] p {
+  font-size: 11px;
+  color: #9a917f;
+}
+p:has(> [class*="_statusLabel"]), [class*="_statusLabel"],
+time[class*="_timestamp"] span {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #e0a458;
+}
+figcaption {
+  color: #9a917f;
+}
+
+/* sepia photos, ruled columns */
+:where(picture[class*="_mediaWrapper"]) img {
+  filter: grayscale(1) sepia(0.3) brightness(0.85);
+  border-radius: 0;
+}
+[class*="_dividerLeft"]::before, [class*="_dividerLeft"], [class*="_border"] {
+  border-color: #3a352d;
+}
+div[class*="_topDivider"], [class*="_topBorder"] {
+  border-top-color: #3a352d;
+}
+hr[class*="_hRule"] {
+  border-top-color: #3a352d;
+}
+a:hover p.indicate-hover {
+  text-decoration: underline;
+}
+
+nav li > button, nav li > button svg {
+  background: transparent;
+}
+
+/* loading placeholders match the paper */
+:root {
+  --g-color-loading-background: #2a2621;
+  --color-background-tertiary: #2a2621;
+  --tpl-color-background-tertiary: #2a2621;
+  --color-background-secondary: #201d19;
+  --tpl-color-background-secondary: #201d19;
+}
+
+/* carousel arrows */
+button[aria-label*="revious"] svg circle, button[aria-label*="ext"] svg circle {
+  fill: #171512;
+  stroke: #6b6457;
+}
+button[aria-label*="revious"] svg path, button[aria-label*="ext"] svg path {
+  stroke: #e6dfd0;
+}
+
+/* nav popover menus */
+[data-testid*="dropdown"] {
+  background: #171512;
+  color: #e6dfd0;
+  border-bottom: 3px double #4a443a;
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.5);
+}
+[data-testid*="dropdown"] a {
+  color: #e6dfd0;
+}
+[data-testid*="dropdown"] a:hover {
+  text-decoration: underline;
+}
+
+/* disabled carousel arrow */
+button[disabled] svg circle, button[disabled] svg path {
+  stroke: #e6dfd0;
+  opacity: 0.25;
+}
+
+/* article page */
+#in-story-masthead {
+  background: #171512;
+  border-bottom: 1px solid #4a443a;
+}
+#in-story-masthead span, #in-story-masthead a {
+  color: #e6dfd0;
+}
+button.actionbar-button, span.gps-cta {
+  background: #171512;
+  color: #e6dfd0;
+  border-color: #4a443a;
+}
+button.actionbar-button svg {
+  color: #e6dfd0;
+}
+.byline-container p, article#story > header time {
+  font-family: "Work Sans";
+}
+article#story > header h1 {
+  font-family: "Playfair Display";
+  font-weight: 700;
+  font-style: normal;
+  color: #f4eddf;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+}
+.byline-container p:has(> a) {
+  font-style: normal;
+  letter-spacing: 0.02em;
+}
+.StoryBodyCompanionColumn > div > p {
+  font-family: "Lora";
+  font-size: 21px;
+  line-height: 1.6;
+  font-weight: 400;
+  color: #e6dfd0;
+}
+.StoryBodyCompanionColumn > div > p a {
+  color: #e0a458;
+}
+.StoryBodyCompanionColumn > div > p:first-child::first-letter {
+  color: #e6dfd0;
+}
+:where(article#story figure picture) img {
+  filter: grayscale(1) sepia(0.3) brightness(0.85);
+  border-radius: 0;
+}
+img:where(.byline-container img) {
+  filter: grayscale(1) sepia(0.3) brightness(0.85);
+}
+aside#gpsModule {
+  background: #201d19;
+  border-top: 1px solid #4a443a;
+  border-bottom: 1px solid #4a443a;
+}
+a[href="#site-index"], button#desktop-sections-button {
+  background: #171512;
+  color: #e6dfd0;
+}
+
+/* tint all NYT photos and video; hover reveals true color */
+img[src*="static01.nyt.com/images"], video, nyt-betamax {
+  filter: grayscale(1) sepia(0.3) brightness(0.85);
+  transition: filter 0.25s ease;
+}
+picture[class*="_mediaWrapper"] img, article#story figure picture img, .byline-container img {
+  transition: filter 0.25s ease;
+}
+/* cards stretch their headline link over the photo, so key hover off the
+   card, slide or player holding the media, or the parent of a hovered link;
+   the tint rules above use :where() so these always win */
+:is(a, li, figure, picture, .story-wrapper, .tpl-lb, nyt-betamax,
+  [class*="video" i], [class*="media" i], [class*="slide" i],
+  article[class*="promo" i]):hover
+  :is(img[src*="static01.nyt.com/images"], picture img, .byline-container img, video, nyt-betamax),
+:has(> a:hover) :is(img[src*="static01.nyt.com/images"], picture img, .byline-container img, video, nyt-betamax),
+:is(img[src*="static01.nyt.com/images"], picture img, .byline-container img, video, nyt-betamax):hover {
+  filter: none;
+}
+
+/* article storyline bar: paper, ruled like the homepage nav, not sticky */
+article#story > div:has(#storyline-menu-title),
+article#story > div:has(#storyline-menu-title) > div,
+div:has(> nav > #storyline-menu-title),
+#storyline-menu-title > span {
+  background: #171512;
+  box-shadow: none;
+}
+article#story > div:has(#storyline-menu-title) {
+  position: static;
+  border-top: 1px solid #4a443a;
+  border-bottom: 3px double #4a443a;
+}
+nav:has(> #storyline-menu-title) a, #storyline-menu-title > span {
+  color: #e6dfd0;
+}
+
+/* article footer recirculation ("More in …", "Trending in The Times") */
+[data-testid*="recirc"] {
+  background: #171512;
+}
+
+/* wirecutter: top ad slot and "Never miss a deal" signup bar */
+div:has(> div > p.cca4d3b6),
+#__next *:has(> * > button[aria-label*="ismiss" i]) {
+  display: none;
+}
+
+/* section fronts (/section/...) and article header */
+a[class*="_labelText"] {
+  color: #e6dfd0;
+}
+a[class*="_defaultLink"], a[class*="_defaultLink"] svg {
+  color: #e6dfd0;
+  fill: #e6dfd0;
+}
+section[id^="collection-"] h1 {
+  font-family: "Playfair Display";
+  font-weight: 700;
+  color: #f4eddf;
+}
+.story-body h3, .story-body h3 a,
+section[id^="collection-"] li p:has(> a:only-child),
+section[id^="collection-"] li p:has(> a:only-child) a,
+#stream-panel h3 {
+  font-family: "Playfair Display";
+  font-weight: 700;
+  color: #f4eddf;
+}
+.story-body p:not(:has(*)), #stream-panel article > p:not(:has(*)),
+p#article-summary {
+  font-family: "Lora";
+  color: #bab2a2;
+}
+.story-body p:has(> span), #stream-panel article > p:has(> span),
+#stream-panel article + div {
+  font-family: "Work Sans";
+  color: #9a917f;
+}
+.story-body > div:not(:has(p)) {
+  font-family: "Work Sans";
+  color: #e0a458;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+section[id^="collection-"] > header nav ol li,
+section[id^="collection-"] > header nav ol li a {
+  color: #bab2a2;
+}
+article#story h2 {
+  font-family: "Playfair Display";
+  color: #f4eddf;
+}
+#story figcaption, #story figcaption span {
+  color: #9a917f;
+}
+
+/* dark edition: NYT's own palette and the elements that set their own ink */
+:root {
+  --color-background-primary: #171512;
+  --tpl-color-background-primary: #171512;
+  --color-background-elevated: #201d19;
+  --color-background-quaternary: #3a352d;
+  --g-body-color: #e6dfd0;
+  --g-color-copy: #e6dfd0;
+  --g-color-caption: #9a917f;
+  --g-color-leadin: #9a917f;
+  --g-color-anchor: #e0a458;
+  --color-content-tertiary: #9a917f;
+  --color-content-quintary: #9a917f;
+  --tpl-color-content-secondary: #9a917f;
+  --color-stroke-tertiary: #3a352d;
+  --tpl-theme-tile-border-color: #3a352d;
+  --g-hp-strip_border: 1px solid #3a352d;
+  --tpl-rule-vertical-primary: .0625rem solid #3a352d;
+  --tpl-rule-horizontal-primary: .125rem solid #4a443a;
+  --tpl-color-background-highlight: #2a2621;
+  --color-signal-highlight: #2a2621;
+}
+a[class*="_desktopHomeLink"], a[class*="_desktopHomeLink"] svg {
+  color: #e6dfd0;
+  fill: #e6dfd0;
+}
+li[class*="_menuListItem"], span[class*="_menuTitle"],
+#masthead-bar-one div, #masthead-bar-one span, #masthead-bar-one a,
+header button, header button span, a.nytcp-opt {
+  color: #e6dfd0;
+}
+li[class*="_menuListItem"] a, p.g-demo-sentence a, a.g-promo-slim-hed,
+a.g-promo-slim-item, span.g-card-header-header,
+span.g-card-header-header-carat, div.g-card-source,
+span.g-weather-card-risk-place-carat, span.g-promo-slim-item-title-desktop,
+div.email-signup button, p[class*="_opinionPackageTitle"] span,
+div[class*="_packageTitle"] span, p.indicate-hover {
+  color: #e6dfd0;
+}
+div[class*="_floatingMiniNavContainer"] {
+  background: #171512;
+}
+div.g-infobox, div[class*="_promoCardContent"] {
+  background: #201d19;
+  color: #e6dfd0;
+}
+
+/* fallback: NYT hardcodes near-black text all over sections and articles;
+   :where() keeps this below every other rule here, so accents still win */
+:where(#site-content, #in-story-masthead, header) :where(h1, h2, h3, h4, h5,
+  p, li, dt, dd, time, span, div, a, button, strong, em, b, i, label,
+  figcaption, blockquote, small, cite, th, td) {
+  color: #e6dfd0;
+}
+:where(#site-content, #in-story-masthead, header) svg :is([fill="#000" i], [fill="#000000" i],
+  [fill="black" i], [fill="#121212" i], [fill="#333" i], [fill="#333333" i]) {
+  fill: #e6dfd0;
+}
+:where(#site-content, #in-story-masthead, header) svg :is([stroke="#000" i], [stroke="#000000" i],
+  [stroke="black" i], [stroke="#121212" i], [stroke="#333" i]) {
+  stroke: #e6dfd0;
+}
+/* article action bar icons filled from NYT's css, not attributes */
+svg#playIcon path:first-child, li.save-button svg path:last-of-type {
+  fill: #e6dfd0;
+}
+li.save-button svg path:first-of-type {
+  fill: #171512;
+}
+div:has(> nav > #storyline-menu-title) > span svg [fill] {
+  fill: #e6dfd0;
+}
+
+div[class*="_mastheadContainer"] {
+  border-bottom-color: #3a352d;
+}
+:where(#site-content, #in-story-masthead, header, article, aside, nav, footer) :where(*)::before,
+:where(#site-content, #in-story-masthead, header, article, aside, nav, footer) :where(*)::after {
+  border-color: #3a352d;
+}
+
+/* subtle borders everywhere else (section fronts, articles, sidebars);
+   :where() keeps this below the specific border rules above */
+:where(#site-content, #in-story-masthead, header, article, aside, nav, footer),
+:where(#site-content, #in-story-masthead, header, article, aside, nav, footer) :where(*) {
+  border-color: #3a352d;
+}

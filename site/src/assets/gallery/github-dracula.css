@@ -1,0 +1,529 @@
+/* GitHub: Dracula */
+
+html[data-color-mode="light"][data-light-theme="light"],
+html[data-color-mode="auto"][data-light-theme="light"],
+html[data-color-mode="dark"][data-dark-theme="dark"],
+html[data-color-mode="auto"][data-dark-theme="dark"],
+html[data-color-mode="light"][data-light-theme="light_high_contrast"],
+html[data-color-mode="dark"][data-dark-theme="dark_high_contrast"] {
+  /* base surfaces */
+  --bgColor-default: #282a36;
+  --bgColor-muted: #21222c;
+  --bgColor-inset: #21222c;
+  --bgColor-emphasis: #191a21;
+  --bgColor-disabled: #343746;
+  --bgColor-transparent: #fff0;
+
+  /* text */
+  --fgColor-default: #f8f8f2;
+  --fgColor-muted: #b3bce0;
+  --fgColor-disabled: #6272a4;
+  --fgColor-onEmphasis: #f8f8f2;
+  --fgColor-black: #f8f8f2;
+  --fgColor-white: #282a36;
+
+  /* borders */
+  --borderColor-default: #44475a;
+  --borderColor-muted: #383a4a;
+  --borderColor-emphasis: #6272a4;
+  --borderColor-disabled: #383a4a4d;
+  --borderColor-transparent: #fff0;
+
+  /* accent / links */
+  --fgColor-accent: #8be9fd;
+  --fgColor-link: #8be9fd;
+  --bgColor-accent-emphasis: #bd93f9;
+  --bgColor-accent-muted: #44475a;
+  --borderColor-accent-emphasis: #bd93f9;
+  --borderColor-accent-muted: #6272a466;
+  --focus-outline-color: #ff79c6;
+
+  /* semantic status colors */
+  --fgColor-success: #50fa7b;
+  --bgColor-success-emphasis: #3ecf68;
+  --bgColor-success-muted: #1c3b28;
+  --borderColor-success-emphasis: #50fa7b;
+  --borderColor-success-muted: #3ecf6866;
+
+  --fgColor-danger: #ff5555;
+  --bgColor-danger-emphasis: #ff5555;
+  --bgColor-danger-muted: #3b1e21;
+  --borderColor-danger-emphasis: #ff5555;
+  --borderColor-danger-muted: #ff555566;
+
+  --fgColor-attention: #f1fa8c;
+  --bgColor-attention-emphasis: #e6c229;
+  --bgColor-attention-muted: #3d3a1e;
+  --borderColor-attention-emphasis: #f1fa8c;
+  --borderColor-attention-muted: #f1fa8c66;
+
+  --fgColor-severe: #ffb86c;
+  --bgColor-severe-emphasis: #ffb86c;
+  --bgColor-severe-muted: #3d2e1e;
+  --borderColor-severe-emphasis: #ffb86c;
+
+  --fgColor-done: #ff79c6;
+  --bgColor-done-emphasis: #ff79c6;
+  --bgColor-done-muted: #3a1e33;
+  --borderColor-done-emphasis: #ff79c6;
+
+  --fgColor-sponsors: #ff79c6;
+  --bgColor-sponsors-emphasis: #ff79c6;
+  --bgColor-sponsors-muted: #3a1e33;
+
+  --fgColor-neutral: #b3bce0;
+  --bgColor-neutral-emphasis: #6272a4;
+  --bgColor-neutral-muted: #44475a66;
+  --borderColor-neutral-emphasis: #6272a4;
+
+  --fgColor-open: #50fa7b;
+  --fgColor-closed: #ff5555;
+  --fgColor-draft: #b3bce0;
+  --fgColor-upsell: #ff79c6;
+
+  /* header / top bar — the terminal "title bar" */
+  --header-bgColor: #bd93f9;
+  --header-fgColor-default: #282a36cc;
+  --header-fgColor-logo: #282a36;
+  --header-borderColor-divider: #ff79c6;
+
+  /* buttons + controls */
+  --button-primary-bgColor-rest: #50fa7b;
+  --button-primary-bgColor-hover: #3ecf68;
+  --button-primary-bgColor-active: #2fb955;
+  --button-primary-fgColor-rest: #191a21;
+  --button-danger-fgColor-rest: #ff5555;
+  --button-inactive-bgColor: #343746;
+  --button-inactive-fgColor: #b3bce0;
+  --button-star-iconColor: #f1fa8c;
+
+  --control-bgColor-rest: #21222c;
+  --control-bgColor-hover: #343746;
+  --control-bgColor-active: #44475a;
+  --control-checked-bgColor-active: #bd93f9;
+  --control-checked-bgColor-hover: #a97ff7;
+
+  /* overlays: dropdowns, popovers, modals, tooltips */
+  --overlay-bgColor: #21222c;
+  --overlay-borderColor: #44475a;
+  --overlay-backdrop-bgColor: #191a2199;
+  --tooltip-bgColor: #f8f8f2;
+  --tooltip-fgColor: #191a21;
+  --selectMenu-bgColor-active: #44475a;
+  --menu-bgColor-active: #343746;
+  --sideNav-bgColor-selected: #343746;
+
+  --counter-bgColor-emphasis: #6272a4;
+  --counter-bgColor-muted: #44475a;
+
+  --avatar-bgColor: #44475a;
+
+  /* diffs */
+  --diffBlob-additionLine-bgColor: #1c3b28;
+  --diffBlob-additionNum-bgColor: #2c5c3c;
+  --diffBlob-additionWord-bgColor: #2fb95566;
+  --diffBlob-deletionLine-bgColor: #3b1e21;
+  --diffBlob-deletionNum-bgColor: #5c2c30;
+  --diffBlob-deletionWord-bgColor: #ff555566;
+  --diffBlob-emptyLine-bgColor: #21222c;
+  --diffBlob-emptyNum-bgColor: #21222c;
+  --diffBlob-hunkLine-bgColor: #2a2d42;
+  --diffBlob-hunkLine-fgColor: #b3bce0;
+  --diffBlob-hunkNum-bgColor-rest: #44475a;
+  --diffBlob-hunkNum-bgColor-hover: #6272a4;
+
+  /* code editor (CodeMirror) */
+  --codeMirror-bgColor: #21222c;
+  --codeMirror-fgColor: #f8f8f2;
+  --codeMirror-gutters-bgColor: #21222c;
+  --codeMirror-lineNumber-fgColor: #6272a4;
+  --codeMirror-activeline-bgColor: #343746;
+  --codeMirror-selection-bgColor: #44475a99;
+  --codeMirror-syntax-fgColor-comment: #6272a4;
+  --codeMirror-syntax-fgColor-constant: #bd93f9;
+  --codeMirror-syntax-fgColor-entity: #50fa7b;
+  --codeMirror-syntax-fgColor-keyword: #ff79c6;
+  --codeMirror-syntax-fgColor-storage: #ff79c6;
+  --codeMirror-syntax-fgColor-string: #f1fa8c;
+  --codeMirror-syntax-fgColor-support: #8be9fd;
+  --codeMirror-syntax-fgColor-variable: #ffb86c;
+
+  --shadow-resting-xsmall: 0 1px 1px 0 #00000040;
+  --shadow-resting-small: 0 1px 2px 0 #00000059;
+  --shadow-resting-medium: 0 3px 6px 0 #00000059;
+  --shadow-floating-small: 0 6px 18px 0 #00000073;
+  --shadow-floating-medium: 0 8px 24px 0 #00000080;
+  --shadow-inset: inset 0 1px 0 0 #00000026;
+}
+
+/* ---- typography: force the terminal monospace everywhere -------------
+   Fira Code was dropped from this stack: on at least one real machine
+   (FiraCode-Regular 5.002 via local()), its "@" glyph renders as a
+   corrupted double-story shape instead of an at-sign — confirmed by
+   isolating the font in an unstyled iframe, independent of GitHub or
+   this stylesheet. SF Mono/Consolas/Menlo all render "@" correctly,
+   so lead with those instead of gambling on a system-specific font.
+   --------------------------------------------------------------------- */
+
+* {
+  font-family: "SF Mono", Consolas, Menlo, monospace;
+  font-weight: 400;
+}
+
+/* GitHub sizes most text in rem, so scaling the root nudges the whole
+   site down uniformly without the compounding you'd get from an
+   em-based rule on every element. */
+html {
+  font-size: 87.5%;
+}
+
+/* ---- flatten the rounded-corner "app" look into a boxy terminal ------ */
+
+*::before,
+*::after {
+  border-radius: 2px;
+}
+
+* {
+  border-radius: 2px;
+}
+img.avatar,
+.avatar,
+.avatar-user,
+.AvatarStack-body img {
+  border-radius: 2px;
+}
+
+/* kill drop shadows so cards read as flat panes, like a TUI */
+.Box,
+.Layout,
+.color-shadow-small,
+.color-shadow-medium,
+.color-shadow-large {
+  box-shadow: none;
+}
+
+/* ---- repo action bar (Sponsor / Pin / Watch / Fork / Star) -----------
+   These render as Primer React "prc-Button-*" components. The hash
+   suffix on each class changes per GitHub deploy, but the semantic
+   prefix before the hash has stayed stable, so we match on that
+   with attribute selectors instead of the full class name. Their
+   label/icon color washes out against our dark background, so we
+   force it bright here.
+   --------------------------------------------------------------------- */
+
+[class*="prc-Button-ButtonBase-"] {
+  color: #f8f8f2;
+  border-color: #6272a4;
+  opacity: 1;
+}
+[class*="prc-Button-ButtonBase-"] {
+  color: #f8f8f2;
+  border-color: #6272a4;
+  opacity: 1;
+}
+[class*="prc-Button-Label-"],
+[class*="prc-Button-Visual-"] {
+  color: #f8f8f2;
+  opacity: 1;
+}
+.Counter,
+.js-social-count {
+  color: #f8f8f2;
+  background-color: #44475a;
+}
+
+/* ---- Code/Blame segmented tab switcher (blob + blame views) ----------
+   Same "prc-*" hashed-class situation as the button bar above, but
+   here the component paints its own light track and a white sliding
+   "selected" pill directly in its compiled CSS module — not through
+   the --bgColor-* tokens overridden at the top of this file — so it
+   stays light under our dark theme. That leaves the near-white theme
+   text almost invisible against it (confirmed live on a blame page:
+   both tabs were unreadable before this fix). The pill is a ::before
+   on the track, not a class on the button, so it needs its own rule.
+   --------------------------------------------------------------------- */
+[class*="prc-SegmentedControl-SegmentedControl-"] {
+  background-color: #21222c;
+}
+[class*="prc-SegmentedControl-SegmentedControl-"]::before {
+  background-color: #343746;
+}
+
+/* Sponsor / Pin / Watch / Fork / Star themselves are classic ".btn"
+   elements in a ".BtnGroup" — give them a real button surface and
+   restore the merged-segment look (the global border-radius rule
+   above rounds every corner, which breaks BtnGroup's seamless
+   left/right joins). */
+.btn {
+  background-color: #21222c;
+  border: 1px solid #44475a;
+  border-radius: 6px;
+  color: #f8f8f2;
+  border-width: 1px;
+}
+.btn:hover {
+  background-color: #343746;
+  border-color: #bd93f9;
+}
+.BtnGroup .btn {
+  border-radius: 0;
+  margin-left: -1px;
+}
+.BtnGroup .btn:first-child {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+  margin-left: 0;
+}
+.BtnGroup .btn:last-child {
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+.BtnGroup .btn:hover {
+  position: relative;
+  z-index: 1;
+}
+.btn .Counter {
+  border-radius: 4px;
+}
+
+/* ".btn-primary" (Save, Open, Comment, Merge pull request, etc.) is a
+   legacy class that hardcodes light text — our --button-primary-fgColor
+   token above only reaches the newer React buttons, not this one.
+   Light text on our light green reads as almost no contrast at all,
+   so force dark text here instead. */
+.btn-primary,
+.btn-primary .octicon {
+  color: #191a21;
+}
+.btn-primary {
+  background-color: #50fa7b;
+  border-color: #50fa7b;
+}
+.btn-primary:hover {
+  background-color: #3ecf68;
+  border-color: #3ecf68;
+}
+
+/* the "Open/Merged/Closed/Draft" pill next to a PR/issue title is a
+   separate ".State" component, also with its own hardcoded light text. */
+.State,
+.State .octicon {
+  color: #191a21;
+}
+.State--open {
+  background-color: #50fa7b;
+  border-color: #50fa7b;
+}
+.State--merged {
+  background-color: #bd93f9;
+  border-color: #bd93f9;
+}
+.State--closed {
+  background-color: #ff5555;
+  border-color: #ff5555;
+}
+.State--draft {
+  background-color: #6272a4;
+  border-color: #6272a4;
+  color: #f8f8f2;
+}
+.State--draft .octicon {
+  color: #f8f8f2;
+}
+
+.dropdown-caret {
+  border-top-color: currentColor;
+}
+
+/* ---- diff view (commits, compare, PR "Files changed") ----------------
+   Verified against a live commit page: GitHub's current diff table
+   reads its colors from `var(--diffBlob-*-bgColor, var(--diffBlob-...))`
+   pairs, which our token overrides above already drive — this section
+   is the extra polish on top: coloring the +/- markers semantically,
+   and a fallback for the older server-rendered diff table (still used
+   on some large PR diffs) that doesn't go through those tokens at all.
+   --------------------------------------------------------------------- */
+
+.diff-text.addition .diff-text-marker,
+.blob-code-marker-addition::before {
+  color: #50fa7b;
+}
+.diff-text.deletion .diff-text-marker,
+.blob-code-marker-deletion::before {
+  color: #ff5555;
+}
+
+/* legacy/server-rendered diff table fallback */
+.blob-code-addition,
+.blob-code-addition .blob-code-inner {
+  background-color: #1c3b28;
+  color: #f8f8f2;
+}
+.blob-code-deletion,
+.blob-code-deletion .blob-code-inner {
+  background-color: #3b1e21;
+  color: #f8f8f2;
+}
+.blob-num-addition {
+  background-color: #2c5c3c;
+  color: #50fa7b;
+  border-color: #2fb95566;
+}
+.blob-num-deletion {
+  background-color: #5c2c30;
+  color: #ff5555;
+  border-color: #ff555566;
+}
+.blob-code-addition span.x {
+  background-color: #2fb95566;
+}
+.blob-code-deletion span.x {
+  background-color: #ff555566;
+}
+.diffstat-block-added,
+.diffstat-block-deleted::before {
+  background-color: #50fa7b;
+}
+.diffstat-block-deleted {
+  background-color: #ff5555;
+}
+.diffstat-block-neutral {
+  background-color: #44475a;
+}
+
+/* ---- file/folder icons in the repo file listing -----------------------
+   These inherit the bright default text color and end up glaring next
+   to the muted commit-message text. Tone them down to a dim, muted
+   blue-gray instead.
+   --------------------------------------------------------------------- */
+
+.react-directory-filename-column .octicon,
+.icon-directory {
+  color: #6272a4;
+}
+
+/* ---- markdown body (READMEs, issue/PR descriptions, comments) --------
+   GitHub sizes this relative to its own base, so it reads larger than
+   the rest of the UI even after our root html{font-size} scale-down.
+   --------------------------------------------------------------------- */
+
+.markdown-body {
+  font-size: 14px;
+  line-height: 1.6;
+}
+.markdown-body h1 { font-size: 1.6em; }
+.markdown-body h2 { font-size: 1.35em; }
+.markdown-body h3 { font-size: 1.15em; }
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 { font-size: 1em; }
+.markdown-body code,
+.markdown-body pre,
+.markdown-body tt {
+  font-size: 0.85em;
+}
+
+/* ---- syntax highlighting for markdown code fences / blob view --------
+   GitHub's Linguist ".pl-*" classes have been stable for years and
+   aren't all driven by the CodeMirror tokens above.
+   --------------------------------------------------------------------- */
+
+.pl-c, .pl-c span { color: #6272a4; font-style: italic; }
+.pl-k, .pl-kos { color: #ff79c6; }
+.pl-pds, .pl-s1, .pl-pse { color: #f1fa8c; }
+.pl-s { color: #f1fa8c; }
+.pl-c1, .pl-v, .pl-smi, .pl-vo, .pl-vpf { color: #bd93f9; }
+.pl-en, .pl-e { color: #50fa7b; }
+.pl-ent { color: #ff5555; }
+.pl-s .pl-s1, .pl-pse .pl-s1 { color: #f1fa8c; }
+.pl-mi1, .pl-mdht { color: #50fa7b; }
+.pl-md, .pl-mdhf { color: #ff5555; }
+.pl-ml { color: #f1fa8c; }
+.pl-mh, .pl-mh .pl-en, .pl-ms { color: #8be9fd; }
+
+/* fenced code blocks + inline code in markdown/READMEs */
+.markdown-body pre,
+.markdown-body code,
+.highlight pre {
+  background-color: #21222c;
+  border: 1px solid #44475a;
+}
+.markdown-body code:not([class*="pl-"]) {
+  color: #6bd786;
+  border-width: 1px;
+  border-color: #024413;
+}
+
+/* ---- header: solid terminal title bar --------------------------------
+   --header-bgColor above already recolors GitHub's own header
+   component; this just adds the same bright divider the HN theme
+   uses under its top bar, for anything not covered by the token.
+   --------------------------------------------------------------------- */
+
+header[role="banner"],
+.Header {
+  border-bottom: 2px solid #ff79c6;
+}
+
+/* octicons (github's icon font/svg set) inherit currentColor already,
+   but force it in case an icon hardcodes a fill */
+.octicon {
+  color: currentColor;
+}
+
+/* ---- scrollbar --------------------------------------------------------- */
+
+::-webkit-scrollbar {
+  background: #282a36;
+  width: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: #44475a;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #6272a4;
+}
+div.react-directory-commit-age relative-time {
+  font-size: 12px;
+}
+span.prc-StateLabel-StateLabel-Iawzp {
+  color: #191a21;
+}
+
+[data-variant="primary"] * {
+  color: #000;
+}
+
+span.f1 {
+  font-size: 20px;
+}
+
+span.pl-2 {
+  font-size: 18px;
+}
+
+span.pl-corl {
+  color: #50fa7b;
+}
+
+bdi.markdown-title {
+  font-size: 18px
+}
+
+span.HeaderViewer-module__issueNumberText__MEUhM {
+  font-size: 18px;
+}
+
+span.Button-label {
+  color: #f8f8f2;
+}
+
+div.prc-Truncate-Truncate-2G1eo {
+  color: #f8f8f2;
+}
+
+bdi.f5 {
+  font-size: 13px;
+}

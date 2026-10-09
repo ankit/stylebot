@@ -1,0 +1,307 @@
+/* Wikipedia: Parchment & Ink */
+@import url(https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+@import url(https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap);
+
+:root {
+  --background-color-base: #f4ecd8;
+  --background-color-base-fixed: #f4ecd8;
+  --background-color-interactive-subtle: #efe5cc;
+  --background-color-interactive: #e8dcc0;
+  --color-base: #111;
+  --color-emphasized: #000;
+  --color-link: #111;
+  --color-link--hover: #7a1c1c;
+  --color-link--visited: #333;
+  --color-subtle: #444;
+  --border-color-subtle: #b5ae9a;
+  --border-color-muted: #c4bda9;
+  --color-progressive: #59678a;
+  --color-link--focus: #59678a;
+  --color-link--active: #34466b;
+  --accent-color-base: #59678a;
+}
+
+html, body {
+  background: #f4ecd8;
+  color: #111;
+  font-family: Libre Baskerville;
+}
+
+.mw-page-container, .vector-header-container, #vector-toc-pinned-container, #vector-appearance-pinned-container, .vector-dropdown-content, #searchform, #searchInput {
+  background: #f4ecd8;
+  color: #111;
+}
+
+header.vector-header {
+  background: #f4ecd8;
+  color: #111;
+  display: none;
+}
+
+#mw-content-text, .mw-body-content, .vector-menu-content, .vector-toc, .vector-pinnable-header-label {
+  font-family: Libre Baskerville;
+}
+
+#firstHeading, .mw-first-heading, .mw-body h2, .mw-body h3 {
+  font-family: Playfair Display;
+  color: #000;
+  border-bottom: 1px solid #b5ae9a;
+}
+
+#mw-content-text .mw-parser-output {
+  column-count: 2;
+  column-gap: 2em;
+  column-rule: 1px solid #b5ae9a;
+  text-align: justify;
+  line-height: 1.6;
+}
+
+#mw-content-text .mw-parser-output .mw-heading2, #mw-content-text .mw-parser-output .toc {
+  column-span: all;
+}
+
+#mw-content-text .mw-parser-output .infobox {
+  column-span: none;
+  background-color: #efe5cc;
+  color: #111;
+  border: 1px solid #b5ae9a;
+  font-family: Libre Baskerville;
+  line-height: 1.4;
+  break-inside: avoid;
+  page-break-inside: avoid;
+  float: none;
+  clear: none;
+  width: 100%;
+  margin: 0 0 1em 0;
+}
+
+.vector-page-toolbar, .vector-header-container {
+  border-bottom: 1px solid #b5ae9a;
+}
+
+#mw-content-text .mw-parser-output .infobox th, #mw-content-text .mw-parser-output .infobox td {
+  background-color: transparent;
+  color: #111;
+  border-bottom: 1px solid #d0c9b5;
+}
+
+#mw-content-text .mw-parser-output .infobox a, #mw-content-text .mw-parser-output .infobox a span {
+  color: #111;
+}
+
+#mw-content-text .mw-parser-output .wikitable {
+  background-color: #f4ecd8;
+  color: #111;
+  border: 1px solid #b5ae9a;
+  font-family: Libre Baskerville;
+  line-height: 1.4;
+  column-span: none;
+}
+
+#mw-content-text .mw-parser-output .wikitable th {
+  background-color: #e8dcc0;
+  color: #000;
+  border: 1px solid #b5ae9a;
+}
+
+#mw-content-text .mw-parser-output .wikitable td {
+  background-color: #efe5cc;
+  color: #111;
+  border: 1px solid #d0c9b5;
+}
+
+#mw-content-text .mw-parser-output .wikitable a, #mw-content-text .mw-parser-output .wikitable a span {
+  color: #111;
+}
+
+#mw-content-text .mw-parser-output .wikitable caption {
+  font-family: Playfair Display;
+  color: #000;
+}
+
+#mw-content-text .mw-parser-output .navbox, #mw-content-text .mw-parser-output .navbox-subgroup, #mw-content-text .mw-parser-output #catlinks, #catlinks {
+  background-color: #efe5cc;
+  color: #111;
+  border: 1px solid #b5ae9a;
+  font-family: Libre Baskerville;
+  column-span: all;
+}
+
+#mw-content-text .mw-parser-output .navbox-title, #mw-content-text .mw-parser-output .navbox-abovebelow, #mw-content-text .mw-parser-output .navbox-group {
+  background-color: #e8dcc0;
+  color: #000;
+}
+
+#mw-content-text .mw-parser-output .navbox-list, #mw-content-text .mw-parser-output .navbox-even, #mw-content-text .mw-parser-output .navbox-odd {
+  background-color: #efe5cc;
+  color: #111;
+}
+
+#mw-content-text .mw-parser-output .navbox a, #mw-content-text .mw-parser-output .navbox a span, #catlinks a {
+  color: #111;
+}
+
+#catlinks .mw-normal-catlinks, #catlinks ul, #catlinks li {
+  background-color: transparent;
+  color: #111;
+}
+
+div.vector-appearance {
+  display: none;
+}
+
+button.vector-pinnable-header-toggle-button {
+  display: none;
+}
+
+input.vector-dropdown-checkbox {
+  display: none;
+}
+
+label.vector-dropdown-label {
+  display: none;
+}
+
+table.box-Multiple_issues {
+  background-color: #efe5cc;
+  color: #111;
+  border-left: 6px solid #7a1c1c;
+  font-family: Libre Baskerville;
+  column-span: all;
+  break-inside: avoid;
+  border-top: 1px solid #b5ae9a;
+  border-right: 1px solid #b5ae9a;
+  border-bottom: 1px solid #b5ae9a;
+}
+
+table.box-Multiple_issues td, table.box-Multiple_issues th, table.box-Multiple_issues .ambox, table.box-Multiple_issues .mbox-text {
+  background-color: transparent;
+  color: #111;
+  border-color: #d0c9b5;
+}
+
+table.box-Multiple_issues a, table.box-Multiple_issues a span {
+  color: #111;
+}
+
+table.box-Multiple_issues .mw-collapsible-text, table.box-Multiple_issues .mw-collapsible-toggle a {
+  color: #111;
+}
+
+div.frb-inline-bottombar {
+  display: none;
+  
+}
+
+div.frb-inline-main {
+  display: none;
+  
+}
+
+#mw-content-text .mw-parser-output a:not(.new) {
+  color: #5c6275;
+}
+
+.vector-toc-link, #p-views a, #p-associated-pages a, #p-tb a, #p-coll-print_export a, #p-wikibase-otherprojects a, .mw-editsection a {
+  color: #5c6275;
+}
+
+#mw-content-text .mw-parser-output .infobox a, #mw-content-text .mw-parser-output .infobox a span, #mw-content-text .mw-parser-output .wikitable a, #mw-content-text .mw-parser-output .wikitable a span, #mw-content-text .mw-parser-output .navbox a, #mw-content-text .mw-parser-output .navbox a span {
+  color: #111;
+}
+
+a.frb-mini-banner-link {
+  display: none;
+}
+
+a.cdx-button {
+  display: none;
+}
+
+table.vgr-aggregators caption {
+  background-color: #b5ae9a;
+}
+
+caption.vgr-stacked {
+  background-color: #b5ae9a;
+}
+
+.mwe-popups .mwe-popups-extract::after, .mwe-popups .mwe-popups-extract:after {
+  display: none;
+  background: none;
+}
+
+ol.mw-references li {
+  background-color: rgba(0, 0, 0, 0);
+}
+
+#mw-content-text a[href$='.pdf'].external, #mw-content-text a[href*='.pdf#'].external, #mw-content-text a.external[href$='.PDF'] {
+  filter: saturate(0.2) contrast(0.85);
+  background-blend-mode: luminosity;
+}
+
+ul.noprint {
+  background-color: transparent;
+}
+
+#mw-content-text .mw-parser-output .portalbox {
+  display: block;
+}
+
+#mw-content-text .mw-parser-output .portalbox {
+  float: none;
+  clear: both;
+  width: 100%;
+  margin: 0.5em 0;
+  box-sizing: border-box;
+  break-inside: avoid;
+}
+
+#mw-content-text .mw-parser-output .portalbox {
+  text-align: left;
+  text-justify: none;
+}
+
+#mw-content-text .mw-parser-output .portalbox {
+  float: none;
+  clear: both;
+  width: 100%;
+  margin: 0.5em 0;
+  box-sizing: border-box;
+  break-inside: avoid;
+}
+
+#mw-content-text .mw-parser-output .portalbox {
+  text-align: left;
+  text-justify: none;
+}
+
+#mw-content-text .mw-parser-output .wikitable, #mw-content-text .mw-parser-output table.sortable, #mw-content-text .mw-parser-output .multicol, #mw-content-text .mw-parser-output .navbox, #mw-content-text .mw-parser-output .infobox-wide {
+  column-span: all;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 1em 0;
+  break-inside: avoid;
+}
+
+#mw-content-text .mw-parser-output table:not(.infobox) {
+  column-span: all;
+  max-width: 100%;
+  box-sizing: border-box;
+  break-inside: avoid;
+  margin: 16px;
+}
+
+#mw-content-text .mw-parser-output .wikitable, #mw-content-text .mw-parser-output .navbox, #mw-content-text .mw-parser-output .multicol {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+td.largestCities-cell-background {
+  background-color: transparent;
+}
+
+div.navbar {
+  margin-right: 12px;
+}

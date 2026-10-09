@@ -1,56 +1,167 @@
 import type { ImageMetadata } from 'astro';
-import github from '../assets/gallery/gallery-github.png';
-import hn from '../assets/gallery/gallery-hn.png';
-import nytimes from '../assets/gallery/gallery-nytimes.png';
-import wikipedia from '../assets/gallery/gallery-wikipedia.png';
+import shotGithubSolarized from '../assets/gallery/gallery-github-solarized.png';
+import shotGithubTerminal from '../assets/gallery/gallery-github-terminal.png';
+import shotGithubDracula from '../assets/gallery/gallery-github-dracula.png';
+import shotGmail from '../assets/gallery/gallery-gmail.png';
+import shotGoogleEspresso from '../assets/gallery/gallery-google-espresso.png';
+import shotHnHearth from '../assets/gallery/gallery-hn-hearth.png';
+import shotHn from '../assets/gallery/gallery-hn.png';
+import shotNytimesMorning from '../assets/gallery/gallery-nytimes-morning.png';
+import shotNytimesNight from '../assets/gallery/gallery-nytimes-night.png';
+import shotNytimes from '../assets/gallery/gallery-nytimes.png';
+import shotWikipediaParchment from '../assets/gallery/gallery-wikipedia-parchment.png';
+import shotWikipediaSlate from '../assets/gallery/gallery-wikipedia-slate.png';
+import cssWikipediaParchment from '../assets/gallery/wikipedia-parchment.css?raw';
+import cssWikipediaSlate from '../assets/gallery/wikipedia-slate.css?raw';
+import cssGithubSolarized from '../assets/gallery/github-solarized.css?raw';
+import cssGithubDracula from '../assets/gallery/github-dracula.css?raw';
+import cssGithubTerminal from '../assets/gallery/github-terminal.css?raw';
+import cssNytimes from '../assets/gallery/nytimes.css?raw';
+import cssNytimesMorning from '../assets/gallery/nytimes-morning.css?raw';
+import cssNytimesNight from '../assets/gallery/nytimes-night.css?raw';
+import cssHn from '../assets/gallery/hn.css?raw';
+import cssHnHearth from '../assets/gallery/hn-hearth.css?raw';
+import cssGoogleEspresso from '../assets/gallery/google-espresso.css?raw';
+import cssGmail from '../assets/gallery/gmail.css?raw';
 
-export type GalleryItem = {
-  id: string;
+export type GalleryTheme = {
   name: string;
-  site: string;
+  colors: [string, string];
   image: ImageMetadata;
-} & ({ css: string; note?: never } | { note: string; css?: never });
+} & ({ css: string; file: string; note?: never } | { note: string; css?: never; file?: never });
 
-export const GALLERY: GalleryItem[] = [
+export type GallerySite = {
+  id: string;
+  site: string;
+  url: string;
+  themes: GalleryTheme[];
+};
+
+export const GALLERY: GallerySite[] = [
   {
     id: 'wikipedia',
-    name: 'Readability',
-    site: 'wikipedia.org',
-    image: wikipedia,
-    note: 'Readability turned on in Stylebot',
+    site: 'Wikipedia',
+    url: 'wikipedia.org',
+    themes: [
+      {
+        name: 'Parchment & Ink',
+        colors: ['#f4ecd8', '#55607a'],
+        image: shotWikipediaParchment,
+        css: cssWikipediaParchment,
+        file: 'wikipedia-parchment.css',
+      },
+      {
+        name: 'Slate & Ash',
+        colors: ['#1c1d22', '#8fa2e0'],
+        image: shotWikipediaSlate,
+        css: cssWikipediaSlate,
+        file: 'wikipedia-slate.css',
+      },
+    ],
   },
   {
     id: 'github',
-    name: 'Monospace everything',
-    site: 'github.com',
-    image: github,
-    css: `/* GitHub: Monospace everything */
-* { font-family: "JetBrains Mono", "Fira Code", ui-monospace, monospace !important; }`,
+    site: 'GitHub',
+    url: 'github.com',
+    themes: [
+      {
+        name: 'Dracula',
+        colors: ['#282a36', '#bd93f9'],
+        image: shotGithubDracula,
+        css: cssGithubDracula,
+        file: 'github-dracula.css',
+      },
+      {
+        name: 'Solarized Light',
+        colors: ['#fdf6e3', '#268bd2'],
+        image: shotGithubSolarized,
+        css: cssGithubSolarized,
+        file: 'github-solarized.css',
+      },
+      {
+        name: 'Terminal',
+        colors: ['#0a0f0a', '#3ddc5f'],
+        image: shotGithubTerminal,
+        css: cssGithubTerminal,
+        file: 'github-terminal.css',
+      },
+    ],
   },
   {
     id: 'nytimes',
-    name: 'Dark mode',
-    site: 'nytimes.com',
-    image: nytimes,
-    css: `/* NYTimes: Dark mode */
-body, header, nav, #site-content { background: #1b1b24 !important; }
-h1, h2, h3, p, span { color: #e6e6ea !important; }
-a { color: #9aa8ff !important; }
-hr, [class*="divider"] { border-color: #34344a !important; }`,
+    site: 'The New York Times',
+    url: 'nytimes.com',
+    themes: [
+      {
+        name: 'Midnight Edition',
+        colors: ['#1b1b24', '#9aa8ff'],
+        image: shotNytimes,
+        css: cssNytimes,
+        file: 'nytimes.css',
+      },
+      {
+        name: 'Morning Edition',
+        colors: ['#f6efe0', '#121212'],
+        image: shotNytimesMorning,
+        css: cssNytimesMorning,
+        file: 'nytimes-morning.css',
+      },
+      {
+        name: 'Night Edition',
+        colors: ['#1a1714', '#e0a24a'],
+        image: shotNytimesNight,
+        css: cssNytimesNight,
+        file: 'nytimes-night.css',
+      },
+    ],
   },
   {
     id: 'hn',
-    name: 'Dracula',
-    site: 'news.ycombinator.com',
-    image: hn,
-    css: `/* Hacker News: Dracula */
-body, #hnmain { background: #282a36 !important; }
-#hnmain > tbody > tr:first-child > td { background: #bd93f9 !important; }
-* { font-family: "Fira Code", monospace; }
-.titleline > a { color: #f8f8f2; }
-.titleline > a:visited { color: #ff79c6; }
-.sitestr, .sitebit a { color: #8be9fd; }
-.score { color: #50fa7b; }
-.subtext, .subtext a, .rank { color: #6272a4; }`,
+    site: 'Hacker News',
+    url: 'news.ycombinator.com',
+    themes: [
+      {
+        name: 'Violet Hour',
+        colors: ['#282a36', '#bd93f9'],
+        image: shotHn,
+        css: cssHn,
+        file: 'hn.css',
+      },
+      {
+        name: 'Hacker Hearth',
+        colors: ['#fdf1e1', '#d9773b'],
+        image: shotHnHearth,
+        css: cssHnHearth,
+        file: 'hn-hearth.css',
+      },
+    ],
+  },
+  {
+    id: 'google',
+    site: 'Google',
+    url: 'google.com',
+    themes: [
+      {
+        name: 'Espresso Search',
+        colors: ['#29231f', '#f0a85a'],
+        image: shotGoogleEspresso,
+        css: cssGoogleEspresso,
+        file: 'google-espresso.css',
+      },
+    ],
+  },
+  {
+    id: 'gmail',
+    site: 'Gmail',
+    url: 'mail.google.com',
+    themes: [
+      {
+        name: 'Midnight Mailroom',
+        colors: ['#1a1b26', '#7aa2f7'],
+        image: shotGmail,
+        css: cssGmail,
+        file: 'gmail.css',
+      },
+    ],
   },
 ];
