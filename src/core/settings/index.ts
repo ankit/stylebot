@@ -70,4 +70,7 @@ export {
   hasCliPermissions,
   requestCliPermissions,
   removeCliPermissions,
+  setCliConnected,
+  getCliConnected,
+  onCliConnectedChange,
 } from './cli';

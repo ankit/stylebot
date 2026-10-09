@@ -7,6 +7,7 @@ export { default as ExternalLinkIcon } from './ExternalLinkIcon.vue';
 export { default as InspectorIcon } from './InspectorIcon.vue';
 export { default as SearchIcon } from './SearchIcon.vue';
 export { default as CheckIcon } from './CheckIcon.vue';
+export { default as CopyIcon } from './CopyIcon.vue';
 export { default as SunIcon } from './SunIcon.vue';
 export { default as MoonIcon } from './MoonIcon.vue';
 export { default as MonitorIcon } from './MonitorIcon.vue';

@@ -63,3 +63,37 @@ export const removeCliPermissions = (): Promise<boolean> =>
   callPermissions(chrome.permissions.remove, {
     permissions: CLI_PERMISSIONS.permissions,
   });
+
+const CLI_CONNECTED_KEY = 'cli-connected';
+
+/**
+ * Records whether the background holds a connection to the CLI's native
+ * host, for the editor to read since it can't ask the port itself.
+ */
+export const setCliConnected = (connected: boolean): Promise<void> =>
+  chrome.storage.local.set({ [CLI_CONNECTED_KEY]: connected });
+
+export const getCliConnected = async (): Promise<boolean> => {
+  const items = await chrome.storage.local.get(CLI_CONNECTED_KEY);
+  return items[CLI_CONNECTED_KEY] === true;
+};
+
+/**
+ * Calls back with each change to whether the CLI is connected, until the
+ * returned function is called.
+ */
+export const onCliConnectedChange = (
+  callback: (connected: boolean) => void
+): (() => void) => {
+  const listener = (
+    changes: Record<string, chrome.storage.StorageChange>,
+    area: string
+  ): void => {
+    if (area === 'local' && CLI_CONNECTED_KEY in changes) {
+      callback(changes[CLI_CONNECTED_KEY].newValue === true);
+    }
+  };
+
+  chrome.storage.onChanged.addListener(listener);
+  return () => chrome.storage.onChanged.removeListener(listener);
+};

@@ -16,3 +16,13 @@ export const On = {
   ...cliAccessCard({ options: { cliAccess: true } }),
   parameters: { chrome: { permissions: { granted: true } } },
 };
+
+export const OnAndConnected = {
+  ...cliAccessCard({ options: { cliAccess: true } }),
+  parameters: {
+    chrome: {
+      permissions: { granted: true },
+      storage: { 'cli-connected': true },
+    },
+  },
+};

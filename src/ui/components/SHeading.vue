@@ -9,7 +9,7 @@ import type { PropType } from 'vue';
 import Vue from 'vue';
 
 type Size = 'xl' | 'lg' | 'md' | 'sm';
-type As = 'h1' | 'h2' | 'h3' | 'div';
+type As = 'h1' | 'h2' | 'h3' | 'div' | 'span';
 
 export default Vue.extend({
   name: 'SHeading',

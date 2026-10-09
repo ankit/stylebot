@@ -79,3 +79,40 @@ export const OffWithoutPermissions: StoryObj = {
   parameters: { chrome: { permissions: { granted: false } } },
   name: 'shows off when the setting is on but the browser took the permissions back',
 };
+
+export const ShowsConnected: StoryObj = {
+  ...cliAccessCard({ options: { cliAccess: true } }, async root => {
+    await expect(await within(root).findByRole('status')).toHaveTextContent(
+      'Connected to your terminal'
+    );
+  }),
+  parameters: {
+    chrome: {
+      permissions: { granted: true },
+      storage: { 'cli-connected': true },
+    },
+  },
+  name: 'says it is connected while the CLI host is up',
+};
+
+export const ShowsNotConnected: StoryObj = {
+  ...cliAccessCard({ options: { cliAccess: true } }, async root => {
+    await expect(await within(root).findByRole('status')).toHaveTextContent(
+      'Not connected. Run this in your terminal: stylebot install'
+    );
+  }),
+  parameters: { chrome: { permissions: { granted: true } } },
+  name: 'says how to connect while the setting is on without a CLI host',
+};
+
+export const NoStatusWhileOff: StoryObj = {
+  ...cliAccessCard({}, async root => {
+    await within(root).findByRole('heading', {
+      name: /Let apps on this computer control Stylebot/,
+    });
+    await new Promise(resolve => setTimeout(resolve, 50));
+    await expect(within(root).queryByRole('status')).toBeNull();
+  }),
+  parameters: { chrome: { storage: { 'cli-connected': true } } },
+  name: 'shows no status while the setting is off',
+};

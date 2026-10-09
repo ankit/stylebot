@@ -10,6 +10,7 @@ import {
   chatStateOf,
   chatWithChange,
   chatWithThread,
+  chatWithTerminal,
   DARK_PAGE,
   DARK_PAGE_BACKGROUND,
   LIST_PAGE,
@@ -32,6 +33,32 @@ export default meta;
 
 export const Setup = chat();
 
+const pickChat = async (canvasElement: HTMLElement): Promise<void> => {
+  const canvas = within(canvasElement);
+  await user.click(await canvas.findByRole('radio', { name: /Here in Chat/ }));
+  await canvas.findByLabelText('API key');
+};
+
+export const SetupChat: StoryObj = {
+  ...chat(),
+  play: async ({ canvasElement }) => pickChat(canvasElement),
+};
+
+export const TerminalConnected = chatWithTerminal();
+
+export const TerminalConnectedLookPicked: StoryObj = {
+  ...chatWithTerminal(),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await user.click(
+      (
+        await canvas.findAllByRole('button', { pressed: false })
+      )[0]
+    );
+    await canvas.findByText(/^Style .+ using Stylebot with this theme: /);
+  },
+};
+
 export const SetupKeyRejected: StoryObj = {
   ...chat(),
   play: async ({ canvasElement }) => {
@@ -39,6 +66,7 @@ export const SetupKeyRejected: StoryObj = {
     await waitFor(() =>
       expect(chatStateOf(canvasElement).status).not.toBeNull()
     );
+    await pickChat(canvasElement);
     store.commit('chat/setConnectError', { key: 'chat_error_invalid_key' });
   },
 };

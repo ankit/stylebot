@@ -6,6 +6,7 @@ export { default as SMenu } from './SMenu.vue';
 export { default as SToggleSwitch } from './SToggleSwitch.vue';
 export { default as SPillButton } from './SPillButton.vue';
 export { default as SIconButton } from './SIconButton.vue';
+export { default as SCopyButton } from './SCopyButton.vue';
 export { default as SButton } from './SButton.vue';
 export { default as SLinkButton } from './SLinkButton.vue';
 export { default as SAnchoredMenu } from './SAnchoredMenu.vue';

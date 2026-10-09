@@ -189,6 +189,38 @@ describe('initCliBridge', () => {
     expect(chrome.runtime.connectNative).toBeCalledTimes(1);
   });
 
+  describe('connection state', () => {
+    beforeEach(() => jest.useFakeTimers());
+    afterEach(() => jest.useRealTimers());
+
+    it('records a connection once the host stays up, and its end', async () => {
+      await changeOption(false, true);
+      expect(storage['cli-connected']).toBe(false);
+
+      jest.advanceTimersByTime(500);
+      expect(storage['cli-connected']).toBe(true);
+
+      listeners.portDisconnected();
+      expect(storage['cli-connected']).toBe(false);
+    });
+
+    it('never records a host that goes away at once', async () => {
+      await changeOption(false, true);
+      listeners.portDisconnected();
+      jest.advanceTimersByTime(500);
+
+      expect(storage['cli-connected']).toBe(false);
+    });
+
+    it('records the end when the setting turns off', async () => {
+      await changeOption(false, true);
+      jest.advanceTimersByTime(500);
+      await changeOption(true, false);
+
+      expect(storage['cli-connected']).toBe(false);
+    });
+  });
+
   it('reloads to get connectNative when the grant reaches a running worker', async () => {
     chrome.runtime.connectNative = undefined as never;
     setOption(true);
@@ -204,7 +236,7 @@ describe('initCliBridge', () => {
     await flush();
 
     expect(chrome.runtime.reload).toBeCalledTimes(1);
-    expect(storage).toEqual({ 'cli-reloaded-for-grant': { 7: 'window' } });
+    expect(storage['cli-reloaded-for-grant']).toEqual({ 7: 'window' });
   });
 
   it('connects, restores open tabs and reopens Options on Basics after that reload', async () => {
@@ -216,7 +248,7 @@ describe('initCliBridge', () => {
     expect(connectNative).toBeCalledTimes(1);
     expect(restoreOpenTabs).toBeCalledWith({ 7: 'window' });
     expect(OpenOptionsPage).toBeCalledWith({ route: '/basics' });
-    expect(storage).toEqual({});
+    expect(storage).not.toHaveProperty('cli-reloaded-for-grant');
   });
 
   it('leaves open tabs alone on an ordinary start', async () => {

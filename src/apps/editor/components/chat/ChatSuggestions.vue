@@ -31,7 +31,11 @@
             class="chat-suggestions-slot"
             :style="{ '--i': i, '--turn': i % 2 ? 1 : -1 }"
           >
-            <s-sticker-card :tilt="i % 3" @click="choose(item, $event)">
+            <s-sticker-card
+              :tilt="i % 3"
+              :selected="pickable ? item.id === picked : undefined"
+              @click="choose(item, $event)"
+            >
               <template #preview>
                 <chat-suggestion-preview
                   :id="item.id"
@@ -86,7 +90,7 @@ type Data = {
  * Requests to start a chat with, as cards: first the page's best two and a
  * creative look, then three more looks each time More ideas is pressed.
  * Clicking one sends it; Shift-clicking puts it in the message field to
- * edit first.
+ * edit first. Pickable cards are picked instead, for the parent to use.
  */
 export default Vue.extend({
   name: 'ChatSuggestions',
@@ -96,6 +100,16 @@ export default Vue.extend({
     SStickerCard,
     SText,
     ShuffleIcon,
+  },
+
+  props: {
+    pickable: Boolean,
+
+    // The id of the picked card, while pickable.
+    picked: {
+      type: String,
+      default: '',
+    },
   },
 
   data(): Data {
@@ -176,9 +190,18 @@ export default Vue.extend({
       this.deckHeight = Math.max(this.deckHeight, deck?.offsetHeight ?? 0);
       this.round++;
       this.spin += 180;
+
+      if (this.pickable) {
+        this.$emit('pick', null);
+      }
     },
 
     choose(item: ChatSuggestion, event: MouseEvent): void {
+      if (this.pickable) {
+        this.$emit('pick', item);
+        return;
+      }
+
       if (event.shiftKey) {
         this.$emit('fill', item.request);
         return;

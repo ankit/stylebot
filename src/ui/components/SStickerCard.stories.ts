@@ -64,3 +64,20 @@ export const Focused: StoryObj = {
   ),
   play: ({ canvasElement }) => focusViaTab(canvasElement),
 };
+
+export const Selected = fromTemplate(
+  { SStickerCard },
+  `
+  <div style="display: grid; grid-template-columns: repeat(3, 112px); gap: 8px; padding-top: 8px">
+    <s-sticker-card :tilt="0" :selected="true" @click="() => {}">${preview(
+      '#f3eee3'
+    )}Paper &amp; ink</s-sticker-card>
+    <s-sticker-card :tilt="1" :selected="false" @click="() => {}">${preview(
+      '#0c0f0c'
+    )}Terminal</s-sticker-card>
+    <s-sticker-card :tilt="2" :selected="false" @click="() => {}">${preview(
+      '#1e1814'
+    )}Only the links in color</s-sticker-card>
+  </div>
+`
+);

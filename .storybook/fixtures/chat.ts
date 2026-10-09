@@ -79,6 +79,14 @@ export const chat = (
 });
 
 /**
+ * No key yet, with a coding agent connected through the CLI.
+ */
+export const chatWithTerminal = (): StoryObj => ({
+  ...chat(),
+  parameters: { chrome: { chat: {}, storage: { 'cli-connected': true } } },
+});
+
+/**
  * Connected to Claude, with THREAD as example.com's conversation.
  */
 export const chatWithThread = (

@@ -1,4 +1,4 @@
-import { hasCliPermissions } from '@stylebot/settings';
+import { hasCliPermissions, setCliConnected } from '@stylebot/settings';
 import type { StylebotOptions } from '@stylebot/types';
 
 import { OpenOptionsPage } from '../messages';
@@ -13,6 +13,9 @@ import { styleCommands } from './styles';
 import type { CliCommands, CliRequest, CliResponse } from './types';
 
 const HOST_NAME = 'dev.stylebot.cli';
+
+// A missing host disconnects at once, so a port that outlives this has one.
+const CONNECTED_AFTER_MS = 500;
 const RELOADED_FOR_GRANT_KEY = 'cli-reloaded-for-grant';
 
 const commands: CliCommands = {
@@ -33,12 +36,20 @@ const connect = (): void => {
   const connected = chrome.runtime.connectNative(HOST_NAME);
   port = connected;
 
+  const settled = setTimeout(() => {
+    if (port === connected) {
+      setCliConnected(true);
+    }
+  }, CONNECTED_AFTER_MS);
+
   connected.onDisconnect.addListener(() => {
     // Reading lastError keeps a missing host from logging as unchecked.
     void chrome.runtime.lastError;
+    clearTimeout(settled);
 
     if (port === connected) {
       port = undefined;
+      setCliConnected(false);
     }
   });
 
@@ -83,6 +94,7 @@ const connect = (): void => {
 const disconnect = (): void => {
   port?.disconnect();
   port = undefined;
+  setCliConnected(false);
 };
 
 let pendingUpdate = Promise.resolve();
@@ -163,6 +175,7 @@ export const initCliBridge = (): void => {
     }
   });
 
+  setCliConnected(false);
   reloadedForGrant = resumeAfterGrantReload();
   updateCliBridge();
 };

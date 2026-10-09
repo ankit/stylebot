@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue';
-import { expect, waitFor, within } from '@storybook/test';
+import { expect, spyOn, waitFor, within } from '@storybook/test';
 
 import TheChat from './TheChat.vue';
 import {
@@ -14,6 +14,7 @@ import {
   chatStateOf,
   chatWithChange,
   chatWithThread,
+  chatWithTerminal,
   MIXED_EDITS,
   REPLY,
   SCREENSHOT,
@@ -68,11 +69,99 @@ const send = async (canvas: Canvas, text: string): Promise<void> => {
   await user.type(await messageField(canvas), `${text}{Enter}`);
 };
 
+export const SetupStartsWithTheTerminal: StoryObj = {
+  ...chat(),
+  name: 'setup offers the terminal first, with the CLI’s steps and a link to the command line access setting',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step('the terminal is picked, with its setup steps', async () => {
+      await expect(
+        await canvas.findByRole('radio', { name: /From your terminal/ })
+      ).toHaveAttribute('aria-checked', 'true');
+      await canvas.findByText(/npm install -g @stylebot\/cli/);
+      await expect(
+        canvas.getByRole('link', { name: /See CLI guide/ })
+      ).toHaveAttribute('href', 'https://stylebot.dev/cli');
+      await expect(canvas.queryByLabelText('API key')).toBeNull();
+    });
+
+    await step('the last step opens the setting in Options', async () => {
+      const send = spyOn(chrome.runtime, 'sendMessage');
+      await user.click(
+        canvas.getByRole('button', {
+          name: /Let apps on this computer control Stylebot/,
+        })
+      );
+      await expect(send).toHaveBeenCalledWith({
+        name: 'OpenOptionsPage',
+        route: '/basics',
+      });
+      send.mockRestore();
+    });
+
+    await step('picking Chat swaps the steps for the key form', async () => {
+      await user.click(canvas.getByRole('radio', { name: /Here in Chat/ }));
+      await canvas.findByLabelText('API key');
+      await expect(canvas.queryByText(/stylebot install/)).toBeNull();
+      await canvas.findByRole('button', { name: 'Connect Claude' });
+    });
+  },
+};
+
+export const TerminalConnected: StoryObj = {
+  ...chatWithTerminal(),
+  name: 'with the terminal connected, a look becomes a prompt to paste, and Chat can still be set up',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step('a picked look shows its prompt for this site', async () => {
+      await canvas.findByRole('heading', {
+        name: 'Connected to your terminal',
+      });
+      const [card] = await canvas.findAllByRole('button', { pressed: false });
+      await user.click(card);
+      await expect(card).toHaveAttribute('aria-pressed', 'true');
+      await canvas.findByText(/^Style .+ using Stylebot with this theme: /);
+    });
+
+    await step('More ideas deals new looks and clears the pick', async () => {
+      await user.click(canvas.getByRole('button', { name: /More ideas/ }));
+      await waitFor(() =>
+        expect(
+          canvas.queryByText(/^Style .+ using Stylebot with this theme: /)
+        ).toBeNull()
+      );
+    });
+
+    await step(
+      'Chat opens on its key form, and the terminal leads back',
+      async () => {
+        await user.click(canvas.getByRole('button', { name: /Here in Chat/ }));
+        await expect(
+          await canvas.findByRole('radio', { name: /Here in Chat/ })
+        ).toHaveAttribute('aria-checked', 'true');
+        await canvas.findByLabelText('API key');
+
+        await user.click(
+          canvas.getByRole('radio', { name: /From your terminal/ })
+        );
+        await canvas.findByRole('heading', {
+          name: 'Connected to your terminal',
+        });
+      }
+    );
+  },
+};
+
 export const ConnectsWithAKey: StoryObj = {
   ...chat(),
   name: 'Connect waits for a key, refuses another provider’s, and opens the chat once one works',
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
+    await user.click(
+      await canvas.findByRole('radio', { name: /Here in Chat/ })
+    );
     const connect = await canvas.findByRole('button', {
       name: 'Connect Claude',
     });
@@ -465,7 +554,7 @@ export const RemovesAProvider: StoryObj = {
     await user.click(
       cardOf(canvas, 'OpenAI').getByRole('button', { name: 'Remove' })
     );
-    await canvas.findByRole('button', { name: 'Connect Claude' });
+    await canvas.findByRole('heading', { name: 'Bring your own AI' });
   },
 };
 

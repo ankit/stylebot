@@ -2,7 +2,8 @@
   <button
     type="button"
     class="sticker-card"
-    :class="`tilt-${tilt}`"
+    :class="[`tilt-${tilt}`, { selected }]"
+    :aria-pressed="selected === undefined ? undefined : String(selected)"
     v-on="$listeners"
   >
     <span class="sticker-card-preview"><slot name="preview" /></span>
@@ -34,6 +35,12 @@ export default Vue.extend({
     tilt: {
       type: Number as PropType<0 | 1 | 2>,
       default: 0,
+    },
+
+    // Set for a card that stays picked; left out, the card is a plain button.
+    selected: {
+      type: Boolean,
+      default: undefined,
     },
   },
 });
@@ -77,6 +84,12 @@ export default Vue.extend({
     transform: scale(0.97);
   }
 
+  &.selected {
+    transform: translateY(-4px) scale(1.04);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+
   &:disabled {
     opacity: 0.5;
     cursor: default;
@@ -87,7 +100,8 @@ export default Vue.extend({
 
     &:hover:not(:disabled),
     &:focus-visible,
-    &:active:not(:disabled) {
+    &:active:not(:disabled),
+    &.selected {
       transform: none;
     }
   }
