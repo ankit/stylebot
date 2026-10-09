@@ -109,6 +109,42 @@ test('applies the reader when another page on the site loads', async ({
   await expect(reader(nextPage)).toHaveCount(1);
 });
 
+// Every style change elsewhere (a toggle, a profile switch, sync) re-sends the
+// page's styles with readability on, which used to re-mount and tear down the reader.
+test('keeps the reader when the page is sent its styles again', async ({
+  context,
+  openPopup,
+  extension,
+}) => {
+  const page = await context.newPage();
+  await page.goto(articleUrl);
+  await page.bringToFront();
+
+  await enableReadability(openPopup);
+  await expect(reader(page)).toHaveCount(1);
+
+  await extension.evaluate(async url => {
+    const { styles } = await chrome.storage.local.get('styles');
+    const [styleUrl, style] = Object.entries(styles).find(
+      ([, { readability }]) => readability
+    )!;
+    const [tab] = await chrome.tabs.query({ url });
+
+    await chrome.tabs.sendMessage(tab.id!, {
+      name: 'ApplyStylesToTab',
+      defaultStyle: { url: styleUrl, ...style },
+      styles: [],
+    });
+  }, articleUrl);
+
+  // Outlasts every mount retry, after which a failed re-mount gave up.
+  await page.waitForTimeout(2500);
+
+  await expect(reader(page)).toHaveCount(1);
+  await expect(page.locator('#stylebot-reader-loading-art')).toHaveCount(0);
+  await expect(page.locator('body > article')).toHaveCount(0);
+});
+
 // The reader bundle is loaded with import() from the content script, which the
 // page's own CSP must not be able to block.
 test('applies the reader on a page whose CSP blocks scripts', async ({

@@ -41,5 +41,7 @@ export const revertToCachedDocument = (): void => {
     window.stylebotReaderOriginalDocumentBodyElements.forEach(node => {
       document.body.appendChild(node);
     });
+    // A second revert would move the restored nodes to the end, reloading iframes.
+    window.stylebotReaderOriginalDocumentBodyElements = [];
   }
 };

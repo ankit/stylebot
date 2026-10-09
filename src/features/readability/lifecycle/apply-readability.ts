@@ -81,6 +81,17 @@ const run = async (myGeneration: number, attempt = 0): Promise<void> => {
 };
 
 /**
+ * Whether the reader is on the page and not fading out after being closed.
+ */
+const isReaderShowing = (): boolean => {
+  const panel = document
+    .getElementById('stylebot-reader')
+    ?.shadowRoot?.querySelector('.stylebot-reader');
+
+  return !!panel && !panel.classList.contains('closing');
+};
+
+/**
  * Mounts the reader on the current page, showing a themed loader while it works.
  */
 export const applyReadability = async (forceApply = false): Promise<void> => {
@@ -90,6 +101,12 @@ export const applyReadability = async (forceApply = false): Promise<void> => {
 
   // Prevent duplicate calls for the same url if not force applying
   if (!forceApply && !didUrlChange()) {
+    return;
+  }
+
+  // Every saved style change re-sends readability on; re-mounting would parse
+  // the reader's own page, fail and tear the reader down.
+  if (forceApply && isReaderShowing()) {
     return;
   }
 

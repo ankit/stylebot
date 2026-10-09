@@ -75,6 +75,30 @@ describe('applyReadability()', () => {
     expect(mountReaderModule.mountReader).not.toBeCalled();
   });
 
+  it('should leave a showing reader alone on a forced apply', async () => {
+    const host = document.createElement('div');
+    host.id = 'stylebot-reader';
+    const panel = document.createElement('div');
+    panel.className = 'stylebot-reader';
+    host.attachShadow({ mode: 'open' }).appendChild(panel);
+    document.body.appendChild(host);
+
+    await applyReadability(true);
+    await flushPromises();
+
+    expect(loaderModule.showLoader).not.toBeCalled();
+    expect(mountReaderModule.mountReader).not.toBeCalled();
+
+    // A reader fading out after being closed can be turned back on.
+    panel.classList.add('closing');
+
+    await applyReadability(true);
+    await flushPromises();
+
+    expect(mountReaderModule.mountReader).toBeCalledTimes(1);
+    host.remove();
+  });
+
   it('should revert and skip mounting when the url should not run', async () => {
     (shouldRunOnUrlModule.shouldRunOnUrl as jest.Mock).mockReturnValue(false);
 
