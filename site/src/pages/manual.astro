@@ -64,21 +64,6 @@ const globalShortcuts: Shortcut[] = [
   ['Toggle grayscale', null],
 ];
 
-const editorShortcuts: Shortcut[] = [
-  ['Element picker', ['I']],
-  ['Hide selected elements', ['H']],
-  ['Basic tab', ['B']],
-  ['Code tab', ['C']],
-  ['Presets tab', ['P']],
-  ['Chat tab', ['T']],
-  ['Open in the side panel', ['S']],
-  ['Open in a separate window', ['W']],
-  ['Dock left or right in the page', ['L', 'R'], 'or'],
-  ['Undo', ['ctrl', 'Z']],
-  ['Redo', ['ctrl', 'shift', 'Z']],
-  ['Show shortcuts', ['?']],
-];
-
 const pickerShortcuts: Shortcut[] = [
   ['Select the parent element', ['↑', '←'], 'or'],
   ['Go back to the child element', ['↓', '→'], 'or'],
@@ -87,7 +72,6 @@ const pickerShortcuts: Shortcut[] = [
 
 const shortcutGroups = [
   { title: 'Global', rows: globalShortcuts },
-  { title: 'In the editor', rows: editorShortcuts },
   { title: 'While picking an element', rows: pickerShortcuts },
 ];
 ---
@@ -326,9 +310,8 @@ const shortcutGroups = [
           <h2>Keyboard shortcuts</h2>
           <p>
             Global shortcuts work on any page Stylebot can style; change them in
-            your browser's shortcut settings, linked from Options. Editor
-            shortcuts work while focus isn't in a text field. Press{' '}
-            <Keys keys={['?']} /> in the editor to see this list.
+            your browser's shortcut settings, linked from Options. For the
+            editor's own shortcuts, press <Keys keys={['?']} /> in the editor.
           </p>
           {shortcutGroups.map((group) => (
             <div class="table">
@@ -425,6 +408,7 @@ const shortcutGroups = [
 
   .toc {
     flex: 0 0 220px;
+    margin-left: -12px;
     position: sticky;
     top: 84px;
     display: flex;
@@ -441,14 +425,14 @@ const shortcutGroups = [
   }
 
   .toc a:hover {
-    background: var(--hover);
+    background: var(--track);
     color: var(--ink);
   }
 
   .toc a.is-active {
     font-weight: 600;
     color: var(--ink);
-    background: var(--fill);
+    background: var(--track);
   }
 
   .sections {
@@ -663,6 +647,7 @@ const shortcutGroups = [
     }
 
     .toc {
+      margin-left: 0;
       position: static;
       flex: 1 1 100%;
       flex-direction: row;

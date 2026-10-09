@@ -1,21 +1,13 @@
 import { Component, createRef, type ComponentChildren } from 'preact';
 import SbIcon from '../SbIcon';
 import { ChevronDown, Close, EyeOff } from '../icons';
-import {
-  ChatComposer,
-  ChatEmpty,
-  FIRST_DECK,
-  NIGHT_OWL,
-  SECOND_DECK,
-} from '../chat/Chat';
 import './demo.css';
 import { isDarkTheme } from '../../lib/themes';
 import { currentTheme } from '../../lib/theme-state';
 import {
-  LOOKS,
   INIT,
+  LOOKS,
   LOOK_STEPS,
-  KEY_LEN,
   NEW_PROFILE,
   QUOTE_CSS,
   QUOTE_TOTAL,
@@ -44,6 +36,7 @@ type State = DemoState & {
   paneWidth: number;
   fitWidth: number;
   stageHeight: number;
+  split: boolean;
 };
 
 type Token = { text: string; style: string };
@@ -51,7 +44,8 @@ type Line = { style: string; toks: Token[] };
 
 const PANE_WIDTH = 980;
 const MIN_FIT_SCALE = 0.6;
-const PLAYBACK_KEYS = new Set(['cur', 'click', 'keyType', 'qType', 'profType']);
+const SPLIT_QUERY = '(min-width: 1100px)';
+const PLAYBACK_KEYS = new Set(['cur', 'click', 'qType', 'profType']);
 
 const CODE_COLORS: Record<string, string> = {
   sel: 'color:var(--csel)',
@@ -92,32 +86,29 @@ const Gear = () => (
   <svg
     width="16"
     height="16"
-    viewBox="0 0 16 16"
+    viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    stroke-width="1.4"
+    stroke-width="1.7"
+    stroke-linecap="round"
+    stroke-linejoin="round"
   >
-    <circle cx="8" cy="8" r="2.3" />
-    <circle
-      cx="8"
-      cy="8"
-      r="5.6"
-      stroke-dasharray="2.2 1.6"
-      stroke-width="2.2"
-    />
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
   </svg>
 );
 
 type Props = {
   variant?: 'landing' | 'welcome';
+  intro?: ComponentChildren;
   children?: ComponentChildren;
 };
 
 /**
  * The hero walkthrough: a scripted browser window that plays through opening
- * the editor, picking an element, styling it, creating a profile, and asking
- * the agent. The welcome variant starts by pinning Stylebot and stops at the end
- * instead of looping.
+ * the editor, picking an element, styling it, and creating a profile. The
+ * welcome variant starts by pinning Stylebot and stops at the end instead of
+ * looping.
  */
 export default class Demo extends Component<Props, State> {
   get welcome() {
@@ -134,7 +125,9 @@ export default class Demo extends Component<Props, State> {
 
   paneRef = createRef<HTMLDivElement>();
   stageRef = createRef<HTMLDivElement>();
-  stepsRef = createRef<HTMLOListElement>();
+  stepsRef = createRef<HTMLDivElement>();
+  mainRef = createRef<HTMLDivElement>();
+  belowRef = createRef<HTMLDivElement>();
   rootRef = createRef<HTMLDivElement>();
   resizeObserver?: ResizeObserver;
   timers: ReturnType<typeof setTimeout>[] = [];
@@ -162,6 +155,7 @@ export default class Demo extends Component<Props, State> {
     paneWidth: PANE_WIDTH,
     fitWidth: 0,
     stageHeight: 0,
+    split: false,
   };
 
   onTheme = () => this.setState({ dark: isDarkTheme(currentTheme()) });
@@ -169,25 +163,31 @@ export default class Demo extends Component<Props, State> {
   /**
    * Below the pane's natural width, the demo is laid out at a fixed width and
    * scaled down as a whole, so the page and editor keep their proportions. The
-   * welcome variant also shrinks, steps and all, to keep them on the first screen,
-   * and anything passed in below the steps narrows with them.
+   * welcome variant also shrinks to keep it on the first screen with the steps
+   * and anything passed in below them, which narrows with it when stacked and
+   * spans both columns when the pane sits beside the steps on a wide screen.
    */
   fit = () => {
     const stage = this.stageRef.current;
     const pane = this.paneRef.current;
     const steps = this.stepsRef.current;
-    const root = this.rootRef.current;
-    if (!stage || !pane || !steps || !root) return;
-    const full = root.clientWidth;
+    const main = this.mainRef.current;
+    if (!stage || !pane || !steps || !main) return;
+    const split = this.welcome && matchMedia(SPLIT_QUERY).matches;
+    const full = main.clientWidth;
     let scale = Math.min(1, full / PANE_WIDTH);
     const paneWidth = full / scale;
     if (this.welcome) {
       const top = stage.getBoundingClientRect().top + window.scrollY;
-      const below =
-        steps.getBoundingClientRect().bottom -
-        stage.getBoundingClientRect().bottom;
+      const below = split
+        ? (this.belowRef.current?.offsetHeight ?? -22) + 22
+        : steps.getBoundingClientRect().bottom -
+          stage.getBoundingClientRect().bottom;
       const room = window.innerHeight - top - below - 24;
-      scale = Math.min(scale, Math.max(MIN_FIT_SCALE, room / pane.offsetHeight));
+      scale = Math.min(
+        scale,
+        Math.max(MIN_FIT_SCALE, room / pane.offsetHeight),
+      );
     }
     const width = paneWidth * scale;
     this.setState({
@@ -195,6 +195,7 @@ export default class Demo extends Component<Props, State> {
       paneWidth,
       fitWidth: width < full - 1 ? width : 0,
       stageHeight: pane.offsetHeight * scale,
+      split,
     });
   };
 
@@ -204,8 +205,7 @@ export default class Demo extends Component<Props, State> {
     window.addEventListener('themechange', this.onTheme);
     this.fit();
     this.resizeObserver = new ResizeObserver(this.fit);
-    if (this.rootRef.current)
-      this.resizeObserver.observe(this.rootRef.current);
+    if (this.rootRef.current) this.resizeObserver.observe(this.rootRef.current);
     if (this.welcome) window.addEventListener('resize', this.fit);
     const pane = this.paneRef.current;
     if (pane) {
@@ -217,7 +217,7 @@ export default class Demo extends Component<Props, State> {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
       return;
     }
-    this.startId = setTimeout(() => this.play(0, 0), 600);
+    this.startId = setTimeout(() => this.play(0, 0), this.welcome ? 600 : 2300);
   }
 
   componentWillUnmount() {
@@ -262,11 +262,6 @@ export default class Demo extends Component<Props, State> {
         );
       }
     }
-    if (patch.keyType) {
-      for (let i = 1; i <= KEY_LEN; i++) {
-        this.later(i * 38 * k, () => this.setState({ keyLen: i }));
-      }
-    }
     if (patch.profType) {
       for (let i = 1; i <= NEW_PROFILE.length; i++) {
         this.later(i * 70 * k, () => this.setState({ profLen: i }));
@@ -307,19 +302,12 @@ export default class Demo extends Component<Props, State> {
       popHover: false,
       menuOpen: false,
       focus: null,
-      codeScroll: false,
       profMenu: false,
       profCreating: false,
       profLen: 0,
-      cardHover: null,
-      dealing: false,
     });
     if (this.scenes.slice(0, i).some((sc) => sc.acts.some(([, p]) => p.qType)))
       s.qChars = QUOTE_TOTAL;
-    if (
-      this.scenes.slice(0, i).some((sc) => sc.acts.some(([, p]) => p.keyType))
-    )
-      s.keyLen = KEY_LEN;
     return s as DemoState;
   }
 
@@ -366,7 +354,6 @@ export default class Demo extends Component<Props, State> {
     const from = sc.dur * k * frac;
     const s: Record<string, unknown> = { ...this.baseline(i) };
     const typed: Record<string, () => Partial<DemoState>> = {
-      keyType: () => ({ keyLen: KEY_LEN }),
       qType: () => ({ qChars: QUOTE_TOTAL }),
       profType: () => ({ profLen: NEW_PROFILE.length }),
     };
@@ -440,7 +427,7 @@ export default class Demo extends Component<Props, State> {
       });
       decls.forEach((toks) => lines.push({ style: indent, toks }));
       lines.push({ style: '', toks: [tk('}', 'br')] });
-    } else if (!typed.length && !S.agentTheme) {
+    } else if (!typed.length && !S.lookDone) {
       lines.push({ style: '', toks: [tk('/* No styles yet */', 'com')] });
     }
     if (typed.length) {
@@ -467,7 +454,7 @@ export default class Demo extends Component<Props, State> {
     return { lines, quoteDone };
   }
 
-  agentLines(css: [string, [string, string][]][]): Line[] {
+  lookLines(css: [string, [string, string][]][]): Line[] {
     const hex = (v: string): Token[] =>
       /^#[0-9a-f]{6}$/i.test(v)
         ? [
@@ -501,50 +488,6 @@ export default class Demo extends Component<Props, State> {
     return lines;
   }
 
-  /**
-   * The style for suggestion card `i` of deck `d`: the shown deck rests fanned
-   * out as Chat's stylesheet sets it, and More ideas tosses it away while the
-   * next deck lands in its place.
-   */
-  cardStyle(S: State, d: number, i: number) {
-    const shown = S.deal === d;
-    const hov = shown && S.cardHover === `${d}${i}`;
-    const turn = i % 2 ? 1 : -1;
-    const transform = !shown
-      ? d === 0
-        ? `translateY(-12px) rotate(${turn * 6}deg) scale(.9)`
-        : `translateY(-18px) rotate(${turn * -8}deg) scale(.9)`
-      : hov
-        ? S.clicking
-          ? 'scale(.97)'
-          : 'translateY(-4px) scale(1.04)'
-        : null;
-    const delay = S.dealing ? (shown ? 140 + i * 70 : i * 40) : 0;
-    const dur = S.dealing ? (shown ? '.44s' : '.18s') : '.2s';
-    return (
-      `border-color:${hov ? 'var(--faint)' : 'var(--strong)'};${transform ? `transform:${transform};` : ''}opacity:${shown ? 1 : 0};` +
-      `transition:transform ${dur} cubic-bezier(.3,1.6,.5,1) ${delay}ms,opacity .18s ease ${delay}ms,border-color .2s`
-    );
-  }
-
-  renderEmptyChat(S: State) {
-    const second = S.dark
-      ? [SECOND_DECK[0], NIGHT_OWL, SECOND_DECK[2]]
-      : SECOND_DECK;
-    return (
-      <ChatEmpty
-        decks={[FIRST_DECK, second]}
-        moreStyle={
-          S.clicking && S.dealing
-            ? 'background:var(--hover);transform:scale(.96)'
-            : ''
-        }
-        moreIconStyle={`transition:transform .35s cubic-bezier(.3,1.5,.5,1);transform:rotate(${S.deal * 180}deg)`}
-        cardStyle={(d, i) => this.cardStyle(S, d, i)}
-      />
-    );
-  }
-
   renderLines(lines: Line[]) {
     return lines.map((ln, i) => (
       <div key={i} style={ln.style}>
@@ -559,19 +502,25 @@ export default class Demo extends Component<Props, State> {
 
   /**
    * The state as the current profile shows it: Default keeps the hand-written
-   * styles, and the new profile starts clean and gets the agent's theme.
+   * styles, and the new profile starts clean and gets the look.
    */
   profileView(state: State): State {
     return state.profile === 'Default'
-      ? { ...state, agentTheme: false, lookStep: 0 }
+      ? { ...state, lookDone: false, lookStep: 0 }
       : { ...state, h1Size: 32, h1Color: null, qChars: 0 };
+  }
+
+  /**
+   * Fills in the shortcut wherever a step or caption mentions it.
+   */
+  keysText(text: string, mac: boolean) {
+    return text.replace('{keys}', mac ? '⌥⇧M' : 'Alt+Shift+M');
   }
 
   render(_: Props, state: State) {
     const S = this.profileView(state);
     const read = S.read;
-    const ag = S.agentTheme;
-    const step = ag ? LOOK_STEPS : S.lookStep;
+    const step = S.lookDone ? LOOK_STEPS : S.lookStep;
     const at = (n: number) => step >= n;
     const dk = S.dark;
     const look = LOOKS[dk ? 'dark' : 'light'];
@@ -589,14 +538,9 @@ export default class Demo extends Component<Props, State> {
         ? ';background-color:rgba(111,168,220,.66)' +
           (k === 'h1' ? ';box-shadow:0 10px 0 0 rgba(246,178,107,.5)' : '')
         : '';
-    const tr =
-      ';transition:font-size .25s,color .25s,background .3s,outline-color .2s';
+    const tr = ';transition:outline-color .2s';
 
     const { lines: codeLines, quoteDone: qd } = this.codeLines(S);
-    const agentLines = this.agentLines(look.css);
-    const agentDecls = look.css.reduce((n, [, props]) => n + props.length, 0);
-    const profileName = (name: string) =>
-      name === NEW_PROFILE ? look.profile : name;
     const hasSel = !!S.sel && !S.inspecting;
     const sizeSet = S.h1Size !== 32;
     const computedInk = at(1) ? np.head : dk ? '#dfe2e7' : '#22252b';
@@ -624,17 +568,6 @@ export default class Demo extends Component<Props, State> {
     const grayTog = toggle(S.gray);
     const selected = !S.inspecting && !!S.sel;
     const selText = selected ? 'article h1' : 'Pick an element';
-    const isChat = S.tab === 'chat' && S.keyOk;
-    const needsKey = S.tab === 'chat' && !S.keyOk;
-    const loadText = [
-      'Reading the page…',
-      'Picking colors…',
-      'Measuring the margins…',
-    ][Math.min(2, Math.floor(S.thinkT / 400))];
-    const provOn =
-      'flex:1;text-align:center;padding:7px 0;border-radius:7px;font:600 12.5px/1 var(--ui);background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)';
-    const provOff =
-      'flex:1;text-align:center;padding:7px 0;border-radius:7px;font:400 12.5px/1 var(--ui);color:var(--muted)';
 
     const quote =
       'margin:4px 0 18px;transition:all .35s' +
@@ -655,7 +588,9 @@ export default class Demo extends Component<Props, State> {
       const active = !S.done && i === S.scene;
       return {
         title: sc.title,
-        body: sc.body,
+        body: this.keysText(sc.body, S.mac),
+        mark: doneStep ? '✓' : String(i + 1),
+        state: doneStep ? 'is-done' : active ? 'is-active' : '',
         titleStyle:
           `font:${active ? 600 : 500} 13.5px/1.35 var(--ui);padding-top:2px;color:` +
           (doneStep ? 'var(--muted)' : active ? 'var(--ink)' : 'var(--faint)'),
@@ -971,7 +906,7 @@ export default class Demo extends Component<Props, State> {
                         class="demo-prof-btn"
                         style={S.profMenu ? 'background:var(--hover)' : ''}
                       >
-                        {profileName(S.profile)}
+                        {S.profile}
                         <span style="display:flex;color:var(--muted)">
                           <ChevronDown />
                         </span>
@@ -1014,14 +949,14 @@ export default class Demo extends Component<Props, State> {
                                   <path d="M2.5 6.2 5 8.6 9.5 3.5" />
                                 </svg>
                               </span>
-                              <span>{profileName(name)}</span>
+                              <span>{name}</span>
                             </div>
                           );
                         })}
                         <div class="demo-prof-sep" />
                         {S.profCreating ? (
                           <div class="demo-prof-input">
-                            <span>{look.profile.slice(0, S.profLen)}</span>
+                            <span>{NEW_PROFILE.slice(0, S.profLen)}</span>
                             <span class="demo-caret" />
                           </div>
                         ) : (
@@ -1110,23 +1045,6 @@ export default class Demo extends Component<Props, State> {
                     <span data-t="tab-chat" style={tab('chat')}>
                       Chat
                     </span>
-                    {S.tab === 'chat' && (
-                      <span class="demo-new-chat">
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 16 16"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="1.3"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        >
-                          <path d="M13.5 9v3.5a1.5 1.5 0 0 1-1.5 1.5H3.5A1.5 1.5 0 0 1 2 12.5V4a1.5 1.5 0 0 1 1.5-1.5H7" />
-                          <path d="M11.8 1.8a1.3 1.3 0 0 1 1.9 1.9L8 9.4 5.8 10l.6-2.2z" />
-                        </svg>
-                      </span>
-                    )}
                   </div>
 
                   <div style="flex:1;min-height:0;overflow:hidden;background:var(--fill)">
@@ -1272,153 +1190,10 @@ export default class Demo extends Component<Props, State> {
                         data-t="code"
                         style="height:100%;overflow:hidden;background:var(--surface);font:400 12px/1.75 var(--mono)"
                       >
-                        <div
-                          style={
-                            'padding:12px 14px 40px;transition:transform 1.6s cubic-bezier(.4,0,.2,1);transform:translateY(' +
-                            (S.codeScroll
-                              ? -Math.max(0, codeLines.length * 21 - 8)
-                              : 0) +
-                            'px)'
-                          }
-                        >
+                        <div style="padding:12px 14px 40px">
                           {this.renderLines(codeLines)}
-                          {ag && (
-                            <div
-                              style={`margin:${codeLines.length ? 12 : 0}px -14px 0;padding:6px 14px 8px 12px;border-left:2px solid #1f8a4c;background:rgba(31,138,76,.07)`}
-                            >
-                              <div style="font:400 12px/1.75 var(--mono);color:var(--ccom)">
-                                {`/* ${look.name} · added by Stylebot agent */`}
-                              </div>
-                              {this.renderLines(agentLines)}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {needsKey && (
-                      <div style="height:100%;background:var(--surface);padding:18px 16px;display:flex;flex-direction:column;gap:14px">
-                        <div>
-                          <div style="font:600 14px/1.3 var(--ui);color:var(--ink)">
-                            Set up the Stylebot agent
-                          </div>
-                          <div style="margin-top:5px;font:400 12.5px/1.5 var(--ui);color:var(--muted);text-wrap:pretty">
-                            Bring your own key. It stays in this browser and is
-                            only sent to the provider you pick.
-                          </div>
-                        </div>
-                        <div style="display:flex;padding:3px;gap:2px;border-radius:9px;background:var(--track)">
-                          <span
-                            data-t="prov-claude"
-                            style={S.prov === 'claude' ? provOn : provOff}
-                          >
-                            Claude
-                          </span>
-                          <span style={provOff}>OpenAI</span>
-                        </div>
-                        <div style="display:flex;flex-direction:column;gap:6px">
-                          <span style="font:500 12px/1 var(--ui);color:var(--ink2)">
-                            API key
-                          </span>
-                          <div
-                            data-t="key-input"
-                            style={
-                              'height:36px;display:flex;align-items:center;padding:0 12px;border-radius:9px;overflow:hidden;background:var(--surface);transition:border-color .15s,box-shadow .15s;' +
-                              (S.keyFocus
-                                ? 'border:1px solid var(--acc);box-shadow:0 0 0 3px rgba(42,95,214,.15)'
-                                : 'border:1px solid var(--strong)')
-                            }
-                          >
-                            <span
-                              style={`font:400 12.5px/1 var(--mono);overflow:hidden;white-space:nowrap;color:${S.keyLen ? 'var(--ink)' : 'var(--faint)'}`}
-                            >
-                              {S.keyLen
-                                ? `sk-ant-${'•'.repeat(S.keyLen)}`
-                                : 'Paste your key'}
-                            </span>
-                          </div>
-                        </div>
-                        <span
-                          data-t="key-save"
-                          style={
-                            'align-self:flex-start;padding:10px 16px;border-radius:9px;font:600 13px/1 var(--ui);background:var(--ink);color:var(--surface);transition:opacity .15s;opacity:' +
-                            (S.keyLen ? 1 : 0.45)
-                          }
-                        >
-                          {S.keySaving ? 'Checking…' : 'Connect'}
-                        </span>
-                      </div>
-                    )}
-
-                    {isChat && (
-                      <div class="demo-chat">
-                        <div class="demo-thread">
-                          {!S.chatSent && this.renderEmptyChat(S)}
-                          {S.chatSent && (
-                            <div class="demo-bubble">{look.msg}</div>
-                          )}
-                          {S.chatThinking && (
-                            <div class="demo-thinking">
-                              <SbIcon size={16} animate cycle={1.8} />
-                              <span>{loadText}</span>
-                            </div>
-                          )}
-                          {S.chatReplied && (
-                            <>
-                              <div class="demo-reply">{look.reply}</div>
-                              <div class="demo-change">
-                                <SbIcon size={16} />
-                                <span class="demo-change-label">
-                                  Updated styles
-                                </span>
-                                <span
-                                  data-t="view-code"
-                                  class="demo-diff"
-                                  style={`opacity:${S.clicking && S.tab === 'chat' ? 0.6 : 1}`}
-                                >
-                                  <span class="demo-diff-count">
-                                    +{agentDecls}
-                                  </span>
-                                  <span class="demo-diff-open">
-                                    <svg
-                                      width="12"
-                                      height="12"
-                                      viewBox="0 0 12 12"
-                                      fill="none"
-                                      stroke="currentColor"
-                                      stroke-width="1.5"
-                                      stroke-linecap="round"
-                                      stroke-linejoin="round"
-                                    >
-                                      <path d="M4.5 2.5 8 6l-3.5 3.5" />
-                                    </svg>
-                                  </span>
-                                </span>
-                                <span class="demo-undo">
-                                  <svg
-                                    width="14"
-                                    height="14"
-                                    viewBox="0 0 16 16"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="1.4"
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                  >
-                                    <path d="M5.5 3.5 2.5 6.5l3 3" />
-                                    <path d="M2.5 6.5h7a4 4 0 0 1 0 8H8" />
-                                  </svg>
-                                  Undo
-                                </span>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                        <div style="flex:none;padding:0 20px 12px">
-                          <ChatComposer
-                            tokens={S.chatReplied ? '6.8K tokens' : ''}
-                            thinking={S.chatThinking}
-                          />
+                          {S.lookDone &&
+                            this.renderLines(this.lookLines(look.css))}
                         </div>
                       </div>
                     )}
@@ -1469,7 +1244,7 @@ export default class Demo extends Component<Props, State> {
               {S.scene + 1} / {this.scenes.length}
             </span>
             <span aria-live="polite" style="flex:1;min-width:0">
-              {S.caption.replace(NEW_PROFILE, look.profile)}
+              {this.keysText(S.caption, S.mac)}
             </span>
           </div>
 
@@ -1500,40 +1275,54 @@ export default class Demo extends Component<Props, State> {
       </div>
     );
 
+    const narrow = S.fitWidth && !S.split;
+    const fitted = narrow ? `width:${S.fitWidth}px;align-self:center` : '';
+
     return (
-      <div ref={this.rootRef} class="demo">
-        {stage}
-        <ol
-          ref={this.stepsRef}
-          class="demo-steps"
-          style={
-            S.fitWidth
-              ? `width:${S.fitWidth}px;align-self:center;grid-template-columns:repeat(${steps.length},minmax(0,1fr))`
-              : ''
-          }
-        >
-          {steps.map((s, i) => (
-            <li key={s.title} class="demo-step" onClick={() => this.jump(i)}>
-              <div
-                class="demo-step-bar"
-                title="Jump to this point"
-                onClick={(ev: MouseEvent) => this.seekFromBar(i, ev)}
-              >
-                <div class="demo-step-track">
-                  <div style={s.barStyle} />
-                </div>
-              </div>
-              <button class="demo-step-title" style={s.titleStyle}>
-                {s.title}
-              </button>
-              <div class="demo-step-body">{s.body}</div>
-            </li>
-          ))}
-        </ol>
-        {this.props.children && (
-          <div
-            style={S.fitWidth ? `width:${S.fitWidth}px;align-self:center` : ''}
+      <div
+        ref={this.rootRef}
+        class={this.welcome ? 'demo demo-welcome' : 'demo'}
+      >
+        {this.props.intro && <div class="demo-intro">{this.props.intro}</div>}
+        <div ref={this.mainRef} class="demo-main">
+          {stage}
+        </div>
+        <div ref={this.stepsRef} class="demo-steps-wrap" style={fitted}>
+          <div class="demo-steps-head">How it works</div>
+          <ol
+            class="demo-steps"
+            style={
+              narrow
+                ? `grid-template-columns:repeat(${steps.length},minmax(0,1fr))`
+                : ''
+            }
           >
+            {steps.map((s, i) => (
+              <li
+                key={s.title}
+                class={`demo-step ${s.state}`}
+                onClick={() => this.jump(i)}
+              >
+                <div
+                  class="demo-step-bar"
+                  title="Jump to this point"
+                  onClick={(ev: MouseEvent) => this.seekFromBar(i, ev)}
+                >
+                  <div class="demo-step-track">
+                    <div style={s.barStyle} />
+                  </div>
+                </div>
+                <span class="demo-step-mark">{s.mark}</span>
+                <button class="demo-step-title" style={s.titleStyle}>
+                  {s.title}
+                </button>
+                <div class="demo-step-body">{s.body}</div>
+              </li>
+            ))}
+          </ol>
+        </div>
+        {this.props.children && (
+          <div ref={this.belowRef} class="demo-below" style={fitted}>
             {this.props.children}
           </div>
         )}

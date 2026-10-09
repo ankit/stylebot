@@ -2,7 +2,6 @@ export type Patch = Record<string, unknown> & {
   cur?: string;
   click?: number;
   qType?: boolean;
-  keyType?: boolean;
   profType?: boolean;
 };
 
@@ -13,23 +12,12 @@ export type Scene = {
   acts: [number, Patch][];
 };
 
+export const NEW_PROFILE = 'Newspaper';
+
 export const INIT = {
-  codeScroll: false,
   qChars: 0,
-  agentTheme: false,
-  prov: null as string | null,
-  keyFocus: false,
-  keyLen: 0,
-  keySaving: false,
-  keyOk: false,
-  chatSent: false,
-  chatThinking: false,
-  chatReplied: false,
-  thinkT: 0,
   lookStep: 0,
-  deal: 0,
-  dealing: false,
-  cardHover: null as string | null,
+  lookDone: false,
   pinned: true,
   menuOpen: false,
   popOpen: false,
@@ -57,8 +45,8 @@ export type DemoState = typeof INIT;
 export const SCENES: Scene[] = [
   {
     title: 'Open the editor',
-    body: 'Click the icon, or press alt shift M.',
-    dur: 4300,
+    body: 'Click the icon, or press {keys}.',
+    dur: 4600,
     acts: [
       [
         0,
@@ -77,7 +65,7 @@ export const SCENES: Scene[] = [
           popHover: false,
           editorOpen: true,
           inspecting: true,
-          caption: 'Or press alt shift M to open it directly.',
+          caption: 'Or press {keys} to open it directly.',
         },
       ],
     ],
@@ -85,7 +73,7 @@ export const SCENES: Scene[] = [
   {
     title: 'Pick an element',
     body: 'Click to select. Fields show its current styles.',
-    dur: 6500,
+    dur: 5000,
     acts: [
       [
         0,
@@ -146,127 +134,56 @@ export const SCENES: Scene[] = [
   },
   {
     title: 'Profiles',
-    body: 'Keep several styles per site.',
-    dur: 6000,
+    body: 'Save different looks for the same site.',
+    dur: 10000,
     acts: [
       [
         0,
         {
-          caption: 'Profiles keep more than one style per site.',
+          caption: 'Save different looks for the same site.',
           cur: 'prof-btn',
         },
       ],
       [800, { click: 1, profMenu: true }],
-      [1600, { cur: 'prof-create', caption: 'Create one to try a new look.' }],
+      [
+        1600,
+        { cur: 'prof-create', caption: 'Create a profile for a new look.' },
+      ],
       [2300, { click: 1, profCreating: true, profType: true }],
       [
         3500,
         {
-          profCreating: false,
           profMenu: false,
-          profLen: 0,
-          profiles: ['Default', 'Newspaper'],
-          profile: 'Newspaper',
+          profile: NEW_PROFILE,
+          lookDone: false,
+          lookStep: 0,
           caption: 'Newspaper starts clean. Default is still saved.',
         },
       ],
-    ],
-  },
-  {
-    title: 'Describe it',
-    body: 'Pick a suggestion, or tell the agent what you want.',
-    dur: 22800,
-    acts: [
       [
-        0,
+        3900,
         {
-          caption: 'The Stylebot agent lives in the Chat tab.',
-          cur: 'tab-chat',
+          profCreating: false,
+          profLen: 0,
+          profiles: ['Default', NEW_PROFILE],
         },
       ],
-      [800, { click: 1, tab: 'chat' }],
+      [4600, { lookStep: 1, caption: 'Give it a newspaper look.' }],
+      [4900, { lookStep: 2 }],
+      [5200, { lookStep: 3 }],
+      [5500, { lookStep: 4 }],
+      [5800, { lookStep: 5 }],
+      [6100, { lookDone: true }],
+      [6800, { cur: 'prof-btn', caption: 'Switch between them anytime.' }],
+      [7400, { click: 1, profMenu: true }],
+      [8000, { cur: 'prof-Default' }],
       [
-        1500,
-        {
-          caption: 'Bring your own key: pick Claude or OpenAI.',
-          cur: 'prov-claude',
-        },
-      ],
-      [2200, { click: 1, prov: 'claude' }],
-      [2800, { cur: 'key-input' }],
-      [3400, { click: 1, keyFocus: true, keyType: true }],
-      [4700, { cur: 'key-save', keyFocus: false }],
-      [5300, { click: 1, keySaving: true }],
-      [
-        5900,
-        {
-          keySaving: false,
-          keyOk: true,
-          caption: 'Connected. The key stays in your browser.',
-        },
-      ],
-      [
-        6700,
-        { cur: 'card-00', caption: 'Suggestions are picked for this page.' },
-      ],
-      [7300, { cardHover: '00' }],
-      [7900, { cur: 'card-01', cardHover: null }],
-      [8400, { cardHover: '01' }],
-      [
-        9000,
-        {
-          cur: 'more-ideas',
-          cardHover: null,
-          caption: 'More ideas deals three new looks.',
-        },
-      ],
-      [9600, { click: 1, deal: 1, dealing: true }],
-      [10500, { dealing: false }],
-      [10700, { cur: 'card-11', caption: 'Click one to send it.' }],
-      [11300, { cardHover: '11' }],
-      [11900, { click: 1, cardHover: null, chatSent: true }],
-      [
-        12300,
-        {
-          chatThinking: true,
-          thinkT: 0,
-          caption: 'Styles apply to the page as the agent works.',
-        },
-      ],
-      [12700, { lookStep: 1 }],
-      [13100, { thinkT: 400, lookStep: 2 }],
-      [13500, { lookStep: 3 }],
-      [13900, { thinkT: 800, lookStep: 4 }],
-      [14300, { lookStep: 5 }],
-      [
-        14700,
-        {
-          chatThinking: false,
-          chatReplied: true,
-          agentTheme: true,
-          caption: 'The agent sums up what it did.',
-        },
-      ],
-      [16100, { cur: 'view-code' }],
-      [16900, { click: 1, tab: 'code' }],
-      [
-        17300,
-        {
-          codeScroll: true,
-          caption: 'The full CSS lands in the Code tab, ready to edit.',
-        },
-      ],
-      [19200, { cur: 'prof-btn', caption: 'Switch profiles any time.' }],
-      [19900, { click: 1, profMenu: true }],
-      [20600, { cur: 'prof-Default' }],
-      [
-        21300,
+        8500,
         {
           click: 1,
           profMenu: false,
           profile: 'Default',
-          codeScroll: false,
-          caption: 'Back to Default, with your earlier styles.',
+          caption: 'Back to Default. One site, two looks.',
         },
       ],
     ],
@@ -274,8 +191,8 @@ export const SCENES: Scene[] = [
 ];
 
 /**
- * How many steps the agent's look lands in while it streams: page and text,
- * then the header and fonts, the headline, secondary text, and the quote.
+ * How many steps the look lands in: page and text, then the header and fonts,
+ * the headline, secondary text, and the quote.
  */
 export const LOOK_STEPS = 5;
 
@@ -291,10 +208,6 @@ export const QUOTE_CSS = [
 export const QUOTE_TOTAL = QUOTE_CSS.reduce((a, q) => a + q.txt.length, 0);
 
 type Look = {
-  name: string;
-  profile: string;
-  msg: string;
-  reply: string;
   serif: boolean;
   css: [string, [string, string][]][];
   colors: {
@@ -310,16 +223,11 @@ type Look = {
 };
 
 /**
- * The look the agent applies in the Describe it scene. Morning newspaper on a
- * light site, Night owl on a dark one, so the demo shows a theme that suits it.
+ * The look the Profiles scene gives the new profile: a morning newspaper on a
+ * light site, a warm dark theme on a dark one, so it suits the page.
  */
 export const LOOKS: Record<'light' | 'dark', Look> = {
   light: {
-    name: 'Morning newspaper',
-    profile: 'Newspaper',
-    msg: 'Morning newspaper: cream paper and black ink, a classic serif for headlines and body text, narrow columns, and thin rules between sections.',
-    reply:
-      'Done. The page now has cream paper and black ink, a classic serif for headlines and text, and thin rules between sections. The CSS is saved to this profile.',
     serif: true,
     css: [
       [
@@ -378,11 +286,6 @@ export const LOOKS: Record<'light' | 'dark', Look> = {
     },
   },
   dark: {
-    name: 'Night owl',
-    profile: 'Night owl',
-    msg: 'Night owl: a warm dark theme, with a deep brown-black background, cream text, muted tan for secondary text, amber links, slightly lighter cards and inputs, and images dimmed a little.',
-    reply:
-      'Done. The page now has a warm brown-black background, cream text, muted tan details and amber links, with images dimmed a little. The CSS is saved to this profile.',
     serif: false,
     css: [
       [
@@ -441,10 +344,6 @@ export const LOOKS: Record<'light' | 'dark', Look> = {
     },
   },
 };
-
-export const KEY_LEN = 24;
-
-export const NEW_PROFILE = 'Newspaper';
 
 export const PIN_SCENE: Scene = {
   title: 'Pin it to the toolbar',

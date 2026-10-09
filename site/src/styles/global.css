@@ -74,7 +74,6 @@ img {
   border-bottom-color: var(--border);
   background: color-mix(in srgb, var(--surface) 72%, transparent);
   backdrop-filter: saturate(180%) blur(16px);
-  -webkit-backdrop-filter: saturate(180%) blur(16px);
 }
 
 .site-header-inner {

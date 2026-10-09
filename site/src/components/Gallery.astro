@@ -33,14 +33,19 @@ const sites = await Promise.all(
       <div>
         <h2 class="section-title">Styles to start from</h2>
         <p class="section-lede">
-          A few example styles to get you started. Copy one and adjust it to
-          your liking, or create your own from scratch.
+          Copy one and tweak it, or start from scratch.
         </p>
       </div>
     </div>
     <div class="gallery-grid">
       {sites.map((site) => (
-        <figure class="gallery-item" data-gallery={site.id} data-site={site.url} data-active="0">
+        <figure
+          class="gallery-item"
+          data-gallery={site.id}
+          data-site={site.url}
+          data-active="0"
+        >
+          <span class="gallery-site">{site.site}</span>
           <div class="gallery-shot">
             {site.themes.map((theme, i) => (
               <button
@@ -91,7 +96,6 @@ const sites = await Promise.all(
             </div>
           </div>
           <figcaption class="gallery-caption">
-            <span class="gallery-site">{site.site}</span>
             <div class="gallery-chips">
               {site.themes.map((theme, i) => (
                 <button
@@ -107,13 +111,18 @@ const sites = await Promise.all(
                 </button>
               ))}
             </div>
+            <p class="gallery-hint">
+              Paste it into the Code tab on {site.url}.
+            </p>
           </figcaption>
           {site.themes.map((theme, i) => (
             <template
               data-theme-data={i}
               data-note={theme.note}
               data-source={theme.file && SOURCE_BASE + theme.file}
-            >{theme.css}</template>
+            >
+              {theme.css}
+            </template>
           ))}
         </figure>
       ))}
@@ -185,12 +194,14 @@ const sites = await Promise.all(
   const copied = new Set<string>();
 
   const activeOf = (item: HTMLElement) => Number(item.dataset.active);
-  const keyOf = (item: HTMLElement) => `${item.dataset.gallery}:${activeOf(item)}`;
+  const keyOf = (item: HTMLElement) =>
+    `${item.dataset.gallery}:${activeOf(item)}`;
   const themeData = (item: HTMLElement) =>
     item.querySelector<HTMLTemplateElement>(
       `template[data-theme-data="${activeOf(item)}"]`,
     )!;
-  const cssOf = (item: HTMLElement) => themeData(item).content.textContent ?? '';
+  const cssOf = (item: HTMLElement) =>
+    themeData(item).content.textContent ?? '';
   const noteOf = (item: HTMLElement) => themeData(item).dataset.note;
   const nameOf = (item: HTMLElement) =>
     item.querySelectorAll('.gallery-name')[activeOf(item)].textContent ?? '';
@@ -393,7 +404,8 @@ const sites = await Promise.all(
     noteEl.textContent = note ?? '';
     noteEl.hidden = !note;
     lightboxCopy.hidden = !!note;
-    lightboxInstall.hidden = !!note || !gallery.classList.contains('can-install');
+    lightboxInstall.hidden =
+      !!note || !gallery.classList.contains('can-install');
     lightboxInstall.textContent = installLabel(item);
     lightboxCopy.textContent = copied.has(key) ? 'Copied' : 'Copy CSS';
   }
@@ -416,7 +428,9 @@ const sites = await Promise.all(
       el.addEventListener('click', () => open(item));
     });
     item.querySelectorAll<HTMLElement>('[data-chip]').forEach((chip) => {
-      chip.addEventListener('click', () => select(item, Number(chip.dataset.chip)));
+      chip.addEventListener('click', () =>
+        select(item, Number(chip.dataset.chip)),
+      );
     });
     render(item);
   });
@@ -463,7 +477,7 @@ const sites = await Promise.all(
 <style>
   .gallery-grid {
     display: grid;
-    gap: 32px 24px;
+    gap: 40px 24px;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }
 
@@ -471,7 +485,7 @@ const sites = await Promise.all(
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
     margin: 0;
   }
 
@@ -605,19 +619,31 @@ const sites = await Promise.all(
   .gallery-caption {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     padding: 0 2px;
   }
 
   .gallery-site {
-    font: 500 13px/1.3 var(--ui);
-    color: var(--muted);
+    font: 600 15px/1.3 var(--ui);
+    color: var(--ink);
   }
 
   .gallery-chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px 14px;
+    gap: 4px 16px;
+  }
+
+  .gallery-hint {
+    min-height: 20px;
+    margin: 0;
+    font: 400 13px/1.4 var(--ui);
+    color: var(--muted);
+    visibility: hidden;
+  }
+
+  .is-copied .gallery-hint {
+    visibility: visible;
   }
 
   .gallery-chip {
@@ -642,10 +668,7 @@ const sites = await Promise.all(
   }
 
   .gallery-chip[aria-pressed='true'] .gallery-name {
-    text-decoration: underline;
-    text-decoration-color: var(--strong);
-    text-underline-offset: 5px;
-    text-decoration-thickness: 1.5px;
+    font-weight: 600;
   }
 
   .gallery-dot,

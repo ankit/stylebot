@@ -142,6 +142,145 @@ import { ChevronDown } from './icons';
           </p>
         </div>
       </article>
+
+      <article class="feature">
+        <div class="feature-mock" aria-hidden="true">
+          <div data-ed class="mock-card chat-card">
+            <div class="chat-thread">
+              <div class="chat-msg">
+                Make the article easier to read at night
+              </div>
+              <div class="chat-reply">
+                <p>
+                  Switched to a dark background with warmer text, and set the
+                  body in a larger serif with more line spacing.
+                </p>
+                <div class="chat-change">
+                  <svg viewBox="0 0 28 24" width="12" height="10">
+                    <rect width="24" height="5" rx="2.5" fill="#ec4d86" />
+                    <rect
+                      y="8.5"
+                      width="15"
+                      height="5"
+                      rx="2.5"
+                      fill="#1c9fc4"
+                    />
+                    <rect
+                      y="17"
+                      width="18"
+                      height="5"
+                      rx="2.5"
+                      fill="#e0a218"
+                    />
+                    <rect
+                      x="24.5"
+                      y="13"
+                      width="3.5"
+                      height="11"
+                      rx="1.5"
+                      fill="#2563eb"
+                    />
+                  </svg>
+                  <span class="chat-change-label">Updated styles</span>
+                  <span class="chat-diff">
+                    <span class="chat-added">+14</span>
+                    <span class="chat-diff-open">
+                      <svg
+                        viewBox="0 0 16 16"
+                        width="12"
+                        height="12"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <path d="M6.5 3.5 11 8l-4.5 4.5" />
+                      </svg>
+                    </span>
+                  </span>
+                  <span class="chat-undo">
+                    <svg
+                      viewBox="0 0 16 16"
+                      width="14"
+                      height="14"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.4"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M6 3L3 6l3 3" />
+                      <path d="M3 6h6.5a3.5 3.5 0 0 1 0 7H7" />
+                    </svg>
+                    Undo
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="chat-composer">
+              <div class="chat-input">
+                <div class="chat-placeholder">Describe a change</div>
+                <div class="chat-tools">
+                  <span class="chat-attach">
+                    <svg
+                      viewBox="0 0 16 16"
+                      width="16"
+                      height="16"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <rect x="2" y="3" width="12" height="10" rx="2" />
+                      <circle cx="5.8" cy="6.6" r="1.1" />
+                      <path d="m3 12 3.6-3.4 2.4 2.2 1.8-1.6L14 12" />
+                    </svg>
+                  </span>
+                  <span class="chat-model">
+                    Sonnet
+                    <svg
+                      viewBox="0 0 16 16"
+                      width="10"
+                      height="10"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.6"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M3.5 10 8 5.5 12.5 10" />
+                    </svg>
+                  </span>
+                  <span class="chat-send">
+                    <svg
+                      viewBox="0 0 14 14"
+                      width="12"
+                      height="12"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="1.9"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M7 12V2.5M3 6.5 7 2.5l4 4" />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="feature-text">
+          <h3>Chat</h3>
+          <p>
+            No coding agent? Describe a change in the Chat tab and Stylebot
+            writes the CSS. Bring your own Claude, OpenAI or Gemini key. It
+            stays in your browser.
+          </p>
+        </div>
+      </article>
     </div>
   </div>
 </section>
@@ -428,5 +567,169 @@ import { ChevronDown } from './icons';
 
   .switch.on > span {
     left: 18px;
+  }
+
+  .chat-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--sunken);
+  }
+
+  .chat-thread {
+    padding: 20px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .chat-msg {
+    align-self: flex-end;
+    max-width: 76%;
+    padding: 9px 13px;
+    border-radius: 14px;
+    border: 1px solid color-mix(in srgb, var(--ink) 9%, var(--sunken));
+    background: color-mix(in srgb, var(--ink) 6%, var(--sunken));
+    font: 400 14px/1.45 var(--ui);
+    color: var(--ink);
+    text-wrap: pretty;
+  }
+
+  .chat-reply {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .chat-reply p {
+    margin: 0;
+    font: 400 14px/1.55 var(--ui);
+    color: var(--ink2);
+    text-wrap: pretty;
+  }
+
+  .chat-change {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 28px;
+    margin: 0 -8px;
+    padding: 3px 8px;
+    font: 400 13px/1 var(--ui);
+    color: var(--muted);
+  }
+
+  .chat-change > svg {
+    display: block;
+    flex: none;
+  }
+
+  .chat-change-label {
+    font-weight: 500;
+    color: var(--ink2);
+    white-space: nowrap;
+  }
+
+  .chat-diff {
+    margin-left: 2px;
+    display: flex;
+    flex: none;
+    overflow: hidden;
+    border-radius: 5px;
+    font: 500 11px/1 var(--ui);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .chat-added {
+    padding: 3px 5px;
+    background: #e8f5ee;
+    color: #1a7f4b;
+  }
+
+  :global(:root:is([data-theme='dark'], [data-theme='stylebot'])) .chat-added {
+    background: #173a24;
+    color: #6fdd8b;
+  }
+
+  .chat-diff-open {
+    display: flex;
+    align-items: center;
+    padding: 3px;
+    background: color-mix(in srgb, var(--ink) 6%, var(--sunken));
+    color: var(--muted);
+  }
+
+  .chat-undo {
+    margin-left: auto;
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 9px;
+    border: 1px solid var(--strong);
+    border-radius: 7px;
+    font: 400 12px/1 var(--ui);
+    color: var(--ink2);
+  }
+
+  .chat-composer {
+    padding: 0 12px 12px;
+  }
+
+  .chat-input {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 8px 8px 12px;
+    border: 1px solid var(--strong);
+    border-radius: 12px;
+    background: var(--surface);
+    box-shadow: 0 1px 2px rgba(20, 30, 50, 0.04);
+  }
+
+  .chat-placeholder {
+    min-height: 42px;
+    font: 400 14px/1.5 var(--ui);
+    color: var(--faint);
+  }
+
+  .chat-tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--muted);
+  }
+
+  .chat-attach {
+    width: 26px;
+    height: 26px;
+    margin-left: -5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .chat-model {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    height: 26px;
+    margin-left: -6px;
+    margin-right: auto;
+    padding: 0 6px;
+    font: 400 13px/1 var(--ui);
+    white-space: nowrap;
+  }
+
+  .chat-send {
+    width: 26px;
+    height: 26px;
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 7px;
+    background: color-mix(in srgb, var(--faint) 55%, transparent);
+    color: var(--surface);
   }
 </style>

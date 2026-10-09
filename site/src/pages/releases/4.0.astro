@@ -2,7 +2,8 @@
 import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import ImageZoom from '../../components/ImageZoom.astro';
-import { LINKS } from '../../lib/links';
+import CliCommand from '../../components/cli/CliCommand.astro';
+import { CLI_PACKAGE, LINKS } from '../../lib/links';
 import { crisp } from '../../lib/screenshots';
 import agent from '../../assets/manual/agent-chat.png';
 import profiles from '../../assets/manual/popup-profiles.png';
@@ -16,196 +17,269 @@ import position from '../../assets/manual/position-menu.png';
 import positionDark from '../../assets/manual/position-menu-dark.png';
 import history from '../../assets/manual/history.png';
 import historyDark from '../../assets/manual/history-dark.png';
+
+const toc = [
+  ['editor', 'Redesigned editor'],
+  ['cli', 'Command line'],
+  ['profiles', 'Profiles'],
+  ['panel', 'Side panel'],
+  ['history', 'Version history'],
+  ['sync', 'Sync'],
+  ['chat', 'Chat'],
+  ['more', 'And more'],
+];
+
+const commands = [
+  [
+    'Opens the page in a window behind yours and prints its tab id.',
+    'stylebot open news.ycombinator.com',
+  ],
+  [
+    'Prints the page’s visible elements as an outline.',
+    'stylebot outline 54432929',
+  ],
+  [
+    'Saves the CSS as the site’s style, applies it, and checks the page.',
+    'stylebot css set news.ycombinator.com < dark.css',
+  ],
+  ['Saves a picture of the tab.', 'stylebot screenshot 54432929 -o page.png'],
+];
+
+const cards = [
+  {
+    id: 'profiles',
+    title: 'Profiles',
+    body: 'Keep several looks for a site and switch between them from the editor or the popup.',
+    light: profiles,
+    dark: profilesDark,
+    alt: 'The popup on a site with two profiles, Dracula and Gruvbox',
+  },
+  {
+    id: 'panel',
+    title: 'The side panel, or its own window',
+    body: 'In Chrome and Edge the editor opens in the side panel. Or pop it out into its own window, from <strong>Position</strong> in the editor’s <strong>⋯</strong> menu.',
+    light: position,
+    dark: positionDark,
+    alt: 'The editor’s menu, with Position set to the side panel',
+    small: true,
+  },
+  {
+    id: 'history',
+    title: 'Version history',
+    body: 'Every change is kept, and you can restore any earlier version.',
+    light: history,
+    dark: historyDark,
+    alt: 'Version history in Options, newest change first',
+    wide: true,
+  },
+  {
+    id: 'sync',
+    title: 'Sync',
+    body: 'Google Drive sync is more robust. Edits from different computers are merged, so none get lost. It runs on its own every 30 minutes and right after you edit.',
+    light: sync,
+    dark: syncDark,
+    alt: 'Options, connected to Google Drive and synced',
+    wide: true,
+  },
+  {
+    id: 'chat',
+    title: 'Chat',
+    body: 'No coding agent? Describe what you want, or pick a suggested look, and Stylebot writes the CSS. Bring your own Claude, OpenAI or Gemini key.',
+    light: agent,
+    dark: agentDark,
+    alt: 'The Chat tab suggesting looks for the page: Cozy, Calm, and Only the links in color',
+  },
+];
 ---
 
 <Base
   title="What's new in 4.0"
-  description="Stylebot 4.0 brings a redesigned editor, an AI agent, profiles, a side panel, version history and sync."
+  description="Stylebot 4.0 brings a redesigned editor, a command line for coding agents, profiles, a side panel, Chat, version history and sync."
 >
-  <main class="prose">
-    <h1>What's new in 4.0</h1>
-    <p class="lede">
-      A redesigned editor, an AI agent, profiles, and a side panel.
-    </p>
+  <main class="release">
+    <div class="release-intro">
+      <h1>What's new in 4.0</h1>
+      <p>
+        A redesigned editor, a command line for coding agents, profiles, and a
+        side panel.
+      </p>
+    </div>
     <nav class="release-toc" aria-label="Sections">
-      <a href="#editor">Redesigned editor</a>
-      <a href="#agent">Stylebot agent</a>
-      <a href="#profiles">Profiles</a>
-      <a href="#panel">Side panel</a>
-      <a href="#history">Version history</a>
-      <a href="#sync">Sync</a>
-      <a href="#more">And more</a>
+      {toc.map(([id, label]) => (
+        <a href={`#${id}`}>{label}</a>
+      ))}
     </nav>
 
-    <h2 id="editor">A redesigned editor</h2>
-    <figure>
-      <Image
-        class="shot-image is-light"
-        src={editor}
-        height={560}
-        densities={[1, 2]}
-        {...crisp(editor)}
-        alt="The redesigned Basic tab, styling Hacker News with a Dracula profile"
-      />
-      <Image
-        class="shot-image is-dark"
-        src={editorDark}
-        height={560}
-        densities={[1, 2]}
-        {...crisp(editorDark)}
-        alt="The redesigned Basic tab, styling Hacker News with a Dracula profile"
-      />
-    </figure>
-    <p>Rebuilt from the ground up, now with dark mode.</p>
-    <ul>
-      <li>Grouped controls that show the page's own values</li>
-      <li>Color palettes and an eyedropper</li>
-      <li>400 Google Fonts</li>
-      <li>Edit any other CSS property in place under More properties</li>
-      <li>Undo and redo</li>
-    </ul>
+    <div class="release-body">
+      <section id="editor" class="release-split">
+        <div class="release-text">
+          <h2>A redesigned editor</h2>
+          <p>Rebuilt from the ground up, now with dark mode.</p>
+          <ul>
+            <li>Grouped controls that show the page's own values</li>
+            <li>
+              Better selector generation, with selectors that keep working when
+              a site updates and others to choose from
+            </li>
+            <li>Shows when another rule overrides a value</li>
+            <li>Color palettes and an eyedropper</li>
+            <li>Preview a color or font on the page by hovering it</li>
+            <li>Edit any other CSS property in place under More properties</li>
+            <li>Undo support</li>
+          </ul>
+        </div>
+        <div class="release-shot">
+          <Image
+            class="shot-image is-light"
+            src={editor}
+            width={290}
+            densities={[1, 2]}
+            {...crisp(editor)}
+            alt="The redesigned Basic tab, styling Hacker News with a Newspaper profile"
+          />
+          <Image
+            class="shot-image is-dark"
+            src={editorDark}
+            width={290}
+            densities={[1, 2]}
+            {...crisp(editorDark)}
+            alt="The redesigned Basic tab, styling Hacker News with a Newspaper profile"
+          />
+        </div>
+      </section>
 
-    <h2 id="agent">The Stylebot agent</h2>
-    <figure>
-      <Image
-        class="shot-image is-light"
-        src={agent}
-        height={400}
-        densities={[1, 2]}
-        {...crisp(agent)}
-        alt="The Chat tab after asking the agent for a calmer, Everforest-themed Google"
-      />
-      <Image
-        class="shot-image is-dark"
-        src={agentDark}
-        height={400}
-        densities={[1, 2]}
-        {...crisp(agentDark)}
-        alt="The Chat tab after asking the agent for a calmer, Everforest-themed Google"
-      />
-    </figure>
-    <p>Describe what you want in the Chat tab and the agent writes the CSS.</p>
-    <ul>
-      <li>Bring your own Claude, OpenAI or Gemini key</li>
-      <li>Point at an element or attach a screenshot</li>
-      <li>Undo any change</li>
-    </ul>
+      <hr />
 
-    <h2 id="profiles">Profiles</h2>
-    <figure>
-      <Image
-        class="shot-image is-light"
-        src={profiles}
-        height={profiles.height / 2}
-        densities={[1, 2]}
-        {...crisp(profiles)}
-        alt="The popup on a site with two profiles, Dracula and Gruvbox"
-      />
-      <Image
-        class="shot-image is-dark"
-        src={profilesDark}
-        height={profilesDark.height / 2}
-        densities={[1, 2]}
-        {...crisp(profilesDark)}
-        alt="The popup on a site with two profiles, Dracula and Gruvbox"
-      />
-    </figure>
-    <p>
-      Keep several looks for a site and switch between them from the editor or
-      the popup.
-    </p>
+      <section id="cli" class="release-split release-cli">
+        <div class="release-text">
+          <h2>Stylebot from your terminal</h2>
+          <p>
+            Control Stylebot from the command line, or let a coding agent like
+            Claude Code, Codex or Cursor do it. The agent restyles sites right
+            in your browser, using your own subscription instead of an API key.
+          </p>
+          <div class="release-cli-setup">
+            <CliCommand lines={[`npm install -g ${CLI_PACKAGE}`]} boxed />
+            <a href={LINKS.cli} class="btn btn-primary">
+              Set up the CLI →
+            </a>
+          </div>
+          <p class="release-note">
+            For Chrome or Edge. The command line doesn't work on Firefox yet.
+          </p>
+        </div>
+        <div class="release-term" aria-hidden="true">
+          <div class="release-term-bar">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          <div class="release-term-body">
+            {commands.map(([what, command]) => (
+              <div class="release-term-cmd">
+                <span class="release-term-comment"># {what}</span>
+                <span>
+                  <span class="release-term-prompt">$ </span>
+                  {command}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-    <h2 id="panel">The side panel, or its own window</h2>
-    <figure>
-      <Image
-        class="shot-image is-light"
-        src={position}
-        height={position.height / 2}
-        densities={[1, 2]}
-        {...crisp(position)}
-        alt="The editor's menu, with Position set to the side panel"
-      />
-      <Image
-        class="shot-image is-dark"
-        src={positionDark}
-        height={positionDark.height / 2}
-        densities={[1, 2]}
-        {...crisp(positionDark)}
-        alt="The editor's menu, with Position set to the side panel"
-      />
-    </figure>
-    <p>
-      In Chrome and Edge the editor opens in the side panel. Or pop it out into
-      its own window, from <strong>Position</strong> in the editor's
-      <strong>⋯</strong> menu.
-    </p>
+      <hr />
 
-    <h2 id="history">Version history</h2>
-    <figure>
-      <Image
-        class="shot-image is-light"
-        src={history}
-        width={history.width / 2}
-        densities={[1, 2]}
-        {...crisp(history)}
-        alt="Version history in Options, newest change first"
-      />
-      <Image
-        class="shot-image is-dark"
-        src={historyDark}
-        width={historyDark.width / 2}
-        densities={[1, 2]}
-        {...crisp(historyDark)}
-        alt="Version history in Options, newest change first"
-      />
-    </figure>
-    <p>Every change is kept, and you can restore any earlier version.</p>
-
-    <h2 id="sync">Sync</h2>
-    <figure>
-      <Image
-        class="shot-image is-light"
-        src={sync}
-        width={sync.width / 2}
-        densities={[1, 2]}
-        {...crisp(sync)}
-        alt="Options, connected to Google Drive and synced"
-      />
-      <Image
-        class="shot-image is-dark"
-        src={syncDark}
-        width={syncDark.width / 2}
-        densities={[1, 2]}
-        {...crisp(syncDark)}
-        alt="Options, connected to Google Drive and synced"
-      />
-    </figure>
-    <p>
-      Google Drive sync is more robust, and merges changes from different
-      computers instead of overwriting them.
-    </p>
-
-    <h2 id="more">And more</h2>
-    <ul>
-      <li>A new Stylebot icon</li>
-      <li>
-        Stylebot's shortcuts now live in your browser's shortcut settings. In
-        Chrome and Edge, any you changed are back to their defaults, so set them
-        again there.
-      </li>
-      <li>Stylebot is now available in Vietnamese</li>
-    </ul>
-
-    <h2>
-      And lots of <a href={LINKS.changelog}>bug fixes</a>
-    </h2>
+      <section class="release-cards">
+        {cards.map((card) => (
+          <article id={card.id} class="release-card">
+            <div
+              class:list={[
+                'release-card-shot',
+                { 'is-wide': card.wide, 'is-small': card.small },
+              ]}
+            >
+              <Image
+                class="shot-image is-light"
+                src={card.light}
+                width={card.wide ? 480 : card.small ? 220 : 300}
+                densities={[1, 2]}
+                {...crisp(card.light)}
+                alt={card.alt}
+              />
+              <Image
+                class="shot-image is-dark"
+                src={card.dark}
+                width={card.wide ? 480 : card.small ? 220 : 300}
+                densities={[1, 2]}
+                {...crisp(card.dark)}
+                alt={card.alt}
+              />
+            </div>
+            <div class="release-card-text">
+              <h3>{card.title}</h3>
+              <p set:html={card.body} />
+            </div>
+          </article>
+        ))}
+        <article id="more" class="release-card release-more">
+          <h3>And more</h3>
+          <ul>
+            <li>A new stylebot.dev</li>
+            <li>A new Stylebot icon</li>
+            <li>
+              Styles now apply inside shadow DOM, so they work on sites built
+              with web components
+            </li>
+            <li>
+              Stylebot's shortcuts now live in your browser's shortcut settings.
+              In Chrome and Edge, any you changed are back to their defaults, so
+              set them again there.
+            </li>
+            <li>Stylebot is now available in Vietnamese</li>
+          </ul>
+          <p class="release-fixes">
+            And lots of <a href={LINKS.changelog}>bug fixes</a>
+          </p>
+        </article>
+      </section>
+    </div>
   </main>
   <ImageZoom />
 </Base>
 
 <style>
+  .release {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 64px 24px 0;
+    color: var(--ink2);
+  }
+
+  .release-intro {
+    max-width: 720px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .release-intro h1 {
+    margin: 0;
+    font: 700 clamp(38px, 5.4vw, 60px) / 1.04 var(--display);
+    letter-spacing: -0.035em;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+
+  .release-intro p {
+    margin: 0;
+    font: 400 19px/1.55 var(--ui);
+    color: var(--muted);
+    text-wrap: pretty;
+  }
+
   .release-toc {
-    margin: 20px 0 0;
+    margin: 28px 0 0;
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
@@ -216,7 +290,7 @@ import historyDark from '../../assets/manual/history-dark.png';
     border-radius: 999px;
     border: 1px solid var(--border);
     background: var(--surface);
-    font: 500 13.5px/1 var(--ui);
+    font: 500 13px/1 var(--ui);
     color: var(--ink2);
   }
 
@@ -225,7 +299,272 @@ import historyDark from '../../assets/manual/history-dark.png';
     color: var(--ink);
   }
 
-  h2[id] {
+  .release-body {
+    margin-top: 56px;
+    display: flex;
+    flex-direction: column;
+    gap: 72px;
+  }
+
+  .release-body hr {
+    width: 100%;
+    height: 1px;
+    margin: 0;
+    border: none;
+    background: var(--border);
+  }
+
+  .release h2,
+  .release h3 {
+    margin: 0;
+    color: var(--ink);
+  }
+
+  .release [id] {
     scroll-margin-top: 80px;
+  }
+
+  .release h2 {
+    font: 650 clamp(24px, 2.6vw, 30px) / 1.15 var(--display);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  .release h3 {
+    font: 650 20px/1.2 var(--display);
+    letter-spacing: -0.015em;
+  }
+
+  .release-split {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+    gap: clamp(24px, 4vw, 56px);
+    align-items: center;
+  }
+
+  .release-cli {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+  }
+
+  .release-text {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .release-text p {
+    margin: 0;
+    max-width: 60ch;
+    font: 400 17px/1.65 var(--ui);
+    text-wrap: pretty;
+  }
+
+  .release ul {
+    margin: 4px 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .release li {
+    position: relative;
+    padding-left: 17px;
+    font: 400 16px/1.55 var(--ui);
+    text-wrap: pretty;
+  }
+
+  .release li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 10px;
+    width: 5px;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--faint);
+  }
+
+  .release-shot {
+    padding: 28px;
+    border-radius: 16px;
+    background: var(--fill);
+    border: 1px solid var(--border);
+    display: flex;
+    justify-content: center;
+  }
+
+  .release-shot :global(img) {
+    width: 100%;
+    max-width: 290px;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+  }
+
+  .release-cli-setup {
+    margin-top: 4px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .release-cli-setup :global(.cli-cmd) {
+    flex: 1 1 260px;
+    max-width: 340px;
+  }
+
+  .release .release-note {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--muted);
+  }
+
+  .release-term {
+    min-width: 0;
+    border-radius: 14px;
+    background: #15171a;
+    border: 1px solid #2c2f35;
+    overflow: hidden;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.14);
+  }
+
+  .release-term-bar {
+    height: 36px;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    border-bottom: 1px solid #2c2f35;
+  }
+
+  .release-term-bar span {
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background: #3a3f47;
+  }
+
+  .release-term-body {
+    padding: 22px 22px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    font: 400 13px/1.55 var(--mono);
+    color: #e8eaee;
+    overflow-wrap: anywhere;
+  }
+
+  .release-term-cmd {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .release-term-comment {
+    color: #7d8593;
+  }
+
+  .release-term-prompt {
+    color: #5b8cf5;
+  }
+
+  .release-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+    gap: 24px;
+  }
+
+  .release-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  .release-card-shot {
+    height: 280px;
+    overflow: hidden;
+    padding: 24px 24px 0;
+    background: var(--fill);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    mask-image: linear-gradient(#000 78%, transparent);
+  }
+
+  .release-card-shot :global(img) {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+    border-radius: 10px;
+    box-shadow:
+      0 0 0 1px var(--border),
+      0 8px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  .release-card-shot.is-wide {
+    align-items: center;
+    padding-bottom: 24px;
+    mask-image: none;
+  }
+
+  .release-card-shot.is-small {
+    align-items: center;
+    padding-bottom: 24px;
+    mask-image: none;
+  }
+
+  .release-card-shot.is-small :global(img) {
+    max-width: 220px;
+  }
+
+  .release-card-shot.is-wide :global(img) {
+    max-width: 480px;
+  }
+
+  .release-card-text {
+    padding: 22px 24px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .release-card-text p {
+    margin: 0;
+    font: 400 15px/1.6 var(--ui);
+    text-wrap: pretty;
+  }
+
+  .release-more {
+    padding: 26px 24px;
+    gap: 18px;
+  }
+
+  .release-more ul {
+    margin: 0;
+    gap: 10px;
+  }
+
+  .release-more li {
+    font-size: 15px;
+  }
+
+  .release-fixes {
+    margin: auto 0 0;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    font: 600 16px/1.5 var(--ui);
+    color: var(--ink);
+  }
+
+  .release-fixes a {
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
   }
 </style>

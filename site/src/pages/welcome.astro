@@ -1,7 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import Demo from '../components/demo/Demo';
-import Keys from '../components/manual/Keys.astro';
+import CliCommand from '../components/cli/CliCommand.astro';
+import { CLI_PACKAGE, LINKS } from '../lib/links';
 ---
 
 <Base
@@ -11,49 +12,89 @@ import Keys from '../components/manual/Keys.astro';
   noindex
 >
   <main>
-    <div class="hero">
-      <h1>Stylebot is installed.</h1>
-      <p>Here's how it works, start to finish, in about a minute.</p>
-    </div>
     <div class="demo-wrap">
       <Demo client:load variant="welcome">
+        <div slot="intro" class="hero">
+          <h1>Stylebot is installed.</h1>
+        </div>
         <div class="your-turn">
-          <div class="your-turn-row">
-            <div class="your-turn-text">
-              <strong>Your turn.</strong>
-              <span>
-                Open any site and press the shortcut. Nothing changes until you
-                do.
-              </span>
-            </div>
-            <Keys keys={['alt', 'shift', 'M']} />
-            <a href="/manual" class="your-turn-link">
-              Manual<span>›</span>
-            </a>
+          <div class="your-turn-text">
+            <strong>Your turn.</strong>
+            <span>
+              Open any site and press the shortcut. Nothing changes until you
+              do.
+            </span>
           </div>
-          <div class="your-turn-row your-turn-cli">
-            <div class="your-turn-text">
-              <strong>Or let your agent do it.</strong>
-              <span>
-                Claude Code, Codex or Cursor can restyle sites in your browser
-                through Stylebot's command line.
-              </span>
-            </div>
-            <a href="/cli" class="your-turn-link">
-              Command line<span>›</span>
-            </a>
-          </div>
+          <span class="your-turn-keys">
+            <kbd data-mac="⌥ Option">Alt</kbd>
+            <kbd data-mac="⇧ Shift">Shift</kbd>
+            <kbd>M</kbd>
+          </span>
+          <a href="/manual" class="your-turn-link">
+            Manual<span>›</span>
+          </a>
         </div>
       </Demo>
     </div>
+    <section class="agent">
+      <div class="agent-inner">
+        <div class="agent-text">
+          <h2>Connect your coding agent</h2>
+          <p>
+            Claude Code, Codex, Cursor or any agent that runs commands can use
+            Stylebot from the terminal.
+          </p>
+          <div class="agent-setup">
+            <CliCommand lines={[`npm install -g ${CLI_PACKAGE}`]} boxed />
+            <a href={LINKS.cli} class="agent-guide">
+              Set up the CLI →
+            </a>
+          </div>
+        </div>
+        <div class="agent-term" aria-hidden="true">
+          <div class="agent-term-title">Terminal · coding agent</div>
+          <div class="agent-term-body">
+            <div class="agent-term-ask">
+              <span class="agent-term-dim">&gt;</span>
+              <span>give this site an Everforest theme with nicer fonts</span>
+            </div>
+            <div class="agent-term-run">
+              <span class="agent-term-cmd">stylebot outline 54432929</span>
+              <span class="agent-term-dim">article › h1, p.dek, p ×12</span>
+            </div>
+            <div class="agent-term-run">
+              <span class="agent-term-cmd">
+                stylebot css set harbourpost.example &lt; everforest.css
+              </span>
+              <span class="agent-term-dim">Saved · applied to 1 tab</span>
+            </div>
+            <div class="agent-term-reply">
+              Switched to Everforest colors with Lora and Newsreader.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 </Base>
+
+<script>
+  const platform =
+    (navigator as Navigator & { userAgentData?: { platform: string } })
+      .userAgentData?.platform ?? navigator.platform;
+
+  if (/mac/i.test(platform)) {
+    document.querySelectorAll<HTMLElement>('kbd[data-mac]').forEach((kbd) => {
+      kbd.textContent = kbd.dataset.mac!;
+    });
+  }
+</script>
 
 <style>
   .hero {
     max-width: 760px;
     margin: 0 auto;
-    padding: 56px 24px 36px;
+    padding: 56px 0 8px;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -68,18 +109,10 @@ import Keys from '../components/manual/Keys.astro';
     text-wrap: balance;
   }
 
-  .hero p {
-    font: 400 18px/1.55 var(--ui);
-    color: var(--muted);
-    margin: 0;
-    max-width: 48ch;
-    text-wrap: pretty;
-  }
-
   .demo-wrap {
     max-width: 1180px;
     margin: 0 auto;
-    padding: 0 24px 88px;
+    padding: 0 24px 40px;
     display: flex;
     flex-direction: column;
     gap: 28px;
@@ -91,19 +124,10 @@ import Keys from '../components/manual/Keys.astro';
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 12px;
-  }
-
-  .your-turn-row {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 14px 24px;
-  }
-
-  .your-turn-cli {
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
   }
 
   .your-turn-text {
@@ -122,23 +146,26 @@ import Keys from '../components/manual/Keys.astro';
     color: var(--ink);
   }
 
-  .your-turn :global(.keys) {
+  .your-turn-keys {
     display: flex;
-    gap: 4px;
+    gap: 5px;
   }
 
-  .your-turn :global(.keys-sep) {
-    display: none;
-  }
-
-  .your-turn :global(kbd) {
-    padding: 4px 8px;
-    border-radius: 5px;
-    background: var(--fill);
+  .your-turn-keys kbd {
+    min-width: 28px;
+    height: 28px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    border-radius: 6px;
+    background: var(--surface);
     border: 1px solid var(--strong);
-    border-bottom-width: 2px;
-    font: 500 12px/1.3 var(--mono);
-    color: var(--ink2);
+    border-bottom-width: 3px;
+    font: 600 12px/1 var(--ui);
+    color: var(--ink);
+    white-space: nowrap;
   }
 
   .your-turn-link {
@@ -161,9 +188,142 @@ import Keys from '../components/manual/Keys.astro';
     color: var(--faint);
   }
 
-  @media (max-width: 600px) {
+  .agent {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 24px 24px;
+  }
+
+  .agent-inner {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+    gap: 28px 56px;
+    align-items: center;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+  }
+
+  .agent-text {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .agent-text h2 {
+    font: 700 clamp(24px, 2.6vw, 30px) / 1.15 var(--display);
+    letter-spacing: -0.025em;
+    margin: 0;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+
+  .agent-text p {
+    font: 400 16px/1.6 var(--ui);
+    color: var(--muted);
+    margin: 0;
+    max-width: 52ch;
+    text-wrap: pretty;
+  }
+
+  .agent-setup {
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .agent-guide {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--strong);
+    background: var(--surface);
+    font: 600 14px/1 var(--ui);
+    color: var(--ink);
+  }
+
+  .agent-guide:hover {
+    background: var(--hover);
+    color: var(--ink);
+  }
+
+  .agent-term {
+    min-width: 0;
+    border-radius: 12px;
+    background: #15171c;
+    box-shadow: 0 18px 40px rgba(10, 14, 22, 0.22);
+    overflow: hidden;
+  }
+
+  .agent-term-title {
+    padding: 11px 16px;
+    border-bottom: 1px solid #262a32;
+    font: 500 12px/1 var(--ui);
+    color: #8b92a0;
+  }
+
+  .agent-term-body {
+    padding: 16px 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font: 400 13px/1.55 var(--mono);
+    color: #e7e9ee;
+    overflow-wrap: anywhere;
+  }
+
+  .agent-term-ask {
+    display: flex;
+    gap: 8px;
+  }
+
+  .agent-term-run {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .agent-term-cmd {
+    color: #8fb4ff;
+  }
+
+  .agent-term-dim {
+    color: #8b92a0;
+  }
+
+  .agent-term-reply {
+    color: #c9cdd6;
+    text-wrap: pretty;
+  }
+
+  @media (min-width: 1100px) {
+    .hero {
+      padding: 24px 0 0;
+      text-align: left;
+      align-items: flex-start;
+      gap: 22px;
+    }
+
+    .hero h1 {
+      font-size: clamp(32px, 4vw, 44px);
+      line-height: 1.06;
+      letter-spacing: -0.03em;
+    }
+
+    .your-turn {
+      margin-top: 0;
+    }
+
+    .demo-wrap,
+    .agent {
+      max-width: 1400px;
+    }
+
     .demo-wrap {
-      padding-bottom: 64px;
+      padding-top: 32px;
     }
   }
 </style>

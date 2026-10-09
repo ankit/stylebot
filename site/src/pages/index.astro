@@ -33,9 +33,22 @@ const structuredData = {
     is:inline
     set:html={JSON.stringify(structuredData)}
   />
+  <link
+    slot="head"
+    href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@1&family=JetBrains+Mono:wght@500&family=Silkscreen&family=Libre+Caslon+Text:wght@700&display=swap&text=Restyle"
+    rel="stylesheet"
+  />
   <main>
     <div class="hero">
-      <h1>Restyle any website.</h1>
+      <h1>
+        <button class="restyle" type="button" title="Click to restyle">
+          Restyle
+          <span class="restyle-cycle" aria-hidden="true">
+            Restyle
+          </span>
+        </button>{' '}
+        any website.
+      </h1>
       <p>
         Point at something on the page and change it, or just describe what you
         want. Stylebot writes the CSS and loads your style every time you come
@@ -85,11 +98,56 @@ const structuredData = {
   </main>
 </Base>
 
+<script>
+  const STEPS = 5;
+  const PLAY = [0, 350, 700, 1050, 1450];
+
+  for (const font of [
+    "italic 1em 'DM Serif Display'",
+    "500 1em 'JetBrains Mono'",
+    '1em Silkscreen',
+    "700 1em 'Libre Caslon Text'",
+  ]) {
+    document.fonts.load(font, 'Restyle');
+  }
+
+  const button = document.querySelector<HTMLButtonElement>('.restyle')!;
+  const word = button.querySelector<HTMLElement>('.restyle-cycle')!;
+  let step = 0;
+  let timers: number[] = [];
+
+  function show(next: number) {
+    step = next;
+    word.dataset.step = String(step);
+  }
+
+  function stopPlaying() {
+    timers.forEach(clearTimeout);
+    timers = [];
+    delete word.dataset.playing;
+  }
+
+  button.addEventListener('click', () => {
+    stopPlaying();
+    show((step + 1) % STEPS);
+  });
+
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    timers = PLAY.map((at, i) =>
+      window.setTimeout(() => {
+        const last = i === PLAY.length - 1;
+        word.toggleAttribute('data-playing', !last);
+        show(last ? 0 : i + 1);
+      }, 400 + at),
+    );
+  }
+</script>
+
 <style>
   .hero {
     max-width: 760px;
     margin: 0 auto;
-    padding: 88px 24px 44px;
+    padding: 64px 24px 36px;
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -102,6 +160,81 @@ const structuredData = {
     letter-spacing: -0.035em;
     margin: 0;
     text-wrap: balance;
+  }
+
+  .restyle {
+    position: relative;
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    letter-spacing: inherit;
+    color: transparent;
+    cursor: pointer;
+  }
+
+  .restyle:focus-visible {
+    outline: none;
+  }
+
+  .restyle-cycle {
+    position: absolute;
+    right: -4px;
+    top: 50%;
+    translate: 0 -50%;
+    padding: 0 4px;
+    border-radius: 4px;
+    color: var(--ink);
+    white-space: nowrap;
+    user-select: none;
+    pointer-events: none;
+    outline: 1.5px dashed transparent;
+    outline-offset: 4px;
+  }
+
+  .restyle:hover .restyle-cycle,
+  .restyle:focus-visible .restyle-cycle,
+  .restyle-cycle[data-playing] {
+    outline-color: color-mix(in srgb, var(--acc) 45%, transparent);
+  }
+
+  .restyle-cycle[data-step='1'] {
+    translate: 0 calc(-50% + 0.027em);
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    color: var(--acc);
+  }
+
+  .restyle-cycle[data-step='2'] {
+    translate: 0 calc(-50% + 0.034em);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.94em;
+    font-weight: 500;
+    letter-spacing: -0.06em;
+    color: #191b1f;
+    background: #fde68a;
+  }
+
+  .restyle-cycle[data-step='3'] {
+    translate: 0 calc(-50% + 0.15em);
+    font-family: 'Silkscreen', monospace;
+    font-size: 0.72em;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--acc);
+    background: var(--accline);
+  }
+
+  .restyle-cycle[data-step='4'] {
+    translate: 0 calc(-50% + 0.039em);
+    font-family: 'Libre Caslon Text', serif;
+    font-size: 0.95em;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #191b1f;
+    background: #e7e4dc;
   }
 
   .hero p {
