@@ -12,10 +12,10 @@ import { LINKS } from '../lib/links';
       <h1>Privacy</h1>
       <p>
         Stylebot has no server, no account and no analytics. Your styles stay in
-        your browser unless you turn on sync or the agent, and then they go
-        straight to a service you chose.
+        your browser unless you turn on sync, the agent or the command line, and then
+        they go straight to a service you chose or an app you allowed.
       </p>
-      <p class="updated">Last updated October 5, 2026</p>
+      <p class="updated">Last updated October 8, 2026</p>
     </div>
 
     <section>
@@ -28,7 +28,7 @@ import { LINKS } from '../lib/links';
       <p>
         Stylebot can read and change the pages you visit, since that's how it
         applies your styles. What it reads there is used to style the page, and
-        isn't sent anywhere unless you use the agent.
+        isn't sent anywhere unless you use the agent or the command line.
       </p>
     </section>
 
@@ -72,6 +72,25 @@ import { LINKS } from '../lib/links';
         <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>,{' '}
         <a href="https://openai.com/policies/privacy-policy/">OpenAI</a> and{' '}
         <a href="https://ai.google.dev/gemini-api/terms">Google</a>.
+      </p>
+    </section>
+
+    <section>
+      <h2>Command line</h2>
+      <p>
+        The command line is off until you turn on{' '}
+        <q>Let apps on this computer control Stylebot</q> in Options. Stylebot
+        then connects to a small program on your computer, and any app running
+        as you can use it to list your tabs, read and inspect pages, take
+        screenshots, and read and change your styles and profiles. It talks
+        through a local socket only you can read, and Stylebot sends nothing
+        to a server of its own.
+      </p>
+      <p>
+        What an app does with that is up to the app. Page outlines, screenshots
+        and styles it reads can reach whatever service it uses, such as the
+        model behind a coding agent, under that service's policy. Turn the
+        setting off in Options to disconnect.
       </p>
     </section>
 
