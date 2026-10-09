@@ -61,6 +61,14 @@ real page through CDP.
 `web-ext run` and about:debugging use): it installs `firefox-dist/` as a temporary add-on
 and evaluates JS in the extension's background page through the DevTools console actor.
 
+**Upgrading from an earlier release** — the upgrade test, Chrome and Edge only, launches
+its own browser. It downloads that release's published zip once into `e2e/.cache/`
+(gitignored) and seeds storage under it. Then it copies the current build over the same
+folder, with a newer version number, and loads that path again. Loading an enabled
+extension's path a second time reloads it from disk as an update, keeping its id and
+storage. `chrome.runtime.reload()` doesn't work here: it leaves a CDP-loaded extension
+disabled.
+
 ### The popup on Firefox
 
 Neither of Playwright's Firefox drivers can attach to `moz-extension://` documents — its

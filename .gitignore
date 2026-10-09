@@ -21,3 +21,4 @@ junit.xml
 evals/chat/.cache
 evals/chat/pages
 evals/chat/results
+e2e/.cache
