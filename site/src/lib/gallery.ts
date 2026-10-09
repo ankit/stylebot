@@ -1,28 +1,28 @@
 import type { ImageMetadata } from 'astro';
-import shotGithubSolarized from '../assets/gallery/gallery-github-solarized.png';
-import shotGithubTerminal from '../assets/gallery/gallery-github-terminal.png';
-import shotGithubDracula from '../assets/gallery/gallery-github-dracula.png';
-import shotGmail from '../assets/gallery/gallery-gmail.png';
-import shotGoogleEspresso from '../assets/gallery/gallery-google-espresso.png';
-import shotHnHearth from '../assets/gallery/gallery-hn-hearth.png';
-import shotHn from '../assets/gallery/gallery-hn.png';
-import shotNytimesMorning from '../assets/gallery/gallery-nytimes-morning.png';
-import shotNytimesNight from '../assets/gallery/gallery-nytimes-night.png';
-import shotNytimes from '../assets/gallery/gallery-nytimes.png';
-import shotWikipediaParchment from '../assets/gallery/gallery-wikipedia-parchment.png';
-import shotWikipediaSlate from '../assets/gallery/gallery-wikipedia-slate.png';
-import cssWikipediaParchment from '../assets/gallery/wikipedia-parchment.css?raw';
-import cssWikipediaSlate from '../assets/gallery/wikipedia-slate.css?raw';
-import cssGithubSolarized from '../assets/gallery/github-solarized.css?raw';
-import cssGithubDracula from '../assets/gallery/github-dracula.css?raw';
-import cssGithubTerminal from '../assets/gallery/github-terminal.css?raw';
-import cssNytimes from '../assets/gallery/nytimes.css?raw';
-import cssNytimesMorning from '../assets/gallery/nytimes-morning.css?raw';
-import cssNytimesNight from '../assets/gallery/nytimes-night.css?raw';
-import cssHn from '../assets/gallery/hn.css?raw';
-import cssHnHearth from '../assets/gallery/hn-hearth.css?raw';
-import cssGoogleEspresso from '../assets/gallery/google-espresso.css?raw';
-import cssGmail from '../assets/gallery/gmail.css?raw';
+import shotGithubSolarized from '../assets/gallery/github/solarized.png';
+import shotGithubTerminal from '../assets/gallery/github/terminal.png';
+import shotGithubDracula from '../assets/gallery/github/dracula.png';
+import shotGmail from '../assets/gallery/gmail/midnight.png';
+import shotGoogleEspresso from '../assets/gallery/google/espresso.png';
+import shotHnHearth from '../assets/gallery/hn/hearth.png';
+import shotHn from '../assets/gallery/hn/violet.png';
+import shotNytimesMorning from '../assets/gallery/nytimes/morning.png';
+import shotNytimesNight from '../assets/gallery/nytimes/night.png';
+import shotNytimes from '../assets/gallery/nytimes/midnight.png';
+import shotWikipediaParchment from '../assets/gallery/wikipedia/parchment.png';
+import shotWikipediaSlate from '../assets/gallery/wikipedia/slate.png';
+import cssWikipediaParchment from '../assets/gallery/wikipedia/parchment.css?raw';
+import cssWikipediaSlate from '../assets/gallery/wikipedia/slate.css?raw';
+import cssGithubSolarized from '../assets/gallery/github/solarized.css?raw';
+import cssGithubDracula from '../assets/gallery/github/dracula.css?raw';
+import cssGithubTerminal from '../assets/gallery/github/terminal.css?raw';
+import cssNytimes from '../assets/gallery/nytimes/midnight.css?raw';
+import cssNytimesMorning from '../assets/gallery/nytimes/morning.css?raw';
+import cssNytimesNight from '../assets/gallery/nytimes/night.css?raw';
+import cssHn from '../assets/gallery/hn/violet.css?raw';
+import cssHnHearth from '../assets/gallery/hn/hearth.css?raw';
+import cssGoogleEspresso from '../assets/gallery/google/espresso.css?raw';
+import cssGmail from '../assets/gallery/gmail/midnight.css?raw';
 
 export type GalleryTheme = {
   name: string;
@@ -48,14 +48,14 @@ export const GALLERY: GallerySite[] = [
         colors: ['#f4ecd8', '#55607a'],
         image: shotWikipediaParchment,
         css: cssWikipediaParchment,
-        file: 'wikipedia-parchment.css',
+        file: 'wikipedia/parchment.css',
       },
       {
         name: 'Slate & Ash',
         colors: ['#1c1d22', '#8fa2e0'],
         image: shotWikipediaSlate,
         css: cssWikipediaSlate,
-        file: 'wikipedia-slate.css',
+        file: 'wikipedia/slate.css',
       },
     ],
   },
@@ -69,21 +69,21 @@ export const GALLERY: GallerySite[] = [
         colors: ['#282a36', '#bd93f9'],
         image: shotGithubDracula,
         css: cssGithubDracula,
-        file: 'github-dracula.css',
+        file: 'github/dracula.css',
       },
       {
         name: 'Solarized Light',
         colors: ['#fdf6e3', '#268bd2'],
         image: shotGithubSolarized,
         css: cssGithubSolarized,
-        file: 'github-solarized.css',
+        file: 'github/solarized.css',
       },
       {
         name: 'Terminal',
         colors: ['#0a0f0a', '#3ddc5f'],
         image: shotGithubTerminal,
         css: cssGithubTerminal,
-        file: 'github-terminal.css',
+        file: 'github/terminal.css',
       },
     ],
   },
@@ -97,21 +97,21 @@ export const GALLERY: GallerySite[] = [
         colors: ['#1b1b24', '#9aa8ff'],
         image: shotNytimes,
         css: cssNytimes,
-        file: 'nytimes.css',
+        file: 'nytimes/midnight.css',
       },
       {
         name: 'Morning Edition',
         colors: ['#f6efe0', '#121212'],
         image: shotNytimesMorning,
         css: cssNytimesMorning,
-        file: 'nytimes-morning.css',
+        file: 'nytimes/morning.css',
       },
       {
         name: 'Night Edition',
         colors: ['#1a1714', '#e0a24a'],
         image: shotNytimesNight,
         css: cssNytimesNight,
-        file: 'nytimes-night.css',
+        file: 'nytimes/night.css',
       },
     ],
   },
@@ -125,14 +125,14 @@ export const GALLERY: GallerySite[] = [
         colors: ['#282a36', '#bd93f9'],
         image: shotHn,
         css: cssHn,
-        file: 'hn.css',
+        file: 'hn/violet.css',
       },
       {
         name: 'Hacker Hearth',
         colors: ['#fdf1e1', '#d9773b'],
         image: shotHnHearth,
         css: cssHnHearth,
-        file: 'hn-hearth.css',
+        file: 'hn/hearth.css',
       },
     ],
   },
@@ -146,7 +146,7 @@ export const GALLERY: GallerySite[] = [
         colors: ['#29231f', '#f0a85a'],
         image: shotGoogleEspresso,
         css: cssGoogleEspresso,
-        file: 'google-espresso.css',
+        file: 'google/espresso.css',
       },
     ],
   },
@@ -160,7 +160,7 @@ export const GALLERY: GallerySite[] = [
         colors: ['#1a1b26', '#7aa2f7'],
         image: shotGmail,
         css: cssGmail,
-        file: 'gmail.css',
+        file: 'gmail/midnight.css',
       },
     ],
   },
