@@ -1,8 +1,26 @@
 import { useState } from 'preact/hooks';
-import { LINKS } from '../lib/links';
 import type { SiteMessages } from '../i18n';
 
 type Props = { messages: SiteMessages['goodbye']['feedback'] };
+
+declare global {
+  interface Window {
+    plausible?: (
+      event: string,
+      options?: { props: Record<string, string> },
+    ) => void;
+  }
+}
+
+// Same order as `reasons` in every locale, so reports don't split by language.
+const REASON_KEYS = [
+  'not-needed',
+  'hard-to-use',
+  'broke-a-site',
+  'missing-feature',
+  'too-slow',
+  'other',
+];
 
 /**
  * Optional uninstall survey: pick any reasons, add a note, and send it.
@@ -20,12 +38,16 @@ export default function GoodbyeFeedback({ messages: t }: Props) {
 
   const send = () => {
     if (!ready) return;
-    const body = [picked.join(', '), note.trim()].filter(Boolean).join('\n\n');
-    const params = new URLSearchParams({
-      subject: 'Stylebot uninstall feedback',
-      body,
-    });
-    window.location.href = `mailto:${LINKS.feedbackEmail}?${params}`;
+    picked.forEach((reason) =>
+      window.plausible?.('Uninstall reason', {
+        props: { reason: REASON_KEYS[t.reasons.indexOf(reason)] },
+      }),
+    );
+    if (note.trim()) {
+      window.plausible?.('Uninstall note', {
+        props: { note: note.trim().slice(0, 2000) },
+      });
+    }
     setSent(true);
   };
 
