@@ -1,7 +1,8 @@
 // The store screenshots, in listing order. Chrome takes the first five, Edge
-// takes all of them.
+// takes all of them, and Safari all but the CLI.
 
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -19,6 +20,9 @@ import {
   wait,
 } from './browser.mjs';
 import { captureCli } from './cli-shot.mjs';
+
+const require = createRequire(import.meta.url);
+const postcss = require('postcss');
 
 const THEMES_DIR = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -38,6 +42,9 @@ export const gallery = (site, name) =>
 // out a little wider and scaled into the space.
 const GITHUB_WIDTH = 1012;
 
+// Craigslist's three columns need more room than sits beside the panel.
+const CRAIGSLIST_WIDTH = 1180;
+
 const hackerNews = active => {
   const list = [
     { name: 'Night Shift', css: gallery('hn', 'night-shift') },
@@ -54,21 +61,39 @@ const hackerNews = active => {
 };
 
 /**
- * Clicks More ideas until the first card is `label`. The deck starts at a
- * random look, and every look comes round within ten presses.
+ * A finished Chat exchange whose reply wrote `css`, so its change card counts
+ * the same lines the style holds.
  */
-const dealUntil = async (panel, label) => {
-  const first = panel.locator('.chat-suggestions-slot').first();
-  for (let i = 0; i < 10; i++) {
-    if ((await first.innerText().catch(() => '')).includes(label)) {
-      // Off the button, so it isn't shown hovered.
-      await panel.mouse.move(0, 0);
-      return;
-    }
-    await panel.getByText('More ideas').click();
-    await panel.waitForTimeout(1200);
-  }
-  throw new Error(`Chat never dealt "${label}" first`);
+const chatThread = (request, reply, css) => {
+  const edits = [];
+  postcss.parse(css).walkRules(rule =>
+    edits.push({
+      selector: rule.selector,
+      declarations: rule.nodes
+        .filter(node => node.type === 'decl')
+        .map(({ prop, value }) => ({ property: prop, value })),
+    })
+  );
+
+  return [
+    { role: 'user', id: 'u1', text: request },
+    {
+      role: 'assistant',
+      id: 'a1',
+      text: reply,
+      edits,
+      previous: edits.flatMap(({ selector, declarations }) =>
+        declarations.map(({ property }) => ({
+          selector,
+          property,
+          value: null,
+        }))
+      ),
+      applied: true,
+      model: 'claude-sonnet-5-5',
+      usage: { inputTokens: 18400, outputTokens: 3100, cacheReadTokens: 0 },
+    },
+  ];
 };
 
 const history = () => {
@@ -100,7 +125,7 @@ export const SHOTS = [
     name: '1-pick-element',
     about: 'Picking an element: Wikipedia in Slate',
     appearance: 'dark',
-    run: async (browser, file) => {
+    run: async (browser, file, options) => {
       await seed(browser, {
         styles: {
           'en.wikipedia.org': profiles(
@@ -117,85 +142,17 @@ export const SHOTS = [
       const panel = await openPanel(browser, page);
       await page.locator('#firstHeading').hover();
       await wait(900);
-      await capture(browser.context, file, page, panel, { appearance: 'dark' });
-    },
-  },
-  {
-    name: '2-chat',
-    about: "Chat's suggestions: GitHub in dark mode",
-    appearance: 'dark',
-    run: async (browser, file) => {
-      // A placeholder, so Chat shows its composer; no reply is ever requested.
-      await seed(browser, {
-        'chat-api-key-anthropic': 'sk-ant-store-screenshot-placeholder',
-        'chat-provider': 'anthropic',
+      await capture(browser.context, file, page, panel, {
+        appearance: 'dark',
+        ...options,
       });
-      const page = await openSite(
-        browser.context,
-        'https://github.com/ankit/stylebot',
-        {
-          width: GITHUB_WIDTH,
-        }
-      );
-      const panel = await openPanel(browser, page);
-      await showTab(panel, 'Chat');
-      await dealUntil(panel, 'Morning newspaper');
-      await capture(browser.context, file, page, panel, { appearance: 'dark' });
     },
   },
   {
-    name: '3-cli',
-    about: 'Claude Code restyling Hacker News through the CLI',
-    appearance: 'light',
-    // Runs its own browser, set up for the CLI.
-    standalone: true,
-    run: file => captureCli(file, gallery('hn', 'newspaper')),
-  },
-  {
-    name: '4-profiles',
-    about: 'Profiles: Hacker News in Newspaper Dark',
-    appearance: 'dark',
-    run: async (browser, file) => {
-      await seed(browser, {
-        styles: { 'news.ycombinator.com': hackerNews('Newspaper Dark') },
-      });
-      const page = await openSite(
-        browser.context,
-        'https://news.ycombinator.com/'
-      );
-      const panel = await openPanel(browser, page);
-      await showTab(panel);
-      await panel.getByRole('button', { name: 'Switch profile' }).click();
-      await wait(600);
-      await capture(browser.context, file, page, panel, { appearance: 'dark' });
-    },
-  },
-  {
-    name: '5-readability',
-    about: 'Readability: Wikipedia with its settings open',
-    appearance: 'light',
-    run: async (browser, file) => {
-      await seed(browser, {
-        styles: { 'en.wikipedia.org': style('', { readability: true }) },
-      });
-      const page = await openSite(
-        browser.context,
-        'https://en.wikipedia.org/wiki/Blue_Prince',
-        {
-          full: true,
-        }
-      );
-      await wait(2500);
-      await page.getByRole('button', { name: /Aa/ }).first().click();
-      await wait(800);
-      await capture(browser.context, file, page, null, { appearance: 'light' });
-    },
-  },
-  {
-    name: '6-code',
+    name: '2-code',
     about: 'The Code tab: GitHub in Dracula',
     appearance: 'dark',
-    run: async (browser, file) => {
+    run: async (browser, file, options) => {
       await seed(browser, {
         styles: {
           'github.com': profiles(
@@ -215,14 +172,104 @@ export const SHOTS = [
       const panel = await openPanel(browser, page);
       await showTab(panel, 'Code');
       await wait(1500);
-      await capture(browser.context, file, page, panel, { appearance: 'dark' });
+      await capture(browser.context, file, page, panel, {
+        appearance: 'dark',
+        ...options,
+      });
+    },
+  },
+  {
+    name: '3-profiles',
+    about: 'Profiles: Hacker News in Newspaper Dark',
+    appearance: 'dark',
+    run: async (browser, file, options) => {
+      await seed(browser, {
+        styles: { 'news.ycombinator.com': hackerNews('Newspaper Dark') },
+      });
+      const page = await openSite(
+        browser.context,
+        'https://news.ycombinator.com/'
+      );
+      const panel = await openPanel(browser, page);
+      await showTab(panel);
+      await panel.getByRole('button', { name: 'Switch profile' }).click();
+      await wait(600);
+      await capture(browser.context, file, page, panel, {
+        appearance: 'dark',
+        ...options,
+      });
+    },
+  },
+  {
+    name: '4-cli',
+    about: 'Claude Code restyling Hacker News through the CLI',
+    appearance: 'light',
+    // Runs its own browser, set up for the CLI.
+    standalone: true,
+    // Safari builds don't carry the CLI.
+    cli: true,
+    run: file => captureCli(file, gallery('hn', 'newspaper')),
+  },
+  {
+    name: '5-chat',
+    about: 'Chat restyling Craigslist as a modern app',
+    appearance: 'dark',
+    run: async (browser, file, options) => {
+      const css = theme('craigslist-modern');
+      // A placeholder, so Chat shows its composer; no reply is ever requested.
+      await seed(browser, {
+        'chat-api-key-anthropic': 'sk-ant-store-screenshot-placeholder',
+        'chat-provider': 'anthropic',
+        'chat-thread-craigslist.org': chatThread(
+          'make this look like a modern app',
+          'Gave Craigslist a modern app look: a warm off-white page with each category in its own rounded white card, Fraunces headings over Inter text, the boroughs as soft pill buttons, and purple for the logo, today’s date and a pill-shaped **post an ad** button.',
+          css
+        ),
+        styles: { 'craigslist.org': profiles({ name: 'Modern', css }) },
+      });
+      const page = await openSite(
+        browser.context,
+        'https://www.craigslist.org/area/newyork',
+        { width: CRAIGSLIST_WIDTH }
+      );
+      const panel = await openPanel(browser, page);
+      await showTab(panel, 'Chat');
+      await panel.mouse.move(0, 0);
+      await capture(browser.context, file, page, panel, {
+        appearance: 'dark',
+        ...options,
+      });
+    },
+  },
+  {
+    name: '6-readability',
+    about: 'Readability: Wikipedia with its settings open',
+    appearance: 'light',
+    run: async (browser, file, options) => {
+      await seed(browser, {
+        styles: { 'en.wikipedia.org': style('', { readability: true }) },
+      });
+      const page = await openSite(
+        browser.context,
+        'https://en.wikipedia.org/wiki/Blue_Prince',
+        {
+          full: true,
+        }
+      );
+      await wait(2500);
+      await page.getByRole('button', { name: /Aa/ }).first().click();
+      await wait(800);
+      await capture(browser.context, file, page, null, {
+        appearance: 'light',
+        ...options,
+      });
     },
   },
   {
     name: '7-version-history',
     about: 'Version history in Options',
     appearance: 'dark',
-    run: async (browser, file) => {
+    run: async (browser, file, options) => {
       const sites = [
         'news.ycombinator.com',
         'github.com',
@@ -258,7 +305,10 @@ export const SHOTS = [
         }
       });
       await wait(600);
-      await capture(browser.context, file, page, null, { appearance: 'dark' });
+      await capture(browser.context, file, page, null, {
+        appearance: 'dark',
+        ...options,
+      });
     },
   },
 ];

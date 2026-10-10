@@ -1,6 +1,6 @@
 ---
 name: capture-store
-description: Retake the Chrome Web Store and Edge Add-ons screenshots in store/screenshots/ with `yarn capture:store`, then check each one by eye before committing. Use when the UI has changed and the listing's screenshots are out of date, before a release, or when the user asks to "update the store screenshots", "retake the store shots", or change what one of them shows.
+description: Retake the Chrome Web Store and Edge Add-ons screenshots in store/screenshots/, or the Mac App Store ones in store/safari/, with `yarn capture:store`, then check each one by eye before committing. Use when the UI has changed and the listing's screenshots are out of date, before a release, or when the user asks to "update the store screenshots", "retake the store shots", or change what one of them shows.
 ---
 
 # Capture the store screenshots
@@ -18,7 +18,8 @@ image still takes a look, because the sites it shows change under it.
 yarn capture:store
 ```
 
-- `--only 2-chat 4` retakes some shots, by name or number; `--no-build` reuses `dist/`.
+- `--only 5-chat 2` retakes some shots, by name or number; `--no-build` reuses `dist/`.
+- `--safari` takes the Mac App Store set into `store/safari/` instead: every shot but the CLI, which Safari builds don't carry, at 2560×1600. Safari can't be automated with an extension loaded, so these are rendered in headless Chrome too; no browser UI shows, and the panel looks the same.
 - It takes about a minute. A shot that fails says why and the others still run.
 - The command line shot drives the real CLI in a temporary HOME, as its e2e spec does, so
   it never touches `~/.stylebot` or the user's browsers.
@@ -33,7 +34,7 @@ Open each PNG and check, before saying they're done:
   justified into big gaps, a menu cut off at the edge.
 - **The panel is in the theme it should be.** Every shot's Stylebot panel is dark; pages
   alternate between dark and light so the set doesn't read as a dark-mode extension.
-- **Chat's cards** are Morning newspaper, Swiss poster and Night owl.
+- **Chat's Craigslist** fits beside the panel, with its left and right columns whole.
 - **The terminal's last line still describes the page beside it.** It's written by hand
   (`SUMMARY` in `cli-shot.mjs`); rewrite it whenever the Newspaper theme changes.
 
@@ -54,6 +55,8 @@ Choosing what to show:
   columns squeeze around pictures and leave gaps between words.
 - **Check a site loads headless** before moving a shot to it. Reddit, Stack Overflow and
   NYTimes block it; Gmail needs a sign-in.
-- **Keep Chat honest**: the shot shows its suggestions, never a reply, since a reply needs a
-  real API key. The key the script seeds is a placeholder that is never sent anywhere.
+- **Keep Chat honest**: the conversation is seeded, since a live reply needs a real API key,
+  but its CSS is the user's own Modern style for Craigslist, kept in `scripts/capture/themes/`,
+  and the reply only describes what that CSS does. Rewrite the reply when the CSS changes. The
+  key the script seeds is a placeholder that is never sent anywhere.
 
