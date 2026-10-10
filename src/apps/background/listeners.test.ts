@@ -12,6 +12,7 @@ jest.mock('./editor-window', () => ({
   forgetWindow: jest.fn(),
 }));
 jest.mock('./messages', () => ({}));
+jest.mock('./restore-tabs', () => ({ restoreOpenTabs: jest.fn() }));
 jest.mock('./chat', () => ({ initChatPort: jest.fn() }));
 jest.mock('./styles', () => ({
   refreshAllBadges: jest.fn(),
@@ -31,6 +32,7 @@ jest.mock('@stylebot/sync', () => ({
 
 import { initListeners } from './listeners';
 import { pruneRetired } from './options';
+import { restoreOpenTabs } from './restore-tabs';
 
 type InstalledDetails = { reason: string; previousVersion?: string };
 type OnInstalled = (details: InstalledDetails) => Promise<void>;
@@ -85,6 +87,8 @@ const makeChrome = (version: string) => {
 };
 
 describe('onInstalled', () => {
+  beforeEach(() => jest.clearAllMocks());
+
   it('opens the release page in the background after a major update', async () => {
     const { api, fireInstalled } = makeChrome('4.0.0');
 
@@ -98,6 +102,17 @@ describe('onInstalled', () => {
     expect(api.storage.local.set).toBeCalledWith({
       'notification~release/4.0': true,
     });
+  });
+
+  it('puts Stylebot back into open tabs before the release page opens', async () => {
+    const { api, fireInstalled } = makeChrome('4.0.0');
+
+    await fireInstalled({ reason: 'update', previousVersion: '3.2.4' });
+
+    expect(restoreOpenTabs).toBeCalledWith();
+    expect(
+      (restoreOpenTabs as jest.Mock).mock.invocationCallOrder[0]
+    ).toBeLessThan(api.tabs.create.mock.invocationCallOrder[0]);
   });
 
   it.each([
@@ -135,5 +150,6 @@ describe('onInstalled', () => {
     expect(api.tabs.create).toBeCalledWith({
       url: 'https://stylebot.dev/welcome',
     });
+    expect(restoreOpenTabs).not.toBeCalled();
   });
 });

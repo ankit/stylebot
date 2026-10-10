@@ -33,8 +33,12 @@ const RELEASE_INSTALL_WARNING_FIELDS = {
       'sidePanel',
       // Covered by the warning tabs already shows, so it adds none.
       'favicon',
+      // No warning of its own, and <all_urls> below adds none either, since
+      // the content scripts already match every site (checked against 3.2.4
+      // with getPermissionWarningsByManifest on Chrome and Edge).
+      'scripting',
     ],
-    host_permissions: GOOGLE_HOSTS,
+    host_permissions: [...GOOGLE_HOSTS, '<all_urls>'],
     content_script_matches: CONTENT_SCRIPT_MATCHES,
   },
   firefox: {
@@ -141,13 +145,8 @@ describe('CLI permissions', () => {
       preview,
     });
 
-    expect(manifest.permissions).toEqual(base.permissions);
-    expect(manifest.host_permissions).toEqual(base.host_permissions);
-    expect(manifest.optional_permissions).toEqual([
-      'nativeMessaging',
-      'scripting',
-    ]);
-    expect(manifest.optional_host_permissions).toEqual(['<all_urls>']);
+    expect(manifest.permissions).not.toContain('nativeMessaging');
+    expect(manifest.optional_permissions).toEqual(['nativeMessaging']);
   });
 
   it.each(['firefox', 'safari'] as const)(

@@ -65,18 +65,27 @@ const CLI_BROWSERS = [CHROME];
 const supportsCLI = browser => CLI_BROWSERS.includes(browser ?? CHROME);
 
 /**
- * Adds the CLI's permissions, requested only when it's turned on, and its
- * page inspector. Scripting puts Stylebot back into the tabs open during the
- * restart that turning it on takes.
+ * Adds the CLI's native host permission, requested only when it's turned on,
+ * and its page inspector.
  */
 const addCli = manifest => ({
   ...manifest,
-  optional_permissions: ['nativeMessaging', 'scripting'],
-  optional_host_permissions: ['<all_urls>'],
+  optional_permissions: ['nativeMessaging'],
   web_accessible_resources: [
     ...manifest.web_accessible_resources,
     { resources: ['cli-inspector/index.js'], matches: ['<all_urls>'] },
   ],
+});
+
+/**
+ * Adds scripting and host access to every site, to run scripts in open tabs.
+ * The content scripts already match every site, so neither adds an install
+ * warning.
+ */
+const addScripting = manifest => ({
+  ...manifest,
+  permissions: [...manifest.permissions, 'scripting'],
+  host_permissions: [...manifest.host_permissions, '<all_urls>'],
 });
 
 /**
@@ -85,11 +94,13 @@ const addCli = manifest => ({
  * uploaded manifest with a `key`.
  */
 const buildChromeManifest = (manifest, { nodeEnv, preview }) => {
+  const scripting = addScripting(manifest);
+
   if (nodeEnv === 'development' || preview) {
-    return { ...manifest, ...readManifest('manifest-dev.json') };
+    return { ...scripting, ...readManifest('manifest-dev.json') };
   }
 
-  return manifest;
+  return scripting;
 };
 
 const SITE_BRIDGE_SCRIPT = 'site-bridge/index.js';

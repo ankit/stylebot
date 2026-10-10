@@ -22,7 +22,7 @@ beforeEach(() => {
 });
 
 describe('CLI permissions', () => {
-  it('checks for the native host and every site', async () => {
+  it('checks for the native host', async () => {
     await expect(hasCliPermissions()).resolves.toBe(true);
 
     expect(chrome.permissions.contains).toBeCalledWith(
@@ -31,19 +31,16 @@ describe('CLI permissions', () => {
     );
   });
 
-  it('asks for scripting too, to restore open tabs after the restart', async () => {
+  it('asks for the native host', async () => {
     await expect(requestCliPermissions()).resolves.toBe(true);
 
     expect(chrome.permissions.request).toBeCalledWith(
-      {
-        permissions: ['nativeMessaging', 'scripting'],
-        origins: ['<all_urls>'],
-      },
+      { permissions: ['nativeMessaging'] },
       expect.any(Function)
     );
   });
 
-  it('removes only the native host, which Chrome lets go of', async () => {
+  it('gives back the native host', async () => {
     await removeCliPermissions();
 
     expect(chrome.permissions.remove).toBeCalledWith(

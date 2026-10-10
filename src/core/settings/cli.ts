@@ -1,19 +1,9 @@
 /**
- * What the CLI needs: its native host, and every site, to read pages and
- * take screenshots. Optional, so they're requested only when it's turned on.
+ * What the CLI needs beyond the access to every site Stylebot already has:
+ * its native host. Optional, so it's requested only when it's turned on.
  */
 export const CLI_PERMISSIONS: chrome.permissions.Permissions = {
   permissions: ['nativeMessaging'],
-  origins: ['<all_urls>'],
-};
-
-/**
- * What turning the CLI on asks for: its permissions, and scripting to put
- * Stylebot back into open tabs after the restart the grant takes.
- */
-const CLI_REQUEST: chrome.permissions.Permissions = {
-  ...CLI_PERMISSIONS,
-  permissions: ['nativeMessaging', 'scripting'],
 };
 
 /**
@@ -53,16 +43,13 @@ export const hasCliPermissions = (): Promise<boolean> =>
  * await, since the browser only prompts during a user gesture.
  */
 export const requestCliPermissions = (): Promise<boolean> =>
-  callPermissions(chrome.permissions.request, CLI_REQUEST);
+  callPermissions(chrome.permissions.request, CLI_PERMISSIONS);
 
 /**
- * Gives back the native host, which cuts the CLI off. Chrome refuses to remove
- * <all_urls> since the content scripts match it, and would fail the whole call.
+ * Gives back the native host, which cuts the CLI off.
  */
 export const removeCliPermissions = (): Promise<boolean> =>
-  callPermissions(chrome.permissions.remove, {
-    permissions: CLI_PERMISSIONS.permissions,
-  });
+  callPermissions(chrome.permissions.remove, CLI_PERMISSIONS);
 
 const CLI_CONNECTED_KEY = 'cli-connected';
 

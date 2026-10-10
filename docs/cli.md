@@ -182,9 +182,9 @@ The browser starts the native host when the extension connects to it, and keeps 
 
 The code that reads a page loads into it the first time the CLI asks about that page, so pages the CLI never touches don't carry it.
 
-The extension connects only while the setting is on and the browser has granted its two optional permissions: `nativeMessaging` for the host, and `<all_urls>` for screenshots. Once granted, `<all_urls>` also lifts CORS on the background's own requests, so a cross-origin fetch that works there can still fail for someone who never turned the setting on. Chrome won't let the extension give `<all_urls>` back, since its content scripts already match every site, so turning the setting off removes only `nativeMessaging`.
+The extension connects only while the setting is on and the browser has granted its optional `nativeMessaging` permission for the host. Screenshots need `<all_urls>`, which Stylebot already holds on Chrome and Edge, to restore open tabs after an update.
 
-Chrome lets the background reach the native host only once it starts again after the grant, so turning the setting on restarts the extension once. A restart cuts off the content scripts already running in open tabs, and Chrome only injects into pages that load afterwards. So the setting also asks for `scripting`, which has no install warning, and after the restart Stylebot runs its content scripts again in the open tabs. The fresh copy removes the panel the old one left, which no longer responds.
+Chrome lets the background reach the native host only once it starts again after the grant, so turning the setting on restarts the extension once. A restart cuts off the content scripts already running in open tabs, and Chrome only injects into pages that load afterwards. So after the restart Stylebot runs its content scripts again in the open tabs, as it does after an update. The fresh copy removes the panel the old one left, which no longer responds.
 
 ### Versions
 

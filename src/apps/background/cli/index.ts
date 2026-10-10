@@ -3,12 +3,12 @@ import type { StylebotOptions } from '@stylebot/types';
 
 import { OpenOptionsPage } from '../messages';
 import { get as getOption } from '../options';
+import { findOpenEditors, restoreOpenTabs } from '../restore-tabs';
 import { inspectCommands } from './inspect';
 import { pageCommands } from './pages';
 import { pointerCommands } from './pointer';
 import { profileCommands } from './profiles';
 import { CLI_PROTOCOL } from './protocol';
-import { findOpenEditors, restoreOpenTabs } from './restore-tabs';
 import { styleCommands } from './styles';
 import type { CliCommands, CliRequest, CliResponse } from './types';
 

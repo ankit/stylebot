@@ -18,10 +18,7 @@ const toggle = (root: HTMLElement) =>
     name: /Let apps on this computer control Stylebot/,
   });
 
-const CLI_REQUEST = {
-  permissions: ['nativeMessaging', 'scripting'],
-  origins: ['<all_urls>'],
-};
+const CLI_REQUEST = { permissions: ['nativeMessaging'] };
 
 export const SavesOnceGranted: StoryObj = {
   ...cliAccessCard({}, async (root, store) => {

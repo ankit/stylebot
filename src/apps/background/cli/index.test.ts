@@ -1,8 +1,8 @@
 import { OpenOptionsPage } from '../messages';
 import { get as getOption } from '../options';
+import { restoreOpenTabs } from '../restore-tabs';
 import { initCliBridge, updateCliBridge } from './index';
 import { pageCommands } from './pages';
-import { restoreOpenTabs } from './restore-tabs';
 
 jest.mock('../messages', () => ({ OpenOptionsPage: jest.fn() }));
 jest.mock('../options', () => ({ get: jest.fn() }));
@@ -12,7 +12,7 @@ jest.mock('./pages', () => ({
 }));
 jest.mock('./pointer', () => ({ pointerCommands: {} }));
 jest.mock('./profiles', () => ({ profileCommands: {} }));
-jest.mock('./restore-tabs', () => ({
+jest.mock('../restore-tabs', () => ({
   findOpenEditors: jest.fn(async () => ({ 7: 'window' })),
   restoreOpenTabs: jest.fn(),
 }));

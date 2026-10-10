@@ -3,8 +3,9 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import type { BrowserContext, Route } from '@playwright/test';
+import type { Engine } from './engine';
 import { test, expect, type Extension } from './fixtures';
-import { startTestServer } from './helpers';
+import { openEditor, startTestServer } from './helpers';
 
 const RELEASE = '3.2.4';
 // The build under test may still carry the old version number until release.
@@ -183,6 +184,27 @@ const waitForVersion = (extension: Extension, version: string) =>
     )
     .toBe(version);
 
+/**
+ * Copies the current build over the release's folder with a newer version,
+ * and loads it again, which reloads it from disk as an update, keeping its
+ * id and storage.
+ */
+const updateToBuild = async (
+  engine: Engine,
+  context: BrowserContext,
+  extensionDir: string,
+  old: Extension
+): Promise<Extension> => {
+  fs.rmSync(extensionDir, { recursive: true, force: true });
+  fs.cpSync(DIST_PATH, extensionDir, { recursive: true });
+  stampVersion(extensionDir, NEXT_VERSION);
+
+  const upgraded = await engine.loadExtension(context, extensionDir);
+  expect(upgraded.id).toBe(old.id);
+  await waitForVersion(upgraded, NEXT_VERSION);
+  return upgraded;
+};
+
 test('upgrading from 3.2.4 keeps styles and settings, and syncs without dropping a style', async ({
   engine,
 }, testInfo) => {
@@ -231,18 +253,8 @@ test('upgrading from 3.2.4 keeps styles and settings, and syncs without dropping
     });
 
     const extension =
-      await test.step('swap in the new build at the same path', async () => {
-        fs.rmSync(extensionDir, { recursive: true, force: true });
-        fs.cpSync(DIST_PATH, extensionDir, { recursive: true });
-        stampVersion(extensionDir, NEXT_VERSION);
-
-        // Loading an enabled extension's path again reloads it from disk as an
-        // update, keeping its id and storage.
-        const upgraded = await engine.loadExtension(context, extensionDir);
-        expect(upgraded.id).toBe(old.id);
-        await waitForVersion(upgraded, NEXT_VERSION);
-        return upgraded;
-      });
+      await test.step('swap in the new build at the same path', () =>
+        updateToBuild(engine, context, extensionDir, old));
 
     await test.step('the migrations finish cleanly', async () => {
       await expect
@@ -315,6 +327,86 @@ test('upgrading from 3.2.4 keeps styles and settings, and syncs without dropping
         return Object.keys(items.styles).sort();
       });
       expect(local).toEqual(expected);
+    });
+  } finally {
+    await context.close().catch(() => {});
+    await server.close();
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('updating from 3.2.4 brings Stylebot back to a tab left open, without reloading it', async ({
+  engine,
+}, testInfo) => {
+  test.skip(
+    process.env.STYLEBOT_BROWSER === 'firefox',
+    `The ${RELEASE} release zip is the Chrome and Edge build`
+  );
+  test.setTimeout(120_000);
+
+  const zip = await getReleaseZip();
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'stylebot-update-'));
+  const extensionDir = path.join(root, 'extension');
+  execFileSync('unzip', ['-q', zip, '-d', extensionDir]);
+
+  const server = await startTestServer({ '/': PAGE_HTML });
+  const context = await engine.launch(path.join(root, 'profile'), {
+    headless: testInfo.project.use.headless ?? true,
+    viewport: null,
+    colorScheme: null,
+  });
+
+  try {
+    await context.route('https://stylebot.dev/**', route =>
+      route.fulfill({ contentType: 'text/html', body: '' })
+    );
+
+    const old = await engine.loadExtension(context, extensionDir);
+    await waitForVersion(old, RELEASE);
+    await old.evaluate(styles => chrome.storage.local.set({ styles }), {
+      localhost: stylesFrom324.localhost,
+    });
+
+    const page = await context.newPage();
+    await page.goto(server.baseUrl);
+    await expect(page.locator('h1')).toHaveCSS('color', 'rgb(0, 128, 0)');
+
+    const extension = await updateToBuild(engine, context, extensionDir, old);
+    const openPopup = () => engine.openPopup(context, extension);
+
+    await test.step('the page answers the new version', async () => {
+      await expect
+        .poll(() =>
+          extension.evaluate(async () => {
+            const [tab] = await chrome.tabs.query({
+              url: 'http://localhost/*',
+            });
+            return chrome.tabs
+              .sendMessage(tab.id!, { name: 'GetCanStylePage' })
+              .catch(() => undefined);
+          })
+        )
+        .toBe(true);
+    });
+
+    await test.step('style changes still reach the page', async () => {
+      const popup = await openPopup();
+      // Not awaited: the background never answers these.
+      await popup.evaluate(() => {
+        chrome.runtime.sendMessage({ name: 'DisableStyle', url: 'localhost' });
+      });
+      await expect(page.locator('h1')).not.toHaveCSS('color', 'rgb(0, 128, 0)');
+
+      await popup.evaluate(() => {
+        chrome.runtime.sendMessage({ name: 'EnableStyle', url: 'localhost' });
+      });
+      await expect(page.locator('h1')).toHaveCSS('color', 'rgb(0, 128, 0)');
+      await popup.close();
+    });
+
+    await test.step('the editor opens, once', async () => {
+      await openEditor(page, openPopup);
+      await expect(page.locator('[id="stylebot"]')).toHaveCount(1);
     });
   } finally {
     await context.close().catch(() => {});

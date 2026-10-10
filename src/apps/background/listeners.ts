@@ -2,6 +2,7 @@ import { ContextMenu, handleContextMenuClick } from './contextmenu';
 import { handleCommand } from './global-commands';
 import { configureSidePanelTabs, initSidePanelTabs } from './side-panel-tabs';
 import * as editorWindow from './editor-window';
+import { restoreOpenTabs } from './restore-tabs';
 
 import {
   GetCommands,
@@ -85,8 +86,9 @@ import {
  * synchronously when the service worker starts, for Chrome to wake it for them.
  */
 export const initListeners = (): void => {
-  // Set up side panels and open the welcome page on install; clean up retired
-  // options on update, and show what's new after a major update.
+  // Set up side panels and open the welcome page on install; on update, clean
+  // up retired options, put Stylebot back into open tabs, and show what's new
+  // after a major update.
   chrome.runtime.onInstalled.addListener(
     async ({ reason, previousVersion }) => {
       configureSidePanelTabs();
@@ -105,6 +107,8 @@ export const initListeners = (): void => {
 
       if (reason === 'update') {
         pruneRetired();
+        // Before the release page opens, which gets the new content scripts.
+        restoreOpenTabs();
 
         if (isMajorUpdate(previousVersion, getExtensionVersion())) {
           chrome.tabs.create({ url: getReleaseUrl(), active: false });

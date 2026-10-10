@@ -127,12 +127,7 @@ const grantCliPermissions = (manifest: Manifest) => {
     ...(manifest.permissions as Array<string>),
     ...(manifest.optional_permissions as Array<string>),
   ];
-  manifest.host_permissions = [
-    ...(manifest.host_permissions as Array<string>),
-    ...(manifest.optional_host_permissions as Array<string>),
-  ];
   delete manifest.optional_permissions;
-  delete manifest.optional_host_permissions;
 };
 
 /**
