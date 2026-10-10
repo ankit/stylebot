@@ -1,7 +1,7 @@
 <template>
   <div
     class="card"
-    :class="{ contained }"
+    :class="[{ contained }, size]"
     aria-modal="true"
     aria-labelledby="dialog-title"
   >
@@ -16,6 +16,7 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import Vue from 'vue';
 
 export default Vue.extend({
@@ -30,6 +31,11 @@ export default Vue.extend({
     contained: {
       type: Boolean,
       default: false,
+    },
+
+    size: {
+      type: String as PropType<'default' | 'small'>,
+      default: 'default',
     },
   },
 });
@@ -63,6 +69,10 @@ export default Vue.extend({
   line-height: 1.3;
   text-wrap: pretty;
   color: var(--text-primary);
+
+  .small & {
+    font-size: 15px;
+  }
 }
 
 .title + .actions {

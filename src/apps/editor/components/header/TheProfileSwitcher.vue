@@ -80,6 +80,7 @@
     <s-confirm-dialog
       v-if="deleteTarget"
       contained
+      size="small"
       :title="t('delete_profile_name', [displayName(deleteTarget)])"
       :message="t('delete_profile_warning')"
       :confirm-label="t('delete')"

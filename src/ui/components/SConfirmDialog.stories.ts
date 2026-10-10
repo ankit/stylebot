@@ -43,6 +43,7 @@ export const Contained = playground(
   <div style="position: relative; width: 396px; height: 600px; border: 1px solid var(--panel-border); border-radius: 14px">
     <s-confirm-dialog
       contained
+      size="small"
       :title="title"
       :message="message"
       :confirm-label="confirmLabel"

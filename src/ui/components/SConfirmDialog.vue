@@ -3,6 +3,7 @@
     <s-dialog-card
       :title="title"
       :contained="contained"
+      :size="size"
       role="alertdialog"
       aria-describedby="confirm-dialog-message"
     >
@@ -22,6 +23,7 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import Vue from 'vue';
 
 import SButton from './SButton.vue';
@@ -61,6 +63,11 @@ export default Vue.extend({
     contained: {
       type: Boolean,
       default: false,
+    },
+
+    size: {
+      type: String as PropType<'default' | 'small'>,
+      default: 'default',
     },
   },
 });
