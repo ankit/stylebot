@@ -62,7 +62,7 @@ export default Vue.extend({
 
 .text-large {
   font-size: 14px;
-  line-height: 1.3;
+  line-height: 1.45;
 }
 
 .text-body {

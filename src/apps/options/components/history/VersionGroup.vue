@@ -12,11 +12,6 @@
       <template v-if="!compact" #title>{{ label }}</template>
 
       <template #meta>
-        <s-tooltip :text="exactTime" class="time">
-          <s-text as="span" :size="textSize" variant="muted" class="stamp">
-            {{ time }}
-          </s-text>
-        </s-tooltip>
         <template v-for="(part, index) in metaParts">
           <span
             v-if="part.pill"
@@ -55,6 +50,20 @@
           <span v-if="addedLines" class="added">+{{ addedLines }}</span>
           <span v-if="removedLines" class="removed">−{{ removedLines }}</span>
         </span>
+
+        <s-tooltip :text="exactTime" class="time">
+          <s-text as="span" variant="muted" class="stamp">
+            <span>{{ time }}</span>
+            <span
+              v-for="widest in widestTimes"
+              :key="widest"
+              class="sizer"
+              aria-hidden="true"
+            >
+              {{ widest }}
+            </span>
+          </s-text>
+        </s-tooltip>
 
         <chevron-down-icon
           v-if="expandable"
@@ -219,8 +228,16 @@ export default Vue.extend({
       return formatExact(new Date(this.newest.modifiedTime));
     },
 
+    // The widest times in the morning and evening, which keep the counts
+    // before the time lined up from row to row.
+    widestTimes(): Array<string> {
+      return [10, 22].map(hour =>
+        formatClockTime(new Date(2000, 0, 1, hour, 58))
+      );
+    },
+
     /**
-     * What happened, after the time, as a verb and the profile it happened
+     * What happened, as a verb and the profile it happened
      * to: edited, added, deleted, renamed or restored. Several sites are
      * counted instead. Profile names are pills.
      */
@@ -228,32 +245,34 @@ export default Vue.extend({
       const dot: SentencePart = { text: '·', pill: false };
 
       if (!this.single) {
-        return (['added', 'changed', 'deleted'] as const).flatMap(status => {
-          const count = this.changes.filter(
-            change => change.status === status
-          ).length;
+        return (['added', 'changed', 'deleted'] as const)
+          .flatMap(status => {
+            const count = this.changes.filter(
+              change => change.status === status
+            ).length;
 
-          return count
-            ? [
-                dot,
-                {
-                  text: this.t(`restore_count_${status}`, [String(count)]),
-                  pill: false,
-                },
-              ]
-            : [];
-        });
+            return count
+              ? [
+                  dot,
+                  {
+                    text: this.t(`restore_count_${status}`, [String(count)]),
+                    pill: false,
+                  },
+                ]
+              : [];
+          })
+          .slice(1);
       }
 
       if (this.action) {
-        return [dot, ...this.describeAction(this.action)];
+        return this.describeAction(this.action);
       }
 
       if (!this.profile) {
-        return [dot, { text: this.t('restore_deleted'), pill: false }];
+        return [{ text: this.t('restore_deleted'), pill: false }];
       }
 
-      return [dot, ...this.describeEdit(this.profile)];
+      return this.describeEdit(this.profile);
     },
 
     // Where "Current" goes: the last profile pill, if there is one.
@@ -417,7 +436,17 @@ export default Vue.extend({
 }
 
 .stamp {
+  display: inline-grid;
+  justify-items: end;
   font-variant-numeric: tabular-nums;
+}
+
+.stamp > span {
+  grid-area: 1 / 1;
+}
+
+.sizer {
+  visibility: hidden;
 }
 
 .profile {

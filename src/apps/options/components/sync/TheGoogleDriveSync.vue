@@ -28,7 +28,7 @@
             </s-badge>
           </template>
 
-          <s-text v-else variant="muted" class="subtitle">
+          <s-text v-else variant="muted" size="large" class="subtitle">
             {{ t('sync_not_connected') }}
           </s-text>
         </div>
@@ -85,7 +85,7 @@
         <li class="service">
           <div class="service-text">
             <div class="service-name">{{ t('google_drive') }}</div>
-            <s-text variant="muted">
+            <s-text variant="muted" size="large">
               {{ t('sync_google_drive_description', [syncFileName]) }}
             </s-text>
           </div>
@@ -98,7 +98,7 @@
 
     <div v-if="conflicts.length" class="conflicts">
       <s-heading as="h3" size="md">{{ t('sync_conflicts_title') }}</s-heading>
-      <s-text variant="muted" class="description">
+      <s-text variant="muted" size="large" class="description">
         {{ t('sync_conflicts_description') }}
       </s-text>
 

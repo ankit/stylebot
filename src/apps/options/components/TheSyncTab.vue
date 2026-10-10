@@ -36,7 +36,7 @@
 
     <div>
       <s-heading as="h1" size="xl">{{ t('sync_options') }}</s-heading>
-      <s-text variant="muted" class="description">
+      <s-text variant="muted" size="large" class="description">
         {{ t('sync_tab_description') }}
       </s-text>
 
@@ -48,7 +48,7 @@
 
     <div class="section">
       <s-heading as="h2" size="lg">{{ t('backup') }}</s-heading>
-      <s-text variant="muted" class="description">
+      <s-text variant="muted" size="large" class="description">
         {{ t('backup_description') }}
       </s-text>
 

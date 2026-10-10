@@ -3,7 +3,7 @@
     <div class="header">
       <div class="title-block">
         <s-heading as="h1" size="xl">{{ t('styles_options') }}</s-heading>
-        <s-text variant="muted" class="subtitle">
+        <s-text variant="muted" size="large" class="subtitle">
           {{
             t(totalCount === 1 ? 'sites_count_one' : 'sites_count_other', [
               String(totalCount),

@@ -4,7 +4,9 @@
       <h2 class="heading">{{ t('theme') }}</h2>
     </template>
     <template #meta>
-      <s-text variant="muted" as="span">{{ t('theme_description') }}</s-text>
+      <s-text variant="muted" size="large" as="span">
+        {{ t('theme_description') }}
+      </s-text>
     </template>
 
     <template #trailing>

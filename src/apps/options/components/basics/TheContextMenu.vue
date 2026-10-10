@@ -4,7 +4,7 @@
       <h2 class="heading">{{ t('right_click_menu') }}</h2>
     </template>
     <template #meta>
-      <s-text variant="muted" as="span">
+      <s-text variant="muted" size="large" as="span">
         {{ t('right_click_menu_description') }}
       </s-text>
     </template>

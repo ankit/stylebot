@@ -1,7 +1,7 @@
 <template>
   <div class="history-tab">
     <s-heading as="h1" size="xl">{{ t('history_options') }}</s-heading>
-    <s-text variant="muted" class="description">
+    <s-text variant="muted" size="large" class="description">
       {{ t('history_tab_description') }}
     </s-text>
 

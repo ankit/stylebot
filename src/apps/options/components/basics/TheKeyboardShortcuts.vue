@@ -3,7 +3,7 @@
     <div class="header">
       <div class="title-block">
         <s-heading as="h2" size="lg">{{ t('keyboard_shortcuts') }}</s-heading>
-        <s-text variant="muted" class="description">
+        <s-text variant="muted" size="large" class="description">
           {{
             safari
               ? t('change_shortcuts_in_safari_settings_extensions')

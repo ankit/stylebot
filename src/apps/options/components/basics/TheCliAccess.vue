@@ -7,7 +7,7 @@
     </template>
     <template #meta>
       <span class="details">
-        <s-text variant="muted" as="span">
+        <s-text variant="muted" size="large" as="span">
           {{ t('let_apps_on_this_computer_control_stylebot_description') }}
         </s-text>
 
