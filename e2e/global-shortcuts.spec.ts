@@ -3,8 +3,8 @@ import { PAGE_URL, seedStyles, servePage } from './helpers';
 
 /*
  * Playwright can't press a browser-level shortcut, so these cover the parts
- * around it: the commands the browser registers, and the page carrying out
- * one the background hands it.
+ * around it: the commands the browser registers, the page carrying out one
+ * the background hands it, and the background's handler run directly.
  */
 
 const PAGE_HTML = `
@@ -45,6 +45,23 @@ const runCommand = (extension: Extension, command: string) =>
       });
     },
     [PAGE_URL, command]
+  );
+
+// Runs the background's handler as if the browser had caught the shortcut.
+const pressShortcut = (extension: Extension, command: string, times = 1) =>
+  extension.evaluate(
+    async ([url, name, count]) => {
+      const tabs = await chrome.tabs.query({});
+      const tab = tabs.find(candidate => candidate.url?.startsWith(url));
+      const event = chrome.commands.onCommand as unknown as {
+        dispatch: (command: string, tab?: chrome.tabs.Tab) => void;
+      };
+
+      for (let i = 0; i < count; i++) {
+        event.dispatch(name, tab);
+      }
+    },
+    [PAGE_URL, command, times] as const
   );
 
 test('the global shortcuts are registered with the browser, two of them with keys', async ({
@@ -91,7 +108,7 @@ test('the page toggles the editor when the browser reports the shortcut', async 
   await expect(page.locator('#stylebot .stylebot')).toHaveCount(0);
 });
 
-test('the page toggles styling when the browser reports the shortcut', async ({
+test('the styling shortcut flips styling once per press, however quickly pressed', async ({
   context,
   extension,
 }) => {
@@ -105,7 +122,15 @@ test('the page toggles styling when the browser reports the shortcut', async ({
   await expect(page.locator('h1')).toHaveCSS('color', 'rgb(255, 0, 128)');
   await waitForContentScript(extension);
 
-  await runCommand(extension, 'style');
-
+  await pressShortcut(extension, 'style');
   await expect(page.locator('h1')).not.toHaveCSS('color', 'rgb(255, 0, 128)');
+
+  // An even burst must leave styling as it was, so let it settle first.
+  await pressShortcut(extension, 'style', 2);
+  await page.waitForTimeout(500);
+  await expect(page.locator('h1')).not.toHaveCSS('color', 'rgb(255, 0, 128)');
+
+  await pressShortcut(extension, 'style');
+  await expect(page.locator('h1')).toHaveCSS('color', 'rgb(255, 0, 128)');
+  await expect(page.locator('#stylebot')).toHaveCount(0);
 });

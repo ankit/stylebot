@@ -4,8 +4,6 @@ import { injectCSSIntoDocument } from '@stylebot/css';
 import type { Style } from '@stylebot/types';
 
 import {
-  enableStyle as sendEnableStyleMessage,
-  disableStyle as sendDisableStyleMessage,
   openEditorWindow,
   toggleEditorWindow,
   requestEditorSidePanel,
@@ -89,14 +87,6 @@ export const toggleReadability = ({
     dispatch('applyReadability', false);
   } else {
     dispatch('applyReadability', true);
-  }
-};
-
-export const sendToggleStyleMessage = ({ state }: { state: State }): void => {
-  if (state.enabled) {
-    sendDisableStyleMessage(state.url);
-  } else {
-    sendEnableStyleMessage(state.url);
   }
 };
 

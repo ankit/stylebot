@@ -387,6 +387,24 @@ export const disable = (url: string): Promise<void> =>
   });
 
 /**
+ * Flips the enabled state of a page's default style, deciding from the map
+ * the write reads so presses in quick succession each flip it once.
+ */
+export const toggleForPage = (pageUrl: string): Promise<void> =>
+  update(styles => {
+    const { defaultStyle } = getStylesForPage(pageUrl, styles);
+
+    if (!defaultStyle) {
+      return undefined;
+    }
+
+    styles[defaultStyle.url] = editStyle(styles[defaultStyle.url], {
+      enabled: !defaultStyle.enabled,
+    });
+    return styles;
+  });
+
+/**
  * Sets readability for a url, creating a blank style entry if none exists.
  * Skips the write when nothing would change: every ApplyStylesToTab makes the
  * editor re-persist readability, and a no-op write would still bump

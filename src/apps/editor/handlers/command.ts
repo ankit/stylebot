@@ -3,12 +3,7 @@ import type { Store } from 'vuex';
 import type { State } from 'apps/editor/store';
 import type { StylebotCommandName } from '@stylebot/types';
 
-import {
-  toggleStylebot,
-  toggleReadability,
-  toggleGrayscale,
-  sendToggleStyleMessage,
-} from './common';
+import { toggleStylebot, toggleReadability, toggleGrayscale } from './common';
 
 /**
  * Returns a handler that runs a Stylebot keyboard shortcut against the store.
@@ -19,10 +14,6 @@ export const createCommandHandler =
     switch (name) {
       case 'stylebot':
         toggleStylebot(store);
-        break;
-
-      case 'style':
-        sendToggleStyleMessage(store);
         break;
 
       case 'readability':

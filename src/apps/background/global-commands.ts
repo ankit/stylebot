@@ -8,6 +8,7 @@ import {
 } from '@stylebot/utils';
 
 import * as editorWindow from './editor-window';
+import { applyStylesToAllTabs, toggleForPage } from './styles';
 
 const isCommandName = (command: string): command is StylebotCommandName =>
   COMMAND_NAMES.includes(command as StylebotCommandName);
@@ -67,6 +68,19 @@ const toggleEditorWithSidePanel = (tabId: number): void => {
 };
 
 /**
+ * Toggles the tab's style here rather than in the page, which would load the
+ * editor first and decide from a copy of the style that lags quick presses.
+ */
+const toggleStyle = async (tabId: number): Promise<void> => {
+  const { url } = await chrome.tabs.get(tabId);
+
+  if (url) {
+    await toggleForPage(url);
+    await applyStylesToAllTabs();
+  }
+};
+
+/**
  * Carries out a global shortcut the browser caught, wherever focus was.
  */
 export const handleCommand = (
@@ -87,6 +101,11 @@ export const handleCommand = (
     } else {
       runInPage(target.tabId, command);
     }
+    return;
+  }
+
+  if (command === 'style') {
+    toggleStyle(target.tabId).catch(() => undefined);
     return;
   }
 

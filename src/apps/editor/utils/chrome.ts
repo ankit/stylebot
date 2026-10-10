@@ -9,7 +9,6 @@ import type {
   SetOption,
   GetAllOptions,
   EnableStyle,
-  DisableStyle,
   GetStylesForPage,
   GetCommands,
   GetAllOptionsResponse,
@@ -161,15 +160,6 @@ export const getStylesForPage = (): Promise<GetStylesForPageResponse> => {
 export const enableStyle = (url: string): void => {
   const message: EnableStyle = {
     name: 'EnableStyle',
-    url,
-  };
-
-  chrome.runtime.sendMessage(message);
-};
-
-export const disableStyle = (url: string): void => {
-  const message: DisableStyle = {
-    name: 'DisableStyle',
     url,
   };
 

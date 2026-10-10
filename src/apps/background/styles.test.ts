@@ -9,6 +9,7 @@ import {
   setAll,
   enable,
   disable,
+  toggleForPage,
   move,
   setReadability,
   setActiveProfile,
@@ -202,6 +203,23 @@ describe('style edits', () => {
   it('skips the write when enabling or disabling changes nothing', async () => {
     await enable('example.com');
     await disable('missing.com');
+
+    expect(writes()).toBe(0);
+  });
+
+  it('flips the page style once per toggle, however quickly they come', async () => {
+    await Promise.all([
+      toggleForPage('https://example.com/a'),
+      toggleForPage('https://example.com/b'),
+      toggleForPage('https://example.com/c'),
+    ]);
+
+    expect(stored('example.com').enabled).toBe(false);
+    expect(writes()).toBe(3);
+  });
+
+  it('skips the toggle on a page without a style', async () => {
+    await toggleForPage('https://missing.com/');
 
     expect(writes()).toBe(0);
   });

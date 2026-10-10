@@ -1,6 +1,11 @@
 jest.mock('./editor-window', () => ({ close: jest.fn() }));
+jest.mock('./styles', () => ({
+  toggleForPage: jest.fn(async () => undefined),
+  applyStylesToAllTabs: jest.fn(async () => undefined),
+}));
 
 import * as editorWindow from './editor-window';
+import { applyStylesToAllTabs, toggleForPage } from './styles';
 import { handleCommand } from './global-commands';
 
 const PAGE = { id: 7, url: 'https://example.com/' } as chrome.tabs.Tab;
@@ -29,7 +34,10 @@ const makeChrome = ({
       ),
       lastError: undefined,
     },
-    tabs: { sendMessage: jest.fn() },
+    tabs: {
+      sendMessage: jest.fn(),
+      get: jest.fn(async (tabId: number) => ({ id: tabId, url: PAGE.url })),
+    },
     sidePanel: sidePanel
       ? {
           open: jest.fn(() =>
@@ -121,14 +129,26 @@ describe('handleCommand', () => {
     } as chrome.tabs.Tab;
 
     handleCommand('stylebot', editorWindowTab);
-    handleCommand('style', editorWindowTab);
+    handleCommand('readability', editorWindowTab);
 
     expect(editorWindow.close).toBeCalledWith(7);
     expect(api.tabs.sendMessage).toBeCalledWith(
       7,
-      { name: 'RunCommand', command: 'style' },
+      { name: 'RunCommand', command: 'readability' },
       expect.any(Function)
     );
+  });
+
+  it('toggles styling itself, without loading the editor in the page', async () => {
+    const api = makeChrome();
+
+    handleCommand('style', PAGE);
+    await flush();
+
+    expect(api.tabs.get).toBeCalledWith(7);
+    expect(toggleForPage).toBeCalledWith(PAGE.url);
+    expect(applyStylesToAllTabs).toBeCalled();
+    expect(api.tabs.sendMessage).not.toBeCalled();
   });
 
   it('ignores pages Stylebot can’t run on and unknown commands', () => {
