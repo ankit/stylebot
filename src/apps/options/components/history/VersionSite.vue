@@ -41,7 +41,7 @@ import Vue from 'vue';
 import { SBadge, SButton, SText } from '@stylebot/components';
 import { ChevronDownIcon } from '@stylebot/icons';
 
-import Favicon from './Favicon.vue';
+import Favicon from '../site/Favicon.vue';
 import type { SiteChange } from './site-change';
 import VersionDiff from './VersionDiff.vue';
 

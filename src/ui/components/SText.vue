@@ -1,5 +1,9 @@
 <template>
-  <component :is="as" class="text" :class="[`text-${size}`, variant]">
+  <component
+    :is="as"
+    class="text"
+    :class="[`text-${size}`, variant, { medium }]"
+  >
     <slot />
   </component>
 </template>
@@ -23,6 +27,12 @@ export default Vue.extend({
     variant: {
       type: String as PropType<Variant>,
       default: 'default',
+    },
+
+    // Medium weight, for a label that leads its row.
+    medium: {
+      type: Boolean,
+      default: false,
     },
 
     // Rendered tag — use 'span' for inline/phrasing contexts (e.g. inside
@@ -78,5 +88,9 @@ export default Vue.extend({
   letter-spacing: 0.09em;
   text-transform: uppercase;
   color: var(--text-faint);
+}
+
+.text.medium {
+  font-weight: 500;
 }
 </style>

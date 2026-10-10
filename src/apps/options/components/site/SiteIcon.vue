@@ -1,5 +1,5 @@
 <template>
-  <span class="tile" :class="{ grid: urls.length > 1 }">
+  <span class="tile" :class="{ grid: urls.length > 1, large }">
     <favicon
       v-for="url in urls.slice(0, 4)"
       :key="url"
@@ -30,6 +30,11 @@ export default Vue.extend({
       type: Array as PropType<Array<string>>,
       required: true,
     },
+    // A 32px tile, for a page's heading rather than a list row.
+    large: {
+      type: Boolean,
+      default: false,
+    },
   },
 });
 </script>
@@ -46,6 +51,12 @@ export default Vue.extend({
   border-radius: 7px;
   box-sizing: border-box;
   background: var(--panel-surface);
+}
+
+.large {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
 }
 
 .grid {

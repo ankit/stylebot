@@ -105,10 +105,14 @@ export default Vue.extend({
 }
 
 .button.danger {
-  color: var(--danger);
+  background: var(--danger);
+  border-color: var(--danger);
+  color: var(--panel-surface);
 
   &:hover:not(:disabled) {
-    background: var(--danger-background);
+    filter: brightness(0.92);
   }
+
+  @include focus-ring(2px);
 }
 </style>

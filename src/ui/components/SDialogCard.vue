@@ -37,12 +37,19 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .card {
-  width: 420px;
+  width: 480px;
   max-width: calc(100vw - 32px);
+  box-sizing: border-box;
   background: var(--panel-surface);
   border-radius: 14px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.24);
+  box-shadow: 0 8px 24px rgba(20, 22, 26, 0.12);
   padding: 24px;
+
+  @include dark-mode {
+    border: 1px solid var(--menu-border);
+    background: var(--menu-surface);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  }
 
   &.contained {
     max-width: 100%;
@@ -51,14 +58,15 @@ export default Vue.extend({
 
 .title {
   margin: 0;
-  font-weight: 400;
-  font-size: 16px;
+  font-weight: 600;
+  font-size: 18px;
   line-height: 1.3;
+  text-wrap: pretty;
   color: var(--text-primary);
 }
 
 .title + .actions {
-  margin-top: 28px;
+  margin-top: 24px;
 }
 
 .actions {

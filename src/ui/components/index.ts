@@ -24,6 +24,8 @@ export { default as SSelect } from './SSelect.vue';
 export { default as SNumberField } from './SNumberField.vue';
 export { default as SBadge } from './SBadge.vue';
 export { default as SCard } from './SCard.vue';
+export { default as SList } from './SList.vue';
+export { default as SListItem } from './SListItem.vue';
 export { default as SCheckbox } from './SCheckbox.vue';
 export { default as SCountBadge } from './SCountBadge.vue';
 export { default as SSlider } from './SSlider.vue';

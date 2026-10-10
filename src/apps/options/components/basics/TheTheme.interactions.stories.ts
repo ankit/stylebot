@@ -16,7 +16,11 @@ export default meta;
 
 export const SwitchesTheme: StoryObj = {
   ...optionsPage('Basics', {}, async root => {
-    const card = within(root.querySelector('.basics-tab .card') as HTMLElement);
+    const card = within(
+      within(root)
+        .getByRole('heading', { name: 'Theme' })
+        .closest('.list-item') as HTMLElement
+    );
     const app = root.querySelector('.options-app') as HTMLElement;
 
     for (const [item, appearance] of [

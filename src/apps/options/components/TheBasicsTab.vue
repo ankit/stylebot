@@ -2,20 +2,20 @@
   <div v-if="optionsLoaded" class="basics-tab">
     <s-heading as="h1" size="xl">{{ t('basics_options') }}</s-heading>
 
-    <the-theme />
-    <the-context-menu />
-    <the-cli-access v-if="showCliAccess" />
+    <s-list class="settings">
+      <the-theme />
+      <the-context-menu />
+      <the-cli-access v-if="showCliAccess" />
+    </s-list>
 
-    <div class="section">
-      <the-keyboard-shortcuts />
-    </div>
+    <the-keyboard-shortcuts class="section" />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
-import { SHeading } from '@stylebot/components';
+import { SHeading, SList } from '@stylebot/components';
 import { supportsCLI } from '@stylebot/settings';
 import TheTheme from './basics/TheTheme.vue';
 import TheContextMenu from './basics/TheContextMenu.vue';
@@ -27,6 +27,7 @@ export default Vue.extend({
 
   components: {
     SHeading,
+    SList,
     TheTheme,
     TheContextMenu,
     TheCliAccess,
@@ -47,11 +48,15 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .basics-tab {
-  max-width: 760px;
+  max-width: 860px;
   padding: 20px 22px 26px;
 }
 
+.settings {
+  margin-top: 24px;
+}
+
 .section {
-  margin-top: 40px;
+  margin-top: 48px;
 }
 </style>

@@ -1,5 +1,10 @@
 <template>
-  <div ref="root" class="segmented" :class="{ fit, disabled }" role="group">
+  <div
+    ref="root"
+    class="segmented"
+    :class="[{ fit, disabled }, size]"
+    role="group"
+  >
     <span
       class="segment-indicator"
       :class="{ ready }"
@@ -83,6 +88,12 @@ export default Vue.extend({
     disabled: {
       type: Boolean,
       default: false,
+    },
+
+    // Large is for a setting on its own page, at the size of a button.
+    size: {
+      type: String as PropType<'default' | 'large'>,
+      default: 'default',
     },
 
     // The option in effect without a value set here (e.g. from the page),
@@ -195,6 +206,24 @@ export default Vue.extend({
     padding: 0 8px;
     border-radius: 5px;
     font-size: 13px;
+  }
+}
+
+.segmented.large {
+  padding: 3px;
+  border-radius: 10px;
+
+  .segment {
+    height: 30px;
+    padding: 0 12px;
+    border-radius: 7px;
+    font-weight: 500;
+  }
+
+  .segment-indicator {
+    top: 3px;
+    bottom: 3px;
+    border-radius: 7px;
   }
 }
 

@@ -6,12 +6,10 @@
       role="alertdialog"
       aria-describedby="confirm-dialog-message"
     >
-      <s-text id="confirm-dialog-message" variant="muted" class="message">
-        {{ message }}
-      </s-text>
+      <p id="confirm-dialog-message" class="message">{{ message }}</p>
 
       <template #actions>
-        <s-button variant="ghost" @click="$emit('cancel')">
+        <s-button @click="$emit('cancel')">
           {{ cancelLabel }}
         </s-button>
 
@@ -26,7 +24,6 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import SText from './SText.vue';
 import SButton from './SButton.vue';
 import SDialog from './SDialog.vue';
 import SDialogCard from './SDialogCard.vue';
@@ -36,7 +33,6 @@ export default Vue.extend({
 
   components: {
     SButton,
-    SText,
     SDialog,
     SDialogCard,
   },
@@ -72,6 +68,10 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .message {
-  margin: 8px 0 20px;
+  margin: 8px 0 24px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-wrap: pretty;
 }
 </style>

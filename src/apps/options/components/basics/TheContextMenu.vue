@@ -1,28 +1,37 @@
 <template>
-  <div class="card">
-    <s-toggle-switch
-      size="lg"
-      :value="contextMenu"
-      @change="contextMenu = $event"
-    >
-      <s-heading as="h2" size="md">{{ t('right_click_menu') }}</s-heading>
-      <s-text variant="muted" class="description">
+  <s-list-item padded>
+    <template #title>
+      <h2 class="heading">{{ t('right_click_menu') }}</h2>
+    </template>
+    <template #meta>
+      <s-text variant="muted" as="span">
         {{ t('right_click_menu_description') }}
       </s-text>
-    </s-toggle-switch>
-  </div>
+    </template>
+
+    <template #trailing>
+      <s-toggle-switch
+        size="lg"
+        track-end
+        :value="contextMenu"
+        @change="contextMenu = $event"
+      >
+        <span class="visually-hidden">{{ t('right_click_menu') }}</span>
+      </s-toggle-switch>
+    </template>
+  </s-list-item>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { SToggleSwitch, SHeading, SText } from '@stylebot/components';
+import { SListItem, SToggleSwitch, SText } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'TheContextMenu',
 
   components: {
+    SListItem,
     SToggleSwitch,
-    SHeading,
     SText,
   },
 
@@ -41,14 +50,17 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.card {
-  margin-top: 16px;
-  padding: 12px 14px;
-  border: 1px solid var(--panel-border);
-  border-radius: 10px;
+.heading {
+  margin: 0;
+  font: inherit;
 }
 
-.description {
-  margin-top: 2px;
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 </style>

@@ -24,7 +24,7 @@ export const Editor = optionsPage(
   'Styles',
   { styles: seededStyles },
   async root => {
-    await user.click(root.querySelector('.row .domain') as HTMLElement);
+    await user.click(root.querySelector('.list-item .title') as HTMLElement);
     await expect(root.querySelector('.editor-page')).toBeVisible();
   }
 );

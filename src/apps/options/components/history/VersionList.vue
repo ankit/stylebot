@@ -1,5 +1,5 @@
 <template>
-  <div class="list">
+  <s-list>
     <template v-for="day in days">
       <s-text
         :key="day.label"
@@ -22,13 +22,13 @@
         @restore="(version, options) => $emit('restore', version, options)"
       />
     </template>
-  </div>
+  </s-list>
 </template>
 
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-import { SText } from '@stylebot/components';
+import { SList, SText } from '@stylebot/components';
 
 import type { DayGroup } from './group-by-day';
 import type { SiteGroup } from './group-by-site';
@@ -38,6 +38,7 @@ export default Vue.extend({
   name: 'VersionList',
 
   components: {
+    SList,
     SText,
     VersionGroup,
   },
@@ -66,22 +67,11 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.list {
-  overflow: clip;
-  border: 1px solid var(--panel-border);
-  border-radius: 14px;
-}
-
-.list > *:last-child {
-  border-bottom: 0;
-}
-
 .day {
   position: sticky;
   top: 0;
   z-index: 1;
   padding: 12px 20px;
-  border-bottom: 1px solid var(--panel-border);
   background: var(--tab-surface);
 }
 </style>

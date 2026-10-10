@@ -40,7 +40,5 @@ test('Tab indents in the options code editor and Escape hands Tab back to the pa
 
   await page.keyboard.press('Tab');
 
-  await expect(
-    page.getByRole('button', { name: 'Discard changes' })
-  ).toBeFocused();
+  await expect(page.getByRole('button', { name: 'Discard' })).toBeFocused();
 });

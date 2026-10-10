@@ -24,7 +24,7 @@
         </s-text>
 
         <template #actions>
-          <s-button variant="ghost" @click="$emit('cancel')">
+          <s-button @click="$emit('cancel')">
             {{ cancelLabel }}
           </s-button>
 

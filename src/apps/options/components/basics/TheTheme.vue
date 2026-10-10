@@ -1,33 +1,35 @@
 <template>
-  <div class="card">
-    <div class="text">
-      <s-heading as="h2" size="md">{{ t('theme') }}</s-heading>
-      <s-text variant="muted" class="description">
-        {{ t('theme_description') }}
-      </s-text>
-    </div>
+  <s-list-item padded>
+    <template #title>
+      <h2 class="heading">{{ t('theme') }}</h2>
+    </template>
+    <template #meta>
+      <s-text variant="muted" as="span">{{ t('theme_description') }}</s-text>
+    </template>
 
-    <s-segmented-control
-      fit
-      class="control"
-      :value="appearance"
-      :options="appearanceOptions"
-      @change="appearance = $event"
-    >
-      <template #option="{ option }">
-        <span class="option">
-          <component :is="option.icon" :size="14" />
-          {{ option.label }}
-        </span>
-      </template>
-    </s-segmented-control>
-  </div>
+    <template #trailing>
+      <s-segmented-control
+        fit
+        size="large"
+        :value="appearance"
+        :options="appearanceOptions"
+        @change="appearance = $event"
+      >
+        <template #option="{ option }">
+          <span class="option">
+            <component :is="option.icon" :size="14" />
+            {{ option.label }}
+          </span>
+        </template>
+      </s-segmented-control>
+    </template>
+  </s-list-item>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
-import { SHeading, SSegmentedControl, SText } from '@stylebot/components';
+import { SListItem, SSegmentedControl, SText } from '@stylebot/components';
 import { MonitorIcon, MoonIcon, SunIcon } from '@stylebot/icons';
 import type { StylebotAppearance } from '@stylebot/types';
 
@@ -35,7 +37,7 @@ export default Vue.extend({
   name: 'TheTheme',
 
   components: {
-    SHeading,
+    SListItem,
     SSegmentedControl,
     SText,
     MonitorIcon,
@@ -82,27 +84,9 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-top: 16px;
-  padding: 12px 14px;
-  border: 1px solid var(--panel-border);
-  border-radius: 10px;
-}
-
-.text {
-  flex: 1;
-  min-width: 0;
-}
-
-.description {
-  margin-top: 2px;
-}
-
-.control {
-  flex: none;
+.heading {
+  margin: 0;
+  font: inherit;
 }
 
 .option {

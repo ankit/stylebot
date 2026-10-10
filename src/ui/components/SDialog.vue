@@ -120,18 +120,24 @@ export default Vue.extend({
   left: 0;
   z-index: 2147483647;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  box-sizing: border-box;
   width: 100vw;
   height: 100vh;
-  padding: 20px;
+  padding: min(160px, 20vh) 20px 20px;
   overflow: auto;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(20, 22, 26, 0.4);
+
+  @include dark-mode {
+    background: rgba(0, 0, 0, 0.6);
+  }
 
   &.contained {
     position: absolute;
     inset: 0;
     z-index: 30;
+    align-items: center;
     width: auto;
     height: auto;
     padding: 16px;

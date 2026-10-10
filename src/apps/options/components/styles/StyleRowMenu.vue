@@ -3,14 +3,24 @@
     <template #trigger="{ toggle }">
       <icon-menu-trigger
         :size="size"
-        :bordered="false"
+        :bordered="bordered"
         :title="t('more_actions')"
         @click="toggle"
       />
     </template>
 
     <template #default="{ close }">
-      <s-menu dense :min-width="200">
+      <s-menu dense :min-width="160" style="--menu-item-font-size: 14px">
+        <s-menu-item
+          v-if="$listeners.edit"
+          @click="
+            $emit('edit');
+            close();
+          "
+        >
+          {{ t('edit') }}
+        </s-menu-item>
+
         <s-menu-item
           class="truncate"
           @click="
@@ -21,16 +31,7 @@
           {{ t('open_url', [url]) }}
         </s-menu-item>
 
-        <s-menu-item
-          @click="
-            $emit('copy-css');
-            close();
-          "
-        >
-          {{ t('copy_css') }}
-        </s-menu-item>
-
-        <div class="divider" />
+        <s-menu-divider />
 
         <s-menu-item
           danger
@@ -39,7 +40,7 @@
             close();
           "
         >
-          {{ t('delete_this_sites_style') }}
+          {{ t('delete') }}
         </s-menu-item>
       </s-menu>
     </template>
@@ -49,7 +50,12 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { SAnchoredMenu, SMenu, SMenuItem } from '@stylebot/components';
+import {
+  SAnchoredMenu,
+  SMenu,
+  SMenuDivider,
+  SMenuItem,
+} from '@stylebot/components';
 import IconMenuTrigger from '../IconMenuTrigger.vue';
 
 export default Vue.extend({
@@ -59,6 +65,7 @@ export default Vue.extend({
     SAnchoredMenu,
     IconMenuTrigger,
     SMenu,
+    SMenuDivider,
     SMenuItem,
   },
 
@@ -72,6 +79,12 @@ export default Vue.extend({
       type: Number,
       default: 30,
     },
+
+    // Outlined, where the menu stands on its own rather than in a row.
+    bordered: {
+      type: Boolean,
+      default: false,
+    },
   },
 });
 </script>
@@ -81,11 +94,5 @@ export default Vue.extend({
   @include truncate;
 
   max-width: 220px;
-}
-
-.divider {
-  height: 1px;
-  background: var(--panel-border);
-  margin: 5px 10px;
 }
 </style>

@@ -1,39 +1,54 @@
 <template>
-  <div class="card">
-    <s-toggle-switch size="lg" :value="enabled" @change="setEnabled">
-      <s-heading as="h2" size="md">
+  <s-list-item padded>
+    <template #title>
+      <h2 class="heading">
         {{ t('let_apps_on_this_computer_control_stylebot') }}
-      </s-heading>
-      <s-text variant="muted" class="description">
-        {{ t('let_apps_on_this_computer_control_stylebot_description') }}
-      </s-text>
-    </s-toggle-switch>
-
-    <div
-      v-if="enabled"
-      class="status"
-      :class="{ connected }"
-      role="status"
-      aria-live="polite"
-    >
-      <span class="status-dot" aria-hidden="true" />
-      <s-text v-if="connected" as="span">
-        {{ t('connected_to_your_terminal') }}
-      </s-text>
-      <template v-else>
-        <s-text as="span" variant="muted">
-          {{ t('not_connected_run_this_in_your_terminal') }}
+      </h2>
+    </template>
+    <template #meta>
+      <span class="details">
+        <s-text variant="muted" as="span">
+          {{ t('let_apps_on_this_computer_control_stylebot_description') }}
         </s-text>
-        <code class="command">{{ installCommand }}</code>
-      </template>
-    </div>
-  </div>
+
+        <span
+          v-if="enabled"
+          class="status"
+          :class="{ connected }"
+          role="status"
+          aria-live="polite"
+        >
+          <span class="status-dot" aria-hidden="true" />
+          <template v-if="connected">
+            {{ t('connected_to_your_terminal') }}
+          </template>
+          <template v-else>
+            {{ t('not_connected_run_this_in_your_terminal') }}
+            <code class="command">{{ installCommand }}</code>
+          </template>
+        </span>
+      </span>
+    </template>
+
+    <template #trailing>
+      <s-toggle-switch
+        size="lg"
+        track-end
+        :value="enabled"
+        @change="setEnabled"
+      >
+        <span class="visually-hidden">
+          {{ t('let_apps_on_this_computer_control_stylebot') }}
+        </span>
+      </s-toggle-switch>
+    </template>
+  </s-list-item>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
-import { SToggleSwitch, SHeading, SText } from '@stylebot/components';
+import { SListItem, SToggleSwitch, SText } from '@stylebot/components';
 import {
   getCliConnected,
   hasCliPermissions,
@@ -46,8 +61,8 @@ export default Vue.extend({
   name: 'TheCliAccess',
 
   components: {
+    SListItem,
     SToggleSwitch,
-    SHeading,
     SText,
   },
 
@@ -107,41 +122,61 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.card {
-  margin-top: 16px;
-  padding: 12px 14px;
-  border: 1px solid var(--panel-border);
-  border-radius: 10px;
+.heading {
+  margin: 0;
+  font: inherit;
 }
 
-.description {
-  margin-top: 2px;
+.details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
 }
 
 .status {
-  display: flex;
+  display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
-  margin: 10px 0 0 48px;
+  gap: 6px;
+  min-height: 24px;
+  padding: 0 10px 0 8px;
+  border-radius: 12px;
+  background: var(--field-surface);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+
+  &.connected {
+    background: var(--success-background);
+    color: var(--success);
+  }
 }
 
 .command {
   font-family: var(--font-mono);
-  font-size: 13px;
   color: var(--text-primary);
 }
 
 .status-dot {
   flex: none;
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: var(--text-faint);
 
   .connected & {
     background: var(--success);
-    box-shadow: 0 0 0 3px var(--success-background);
   }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 </style>

@@ -1,85 +1,79 @@
 <template>
-  <div
-    class="row"
+  <s-list-item
+    interactive
+    :muted="!enabled"
     role="link"
     tabindex="0"
     @click="$emit('edit', url)"
     @keydown.enter.self="$emit('edit', url)"
   >
-    <span class="toggle" @click.stop>
-      <s-toggle-switch :value="enabled" @change="onToggle">
-        <span class="toggle-label">{{ url }}</span>
-      </s-toggle-switch>
-    </span>
+    <template #icon><site-icon :urls="[url]" /></template>
+    <template #title>{{ url }}</template>
+    <template #meta>
+      <s-text as="span" variant="muted" class="meta">{{ meta }}</s-text>
+    </template>
 
-    <s-text
-      as="span"
-      size="label"
-      class="domain"
-      :variant="enabled ? 'default' : 'muted'"
-    >
-      {{ url }}
-    </s-text>
+    <template #trailing>
+      <span class="control" @click.stop>
+        <s-toggle-switch :value="enabled" @change="$emit('toggle')">
+          <span class="toggle-label">{{ url }}</span>
+        </s-toggle-switch>
+      </span>
 
-    <s-text as="span" variant="muted" class="meta">
-      <template v-if="profileCount > 1">
-        {{ t('profile_count', [String(profileCount)]) }}
-      </template>
-    </s-text>
+      <span class="control" @click.stop>
+        <style-row-menu
+          :url="url"
+          :size="28"
+          @edit="$emit('edit', url)"
+          @open-site="openSite"
+          @delete="showDeleteConfirm = true"
+        />
+      </span>
 
-    <s-text as="span" variant="muted" class="meta timestamp">
-      {{ formattedTimestamp }}
-    </s-text>
-
-    <span class="actions" @click.stop>
-      <style-row-menu
-        :url="url"
-        :size="28"
-        @open-site="openSite"
-        @copy-css="copyCss"
-        @delete="showDeleteConfirm = true"
-      />
-    </span>
-
-    <span v-if="showDeleteConfirm" @click.stop>
-      <s-confirm-dialog
-        :title="t('delete_style_for_url', [url])"
-        :message="t('delete_style_warning')"
-        :confirm-label="t('delete')"
-        @cancel="showDeleteConfirm = false"
-        @confirm="
-          showDeleteConfirm = false;
-          $emit('delete');
-        "
-      />
-    </span>
-  </div>
+      <span v-if="showDeleteConfirm" @click.stop>
+        <s-confirm-dialog
+          :title="t('delete_styles_for_url', [url])"
+          :message="t('delete_style_warning')"
+          :confirm-label="t('delete')"
+          @cancel="showDeleteConfirm = false"
+          @confirm="
+            showDeleteConfirm = false;
+            $emit('delete');
+          "
+        />
+      </span>
+    </template>
+  </s-list-item>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import { formatDistanceToNow } from 'date-fns';
 
-import { SToggleSwitch, SConfirmDialog, SText } from '@stylebot/components';
+import {
+  SConfirmDialog,
+  SListItem,
+  SText,
+  SToggleSwitch,
+} from '@stylebot/components';
+
+import SiteIcon from '../site/SiteIcon.vue';
 import StyleRowMenu from './StyleRowMenu.vue';
 
 export default Vue.extend({
   name: 'StyleListRow',
 
   components: {
-    SToggleSwitch,
     SConfirmDialog,
+    SListItem,
     SText,
+    SToggleSwitch,
+    SiteIcon,
     StyleRowMenu,
   },
 
   props: {
     url: {
-      type: String,
-      required: true,
-    },
-
-    css: {
       type: String,
       required: true,
     },
@@ -107,50 +101,35 @@ export default Vue.extend({
   },
 
   computed: {
-    formattedTimestamp(): string {
-      return formatDistanceToNow(new Date(this.modifiedTime), {
+    /**
+     * How many profiles the style has, when it has more than one, and when
+     * it was last edited.
+     */
+    meta(): string {
+      const edited = formatDistanceToNow(new Date(this.modifiedTime), {
         addSuffix: true,
       });
+
+      return this.profileCount > 1
+        ? `${this.t('profile_count', [String(this.profileCount)])} · ${edited}`
+        : edited;
     },
   },
 
   methods: {
-    onToggle(): void {
-      this.$emit('toggle');
-    },
-
     openSite(): void {
       window.open(`https://${this.url}`, '_blank');
-    },
-
-    copyCss(): void {
-      navigator.clipboard.writeText(this.css);
     },
   },
 });
 </script>
 
 <style lang="scss" scoped>
-.row {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto auto 28px;
-  align-items: center;
-  gap: 16px;
-  height: 44px;
-  padding: 0 6px 0 12px;
-  border-radius: 8px;
-  outline: none;
-  cursor: pointer;
-
-  &:hover,
-  &:focus-visible {
-    background: var(--hover-tint);
-  }
-
-  @include focus-ring;
+.meta {
+  @include truncate;
 }
 
-.toggle {
+.control {
   display: flex;
 }
 
@@ -161,22 +140,5 @@ export default Vue.extend({
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
-}
-
-.domain {
-  @include truncate;
-}
-
-.meta {
-  white-space: nowrap;
-}
-
-.timestamp {
-  min-width: 92px;
-  text-align: right;
-}
-
-.actions {
-  display: flex;
 }
 </style>

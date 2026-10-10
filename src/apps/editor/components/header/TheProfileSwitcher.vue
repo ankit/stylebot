@@ -34,7 +34,7 @@
           tabindex="-1"
           @mousedown="onPanelMousedown"
         >
-          <s-menu dense class="profile-list">
+          <s-menu dense size="small" class="profile-list">
             <profile
               v-for="profile in profiles"
               :key="profile.id"
@@ -81,8 +81,8 @@
     <s-confirm-dialog
       v-if="deleteTarget"
       contained
-      :title="t('delete_profile')"
-      :message="t('delete_profile_warning', [displayName(deleteTarget)])"
+      :title="t('delete_profile_name', [displayName(deleteTarget)])"
+      :message="t('delete_profile_warning')"
       :confirm-label="t('delete')"
       :cancel-label="t('cancel')"
       @confirm="onDeleteConfirm"

@@ -1,70 +1,70 @@
 <template>
-  <div class="group">
-    <component
-      :is="expandable ? 'button' : 'div'"
+  <div class="group" :class="{ compact }">
+    <s-list-item
+      :as="expandable ? 'button' : 'div'"
       :type="expandable ? 'button' : undefined"
-      class="row"
-      :class="{ expandable, compact }"
+      :interactive="expandable"
+      :compact="compact"
       :aria-expanded="expandable ? String(expanded) : undefined"
       @click="expandable && $emit('toggle')"
     >
-      <site-icon v-if="!compact" :urls="group.urls" />
+      <template #icon><site-icon :urls="group.urls" /></template>
+      <template v-if="!compact" #title>{{ label }}</template>
 
-      <span class="summary">
-        <span v-if="!compact" class="label">{{ label }}</span>
-
-        <span class="details-line">
-          <s-tooltip :text="exactTime" class="time">
-            <s-text as="span" :size="textSize" variant="muted" class="stamp">
-              {{ time }}
-            </s-text>
-          </s-tooltip>
-          <template v-for="(part, index) in metaParts">
-            <span
-              v-if="part.pill"
-              :key="index"
-              class="profile"
-              :class="{ current: current && index === lastPill }"
-            >
-              {{ part.text }}
-              <span v-if="current && index === lastPill" class="current-mark">
-                · {{ t('restore_current') }}
-              </span>
+      <template #meta>
+        <s-tooltip :text="exactTime" class="time">
+          <s-text as="span" :size="textSize" variant="muted" class="stamp">
+            {{ time }}
+          </s-text>
+        </s-tooltip>
+        <template v-for="(part, index) in metaParts">
+          <span
+            v-if="part.pill"
+            :key="index"
+            class="profile"
+            :class="{ current: current && index === lastPill }"
+          >
+            {{ part.text }}
+            <span v-if="current && index === lastPill" class="current-mark">
+              · {{ t('restore_current') }}
             </span>
-            <s-text
-              v-else
-              :key="index"
-              as="span"
-              :size="textSize"
-              :variant="compact ? 'default' : 'muted'"
-              class="meta"
-            >
-              {{ part.text }}
-            </s-text>
-          </template>
+          </span>
           <s-text
-            v-if="current && lastPill === -1"
+            v-else
+            :key="index"
             as="span"
             :size="textSize"
-            variant="primary"
+            :variant="compact ? 'default' : 'muted'"
+            class="meta"
           >
-            · {{ t('restore_current') }}
+            {{ part.text }}
           </s-text>
+        </template>
+        <s-text
+          v-if="current && lastPill === -1"
+          as="span"
+          :size="textSize"
+          variant="primary"
+        >
+          · {{ t('restore_current') }}
+        </s-text>
+      </template>
+
+      <template #trailing>
+        <span class="counts">
+          <span v-if="addedLines" class="added">+{{ addedLines }}</span>
+          <span v-if="removedLines" class="removed">−{{ removedLines }}</span>
         </span>
-      </span>
 
-      <span class="counts">
-        <span v-if="addedLines" class="added">+{{ addedLines }}</span>
-        <span v-if="removedLines" class="removed">−{{ removedLines }}</span>
-      </span>
-
-      <chevron-down-icon
-        v-if="expandable"
-        :size="12"
-        class="chevron"
-        :class="{ up: expanded }"
-      />
-    </component>
+        <chevron-down-icon
+          v-if="expandable"
+          :size="12"
+          class="chevron"
+          :class="{ up: expanded }"
+        />
+        <span v-else class="chevron" />
+      </template>
+    </s-list-item>
 
     <div v-if="expanded && expandable" class="details">
       <template v-if="single">
@@ -98,7 +98,7 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-import { SButton, SText, STooltip } from '@stylebot/components';
+import { SButton, SListItem, SText, STooltip } from '@stylebot/components';
 import { ChevronDownIcon } from '@stylebot/icons';
 import type { ProfileAction, RestoreOptions, Version } from '@stylebot/types';
 
@@ -109,7 +109,7 @@ import type { SentencePart } from './sentence-parts';
 import { splitSentence } from './sentence-parts';
 import type { SiteChange } from './site-change';
 import { getNetAction, getSiteChange } from './site-change';
-import SiteIcon from './SiteIcon.vue';
+import SiteIcon from '../site/SiteIcon.vue';
 import VersionDiff from './VersionDiff.vue';
 import VersionSite from './VersionSite.vue';
 
@@ -118,6 +118,7 @@ export default Vue.extend({
 
   components: {
     SButton,
+    SListItem,
     SText,
     STooltip,
     ChevronDownIcon,
@@ -399,69 +400,10 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.group {
-  border-bottom: 1px solid var(--panel-border);
-}
-
-.row {
-  @include button-reset;
-
-  display: grid;
-  grid-template-columns: 28px minmax(0, 1fr) auto 20px;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
-  min-height: 64px;
-  padding: 0 20px;
-  text-align: start;
-}
-
-.compact {
-  grid-template-columns: minmax(0, 1fr) auto 20px;
-  min-height: 48px;
-}
-
 .compact .meta {
   @include dark-mode {
     color: color-mix(in srgb, var(--text-primary) 85%, var(--panel-surface));
   }
-}
-
-.expandable {
-  cursor: pointer;
-
-  &:hover {
-    background: var(--card-surface);
-  }
-
-  @include focus-ring;
-}
-
-.summary {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  min-width: 0;
-}
-
-.label {
-  @include truncate;
-
-  font-size: 15px;
-  font-weight: 500;
-  line-height: 1.3;
-  color: var(--text-primary);
-
-  @include dark-mode {
-    color: color-mix(in srgb, var(--text-primary) 85%, var(--panel-surface));
-  }
-}
-
-.details-line {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
 }
 
 .time {
@@ -530,7 +472,7 @@ export default Vue.extend({
 }
 
 .chevron {
-  justify-self: end;
+  width: 12px;
   color: var(--text-faint);
 }
 
@@ -545,7 +487,7 @@ export default Vue.extend({
   padding: 4px 20px 20px 62px;
 }
 
-.compact + .details {
+.compact .details {
   padding-left: 20px;
 }
 

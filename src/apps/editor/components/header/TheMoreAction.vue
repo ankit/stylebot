@@ -7,7 +7,7 @@
     </template>
 
     <template #default="{ close }">
-      <s-menu dense class="more-menu">
+      <s-menu dense size="small" class="more-menu">
         <div class="dock-row">
           <s-text>{{ t('position') }}</s-text>
 

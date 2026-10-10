@@ -2,14 +2,14 @@
   <s-anchored-menu>
     <template #trigger="{ toggle }">
       <icon-menu-trigger
-        :size="38"
+        :size="36"
         :title="t('more_actions')"
         @click="toggle"
       />
     </template>
 
     <template #default="{ close }">
-      <s-menu dense :min-width="176">
+      <s-menu dense :min-width="160" style="--menu-item-font-size: 14px">
         <s-menu-item
           @click="
             $emit('enable-all');
@@ -28,7 +28,7 @@
           {{ t('disable_all_styles') }}
         </s-menu-item>
 
-        <div class="divider" />
+        <s-menu-divider />
 
         <s-menu-item
           danger
@@ -47,7 +47,12 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { SAnchoredMenu, SMenu, SMenuItem } from '@stylebot/components';
+import {
+  SAnchoredMenu,
+  SMenu,
+  SMenuDivider,
+  SMenuItem,
+} from '@stylebot/components';
 import IconMenuTrigger from '../IconMenuTrigger.vue';
 
 export default Vue.extend({
@@ -57,15 +62,8 @@ export default Vue.extend({
     SAnchoredMenu,
     IconMenuTrigger,
     SMenu,
+    SMenuDivider,
     SMenuItem,
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.divider {
-  height: 1px;
-  background: var(--panel-border);
-  margin: 5px 10px;
-}
-</style>

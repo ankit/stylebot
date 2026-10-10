@@ -86,7 +86,7 @@ import type { VersionHistory } from '@stylebot/types';
 import { formatClockTime, formatDay } from '@stylebot/utils';
 import { isToday } from 'date-fns';
 
-import Favicon from './Favicon.vue';
+import Favicon from '../site/Favicon.vue';
 
 type Site = VersionHistory['sites'][number];
 

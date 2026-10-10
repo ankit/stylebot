@@ -1,11 +1,23 @@
 <template>
   <div>
-    <s-heading as="h2" size="lg">{{ t('keyboard_shortcuts') }}</s-heading>
-    <s-text variant="muted" class="description">
-      {{ t('shortcuts_are_set_in_your_browser') }}
-    </s-text>
+    <div class="header">
+      <div class="title-block">
+        <s-heading as="h2" size="lg">{{ t('keyboard_shortcuts') }}</s-heading>
+        <s-text variant="muted" class="description">
+          {{
+            safari
+              ? t('change_shortcuts_in_safari_settings_extensions')
+              : t('shortcuts_are_set_in_your_browser')
+          }}
+        </s-text>
+      </div>
 
-    <div class="rows">
+      <s-button v-if="!safari" @click="openShortcutsPage">
+        {{ t('change_shortcuts') }}
+      </s-button>
+    </div>
+
+    <s-list class="rows">
       <shortcut-row
         v-for="row in rows"
         :key="row.settingKey"
@@ -17,21 +29,20 @@
         />
         <s-text v-else variant="muted">{{ t('not_set') }}</s-text>
       </shortcut-row>
-    </div>
-
-    <s-button v-if="!safari" class="change" @click="openShortcutsPage">
-      {{ t('change_shortcuts') }}
-    </s-button>
-    <s-text v-else variant="muted" class="change">
-      {{ t('change_shortcuts_in_safari_settings_extensions') }}
-    </s-text>
+    </s-list>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import type { StylebotCommandName, StylebotCommands } from '@stylebot/types';
-import { SButton, SShortcutChip, SHeading, SText } from '@stylebot/components';
+import {
+  SButton,
+  SHeading,
+  SList,
+  SShortcutChip,
+  SText,
+} from '@stylebot/components';
 import { isSafari, openShortcutsPage } from '@stylebot/utils';
 
 import ShortcutRow from './ShortcutRow.vue';
@@ -44,8 +55,9 @@ export default Vue.extend({
   components: {
     ShortcutRow,
     SButton,
-    SShortcutChip,
     SHeading,
+    SList,
+    SShortcutChip,
     SText,
   },
 
@@ -76,16 +88,22 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+.header {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.title-block {
+  flex: 1;
+  min-width: 0;
+}
+
 .description {
-  margin-top: 4px;
-  max-width: 520px;
+  margin-top: 6px;
 }
 
 .rows {
-  margin-top: 12px;
-}
-
-.change {
-  margin-top: 12px;
+  margin-top: 16px;
 }
 </style>

@@ -14,18 +14,20 @@
         </s-text>
       </div>
 
-      <s-button @click="$emit('edit', '')">{{ t('add_a_style') }}</s-button>
+      <s-button variant="primary" @click="$emit('edit', '')">
+        {{ t('add_a_style') }}
+      </s-button>
     </div>
 
     <div class="search-row">
-      <div class="search">
+      <label class="search">
         <search-icon />
         <input
           v-model="urlFilter"
           type="text"
           :placeholder="t('search_sites')"
         />
-      </div>
+      </label>
 
       <styles-bulk-menu
         @enable-all="enableAll"
@@ -34,11 +36,10 @@
       />
     </div>
 
-    <div class="list">
+    <s-list v-if="styles.length" class="list">
       <style-list-row
         v-for="style in styles"
         :key="style.url"
-        :css="style.css"
         :url="style.url"
         :modified-time="style.modifiedTime"
         :enabled="style.enabled"
@@ -47,13 +48,17 @@
         @toggle="toggleStyle(style)"
         @delete="deleteStyle(style)"
       />
-    </div>
+    </s-list>
+
+    <s-text v-else-if="urlFilter" variant="muted" class="empty">
+      {{ t('no_sites_match') }}
+    </s-text>
 
     <s-confirm-dialog
       v-if="showDeleteAllConfirm"
-      :title="t('delete_all_styles')"
-      :message="t('delete_all_warning')"
-      :confirm-label="t('delete_all_styles')"
+      :title="t('delete_all_styles_question')"
+      :message="t('delete_all_warning', [String(totalCount)])"
+      :confirm-label="t('delete_all')"
       @cancel="showDeleteAllConfirm = false"
       @confirm="
         showDeleteAllConfirm = false;
@@ -68,7 +73,13 @@ import Vue from 'vue';
 import { compareAsc } from 'date-fns';
 
 import type { Style } from '@stylebot/types';
-import { SHeading, SText, SButton, SConfirmDialog } from '@stylebot/components';
+import {
+  SHeading,
+  SText,
+  SButton,
+  SConfirmDialog,
+  SList,
+} from '@stylebot/components';
 import { SearchIcon } from '@stylebot/icons';
 import { listProfiles } from '@stylebot/saved-styles';
 
@@ -83,6 +94,7 @@ export default Vue.extend({
     SText,
     SButton,
     SConfirmDialog,
+    SList,
     SearchIcon,
     StyleListRow,
     StylesBulkMenu,
@@ -111,8 +123,9 @@ export default Vue.extend({
     },
 
     styles(): Array<Style> {
-      const styles = this.allStyles.filter(
-        style => style.url.indexOf(this.urlFilter) !== -1
+      const query = this.urlFilter.trim().toLowerCase();
+      const styles = this.allStyles.filter(style =>
+        style.url.toLowerCase().includes(query)
       );
 
       styles.sort((s1, s2) =>
@@ -164,17 +177,14 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .styles-tab {
-  max-width: 760px;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+  max-width: 860px;
+  padding: 20px 22px 26px;
 }
 
 .header {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 20px 18px 16px;
+  align-items: flex-start;
+  gap: 16px;
 }
 
 .title-block {
@@ -183,48 +193,54 @@ export default Vue.extend({
 }
 
 .subtitle {
-  margin-top: 3px;
+  margin-top: 8px;
 }
 
 .search-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0 18px 14px;
+  margin-top: 24px;
 }
 
 .search {
+  @include field-border(8px);
+
   flex: 1;
   display: flex;
   align-items: center;
-  gap: 9px;
-  padding: 9px 12px;
-  border-radius: 9px;
-  background: var(--hover-tint);
-  border: 1px solid var(--panel-border);
-  color: var(--text-muted);
+  gap: 8px;
+  height: 36px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  color: var(--text-faint);
+  cursor: text;
+
+  &:focus-within {
+    @include field-active-border;
+  }
 
   input {
     @include button-reset;
 
     flex: 1;
     min-width: 0;
-    font-weight: 400;
     font-size: 14px;
     line-height: 1.2;
     color: var(--text-primary);
 
     &::placeholder {
-      color: var(--text-muted);
+      color: var(--field-placeholder);
     }
   }
 }
 
 .list {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding: 6px;
-  border-top: 1px solid var(--panel-border);
+  margin-top: 16px;
+}
+
+.empty {
+  margin-top: 32px;
+  text-align: center;
 }
 </style>

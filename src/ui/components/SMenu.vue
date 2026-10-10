@@ -3,7 +3,7 @@
     class="menu"
     role="menu"
     tabindex="-1"
-    :class="{ dense }"
+    :class="[{ dense }, size]"
     :style="{
       minWidth: `${minWidth}px`,
       maxHeight: maxHeight ? `${maxHeight}px` : undefined,
@@ -14,12 +14,20 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import Vue from 'vue';
 
 export default Vue.extend({
   name: 'SMenu',
 
   props: {
+    // Small keeps items at 13px, for menus in a narrow panel like the
+    // editor's.
+    size: {
+      type: String as PropType<'default' | 'small'>,
+      default: 'default',
+    },
+
     dense: {
       type: Boolean,
       default: false,
@@ -68,10 +76,14 @@ export default Vue.extend({
   &.dense {
     --menu-padding: 4px;
     --menu-item-padding-y: 7px;
-    --menu-item-font-size: 13px;
+    --menu-item-font-size: 14px;
     padding: var(--menu-padding);
     border-radius: 10px;
     gap: 1px;
+  }
+
+  &.dense.small {
+    --menu-item-font-size: 13px;
   }
 }
 

@@ -3,16 +3,23 @@
     <div class="editor-header">
       <div class="title-block">
         <a href="#" class="back-link" @click.prevent="attemptLeave">
-          <chevron-left-icon :size="10" />
+          <chevron-left-icon :size="14" class="back-icon" />
           {{ t('styles_options') }}
         </a>
 
-        <input
-          v-model="url"
-          class="url-input"
-          placeholder="example.com"
-          autofocus
-        />
+        <div class="site">
+          <site-icon
+            large
+            :urls="url.trim() ? [url.trim()] : []"
+            :class="{ off: existingStyle && !existingStyle.enabled }"
+          />
+          <input
+            v-model="url"
+            class="url-input"
+            placeholder="example.com"
+            autofocus
+          />
+        </div>
       </div>
 
       <s-toggle-switch
@@ -21,14 +28,16 @@
         :value="existingStyle.enabled"
         @change="onToggleEnabled"
       >
-        <s-text as="span">{{ t('enabled') }}</s-text>
+        <s-text as="span" size="large" medium>
+          {{ existingStyle.enabled ? t('enabled') : t('disabled') }}
+        </s-text>
       </s-toggle-switch>
 
       <style-row-menu
         :url="url"
-        :size="28"
+        :size="36"
+        bordered
         @open-site="openSite"
-        @copy-css="copyCss"
         @delete="showDeleteConfirm = true"
       />
     </div>
@@ -45,11 +54,6 @@
           :aria-selected="id === selectedProfile ? 'true' : 'false'"
           @click="selectedProfile = id"
         >
-          <check-icon
-            v-if="id === activeProfile"
-            :size="12"
-            class="tab-check"
-          />
           {{ profileName(id) }}
           <span v-if="id === activeProfile" class="visually-hidden">
             {{ t('active') }}
@@ -57,19 +61,15 @@
         </button>
       </div>
 
-      <s-button
-        class="create-button"
-        size="small"
-        variant="ghost"
-        @click="dialog = 'new'"
-      >
+      <s-button class="create-button" variant="ghost" @click="dialog = 'new'">
+        <plus-icon :size="12" />
         {{ t('create_profile') }}
       </s-button>
 
       <s-anchored-menu>
         <template #trigger="{ toggle }">
           <icon-menu-trigger
-            :size="28"
+            :size="36"
             :bordered="false"
             :title="t('profile_actions')"
             @click="toggle"
@@ -111,7 +111,7 @@
                 close();
               "
             >
-              {{ t('delete') }}
+              {{ t('delete_profile') }}
             </s-menu-item>
           </s-menu>
         </template>
@@ -128,23 +128,32 @@
     </div>
 
     <div class="editor-footer">
-      <s-text variant="muted" class="stats">
-        {{ lineCountLabel }} · {{ ruleCountLabel }}
-        <template v-if="savedLabel">· {{ savedLabel }}</template>
+      <s-text as="div" variant="muted" class="stats">
+        <template v-if="isDirty">
+          <span class="dirty-dot" />
+          <s-text as="span" size="label" class="dirty-text">
+            {{ t('unsaved_changes') }}
+          </s-text>
+          <span>·</span>
+        </template>
+        <span class="counts">
+          {{ lineCountLabel }} · {{ ruleCountLabel }}
+          <template v-if="savedLabel">· {{ savedLabel }}</template>
+        </span>
       </s-text>
 
-      <s-button variant="ghost" :disabled="!isDirty" @click="discard">
-        {{ t('discard_changes') }}
+      <s-button :disabled="!isDirty" @click="discard">
+        {{ t('discard') }}
       </s-button>
 
-      <s-button :disabled="!valid" @click="save">
+      <s-button variant="primary" :disabled="!valid" @click="save">
         {{ t('save') }}
       </s-button>
     </div>
 
     <s-confirm-dialog
       v-if="showDeleteConfirm"
-      :title="t('delete_style_for_url', [url])"
+      :title="t('delete_styles_for_url', [url])"
       :message="t('delete_style_warning')"
       :confirm-label="t('delete')"
       @cancel="showDeleteConfirm = false"
@@ -165,8 +174,8 @@
 
     <s-confirm-dialog
       v-if="showDeleteProfileConfirm"
-      :title="t('delete_profile')"
-      :message="t('delete_profile_warning', [selectedName])"
+      :title="t('delete_profile_name', [selectedName])"
+      :message="t('delete_profile_warning')"
       :confirm-label="t('delete')"
       :cancel-label="t('cancel')"
       @cancel="showDeleteProfileConfirm = false"
@@ -210,10 +219,11 @@ import {
   SPromptDialog,
 } from '@stylebot/components';
 import { countRules } from '@stylebot/css';
-import { CheckIcon, ChevronLeftIcon } from '@stylebot/icons';
+import { ChevronLeftIcon, PlusIcon } from '@stylebot/icons';
 import { DEFAULT_PROFILE_ID, expandProfiles } from '@stylebot/saved-styles';
 import type { ExpandedProfiles } from '@stylebot/saved-styles';
 
+import SiteIcon from '../site/SiteIcon.vue';
 import StyleRowMenu from './StyleRowMenu.vue';
 import CodeEditor from './CodeEditor.vue';
 import IconMenuTrigger from '../IconMenuTrigger.vue';
@@ -225,8 +235,9 @@ export default Vue.extend({
 
   components: {
     SToggleSwitch,
-    CheckIcon,
     ChevronLeftIcon,
+    PlusIcon,
+    SiteIcon,
     SText,
     SButton,
     SAnchoredMenu,
@@ -375,12 +386,11 @@ export default Vue.extend({
         return '';
       }
 
-      return `saved ${formatDistanceToNow(
-        new Date(this.existingStyle.modifiedTime),
-        {
+      return this.t('saved_time', [
+        formatDistanceToNow(new Date(this.existingStyle.modifiedTime), {
           addSuffix: true,
-        }
-      )}`;
+        }),
+      ]);
     },
 
     valid(): boolean {
@@ -442,10 +452,6 @@ export default Vue.extend({
 
     openSite(): void {
       window.open(`https://${this.url}`, '_blank');
-    },
-
-    copyCss(): void {
-      navigator.clipboard.writeText(this.css);
     },
 
     confirmReplace(): void {
@@ -568,17 +574,28 @@ export default Vue.extend({
 
 .editor-header {
   display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 16px 14px 20px;
+  align-items: flex-end;
+  gap: 12px;
+  padding: 32px 24px 24px;
 }
 
 .title-block {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 12px;
   flex: 1;
   min-width: 0;
+}
+
+.site {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.off {
+  opacity: 0.4;
 }
 
 .back-link {
@@ -586,16 +603,21 @@ export default Vue.extend({
   align-items: center;
   gap: 4px;
   align-self: flex-start;
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: 500;
   line-height: 1;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   text-decoration: none;
 
   &:hover {
-    color: var(--text-body);
+    color: var(--text-primary);
   }
 
   @include focus-ring(2px);
+}
+
+.back-icon {
+  margin-left: -4px;
 }
 
 .url-input {
@@ -605,8 +627,9 @@ export default Vue.extend({
   display: block;
   width: 100%;
   font-weight: 600;
-  font-size: 15px;
+  font-size: 20px;
   line-height: 1.2;
+  letter-spacing: -0.01em;
   color: var(--text-primary);
 
   &::placeholder {
@@ -618,7 +641,16 @@ export default Vue.extend({
 .switch.enabled-toggle {
   flex: none;
   width: auto;
-  gap: 8px;
+  height: 36px;
+  gap: 10px;
+  padding: 0 12px;
+  border: 1px solid var(--field-border);
+  border-radius: 8px;
+  box-sizing: border-box;
+
+  &:hover {
+    background: var(--hover-tint);
+  }
 
   ::v-deep .label {
     order: -1;
@@ -629,8 +661,9 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 4px;
-  padding: 0 16px 0 14px;
+  padding: 0 24px 0 16px;
   border-bottom: 1px solid var(--panel-border);
+  color: var(--icon-color);
 }
 
 .profile-tabs {
@@ -649,11 +682,12 @@ export default Vue.extend({
   align-items: center;
   gap: 6px;
   flex: none;
-  height: 34px;
+  height: 44px;
   padding: 0 8px;
   margin-bottom: -1px;
-  border-bottom: 2px solid transparent;
-  font-size: 13px;
+  border-bottom: 3px solid transparent;
+  font-size: 14px;
+  font-weight: 500;
   line-height: 1;
   color: var(--text-muted);
   cursor: pointer;
@@ -663,7 +697,7 @@ export default Vue.extend({
   }
 
   &.selected {
-    font-weight: 500;
+    font-weight: 600;
     color: var(--text-primary);
     border-bottom-color: var(--accent);
   }
@@ -672,12 +706,8 @@ export default Vue.extend({
 }
 
 .create-button {
-  font-size: 13px;
-  font-weight: 400;
-}
-
-.tab-check {
-  color: var(--accent-text);
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .visually-hidden {
@@ -698,13 +728,34 @@ export default Vue.extend({
 .editor-footer {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 12px 18px;
+  gap: 8px;
+  padding: 12px 24px;
   border-top: 1px solid var(--panel-border);
 }
 
 .stats {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   flex: 1;
   min-width: 0;
+  margin-right: 8px;
+}
+
+.dirty-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--warning-icon);
+  transform: translateY(-1px);
+}
+
+.counts {
+  @include truncate;
+}
+
+.dirty-text {
+  flex: none;
 }
 </style>

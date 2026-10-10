@@ -1,5 +1,11 @@
 <template>
-  <s-menu dense :min-width="132" class="row-menu" :style="{ top: `${top}px` }">
+  <s-menu
+    dense
+    size="small"
+    :min-width="132"
+    class="row-menu"
+    :style="{ top: `${top}px` }"
+  >
     <s-menu-item @click="$emit('rename')">{{ t('rename') }}</s-menu-item>
     <s-menu-item @click="$emit('duplicate')">{{ t('duplicate') }}</s-menu-item>
     <s-menu-item v-if="canDelete" danger @click="$emit('delete')">

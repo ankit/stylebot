@@ -14,7 +14,7 @@ export default Vue.extend({
 .menu-divider {
   flex: none;
   height: 1px;
-  margin: 0 2px 2px;
+  margin: 3px 0;
   background: var(--panel-border);
 }
 </style>

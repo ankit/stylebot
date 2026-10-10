@@ -1,17 +1,24 @@
 <template>
-  <div class="shortcut-row">
-    <div class="label">{{ label }}</div>
-    <div class="control">
-      <slot />
-    </div>
-  </div>
+  <s-list-item compact>
+    <template #meta>
+      <s-text as="span" size="large" medium class="label">{{ label }}</s-text>
+    </template>
+    <template #trailing><slot /></template>
+  </s-list-item>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
+import { SListItem, SText } from '@stylebot/components';
+
 export default Vue.extend({
   name: 'ShortcutRow',
+
+  components: {
+    SListItem,
+    SText,
+  },
 
   props: {
     label: {
@@ -23,28 +30,7 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.shortcut-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 11px 0;
-  border-bottom: 1px solid var(--hover-tint);
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
 .label {
-  flex: 1;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 20px;
-  color: var(--text-primary);
-}
-
-.control {
-  width: 190px;
-  flex: none;
+  @include truncate;
 }
 </style>

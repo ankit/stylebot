@@ -39,11 +39,11 @@ const editCss = async (css: string) => {
  * Opens the seeded style that has a Default and a Night profile.
  */
 const openProfiledStyle = async (root: HTMLElement) => {
-  const row = Array.from(root.querySelectorAll<HTMLElement>('.row')).find(el =>
-    el.textContent?.includes(URL)
+  const row = Array.from(root.querySelectorAll<HTMLElement>('.list-item')).find(
+    el => el.textContent?.includes(URL)
   ) as HTMLElement;
 
-  await user.click(row.querySelector('.domain') as HTMLElement);
+  await user.click(row.querySelector('.title') as HTMLElement);
   await waitFor(() => expect(root.querySelector('.editor-page')).toBeVisible());
 };
 
@@ -62,15 +62,15 @@ export const CountInList: StoryObj = {
     const { canvasElement } = context;
 
     const row = Array.from(
-      canvasElement.querySelectorAll<HTMLElement>('.row')
+      canvasElement.querySelectorAll<HTMLElement>('.list-item')
     ).find(el => el.textContent?.includes(URL)) as HTMLElement;
 
-    await expect(within(row).getByText('2 profiles')).toBeVisible();
+    await expect(within(row).getByText(/2 profiles/)).toBeVisible();
     await expect(
       within(row).queryByRole('button', { name: 'Edit' })
     ).toBeNull();
 
-    await user.click(row.querySelector('.domain') as HTMLElement);
+    await user.click(row.querySelector('.title') as HTMLElement);
     await waitFor(() =>
       expect(canvasElement.querySelector('.editor-page')).toBeVisible()
     );

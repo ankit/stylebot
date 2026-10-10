@@ -25,7 +25,7 @@
         </template>
 
         <template #default="{ close }">
-          <s-menu dense :min-width="190" :max-height="260">
+          <s-menu dense size="small" :min-width="190" :max-height="260">
             <s-menu-item
               v-for="option in options"
               :key="option.key"

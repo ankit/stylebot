@@ -21,7 +21,7 @@
     </template>
 
     <template #default="{ close }">
-      <s-menu ref="menu" dense :min-width="250">
+      <s-menu ref="menu" dense size="small" :min-width="250">
         <s-menu-item
           v-if="level"
           class="chat-model-back"

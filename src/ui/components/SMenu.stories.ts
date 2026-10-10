@@ -39,6 +39,7 @@ export const Variants = matrix({
   rows: [
     { label: 'default', attrs: '' },
     { label: 'dense', attrs: 'dense' },
+    { label: 'dense small', attrs: 'dense size="small"' },
   ],
   columns: [
     {

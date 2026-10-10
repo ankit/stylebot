@@ -325,7 +325,7 @@ export const DeleteProfile: StoryObj = {
     await user.click(within(rowMenu).getByRole('menuitem', { name: 'Delete' }));
 
     const dialog = await canvas.findByRole('alertdialog');
-    await expect(dialog).toHaveTextContent('the Dark profile');
+    await expect(dialog).toHaveTextContent('Delete ‘Dark’?');
 
     const panel = canvasElement.querySelector('.stylebot') as HTMLElement;
     const backdrop = dialog.parentElement as HTMLElement;
