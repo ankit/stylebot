@@ -1,7 +1,7 @@
 <template>
   <div
     class="profile-row"
-    :class="{ active, muted, editing, 'menu-open': menuOpen }"
+    :class="{ active, editing, 'menu-open': menuOpen }"
     @click="editing || $emit('pick')"
   >
     <profile-name-input
@@ -68,7 +68,6 @@ export default Vue.extend({
     },
 
     active: Boolean,
-    muted: Boolean,
     editing: Boolean,
     menuOpen: Boolean,
 
@@ -116,14 +115,6 @@ export default Vue.extend({
   &.active {
     font-weight: 500;
     color: var(--text-primary);
-  }
-
-  &.muted {
-    color: var(--text-muted);
-
-    &:hover {
-      color: var(--text-primary);
-    }
   }
 
   &.editing {

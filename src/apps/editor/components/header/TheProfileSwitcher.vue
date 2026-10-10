@@ -57,7 +57,6 @@
             <profile
               v-model="draft"
               :name="t('create_profile')"
-              muted
               :actions="false"
               :editing="editing === NEW_ID"
               :error="nameError"
