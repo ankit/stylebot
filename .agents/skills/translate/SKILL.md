@@ -130,6 +130,8 @@ breaks it, bring it in line):
 - **French:** "vous". **Spanish, Italian, Romanian:** informal "tú/tu".
   **Portuguese (both):** "você".
 - **Russian:** "вы", lowercase.
+- **Indonesian:** "Anda", capitalized; Chrome's terms ("Setelan", "Urungkan",
+  "Pintasan keyboard"); "gaya" for a style, "Mode baca" for the reader.
 
 ## Glossary
 

@@ -14,6 +14,8 @@ import ptPtSite from './pt-pt/site';
 import ptPtDemo from './pt-pt/demo';
 import roSite from './ro/site';
 import roDemo from './ro/demo';
+import idSite from './id/site';
+import idDemo from './id/demo';
 import viSite from './vi/site';
 import viDemo from './vi/demo';
 import ruSite from './ru/site';
@@ -41,6 +43,7 @@ const MESSAGES: Record<Locale, Messages> = {
   'pt-br': { site: ptBrSite, demo: ptBrDemo },
   'pt-pt': { site: ptPtSite, demo: ptPtDemo },
   ro: { site: roSite, demo: roDemo },
+  id: { site: idSite, demo: idDemo },
   vi: { site: viSite, demo: viDemo },
   ru: { site: ruSite, demo: ruDemo },
   ja: { site: jaSite, demo: jaDemo },

@@ -7,6 +7,7 @@ const SITE_LOCALES = [
   'de',
   'es',
   'fr',
+  'id',
   'it',
   'ja',
   'ko',

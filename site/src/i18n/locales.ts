@@ -7,6 +7,7 @@ export const LOCALES = [
   { code: 'pt-br', lang: 'pt-BR', name: 'Português (Brasil)' },
   { code: 'pt-pt', lang: 'pt-PT', name: 'Português (Portugal)' },
   { code: 'ro', lang: 'ro', name: 'Română' },
+  { code: 'id', lang: 'id', name: 'Bahasa Indonesia' },
   { code: 'vi', lang: 'vi', name: 'Tiếng Việt' },
   { code: 'ru', lang: 'ru', name: 'Русский' },
   { code: 'ja', lang: 'ja', name: '日本語' },
