@@ -20,6 +20,21 @@ describe('getPageOutline', () => {
     );
   });
 
+  it("leaves out minified modifiers only some of a class's elements have", () => {
+    document.body.innerHTML = `
+      <p class="VwiC3b yXK7lf Hdw6tb">first</p>
+      <p class="VwiC3b yXK7lf">second</p>
+    `;
+
+    expect(getPageOutline()).toMatch(/^p\.VwiC3b\.yXK7lf "first"/);
+  });
+
+  it('leaves out ids the page generates on each load', () => {
+    document.body.innerHTML = `<h3 id="tsuid_hsLJaqLJBPu9ruEP7uOYkAo_91" class="LC20lb">Title</h3>`;
+
+    expect(getPageOutline()).toMatch(/^h3\.LC20lb "Title"/);
+  });
+
   it('summarises long runs of alike siblings', () => {
     document.body.innerHTML = `<ul>${'<li class="row">x</li>'.repeat(6)}</ul>`;
 

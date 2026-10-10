@@ -63,53 +63,66 @@ sweeping check), since a saved effect is found again by its exact selector.
 
 ### What counts as a "hashed" class
 
-A class name counts as hashed, carrying no stable meaning, when it's:
+Every class name falls into one of four kinds:
 
-- from a CSS-in-JS library: `css-1q2w3e` (Emotion), `sc-`, `jsx-`,
-  `emotion-`, `styled-`, `chakra-`. `css-` needs a digit in its hash, so a
-  real class like `css-truncate` stays authored.
-- an atomic class: React Native Web's `r-1awozwy` (X), or StyleX's `xeuugli`
-  (Facebook, Instagram, Threads). A StyleX class can look like a word, so
-  `x`-prefixed classes only count once the page has at least 10 of them.
-- Google's obfuscated `m5k28` or `vr1PYe` (digits among the letters, in 5
-  lowercase characters or mixed case with no capitalised word, unlike
-  `icon24px` or `v2Header`) or
-  Google bar's `gb_Ra`, Instagram's legacy `_a6hd`, vanilla-extract's `_7uluu50` (The Verge), Svelte's `svelte-1abc2de`, Astro's
-  `astro-J7PV25F6`, next/font's `__className_a64ecd`, or a JSS counter like
-  `jss123` or `makeStyles-root-12`, or Angular's `ng-tns-c3784233582-0`
-- a hex-like hash such as CSS Modules' `_1a2b3c`
-- a short (4–12 chars) name with an unusually high number of case transitions,
-  which separates a hash like `WwrzSb` from a camelCase word like `navBar`
+- **Hashed**: a build tool generated it, and it can change on the site's next
+  build. Ranked below anything authored, and reported as fragile.
+- **Minified**: a compiler shortened it from a map it keeps across releases,
+  so it lasts for years. Ranked like a hashed class, except that an element's
+  own minified class beats an ancestor scope that matches more, and it isn't
+  reported as fragile.
+- **Partly hashed**: an authored name with a hash in it. Matched by its
+  authored parts with `[class*="…"]`, so it survives the next build.
+- **Authored**: anything else. Anything containing `-` or `_` is authored,
+  unless a row below says otherwise.
 
-Google's names and the short case-mixed ones (`LC20lb`, `MjjYud`) are
-_minified_ rather than hashed: a compiler renames them from a map it keeps
-across releases, so they last for years. They still rank as hashed, but an
-element's own minified class beats an ancestor scope that matches more.
+| Source                         | Example                                         | Kind          | Matched as                                  |
+| :----------------------------- | :---------------------------------------------- | :------------ | :------------------------------------------ |
+| Emotion                        | `css-1q2w3e`                                    | hashed        |                                             |
+| Other CSS-in-JS prefixes       | `sc-bdVaJa`, `jsx-123`, `emotion-0`, `chakra-…` | hashed        |                                             |
+| React Native Web (X)           | `r-1awozwy`                                     | hashed        |                                             |
+| StyleX (Facebook, Instagram)   | `xeuugli`                                       | hashed        | only once the page has 10 such classes      |
+| Google bar                     | `gb_Ra`                                         | hashed        |                                             |
+| Instagram (legacy)             | `_a6hd`                                         | hashed        |                                             |
+| vanilla-extract (The Verge)    | `_7uluu50`                                      | hashed        |                                             |
+| Svelte, Astro                  | `svelte-1abc2de`, `astro-J7PV25F6`              | hashed        |                                             |
+| next/font                      | `__className_a64ecd`                            | hashed        |                                             |
+| JSS, Material UI v4            | `jss123`, `makeStyles-root-12`                  | hashed        |                                             |
+| Angular animations             | `ng-tns-c3784233582-0`                          | hashed        |                                             |
+| CSS Modules, hex hash          | `_1a2b3c`                                       | hashed        |                                             |
+| styled-components style hash   | `kZxyAb`                                        | hashed        | on a page using styled-components           |
+| Google (Closure Compiler)      | `LC20lb`, `VwiC3b`, `m5k28`                     | minified      |                                             |
+| Other short, case-mixed names  | `MjjYud`, `WwrzSb`                              | minified      |                                             |
+| CSS Modules (Next.js, Primer)  | `NavDropdown-module__button__PEHWX`             | partly hashed | `[class*="NavDropdown-module__button__"]`   |
+| CSS Modules, dash-separated    | `prc-TopicTag-TopicTag-LS-jX`                   | partly hashed | `[class*="prc-TopicTag-TopicTag-"]`         |
+| Turbopack                      | `page-module__E0kJGG__main`                     | partly hashed | `[class*="page-module__"][class*="__main"]` |
+| New York Times                 | `ZcdlOG_nav`, `Wr7_RG_mastheadContainer`        | partly hashed | `[class*="_nav"]`                           |
+| styled-components display name | `Header-sc-1x2y3z-0`                            | partly hashed | `[class*="Header-sc-"]`                     |
+| Vite CSS Modules               | `_card_1wfme_1`                                 | partly hashed | `[class*="_card_"]`                         |
+| React id suffix                | `button-label-_R_93ades_`                       | partly hashed | `[class*="button-label-"]`                  |
+| Tailwind and other utilities   | `bg-red-500`, `md:flex`, `col-md-12`            | authored      |                                             |
+| BEM and other authored names   | `card__title`, `btn--primary`, `isActive`       | authored      |                                             |
 
-Otherwise, anything containing `-` or `_` is treated as authored, unless it's
-partly hashed, in which case the authored part is kept:
+How the shapes are told apart:
 
-- `File-module__local__hash`, as Next.js and Primer name CSS Modules: the last
-  5 characters are the hash whatever they look like, so
-  `NavDropdown-module__button__PEHWX` keeps `NavDropdown-module__button__`.
-- a dash-separated CSS Modules name ending in a 5-character hash, like
-  Primer's `prc-TopicTag-TopicTag-LS-jX`, which keeps `prc-TopicTag-TopicTag-`.
-  It needs a PascalCase component name before the hash, and a hash that mixes
-  letters with digits or case, so utility classes like `col-md-12` stay
-  authored.
-- another `__`-separated segment that reads like a hash rather than a word:
-  letters mixed with digits (`a1B2c`, but not `item2`) or frequent case
-  changes. The parts on either side are kept, so Turbopack's
-  `page-module__E0kJGG__main` becomes
-  `[class*="page-module__"][class*="__main"]`.
-- a 6-character hash at the start, as the New York Times names them
-  (`ZcdlOG_nav`, `Wr7_RG_mastheadContainer`), which keeps the authored part,
-  `[class*="_nav"]`. The hash must mix letters with digits or have several
-  capitals, so a camelCase word like `navBar_item` stays authored.
-- styled-components' `Name-sc-hash-0`, which keeps `Name-sc-`.
-- Vite's `_card_1wfme_1`, which keeps `_card_`.
-- a React id suffix, as in `button-label-_R_93ades_`, which keeps
-  `button-label-`.
+- **Google's names** have digits among the letters, in 5 lowercase
+  characters or mixed case with no capitalised word, so `icon24px` and
+  `v2Header` stay authored.
+- **Short case-mixed names** are 4–12 characters with an unusually high
+  share of case changes, which separates `WwrzSb` from a camelCase word like
+  `isActive`. Very short camelCase words can still trip it: `navBar` counts
+  as minified.
+- **styled-components' style hashes** have the same shape as Google's
+  names but change whenever a component's styles do, so on a page with
+  styled-components' own style tag or `sc-` classes nothing counts as
+  minified.
+- **`css-`** needs a digit in its hash, so `css-truncate` stays authored.
+- **A partly hashed name's hash** must look like one: letters mixed with
+  digits or several capitals (`a1B2c`, but not `item2` or `navBar_item`). A
+  dash-separated CSS Modules name also needs a PascalCase component name
+  before its 5-character hash, so `col-md-12` stays authored.
+- **A partly hashed match is used** only while it matches exactly the
+  elements the full class does.
 
 ### Other selectors for the element
 

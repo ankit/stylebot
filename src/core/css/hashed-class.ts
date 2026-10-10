@@ -183,6 +183,19 @@ function pageUsesStyleX(): boolean {
 }
 
 /**
+ * Whether the page is styled with styled-components, whose per-style hashes
+ * like `kZxyAb` look minified but change whenever a component's css does.
+ */
+function pageUsesStyledComponents(): boolean {
+  return (
+    typeof document !== 'undefined' &&
+    !!document.querySelector(
+      'style[data-styled], [class^="sc-"], [class*=" sc-"]'
+    )
+  );
+}
+
+/**
  * Google's obfuscated names: digits among the letters, and either 5
  * lowercase characters (`m5k28`) or mixed case with no capitalised word in
  * it (`vr1PYe`), unlike `icon24px`, `grid3x3` or `v2Header`.
@@ -255,7 +268,7 @@ export function looksHashed(className: string): boolean {
     return true;
   }
 
-  return looksMinified(className);
+  return hasMinifiedShape(className);
 }
 
 /**
@@ -264,6 +277,14 @@ export function looksHashed(className: string): boolean {
  * unlike a build hash.
  */
 export function looksMinified(className: string): boolean {
+  return hasMinifiedShape(className) && !pageUsesStyledComponents();
+}
+
+/**
+ * Whether a name is shaped like a minified one, which a styled-components
+ * hash is too.
+ */
+function hasMinifiedShape(className: string): boolean {
   if (/[-_]/.test(className) || /^_?[0-9a-f]{5,}$/i.test(className)) {
     return false;
   }

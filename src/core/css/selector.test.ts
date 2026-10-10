@@ -280,6 +280,10 @@ describe('selector', () => {
       });
     });
 
+    it('returns null for minified classes, which outlast a rebuild', () => {
+      expect(getFragileSelector('div.VwiC3b h3.LC20lb')).toBeNull();
+    });
+
     it('returns null for a selector of authored classes', () => {
       expect(getFragileSelector('nav .menu > a.link')).toBeNull();
       expect(getFragileSelector('a[href=".css-1a0ymrn"]')).toBeNull();

@@ -169,6 +169,15 @@ describe('hashed-class', () => {
     );
   });
 
+  describe('looksMinified on a styled-components page', () => {
+    it('treats its hashes as hashed but not minified', () => {
+      document.body.innerHTML = '<div class="sc-bdVaJa kZxyAb"></div>';
+
+      expect(looksHashed('kZxyAb')).toBe(true);
+      expect(looksMinified('kZxyAb')).toBe(false);
+    });
+  });
+
   describe('looksGeneratedId', () => {
     it.each([
       '_3MTJavGCHNyKptQPt7ejqQI_120',

@@ -254,7 +254,7 @@ export const getStableSelector = (selector: string): string =>
 /**
  * The selector's generated class names, which change when the site rebuilds,
  * with a version that matches the partly generated ones by their stable
- * parts; null when it has none.
+ * parts; null when it has none. Minified names, kept across releases, pass.
  */
 export const getFragileSelector = (
   selector: string
@@ -262,7 +262,7 @@ export const getFragileSelector = (
   const hashed: Array<string> = [];
 
   replaceClasses(selector, className => {
-    if (looksHashed(className)) {
+    if (looksHashed(className) && !looksMinified(className)) {
       hashed.push(className);
     }
 
