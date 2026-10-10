@@ -21,9 +21,9 @@ flowchart TB
     subgraph authored["Authored, on the element"]
         direction LR
         S1["<b>1</b> class<br/><code>div.card</code><br/><i>first one not hashed:<br/>.WwrzSb.card → div.card</i>"]
-        S2["<b>2</b> test id<br/><code>button[data-testid=&quot;submit&quot;]</code><br/><i>also data-test-id, data-test,<br/>data-cy, data-qa</i>"]
-        S3["<b>3</b> name<br/><code>input[name=&quot;q&quot;]</code>"]
-        S4["<b>4</b> authored part of a class<br/><code>nav[class*=&quot;Header_nav__&quot;]</code><br/><i>from Header_nav__a1B2c, while it<br/>matches what the full class does</i>"]
+        S2["<b>2</b> test id<br/><code>button[data-testid='submit']</code><br/><i>also data-test-id, data-test,<br/>data-cy, data-qa</i>"]
+        S3["<b>3</b> name<br/><code>input[name='q']</code>"]
+        S4["<b>4</b> authored part of a class<br/><code>nav[class*='Header_nav__']</code><br/><i>from Header_nav__a1B2c, while it<br/>matches what the full class does</i>"]
         S1 --> S2 --> S3 --> S4
     end
     subgraph scoped["Authored, on an ancestor"]
@@ -33,7 +33,7 @@ flowchart TB
     subgraph ids["Identifiers"]
         direction LR
         S6["<b>6</b> id<br/><code>#search</code><br/><i>never one generated per load:<br/>tsuid_hsLJaqLJBPu9ruEP7uOYkAo_91</i>"]
-        S7["<b>7</b> link address or aria-label<br/><code>a[href=&quot;/section/world&quot;]</code><br/><code>button[aria-label=&quot;Search&quot;]</code><br/><i>no query, hash, id or date;<br/>no wider than the own class</i>"]
+        S7["<b>7</b> link address or aria-label<br/><code>a[href='/section/world']</code><br/><code>button[aria-label='Search']</code><br/><i>no query, hash, id or date;<br/>no wider than the own class</i>"]
         S6 --> S7
     end
     subgraph hashed["Hashed or minified"]
