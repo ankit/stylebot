@@ -71,7 +71,8 @@
     "unlimitedStorage",
     "alarms",
     "idle",
-    "sidePanel"
+    "sidePanel",
+    "favicon"
   ],
   "host_permissions": [
     "https://drive.google.com/*",

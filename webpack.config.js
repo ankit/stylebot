@@ -12,6 +12,17 @@ const TerserPlugin = require('terser-webpack-plugin');
 
 const { buildManifest, supportsCLI } = require('./scripts/lib/build-manifest');
 const { parseLocaleConfig } = require('./scripts/lib/parse-locale-config');
+
+/**
+ * The English messages, whose placeholder order every locale is numbered by.
+ */
+const englishMessages = () =>
+  parseLocaleConfig(
+    fs.readFileSync(
+      path.join(__dirname, 'src/assets/_locales/en.config'),
+      'utf8'
+    )
+  ).messages;
 const { SRC_DIR, packageDirs } = require('./scripts/lib/src-packages');
 
 const isPreview = process.env.STYLEBOT_PREVIEW === '1';
@@ -248,7 +259,10 @@ const config = {
           to: '_locales/[name]/messages.json',
 
           transform: raw => {
-            const { messages } = parseLocaleConfig(raw.toString());
+            const { messages } = parseLocaleConfig(
+              raw.toString(),
+              englishMessages()
+            );
 
             return JSON.stringify(messages, null, 2);
           },

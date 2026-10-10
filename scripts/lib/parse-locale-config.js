@@ -1,6 +1,12 @@
+const placeholderNames = message => [
+  ...new Set([...message.matchAll(/\$([^$]+)\$/g)].map(m => m[1])),
+];
+
 // Shared by the webpack build and validate-locales.mjs; duplicateKeys exists
 // because a repeated `@key` below silently overwrites the earlier entry.
-function parseLocaleConfig(raw) {
+// Placeholders are numbered by their order in `reference` (the English
+// messages), so a translation can reorder them and still get the right value.
+function parseLocaleConfig(raw, reference = {}) {
   const content = raw.replace(/^#.*?$/gm, '');
   const messages = {};
   const seenCounts = {};
@@ -26,14 +32,20 @@ function parseLocaleConfig(raw) {
       message,
     };
 
-    const placeholderMatches = [...message.matchAll(/\$([^$]+)\$/g)];
+    const names = placeholderNames(message);
 
-    if (placeholderMatches.length > 0) {
+    if (names.length > 0) {
+      const order = reference[messageName]
+        ? placeholderNames(reference[messageName].message)
+        : names;
+
       messages[messageName].placeholders = {};
 
-      placeholderMatches.forEach(m => {
-        messages[messageName].placeholders[m[1]] = {
-          content: '$1',
+      names.forEach((name, index) => {
+        const position = order.includes(name) ? order.indexOf(name) : index;
+
+        messages[messageName].placeholders[name] = {
+          content: `$${position + 1}`,
         };
       });
     }

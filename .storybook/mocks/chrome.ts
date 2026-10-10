@@ -173,14 +173,15 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
       return {
         scan: overrides.versionHistory ?? {
           versions: [],
-          previews: {},
-          changes: {},
-          total: 0,
+          hasMore: false,
+          sites: [],
         },
       };
     },
 
-    RestoreVersion: () => ({ ok: true }),
+    RestoreVersion: () => ({ ok: true, entryId: 'restored' }),
+
+    UndoRestore: () => ({ ok: true }),
 
     OpenEditorSidePanel: () => true,
 

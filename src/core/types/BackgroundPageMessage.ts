@@ -174,6 +174,16 @@ export type ScanVersionHistory = {
   name: 'ScanVersionHistory';
   // Absent asks for every version held.
   limit?: number;
+  // Only versions that touched this site.
+  site?: string;
+};
+
+export type UndoRestore = {
+  name: 'UndoRestore';
+  // The history entry the restore recorded.
+  entryId: string;
+  // The one profile the restore put back, if it was one.
+  profileId?: string;
 };
 
 export type RestoreVersion = {
@@ -181,6 +191,10 @@ export type RestoreVersion = {
   versionId: string;
   // Absent restores the whole version; a list restores only those sites.
   urls?: Array<string>;
+  // Restores the styles as they were just before this version's change.
+  before?: boolean;
+  // Restores only this profile of the one site in `urls`.
+  profileId?: string;
 };
 
 export type GetRecentColors = {
@@ -291,6 +305,7 @@ type BackgroundPageMessage =
   | GoogleSignInRedirect
   | ScanVersionHistory
   | RestoreVersion
+  | UndoRestore
   | GetRecentColors
   | AddRecentColor
   | OpenEditorWindow

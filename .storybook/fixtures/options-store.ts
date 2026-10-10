@@ -16,12 +16,14 @@ import type {
   StylebotOptions,
   StylebotCommands,
   SyncState,
+  RestoreOptions,
 } from '@stylebot/types';
 import type { SyncStatus } from '@/apps/options/store';
 import {
   runGoogleDriveSync,
   scanVersionHistory,
   restoreVersion,
+  undoRestore,
 } from '@/apps/options/utils';
 
 export type OptionsState = {
@@ -174,15 +176,25 @@ const actions: ActionTree<OptionsState, OptionsState> = {
     };
   },
 
-  scanVersionHistory(_context, limit?: number) {
-    return scanVersionHistory(limit);
+  scanVersionHistory(
+    _context,
+    options: { limit?: number; site?: string } = {}
+  ) {
+    return scanVersionHistory(options);
   },
 
   restoreVersion(
     _context,
-    { versionId, urls }: { versionId: string; urls?: Array<string> }
+    { versionId, ...options }: { versionId: string } & RestoreOptions
   ) {
-    return restoreVersion(versionId, urls);
+    return restoreVersion(versionId, options);
+  },
+
+  undoRestore(
+    _context,
+    { entryId, profileId }: { entryId: string; profileId?: string }
+  ) {
+    return undoRestore(entryId, profileId);
   },
 
   async syncWithGoogleDrive({ state }) {

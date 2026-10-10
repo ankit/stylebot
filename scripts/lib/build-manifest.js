@@ -11,12 +11,12 @@ const without = (list, ...removed) =>
 
 /**
  * Firefox runs the background as an event page under its own add-on id, and
- * has no per-tab side panel, so it warns on the unknown permission.
+ * has no per-tab side panel or favicon cache, so it warns on those permissions.
  */
 const buildFirefoxManifest = manifest => ({
   ...manifest,
   ...readManifest('manifest-firefox.json'),
-  permissions: without(manifest.permissions, 'sidePanel'),
+  permissions: without(manifest.permissions, 'sidePanel', 'favicon'),
 });
 
 /**
@@ -35,7 +35,7 @@ const buildSafariManifest = manifest => ({
     },
   },
   permissions: [
-    ...without(manifest.permissions, 'sidePanel', 'identity'),
+    ...without(manifest.permissions, 'sidePanel', 'identity', 'favicon'),
     'declarativeNetRequestWithHostAccess',
   ],
   host_permissions: [

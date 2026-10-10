@@ -31,6 +31,8 @@ const RELEASE_INSTALL_WARNING_FIELDS = {
       'alarms',
       'idle',
       'sidePanel',
+      // Covered by the warning tabs already shows, so it adds none.
+      'favicon',
     ],
     host_permissions: GOOGLE_HOSTS,
     content_script_matches: CONTENT_SCRIPT_MATCHES,

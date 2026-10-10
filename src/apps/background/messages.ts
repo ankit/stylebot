@@ -56,6 +56,7 @@ import type {
   GoogleSignInRedirect as GoogleSignInRedirectType,
   ScanVersionHistory as ScanVersionHistoryType,
   RestoreVersion as RestoreVersionType,
+  UndoRestore as UndoRestoreType,
   AddRecentColor as AddRecentColorType,
   OpenEditorWindow as OpenEditorWindowType,
   ToggleEditorWindow as ToggleEditorWindowType,
@@ -77,6 +78,7 @@ import type {
   RunGoogleDriveSyncResponse,
   ScanVersionHistoryResponse,
   RestoreVersionResponse,
+  UndoRestoreResponse,
   SetAllStylesResponse,
   GetRecentColorsResponse,
   AddRecentColorResponse,
@@ -92,7 +94,11 @@ import type {
 import { completeTabSignIn } from '@stylebot/sync';
 import { syncStyles } from './sync';
 
-import { scanVersionHistory, restoreVersion } from '@stylebot/history';
+import {
+  scanVersionHistory,
+  restoreVersion,
+  undoRestore,
+} from '@stylebot/history';
 
 import {
   get as getReadabilitySettings,
@@ -470,15 +476,33 @@ export const ScanVersionHistory = async (
   message: ScanVersionHistoryType,
   sendResponse: (response: ScanVersionHistoryResponse) => void
 ): Promise<void> => {
-  sendResponse({ scan: await scanVersionHistory(styleStorage, message.limit) });
+  sendResponse({
+    scan: await scanVersionHistory(styleStorage, {
+      limit: message.limit,
+      site: message.site,
+    }),
+  });
 };
 
 export const RestoreVersion = async (
   message: RestoreVersionType,
   sendResponse: (response: RestoreVersionResponse) => void
 ): Promise<void> => {
+  sendResponse(
+    await restoreVersion(styleStorage, message.versionId, {
+      urls: message.urls,
+      before: message.before,
+      profileId: message.profileId,
+    })
+  );
+};
+
+export const UndoRestore = async (
+  message: UndoRestoreType,
+  sendResponse: (response: UndoRestoreResponse) => void
+): Promise<void> => {
   sendResponse({
-    ok: await restoreVersion(styleStorage, message.versionId, message.urls),
+    ok: await undoRestore(styleStorage, message.entryId, message.profileId),
   });
 };
 

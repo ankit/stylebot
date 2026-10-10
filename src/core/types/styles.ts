@@ -66,11 +66,18 @@ export type StyleStorage = {
   getAll: () => Promise<StyleMap>;
   /**
    * Replaces every style. fromSync keeps the write from queueing a sync of
-   * its own; restoredFrom names the version a restore put back.
+   * its own; restoredFrom names the version a restore put back, and entryId
+   * the id its history entry takes; skipHistory leaves the write out of the
+   * version history.
    */
   setAll: (
     styles: StyleMap,
-    options?: { fromSync?: boolean; restoredFrom?: Timestamp }
+    options?: {
+      fromSync?: boolean;
+      restoredFrom?: Timestamp;
+      skipHistory?: boolean;
+      entryId?: string;
+    }
   ) => Promise<void>;
   /**
    * Writes only if nothing landed since `revision` was read, returning the

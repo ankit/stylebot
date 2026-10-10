@@ -36,6 +36,7 @@ import {
   RunGoogleDriveSync,
   ScanVersionHistory,
   RestoreVersion,
+  UndoRestore,
   GetRecentColors,
   AddRecentColor,
   OpenEditorWindow,
@@ -313,6 +314,9 @@ export const initListeners = (): void => {
           break;
         case 'RestoreVersion':
           RestoreVersion(message, sendResponse);
+          break;
+        case 'UndoRestore':
+          UndoRestore(message, sendResponse);
           break;
 
         case 'GetRecentColors':

@@ -6,7 +6,9 @@ import type {
   Timestamp,
 } from '@stylebot/types';
 
-import { isEquivalentStyle } from '@stylebot/saved-styles';
+import { expandProfiles, isEquivalentStyle } from '@stylebot/saved-styles';
+
+import { getProfileAction } from './profile-action';
 
 const HISTORY_KEY = 'version-history';
 const SESSION_KEY = 'version-history-session';
@@ -37,13 +39,16 @@ type EditSession = {
 
 /**
  * The urls whose style the write changed, compared the way sync compares
- * them — so a restamped time or reformatted css is not a change.
+ * them — so a restamped time, reformatted css or switching which profile is
+ * active is not a change.
  */
 const findChangedUrls = (previous: StyleMap, next: StyleMap): Array<string> =>
   [...new Set([...Object.keys(previous), ...Object.keys(next)])].filter(
     url =>
       previous[url] !== next[url] &&
-      !isEquivalentStyle(previous[url], next[url])
+      !isEquivalentStyle(previous[url], next[url], {
+        ignoreActiveProfile: true,
+      })
   );
 
 /**
@@ -88,26 +93,62 @@ export const getHistory = async (): Promise<Array<VersionEntry>> => {
 };
 
 /**
+ * Whether a write only added, deleted or renamed a profile on each style it
+ * touched, which the list shows as a step of its own. A switch never gets
+ * here, since switching is not a change.
+ */
+const isProfileChange = (
+  previous: StyleMap,
+  next: StyleMap,
+  urls: Array<string>
+): boolean =>
+  urls.every(
+    url => getProfileAction(previous[url] ?? null, next[url] ?? null) !== null
+  );
+
+/**
+ * Whether a write made another profile active on any style, which ends the
+ * editing session even though the switch itself is not recorded.
+ */
+const switchesProfile = (previous: StyleMap, next: StyleMap): boolean =>
+  Object.keys(next).some(
+    url =>
+      previous[url] &&
+      previous[url] !== next[url] &&
+      expandProfiles(previous[url]).active !== expandProfiles(next[url]).active
+  );
+
+/**
  * Records what a write changed, as the values it changed away from. A write
  * that changed nothing, or that carries on the session, adds no entry. A
- * restore names the version it put back, which gives it an entry of its own
+ * restore, or a profile added, deleted or renamed, gets an entry of its own
  * and ends the session, so neither it nor the edits after it are folded in.
  */
 export const recordStyleChange = async (
   previous: StyleMap,
   next: StyleMap,
-  { fromSync, restoredFrom }: { fromSync: boolean; restoredFrom?: Timestamp }
+  {
+    fromSync,
+    restoredFrom,
+    entryId,
+  }: { fromSync: boolean; restoredFrom?: Timestamp; entryId?: string }
 ): Promise<void> => {
   const urls = findChangedUrls(previous, next);
+  const switched = switchesProfile(previous, next);
 
   if (urls.length === 0) {
+    if (switched) {
+      await chrome.storage.local.set({ [SESSION_KEY]: null });
+    }
     return;
   }
 
   const source: VersionSource = fromSync ? 'sync' : 'local';
   const now = Date.now();
+  const standalone =
+    Boolean(restoredFrom) || switched || isProfileChange(previous, next, urls);
 
-  if (!restoredFrom) {
+  if (!standalone) {
     const items = await chrome.storage.local.get(SESSION_KEY);
 
     if (belongsToSession(items[SESSION_KEY], urls, source, now)) {
@@ -121,7 +162,7 @@ export const recordStyleChange = async (
   });
 
   const entry: VersionEntry = {
-    id: crypto.randomUUID(),
+    id: entryId ?? crypto.randomUUID(),
     modifiedTime: getCurrentTimestamp(),
     source,
     before,
@@ -135,12 +176,31 @@ export const recordStyleChange = async (
 
   await chrome.storage.local.set({
     [HISTORY_KEY]: trimToBudget(entries),
-    ...(restoredFrom ? {} : { [SESSION_KEY]: session }),
+    [SESSION_KEY]: standalone ? null : session,
+  });
+};
+
+/**
+ * Takes the newest entry out of the history, if it is still the newest, and
+ * ends the session so later edits start an entry of their own. Returns the
+ * entry it removed.
+ */
+export const removeNewestEntry = async (
+  id: string
+): Promise<VersionEntry | null> => {
+  const entries = await getHistory();
+  const newest = entries[entries.length - 1];
+
+  if (newest?.id !== id) {
+    return null;
+  }
+
+  await chrome.storage.local.set({
+    [HISTORY_KEY]: entries.slice(0, -1),
+    [SESSION_KEY]: null,
   });
 
-  if (restoredFrom) {
-    await chrome.storage.local.remove(SESSION_KEY);
-  }
+  return newest;
 };
 
 /**

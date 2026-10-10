@@ -22,40 +22,63 @@ export type VersionEntry = {
 };
 
 /**
- * One version as the list shows it: the entry without the styles it holds.
+ * What a version's change did to one site: the css of the profile it was
+ * made in, before and after, null where there was none.
  */
-export type Version = Omit<VersionEntry, 'before'>;
+export type VersionCss = {
+  before: string | null;
+  after: string | null;
+  // The profile the change was made in — or added, deleted or renamed — with
+  // its name then (empty for the default). Absent when the site was deleted.
+  profile?: { id: string; name: string };
+  // Set when all the change did was add, delete or rename a profile.
+  profileAction?: ProfileAction;
+  // Whether the site, or the profile, is still as this change left it.
+  matchesNow: boolean;
+};
 
 /**
- * The versions kept on this computer, each with what its change did and what
- * restoring it would do to the styles now.
+ * A change that touched a style's profiles and nothing else. A default
+ * profile's name is empty.
+ */
+export type ProfileAction =
+  | { kind: 'added'; id: string; name: string }
+  | { kind: 'deleted'; id: string; name: string }
+  | { kind: 'renamed'; from: string; to: string };
+
+/**
+ * One version as the list shows it: the entry with the css of each site its
+ * change touched, in place of the styles it holds.
+ */
+export type Version = Omit<VersionEntry, 'before'> & {
+  css: Record<string, VersionCss>;
+};
+
+/**
+ * The versions read from those kept on this computer.
  */
 export type VersionHistory = {
   versions: Array<Version>;
-  previews: Record<string, VersionPreview>;
-  // What each version changed about the one before it, which is what that
-  // save did.
-  changes: Record<string, VersionChange>;
-  // How many are held, which may be more than were asked for.
-  total: number;
+  // Whether older versions are kept past the ones read.
+  hasMore: boolean;
+  // Every site in the history, by when it was last edited, newest first.
+  sites: Array<{ url: string; modifiedTime: Timestamp }>;
 };
 
 /**
- * How two style maps differ: what the later one holds and the earlier does
- * not, what both hold but differ over, and what only the earlier holds.
+ * How much of a version a restore puts back.
  */
-export type VersionChange = {
-  addedUrls: Array<string>;
-  changedUrls: Array<string>;
-  removedUrls: Array<string>;
+export type RestoreOptions = {
+  // Only these sites; absent restores every site.
+  urls?: Array<string>;
+  // The styles just before the version's change, rather than after it.
+  before?: boolean;
+  // Only this profile of the one site in `urls`.
+  profileId?: string;
 };
 
 /**
- * What restoring a version would do to the styles you have now, which is the
- * same difference read forwards: `addedUrls` comes back, `changedUrls` rolls
- * back to the version's copy, and `removedUrls` is what only you have, which
- * a whole-version restore would delete.
+ * Whether a restore happened, and the history entry it recorded, which Undo
+ * takes back. Absent when the restore changed nothing.
  */
-export type VersionPreview = VersionChange & {
-  styleCount: number;
-};
+export type RestoreResult = { ok: boolean; entryId?: string };

@@ -129,8 +129,9 @@ const readForWrite = async (): Promise<StoredState> => {
 };
 
 /**
- * Writes the style map, records what it changed, and lines up a sync unless
- * the write came from sync itself. `previous` saves a caller's read.
+ * Writes the style map, records what it changed unless told not to, and
+ * lines up a sync unless the write came from sync itself. `previous` saves a
+ * caller's read.
  */
 const writeToStorage = async (
   styles: StyleMap,
@@ -138,7 +139,15 @@ const writeToStorage = async (
     fromSync,
     previous,
     restoredFrom,
-  }: { fromSync: boolean; previous?: StoredState; restoredFrom?: Timestamp }
+    skipHistory = false,
+    entryId,
+  }: {
+    fromSync: boolean;
+    previous?: StoredState;
+    restoredFrom?: Timestamp;
+    skipHistory?: boolean;
+    entryId?: string;
+  }
 ): Promise<string> => {
   const modifiedTime = getCurrentTimestamp();
   const before = previous ?? (await readForWrite());
@@ -154,7 +163,13 @@ const writeToStorage = async (
     [COMPILED_STYLES_KEY]: compileStyles(styles, modifiedTime, reuse),
   });
 
-  await recordStyleChange(before.styles, styles, { fromSync, restoredFrom });
+  if (!skipHistory) {
+    await recordStyleChange(before.styles, styles, {
+      fromSync,
+      restoredFrom,
+      entryId,
+    });
+  }
 
   if (!fromSync) {
     await scheduleSyncAfterEdit();
@@ -183,17 +198,30 @@ export const holdWritesUntil = (ready: Promise<void>): void => {
  * Replaces the entire style map. Sync passes fromSync so the write it makes
  * while pulling is not itself queued up as an edit to push. A restore names
  * the version it put back, since that is its own act rather than a
- * continuation of whatever was being edited.
+ * continuation of whatever was being edited; undoing one skips the history,
+ * which drops the restore's entry instead.
  */
 export const setAll = (
   styles: StyleMap,
   {
     fromSync = false,
     restoredFrom,
-  }: { fromSync?: boolean; restoredFrom?: Timestamp } = {}
+    skipHistory = false,
+    entryId,
+  }: {
+    fromSync?: boolean;
+    restoredFrom?: Timestamp;
+    skipHistory?: boolean;
+    entryId?: string;
+  } = {}
 ): Promise<void> => {
   pendingWrite = pendingWrite.then(() =>
-    writeToStorage(styles, { fromSync, restoredFrom }).then()
+    writeToStorage(styles, {
+      fromSync,
+      restoredFrom,
+      skipHistory,
+      entryId,
+    }).then()
   );
   return pendingWrite;
 };

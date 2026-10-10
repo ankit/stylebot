@@ -1,2 +1,2 @@
-export { scanVersionHistory, restoreVersion } from './api';
+export { scanVersionHistory, restoreVersion, undoRestore } from './api';
 export { recordStyleChange } from './store';

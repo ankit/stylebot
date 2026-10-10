@@ -3,7 +3,7 @@ import type { StylebotOptions } from './options';
 import type { StylebotCommands } from './commands';
 import type { ReadabilitySettings } from './readability';
 import type { GoogleDriveSyncMetadata } from './sync';
-import type { VersionHistory } from './history';
+import type { RestoreResult, VersionHistory } from './history';
 import type { ChatErrorKey, ChatStatus, ChatTurn } from './chat';
 
 export type GetAllOptionsResponse = StylebotOptions;
@@ -54,7 +54,9 @@ export type RunGoogleDriveSyncResponse =
 
 export type ScanVersionHistoryResponse = { scan: VersionHistory };
 
-export type RestoreVersionResponse = { ok: boolean };
+export type RestoreVersionResponse = RestoreResult;
+
+export type UndoRestoreResponse = { ok: boolean };
 
 export type GetRecentColorsResponse = Array<string>;
 export type AddRecentColorResponse = Array<string>;
@@ -83,6 +85,7 @@ type BackgroundPageMessageResponse =
   | RunGoogleDriveSyncResponse
   | ScanVersionHistoryResponse
   | RestoreVersionResponse
+  | UndoRestoreResponse
   | SetAllStylesResponse
   | GetRecentColorsResponse
   | AddRecentColorResponse

@@ -12,6 +12,7 @@ import type {
   StylebotCommands,
   SyncState,
   SyncErrorKey,
+  RestoreOptions,
 } from '@stylebot/types';
 import {
   getGoogleDriveSyncEnabled,
@@ -39,6 +40,7 @@ import {
   runGoogleDriveSync,
   scanVersionHistory,
   restoreVersion,
+  undoRestore,
 } from '../utils';
 
 // Only failures get a banner; success shows in the card's synced pill.
@@ -126,8 +128,11 @@ export const createStore = (): Store<State> => {
         }
       },
 
-      scanVersionHistory(_context, limit?: number) {
-        return scanVersionHistory(limit);
+      scanVersionHistory(
+        _context,
+        options: { limit?: number; site?: string } = {}
+      ) {
+        return scanVersionHistory(options);
       },
 
       /**
@@ -137,9 +142,18 @@ export const createStore = (): Store<State> => {
        */
       async restoreVersion(
         { dispatch },
-        { versionId, urls }: { versionId: string; urls?: Array<string> }
+        { versionId, ...options }: { versionId: string } & RestoreOptions
       ) {
-        const ok = await restoreVersion(versionId, urls);
+        const result = await restoreVersion(versionId, options);
+        await dispatch('getAllStyles');
+        return result;
+      },
+
+      async undoRestore(
+        { dispatch },
+        { entryId, profileId }: { entryId: string; profileId?: string }
+      ) {
+        const ok = await undoRestore(entryId, profileId);
         await dispatch('getAllStyles');
         return ok;
       },

@@ -17,6 +17,10 @@ import type {
   ScanVersionHistoryResponse,
   RestoreVersion,
   RestoreVersionResponse,
+  RestoreOptions,
+  RestoreResult,
+  UndoRestore,
+  UndoRestoreResponse,
 } from '@stylebot/types';
 
 export const getAllStyles = (): Promise<GetAllStylesResponse> => {
@@ -112,34 +116,56 @@ export const runGoogleDriveSync =
  * A torn-down worker answering with undefined is read as an empty history,
  * which is what someone with no history has.
  */
-export const scanVersionHistory = async (
-  limit?: number
-): Promise<VersionHistory> => {
-  const message: ScanVersionHistory = { name: 'ScanVersionHistory', limit };
+export const scanVersionHistory = async ({
+  limit,
+  site,
+}: { limit?: number; site?: string } = {}): Promise<VersionHistory> => {
+  const message: ScanVersionHistory = {
+    name: 'ScanVersionHistory',
+    limit,
+    site,
+  };
 
   const response = await chrome.runtime.sendMessage<
     ScanVersionHistory,
     ScanVersionHistoryResponse | undefined
   >(message);
 
-  return (
-    response?.scan ?? { versions: [], previews: {}, changes: {}, total: 0 }
-  );
+  return response?.scan ?? { versions: [], hasMore: false, sites: [] };
 };
 
 export const restoreVersion = async (
   versionId: string,
-  urls?: Array<string>
-): Promise<boolean> => {
+  { urls, before, profileId }: RestoreOptions = {}
+): Promise<RestoreResult> => {
   const message: RestoreVersion = {
     name: 'RestoreVersion',
     versionId,
     urls,
+    before,
+    profileId,
   };
 
   const response = await chrome.runtime.sendMessage<
     RestoreVersion,
     RestoreVersionResponse | undefined
+  >(message);
+
+  return response ?? { ok: false };
+};
+
+/**
+ * Takes back the restore that recorded `entryId`.
+ */
+export const undoRestore = async (
+  entryId: string,
+  profileId?: string
+): Promise<boolean> => {
+  const message: UndoRestore = { name: 'UndoRestore', entryId, profileId };
+
+  const response = await chrome.runtime.sendMessage<
+    UndoRestore,
+    UndoRestoreResponse | undefined
   >(message);
 
   return Boolean(response?.ok);
