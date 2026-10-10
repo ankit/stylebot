@@ -116,3 +116,29 @@ export const NoStatusWhileOff: StoryObj = {
   parameters: { chrome: { storage: { 'cli-connected': true } } },
   name: 'shows no status while the setting is off',
 };
+
+export const RowTurnsItOn: StoryObj = {
+  ...cliAccessCard({}, async (root, store) => {
+    await user.click(
+      within(root).getByText(/^Apps and coding agents on this computer/)
+    );
+
+    await waitFor(() => expect(store.state.options?.cliAccess).toBe(true));
+    await expect(toggle(root)).toBeChecked();
+  }),
+  parameters: { chrome: { permissions: { allowRequest: true } } },
+  name: 'clicking anywhere on the row turns it on',
+};
+
+export const StatusDoesNotToggle: StoryObj = {
+  ...cliAccessCard({ options: { cliAccess: true } }, async (root, store) => {
+    await waitFor(() => expect(toggle(root)).toBeChecked());
+    await user.click(within(root).getByText('stylebot install'));
+
+    await new Promise(resolve => setTimeout(resolve, 50));
+    await expect(toggle(root)).toBeChecked();
+    await expect(store.state.options?.cliAccess).toBe(true);
+  }),
+  parameters: { chrome: { permissions: { granted: true } } },
+  name: 'clicking the install command leaves it on, so it can be copied',
+};

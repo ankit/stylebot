@@ -1,7 +1,9 @@
 <template>
-  <s-list-item padded>
+  <s-list-item padded interactive @click="onRowClick">
     <template #title>
-      <h2 class="heading">{{ t('right_click_menu') }}</h2>
+      <h2 class="heading">
+        <label for="context-menu">{{ t('right_click_menu') }}</label>
+      </h2>
     </template>
     <template #meta>
       <s-text variant="muted" size="large" as="span">
@@ -11,13 +13,13 @@
 
     <template #trailing>
       <s-toggle-switch
+        ref="toggle"
         size="lg"
         track-end
+        input-id="context-menu"
         :value="contextMenu"
         @change="contextMenu = $event"
-      >
-        <span class="visually-hidden">{{ t('right_click_menu') }}</span>
-      </s-toggle-switch>
+      />
     </template>
   </s-list-item>
 </template>
@@ -46,6 +48,15 @@ export default Vue.extend({
       },
     },
   },
+
+  methods: {
+    onRowClick(event: MouseEvent): void {
+      // The switch and its heading label toggle on their own.
+      if (!(event.target as Element).closest('label')) {
+        (this.$refs.toggle as InstanceType<typeof SToggleSwitch>).toggle();
+      }
+    },
+  },
 });
 </script>
 
@@ -53,14 +64,5 @@ export default Vue.extend({
 .heading {
   margin: 0;
   font: inherit;
-}
-
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
 }
 </style>

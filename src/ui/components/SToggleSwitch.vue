@@ -4,6 +4,7 @@
     :class="[`switch--${size}`, { disabled, 'switch--track-end': trackEnd }]"
   >
     <input
+      :id="inputId"
       ref="input"
       type="checkbox"
       :checked="value"
@@ -35,6 +36,11 @@ export default Vue.extend({
     disabled: Boolean,
     // Puts the switch after the label and trailing content, at the row's end.
     trackEnd: Boolean,
+    // For a label elsewhere in the row, such as its heading, to point at.
+    inputId: {
+      type: String,
+      default: undefined,
+    },
     size: {
       type: String as PropType<Size>,
       default: 'sm',
@@ -44,6 +50,14 @@ export default Vue.extend({
   methods: {
     focusInput(): void {
       (this.$refs.input as HTMLInputElement)?.focus();
+    },
+
+    /**
+     * Flips the switch as a click on it would, so a row around it can
+     * forward its own clicks.
+     */
+    toggle(): void {
+      (this.$refs.input as HTMLInputElement)?.click();
     },
 
     onChange(event: Event): void {

@@ -1,8 +1,10 @@
 <template>
-  <s-list-item padded>
+  <s-list-item padded interactive @click="onRowClick">
     <template #title>
       <h2 class="heading">
-        {{ t('let_apps_on_this_computer_control_stylebot') }}
+        <label for="cli-access">
+          {{ t('let_apps_on_this_computer_control_stylebot') }}
+        </label>
       </h2>
     </template>
     <template #meta>
@@ -32,15 +34,13 @@
 
     <template #trailing>
       <s-toggle-switch
+        ref="toggle"
         size="lg"
         track-end
+        input-id="cli-access"
         :value="enabled"
         @change="setEnabled"
-      >
-        <span class="visually-hidden">
-          {{ t('let_apps_on_this_computer_control_stylebot') }}
-        </span>
-      </s-toggle-switch>
+      />
     </template>
   </s-list-item>
 </template>
@@ -96,6 +96,13 @@ export default Vue.extend({
   },
 
   methods: {
+    onRowClick(event: MouseEvent): void {
+      // The switch and its heading label toggle on their own.
+      if (!(event.target as Element).closest('label, .status')) {
+        (this.$refs.toggle as InstanceType<typeof SToggleSwitch>).toggle();
+      }
+    },
+
     async setEnabled(value: boolean): Promise<void> {
       this.enabled = value;
 
@@ -147,6 +154,7 @@ export default Vue.extend({
   font-size: 12px;
   font-weight: 500;
   color: var(--text-secondary);
+  cursor: auto;
 
   &.connected {
     background: var(--success-background);
@@ -169,14 +177,5 @@ export default Vue.extend({
   .connected & {
     background: var(--success);
   }
-}
-
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-  white-space: nowrap;
 }
 </style>
