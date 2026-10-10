@@ -255,6 +255,19 @@ export function looksHashed(className: string): boolean {
     return true;
   }
 
+  return looksMinified(className);
+}
+
+/**
+ * A short name a compiler minified rather than hashed, like Google's
+ * `LC20lb` or `MjjYud`: meaningless, but kept across the site's releases,
+ * unlike a build hash.
+ */
+export function looksMinified(className: string): boolean {
+  if (/[-_]/.test(className) || /^_?[0-9a-f]{5,}$/i.test(className)) {
+    return false;
+  }
+
   if (isGoogleObfuscated(className)) {
     return true;
   }
@@ -265,4 +278,21 @@ export function looksHashed(className: string): boolean {
 
   // camelCase words have 1-2 case transitions; hashes have far more.
   return caseTransitionRatio(className) > 0.3;
+}
+
+/**
+ * Ids a page generates on each load, like Google's
+ * `tsuid_hsLJaqLJBPu9ruEP7uOYkAo_91`, which a saved rule never matches again.
+ */
+export function looksGeneratedId(id: string): boolean {
+  return id
+    .split(/[-_:.]+/)
+    .some(
+      part =>
+        part.length >= 10 &&
+        /[a-z]/.test(part) &&
+        /[A-Z]/.test(part) &&
+        /\d/.test(part) &&
+        caseTransitionRatio(part) > 0.3
+    );
 }

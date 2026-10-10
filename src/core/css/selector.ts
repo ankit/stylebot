@@ -5,8 +5,10 @@ import { splitCommaList } from '@stylebot/utils';
 import { getSubjectCompound } from './get-subject-compound';
 import {
   getStableClassParts,
+  looksGeneratedId,
   looksHashed,
   looksHashedByShape,
+  looksMinified,
 } from './hashed-class';
 
 /**
@@ -289,6 +291,14 @@ export const getIdBasedSelector = (el: HTMLElement): string | null => {
   return null;
 };
 
+/**
+ * The element's #id, unless the page generates it on each load.
+ */
+export const getStableIdBasedSelector = (el: HTMLElement): string | null => {
+  const id = el.getAttribute('id');
+  return id && !looksGeneratedId(id) ? getIdBasedSelector(el) : null;
+};
+
 export const getTagNameBasedSelector = (
   el: HTMLElement,
   domHeirarchyLevel = 0
@@ -359,6 +369,21 @@ export const getAncestorBasedSelector = (el: HTMLElement): string | null =>
   climbToNearestUsableAncestor(el, getGoodOwnSelector);
 
 /**
+ * The ancestor scope, unless it reaches more of the page than the element's
+ * own minified class, as `div.ieodic div` does next to Google's `div.VwiC3b`.
+ */
+function getAncestorScopeWithinOwnClass(el: HTMLElement): string | null {
+  const scope = getAncestorBasedSelector(el);
+  const [firstClass] = getClassNames(el);
+  const own =
+    firstClass && looksMinified(firstClass)
+      ? classSelector(el, firstClass)
+      : null;
+
+  return scope && own && countMatches(scope) > countMatches(own) ? null : scope;
+}
+
+/**
  * The same climb as getAncestorBasedSelector, but accepting a hashed
  * class too — only reached once nothing better is available anywhere.
  */
@@ -398,8 +423,8 @@ const unlessSweeping = (selector: string | null): string | null =>
  */
 export const getSelector = (el: HTMLElement): string =>
   getGoodOwnSelector(el) ??
-  unlessSweeping(getAncestorBasedSelector(el)) ??
-  getIdBasedSelector(el) ??
+  unlessSweeping(getAncestorScopeWithinOwnClass(el)) ??
+  getStableIdBasedSelector(el) ??
   getLabelBasedSelector(el) ??
   getClassBasedSelector(el) ??
   unlessSweeping(getAncestorHashedClassSelector(el)) ??
@@ -544,13 +569,13 @@ const getPositionedStep = (el: HTMLElement): string => {
 /**
  * A selector matching `el` and nothing else: its positioned step, prefixed
  * by each ancestor's in turn until only `el` matches, stopping at the
- * first ancestor with a unique #id.
+ * first ancestor with a unique #id the page didn't generate.
  */
 export const getUniqueSelector = (el: HTMLElement): string | null => {
   let selector = '';
 
   for (let node: HTMLElement | null = el; node; node = node.parentElement) {
-    const id = getIdBasedSelector(node);
+    const id = getStableIdBasedSelector(node);
     const step = id && countMatches(id) === 1 ? id : getPositionedStep(node);
 
     selector = selector ? `${step} ${selector}` : step;
@@ -602,7 +627,7 @@ export const getSelectorCandidates = (el: HTMLElement): Array<string> =>
     getStableClassPartsSelector(el),
     getAncestorBasedSelector(el),
     ...getAncestorScopedSelectors(el),
-    getIdBasedSelector(el),
+    getStableIdBasedSelector(el),
     getLabelBasedSelector(el),
     getClassBasedSelector(el),
     getAncestorHashedClassSelector(el),

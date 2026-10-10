@@ -29,10 +29,14 @@ Each strategy is tried in turn; the first one that returns something wins.
 5. **Nearest ancestor with any of the above**, up to 2 levels up, joined with
    the intervening tag chain — e.g. `.card span` or `div.mw-heading h2`. The
    climb stops at the first usable ancestor rather than always reaching 2
-   levels.
+   levels. It's skipped when it matches more elements than the element's own
+   minified class (see below), as `div.ieodic div` does next to Google's
+   `div.VwiC3b`.
 6. **Own `#id`** — ranks below anything genuinely authored (its own or an
    ancestor's) since ids are often generated, but above a hashed class since
-   it's still far more reliable than a random hash.
+   it's still far more reliable than a random hash. An id the page generates
+   on each load, like Google's `tsuid_hsLJaqLJBPu9ruEP7uOYkAo_91` (a long run
+   of mixed case and digits), is never used.
 7. **Own address or aria-label** — `a[href="/section/world"]` for a link, or
    `button[aria-label="Search"]`, for an element whose classes are all
    generated. A link's address is used only when it has no query, hash, id or
@@ -77,6 +81,11 @@ A class name counts as hashed, carrying no stable meaning, when it's:
 - a short (4–12 chars) name with an unusually high number of case transitions,
   which separates a hash like `WwrzSb` from a camelCase word like `navBar`
 
+Google's names and the short case-mixed ones (`LC20lb`, `MjjYud`) are
+_minified_ rather than hashed: a compiler renames them from a map it keeps
+across releases, so they last for years. They still rank as hashed, but an
+element's own minified class beats an ancestor scope that matches more.
+
 Otherwise, anything containing `-` or `_` is treated as authored, unless it's
 partly hashed, in which case the authored part is kept:
 
@@ -108,10 +117,10 @@ The selector field also offers the other strategies' selectors for the picked
 element, narrowest first, keeping one per set of matched elements, each
 with how many elements it matches. The list always starts with:
 
-- **Only this element** — its `#id` when that's unique, otherwise the
-  element and its ancestors, each positioned with `:nth-of-type` where a
-  sibling would also match, climbing until only this element matches or an
-  ancestor has a unique `#id`. Positions shift when a list reorders, so this
+- **Only this element** — its `#id` when that's unique and not generated,
+  otherwise the element and its ancestors, each positioned with
+  `:nth-of-type` where a sibling would also match, climbing until only this
+  element matches or an ancestor has a unique `#id`. Positions shift when a list reorders, so this
   is the least stable choice.
 - **This item** — elements like it inside the nearest repeated ancestor (a
   row, list item or card), e.g. `tr.athing:nth-of-type(3) a` for every link
