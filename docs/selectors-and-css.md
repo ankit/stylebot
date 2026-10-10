@@ -14,44 +14,59 @@ specific enough to be useful.
 Each strategy is tried in turn; the first one that returns something wins.
 
 ```mermaid
+%%{init: {"flowchart": {"curve": "basis", "nodeSpacing": 24, "rankSpacing": 36}}}%%
 flowchart TB
-    subgraph authored["Authored, own"]
-        S1["1 · own class<br/><code>div.card</code>"]
-        S2["2 · test id<br/><code>button[data-testid=…]</code>"]
-        S3["3 · name<br/><code>input[name=q]</code>"]
-        S4["4 · authored part of a class<br/><code>nav[class*=Header_nav__]</code>"]
+    subgraph authored["Authored, on the element"]
+        direction LR
+        S1["<b>1</b> own class<br/><code>div.card</code>"]
+        S2["<b>2</b> test id<br/><code>[data-testid=…]</code>"]
+        S3["<b>3</b> name<br/><code>input[name=q]</code>"]
+        S4["<b>4</b> authored part<br/><code>[class*=Nav__]</code>"]
+        S1 --> S2 --> S3 --> S4
     end
-    subgraph scoped["Authored, ancestor"]
-        S5["5 · ancestor scope<br/><code>div.mw-heading h2</code>"]
+    subgraph scoped["Authored, on an ancestor"]
+        direction LR
+        S5["<b>5</b> ancestor scope<br/><code>div.mw-heading h2</code><br/><i>unless too broad</i>"]
     end
     subgraph ids["Identifiers"]
-        S6["6 · #id<br/><code>#search</code>"]
-        S7["7 · address or aria-label<br/><code>a[href=/world]</code>"]
+        direction LR
+        S6["<b>6</b> #id<br/><code>#search</code><br/><i>unless generated per load</i>"]
+        S7["<b>7</b> address or label<br/><code>a[href=/world]</code>"]
+        S6 --> S7
     end
     subgraph hashed["Hashed or minified"]
-        S8["8 · own class, any<br/><code>h3.LC20lb</code>"]
-        S9["9 · ancestor's class, any<br/><code>div.WwrzSb a</code>"]
+        direction LR
+        S8["<b>8</b> own class<br/><code>h3.LC20lb</code>"]
+        S9["<b>9</b> ancestor's class<br/><code>div.WwrzSb a</code><br/><i>unless too broad</i>"]
+        S8 --> S9
     end
     subgraph last["Last resort"]
-        S10["10 · tag chain<br/><code>ul li a</code>"]
-        S11["11 · only this element<br/><code>#rso div:nth-of-type(2) h3</code>"]
+        direction LR
+        S10["<b>10</b> tag chain<br/><code>ul li a</code><br/><i>unless too broad</i>"]
+        S11["<b>11</b> only this element<br/><code>li:nth-of-type(3) a</code>"]
+        S10 --> S11
     end
-    S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7 --> S8 --> S9 --> S10 --> S11
+    authored --> scoped --> ids --> hashed --> last
 
-
-    N5["skipped if it sweeps the page, or matches more than the element's own minified class"]
-    N6["skipped for an id generated on each load"]
-    N9["skipped if it sweeps the page"]
-    S5 -.- N5
-    S6 -.- N6
-    S9 -.- N9
-    S10 -.- N9
-    classDef note fill:none,stroke-dasharray:3 3
-    class N5,N6,N9 note
+    classDef t1 fill:#0b6e4f,stroke:#0b6e4f,color:#ffffff
+    classDef t2 fill:#139a6c,stroke:#139a6c,color:#ffffff
+    classDef t3 fill:#6fcaa4,stroke:#6fcaa4,color:#08261b
+    classDef t4 fill:#cdeee0,stroke:#9fd9c0,color:#08261b
+    classDef t5 fill:transparent,stroke:#7a8a84,stroke-dasharray:4 3,color:#7a8a84
+    class S1,S2,S3,S4 t1
+    class S5 t2
+    class S6,S7 t3
+    class S8,S9 t4
+    class S10,S11 t5
+    style authored fill:transparent,stroke:#0b6e4f,stroke-width:1px
+    style scoped fill:transparent,stroke:#139a6c,stroke-width:1px
+    style ids fill:transparent,stroke:#6fcaa4,stroke-width:1px
+    style hashed fill:transparent,stroke:#9fd9c0,stroke-width:1px
+    style last fill:transparent,stroke:#7a8a84,stroke-width:1px,stroke-dasharray:4 3
 ```
 
-Read it top to bottom: the first step that gives a selector wins, so the
-higher a step, the more it trusts that the site wrote the name on purpose.
+Read it top to bottom: the first step that gives a selector wins. The darker
+a step, the more it trusts that the site wrote the name on purpose.
 
 1. **Own non-hashed class** — `tag.class`, using the first class that doesn't
    look build-tool-generated. A hashed class earlier in the list is skipped in
