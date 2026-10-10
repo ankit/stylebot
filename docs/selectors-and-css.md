@@ -13,6 +13,46 @@ specific enough to be useful.
 
 Each strategy is tried in turn; the first one that returns something wins.
 
+```mermaid
+flowchart TB
+    subgraph authored["Authored, own"]
+        S1["1 · own class<br/><code>div.card</code>"]
+        S2["2 · test id<br/><code>button[data-testid=…]</code>"]
+        S3["3 · name<br/><code>input[name=q]</code>"]
+        S4["4 · authored part of a class<br/><code>nav[class*=Header_nav__]</code>"]
+    end
+    subgraph scoped["Authored, ancestor"]
+        S5["5 · ancestor scope<br/><code>div.mw-heading h2</code>"]
+    end
+    subgraph ids["Identifiers"]
+        S6["6 · #id<br/><code>#search</code>"]
+        S7["7 · address or aria-label<br/><code>a[href=/world]</code>"]
+    end
+    subgraph hashed["Hashed or minified"]
+        S8["8 · own class, any<br/><code>h3.LC20lb</code>"]
+        S9["9 · ancestor's class, any<br/><code>div.WwrzSb a</code>"]
+    end
+    subgraph last["Last resort"]
+        S10["10 · tag chain<br/><code>ul li a</code>"]
+        S11["11 · only this element<br/><code>#rso div:nth-of-type(2) h3</code>"]
+    end
+    S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7 --> S8 --> S9 --> S10 --> S11
+
+
+    N5["skipped if it sweeps the page, or matches more than the element's own minified class"]
+    N6["skipped for an id generated on each load"]
+    N9["skipped if it sweeps the page"]
+    S5 -.- N5
+    S6 -.- N6
+    S9 -.- N9
+    S10 -.- N9
+    classDef note fill:none,stroke-dasharray:3 3
+    class N5,N6,N9 note
+```
+
+Read it top to bottom: the first step that gives a selector wins, so the
+higher a step, the more it trusts that the site wrote the name on purpose.
+
 1. **Own non-hashed class** — `tag.class`, using the first class that doesn't
    look build-tool-generated. A hashed class earlier in the list is skipped in
    favour of a real one further down (e.g. `.WwrzSb.card` → `div.card`).
