@@ -174,7 +174,7 @@ STYLEBOT_PROFILE_DIR=.chrome-dev-profile-test STYLEBOT_SOCKET=~/.stylebot/test.s
 
 Run `yarn stylebot install` once the profile folder exists, so it's registered there too, and run the CLI with the same `STYLEBOT_SOCKET` to drive that browser.
 
-To try the CLI against a release-like build, run `yarn build:preview` and add `STYLEBOT_EXTENSION_DIR=preview-dist`. It carries the store's key, so it gets the extension id the host allows.
+To try the CLI against a release-like build, run `yarn preview:chrome` instead of `yarn start:chrome`. It carries the store's key, so it gets the extension id the host allows.
 
 ## How it works
 

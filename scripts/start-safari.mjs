@@ -91,12 +91,8 @@ const launch = () => {
   spawnSync('open', ['-a', 'Safari'], { stdio: 'inherit' });
 
   console.log(`
-Stylebot is installed in Safari. Two steps Safari only lets you do by hand:
-  1. Develop > Allow Unsigned Extensions (resets every time Safari quits;
-     turn on Settings > Advanced > "Show features for web developers" if
-     there's no Develop menu)
-  2. Settings > Extensions > tick Stylebot Extension and allow it on all
-     websites (once)
+Stylebot is installed in Safari. If it's new there, turn it on by hand once:
+Settings > Extensions > tick Stylebot Extension and allow it on all websites.
 `);
 };
 

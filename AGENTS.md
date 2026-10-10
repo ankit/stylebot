@@ -33,6 +33,7 @@ session is already inside a worktree.
 - `yarn watch` — build for Chrome/Edge in watch mode
 - `yarn watch:firefox` — build for Firefox in watch mode
 - `yarn build:preview` — production build for local testing (not release) into `preview-dist/`, with the store's public key so it gets the store id
+- `yarn preview:chrome` / `preview:edge` / `preview:firefox` / `preview:safari` — production build, then launch it in that browser. Safari's needs `STYLEBOT_GOOGLE_CLIENT_SECRET`
 - `yarn dev:chrome` — watch + launch a Chrome instance with the extension loaded
 - `yarn dev:chrome:locale <locale>` — the same, with the browser and extension in another language (e.g. `vi`), in its own profile
 - `yarn lint` / `yarn lint:fix` — ESLint
