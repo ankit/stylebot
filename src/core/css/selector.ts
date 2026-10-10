@@ -419,7 +419,7 @@ const unlessSweeping = (selector: string | null): string | null =>
 /**
  * #id ranks above a hashed class but below anything genuinely authored,
  * the element's own or an ancestor's. Rather than sweep the page, it falls
- * back to this element alone. See docs/selectors-and-css.md.
+ * back to this element alone. See docs/selectors.md.
  */
 export const getSelector = (el: HTMLElement): string =>
   getGoodOwnSelector(el) ??
