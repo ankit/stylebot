@@ -2,6 +2,9 @@ import { shallowMount } from '@vue/test-utils';
 
 import App from './App.vue';
 import OptionsButton from './components/OptionsButton.vue';
+import SiteProfiles from './components/SiteProfiles.vue';
+import StyleComponent from './components/Style.vue';
+import ToggleStylebot from './components/ToggleStylebot.vue';
 import SyncStylebot from './components/SyncStylebot.vue';
 import UnsupportedPage from './components/UnsupportedPage.vue';
 import { getCurrentTab, getStyles, getCommands } from './utils';
@@ -122,5 +125,39 @@ describe('App.vue', () => {
     wrapper.findComponent(SyncStylebot).vm.$emit('synced');
 
     expect(getStyles).toHaveBeenCalledTimes(2);
+  });
+
+  it('should list every matching style as a row, the most specific first, whatever its save order', async () => {
+    const style = (url: string) => ({
+      url,
+      css: 'a { color: red; }',
+      enabled: true,
+      readability: false,
+    });
+    const broad = {
+      ...style('google.com'),
+      activeProfile: 'minimalist',
+      profiles: {
+        default: { name: '', css: 'a { color: red; }' },
+        minimalist: { name: 'Minimalist', css: 'a { color: blue; }' },
+      },
+    };
+    const own = style('www.google.com');
+
+    (getStyles as jest.Mock).mockImplementation((_tab, cb) =>
+      cb({ styles: [broad, own], defaultStyle: own })
+    );
+
+    const wrapper = await openPopup('https://www.google.com/');
+
+    expect(wrapper.findComponent(SiteProfiles).exists()).toBe(false);
+    expect(
+      wrapper
+        .findAllComponents(StyleComponent)
+        .wrappers.map(row => row.props('url'))
+    ).toEqual(['www.google.com', 'google.com']);
+    expect(wrapper.findComponent(ToggleStylebot).props('profileName')).toBe(
+      'www.google.com'
+    );
   });
 });

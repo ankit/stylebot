@@ -1,5 +1,5 @@
 <template>
-  <popup-row hover :disabled="disableToggle">
+  <popup-row :hover="profiles.length < 2" :disabled="disableToggle">
     <s-toggle-switch
       v-model="enabled"
       :disabled="disableToggle"
@@ -12,11 +12,21 @@
           <s-shortcut-kbd :value="shortcut" />
         </span>
       </span>
-      <template v-else>{{ url }}</template>
+      <span v-else class="style-url">{{ url }}</span>
     </s-toggle-switch>
 
+    <span v-if="editable" class="edit-button" @click.stop>
+      <s-icon-button
+        :size="28"
+        :tooltip="t('edit_in_options')"
+        @click="openStyleInOptions(url)"
+      >
+        <compose-icon />
+      </s-icon-button>
+    </span>
+
     <span v-if="profiles.length > 1" class="profile-select" @click.stop>
-      <s-select :text="activeName" :menu-min-width="160">
+      <s-select full-width :text="activeName" :menu-min-width="160">
         <template #default="{ close }">
           <s-menu-item
             v-for="profile in profiles"
@@ -40,20 +50,29 @@ import Vue from 'vue';
 import type { PropType } from 'vue';
 import type { ProfileSummary } from '@stylebot/saved-styles';
 import PopupRow from './PopupRow.vue';
+import { ComposeIcon } from '@stylebot/icons';
 import {
+  SIconButton,
   SMenuItem,
   SSelect,
   SShortcutKbd,
   SText,
   SToggleSwitch,
 } from '@stylebot/components';
-import { disableStyle, enableStyle, setActiveProfile } from '../utils';
+import {
+  disableStyle,
+  enableStyle,
+  openStyleInOptions,
+  setActiveProfile,
+} from '../utils';
 
 export default Vue.extend({
   name: 'StyleComponent',
 
   components: {
+    ComposeIcon,
     PopupRow,
+    SIconButton,
     SToggleSwitch,
     SShortcutKbd,
     SText,
@@ -85,6 +104,10 @@ export default Vue.extend({
       type: String,
       default: '',
     },
+    // A broader style, which the page's editor can't open, edits in Options.
+    editable: {
+      type: Boolean,
+    },
     profiles: {
       type: Array as PropType<Array<ProfileSummary>>,
       default: () => [],
@@ -112,6 +135,8 @@ export default Vue.extend({
   },
 
   methods: {
+    openStyleInOptions,
+
     displayName(profile: ProfileSummary): string {
       return profile.name || this.t('profile_default_name');
     },
@@ -135,6 +160,19 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+.popup-row .switch:not(.switch--track-end) {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 0;
+  max-width: 55%;
+}
+
+.style-url {
+  @include truncate;
+
+  display: block;
+}
+
 .site-style-label {
   display: flex;
   align-items: center;
@@ -142,8 +180,26 @@ export default Vue.extend({
 }
 
 .profile-select {
-  flex: none;
+  --field-surface: var(--card-field-surface-hover);
+  --field-surface-hover: var(--field-border);
+
+  display: flex;
+  flex: 0 1 auto;
+  min-width: 72px;
+  margin-left: auto;
   cursor: default;
+
+  @include dark-mode {
+    --field-surface: var(--card-field-surface-hover);
+    --field-surface-hover: var(--field-surface-active);
+  }
+}
+
+.edit-button {
+  display: flex;
+  flex: none;
+  margin: -6px -6px -6px -10px;
+  color: var(--icon-color);
 }
 
 .shortcut-hint {

@@ -38,8 +38,8 @@ export const StyleDisabled = popup({
 });
 
 export const WithProfiles = popup({
-  styles: [profiledStyle('example.com'), profiledStyle('*.example.com')],
-  defaultStyle: profiledStyle('example.com'),
+  styles: [profiledStyle('example.com/article'), profiledStyle('example.com')],
+  defaultStyle: profiledStyle('example.com/article'),
 });
 
 export const WithProfilesAndSync = popup({

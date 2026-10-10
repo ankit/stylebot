@@ -150,6 +150,11 @@ export const openOptions = (): void => {
   window.close();
 };
 
+export const openStyleInOptions = (url: string): void => {
+  openOptionsPage(`/styles/edit?url=${encodeURIComponent(url)}`);
+  window.close();
+};
+
 export const openSyncOptions = (): void => {
   openOptionsPage('/sync');
   window.close();

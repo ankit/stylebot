@@ -11,7 +11,7 @@
 
     <div v-else-if="tab && tab.id && pageSupport === 'supported'">
       <site-profiles
-        v-if="hasProfiles"
+        v-if="showProfileList"
         :url="styles[0].url"
         :profiles="siteProfiles"
         :active-profile="siteActiveProfile"
@@ -36,7 +36,7 @@
       <div
         v-if="hasToggleRows"
         class="popup-menu"
-        :class="{ 'popup-menu--after-profiles': hasProfiles }"
+        :class="{ 'popup-menu--after-profiles': showProfileList }"
       >
         <style-component
           v-if="showSiteStyle"
@@ -48,21 +48,22 @@
           :initial-enabled="styles[0].enabled"
         />
 
+        <style-component
+          v-for="style in rowStyles"
+          :key="style.url"
+          :url="style.url"
+          :disable-toggle="isOpen || (pageReaderable && readability)"
+          :initial-enabled="style.enabled"
+          :profiles="profilesOf(style)"
+          :editable="style.url !== styles[0].url"
+        />
+
         <readability
           v-if="showReadability"
           :tab="tab"
           :initial-readability="readability"
           :shortcut="readabilityShortcut"
           @change="readability = $event"
-        />
-
-        <style-component
-          v-for="style in otherStyles"
-          :key="style.url"
-          :url="style.url"
-          :disable-toggle="isOpen || (pageReaderable && readability)"
-          :initial-enabled="style.enabled"
-          :profiles="profilesOf(style)"
         />
       </div>
 
@@ -197,8 +198,10 @@ export default Vue.extend({
       return this.styles.length ? listProfiles(this.styles[0]) : [];
     },
 
-    hasProfiles(): boolean {
-      return this.siteProfiles.length > 1;
+    // Several matching styles each get the same row instead, so the list
+    // can't be read as turning off the whole page.
+    showProfileList(): boolean {
+      return this.styles.length === 1 && this.siteProfiles.length > 1;
     },
 
     // Offered only where it applies, or to turn it back off.
@@ -208,25 +211,29 @@ export default Vue.extend({
 
     // The site's one style, as an on/off row rather than a profile list.
     showSiteStyle(): boolean {
-      return this.styles.length > 0 && !this.hasProfiles;
+      return this.styles.length === 1 && !this.showProfileList;
     },
 
-    // Styles of broader patterns that also match the page, e.g. *.example.com.
-    otherStyles(): Array<Style> {
-      return this.styles.slice(1);
+    // With broader patterns also matching the page, e.g. *.example.com,
+    // every matching style is a row named by its url.
+    rowStyles(): Array<Style> {
+      return this.styles.length > 1 ? this.styles : [];
     },
 
     hasToggleRows(): boolean {
       return (
-        this.showSiteStyle ||
-        this.showReadability ||
-        this.otherStyles.length > 0
+        this.showSiteStyle || this.showReadability || this.rowStyles.length > 0
       );
     },
 
     // Names the profile the editor would open on, once it has a name: a
-    // single style left unnamed is just "the style".
+    // single style left unnamed is just "the style". With several styles
+    // matching, it names the style instead, whose row shows the profile.
     editProfileName(): string {
+      if (this.rowStyles.length) {
+        return this.styles[0].url;
+      }
+
       const profile = this.siteProfiles.find(
         ({ id }) => id === this.siteActiveProfile
       );
@@ -235,7 +242,7 @@ export default Vue.extend({
         return '';
       }
 
-      return this.hasProfiles
+      return this.showProfileList
         ? profile.name || this.t('profile_default_name')
         : profile.name;
     },
@@ -301,7 +308,14 @@ export default Vue.extend({
       }
 
       getStyles(this.tab, ({ styles, defaultStyle }) => {
-        this.styles = styles.filter(hasAnyCss);
+        // Matches come in save order, so the page's own style is moved first.
+        this.styles = styles
+          .filter(hasAnyCss)
+          .sort(
+            (a, b) =>
+              Number(b.url === defaultStyle?.url) -
+              Number(a.url === defaultStyle?.url)
+          );
 
         const [site] = this.styles;
 

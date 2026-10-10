@@ -183,3 +183,61 @@ export const OtherStyleProfiles: StoryObj = {
     );
   },
 };
+
+export const SeveralStylesAsRows: StoryObj = {
+  ...popup({
+    styles: [
+      profiledStyle('example.com/article'),
+      profiledStyle('example.com'),
+    ],
+    defaultStyle: profiledStyle('example.com/article'),
+  }),
+  name: 'several matching styles are all rows, and Edit names the style it opens',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const sendMessage = sentMessages();
+
+    await canvas.findByRole('button', { name: /^Edit example\.com\/article/ });
+    await expect(canvas.queryByRole('radio')).toBeNull();
+
+    const [own] = canvas.getAllByRole('button', { name: 'Default' });
+    await user.click(own);
+    const menu = await findOpenMenu(canvas);
+    await user.click(within(menu).getByRole('menuitem', { name: 'Dark' }));
+
+    await expect(sendMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'SetActiveProfile',
+        url: 'example.com/article',
+        profileId: 'dark',
+      })
+    );
+  },
+};
+
+export const BroaderStyleEditsInOptions: StoryObj = {
+  ...popup({
+    styles: [style('example.com/article'), profiledStyle('example.com')],
+    defaultStyle: style('example.com/article'),
+  }),
+  name: 'a broader matching style opens in Options from its row',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const sendMessage = sentMessages();
+
+    const [edit] = await canvas.findAllByRole('button', {
+      name: 'Edit in Options',
+    });
+    await expect(
+      canvas.getAllByRole('button', { name: 'Edit in Options' })
+    ).toHaveLength(1);
+    await user.click(edit);
+
+    await expect(sendMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'OpenOptionsPage',
+        route: '/styles/edit?url=example.com',
+      })
+    );
+  },
+};
