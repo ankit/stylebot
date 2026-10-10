@@ -10,12 +10,35 @@ import {
 import type { CompiledStyles } from '@stylebot/types';
 
 /**
+ * The url this frame's styles match. A frame with no url of its own
+ * (about:blank, about:srcdoc) uses the nearest same-origin ancestor's.
+ */
+const getPageUrl = (): string => {
+  let win: Window = window;
+
+  while (win.location.protocol === 'about:' && win !== win.parent) {
+    try {
+      // Throws for a cross-origin parent, whose url this frame can't read.
+      if (!win.parent.location.href) {
+        break;
+      }
+    } catch {
+      break;
+    }
+
+    win = win.parent;
+  }
+
+  return win.location.href;
+};
+
+/**
  * What this page should have applied: the compiled styles matching its url,
  * and whether its default style turns the reader on.
  */
 export const getPageState = (compiled: CompiledStyles): CachedState => {
   const { styles, defaultStyle } = getStylesForPage(
-    window.location.href,
+    getPageUrl(),
     compiled.styles
   );
 
