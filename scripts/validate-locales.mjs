@@ -26,8 +26,13 @@ const manifestPath = path.join(rootDir, 'src/assets/manifest/manifest.json');
 
 const KEY_PATTERN = /^[a-z][a-z0-9_]*$/;
 
-// Kept for use outside the extension: the Chrome Web Store listing.
-const UNREFERENCED_KEYS = new Set(['store_listing', 'privacy_policy']);
+// Kept for use outside the extension: the store listings.
+const UNREFERENCED_KEYS = new Set([
+  'store_listing',
+  'privacy_policy',
+  'app_store_subtitle',
+  'app_store_keywords',
+]);
 
 // Attributes and script properties whose value a user reads.
 const TEXT_ATTRIBUTES = new Set([

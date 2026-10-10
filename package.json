@@ -49,6 +49,7 @@
     "test:storybook": "node scripts/storybook-test.mjs",
     "e2e": "node scripts/e2e.mjs",
     "capture:store": "node scripts/capture/store.mjs",
+    "store:safari-text": "node scripts/store-safari-text.mjs",
     "capture:gallery": "node scripts/capture/gallery.mjs",
     "capture:manual": "node scripts/capture/manual.mjs",
     "storybook": "storybook dev -p 6006 --no-open",
