@@ -22,8 +22,16 @@ export const escapeSelectorToken = (value: string): string => {
   return value.replace(/([ !"#$%&'()*+,./:;<=>?@[\\\]^`{|}~])/g, '\\$1');
 };
 
+/**
+ * A value quoted in a CSS string, with control characters such as
+ * newlines written as hex escapes, which CSS strings can't hold raw.
+ */
 function escapeAttributeValue(value: string): string {
-  return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+  return value.replace(/[\\"]/g, '\\$&').replace(
+    // eslint-disable-next-line no-control-regex
+    /[\u0000-\u001f\u007f]/g,
+    char => `\\${char.charCodeAt(0).toString(16)} `
+  );
 }
 
 /**
@@ -73,6 +81,13 @@ const countMatches = (selector: string): number => {
 };
 
 /**
+ * An aria-label that reads the same for everyone: a single line with no
+ * email address, unlike e.g. Google's account button label.
+ */
+const isSharedLabel = (label: string): boolean =>
+  !/[\r\n]|\S@\S+\.\S/.test(label);
+
+/**
  * A link's path, when it names a place rather than a page: a relative or
  * absolute address with no query or hash, and no id or date in it.
  */
@@ -93,7 +108,8 @@ const getLinkPath = (el: HTMLElement): string | null => {
 export const getLabelBasedSelector = (el: HTMLElement): string | null => {
   const tag = el.tagName.toLowerCase();
   const path = tag === 'a' ? getLinkPath(el) : null;
-  const label = el.getAttribute('aria-label');
+  const ariaLabel = el.getAttribute('aria-label');
+  const label = ariaLabel && isSharedLabel(ariaLabel) ? ariaLabel : null;
   const candidates = [
     path && `${tag}[href="${escapeAttributeValue(path)}"]`,
     label && `${tag}[aria-label="${escapeAttributeValue(label)}"]`,

@@ -69,6 +69,16 @@ describe('selector', () => {
     });
   });
 
+  it('escapes control characters in attribute values', () => {
+    document.body.innerHTML = '<div></div>';
+    const el = document.body.firstElementChild as HTMLElement;
+    el.setAttribute('data-testid', 'a\nb\t"c"');
+    const selector = getTestIdBasedSelector(el) as string;
+
+    expect(selector).toBe('div[data-testid="a\\a b\\9 \\"c\\""]');
+    expect(el.matches(selector)).toBe(true);
+  });
+
   describe('getNameBasedSelector', () => {
     it('returns null when the element has no name attribute', () => {
       const el = document.createElement('input');
@@ -353,6 +363,15 @@ describe('selector', () => {
       const el = page('<button class="css-abc12d" aria-label="Search">');
 
       expect(getLabelBasedSelector(el)).toBe('button[aria-label="Search"]');
+    });
+
+    it('skips an aria-label with a line break or an email in it', () => {
+      const el = page('<a class="css-abc12d">');
+
+      el.setAttribute('aria-label', 'Google Account: Ann\n(ann@example.com)');
+      expect(getLabelBasedSelector(el)).toBeNull();
+      el.setAttribute('aria-label', 'Account ann@example.com');
+      expect(getLabelBasedSelector(el)).toBeNull();
     });
 
     it('is null while it would match more than the own class does', () => {
