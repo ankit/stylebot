@@ -13,7 +13,10 @@ import type {
 Vue.use(Vuex);
 
 jest.mock('postcss', () => ({ parse: () => ({ walkRules: jest.fn() }) }));
-jest.mock('../utils/init-editor', () => ({ initEditor: jest.fn() }));
+const initEditor = jest.fn();
+jest.mock('../utils/init-editor', () => ({
+  initEditor: (...args: Array<unknown>) => initEditor(...args),
+}));
 jest.mock('../utils/chrome', () => ({
   closeEditorWindow: jest.fn(),
   requestCloseEditorSidePanel: jest.fn(),
@@ -246,6 +249,27 @@ describe('createEditorWindowHandler', () => {
       },
       { type: 'response', id: 4, result: { 'font-size': '16px' } },
     ]);
+  });
+
+  it('connects while the page loads and waits for its body to inspect', async () => {
+    jest.spyOn(document, 'readyState', 'get').mockReturnValue('loading');
+    const snapshot = { ...mockState.page, title: 'Loaded' };
+    bridge.getSnapshot.mockResolvedValue(snapshot);
+
+    const port = connect();
+    port.send({ type: 'startInspecting' });
+
+    expect(port.sent()[0].type).toBe('connected');
+    expect(initEditor).not.toBeCalled();
+    expect(bridge.startInspecting).not.toBeCalled();
+
+    jest.restoreAllMocks();
+    document.dispatchEvent(new Event('DOMContentLoaded'));
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    expect(initEditor).toBeCalledWith(store);
+    expect(bridge.startInspecting).toBeCalled();
+    expect(port.sent()).toContainEqual({ type: 'snapshotChanged', snapshot });
   });
 
   it('drives inspecting and highlighting on the page', () => {

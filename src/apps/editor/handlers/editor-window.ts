@@ -9,6 +9,7 @@ import type {
 import { getPageBridge } from '@stylebot/page-bridge';
 import { isFieldTarget } from '@stylebot/utils';
 import { initEditor } from '../utils/init-editor';
+import { whenDomReady } from '../utils/dom-ready';
 import {
   closeEditorWindow,
   requestCloseEditorSidePanel,
@@ -51,9 +52,6 @@ export const createEditorWindowHandler = (
     };
     const bridge = getPageBridge();
 
-    // The overlay tip mounts into the editor's themed root; the panel itself
-    // stays hidden while the window owns the editing.
-    initEditor(store);
     store.commit('setWindowConnected', true);
 
     post({
@@ -165,7 +163,7 @@ export const createEditorWindowHandler = (
       }
     };
 
-    incoming.onMessage.addListener((message: RemotePageBridgeMessageToPage) => {
+    const handleMessage = (message: RemotePageBridgeMessageToPage) => {
       switch (message.type) {
         case 'request':
           respond(message.id, () => {
@@ -269,8 +267,31 @@ export const createEditorWindowHandler = (
           requestCloseEditorSidePanel();
           break;
       }
+    };
+
+    // The window connects as soon as the page starts loading. Requests and
+    // styles are served right away; what needs the page's body waits for it.
+    incoming.onMessage.addListener((message: RemotePageBridgeMessageToPage) => {
+      if (['request', 'applyCss', 'previewCss'].includes(message.type)) {
+        handleMessage(message);
+      } else {
+        whenDomReady(() => teardown === cleanup && handleMessage(message));
+      }
     });
 
     incoming.onDisconnect.addListener(cleanup);
+
+    const loading = document.readyState === 'loading';
+    whenDomReady(() => {
+      // The overlay tip mounts into the editor's themed root; the panel itself
+      // stays hidden while the window owns the editing.
+      initEditor(store);
+
+      if (loading && teardown === cleanup) {
+        bridge
+          .getSnapshot()
+          .then(snapshot => store.commit('setPage', snapshot));
+      }
+    });
   };
 };

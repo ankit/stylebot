@@ -13,6 +13,7 @@ import { REMOTE_PAGE_BRIDGE_PORT } from '@stylebot/page-bridge';
 import type { EditorApp } from './load-editor';
 import { isEditorLoading, loadEditor } from './load-editor';
 import { loadInspector } from './load-inspector';
+import { whenDomReady } from './utils/dom-ready';
 import { getIsEditorWindowOpen, getStylesForPage } from './utils/chrome';
 
 const EDITOR_MESSAGES: Array<TabMessage['name']> = [
@@ -25,32 +26,25 @@ const EDITOR_MESSAGES: Array<TabMessage['name']> = [
 let contextMenuTarget: EventTarget | null = null;
 
 /**
- * Runs fn once the page has parsed its body, which the editor and the
- * reader mount into. This script starts earlier, so no message is missed.
- */
-const whenDomReady = (fn: () => void): void => {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', fn, { once: true });
-  } else {
-    fn();
-  }
-};
-
-/**
  * Forwards an event to the editor, loading it first if needed. The first load
  * replays the last context menu target, which the editor didn't see.
  */
+const forwardToEditorNow = (forward: (editor: EditorApp) => void): void => {
+  const firstLoad = !isEditorLoading();
+  const loaded = loadEditor();
+
+  if (firstLoad) {
+    loaded.then(editor => editor.handleContextMenu(contextMenuTarget));
+  }
+
+  loaded.then(forward).catch(() => undefined);
+};
+
+/**
+ * Forwards an event to the editor once the page has a body to mount it in.
+ */
 const forwardToEditor = (forward: (editor: EditorApp) => void): void =>
-  whenDomReady(() => {
-    const firstLoad = !isEditorLoading();
-    const loaded = loadEditor();
-
-    if (firstLoad) {
-      loaded.then(editor => editor.handleContextMenu(contextMenuTarget));
-    }
-
-    loaded.then(forward).catch(() => undefined);
-  });
+  whenDomReady(() => forwardToEditorNow(forward));
 
 // Re-derive readability only on real URL changes, not favicon/title-only
 // TabUpdated events — null so the first event here still runs.
@@ -167,7 +161,9 @@ const listen = (): void => {
       disconnected = true;
     });
 
-    forwardToEditor(editor => {
+    // Not held until DOMContentLoaded, which a slow script in the page's
+    // head can delay by seconds; the handler waits for the body itself.
+    forwardToEditorNow(editor => {
       if (!disconnected) {
         editor.handleEditorWindowPort(port);
       }
