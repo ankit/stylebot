@@ -11,33 +11,35 @@ specific enough to be useful.
 
 ### Priority order
 
-Each strategy is tried in turn; the first one that returns something wins.
+Each strategy is tried in turn, top to bottom, and the first one that gives a
+selector wins. The darker a step, the more it trusts that the site wrote the
+name on purpose.
 
 ```mermaid
-%%{init: {"flowchart": {"curve": "basis", "nodeSpacing": 24, "rankSpacing": 36}}}%%
+%%{init: {"flowchart": {"curve": "basis", "nodeSpacing": 20, "rankSpacing": 36, "wrappingWidth": 320}, "themeCSS": "g.node code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; padding: 1px 6px; border-radius: 4px; white-space: nowrap; } g.t1 code, g.t2 code { background: rgba(255,255,255,0.16); } g.t3 code, g.t4 code { background: rgba(8,38,27,0.10); } g.t5 code { background: rgba(122,138,132,0.14); } g.node i { font-size: 11px; opacity: 0.85; }"}}%%
 flowchart TB
     subgraph authored["Authored, on the element"]
         direction LR
-        S1["<b>1</b> own class<br/><code>div.card</code>"]
-        S2["<b>2</b> test id<br/><code>[data-testid=…]</code>"]
-        S3["<b>3</b> name<br/><code>input[name=q]</code>"]
-        S4["<b>4</b> authored part<br/><code>[class*=Nav__]</code>"]
+        S1["<b>1</b> class<br/><code>div.card</code><br/><i>first one not hashed:<br/>.WwrzSb.card → div.card</i>"]
+        S2["<b>2</b> test id<br/><code>button[data-testid=&quot;submit&quot;]</code><br/><i>also data-test-id, data-test,<br/>data-cy, data-qa</i>"]
+        S3["<b>3</b> name<br/><code>input[name=&quot;q&quot;]</code>"]
+        S4["<b>4</b> authored part of a class<br/><code>nav[class*=&quot;Header_nav__&quot;]</code><br/><i>from Header_nav__a1B2c, while it<br/>matches what the full class does</i>"]
         S1 --> S2 --> S3 --> S4
     end
     subgraph scoped["Authored, on an ancestor"]
         direction LR
-        S5["<b>5</b> ancestor scope<br/><code>div.mw-heading h2</code><br/><i>unless too broad</i>"]
+        S5["<b>5</b> ancestor with 1–4, up to 2 levels<br/><code>div.mw-heading h2</code><br/><i>unless too broad, or wider than<br/>a minified own class: div.VwiC3b</i>"]
     end
     subgraph ids["Identifiers"]
         direction LR
-        S6["<b>6</b> #id<br/><code>#search</code><br/><i>unless generated per load</i>"]
-        S7["<b>7</b> address or label<br/><code>a[href=/world]</code>"]
+        S6["<b>6</b> id<br/><code>#search</code><br/><i>never one generated per load:<br/>tsuid_hsLJaqLJBPu9ruEP7uOYkAo_91</i>"]
+        S7["<b>7</b> link address or aria-label<br/><code>a[href=&quot;/section/world&quot;]</code><br/><code>button[aria-label=&quot;Search&quot;]</code><br/><i>no query, hash, id or date;<br/>no wider than the own class</i>"]
         S6 --> S7
     end
     subgraph hashed["Hashed or minified"]
         direction LR
-        S8["<b>8</b> own class<br/><code>h3.LC20lb</code>"]
-        S9["<b>9</b> ancestor's class<br/><code>div.WwrzSb a</code><br/><i>unless too broad</i>"]
+        S8["<b>8</b> first class, whatever it is<br/><code>h3.LC20lb</code>"]
+        S9["<b>9</b> ancestor's class<br/><code>section.WwrzSb a</code><br/><i>unless too broad</i>"]
         S8 --> S9
     end
     subgraph last["Last resort"]
@@ -65,50 +67,9 @@ flowchart TB
     style last fill:transparent,stroke:#7a8a84,stroke-width:1px,stroke-dasharray:4 3
 ```
 
-Read it top to bottom: the first step that gives a selector wins. The darker
-a step, the more it trusts that the site wrote the name on purpose.
-
-1. **Own non-hashed class** — `tag.class`, using the first class that doesn't
-   look build-tool-generated. A hashed class earlier in the list is skipped in
-   favour of a real one further down (e.g. `.WwrzSb.card` → `div.card`).
-2. **Own test id** — `tag[data-testid="…"]`, checking `data-testid`,
-   `data-test-id`, `data-test`, `data-cy`, `data-qa` in that order.
-3. **Own `name`** — `tag[name="…"]`. Like a test id, it's an identifier, not a
-   human-readable description (unlike `aria-label`).
-4. **Authored part of its own partly hashed class** — CSS Modules,
-   styled-components and similar tools join the author's name with a build
-   hash (`Header_nav__a1B2c`, `prc-Link-Link-85e08`, `Nav-sc-1x2y3z-0`). Matching just the authored
-   part, `nav[class*="Header_nav__"]`, survives the site's next build and has
-   the same specificity as a class. It's used only while it matches exactly the
-   same elements on the page as the full class does.
-5. **Nearest ancestor with any of the above**, up to 2 levels up, joined with
-   the intervening tag chain — e.g. `.card span` or `div.mw-heading h2`. The
-   climb stops at the first usable ancestor rather than always reaching 2
-   levels. It's skipped when it matches more elements than the element's own
-   minified class (see below), as `div.ieodic div` does next to Google's
-   `div.VwiC3b`.
-6. **Own `#id`** — ranks below anything genuinely authored (its own or an
-   ancestor's) since ids are often generated, but above a hashed class since
-   it's still far more reliable than a random hash. An id the page generates
-   on each load, like Google's `tsuid_hsLJaqLJBPu9ruEP7uOYkAo_91` (a long run
-   of mixed case and digits), is never used.
-7. **Own address or aria-label** — `a[href="/section/world"]` for a link, or
-   `button[aria-label="Search"]`, for an element whose classes are all
-   generated. A link's address is used only when it has no query, hash, id or
-   date in it, and neither is used while it matches more elements than the
-   element's own class does.
-8. **Own class, hashed or not** — the first class, whatever it looks like.
-   Still much more specific than a bare tag chain.
-9. **Nearest ancestor's class, hashed or not** — the same 2-level climb as
-   step 5, but accepting a hashed class.
-10. **Bare tag chain** — `parent-parent parent tag`, up to 2 levels.
-11. **Only this element** — when the tag chain would sweep the page, the
-    selector matching just this element (see below), so picking one element
-    never targets most of the page.
-
-Steps 5, 9 and 10 are skipped when they'd sweep the page: a bare `div` or
-`span` matching at least 50 elements and over half of that tag on the page,
-like `div.app div div`. Other tags never count, since styling every link or
+Too broad means the selector would sweep the page: a bare `div` or `span`
+matching at least 50 elements and over half of that tag on the page, like
+`div.app div div`. Other tags never count, since styling every link or
 date is a real choice. Sweeping selectors are also left out of the list
 below.
 
