@@ -42,6 +42,7 @@ session is already inside a worktree.
 - `yarn test:storybook` — builds Storybook and runs every story headless with `@storybook/test-runner`, asserting the `play` functions. `--no-build` reuses `storybook-static`; `--dev --watch <path>` runs against a `yarn storybook` already on :6006.
 - `yarn capture:store` — builds the extension and retakes the store screenshots in `store/screenshots/` on live sites, headless; `--only <name>` retakes some. Use the `capture-store` skill, which checks each image.
 - `yarn capture:gallery` — builds the extension and retakes the stylebot.dev gallery's theme screenshots in `site/src/assets/gallery/`, headless; `hn/newspaper` or `hn` retakes some. Use the `capture-gallery` skill, which checks each image.
+- `yarn capture:manual` — builds the extension and retakes the stylebot.dev manual's and 4.0 release page's screenshots in `site/src/assets/manual/`, light and dark, headless; `chat sync` retakes some. Check each image before committing.
 - `yarn storybook` — Storybook 7.6 (last line with Vue 2 support) for the shared primitives and popup/options/editor composites, with a light/dark toolbar
 
 ## Validation

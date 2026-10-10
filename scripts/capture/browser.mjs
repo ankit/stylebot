@@ -179,27 +179,35 @@ export const showTab = async (panel, tab) => {
 const png = async page => (await page.screenshot()).toString('base64');
 
 /**
- * Renders html at the store's size and saves it as a PNG.
+ * Renders html at the store's size and saves it as a PNG, returning it too.
+ * `scale: 'device'` keeps the 2x pixels instead.
  */
-export const render = async (context, html, file) => {
+export const render = async (context, html, file, { scale = 'css' } = {}) => {
   const page = await context.newPage();
   await page.setViewportSize({ width: WIDTH, height: HEIGHT });
   await page.setContent(html);
   await page.waitForTimeout(300);
   // Drawn at 2x and saved at the store's size, which keeps text sharp.
-  await page.screenshot({ path: file, scale: 'css' });
+  const image = await page.screenshot({ path: file ?? undefined, scale });
   await page.close();
+  return image;
 };
 
 /**
  * Saves the page, with the panel beside it when there is one, as one shot.
  */
-export const capture = async (context, file, page, panel, { appearance }) => {
+export const capture = async (
+  context,
+  file,
+  page,
+  panel,
+  { appearance, scale }
+) => {
   const [site, side] = await Promise.all([png(page), panel && png(panel)]);
   const image = (data, width) =>
     `<img src="data:image/png;base64,${data}" style="display:block;width:${width}px;height:${HEIGHT}px">`;
 
-  await render(
+  return render(
     context,
     `<body style="margin:0;display:flex;gap:1px;background:${
       DIVIDER[appearance]
@@ -207,6 +215,7 @@ export const capture = async (context, file, page, panel, { appearance }) => {
       ${image(site, side ? PAGE_WIDTH : WIDTH)}
       ${side ? image(side, PANEL_WIDTH) : ''}
     </body>`,
-    file
+    file,
+    { scale }
   );
 };
