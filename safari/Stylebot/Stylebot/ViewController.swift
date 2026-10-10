@@ -9,7 +9,7 @@ import Cocoa
 import SafariServices
 import WebKit
 
-let extensionBundleIdentifier = "dev.stylebot.mac.Extension"
+let extensionBundleIdentifier = "dev.stylebot.Stylebot.Extension"
 
 struct ExtensionMessage: Decodable {
     let message: String

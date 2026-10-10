@@ -13,9 +13,8 @@ Day-to-day pull requests target `v4`. 3.x releases ship from `main`, and the rel
 - Chrome and Edge: Run `yarn build` and manually create zip for distribution from `dist/`
 - Firefox: Run `yarn package:firefox` from a clean working tree. It builds the extension and writes the extension zip and the source zip AMO asks for, with build steps for reviewers, to `release/`
 - Safari (Mac App Store, macOS 15 and later):
-  - Run `yarn build:safari` with `STYLEBOT_GOOGLE_CLIENT_SECRET` set to the Desktop OAuth client's secret — the build fails without it, since Drive sign-in needs it
-  - Open `safari/Stylebot/Stylebot.xcodeproj` and choose Product → Archive. The app and extension take their version and build number from the manifest, so there's nothing to bump in Xcode — but App Store Connect rejects a second upload of the same version, so a rebuilt upload needs a new version
-  - In the Organizer, choose Distribute App → App Store Connect, which signs with the team set in the project and uploads the build
+  - Run `yarn upload:safari` with `STYLEBOT_GOOGLE_CLIENT_SECRET` set to the Desktop OAuth client's secret — Drive sign-in needs it. It builds the extension, archives the app and uploads it to App Store Connect, signing with the Apple account signed in to Xcode, or with an App Store Connect API key when `APP_STORE_CONNECT_KEY_PATH`, `APP_STORE_CONNECT_KEY_ID` and `APP_STORE_CONNECT_ISSUER_ID` are set
+  - The app and extension take their version from the manifest and a build number from the build's time, so there's nothing to bump in Xcode, and a rebuilt upload of the same version is accepted as a new build
   - In App Store Connect, try the build through TestFlight, then add it to the new version and submit it for review
 
 ## CLI

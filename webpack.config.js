@@ -47,6 +47,12 @@ if (
   console.warn(`Warning: ${message}`);
 }
 
+// The build's UTC time as YYYYMMDDHHMM, so each Safari build gets a higher number.
+const safariBuildNumber = new Date()
+  .toISOString()
+  .slice(0, 16)
+  .replace(/\D/g, '');
+
 const getOutputPath = () => {
   if (isPreview) {
     return `${__dirname}/preview-dist`;
@@ -282,7 +288,8 @@ const config = {
               2
             ),
         },
-        // The Safari Xcode project reads its app and extension version from here.
+        // The Safari Xcode project reads its app and extension version from
+        // here. App Store Connect needs a new build number for every upload.
         ...(process.env.BROWSER === 'safari'
           ? [
               {
@@ -290,7 +297,7 @@ const config = {
                 to: 'Version.xcconfig',
                 transform: content => {
                   const { version } = JSON.parse(content);
-                  return `MARKETING_VERSION = ${version}\nCURRENT_PROJECT_VERSION = ${version}\n`;
+                  return `MARKETING_VERSION = ${version}\nCURRENT_PROJECT_VERSION = ${safariBuildNumber}\n`;
                 },
               },
             ]
