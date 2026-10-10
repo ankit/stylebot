@@ -11,45 +11,65 @@ specific enough to be useful.
 
 ### Priority order
 
-Each strategy is tried in turn; the first one that returns something wins.
+Each strategy is tried in turn, top to bottom, and the first one that gives a
+selector wins. The darker a step, the more it trusts that the site wrote the
+name on purpose.
 
-1. **Own non-hashed class** — `tag.class`, using the first class that doesn't
-   look build-tool-generated. A hashed class earlier in the list is skipped in
-   favour of a real one further down (e.g. `.WwrzSb.card` → `div.card`).
-2. **Own test id** — `tag[data-testid="…"]`, checking `data-testid`,
-   `data-test-id`, `data-test`, `data-cy`, `data-qa` in that order.
-3. **Own `name`** — `tag[name="…"]`. Like a test id, it's an identifier, not a
-   human-readable description (unlike `aria-label`).
-4. **Authored part of its own partly hashed class** — CSS Modules,
-   styled-components and similar tools join the author's name with a build
-   hash (`Header_nav__a1B2c`, `prc-Link-Link-85e08`, `Nav-sc-1x2y3z-0`). Matching just the authored
-   part, `nav[class*="Header_nav__"]`, survives the site's next build and has
-   the same specificity as a class. It's used only while it matches exactly the
-   same elements on the page as the full class does.
-5. **Nearest ancestor with any of the above**, up to 2 levels up, joined with
-   the intervening tag chain — e.g. `.card span` or `div.mw-heading h2`. The
-   climb stops at the first usable ancestor rather than always reaching 2
-   levels.
-6. **Own `#id`** — ranks below anything genuinely authored (its own or an
-   ancestor's) since ids are often generated, but above a hashed class since
-   it's still far more reliable than a random hash.
-7. **Own address or aria-label** — `a[href="/section/world"]` for a link, or
-   `button[aria-label="Search"]`, for an element whose classes are all
-   generated. A link's address is used only when it has no query, hash, id or
-   date in it, and neither is used while it matches more elements than the
-   element's own class does.
-8. **Own class, hashed or not** — the first class, whatever it looks like.
-   Still much more specific than a bare tag chain.
-9. **Nearest ancestor's class, hashed or not** — the same 2-level climb as
-   step 5, but accepting a hashed class.
-10. **Bare tag chain** — `parent-parent parent tag`, up to 2 levels.
-11. **Only this element** — when the tag chain would sweep the page, the
-    selector matching just this element (see below), so picking one element
-    never targets most of the page.
+```mermaid
+%%{init: {"flowchart": {"curve": "basis", "nodeSpacing": 20, "rankSpacing": 36, "wrappingWidth": 320}, "themeCSS": "g.node code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; padding: 1px 6px; border-radius: 4px; white-space: nowrap; } g.t1 code, g.t2 code { background: rgba(255,255,255,0.16); } g.t3 code, g.t4 code { background: rgba(8,38,27,0.10); } g.t5 code { background: rgba(122,138,132,0.14); } g.node i { font-size: 11px; opacity: 0.85; }"}}%%
+flowchart TB
+    subgraph authored["Authored, on the element"]
+        direction LR
+        S1["<b>1 · class</b><br/><code>div.card</code><br/><i>first one not hashed:<br/>.WwrzSb.card → div.card</i>"]
+        S2["<b>2 · test id</b><br/><code>button[data-testid='submit']</code><br/><i>also data-test-id, data-test,<br/>data-cy, data-qa</i>"]
+        S3["<b>3 · name</b><br/><code>input[name='q']</code>"]
+        S4["<b>4 · authored part of a class</b><br/><code>nav[class*='Header_nav__']</code><br/><i>from Header_nav__a1B2c, while it<br/>matches what the full class does</i>"]
+        S1 --> S2 --> S3 --> S4
+    end
+    subgraph scoped["Authored, on an ancestor"]
+        direction LR
+        S5["<b>5 · ancestor with 1–4, up to 2 levels</b><br/><code>div.mw-heading h2</code><br/><i>unless too broad, or wider than<br/>a minified own class: div.VwiC3b</i>"]
+    end
+    subgraph ids["Identifiers"]
+        direction LR
+        S6["<b>6 · id</b><br/><code>#search</code><br/><i>never one generated per load:<br/>tsuid_hsLJaqLJBPu9ruEP7uOYkAo_91</i>"]
+        S7["<b>7 · link address or aria-label</b><br/><code>a[href='/section/world']</code><br/><code>button[aria-label='Search']</code><br/><i>no query, hash, id or date;<br/>no wider than the own class</i>"]
+        S6 --> S7
+    end
+    subgraph hashed["Hashed or minified"]
+        direction LR
+        S8["<b>8 · first class, whatever it is</b><br/><code>h3.LC20lb</code>"]
+        S9["<b>9 · ancestor's class</b><br/><code>section.WwrzSb a</code><br/><i>unless too broad</i>"]
+        S8 --> S9
+    end
+    subgraph last["Last resort"]
+        direction LR
+        S10["<b>10 · tag chain</b><br/><code>ul li a</code><br/><i>unless too broad</i>"]
+        S11["<b>11 · only this element</b><br/><code>li:nth-of-type(3) a</code>"]
+        S10 --> S11
+    end
+    authored --> scoped --> ids --> hashed --> last
 
-Steps 5, 9 and 10 are skipped when they'd sweep the page: a bare `div` or
-`span` matching at least 50 elements and over half of that tag on the page,
-like `div.app div div`. Other tags never count, since styling every link or
+    classDef t1 fill:#0b6e4f,stroke:#0b6e4f,color:#ffffff
+    classDef t2 fill:#139a6c,stroke:#139a6c,color:#ffffff
+    classDef t3 fill:#6fcaa4,stroke:#6fcaa4,color:#08261b
+    classDef t4 fill:#cdeee0,stroke:#9fd9c0,color:#08261b
+    classDef t5 fill:transparent,stroke:#7a8a84,stroke-dasharray:4 3,color:#7a8a84
+    class S1,S2,S3,S4 t1
+    class S5 t2
+    class S6,S7 t3
+    class S8,S9 t4
+    class S10,S11 t5
+    style authored fill:transparent,stroke:#0b6e4f,stroke-width:1px
+    style scoped fill:transparent,stroke:#139a6c,stroke-width:1px
+    style ids fill:transparent,stroke:#6fcaa4,stroke-width:1px
+    style hashed fill:transparent,stroke:#9fd9c0,stroke-width:1px
+    style last fill:transparent,stroke:#7a8a84,stroke-width:1px,stroke-dasharray:4 3
+```
+
+Too broad means the selector would sweep the page: a bare `div` or `span`
+matching at least 50 elements and over half of that tag on the page, like
+`div.app div div`. Other tags never count, since styling every link or
 date is a real choice. Sweeping selectors are also left out of the list
 below.
 
@@ -59,48 +79,66 @@ sweeping check), since a saved effect is found again by its exact selector.
 
 ### What counts as a "hashed" class
 
-A class name counts as hashed, carrying no stable meaning, when it's:
+Every class name falls into one of four kinds:
 
-- from a CSS-in-JS library: `css-1q2w3e` (Emotion), `sc-`, `jsx-`,
-  `emotion-`, `styled-`, `chakra-`. `css-` needs a digit in its hash, so a
-  real class like `css-truncate` stays authored.
-- an atomic class: React Native Web's `r-1awozwy` (X), or StyleX's `xeuugli`
-  (Facebook, Instagram, Threads). A StyleX class can look like a word, so
-  `x`-prefixed classes only count once the page has at least 10 of them.
-- Google's obfuscated `m5k28` or `vr1PYe` (digits among the letters, in 5
-  lowercase characters or mixed case with no capitalised word, unlike
-  `icon24px` or `v2Header`) or
-  Google bar's `gb_Ra`, Instagram's legacy `_a6hd`, vanilla-extract's `_7uluu50` (The Verge), Svelte's `svelte-1abc2de`, Astro's
-  `astro-J7PV25F6`, next/font's `__className_a64ecd`, or a JSS counter like
-  `jss123` or `makeStyles-root-12`, or Angular's `ng-tns-c3784233582-0`
-- a hex-like hash such as CSS Modules' `_1a2b3c`
-- a short (4–12 chars) name with an unusually high number of case transitions,
-  which separates a hash like `WwrzSb` from a camelCase word like `navBar`
+- **Hashed**: a build tool generated it, and it can change on the site's next
+  build. Ranked below anything authored, and reported as fragile.
+- **Minified**: a compiler shortened it from a map it keeps across releases,
+  so it lasts for years. Ranked like a hashed class, except that an element's
+  own minified class beats an ancestor scope that matches more, and it isn't
+  reported as fragile.
+- **Partly hashed**: an authored name with a hash in it. Matched by its
+  authored parts with `[class*="…"]`, so it survives the next build.
+- **Authored**: anything else. Anything containing `-` or `_` is authored,
+  unless a row below says otherwise.
 
-Otherwise, anything containing `-` or `_` is treated as authored, unless it's
-partly hashed, in which case the authored part is kept:
+| Source                         | Example                                         | Kind          | Matched as                                  |
+| :----------------------------- | :---------------------------------------------- | :------------ | :------------------------------------------ |
+| Emotion                        | `css-1q2w3e`                                    | hashed        |                                             |
+| Other CSS-in-JS prefixes       | `sc-bdVaJa`, `jsx-123`, `emotion-0`, `chakra-…` | hashed        |                                             |
+| React Native Web (X)           | `r-1awozwy`                                     | hashed        |                                             |
+| StyleX (Facebook, Instagram)   | `xeuugli`                                       | hashed        | only once the page has 10 such classes      |
+| Google bar                     | `gb_Ra`                                         | hashed        |                                             |
+| Instagram (legacy)             | `_a6hd`                                         | hashed        |                                             |
+| vanilla-extract (The Verge)    | `_7uluu50`                                      | hashed        |                                             |
+| Svelte, Astro                  | `svelte-1abc2de`, `astro-J7PV25F6`              | hashed        |                                             |
+| next/font                      | `__className_a64ecd`                            | hashed        |                                             |
+| JSS, Material UI v4            | `jss123`, `makeStyles-root-12`                  | hashed        |                                             |
+| Angular animations             | `ng-tns-c3784233582-0`                          | hashed        |                                             |
+| CSS Modules, hex hash          | `_1a2b3c`                                       | hashed        |                                             |
+| styled-components style hash   | `kZxyAb`                                        | hashed        | on a page using styled-components           |
+| Google (Closure Compiler)      | `LC20lb`, `VwiC3b`, `m5k28`                     | minified      |                                             |
+| Other short, case-mixed names  | `MjjYud`, `WwrzSb`                              | minified      |                                             |
+| CSS Modules (Next.js, Primer)  | `NavDropdown-module__button__PEHWX`             | partly hashed | `[class*="NavDropdown-module__button__"]`   |
+| CSS Modules, dash-separated    | `prc-TopicTag-TopicTag-LS-jX`                   | partly hashed | `[class*="prc-TopicTag-TopicTag-"]`         |
+| Turbopack                      | `page-module__E0kJGG__main`                     | partly hashed | `[class*="page-module__"][class*="__main"]` |
+| New York Times                 | `ZcdlOG_nav`, `Wr7_RG_mastheadContainer`        | partly hashed | `[class*="_nav"]`                           |
+| styled-components display name | `Header-sc-1x2y3z-0`                            | partly hashed | `[class*="Header-sc-"]`                     |
+| Vite CSS Modules               | `_card_1wfme_1`                                 | partly hashed | `[class*="_card_"]`                         |
+| React id suffix                | `button-label-_R_93ades_`                       | partly hashed | `[class*="button-label-"]`                  |
+| Tailwind and other utilities   | `bg-red-500`, `md:flex`, `col-md-12`            | authored      |                                             |
+| BEM and other authored names   | `card__title`, `btn--primary`, `isActive`       | authored      |                                             |
 
-- `File-module__local__hash`, as Next.js and Primer name CSS Modules: the last
-  5 characters are the hash whatever they look like, so
-  `NavDropdown-module__button__PEHWX` keeps `NavDropdown-module__button__`.
-- a dash-separated CSS Modules name ending in a 5-character hash, like
-  Primer's `prc-TopicTag-TopicTag-LS-jX`, which keeps `prc-TopicTag-TopicTag-`.
-  It needs a PascalCase component name before the hash, and a hash that mixes
-  letters with digits or case, so utility classes like `col-md-12` stay
-  authored.
-- another `__`-separated segment that reads like a hash rather than a word:
-  letters mixed with digits (`a1B2c`, but not `item2`) or frequent case
-  changes. The parts on either side are kept, so Turbopack's
-  `page-module__E0kJGG__main` becomes
-  `[class*="page-module__"][class*="__main"]`.
-- a 6-character hash at the start, as the New York Times names them
-  (`ZcdlOG_nav`, `Wr7_RG_mastheadContainer`), which keeps the authored part,
-  `[class*="_nav"]`. The hash must mix letters with digits or have several
-  capitals, so a camelCase word like `navBar_item` stays authored.
-- styled-components' `Name-sc-hash-0`, which keeps `Name-sc-`.
-- Vite's `_card_1wfme_1`, which keeps `_card_`.
-- a React id suffix, as in `button-label-_R_93ades_`, which keeps
-  `button-label-`.
+How the shapes are told apart:
+
+- **Google's names** have digits among the letters, in 5 lowercase
+  characters or mixed case with no capitalised word, so `icon24px` and
+  `v2Header` stay authored.
+- **Short case-mixed names** are 4–12 characters with an unusually high
+  share of case changes, which separates `WwrzSb` from a camelCase word like
+  `isActive`. Very short camelCase words can still trip it: `navBar` counts
+  as minified.
+- **styled-components' style hashes** have the same shape as Google's
+  names but change whenever a component's styles do, so on a page with
+  styled-components' own style tag or `sc-` classes nothing counts as
+  minified.
+- **`css-`** needs a digit in its hash, so `css-truncate` stays authored.
+- **A partly hashed name's hash** must look like one: letters mixed with
+  digits or several capitals (`a1B2c`, but not `item2` or `navBar_item`). A
+  dash-separated CSS Modules name also needs a PascalCase component name
+  before its 5-character hash, so `col-md-12` stays authored.
+- **A partly hashed match is used** only while it matches exactly the
+  elements the full class does.
 
 ### Other selectors for the element
 
@@ -108,10 +146,10 @@ The selector field also offers the other strategies' selectors for the picked
 element, narrowest first, keeping one per set of matched elements, each
 with how many elements it matches. The list always starts with:
 
-- **Only this element** — its `#id` when that's unique, otherwise the
-  element and its ancestors, each positioned with `:nth-of-type` where a
-  sibling would also match, climbing until only this element matches or an
-  ancestor has a unique `#id`. Positions shift when a list reorders, so this
+- **Only this element** — its `#id` when that's unique and not generated,
+  otherwise the element and its ancestors, each positioned with
+  `:nth-of-type` where a sibling would also match, climbing until only this
+  element matches or an ancestor has a unique `#id`. Positions shift when a list reorders, so this
   is the least stable choice.
 - **This item** — elements like it inside the nearest repeated ancestor (a
   row, list item or card), e.g. `tr.athing:nth-of-type(3) a` for every link

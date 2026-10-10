@@ -1,4 +1,9 @@
-import { escapeSelectorToken, getStableClassMatcher } from '@stylebot/css';
+import {
+  escapeSelectorToken,
+  getStableClassMatcher,
+  looksGeneratedId,
+  looksMinified,
+} from '@stylebot/css';
 
 const MAX_LINES = 400;
 const MAX_CHARS = 16000;
@@ -32,6 +37,54 @@ export const isVisible = (element: Element): boolean => {
   return getComputedStyle(element).display !== 'none';
 };
 
+// Set while an outline is built, then let go.
+let sharedClasses: Map<string, Set<string>> | null = null;
+
+/**
+ * For each class an element lists first, the other classes every element
+ * listing it first also has.
+ */
+const getSharedClasses = (): Map<string, Set<string>> => {
+  const shared = new Map<string, Set<string>>();
+
+  document.querySelectorAll('[class]').forEach(element => {
+    const [first, ...rest] = Array.from(element.classList);
+    const known = first && shared.get(first);
+
+    if (!first) {
+      return;
+    }
+
+    if (!known) {
+      shared.set(first, new Set(rest));
+      return;
+    }
+
+    known.forEach(name => {
+      if (!element.classList.contains(name)) {
+        known.delete(name);
+      }
+    });
+  });
+
+  return shared;
+};
+
+/**
+ * Whether `name` is a minified modifier that only some of the elements
+ * sharing this element's first class have, like the extra classes on a few
+ * of Google's result snippets: copied into a selector, it'd miss the rest.
+ */
+const isVaryingModifier = (element: Element, name: string): boolean => {
+  const first = element.classList[0];
+
+  if (!sharedClasses || name === first || !looksMinified(name)) {
+    return false;
+  }
+
+  return !sharedClasses.get(first)?.has(name);
+};
+
 /**
  * Up to 4 of the element's short classes. A long one still gets in when
  * it has a stable part, as styled-components' display names on BBC News do,
@@ -41,10 +94,17 @@ const classesOf = (element: Element): Array<string> =>
   Array.from(element.classList)
     .filter(
       name =>
-        name.length <= 30 ||
-        (name.length <= MAX_HASHED_CLASS && getStableClassMatcher(name))
+        (name.length <= 30 ||
+          (name.length <= MAX_HASHED_CLASS && getStableClassMatcher(name))) &&
+        !isVaryingModifier(element, name)
     )
     .slice(0, MAX_CLASSES);
+
+/**
+ * The element's id, unless the page generates it on each load.
+ */
+const idOf = (element: Element): string =>
+  element.id && !looksGeneratedId(element.id) ? element.id : '';
 
 // A named id makes an element unique, so it's never folded into a run;
 // numbered ones (a post's id) mark items of a list, which still fold.
@@ -277,7 +337,7 @@ const holdsRepeats = (element: Element): boolean => {
 const describe = (element: Element, repeated = false): string => {
   const tag = element.tagName.toLowerCase();
   // Escaped as a selector needs them, since the model copies them as written.
-  const id = element.id ? `#${escapeSelectorToken(element.id)}` : '';
+  const id = idOf(element) ? `#${escapeSelectorToken(idOf(element))}` : '';
   const classes = classesOf(element)
     .map(name => `.${escapeSelectorToken(name)}`)
     .join('');
@@ -321,13 +381,7 @@ const isBareWrapper = (element: Element): boolean =>
   !element.classList.length &&
   !ownText(element);
 
-/**
- * An indented outline of the page's visible elements (tag, id, classes, a
- * snippet of their own text, and how they look where that differs from
- * their parent), for the model to pick selectors from. Kept to a budget;
- * long runs of alike siblings are summarised.
- */
-export const getPageOutline = (): string => {
+const buildPageOutline = (): string => {
   const lines: Array<string> = [];
   let chars = 0;
   const page = pageHints();
@@ -409,4 +463,20 @@ export const getPageOutline = (): string => {
   }
 
   return lines.join('\n');
+};
+
+/**
+ * An indented outline of the page's visible elements (tag, id, classes, a
+ * snippet of their own text, and how they look where that differs from
+ * their parent), for the model to pick selectors from. Kept to a budget;
+ * long runs of alike siblings are summarised.
+ */
+export const getPageOutline = (): string => {
+  sharedClasses = getSharedClasses();
+
+  try {
+    return buildPageOutline();
+  } finally {
+    sharedClasses = null;
+  }
 };

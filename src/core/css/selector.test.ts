@@ -280,6 +280,10 @@ describe('selector', () => {
       });
     });
 
+    it('returns null for minified classes, which outlast a rebuild', () => {
+      expect(getFragileSelector('div.VwiC3b h3.LC20lb')).toBeNull();
+    });
+
     it('returns null for a selector of authored classes', () => {
       expect(getFragileSelector('nav .menu > a.link')).toBeNull();
       expect(getFragileSelector('a[href=".css-1a0ymrn"]')).toBeNull();
@@ -668,6 +672,38 @@ describe('selector', () => {
       expect(getSelector(el)).toBe('section.WwrzSb a');
     });
 
+    it('skips an id the page generates on each load', () => {
+      const el = document.createElement('h3');
+      el.setAttribute('class', 'LC20lb MBeuO');
+      el.setAttribute('id', '_3MTJavGCHNyKptQPt7ejqQI_120');
+
+      expect(getSelector(el)).toBe('h3.LC20lb');
+    });
+
+    it('prefers its own minified class over a wider ancestor scope', () => {
+      document.body.innerHTML = `
+        <div class="ieodic">
+          <div class="VwiC3b yXK7lf">snippet</div>
+          <div>source</div>
+          <div>date</div>
+        </div>
+      `;
+
+      const el = document.querySelector('.VwiC3b') as HTMLElement;
+      expect(getSelector(el)).toBe('div.VwiC3b');
+    });
+
+    it('keeps an ancestor scope that matches no more than its own minified class', () => {
+      document.body.innerHTML = `
+        <div class="result">
+          <div class="VwiC3b">snippet</div>
+        </div>
+      `;
+
+      const el = document.querySelector('.VwiC3b') as HTMLElement;
+      expect(getSelector(el)).toBe('div.result div');
+    });
+
     it('falls back to an id-based selector when nothing nearby is usable', () => {
       const el = document.createElement('div');
       el.setAttribute('id', 'foo');
@@ -757,6 +793,15 @@ describe('getUniqueSelector and getItemScopedSelector', () => {
 
   it('uses a unique id as is', () => {
     expect(getUniqueSelector(rows())).toBe('#pick');
+  });
+
+  it('passes over an id the page generates on each load', () => {
+    document.body.innerHTML = `
+      <div><span id="tsuid_hsLJaqLJBPu9ruEP7uOYkAo_91"></span></div>
+    `;
+
+    const el = document.querySelector('span') as HTMLElement;
+    expect(getUniqueSelector(el)).toBe('span');
   });
 
   it('positions the element among its repeated ancestors when it has no id', () => {

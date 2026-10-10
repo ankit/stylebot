@@ -29,6 +29,7 @@ export {
   dedupeByMatches,
   byReach,
 } from './selector';
+export { looksGeneratedId, looksMinified } from './hashed-class';
 
 export {
   addGoogleWebFont,

@@ -1,4 +1,9 @@
-import { getStableClassParts, looksHashed } from './hashed-class';
+import {
+  getStableClassParts,
+  looksGeneratedId,
+  looksHashed,
+  looksMinified,
+} from './hashed-class';
 
 describe('hashed-class', () => {
   afterEach(() => {
@@ -145,6 +150,52 @@ describe('hashed-class', () => {
       document.body.innerHTML = '<div class="xlarge xsmall x1n2onr6"></div>';
 
       expect(looksHashed('xlarge')).toBe(false);
+    });
+  });
+
+  describe('looksMinified', () => {
+    it.each(['LC20lb', 'VwiC3b', 'MjjYud', 'm5k28'])(
+      'treats %s as minified',
+      className => {
+        expect(looksMinified(className)).toBe(true);
+      }
+    );
+
+    it.each(['_1a2b3c', 'css-1q2w3e', 'gb_Ra', 'navItem', 'header'])(
+      'does not treat %s as minified',
+      className => {
+        expect(looksMinified(className)).toBe(false);
+      }
+    );
+  });
+
+  describe('looksMinified on a styled-components page', () => {
+    it('treats its hashes as hashed but not minified', () => {
+      document.body.innerHTML = '<div class="sc-bdVaJa kZxyAb"></div>';
+
+      expect(looksHashed('kZxyAb')).toBe(true);
+      expect(looksMinified('kZxyAb')).toBe(false);
+    });
+  });
+
+  describe('looksGeneratedId', () => {
+    it.each([
+      '_3MTJavGCHNyKptQPt7ejqQI_120',
+      'tsuid_hsLJaqLJBPu9ruEP7uOYkAo_91',
+      'atritem-_EIrBapXtL_6gw8cPyM7v4As_64',
+    ])('treats %s as generated', id => {
+      expect(looksGeneratedId(id)).toBe(true);
+    });
+
+    it.each([
+      'rso',
+      'main-content',
+      'mainContentWrapperSection',
+      'section2Title',
+      'post-12345',
+      'ti6dpd',
+    ])('does not treat %s as generated', id => {
+      expect(looksGeneratedId(id)).toBe(false);
     });
   });
 });
