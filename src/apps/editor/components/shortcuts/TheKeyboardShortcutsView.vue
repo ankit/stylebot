@@ -212,8 +212,7 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px calc(var(--panel-gutter) - 2px) 12px
-    calc(var(--panel-gutter) - 9px);
+  padding: 12px var(--panel-gutter) 12px calc(var(--panel-gutter) - 9px);
   background: var(--panel-surface);
   border-bottom: 1px solid var(--panel-border);
 }
@@ -230,7 +229,7 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 12px calc(var(--panel-gutter) - 4px);
+  padding: 12px var(--panel-gutter);
 }
 
 .group {
