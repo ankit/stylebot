@@ -23,6 +23,9 @@ export type Extension = {
   isRunning(): boolean;
   // Mirrors Playwright's `worker.evaluate(fn, arg)`: the result must be JSON-serializable.
   evaluate<A, R>(fn: ExtensionFunction<A, R>, arg?: A): Promise<R>;
+  // Has the background handle a global shortcut `times` times in a row, as if the
+  // browser had caught it on the tab at `tabUrl`. Playwright can't press one.
+  pressShortcut(command: string, tabUrl: string, times?: number): Promise<void>;
   close(): void;
 };
 

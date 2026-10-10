@@ -128,7 +128,10 @@ test('keeps the reader when the page is sent its styles again', async ({
     const [styleUrl, style] = Object.entries(styles).find(
       ([, { readability }]) => readability
     )!;
-    const [tab] = await chrome.tabs.query({ url });
+    // Firefox's match patterns can't name the test server's port.
+    const tab = (await chrome.tabs.query({})).find(
+      candidate => candidate.url === url
+    )!;
 
     await chrome.tabs.sendMessage(tab.id!, {
       name: 'ApplyStylesToTab',

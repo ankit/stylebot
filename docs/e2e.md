@@ -48,18 +48,21 @@ Failing tests attach a trace, which the HTML report (`playwright-report/`) opens
 Each Playwright worker launches one browser and keeps it for every test it runs,
 relaunching if it dies. Each test gets a fresh set of tabs and cleared extension storage,
 so tests can run fully in parallel. Everything engine-specific sits behind a small
-contract — launch the browser, load the build, evaluate with the extension's privileges —
-with one implementation per engine:
+contract — launch the browser, load the build, evaluate with the extension's privileges,
+fire a global shortcut — with one implementation per engine:
 
 **Chrome / Edge** — a persistent Chromium context with
 `--enable-unsafe-extension-debugging`, then CDP `Extensions.loadUnpacked` on `dist/`.
 Extension-privileged code runs in the MV3 service worker, and the popup is opened as a
-real page through CDP.
+real page through CDP. A shortcut is fired through the dispatch Chrome's own event
+bindings use.
 
 **Firefox** — Playwright can't load extensions into Firefox, so it starts Firefox with
 `--start-debugger-server` and talks Firefox's Remote Debugging Protocol (the same thing
 `web-ext run` and about:debugging use): it installs `firefox-dist/` as a temporary add-on
 and evaluates JS in the extension's background page through the DevTools console actor.
+A shortcut is fired in the parent process's console, where Firefox's own key handler
+fires it, so it goes to the focused tab like a real press.
 
 **Upgrading from an earlier release** — the upgrade test, Chrome and Edge only, launches
 its own browser. It downloads that release's published zip once into `e2e/.cache/`

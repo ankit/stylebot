@@ -48,6 +48,8 @@ export class FirefoxEngine implements Engine {
       ],
       firefoxUserPrefs: {
         'devtools.debugger.prompt-connection': false,
+        // Lets the debugger reach the parent process, where shortcuts are fired.
+        'devtools.chrome.enabled': true,
         // MV3 treats <all_urls> content scripts as optional host permissions
         // that a user would normally have to grant on install.
         'extensions.originControls.grantByDefault': true,

@@ -17,6 +17,28 @@ export class ChromiumExtension implements Extension {
     return worker.evaluate(fn as PageFunction<A, R>, arg as A);
   }
 
+  async pressShortcut(
+    command: string,
+    tabUrl: string,
+    times = 1
+  ): Promise<void> {
+    await this.evaluate(
+      async ([name, url, count]) => {
+        const tabs = await chrome.tabs.query({});
+        const tab = tabs.find(candidate => candidate.url?.startsWith(url));
+        // Chrome's events expose the dispatch its own bindings call.
+        const event = chrome.commands.onCommand as unknown as {
+          dispatch: (command: string, tab?: chrome.tabs.Tab) => void;
+        };
+
+        for (let i = 0; i < count; i++) {
+          event.dispatch(name, tab);
+        }
+      },
+      [command, tabUrl, times] as const
+    );
+  }
+
   close(): void {
     // The worker belongs to the browser context, which the fixture closes.
   }

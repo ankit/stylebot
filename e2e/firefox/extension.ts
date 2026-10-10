@@ -130,34 +130,64 @@ export class FirefoxExtension implements Extension {
     fn: ExtensionFunction<A, R>,
     arg?: A
   ): Promise<R> {
-    // The console actor returns objects as remote grips, not values, so the
-    // evaluated code serializes the result itself. `mapped.await` makes the actor
-    // wait for the async IIFE's promise like DevTools does for top-level await.
-    const text = `(async () => JSON.stringify(await (${fn.toString()})(${JSON.stringify(
+    // The console actor returns objects as remote grips, not values, and reports
+    // neither throws nor rejections inside the async IIFE, so the evaluated code
+    // serializes the outcome itself. `mapped.await` makes the actor wait for the
+    // IIFE's promise like DevTools does for top-level await.
+    const text = `(async () => {
+      try {
+        return JSON.stringify({ value: await (${fn.toString()})(${JSON.stringify(
       arg ?? null
-    )})))()`;
+    )}) });
+      } catch (error) {
+        return JSON.stringify({ error: String(error) });
+      }
+    })()`;
 
-    const { resultID } = await this.client.request<{ resultID: string }>({
-      to: target.consoleActor,
-      type: 'evaluateJSAsync',
-      text,
-      mapped: { await: true },
-    });
+    const result = await this.evaluateText(target.consoleActor, text);
 
-    const result =
-      this.results.get(resultID) ??
-      (await new Promise<EvaluationResult>(resolve =>
-        this.resultWaiters.set(resultID, resolve)
-      ));
-    this.results.delete(resultID);
-
-    if (result.hasException) {
-      throw new Error(result.exceptionMessage);
+    if (typeof result !== 'string') {
+      return undefined as R;
     }
 
-    return typeof result.result === 'string'
-      ? JSON.parse(result.result)
-      : (undefined as R);
+    const outcome = JSON.parse(result) as { value?: R; error?: string };
+    if (outcome.error !== undefined) {
+      throw new Error(outcome.error);
+    }
+    return outcome.value as R;
+  }
+
+  /**
+   * Fires a shortcut's command where Firefox's own key handler does, in the
+   * parent process. Like a real press, it goes to the focused window's tab.
+   */
+  async pressShortcut(
+    command: string,
+    tabUrl: string,
+    times = 1
+  ): Promise<void> {
+    const consoleActor = await this.parentConsoleActor();
+    const result = await this.evaluateText(
+      consoleActor,
+      `(() => {
+        const win = Services.wm.getMostRecentWindow('navigator:browser');
+        const url = win.gBrowser.selectedBrowser.currentURI.spec;
+        if (!url.startsWith(${JSON.stringify(tabUrl)})) {
+          return 'The focused tab is ' + url;
+        }
+        const { shortcuts } = WebExtensionPolicy.getByHostname(${JSON.stringify(
+          this.id
+        )}).extension;
+        for (let i = 0; i < ${times}; i++) {
+          shortcuts.onCommand(${JSON.stringify(command)});
+        }
+        return '';
+      })()`
+    );
+
+    if (result) {
+      throw new Error(`Can't press ${command} on ${tabUrl}: ${result}`);
+    }
   }
 
   /**
@@ -196,6 +226,44 @@ export class FirefoxExtension implements Extension {
       };
       this.targetWaiters.push(waiter);
     });
+  }
+
+  private async evaluateText(
+    consoleActor: string,
+    text: string
+  ): Promise<unknown> {
+    const { resultID } = await this.client.request<{ resultID: string }>({
+      to: consoleActor,
+      type: 'evaluateJSAsync',
+      text,
+      mapped: { await: true },
+    });
+
+    const result =
+      this.results.get(resultID) ??
+      (await new Promise<EvaluationResult>(resolve =>
+        this.resultWaiters.set(resultID, resolve)
+      ));
+    this.results.delete(resultID);
+
+    if (result.hasException) {
+      throw new Error(result.exceptionMessage);
+    }
+    return result.result;
+  }
+
+  /**
+   * The console of the parent process, where Firefox handles shortcuts.
+   */
+  private async parentConsoleActor(): Promise<string> {
+    const { processDescriptor } = await this.client.request<{
+      processDescriptor: { actor: string };
+    }>({ to: 'root', type: 'getProcess', id: 0 });
+    const { process } = await this.client.request<{ process: TargetForm }>({
+      to: processDescriptor.actor,
+      type: 'getTarget',
+    });
+    return process.consoleActor;
   }
 
   close(): void {
