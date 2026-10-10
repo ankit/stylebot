@@ -16,6 +16,7 @@
     "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=production webpack --hide-modules",
     "build:preview": "cross-env NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=production STYLEBOT_PREVIEW=1 webpack --hide-modules",
     "build:firefox": "cross-env NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=production BROWSER=firefox webpack --hide-modules",
+    "package:firefox": "node scripts/package-firefox.mjs",
     "build:safari": "cross-env NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=production BROWSER=safari webpack --hide-modules",
     "stylebot": "node tools/cli/lib/cli.mjs",
     "watch": "cross-env NODE_OPTIONS=--openssl-legacy-provider NODE_ENV=development webpack --hide-modules --watch",

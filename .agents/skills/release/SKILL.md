@@ -92,12 +92,13 @@ missing.
 ## 7. Build the store packages
 
 ```
-yarn build          # -> dist/        Chrome Web Store + Edge Add-ons
-yarn build:firefox  # -> firefox-dist/  AMO
+yarn build             # -> dist/     Chrome Web Store + Edge Add-ons
+yarn package:firefox   # -> release/  AMO extension zip + source zip
 ```
 
-Zip each output directory and upload by hand. There is no automated packaging or store
-upload — this step is manual.
+Zip `dist/` by hand. `yarn package:firefox` needs a clean working tree: it builds Firefox
+and writes both zips AMO asks for, the extension and the source it was built from, with
+build steps for reviewers. Upload by hand; there is no automated store upload.
 
 ## Optional follow-up
 

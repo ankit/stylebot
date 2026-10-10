@@ -11,7 +11,7 @@ Day-to-day pull requests target `v4`. 3.x releases ship from `main`, and the rel
 - Open the PR and wait for `build`, `validation`, `storybook`, `e2e`, `e2e (edge)` and `e2e (firefox)` to pass
 - Squash-merge — the GitHub Release and its `vX.Y.Z` tag are then created automatically from the changelog entry
 - Chrome and Edge: Run `yarn build` and manually create zip for distribution from `dist/`
-- Firefox: Run `yarn build:firefox` and manually create zip for distribution from `firefox-dist/`
+- Firefox: Run `yarn package:firefox` from a clean working tree. It builds the extension and writes the extension zip and the source zip AMO asks for, with build steps for reviewers, to `release/`
 - Safari (Mac App Store, macOS 15 and later):
   - Run `yarn build:safari` with `STYLEBOT_GOOGLE_CLIENT_SECRET` set to the Desktop OAuth client's secret — the build fails without it, since Drive sign-in needs it
   - Open `safari/Stylebot/Stylebot.xcodeproj` and choose Product → Archive. The app and extension take their version and build number from the manifest, so there's nothing to bump in Xcode — but App Store Connect rejects a second upload of the same version, so a rebuilt upload needs a new version

@@ -7,6 +7,7 @@ dist
 firefox-dist
 safari-dist
 preview-dist
+release
 node_modules
 .chrome-dev-profile*
 .edge-dev-profile*
