@@ -176,10 +176,26 @@ const listen = (): void => {
  * Stylebot reloads it runs again here, and the old copy no longer responds.
  * A panel left behind would also stop the new one from mounting.
  */
-const removeDeadEditor = (): void =>
+const removeDeadEditor = (): void => {
+  const host = document.getElementById('stylebot');
+
+  // The old copy runs in another world, out of reach, but still hears the
+  // page: Escape has it close its panel, which stops its inspector, whose
+  // listeners on window outlive the panel's removal.
+  if (host?.shadowRoot?.querySelector('.stylebot')) {
+    host.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: 'Escape',
+        bubbles: true,
+        composed: true,
+      })
+    );
+  }
+
   ['stylebot', 'stylebot-overlay', 'stylebot-inspect-cursor'].forEach(id =>
     document.getElementById(id)?.remove()
   );
+};
 
 // A PDF, JSON or XML file gets nothing; its viewer breaks under the editor.
 if (isStylableDocument(document.contentType)) {

@@ -5,7 +5,7 @@ import path from 'node:path';
 import type { BrowserContext, Route } from '@playwright/test';
 import type { Engine } from './engine';
 import { test, expect, type Extension } from './fixtures';
-import { openEditor, startTestServer } from './helpers';
+import { startTestServer } from './helpers';
 
 const RELEASE = '3.2.4';
 // The build under test may still carry the old version number until release.
@@ -335,7 +335,7 @@ test('upgrading from 3.2.4 keeps styles and settings, and syncs without dropping
   }
 });
 
-test('updating from 3.2.4 brings Stylebot back to a tab left open, without reloading it', async ({
+test('updating from 3.2.4 brings Stylebot back to a tab left open with the editor showing, without reloading it', async ({
   engine,
 }, testInfo) => {
   test.skip(
@@ -371,8 +371,40 @@ test('updating from 3.2.4 brings Stylebot back to a tab left open, without reloa
     await page.goto(server.baseUrl);
     await expect(page.locator('h1')).toHaveCSS('color', 'rgb(0, 128, 0)');
 
+    const editorRoot = page.locator('#stylebot');
+    // Its overlay is an unnamed div on the body, drawn while inspecting.
+    const oldOverlays = page.locator('body > div:not([id])');
+
+    await test.step(`open the ${RELEASE} editor, inspecting`, async () => {
+      // Sent until the page's listener is up to hear it.
+      await expect(async () => {
+        await old.evaluate(async () => {
+          const [tab] = await chrome.tabs.query({ url: 'http://localhost/*' });
+          await chrome.tabs.sendMessage(tab.id!, { name: 'OpenStylebot' });
+        });
+        await expect(editorRoot.locator('.stylebot')).toBeVisible({
+          timeout: 1000,
+        });
+      }).toPass();
+      await page.locator('h1').hover();
+      await expect(oldOverlays).not.toHaveCount(0);
+      await page.mouse.move(0, 0);
+    });
+
     const extension = await updateToBuild(engine, context, extensionDir, old);
     const openPopup = () => engine.openPopup(context, extension);
+
+    await test.step("the new editor takes the old one's place", async () => {
+      await expect(editorRoot.locator('.stylebot-content')).toBeVisible();
+      await expect(editorRoot).toHaveCount(1);
+    });
+
+    await test.step(`the ${RELEASE} inspector stops`, async () => {
+      await expect(oldOverlays).toHaveCount(0);
+      await page.locator('h1').hover();
+      await page.mouse.move(0, 0);
+      await expect(oldOverlays).toHaveCount(0);
+    });
 
     await test.step('the page answers the new version', async () => {
       await expect
@@ -402,11 +434,6 @@ test('updating from 3.2.4 brings Stylebot back to a tab left open, without reloa
       });
       await expect(page.locator('h1')).toHaveCSS('color', 'rgb(0, 128, 0)');
       await popup.close();
-    });
-
-    await test.step('the editor opens, once', async () => {
-      await openEditor(page, openPopup);
-      await expect(page.locator('[id="stylebot"]')).toHaveCount(1);
     });
   } finally {
     await context.close().catch(() => {});

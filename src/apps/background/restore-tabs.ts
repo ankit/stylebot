@@ -12,12 +12,11 @@ export type OpenEditors = Record<number, EditorHost>;
 
 /**
  * Whether the page has Stylebot's panel showing. Runs inside the page, where
- * the panel's host element is readable by any copy of the script.
+ * the panel's host element is readable by any copy of the script, including
+ * releases before 4.0, whose panel has only the `stylebot` class.
  */
 const isPanelShowing = (): boolean =>
-  !!document
-    .getElementById('stylebot')
-    ?.shadowRoot?.querySelector('.stylebot-content');
+  !!document.getElementById('stylebot')?.shadowRoot?.querySelector('.stylebot');
 
 const findHost = async (tabId: number): Promise<EditorHost | undefined> => {
   if (await editorWindow.isOpen(tabId)) {
