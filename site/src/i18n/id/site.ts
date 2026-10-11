@@ -12,8 +12,6 @@ const site: SiteMessages = {
     manual: 'Panduan',
     install: 'Instal',
     language: 'Bahasa',
-    suggest: 'Lihat halaman ini dalam bahasa Indonesia',
-    dismiss: 'Tutup',
     theme: 'Tema: {theme}',
   },
   themes: {

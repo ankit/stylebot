@@ -12,8 +12,6 @@ const site: SiteMessages = {
     manual: 'Handbuch',
     install: 'Installieren',
     language: 'Sprache',
-    suggest: 'Diese Seite auf Deutsch ansehen',
-    dismiss: 'Schließen',
     theme: 'Design: {theme}',
   },
   themes: {

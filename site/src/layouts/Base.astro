@@ -1,7 +1,6 @@
 ---
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
-import LocaleSuggestion from '../components/LocaleSuggestion.astro';
 import { STORAGE_KEY, THEME_KEYS, themeStylesheet } from '../lib/themes';
 import {
   DEFAULT_LOCALE,
@@ -121,7 +120,6 @@ const altUrl = (code: (typeof LOCALES)[number]['code']) =>
     )}
   </head>
   <body>
-    {alternates && <LocaleSuggestion />}
     <Header current={current} storeCta={storeCta} install={install} />
     <slot />
     {footer && (

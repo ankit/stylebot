@@ -14,9 +14,6 @@ export default {
     manual: 'Manual',
     install: 'Install',
     language: 'Language',
-    // Offered to visitors whose browser prefers this language, on a page in another one.
-    suggest: 'View this page in English',
-    dismiss: 'Dismiss',
     theme: 'Theme: {theme}',
   },
   themes: {

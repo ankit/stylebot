@@ -12,8 +12,6 @@ const site: SiteMessages = {
     manual: 'Hướng dẫn',
     install: 'Cài đặt',
     language: 'Ngôn ngữ',
-    suggest: 'Xem trang này bằng tiếng Việt',
-    dismiss: 'Bỏ qua',
     theme: 'Giao diện: {theme}',
   },
   themes: {

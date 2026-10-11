@@ -12,8 +12,6 @@ const site: SiteMessages = {
     manual: '手册',
     install: '安装',
     language: '语言',
-    suggest: '以简体中文查看此页面',
-    dismiss: '关闭',
     theme: '主题：{theme}',
   },
   themes: {

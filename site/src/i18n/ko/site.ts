@@ -12,8 +12,6 @@ const site: SiteMessages = {
     manual: '설명서',
     install: '설치',
     language: '언어',
-    suggest: '이 페이지를 한국어로 보기',
-    dismiss: '닫기',
     theme: '테마: {theme}',
   },
   themes: {

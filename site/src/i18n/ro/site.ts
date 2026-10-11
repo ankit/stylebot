@@ -12,8 +12,6 @@ const site: SiteMessages = {
     manual: 'Manual',
     install: 'Instalează',
     language: 'Limbă',
-    suggest: 'Vezi această pagină în română',
-    dismiss: 'Închide',
     theme: 'Temă: {theme}',
   },
   themes: {
