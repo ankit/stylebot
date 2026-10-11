@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { chromium, type BrowserContext } from '@playwright/test';
 import type { Engine, Extension, LaunchOptions, Popup } from '../engine';
 import { ChromiumExtension } from './extension';
@@ -15,6 +17,16 @@ export class ChromiumEngine implements Engine {
   readonly blocksExtensionFonts = false;
 
   launch(userDataDir: string, options: LaunchOptions): Promise<BrowserContext> {
+    if (CHANNEL === 'msedge') {
+      // Edge opens its downloads hub on every download, and closing the hub, as
+      // teardown closes each page a test opened, closes the whole window.
+      fs.mkdirSync(path.join(userDataDir, 'Default'), { recursive: true });
+      fs.writeFileSync(
+        path.join(userDataDir, 'Default', 'Preferences'),
+        JSON.stringify({ browser: { show_hub_popup_on_download_start: false } })
+      );
+    }
+
     // Chrome 137+ removed --load-extension; CDP's Extensions domain replaces it
     // in loadExtension below.
     return chromium.launchPersistentContext(userDataDir, {

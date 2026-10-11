@@ -257,6 +257,29 @@ export const test = base.extend<
       return;
     }
 
+    // Edge keeps a tab's side panel open after the tab closes, and shows it,
+    // still bound to the closed tab, when the next test opens one.
+    const { extension } = await browserPool.get();
+    if (engine.hasSidePanel && extension.isRunning()) {
+      await extension.evaluate(async () => {
+        const panels = await chrome.runtime.getContexts({
+          contextTypes: ['SIDE_PANEL' as chrome.runtime.ContextType],
+        });
+        await Promise.all(
+          panels.map(panel =>
+            chrome.sidePanel
+              .setOptions({
+                tabId: Number(
+                  new URL(panel.documentUrl ?? '').searchParams.get('tabId')
+                ),
+                enabled: false,
+              })
+              .catch(() => undefined)
+          )
+        );
+      });
+    }
+
     await Promise.all(
       context
         .pages()
@@ -270,7 +293,6 @@ export const test = base.extend<
 
     // An idle-terminated background has nothing left to clear, and waiting for it
     // to come back would stall teardown.
-    const { extension } = await browserPool.get();
     if (extension.isRunning()) {
       await extension.evaluate(() => chrome.storage.local.clear());
     }

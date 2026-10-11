@@ -185,7 +185,10 @@ test('moving from the side panel to a window closes the panel', async ({
   await expect
     .poll(() => panel.evaluate(`!!${byLabel('Open in separate window')}`))
     .toBe(true);
-  await panel.evaluate(`${byLabel('Open in separate window')}.click()`);
+  // The click closes the panel, which Edge does before evaluate can answer.
+  await panel.evaluate(
+    `setTimeout(() => ${byLabel('Open in separate window')}.click())`
+  );
 
   const popout = await popoutPromise;
   await popout.locator('.stylebot-window').waitFor();
