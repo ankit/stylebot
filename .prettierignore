@@ -21,3 +21,5 @@ site
 # Chrome profile created by yarn dev:chrome.
 .chrome-dev-profile*
 .edge-dev-profile*
+# A page saved as Wikipedia served it, for the demo video
+store/video/wiki-ikigai.html

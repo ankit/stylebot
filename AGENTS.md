@@ -17,7 +17,7 @@ Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of
 - `e2e/` — Playwright end-to-end tests, driven against a real built extension: via CDP (`Extensions.loadUnpacked`) on Chrome/Edge, via Firefox's remote debugging protocol on Firefox; engine-specific code lives in `e2e/chromium/` and `e2e/firefox/` behind the `e2e/engine.ts` contract
 - `jest/` — Jest setup and the stylesheet stub
 - `dist/` — Chrome/Edge build output; `firefox-dist/` — Firefox build output; `preview-dist/` — `yarn build:preview` output
-- `store/` — store listing art (promo tiles, screenshots) per store; not part of the build. `yarn capture:store` retakes the screenshots
+- `store/` — store listing art (promo tiles, screenshots) per store; not part of the build. `yarn capture:store` retakes the screenshots; `store/video/` makes the demo video (see its README)
 - `site/` — stylebot.dev static site
 - `docs/` — developer docs: setup, releases, translation, e2e, architecture (editor, selectors, CSS, readability, profiles, sync, chat)
 - `patches/` — patch-package patches applied to dependencies on install

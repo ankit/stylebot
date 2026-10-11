@@ -1,0 +1,20 @@
+{
+  "name": "stylebot-demo-video",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "capture": "node capture.mjs",
+    "studio": "remotion studio src/index.jsx",
+    "render": "remotion render src/index.jsx Demo out/stylebot-demo.mp4",
+    "render:4k": "remotion render src/index.jsx Demo out/stylebot-demo-4k.mp4 --scale=2 --crf=16",
+    "preview": "remotion render src/index.jsx Demo out/stylebot-demo-preview.mp4 --scale=0.5 --crf=26",
+    "thumbnail": "remotion still src/index.jsx Thumbnail out/thumbnail.png"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.534",
+    "@remotion/google-fonts": "^4.0.534",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.534"
+  }
+}
