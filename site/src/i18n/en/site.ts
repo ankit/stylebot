@@ -47,7 +47,6 @@ export default {
     // Shown on phones in place of the store buttons.
     desktopOnly:
       'Stylebot runs on <strong>Chrome, Firefox and Edge</strong> on desktop.',
-    watchVideo: 'Watch how it works',
     video: 'Stylebot demo video',
     installTitle: 'Install Stylebot',
     installBody:

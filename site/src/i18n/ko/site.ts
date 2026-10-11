@@ -40,7 +40,6 @@ const site: SiteMessages = {
     also: '{first}, {second}에서도 사용 가능',
     desktopOnly:
       'Stylebot은 데스크톱용 <strong>Chrome, Firefox, Edge</strong>에서 사용할 수 있습니다.',
-    watchVideo: '사용 방법 보기',
     video: 'Stylebot 데모 동영상',
     installTitle: 'Stylebot 설치',
     installBody:

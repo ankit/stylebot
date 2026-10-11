@@ -40,7 +40,6 @@ const site: SiteMessages = {
     also: 'Juga tersedia di {first} dan {second}',
     desktopOnly:
       'Stylebot berjalan di <strong>Chrome, Firefox, dan Edge</strong> versi desktop.',
-    watchVideo: 'Lihat cara kerjanya',
     video: 'Video demo Stylebot',
     installTitle: 'Instal Stylebot',
     installBody:

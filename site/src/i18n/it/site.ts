@@ -40,7 +40,6 @@ const site: SiteMessages = {
     also: 'Anche su {first} e {second}',
     desktopOnly:
       'Stylebot funziona su <strong>Chrome, Firefox ed Edge</strong> da computer.',
-    watchVideo: 'Guarda come funziona',
     video: 'Video dimostrativo di Stylebot',
     installTitle: 'Installa Stylebot',
     installBody:

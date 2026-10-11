@@ -40,7 +40,6 @@ const site: SiteMessages = {
     also: '也支援 {first} 和 {second}',
     desktopOnly:
       'Stylebot 支援電腦版 <strong>Chrome、Firefox 和 Edge</strong>。',
-    watchVideo: '觀看使用示範',
     video: 'Stylebot 示範影片',
     installTitle: '安裝 Stylebot',
     installBody:

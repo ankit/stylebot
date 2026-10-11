@@ -40,7 +40,6 @@ const site: SiteMessages = {
     also: '{first} と {second} にも対応',
     desktopOnly:
       'Stylebot はパソコン版の <strong>Chrome、Firefox、Edge</strong> で使えます。',
-    watchVideo: '使い方を動画で見る',
     video: 'Stylebot のデモ動画',
     installTitle: 'Stylebot をインストール',
     installBody:
