@@ -12,12 +12,15 @@
 
       <input
         class="color-hex"
-        :value="value"
+        :value="shownValue"
         :disabled="disabled"
         :placeholder="placeholder || '—'"
+        :style="{ width: hexWidth }"
         spellcheck="false"
         @focus="onFocus"
         @input="onInput"
+        @blur="onBlur"
+        @keydown.enter="applyDraft.flush()"
       />
     </div>
 
@@ -34,7 +37,7 @@
       <color-picker-popover
         :value="value"
         :role-label="roleLabel"
-        @input="value = $event"
+        @input="onPick"
         @preview="preview"
       />
     </div>
@@ -44,6 +47,8 @@
 <script lang="ts">
 import Vue from 'vue';
 import { getDeclarationValue } from '@stylebot/css';
+import type { Debounced } from '@stylebot/utils';
+import { debounce } from '@stylebot/utils';
 
 import ColorPickerPopover from './ColorPickerPopover.vue';
 import { extractColor } from '../../utils/css-value';
@@ -54,6 +59,9 @@ const ROLE_LABEL_KEYS: Record<string, string> = {
   'background-color': 'color_picker_subtitle_background',
   'border-color': 'color_picker_subtitle_border',
 };
+
+const MIN_HEX_CHARS = 7;
+const MAX_HEX_CHARS = 20;
 
 // Only one popover is open at a time; opening another closes this one first.
 let closeOpenPicker: (() => void) | null = null;
@@ -80,6 +88,8 @@ export default Vue.extend({
   },
 
   data(): {
+    draft: string | null;
+    applyDraft: Debounced<[string]>;
     open: boolean;
     popoverTop: number;
     popoverLeft: number;
@@ -87,6 +97,12 @@ export default Vue.extend({
     popoverResizeObserver: ResizeObserver | null;
   } {
     return {
+      // What's typed, kept until blur: a half-typed value like `rgba(0` doesn't
+      // parse, so the store would hand back the old color mid-typing.
+      draft: null,
+      applyDraft: debounce((value: string) => {
+        this.value = value;
+      }),
       open: false,
       popoverTop: 0,
       popoverLeft: 0,
@@ -110,8 +126,25 @@ export default Vue.extend({
       );
     },
 
+    shownValue(): string {
+      return this.draft ?? this.value;
+    },
+
     shownColor(): string {
-      return this.value || this.placeholder;
+      return this.shownValue || this.placeholder;
+    },
+
+    // Only grows while typing, so replacing a value doesn't jolt the field.
+    hexWidth(): string {
+      const longest = Math.max(
+        this.value.length,
+        this.placeholder.length,
+        this.draft?.length ?? 0
+      );
+
+      const chars = Math.min(Math.max(longest, MIN_HEX_CHARS), MAX_HEX_CHARS);
+
+      return `calc(${chars}ch + 8px)`;
     },
 
     value: {
@@ -144,7 +177,16 @@ export default Vue.extend({
     },
   },
 
+  watch: {
+    // Typing still pending belongs to the rule it was typed for, not the next one.
+    '$store.state.activeSelector'(): void {
+      this.applyDraft.cancel();
+      this.draft = null;
+    },
+  },
+
   beforeDestroy() {
+    this.applyDraft.flush();
     if (closeOpenPicker === this.onClose) {
       closeOpenPicker = null;
     }
@@ -166,7 +208,19 @@ export default Vue.extend({
     },
 
     onInput(event: Event): void {
-      this.value = (event.target as HTMLInputElement).value;
+      this.draft = (event.target as HTMLInputElement).value;
+      this.applyDraft(this.draft);
+    },
+
+    onBlur(): void {
+      this.applyDraft.flush();
+      this.draft = null;
+    },
+
+    onPick(value: string): void {
+      this.applyDraft.cancel();
+      this.draft = null;
+      this.value = value;
     },
 
     toggle(): void {
@@ -308,7 +362,7 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 8px;
-  width: 96px;
+  min-width: 96px;
   height: 28px;
   padding: 0 0 0 8px;
 
@@ -352,8 +406,7 @@ export default Vue.extend({
 .color-hex {
   @include button-reset;
 
-  flex: 1;
-  min-width: 0;
+  flex: none;
   padding: 1px 8px 0 0;
   // Digits have no descenders, so a mathematically-centered box still reads
   // high — nudge down 1px to optically center it instead.

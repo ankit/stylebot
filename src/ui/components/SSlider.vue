@@ -8,12 +8,15 @@
     :value="value"
     :disabled="disabled"
     :style="{ '--fill': `${fill}%` }"
-    @input="$emit('input', $event.target.valueAsNumber)"
+    @input="emitDragged($event.target.valueAsNumber)"
+    @change="emitDragged.flush()"
   />
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
+import type { Debounced } from '@stylebot/utils';
+import { throttle } from '@stylebot/utils';
 
 export default Vue.extend({
   name: 'SSlider',
@@ -45,12 +48,23 @@ export default Vue.extend({
     },
   },
 
+  data(): { emitDragged: Debounced<[number]> } {
+    return {
+      // Owners save on every input; a drag would otherwise save each step.
+      emitDragged: throttle(value => this.$emit('input', value)),
+    };
+  },
+
   computed: {
     fill(): number {
       const span = this.max - this.min;
       const ratio = span > 0 ? (this.value - this.min) / span : 0;
       return Math.min(100, Math.max(0, ratio * 100));
     },
+  },
+
+  beforeDestroy() {
+    this.emitDragged.flush();
   },
 });
 </script>

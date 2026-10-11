@@ -47,7 +47,9 @@ export const OpacitySlider: StoryObj = {
 
     await user.clear(percent);
     await user.type(percent, '30');
-    await expect(declaration(store, 'h1', 'opacity')).toBe('0.3');
+    await waitFor(() =>
+      expect(declaration(store, 'h1', 'opacity')).toBe('0.3')
+    );
   },
 };
 
@@ -73,7 +75,9 @@ export const FilterControl: StoryObj = {
 
     await user.clear(amount);
     await user.type(amount, '10');
-    await expect(declaration(store, 'h1', 'filter')).toBe('blur(10px)');
+    await waitFor(() =>
+      expect(declaration(store, 'h1', 'filter')).toBe('blur(10px)')
+    );
     await expect(pageStyle(canvasElement, 'h1', 'filter')).toBe('blur(10px)');
 
     await user.click(option('Gray'));

@@ -5,13 +5,15 @@
     <input
       ref="input"
       class="number-input"
-      :value="value"
+      :value="shownValue"
       :disabled="disabled"
       :placeholder="placeholder || '—'"
       inputmode="decimal"
       @focus="onFocus"
+      @blur="onBlur"
       @keydown="onKeydown"
-      @input="$emit('input', $event.target.value)"
+      @keyup="flush"
+      @input="onInput"
     />
 
     <div v-if="unit" class="number-unit">{{ unit }}</div>
@@ -52,6 +54,8 @@ import type { PropType } from 'vue';
 import Vue from 'vue';
 
 import { ChevronDownIcon } from '@stylebot/icons';
+import type { Debounced } from '@stylebot/utils';
+import { debounce, throttle } from '@stylebot/utils';
 
 import SAnchoredMenu from './SAnchoredMenu.vue';
 import SMenu from './SMenu.vue';
@@ -109,25 +113,74 @@ export default Vue.extend({
     },
   },
 
+  data(): {
+    draft: string | null;
+    emitAfterTyping: Debounced<[string]>;
+    emitWhileStepping: Debounced<[string]>;
+  } {
+    return {
+      // What's typed or stepped to, shown until blur so a value the owner
+      // hasn't taken up yet stays put.
+      draft: null,
+      emitAfterTyping: debounce(value => this.$emit('input', value)),
+      emitWhileStepping: throttle(value => this.$emit('input', value)),
+    };
+  },
+
+  computed: {
+    shownValue(): string {
+      return this.draft ?? this.value;
+    },
+  },
+
+  beforeDestroy() {
+    this.flush();
+  },
+
   methods: {
     onFocus(event: FocusEvent): void {
       (event.target as HTMLInputElement).select();
     },
 
+    onBlur(): void {
+      this.flush();
+      this.draft = null;
+    },
+
+    onInput(event: Event): void {
+      this.emitWhileStepping.cancel();
+      this.draft = (event.target as HTMLInputElement).value;
+      this.emitAfterTyping(this.draft);
+    },
+
+    flush(): void {
+      this.emitAfterTyping.flush();
+      this.emitWhileStepping.flush();
+    },
+
     pick(value: string | number): void {
+      this.emitAfterTyping.cancel();
+      this.emitWhileStepping.cancel();
+      this.draft = null;
       this.$emit('input', `${value}`);
     },
 
     step(delta: number): void {
-      const base = this.value
-        ? parseInt(this.value, 10)
+      const current = this.shownValue;
+      const base = current
+        ? parseInt(current, 10)
         : Math.round(parseFloat(this.placeholder));
       const next = Number.isNaN(base) ? delta : base + delta;
-      this.$emit('input', `${next}`);
+
+      this.emitAfterTyping.cancel();
+      this.draft = `${next}`;
+      this.emitWhileStepping(this.draft);
     },
 
     onKeydown(event: KeyboardEvent): void {
-      if (event.key === 'ArrowUp') {
+      if (event.key === 'Enter') {
+        this.flush();
+      } else if (event.key === 'ArrowUp') {
         event.preventDefault();
         event.stopPropagation();
         this.step(1);

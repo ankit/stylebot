@@ -1,3 +1,4 @@
+import postcss from 'postcss';
 import type { Wrapper } from '@vue/test-utils';
 import { shallowMount } from '@vue/test-utils';
 
@@ -91,5 +92,79 @@ describe('ColorPicker.vue', () => {
 
     expect(editorKeydown).toHaveBeenCalledTimes(1);
     document.removeEventListener('keydown', editorKeydown, true);
+  });
+
+  describe('typing a value', () => {
+    const mountField = (css = '') => {
+      const store = buildMockStore();
+      if (css) {
+        store.getters.activeRule = postcss.parse(css).first as never;
+      }
+      wrapper = shallowMount(ColorPicker, {
+        propsData: { property: 'color' },
+        mocks: { $store: store },
+      });
+      return { input: wrapper.find('.color-hex'), store };
+    };
+
+    it('applies once typing pauses, not on every keystroke', async () => {
+      const { input, store } = mountField();
+
+      for (const value of ['t', 'tr', 'transparent']) {
+        await input.setValue(value);
+      }
+      expect(store.dispatch).not.toHaveBeenCalled();
+      expect((input.element as HTMLInputElement).value).toBe('transparent');
+
+      jest.runAllTimers();
+
+      expect(store.dispatch).toHaveBeenCalledTimes(1);
+      expect(store.dispatch).toHaveBeenCalledWith('applyDeclaration', {
+        property: 'color',
+        value: 'transparent',
+      });
+    });
+
+    it('applies straight away on Enter', async () => {
+      const { input, store } = mountField();
+
+      await input.setValue('red');
+      await input.trigger('keydown.enter');
+
+      expect(store.dispatch).toHaveBeenCalledWith('applyDeclaration', {
+        property: 'color',
+        value: 'red',
+      });
+    });
+
+    it('widens to fit a long value', async () => {
+      const { input } = mountField();
+
+      await input.setValue('transparent');
+
+      expect((input.element as HTMLInputElement).style.width).toBe(
+        'calc(11ch + 8px)'
+      );
+    });
+
+    it('keeps a half-typed value the store rejects', async () => {
+      const { input } = mountField();
+
+      await input.setValue('rgba(0, 0');
+      jest.runAllTimers();
+      await wrapper!.vm.$nextTick();
+
+      expect((input.element as HTMLInputElement).value).toBe('rgba(0, 0');
+    });
+
+    it("doesn't narrow when a value is replaced", async () => {
+      const { input } = mountField('h1 { color: transparent }');
+
+      await input.setValue('#');
+
+      expect((input.element as HTMLInputElement).style.width).toBe(
+        'calc(11ch + 8px)'
+      );
+    });
   });
 });

@@ -69,7 +69,7 @@ const pasteHex = async (panel: HTMLElement, value: string) => {
 
 export const HexFieldApplies: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'the hex fields apply text and background colors live',
+  name: 'the hex fields apply text and background colors once typing pauses',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -77,7 +77,9 @@ export const HexFieldApplies: StoryObj = {
     const color = hexField(canvas, 'Text');
     await expect(color).toHaveValue('#2a5fd6');
     await user.type(color, '#112233');
-    await expect(declaration(store, 'h1', 'color')).toBe('#112233');
+    await waitFor(() =>
+      expect(declaration(store, 'h1', 'color')).toBe('#112233')
+    );
     await expect(pageStyle(canvasElement, 'h1', 'color')).toBe(
       'rgb(17, 34, 51)'
     );
@@ -88,7 +90,9 @@ export const HexFieldApplies: StoryObj = {
       expect(cardCollapse(canvas, 'Background')).not.toHaveClass('collapsed')
     );
     await user.type(hexField(canvas, 'Background'), '#fafafa');
-    await expect(declaration(store, 'h1', 'background-color')).toBe('#fafafa');
+    await waitFor(() =>
+      expect(declaration(store, 'h1', 'background-color')).toBe('#fafafa')
+    );
   },
 };
 

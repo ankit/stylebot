@@ -28,7 +28,7 @@ const segments = (control: HTMLElement) =>
 
 export const FontSizeField: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'the size field applies px values live and clears them',
+  name: 'the size field applies px values once typing pauses and clears them',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -36,14 +36,17 @@ export const FontSizeField: StoryObj = {
 
     await expect(input).toHaveValue('32');
 
-    // Every keystroke applies, so the field is live rather than committed.
     await user.clear(input);
     await user.type(input, '20');
-    await expect(declaration(store, 'h1', 'font-size')).toBe('20px');
+    await waitFor(() =>
+      expect(declaration(store, 'h1', 'font-size')).toBe('20px')
+    );
     await expect(pageStyle(canvasElement, 'h1', 'font-size')).toBe('20px');
 
     await user.clear(input);
-    await expect(declaration(store, 'h1', 'font-size')).toBeUndefined();
+    await waitFor(() =>
+      expect(declaration(store, 'h1', 'font-size')).toBeUndefined()
+    );
   },
 };
 
@@ -63,8 +66,8 @@ export const LineHeightField: StoryObj = {
     await expect(input).toHaveValue('');
 
     await user.type(input, '24');
-    await expect(declaration(store, '.article-body', 'line-height')).toBe(
-      '24px'
+    await waitFor(() =>
+      expect(declaration(store, '.article-body', 'line-height')).toBe('24px')
     );
   },
 };

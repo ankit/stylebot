@@ -155,6 +155,7 @@ export default Vue.extend({
 .border-color ::v-deep .color-field {
   justify-content: center;
   width: 28px;
+  min-width: 0;
   padding: 0;
 }
 

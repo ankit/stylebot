@@ -186,6 +186,7 @@ export const setRange = async (
 ): Promise<void> => {
   input.value = String(value);
   await fireEvent.input(input);
+  await fireEvent.change(input);
 };
 
 export const numberInput = (control: HTMLElement): HTMLInputElement =>

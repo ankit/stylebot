@@ -24,10 +24,6 @@ import { debounce } from '@stylebot/utils';
 
 import CodeEditorIframe from './code/CodeEditorIframe.vue';
 
-// Typing applies once it pauses, so the page doesn't flash through every
-// partial selector on the way (`d`, `di`, `div`).
-const TYPING_DEBOUNCE_MS = 200;
-
 export default Vue.extend({
   name: 'TheCodeEditor',
 
@@ -44,13 +40,15 @@ export default Vue.extend({
       iframeLoaded: false,
       // What the iframe last showed, whether it reported it or we sent it.
       iframeCss: null,
+      // Typing applies once it pauses, so the page doesn't flash through
+      // every partial selector on the way (`d`, `di`, `div`).
       applyTypedCss: debounce((css: string) => {
         // Skips typing undone back to the store's css: re-saving it would stamp
         // a fresh modifiedTime on a just-pulled style, as if this device edited it.
         if (css !== this.$store.state.css) {
           this.$store.dispatch('applyCss', { css, source: 'code' });
         }
-      }, TYPING_DEBOUNCE_MS),
+      }),
     };
   },
 

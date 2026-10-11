@@ -68,14 +68,18 @@ export const SpacingModes: StoryObj = {
     await pickMode(canvas, padding, 'All sides');
     const all = await spacingInput(padding);
     await user.type(all, '8');
-    await expect(declaration(store, 'h1', 'padding')).toBe('8px');
+    await waitFor(() =>
+      expect(declaration(store, 'h1', 'padding')).toBe('8px')
+    );
     await expect(pageStyle(canvasElement, 'h1', 'padding')).toBe('8px');
 
     await pickMode(canvas, padding, 'Individual');
     const top = await spacingInput(padding, 'T');
     // Focusing a field selects its value, so typing replaces it.
     await user.type(top, '4');
-    await expect(declaration(store, 'h1', 'padding')).toBe('4px 8px 8px');
+    await waitFor(() =>
+      expect(declaration(store, 'h1', 'padding')).toBe('4px 8px 8px')
+    );
     await expect(pageStyle(canvasElement, 'h1', 'padding-top')).toBe('4px');
     await expect(pageStyle(canvasElement, 'h1', 'padding-left')).toBe('8px');
 
@@ -83,7 +87,9 @@ export const SpacingModes: StoryObj = {
     await pickMode(canvas, padding, 'All sides');
     await user.type(await spacingInput(padding), '3');
     await user.clear(await spacingInput(padding));
-    await expect(declaration(store, 'h1', 'padding')).toBeUndefined();
+    await waitFor(() =>
+      expect(declaration(store, 'h1', 'padding')).toBeUndefined()
+    );
     await expect(declaration(store, 'h1', 'padding-top')).toBeUndefined();
     await expect(pageStyle(canvasElement, 'h1', 'padding')).toBe('0px');
   },

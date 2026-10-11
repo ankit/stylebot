@@ -6,10 +6,11 @@ export type Debounced<A extends Array<unknown>> = ((...args: A) => void) & {
 /**
  * Delays calls to `fn` until `wait` ms have passed without another call;
  * the last arguments win. `cancel` drops a pending call, `flush` runs it now.
+ * The default wait suits typing: long enough to skip keystrokes mid-word.
  */
 export const debounce = <A extends Array<unknown>>(
   fn: (...args: A) => void,
-  wait: number
+  wait = 200
 ): Debounced<A> => {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
   let pendingArgs: A | undefined;
