@@ -20,7 +20,7 @@ export const BROWSERS = Object.keys(STORES) as Browser[];
 export const LINKS = {
   github: 'https://github.com/ankit/stylebot',
   issues: 'https://github.com/ankit/stylebot/issues',
-  changelog: 'https://github.com/ankit/stylebot/blob/v4/CHANGELOG.md',
+  changelog: 'https://github.com/ankit/stylebot/releases',
   donate: 'https://ko-fi.com/stylebot',
   manual: '/manual',
   author: 'https://ankitahuja.com',
