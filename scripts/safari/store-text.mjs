@@ -47,15 +47,27 @@ const LIMITS = {
   description: { max: 4000, measure: text => [...text].length },
 };
 
+const BULLET = '★';
+
+const bulletsOf = listing =>
+  listing.split('\n').filter(line => line.startsWith(BULLET));
+
 /**
  * The Chrome Web Store description without its command line bullet, since
- * Safari builds don't carry the CLI. That bullet is the one naming Claude Code.
+ * Safari builds don't carry the CLI, and with • bullets, since App Store
+ * Connect rejects ★. Every locale lists its bullets in English's order.
  */
-const toDescription = listing =>
-  listing
+const toDescription = (listing, cliBullet) => {
+  const cliLine = bulletsOf(listing)[cliBullet];
+
+  return listing
     .split('\n')
-    .filter(line => !(line.startsWith('★') && line.includes('Claude Code')))
+    .filter(line => line !== cliLine)
+    .map(line =>
+      line.startsWith(BULLET) ? `•${line.slice(BULLET.length)}` : line
+    )
     .join('\n');
+};
 
 const read = locale =>
   parseLocaleConfig(
@@ -64,15 +76,33 @@ const read = locale =>
 
 rmSync(outDir, { recursive: true, force: true });
 
+const englishBullets = bulletsOf(read('en_US').store_listing.message);
+const cliBullet = englishBullets.findIndex(line =>
+  line.startsWith(`${BULLET} Command line`)
+);
+
+if (cliBullet === -1) {
+  console.error('✗ Found no command line bullet in the English store listing');
+  process.exit(1);
+}
+
 let failed = 0;
 
 for (const [storeLocale, locale] of Object.entries(LOCALES)) {
   const messages = read(locale);
+  if (
+    bulletsOf(messages.store_listing.message).length !== englishBullets.length
+  ) {
+    failed++;
+    console.error(
+      `✗ ${storeLocale} store listing has a different bullet count`
+    );
+  }
   const fields = {
     name: 'Stylebot',
     subtitle: messages.app_store_subtitle.message,
     keywords: messages.app_store_keywords.message,
-    description: toDescription(messages.store_listing.message),
+    description: toDescription(messages.store_listing.message, cliBullet),
   };
   const dir = path.join(outDir, storeLocale);
   mkdirSync(dir, { recursive: true });

@@ -15,8 +15,8 @@ Pull requests target `main`, and the release workflow only runs on pull requests
 - Safari (Mac App Store, macOS 15 and later):
   - Run `yarn upload:safari` with `STYLEBOT_GOOGLE_CLIENT_SECRET` set to the Desktop OAuth client's secret — Drive sign-in needs it. It builds the extension, archives the app and uploads it to App Store Connect, signing with the Apple account signed in to Xcode, or with an App Store Connect API key when `APP_STORE_CONNECT_KEY_PATH`, `APP_STORE_CONNECT_KEY_ID` and `APP_STORE_CONNECT_ISSUER_ID` are set
   - The app and extension take their version from the manifest and a build number from the build's time, so there's nothing to bump in Xcode, and a rebuilt upload of the same version is accepted as a new build
-  - For the listing, `yarn store:safari-text` writes each language's name, subtitle, keywords and description, from the store copy in the locale files, into `store/safari/listing/` to paste into App Store Connect. Screenshots are in `store/safari/`
-  - In App Store Connect, try the build through TestFlight, then add it to the new version and submit it for review. Before installing it, quit Safari and run `yarn clean:safari`, which unregisters every other Stylebot.app so Safari loads only the TestFlight one
+  - For the listing, `yarn store:safari-text` writes each language's name, subtitle, keywords and description, from the store copy in the locale files, into `store/safari/listing/`. Then `yarn upload:safari-listing`, with the API key set, fills in the version being prepared in App Store Connect: its version number, each language's listing, the screenshots in `store/safari/` and the newest processed build of that version. App Privacy, the age rating, pricing and the review notes are set in App Store Connect itself
+  - In App Store Connect, try the build through TestFlight, then submit the version for review. Before installing it, quit Safari and run `yarn clean:safari`, which unregisters every other Stylebot.app so Safari loads only the TestFlight one
 
 ## CLI
 
