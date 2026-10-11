@@ -16,8 +16,18 @@ Change the appearance of any website. Available for [Chrome](https://chrome.goog
 - **Instant**: Every change applies as you make it and saves automatically.
 - **Presets**: Readability for distraction-free articles, Grayscale to mute color.
 - **Sync and history**: Keep styles in sync across browsers and restore any site's earlier versions.
+- **Command line**: Restyle pages from the terminal, or let a coding agent such as Claude Code do it.
 
-Stylebot 4 is in active development on the `v4` branch; the stores ship 3.x from `main`.
+## Command line
+
+The `stylebot` CLI drives Stylebot in your running browser: list tabs, inspect pages, get and set styles, and take screenshots. Turn it on in Stylebot's options, then:
+
+```bash
+npm install -g @stylebot/cli
+stylebot install
+```
+
+It works on Chrome, Edge and other Chromium browsers. See [docs/cli.md](docs/cli.md) for commands and the Claude Code plugin.
 
 ## Contributing
 
