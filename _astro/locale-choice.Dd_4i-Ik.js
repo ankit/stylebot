@@ -1,0 +1,1 @@
+var e=`stylebot-site-locale-chosen`;export{e as t};
