@@ -31,6 +31,7 @@ const UNREFERENCED_KEYS = new Set([
   'store_listing',
   'app_store_subtitle',
   'app_store_keywords',
+  'edge_search_terms',
 ]);
 
 // Attributes and script properties whose value a user reads.
