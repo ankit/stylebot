@@ -342,13 +342,16 @@ export default Vue.extend({
   font-weight: 400;
   line-height: 1.3;
   width: max-content;
-  overflow-wrap: anywhere;
   pointer-events: none;
 
   &.placement-bottom {
     bottom: auto;
     top: calc(100% + 6px);
   }
+}
+
+.tooltip-text {
+  overflow-wrap: anywhere;
 }
 
 .tooltip-shortcut {
