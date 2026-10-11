@@ -1,7 +1,11 @@
-import { getPageSupport } from '@stylebot/utils';
+import { getPageSupport, isSafari } from '@stylebot/utils';
 import type { EditorWindowBounds, StylebotLayout } from '@stylebot/types';
 
 import { get as getOption } from './options';
+import {
+  unstretchInSafari,
+  restoreBoundsInSafari,
+} from './editor-window-safari';
 
 const SESSION_KEY = 'editorWindows';
 
@@ -109,14 +113,16 @@ const getBounds = async (tab: chrome.tabs.Tab): Promise<EditorWindowBounds> => {
 };
 
 /**
- * Chrome refuses bounds that aren't mostly on a visible screen — a saved
- * position from a monitor that's gone, say — so fall back to letting it
- * place the window, keeping the size, then to its defaults.
+ * Opens the editor window on the page at `url` with the given bounds. Chrome
+ * refuses bounds that aren't mostly on a visible screen — a saved position
+ * from a monitor that's gone, say — so fall back to letting it place the
+ * window, keeping the size, then to its defaults.
  */
 const createWindow = (
-  base: chrome.windows.CreateData,
+  url: string,
   bounds: EditorWindowBounds
 ): Promise<chrome.windows.Window | undefined> => {
+  const base: chrome.windows.CreateData = { url, type: 'popup', focused: true };
   const fallbacks: Array<Partial<EditorWindowBounds>> = [
     { width: bounds.width, height: bounds.height },
     {},
@@ -166,21 +172,26 @@ const openWindow = async (tabId: number): Promise<void> => {
   // Passed on the URL, not read from storage by the window itself, so its
   // first paint can already match instead of flashing the wrong theme.
   const appearance = await getOption('appearance');
-
-  const created = await createWindow(
-    {
-      url: chrome.runtime.getURL(
-        `editor-window/index.html?tabId=${tabId}&appearance=${appearance}`
-      ),
-      type: 'popup',
-      focused: true,
-    },
-    await getBounds(tab)
+  const url = chrome.runtime.getURL(
+    `editor-window/index.html?tabId=${tabId}&appearance=${appearance}`
   );
 
-  if (created?.id !== undefined) {
-    await saveRegistry({ ...(await loadRegistry()), [tabId]: created.id });
+  let bounds = await getBounds(tab);
+  if (isSafari()) {
+    bounds = await unstretchInSafari(bounds, tab, DEFAULT_WIDTH);
   }
+  const created = await createWindow(url, bounds);
+
+  if (created?.id === undefined) {
+    return;
+  }
+
+  if (isSafari()) {
+    restoreBoundsInSafari(created.id, bounds);
+  }
+
+  const current = await loadRegistry();
+  await saveRegistry({ ...current, [tabId]: created.id });
 };
 
 export const close = async (tabId: number): Promise<void> => {

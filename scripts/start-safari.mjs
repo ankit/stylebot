@@ -5,6 +5,7 @@
 
 import { existsSync, mkdirSync, readFileSync, watch } from 'node:fs';
 import { spawnSync } from 'node:child_process';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -86,8 +87,41 @@ const waitForBuild = baseline =>
     checkNow();
   });
 
+const lsregister =
+  '/System/Library/Frameworks/CoreServices.framework/Frameworks/' +
+  'LaunchServices.framework/Support/lsregister';
+
+/**
+ * Unregisters the Stylebot.app other checkouts built, e.g. another worktree's.
+ * Safari lists each as its own Stylebot, which confuses sync, and two copies
+ * running at once can corrupt the extension's storage and crash Safari.
+ */
+const unregisterOtherCopies = appPath => {
+  const derivedData = path.join(
+    os.homedir(),
+    'Library/Developer/Xcode/DerivedData'
+  );
+  const { stdout } = spawnSync(
+    'find',
+    [derivedData, '-name', 'Stylebot.app', '-type', 'd', '-prune'],
+    { encoding: 'utf8' }
+  );
+  const others = stdout.split('\n').filter(other => other && other !== appPath);
+
+  others.forEach(other => {
+    const extension = path.join(
+      other,
+      'Contents/PlugIns/Stylebot Extension.appex'
+    );
+    spawnSync('pluginkit', ['-r', extension]);
+    spawnSync(lsregister, ['-u', other]);
+  });
+};
+
 const launch = () => {
-  spawnSync('open', [getAppPath()], { stdio: 'inherit' });
+  const appPath = getAppPath();
+  unregisterOtherCopies(appPath);
+  spawnSync('open', [appPath], { stdio: 'inherit' });
   spawnSync('open', ['-a', 'Safari'], { stdio: 'inherit' });
 
   console.log(`
@@ -120,6 +154,12 @@ if (watchMode) {
 } else {
   if (!existsSync(path.join(distDir, 'manifest.json'))) {
     console.error('safari-dist/ is missing; run yarn build:safari first.');
+    process.exit(1);
+  }
+  // Reinstalling under a running Safari can corrupt the extension's
+  // declarativeNetRequest store, after which Safari crashes on every launch.
+  if (spawnSync('pgrep', ['-x', 'Safari']).status === 0) {
+    console.error('Quit Safari first; installing while it runs can break it.');
     process.exit(1);
   }
   if (!buildApp()) {
