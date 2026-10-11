@@ -1,3 +1,23 @@
+## Version 4.0.0 (October 2026)
+
+- Redesign the editor, with dark mode, grouped Basic controls that show the page's own values, color palettes and an eyedropper, hover previews for colors and fonts, in-place editing of any other property, and undo/redo (#1109, #1108, #1103, #1101, #1158, #1055, #1124, #916)
+- Generate better selectors that keep working when a site updates, with alternatives to choose from (#949, #1102, #1110, #1165, #1168, #1178, #1179)
+- Add profiles, to keep several looks for a site and switch between them from the editor, the popup or the options page (#1123, #1125, #1130, #1134)
+- Open the editor in Chrome and Edge's side panel, or pop it out into its own window (#993, #994, #996)
+- Add Chat: describe a look, or pick a suggested one, and Stylebot writes the CSS, with your own Claude, OpenAI or Gemini key (#1073, #1074, #1075, #1076, #1143, #1174, #1176)
+- Add the `stylebot` command line, so coding agents like Claude Code can restyle pages in your browser
+- Add version history, to restore any earlier version of a style (#1020)
+- Make Google Drive sync more robust: edits from different computers are merged, and sync runs on its own every 30 minutes and after you edit (#975, #976, #977, #1156, #1160)
+- Apply styles inside shadow DOM, so they work on sites built with web components
+- Redesign the options page's Styles, style editor, Basics and version history pages, and review a backup before importing it (#964, #1135)
+- Move Stylebot's shortcuts into the browser's shortcut settings; in Chrome and Edge, shortcuts you changed are back to their defaults (#1117)
+- Install styles from the stylebot.dev gallery as new profiles
+- Load pages faster by injecting precompiled styles and loading the editor and reader only when needed (#1028, #1041, #1026, #1042)
+- Fix Google Fonts on pages with a strict content security policy, and stop web fonts flashing while editing (#1119, #1166, #1167)
+- Support native CSS nesting (#1010)
+- Add Vietnamese and Indonesian, and revise every other translation
+- Update the Stylebot icon and launch a new stylebot.dev (#1045, #1031)
+
 ## Version 3.2.4 (September 2026)
 
 - Fix CSS autocomplete and color swatches not working in the code editor (#921)
