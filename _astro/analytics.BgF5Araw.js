@@ -1,0 +1,1 @@
+function e(e,t){window.plausible?.(e,t&&{props:t})}export{e as t};
