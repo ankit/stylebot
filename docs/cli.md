@@ -65,6 +65,18 @@ Commands that only read default to the active tab, or take `--tab` when their ar
 - A **target** is a tab id or a site, such as `news.ycombinator.com`.
 - A **profile** is named by its name or id.
 
+### Several browsers
+
+Each browser running Stylebot with the setting on connects on its own, and so does each profile of one browser. With one connected, commands go to it. With more, every command takes `--browser` to say which, since each keeps its own styles and tabs:
+
+```bash
+yarn stylebot browsers
+yarn stylebot open news.ycombinator.com --browser edge
+```
+
+- `browsers` lists them, each with the page it shows, to tell them apart. A browser goes by its name, such as `chrome` or `edge`, or by its name and a short id, such as `chrome-k3f9`, when two of its profiles are connected.
+- A command run on a terminal without `--browser` asks which browser to use. Run elsewhere, such as by an agent, it fails, listing the browsers to choose from. The `/stylebot` skill then asks you which one, and names it in every command after.
+
 ### Pages
 
 ```bash
@@ -321,19 +333,21 @@ To run `stylebot` commands without a prompt each time:
 
 ## A second browser
 
-A test, or a second worktree, can run its own dev browser beside yours without taking over your CLI connection: give it its own profile and socket.
+A test, or a second worktree, can run its own dev browser beside yours. It connects like any other browser, so the CLI asks which to use. To keep it apart entirely, give it its own profile and socket:
 
 ```bash
 STYLEBOT_PROFILE_DIR=.chrome-dev-profile-test STYLEBOT_SOCKET=~/.stylebot/test.sock yarn start:chrome
 ```
 
-Run `stylebot install` once the profile folder exists, so it's registered there too, and run the CLI with the same `STYLEBOT_SOCKET` to drive that browser.
+Run `stylebot install` once the profile folder exists, so it's registered there too, and run the CLI with the same `STYLEBOT_SOCKET` to drive that browser. With it set, the CLI sees only that browser, and without it, never sees it.
 
 To try the CLI against a release-like build, run `yarn preview:chrome` instead of `yarn start:chrome`. It carries the store's key, so it gets the extension id the host allows.
 
 ## How it works
 
-The browser starts the native host when the extension connects to it, and keeps it running while the connection is open. The host listens on a Unix socket in `~/.stylebot/`, readable only by you, and relays each CLI command to the extension and its answer back.
+The browser starts the native host when the extension connects to it, and keeps it running while the connection is open. Each browser profile with Stylebot connected starts its own host. Each host listens on its own Unix socket in `~/.stylebot/browsers/`, readable only by you, and relays each CLI command to the extension and its answer back.
+
+The CLI finds the browsers through their sockets. With more than one, it asks each extension which browser it runs in and what page that browser shows, to name them for `--browser` and to ask you which to use. A socket nothing listens on, left by a host that quit without cleaning up, is removed. A host started before each browser had its own socket listens on the one all browsers used to share, and the CLI finds it there too until the browser restarts.
 
 The code that reads a page loads into it the first time the CLI asks about that page, so pages the CLI never touches don't carry it. It runs in the top frame only.
 
@@ -351,7 +365,7 @@ The host copy in `~/.stylebot/` records the CLI version that installed it. When 
 
 ### Windows
 
-Windows has no Unix sockets, so there the host listens on a named pipe for your user, and a `STYLEBOT_SOCKET` path names a pipe after its file. A pipe can't be taken over, so on Windows the first browser to connect keeps the CLI until it quits.
+Windows has no Unix sockets, so there each host listens on a named pipe for your user, and a `STYLEBOT_SOCKET` path names a pipe after its file. A pipe can't be taken over, so with `STYLEBOT_SOCKET` set, the first browser to connect keeps it until it quits.
 
 ### Where browsers find the host
 

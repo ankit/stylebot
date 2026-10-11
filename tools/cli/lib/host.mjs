@@ -2,6 +2,7 @@
  * The native messaging host the browser starts for Stylebot. Relays each
  * request from the `stylebot` CLI, which arrives on a Unix socket (a named
  * pipe on Windows), to the extension over stdio, and its response back.
+ * Each browser profile running Stylebot starts its own host, on its own socket.
  */
 import fs from 'node:fs';
 import net from 'node:net';
@@ -10,9 +11,11 @@ import path from 'node:path';
 import {
   HOST_STARTED_PATH,
   IS_WINDOWS,
-  SOCKET_PATH,
   STATE_DIR,
+  hostSocketPath,
 } from './paths.mjs';
+
+const SOCKET_PATH = hostSocketPath(process.pid);
 
 const pending = new Map();
 let nextId = 1;
@@ -99,7 +102,7 @@ try {
 }
 
 if (IS_WINDOWS) {
-  // A pipe can't be taken over, so the first browser to start the host keeps it.
+  // A pipe can't be taken over, so with STYLEBOT_SOCKET the first browser keeps it.
   server.on('error', error => {
     console.error(`stylebot: can't listen on ${SOCKET_PATH}: ${error.message}`);
     process.exit(1);
@@ -107,7 +110,7 @@ if (IS_WINDOWS) {
   server.listen(SOCKET_PATH);
 } else {
   fs.mkdirSync(path.dirname(SOCKET_PATH), { recursive: true, mode: 0o700 });
-  // The newest browser to start the host takes over the socket.
+  // A stale socket from a crashed host, or with STYLEBOT_SOCKET, another browser's.
   fs.rmSync(SOCKET_PATH, { force: true });
   server.listen(SOCKET_PATH, () => fs.chmodSync(SOCKET_PATH, 0o600));
 }

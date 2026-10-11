@@ -1,9 +1,8 @@
-import net from 'node:net';
-
+import { chooseSocket } from './browsers.mjs';
 import { diagnoseConnection } from './diagnose.mjs';
+import { exchange } from './exchange.mjs';
 import { prepareHost } from './install.mjs';
-import { SOCKET_PATH } from './paths.mjs';
-import { cliStamp, incompatibility } from './protocol.mjs';
+import { incompatibility } from './protocol.mjs';
 import { isStyled, linkify } from './style.mjs';
 
 export const fail = message => {
@@ -14,44 +13,35 @@ export const fail = message => {
 };
 
 /**
- * Sends one command to the extension through the native host and resolves
- * to its result.
+ * Sends one command to the extension through the native host of the browser
+ * it's meant for, and resolves to its result.
  */
-export const request = (command, args = {}) =>
-  new Promise((resolve, reject) => {
-    const { repinned } = prepareHost();
-    const socket = net.connect(SOCKET_PATH);
-    let output = '';
+export const request = async (command, args = {}) => {
+  const { repinned } = prepareHost();
+  let response;
 
-    socket.on('connect', () =>
-      socket.write(`${JSON.stringify({ command, args, ...cliStamp() })}\n`)
-    );
-    socket.on('data', chunk => (output += chunk));
-    socket.on('error', error => {
-      if (error.code === 'ENOENT' || error.code === 'ECONNREFUSED') {
-        reject(new Error(diagnoseConnection({ code: error.code, repinned })));
-      } else {
-        reject(error);
-      }
-    });
-    socket.on('end', () => {
-      if (!output) {
-        reject(new Error('The extension closed the connection'));
-        return;
-      }
+  try {
+    response = await exchange(await chooseSocket(), command, args);
+  } catch (error) {
+    if (error.code === 'ENOENT' || error.code === 'ECONNREFUSED') {
+      throw new Error(diagnoseConnection({ code: error.code, repinned }));
+    }
 
-      const response = JSON.parse(output);
-      const problem = incompatibility(response);
+    throw error;
+  }
 
-      if (problem) {
-        reject(new Error(problem));
-      } else if ('error' in response) {
-        reject(new Error(response.error));
-      } else {
-        resolve(response.result);
-      }
-    });
-  });
+  const problem = incompatibility(response);
+
+  if (problem) {
+    throw new Error(problem);
+  }
+
+  if ('error' in response) {
+    throw new Error(response.error);
+  }
+
+  return response.result;
+};
 
 /**
  * Prints a command's result through its formatter, or as JSON with --json.

@@ -1,9 +1,9 @@
 import fs from 'node:fs';
-import net from 'node:net';
 import path from 'node:path';
 
+import { connectedBrowsers } from './browsers.mjs';
 import { CLI_VERSION, LIB_DIR } from './package.mjs';
-import { HOST_DIR, HOST_VERSION_PATH, SOCKET_PATH } from './paths.mjs';
+import { HOST_DIR, HOST_VERSION_PATH } from './paths.mjs';
 import {
   findStylebot,
   isHostRegistered,
@@ -27,20 +27,6 @@ const copyHost = () => {
 
   fs.writeFileSync(HOST_VERSION_PATH, `${CLI_VERSION}\n`);
 };
-
-/**
- * Whether a host is listening on the socket, so Stylebot is connected.
- */
-const isConnected = () =>
-  new Promise(resolve => {
-    const socket = net.connect(SOCKET_PATH);
-
-    socket.on('connect', () => {
-      socket.destroy();
-      resolve(true);
-    });
-    socket.on('error', () => resolve(false));
-  });
 
 /**
  * Names joined as a sentence would: "Chrome, Edge and Arc".
@@ -94,8 +80,11 @@ export const checklist = ({ browsers, stylebot, connected }) => {
   }
 
   steps.push(
-    connected
-      ? { done: true, text: 'Connected to Stylebot' }
+    connected.length
+      ? {
+          done: true,
+          text: `Connected to Stylebot in ${sentence([...new Set(connected)])}`,
+        }
       : {
           done: false,
           text: 'Turn on "Allow command line access" in Stylebot\'s settings',
@@ -149,7 +138,7 @@ export const install = async () => {
     checklist({
       browsers: registrations.map(({ browser }) => browser),
       stylebot: findStylebot(),
-      connected: await isConnected(),
+      connected: (await connectedBrowsers()).browsers.map(({ name }) => name),
     })
   );
 };

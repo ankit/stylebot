@@ -427,11 +427,11 @@ describe('findStylebot', () => {
   });
 });
 
-describe('SOCKET_PATH', () => {
+describe('hostSocketPath', () => {
   afterEach(() => delete process.env.STYLEBOT_SOCKET);
 
   /**
-   * The socket path paths.mjs settles on for a platform.
+   * Where paths.mjs has the host with process id 42 listen, on a platform.
    */
   const socketPath = async (platform, home = 'C:\\Users\\ankit') => {
     let paths;
@@ -441,16 +441,25 @@ describe('SOCKET_PATH', () => {
       paths = require('./paths.mjs');
     });
 
-    return paths.SOCKET_PATH;
+    return paths.hostSocketPath(42);
   };
 
-  it('is a named pipe for the user on Windows', async () => {
-    expect(await socketPath('win32')).toBe('\\\\.\\pipe\\stylebot-cli-ankit');
+  it('is a named pipe for the user and host on Windows', async () => {
+    expect(await socketPath('win32')).toBe(
+      '\\\\.\\pipe\\stylebot-browser-42-ankit'
+    );
   });
 
-  it('is a socket in ~/.stylebot elsewhere', async () => {
+  it('is a socket for the host in ~/.stylebot/browsers elsewhere', async () => {
     expect(await socketPath('linux', '/home/ankit')).toBe(
-      '/home/ankit/.stylebot/cli.sock'
+      '/home/ankit/.stylebot/browsers/42.sock'
+    );
+  });
+
+  it('is the socket given, shared by every host', async () => {
+    process.env.STYLEBOT_SOCKET = '/home/ankit/.stylebot/test.sock';
+    expect(await socketPath('linux', '/home/ankit')).toBe(
+      '/home/ankit/.stylebot/test.sock'
     );
   });
 

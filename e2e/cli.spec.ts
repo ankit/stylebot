@@ -186,6 +186,64 @@ const copyCliWithProtocol = (delta: number): string => {
   return dir;
 };
 
+/**
+ * Launches a browser with its user data in the test HOME and Stylebot in it,
+ * granted the CLI's permissions.
+ */
+const launchBrowser = async (userDataDir: string, headless: boolean) => {
+  fs.mkdirSync(userDataDir, { recursive: true });
+
+  const engine = new ChromiumEngine();
+
+  // The host the browser starts inherits HOME, so it listens in the test HOME too.
+  const launched = await engine.launch(userDataDir, {
+    headless,
+    viewport: null,
+    colorScheme: null,
+    env,
+  });
+
+  launched.on('page', page =>
+    page.once('framenavigated', () => {
+      if (/^https:\/\/stylebot\.dev\/welcome/.test(page.url())) {
+        page.close().catch(() => {});
+      }
+    })
+  );
+
+  // Chrome keeps a permission granted when the next version makes it optional.
+  await engine.loadExtension(
+    launched,
+    copyBuild('granted', grantCliPermissions)
+  );
+  const { id } = await engine.loadExtension(
+    launched,
+    copyBuild('stylebot', () => {})
+  );
+
+  return { context: launched, extensionId: id };
+};
+
+/**
+ * Turns on the CLI setting in Options, as a user would.
+ */
+const turnOnCli = async (browser: BrowserContext, id: string) => {
+  const options = await browser.newPage();
+  await options.goto(`chrome-extension://${id}/options.html#/basics`);
+  // A real click, so the permissions request has its user gesture.
+  await options
+    .getByRole('heading', {
+      name: 'Allow command line access',
+    })
+    .click();
+  await expect(
+    options.getByRole('checkbox', {
+      name: /Allow command line access/,
+    })
+  ).toBeChecked();
+  await options.close();
+};
+
 const cliPage = (): Page | undefined =>
   context.pages().find(page => page.url() === `${baseUrl}/`);
 
@@ -199,43 +257,15 @@ test.describe.configure({ mode: 'serial' });
 test.beforeAll(async ({}, testInfo) => {
   testInfo.setTimeout(60_000);
 
-  home = fs.mkdtempSync(path.join(os.tmpdir(), 'stylebot-e2e-cli-'));
+  // Short, as macOS caps a socket's path, which the host's is in this HOME, at 103 bytes.
+  home = fs.mkdtempSync(path.join(os.tmpdir(), 'sb-cli-'));
   env = { ...process.env, HOME: home };
   // Another browser's socket, from your shell, mustn't leak into the test.
   delete env.STYLEBOT_SOCKET;
 
-  const userDataDir = path.join(
-    home,
-    USER_DATA_DIRS[process.platform][BROWSER]
-  );
-  fs.mkdirSync(userDataDir, { recursive: true });
-
-  const engine = new ChromiumEngine();
-
-  // The host the browser starts inherits HOME, so it listens in the test HOME too.
-  context = await engine.launch(userDataDir, {
-    headless: testInfo.project.use.headless ?? true,
-    viewport: null,
-    colorScheme: null,
-    env,
-  });
-
-  context.on('page', page =>
-    page.once('framenavigated', () => {
-      if (/^https:\/\/stylebot\.dev\/welcome/.test(page.url())) {
-        page.close().catch(() => {});
-      }
-    })
-  );
-
-  // Chrome keeps a permission granted when the next version makes it optional.
-  await engine.loadExtension(
-    context,
-    copyBuild('granted', grantCliPermissions)
-  );
-  ({ id: extensionId } = await engine.loadExtension(
-    context,
-    copyBuild('stylebot', () => {})
+  ({ context, extensionId } = await launchBrowser(
+    path.join(home, USER_DATA_DIRS[process.platform][BROWSER]),
+    testInfo.project.use.headless ?? true
   ));
 
   const routes: Parameters<typeof startTestServer>[0] = {
@@ -269,25 +299,11 @@ test('with the setting off, a command says to turn it on', async () => {
 });
 
 test('turning the setting on in Options connects the CLI', async () => {
-  const options = await context.newPage();
-  await options.goto(`chrome-extension://${extensionId}/options.html#/basics`);
-  // A real click, so the permissions request has its user gesture.
-  await options
-    .getByRole('heading', {
-      name: 'Allow command line access',
-    })
-    .click();
-  await expect(
-    options.getByRole('checkbox', {
-      name: /Allow command line access/,
-    })
-  ).toBeChecked();
+  await turnOnCli(context, extensionId);
 
   await expect
     .poll(async () => (await cli(['tabs'])).code, { timeout: 15_000 })
     .toBe(0);
-
-  await options.close();
 });
 
 test("open shows the page in the CLI's own window without switching yours", async () => {
@@ -696,4 +712,69 @@ test('a CLI on another protocol says which side to update', async () => {
   const behind = await cli(['tabs'], copyCliWithProtocol(-1));
   expect(behind.code).toBe(1);
   expect(behind.stderr).toContain('npm update -g @stylebot/cli');
+});
+
+test('with Stylebot in two browsers, the CLI asks which and uses the one named', async ({}, testInfo) => {
+  testInfo.setTimeout(60_000);
+
+  const first = USER_DATA_DIRS[process.platform][BROWSER];
+  const userDataDir = path.join(home, `${first} Second`);
+  fs.mkdirSync(userDataDir, { recursive: true });
+  fs.cpSync(
+    path.join(home, first, 'NativeMessagingHosts'),
+    path.join(userDataDir, 'NativeMessagingHosts'),
+    { recursive: true }
+  );
+
+  const second = await launchBrowser(
+    userDataDir,
+    testInfo.project.use.headless ?? true
+  );
+
+  try {
+    await turnOnCli(second.context, second.extensionId);
+    const page = await second.context.newPage();
+    await page.goto(`${baseUrl}/yours`);
+    await page.bringToFront();
+
+    type Browser = { key: string; page?: { url: string } };
+    const browsers = async () => json<Array<Browser>>(['browsers']);
+
+    await expect
+      .poll(async () => (await browsers()).length, { timeout: 15_000 })
+      .toBe(2);
+
+    const listed = await browsers();
+    const secondKey = listed.find(
+      ({ page }) => page?.url === `${baseUrl}/yours`
+    )!.key;
+    const firstKey = listed.find(({ key }) => key !== secondKey)!.key;
+
+    const { code, stderr } = await cli(['tabs']);
+    expect(code).toBe(1);
+    expect(stderr).toContain(
+      'Stylebot is running in 2 browsers. Name the one to use with --browser:'
+    );
+    expect(stderr).toContain(secondKey);
+
+    const tabsIn = async (key: string) =>
+      (await json<Array<Tab>>(['tabs', '--browser', key])).map(
+        ({ url }) => url
+      );
+    expect(await tabsIn(secondKey)).toContain(`${baseUrl}/yours`);
+    expect(await tabsIn(firstKey)).not.toContain(`${baseUrl}/yours`);
+
+    const unknown = await cli(['tabs', '--browser', 'netscape']);
+    expect(unknown.code).toBe(1);
+    expect(unknown.stderr).toContain(
+      'Stylebot isn\'t running in a browser named "netscape"'
+    );
+  } finally {
+    await second.context.close();
+  }
+
+  // With the second browser gone, commands go to the first again without asking.
+  await expect
+    .poll(async () => (await cli(['tabs'])).code, { timeout: 15_000 })
+    .toBe(0);
 });

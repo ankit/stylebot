@@ -160,13 +160,13 @@ describe('checklist', () => {
       checklist({
         browsers: ['Dev profile', 'Chrome', 'Brave', 'Dev profile'],
         stylebot: ['Chrome'],
-        connected: true,
+        connected: ['Chrome', 'Edge', 'Chrome'],
       })
     ).toEqual([
       { done: true, text: 'Set up the stylebot command' },
       { done: true, text: 'Found Chrome, Brave and your dev profiles' },
       { done: true, text: 'Stylebot is in Chrome' },
-      { done: true, text: 'Connected to Stylebot' },
+      { done: true, text: 'Connected to Stylebot in Chrome and Edge' },
     ]);
   });
 
@@ -174,7 +174,7 @@ describe('checklist', () => {
     const steps = checklist({
       browsers: ['Edge'],
       stylebot: [],
-      connected: false,
+      connected: [],
     });
 
     expect(steps.map(step => [step.done, step.text])).toEqual([
@@ -187,14 +187,14 @@ describe('checklist', () => {
 
   it("skips the Stylebot step when there's no profile to look in", () => {
     expect(
-      checklist({ browsers: ['Chrome'], stylebot: undefined, connected: false })
+      checklist({ browsers: ['Chrome'], stylebot: undefined, connected: [] })
         .map(step => step.text)
         .some(text => /Stylebot is in|Add Stylebot/.test(text))
     ).toBe(false);
   });
 
   it('stops at installing a browser when none was found', () => {
-    expect(checklist({ browsers: [], connected: false })).toEqual([
+    expect(checklist({ browsers: [], connected: [] })).toEqual([
       { done: true, text: 'Set up the stylebot command' },
       {
         done: false,
