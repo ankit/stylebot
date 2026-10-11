@@ -346,55 +346,37 @@ const site: SiteMessages = {
     title: 'Privacy',
     description:
       'Cosa fa Stylebot con i tuoi dati: nessun server, nessun account, nessuna analisi.',
-    lede: 'Stylebot non ha server, account né strumenti di analisi. I tuoi stili restano nel tuo browser, a meno che tu non attivi la sincronizzazione, la chat o la riga di comando: in quel caso vanno direttamente a un servizio che hai scelto o a un’app che hai autorizzato.',
+    lede: 'Stylebot non ha server, account né strumenti di analisi, e non raccoglie, vende né condivide i tuoi dati. I dati lasciano il tuo browser solo quando usi una delle funzioni descritte qui sotto.',
     updated: 'Ultimo aggiornamento: {date}',
     browser: {
-      title: 'Cosa resta nel tuo browser',
+      title: 'Nel tuo browser',
       body: [
-        'I tuoi stili, profili, impostazioni, la cronologia, le conversazioni in chat e le chiavi API sono salvati nello spazio di archiviazione delle estensioni del tuo browser, e disinstallando Stylebot vengono rimossi. Stylebot legge le pagine che visiti per personalizzarne lo stile, e non ne invia nulla a meno che tu non usi la chat o la riga di comando.',
+        'I tuoi stili, le impostazioni, la cronologia, le conversazioni in chat e le chiavi API sono salvati nel tuo browser, e disinstallando Stylebot vengono rimossi. I caratteri di Google Fonts e i fogli di stile che importi con <code>@import</code> vengono scaricati dai server che li ospitano, che vedono il tuo indirizzo IP.',
       ],
     },
     sync: {
       title: 'Sincronizzazione con Google Drive',
       body: [
-        'Quando colleghi Google Drive nelle Opzioni, i tuoi stili vengono salvati in un file nel tuo Drive. Stylebot può vedere solo i file che crea. Il suo token di accesso resta nel tuo browser e scade dopo un’ora. Disconnettiti nelle Opzioni o dal tuo <a href="https://myaccount.google.com/connections">account Google</a>.',
+        'Collegando Google Drive nelle Opzioni, i tuoi stili vengono salvati in un file nel tuo Drive. Stylebot può vedere solo i file che crea, e il suo token di accesso resta nel tuo browser. Disconnettiti nelle Opzioni o dal tuo <a href="https://myaccount.google.com/connections">account Google</a>.',
         'L’uso da parte di Stylebot delle informazioni ricevute dalle API di Google rispetta le <a href="https://developers.google.com/terms/api-services-user-data-policy">Norme relative ai dati utente dei servizi API di Google</a>, inclusi i requisiti di utilizzo limitato.',
       ],
     },
     chat: {
       title: 'Chat',
       body: [
-        'Quando aggiungi una chiave API e invii un messaggio, il tuo browser lo manda direttamente a quel provider insieme agli eventuali screenshot allegati, all’indirizzo e al titolo della pagina, a una struttura di ciò che è visibile nella pagina, al suo CSS e ai tuoi stili. Possono esserci informazioni personali mostrate nella pagina, quindi non usare la chat su pagine che non condivideresti con il provider. Si applicano le sue norme: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
+        'Il tuo messaggio va direttamente al provider di cui hai aggiunto la chiave API, insieme agli eventuali screenshot allegati, all’indirizzo e al titolo della pagina, a una struttura dei suoi contenuti visibili, al suo CSS e ai tuoi stili. Possono esserci informazioni personali presenti nella pagina. Si applicano le norme del provider: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {
       title: 'Riga di comando',
       body: [
-        'Quando attivi <q>Consenti alle app di questo computer di controllare Stylebot</q> nelle Opzioni, le app eseguite con il tuo utente possono elencare le tue schede, leggere le pagine, acquisire screenshot e leggere e modificare i tuoi stili, tramite una connessione locale che solo tu puoi usare. Ciò che leggono può arrivare ai servizi che usano, come il modello dietro un agente di programmazione. Disattiva l’impostazione per scollegarle.',
-      ],
-    },
-    fonts: {
-      title: 'Caratteri e CSS importato',
-      body: [
-        'I caratteri di Google Fonts nei tuoi stili vengono scaricati da Google, che vede il tuo indirizzo IP. I fogli di stile che importi con <code>@import</code> vengono scaricati dal loro indirizzo.',
+        'Attivando <q>Consenti alle app di questo computer di controllare Stylebot</q> nelle Opzioni, le app eseguite con il tuo utente possono leggere le tue schede, le pagine e i tuoi stili, acquisire screenshot e modificare i tuoi stili, tramite una connessione locale. Ciò che leggono può arrivare ai servizi che usano, come il modello di un agente di programmazione.',
       ],
     },
     site: {
       title: 'Questo sito',
       body: [
-        'stylebot.dev non ha pubblicità né cookie ed è ospitato su GitHub Pages, che conserva i normali log del server. Plausible conta le visite per pagina, sito di provenienza, paese e tipo di dispositivo, senza cookie né nulla che ti identifichi.',
-      ],
-    },
-    sharing: {
-      title: 'Condivisione',
-      body: [
-        'Stylebot non raccoglie, vende né condivide i tuoi dati. I dati lasciano il tuo browser solo verso i servizi indicati sopra, quando li usi.',
-      ],
-    },
-    contact: {
-      title: 'Modifiche e contatti',
-      body: [
-        'Le modifiche a queste norme sono elencate nella <a href="{history}">cronologia del sito su GitHub</a>. Per domande scrivi a <a href="mailto:{email}">{email}</a> o apri una <a href="{issues}">segnalazione su GitHub</a>.',
+        'stylebot.dev non ha pubblicità né cookie. È ospitato su GitHub Pages, che conserva i log del server, e Plausible conta visite e clic senza identificarti.',
       ],
     },
     translation:

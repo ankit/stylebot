@@ -1,6 +1,5 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { LINKS } from '../../lib/links';
 import {
   DEFAULT_LOCALE,
   fmt,
@@ -20,24 +19,9 @@ const {
 const updated = new Intl.DateTimeFormat(htmlLang(locale), {
   dateStyle: 'long',
   timeZone: 'UTC',
-}).format(Date.UTC(2026, 9, 8));
+}).format(Date.UTC(2026, 9, 11));
 
-const sections = [
-  t.browser,
-  t.sync,
-  t.chat,
-  t.cli,
-  t.fonts,
-  t.site,
-  t.sharing,
-  t.contact,
-];
-
-const vars = {
-  history: `${LINKS.github}/commits/v4/site/src/i18n/en/site.ts`,
-  email: LINKS.feedbackEmail,
-  issues: LINKS.issues,
-};
+const sections = [t.browser, t.sync, t.chat, t.cli, t.site];
 ---
 
 <Base title={t.title} description={t.description}>
@@ -58,7 +42,7 @@ const vars = {
       <section>
         <h2>{section.title}</h2>
         {section.body.map((paragraph) => (
-          <p set:html={rich(paragraph, vars)} />
+          <p set:html={rich(paragraph)} />
         ))}
       </section>
     ))}

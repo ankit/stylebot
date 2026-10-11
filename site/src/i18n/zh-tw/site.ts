@@ -336,55 +336,37 @@ const site: SiteMessages = {
     title: '隱私權',
     description:
       'Stylebot 如何處理你的資料：沒有伺服器、沒有帳戶、沒有分析工具。',
-    lede: 'Stylebot 沒有伺服器、沒有帳戶，也沒有分析工具。除非你開啟同步、聊天或命令列，否則你的樣式只會留在瀏覽器中；開啟後，資料也只會直接傳送到你選擇的服務或你允許的應用程式。',
+    lede: 'Stylebot 沒有伺服器、沒有帳戶，也沒有分析工具，不會收集、販售或分享你的資料。只有在你使用下列功能時，資料才會離開你的瀏覽器。',
     updated: '最後更新：{date}',
     browser: {
-      title: '留在瀏覽器中的資料',
+      title: '瀏覽器中的資料',
       body: [
-        '你的樣式、設定檔、設定、記錄、聊天對話和 API 金鑰，都儲存在瀏覽器的擴充功能儲存空間中，解除安裝 Stylebot 就會移除這些資料。Stylebot 讀取你造訪的頁面是為了套用樣式，除非你使用聊天或命令列，否則不會從中傳送任何內容。',
+        '你的樣式、設定、記錄、聊天對話和 API 金鑰都儲存在瀏覽器中，解除安裝 Stylebot 就會移除這些資料。Google Fonts 字型和透過 <code>@import</code> 匯入的樣式表會從其託管位置下載，託管方會看到你的 IP 位址。',
       ],
     },
     sync: {
       title: 'Google Drive 同步',
       body: [
-        '在選項中連線 Google Drive 後，你的樣式會儲存到你自己 Drive 中的一個檔案。Stylebot 只看得到它自己建立的檔案。它的存取權杖保存在你的瀏覽器中，一小時後失效。你可以在選項或你的 <a href="https://myaccount.google.com/connections">Google 帳戶</a>中中斷連線。',
+        '在選項中連線 Google Drive 後，你的樣式會儲存到你自己 Drive 中的一個檔案。Stylebot 只看得到它自己建立的檔案，它的存取權杖保存在你的瀏覽器中。你可以在選項或你的 <a href="https://myaccount.google.com/connections">Google 帳戶</a>中中斷連線。',
         'Stylebot 對於從 Google API 取得之資訊的使用方式，遵循 <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API 服務使用者資料政策</a>，包括「有限使用」規定。',
       ],
     },
     chat: {
       title: '聊天',
       body: [
-        '新增 API 金鑰並傳送訊息後，瀏覽器會將以下內容直接傳送給該供應商：你的訊息、你附加的任何螢幕截圖、頁面的 URL 和標題、頁面上可見內容的大綱，以及頁面的 CSS 和你的樣式。其中可能包含頁面上顯示的個人資訊，因此不想分享給供應商的頁面，請勿使用聊天。適用各供應商的政策：<a href="https://www.anthropic.com/legal/privacy">Anthropic</a>、<a href="https://openai.com/policies/privacy-policy/">OpenAI</a>、<a href="https://ai.google.dev/gemini-api/terms">Google</a>。',
+        '你的訊息會直接傳送給你新增了 API 金鑰的供應商，一併傳送的還有你附加的螢幕截圖、頁面的 URL 和標題、頁面可見內容的大綱、頁面的 CSS 和你的樣式。其中可能包含頁面上的個人資訊。適用該供應商的政策：<a href="https://www.anthropic.com/legal/privacy">Anthropic</a>、<a href="https://openai.com/policies/privacy-policy/">OpenAI</a>、<a href="https://ai.google.dev/gemini-api/terms">Google</a>。',
       ],
     },
     cli: {
       title: '命令列',
       body: [
-        '在選項中開啟 <q>允許這台電腦上的應用程式控制 Stylebot</q> 後，以你的身分執行的應用程式就能透過只有你能使用的本機連線，列出你的分頁、讀取頁面、擷取螢幕畫面，以及讀取和變更你的樣式。它們讀取的內容可能會傳送到它們使用的服務，例如程式設計代理背後的模型。關閉此設定即可中斷連線。',
-      ],
-    },
-    fonts: {
-      title: '字型和匯入的 CSS',
-      body: [
-        '樣式中的 Google Fonts 字型會從 Google 下載，Google 會看到你的 IP 位址。透過 <code>@import</code> 匯入的樣式表會從其位址抓取。',
+        '在選項中開啟 <q>允許這台電腦上的應用程式控制 Stylebot</q> 後，以你的身分執行的應用程式就能透過本機連線讀取你的分頁、頁面和樣式，擷取螢幕畫面，以及變更你的樣式。它們讀取的內容可能會傳送到它們使用的服務，例如程式設計代理的模型。',
       ],
     },
     site: {
       title: '本網站',
       body: [
-        'stylebot.dev 沒有廣告或 Cookie，託管於 GitHub Pages，GitHub Pages 會保留標準的伺服器記錄。Plausible 會依頁面、來源網站、國家/地區和裝置類型計算造訪次數，不使用 Cookie，也不會記錄任何能識別你身分的資訊。',
-      ],
-    },
-    sharing: {
-      title: '分享',
-      body: [
-        'Stylebot 不會收集、販售或分享你的資料。只有在你使用上述服務時，資料才會離開你的瀏覽器，傳送到這些服務。',
-      ],
-    },
-    contact: {
-      title: '變更與聯絡方式',
-      body: [
-        '本政策的變更都記錄在 <a href="{history}">GitHub 上的網站歷史記錄</a>中。如有疑問，請寄信至 <a href="mailto:{email}">{email}</a>，或建立 <a href="{issues}">GitHub issue</a>。',
+        'stylebot.dev 沒有廣告或 Cookie。網站託管於 GitHub Pages，GitHub Pages 會保留伺服器記錄；Plausible 會計算造訪次數和點擊次數，但不會識別你的身分。',
       ],
     },
     translation:

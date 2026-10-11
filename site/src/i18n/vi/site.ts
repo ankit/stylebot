@@ -348,55 +348,37 @@ const site: SiteMessages = {
     title: 'Quyền riêng tư',
     description:
       'Stylebot làm gì với dữ liệu của bạn: không máy chủ, không tài khoản, không phân tích.',
-    lede: 'Stylebot không có máy chủ, không tài khoản và không phân tích. Kiểu của bạn nằm trong trình duyệt, trừ khi bạn bật đồng bộ, trò chuyện hoặc dòng lệnh; khi đó, kiểu được gửi thẳng đến dịch vụ bạn chọn hoặc ứng dụng bạn cho phép.',
+    lede: 'Stylebot không có máy chủ, không tài khoản, không phân tích, và không thu thập, bán hay chia sẻ dữ liệu của bạn. Dữ liệu chỉ rời khỏi trình duyệt khi bạn dùng một trong các tính năng bên dưới.',
     updated: 'Cập nhật lần cuối {date}',
     browser: {
-      title: 'Những gì nằm trong trình duyệt của bạn',
+      title: 'Trong trình duyệt của bạn',
       body: [
-        'Kiểu, hồ sơ, cài đặt, lịch sử, các cuộc trò chuyện và khóa API của bạn được lưu trong bộ nhớ tiện ích của trình duyệt, và gỡ cài đặt Stylebot sẽ xóa tất cả. Stylebot đọc các trang bạn truy cập để tạo kiểu cho trang, và không gửi gì từ các trang đó đi trừ khi bạn dùng tính năng trò chuyện hoặc dòng lệnh.',
+        'Kiểu, cài đặt, lịch sử, các cuộc trò chuyện và khóa API của bạn được lưu trong trình duyệt, và gỡ cài đặt Stylebot sẽ xóa tất cả. Google Fonts và các bảng kiểu bạn <code>@import</code> được tải từ nơi lưu trữ chúng, và nơi đó thấy được địa chỉ IP của bạn.',
       ],
     },
     sync: {
       title: 'Đồng bộ Google Drive',
       body: [
-        'Khi bạn kết nối Google Drive trong Tùy chọn, các kiểu của bạn được lưu vào một tệp trong Drive của chính bạn. Stylebot chỉ thấy được các tệp do Stylebot tạo. Mã truy cập được giữ trong trình duyệt của bạn và hết hạn sau một giờ. Hãy ngắt kết nối trong Tùy chọn hoặc trong <a href="https://myaccount.google.com/connections">tài khoản Google</a> của bạn.',
+        'Khi bạn kết nối Google Drive trong Tùy chọn, các kiểu của bạn được lưu vào một tệp trong Drive của chính bạn. Stylebot chỉ thấy được các tệp do Stylebot tạo, và mã truy cập được giữ trong trình duyệt của bạn. Hãy ngắt kết nối trong Tùy chọn hoặc trong <a href="https://myaccount.google.com/connections">tài khoản Google</a> của bạn.',
         'Việc Stylebot sử dụng thông tin nhận được từ các API của Google tuân thủ <a href="https://developers.google.com/terms/api-services-user-data-policy">Chính sách về dữ liệu người dùng của Dịch vụ API của Google</a>, bao gồm các yêu cầu về Sử dụng có giới hạn.',
       ],
     },
     chat: {
       title: 'Trò chuyện',
       body: [
-        'Khi bạn thêm khóa API và gửi tin nhắn, trình duyệt gửi thẳng đến nhà cung cấp đó tin nhắn của bạn, ảnh chụp màn hình bạn đính kèm (nếu có), địa chỉ và tiêu đề của trang, dàn ý những gì hiển thị trên trang, cùng CSS của trang và các kiểu của bạn. Những nội dung này có thể chứa thông tin cá nhân hiển thị trên trang, vì vậy đừng dùng tính năng trò chuyện trên những trang bạn không muốn chia sẻ với nhà cung cấp. Chính sách của nhà cung cấp sẽ được áp dụng: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
+        'Tin nhắn của bạn được gửi thẳng đến nhà cung cấp có khóa API mà bạn đã thêm, kèm ảnh chụp màn hình bạn đính kèm (nếu có), địa chỉ và tiêu đề của trang, dàn ý nội dung hiển thị, CSS của trang và các kiểu của bạn. Những nội dung này có thể chứa thông tin cá nhân trên trang. Chính sách của nhà cung cấp sẽ được áp dụng: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {
       title: 'Dòng lệnh',
       body: [
-        'Khi bạn bật <q>Cho phép ứng dụng trên máy tính này điều khiển Stylebot</q> trong Tùy chọn, các ứng dụng chạy dưới tài khoản của bạn có thể liệt kê các thẻ, đọc trang, chụp ảnh màn hình, cũng như đọc và thay đổi kiểu của bạn, qua kết nối cục bộ mà chỉ bạn dùng được. Những gì ứng dụng đọc được có thể đến các dịch vụ mà ứng dụng sử dụng, chẳng hạn mô hình đứng sau trợ lý lập trình. Tắt cài đặt này để ngắt kết nối.',
-      ],
-    },
-    fonts: {
-      title: 'Phông chữ và CSS được nhập',
-      body: [
-        'Phông chữ Google Fonts trong kiểu của bạn được tải từ Google, và Google thấy địa chỉ IP của bạn. Các bảng kiểu bạn <code>@import</code> được tải từ địa chỉ của chúng.',
+        'Bật <q>Cho phép ứng dụng trên máy tính này điều khiển Stylebot</q> trong Tùy chọn sẽ cho phép các ứng dụng chạy dưới tài khoản của bạn đọc các thẻ, trang và kiểu của bạn, chụp ảnh màn hình và thay đổi kiểu của bạn, qua kết nối cục bộ. Những gì ứng dụng đọc được có thể đến các dịch vụ mà ứng dụng sử dụng, chẳng hạn mô hình của trợ lý lập trình.',
       ],
     },
     site: {
       title: 'Trang web này',
       body: [
-        'stylebot.dev không dùng quảng cáo hay cookie, và được lưu trữ trên GitHub Pages, nơi lưu nhật ký máy chủ tiêu chuẩn. Plausible đếm lượt truy cập theo trang, nguồn giới thiệu, quốc gia và loại thiết bị, không dùng cookie hay bất cứ thứ gì nhận diện được bạn.',
-      ],
-    },
-    sharing: {
-      title: 'Chia sẻ',
-      body: [
-        'Stylebot không thu thập, bán hay chia sẻ dữ liệu của bạn. Dữ liệu chỉ rời khỏi trình duyệt để đến các dịch vụ nêu trên, khi bạn dùng các dịch vụ đó.',
-      ],
-    },
-    contact: {
-      title: 'Thay đổi và liên hệ',
-      body: [
-        'Các thay đổi đối với chính sách này được liệt kê trong <a href="{history}">lịch sử của trang web trên GitHub</a>. Mọi câu hỏi xin gửi đến <a href="mailto:{email}">{email}</a> hoặc qua <a href="{issues}">GitHub issue</a>.',
+        'stylebot.dev không dùng quảng cáo hay cookie. Trang được lưu trữ trên GitHub Pages, nơi lưu nhật ký máy chủ, và Plausible đếm lượt truy cập và lượt nhấp mà không nhận diện bạn.',
       ],
     },
     translation:

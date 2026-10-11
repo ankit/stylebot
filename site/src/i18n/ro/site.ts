@@ -349,55 +349,37 @@ const site: SiteMessages = {
     title: 'Confidențialitate',
     description:
       'Ce face Stylebot cu datele tale: fără server, fără cont, fără statistici.',
-    lede: 'Stylebot nu are server, cont sau statistici. Stilurile tale rămân în browser, cu excepția cazului în care activezi sincronizarea, chatul sau linia de comandă; atunci ajung direct la un serviciu ales de tine sau la o aplicație căreia i-ai dat voie.',
+    lede: 'Stylebot nu are server, cont sau statistici și nu colectează, nu vinde și nu partajează datele tale. Acestea părăsesc browserul doar când folosești una dintre funcțiile de mai jos.',
     updated: 'Ultima actualizare: {date}',
     browser: {
-      title: 'Ce rămâne în browser',
+      title: 'În browser',
       body: [
-        'Stilurile, profilurile, setările, istoricul, conversațiile din chat și cheile API sunt salvate în spațiul de stocare pentru extensii al browserului, iar dezinstalarea Stylebot le elimină. Stylebot citește paginile pe care le vizitezi ca să le stilizeze și nu trimite nimic din ele decât dacă folosești chatul sau linia de comandă.',
+        'Stilurile, setările, istoricul, conversațiile din chat și cheile API sunt salvate în browser, iar dezinstalarea Stylebot le elimină. Fonturile Google Fonts și foile de stil importate cu <code>@import</code> sunt descărcate de pe serverele care le găzduiesc, iar acestea îți văd adresa IP.',
       ],
     },
     sync: {
       title: 'Sincronizare cu Google Drive',
       body: [
-        'Când conectezi Google Drive în Opțiuni, stilurile tale sunt salvate într-un fișier din propriul tău Drive. Stylebot poate vedea doar fișierele pe care le creează. Tokenul său de acces rămâne în browser și expiră după o oră. Te poți deconecta din Opțiuni sau din <a href="https://myaccount.google.com/connections">contul Google</a>.',
+        'Când conectezi Google Drive în Opțiuni, stilurile tale sunt salvate într-un fișier din propriul tău Drive. Stylebot poate vedea doar fișierele pe care le creează, iar tokenul său de acces rămâne în browser. Te poți deconecta din Opțiuni sau din <a href="https://myaccount.google.com/connections">contul Google</a>.',
         'Utilizarea de către Stylebot a informațiilor primite de la API-urile Google respectă <a href="https://developers.google.com/terms/api-services-user-data-policy">Politica privind datele utilizatorilor pentru serviciile API Google</a>, inclusiv cerințele de utilizare limitată.',
       ],
     },
     chat: {
       title: 'Chat',
       body: [
-        'Când adaugi o cheie API și trimiți un mesaj, browserul îl trimite direct furnizorului respectiv, împreună cu orice captură de ecran atașată, adresa și titlul paginii, o schiță a ceea ce se vede pe pagină, CSS-ul ei și stilurile tale. Acestea pot include informații personale afișate pe pagină, așa că nu folosi chatul pe pagini pe care nu le-ai împărtăși furnizorului. Se aplică politica acestuia: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
+        'Mesajul tău ajunge direct la furnizorul a cărui cheie API ai adăugat-o, împreună cu orice captură de ecran atașată, adresa și titlul paginii, o schiță a conținutului vizibil, CSS-ul paginii și stilurile tale. Acestea pot include informații personale de pe pagină. Se aplică politica furnizorului: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {
       title: 'Linia de comandă',
       body: [
-        'Când activezi <q>Permite aplicațiilor de pe acest computer să controleze Stylebot</q> în Opțiuni, aplicațiile care rulează în numele tău îți pot lista filele, pot citi pagini, pot face capturi de ecran și îți pot citi și modifica stilurile, printr-o conexiune locală pe care doar tu o poți folosi. Ce citesc poate ajunge la serviciile pe care le folosesc, cum ar fi modelul din spatele unui agent de programare. Dezactivează setarea ca să deconectezi.',
-      ],
-    },
-    fonts: {
-      title: 'Fonturi și CSS importat',
-      body: [
-        'Fonturile Google Fonts din stilurile tale sunt descărcate de la Google, care îți vede adresa IP. Foile de stil importate cu <code>@import</code> sunt descărcate de la adresa lor.',
+        'Dacă activezi <q>Permite aplicațiilor de pe acest computer să controleze Stylebot</q> în Opțiuni, aplicațiile care rulează în numele tău îți pot citi filele, paginile și stilurile, pot face capturi de ecran și îți pot modifica stilurile, printr-o conexiune locală. Ce citesc poate ajunge la serviciile pe care le folosesc, cum ar fi modelul unui agent de programare.',
       ],
     },
     site: {
       title: 'Acest site',
       body: [
-        'stylebot.dev nu are reclame sau cookie-uri și este găzduit pe GitHub Pages, care păstrează jurnale standard de server. Plausible numără vizitele după pagină, sursa vizitei, țară și tipul de dispozitiv, fără cookie-uri și fără nimic care să te identifice.',
-      ],
-    },
-    sharing: {
-      title: 'Partajare',
-      body: [
-        'Stylebot nu colectează, nu vinde și nu partajează datele tale. Acestea părăsesc browserul doar către serviciile de mai sus, atunci când le folosești.',
-      ],
-    },
-    contact: {
-      title: 'Modificări și contact',
-      body: [
-        'Modificările acestei politici sunt listate în <a href="{history}">istoricul site-ului pe GitHub</a>. Pentru întrebări, scrie la <a href="mailto:{email}">{email}</a> sau deschide un <a href="{issues}">issue pe GitHub</a>.',
+        'stylebot.dev nu are reclame sau cookie-uri. Este găzduit pe GitHub Pages, care păstrează jurnale de server, iar Plausible numără vizitele și clicurile fără să te identifice.',
       ],
     },
     translation:

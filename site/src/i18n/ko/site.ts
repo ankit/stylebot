@@ -342,55 +342,37 @@ const site: SiteMessages = {
     title: '개인정보 처리방침',
     description:
       'Stylebot이 데이터를 다루는 방식: 서버도, 계정도, 분석 도구도 없습니다.',
-    lede: 'Stylebot에는 서버도, 계정도, 분석 도구도 없습니다. 동기화, 채팅, 명령줄을 켜지 않는 한 스타일은 브라우저에만 머무르며, 켜면 직접 선택한 서비스나 허용한 앱으로 바로 전달됩니다.',
+    lede: 'Stylebot에는 서버도, 계정도, 분석 도구도 없으며 데이터를 수집, 판매, 공유하지 않습니다. 데이터는 아래 기능을 사용할 때만 브라우저 밖으로 나갑니다.',
     updated: '최종 업데이트: {date}',
     browser: {
-      title: '브라우저에 저장되는 정보',
+      title: '브라우저 안',
       body: [
-        '스타일, 프로필, 설정, 기록, 채팅 대화, API 키는 브라우저 확장 프로그램 저장소에 저장되며, Stylebot을 삭제하면 함께 삭제됩니다. Stylebot은 스타일을 적용하기 위해 방문하는 페이지를 읽지만, 채팅이나 명령줄을 사용하지 않는 한 페이지 내용을 어디로도 보내지 않습니다.',
+        '스타일, 설정, 기록, 채팅 대화, API 키는 브라우저에 저장되며, Stylebot을 삭제하면 함께 삭제됩니다. Google Fonts 글꼴과 <code>@import</code>로 가져온 스타일시트는 호스팅된 곳에서 다운로드되며, 이때 그곳에 IP 주소가 전달됩니다.',
       ],
     },
     sync: {
       title: 'Google Drive 동기화',
       body: [
-        '옵션에서 Google Drive를 연결하면 스타일이 본인의 Drive에 있는 파일에 저장됩니다. Stylebot은 자신이 만든 파일만 볼 수 있습니다. 액세스 토큰은 브라우저에 보관되며 1시간 후 만료됩니다. 연결은 옵션이나 <a href="https://myaccount.google.com/connections">Google 계정</a>에서 해제할 수 있습니다.',
+        '옵션에서 Google Drive를 연결하면 스타일이 본인의 Drive에 있는 파일에 저장됩니다. Stylebot은 자신이 만든 파일만 볼 수 있으며, 액세스 토큰은 브라우저에 보관됩니다. 연결은 옵션이나 <a href="https://myaccount.google.com/connections">Google 계정</a>에서 해제할 수 있습니다.',
         'Google API에서 받은 정보에 대한 Stylebot의 사용은 제한적 사용 요구사항을 포함한 <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API 서비스 사용자 데이터 정책</a>을 준수합니다.',
       ],
     },
     chat: {
       title: '채팅',
       body: [
-        'API 키를 추가하고 메시지를 보내면 브라우저가 메시지와 함께 첨부한 스크린샷, 페이지의 주소와 제목, 페이지에 보이는 내용의 개요, 페이지의 CSS와 스타일을 해당 제공업체에 직접 전송합니다. 여기에는 페이지에 표시된 개인정보가 포함될 수 있으므로, 제공업체와 공유하고 싶지 않은 페이지에서는 채팅을 사용하지 마세요. 각 제공업체의 정책이 적용됩니다: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
+        '메시지는 API 키를 추가한 제공업체로 바로 전송되며, 첨부한 스크린샷, 페이지의 주소와 제목, 보이는 내용의 개요, 페이지의 CSS와 스타일도 함께 전송됩니다. 여기에는 페이지에 표시된 개인정보가 포함될 수 있습니다. 제공업체의 정책이 적용됩니다: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {
       title: '명령줄',
       body: [
-        '옵션에서 <q>이 컴퓨터의 앱이 Stylebot을 제어하도록 허용</q>을 켜면, 사용자 권한으로 실행되는 앱이 본인만 사용할 수 있는 로컬 연결을 통해 탭 목록을 보고, 페이지를 읽고, 스크린샷을 찍고, 스타일을 읽고 변경할 수 있습니다. 앱이 읽은 내용은 코딩 에이전트의 모델처럼 앱이 사용하는 서비스로 전달될 수 있습니다. 연결을 끊으려면 이 설정을 끄세요.',
-      ],
-    },
-    fonts: {
-      title: '글꼴과 가져온 CSS',
-      body: [
-        '스타일에 쓰인 Google Fonts 글꼴은 Google에서 다운로드되며, 이때 Google에 IP 주소가 전달됩니다. <code>@import</code>로 가져온 스타일시트는 해당 주소에서 불러옵니다.',
+        '옵션에서 <q>이 컴퓨터의 앱이 Stylebot을 제어하도록 허용</q>을 켜면, 사용자 권한으로 실행되는 앱이 로컬 연결을 통해 탭, 페이지, 스타일을 읽고, 스크린샷을 찍고, 스타일을 변경할 수 있습니다. 앱이 읽은 내용은 코딩 에이전트의 모델처럼 앱이 사용하는 서비스로 전달될 수 있습니다.',
       ],
     },
     site: {
       title: '이 웹사이트',
       body: [
-        'stylebot.dev에는 광고나 쿠키가 없으며, 표준 서버 로그를 보관하는 GitHub Pages에서 호스팅됩니다. Plausible이 쿠키나 사용자를 식별할 수 있는 정보 없이 페이지, 유입 경로, 국가, 기기 유형별로 방문 수를 집계합니다.',
-      ],
-    },
-    sharing: {
-      title: '데이터 공유',
-      body: [
-        'Stylebot은 데이터를 수집, 판매, 공유하지 않습니다. 데이터는 위 서비스를 사용할 때만 해당 서비스로 전송됩니다.',
-      ],
-    },
-    contact: {
-      title: '변경 및 문의',
-      body: [
-        '이 방침의 변경 사항은 <a href="{history}">GitHub의 사이트 기록</a>에서 확인할 수 있습니다. 문의는 <a href="mailto:{email}">{email}</a> 또는 <a href="{issues}">GitHub 이슈</a>로 보내 주세요.',
+        'stylebot.dev에는 광고나 쿠키가 없습니다. 호스팅을 맡은 GitHub Pages가 서버 로그를 보관하며, Plausible이 사용자를 식별하지 않고 방문 수와 클릭 수를 집계합니다.',
       ],
     },
     translation:

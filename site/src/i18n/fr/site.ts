@@ -347,55 +347,37 @@ const site: SiteMessages = {
     title: 'Confidentialité',
     description:
       'Ce que Stylebot fait de vos données : pas de serveur, pas de compte, pas de statistiques.',
-    lede: 'Stylebot n’a ni serveur, ni compte, ni statistiques. Vos styles restent dans votre navigateur, sauf si vous activez la synchronisation, le chat ou la ligne de commande : ils vont alors directement à un service que vous avez choisi ou à une application que vous avez autorisée.',
+    lede: 'Stylebot n’a ni serveur, ni compte, ni statistiques, et ne collecte, ne vend ni ne partage vos données. Elles ne quittent votre navigateur que lorsque vous utilisez l’une des fonctionnalités ci-dessous.',
     updated: 'Dernière mise à jour : {date}',
     browser: {
-      title: 'Ce qui reste dans votre navigateur',
+      title: 'Dans votre navigateur',
       body: [
-        'Vos styles, profils, paramètres, historique, conversations de chat et clés d’API sont enregistrés dans le stockage des extensions de votre navigateur, et la désinstallation de Stylebot les supprime. Stylebot lit les pages que vous visitez pour les styliser, et n’en envoie rien, sauf si vous utilisez le chat ou la ligne de commande.',
+        'Vos styles, paramètres, historique, conversations de chat et clés d’API sont enregistrés dans votre navigateur, et la désinstallation de Stylebot les supprime. Les polices Google Fonts et les feuilles de style que vous importez avec <code>@import</code> sont téléchargées depuis leur hébergeur, qui voit votre adresse IP.',
       ],
     },
     sync: {
       title: 'Synchronisation Google Drive',
       body: [
-        'Quand vous connectez Google Drive dans les options, vos styles sont enregistrés dans un fichier de votre propre Drive. Stylebot ne voit que les fichiers qu’il crée. Son jeton d’accès reste dans votre navigateur et expire au bout d’une heure. Déconnectez-vous dans les options ou dans votre <a href="https://myaccount.google.com/connections">compte Google</a>.',
+        'Quand vous connectez Google Drive dans les options, vos styles sont enregistrés dans un fichier de votre propre Drive. Stylebot ne voit que les fichiers qu’il crée, et son jeton d’accès reste dans votre navigateur. Déconnectez-vous dans les options ou dans votre <a href="https://myaccount.google.com/connections">compte Google</a>.',
         'L’utilisation par Stylebot des informations reçues des API Google respecte le <a href="https://developers.google.com/terms/api-services-user-data-policy">Règlement sur les données utilisateur des services d’API Google</a>, y compris les exigences relatives à l’utilisation limitée.',
       ],
     },
     chat: {
       title: 'Chat',
       body: [
-        'Quand vous ajoutez une clé d’API et envoyez un message, votre navigateur l’envoie directement à ce fournisseur, avec les captures d’écran que vous joignez, l’adresse et le titre de la page, un plan de ce qui y est visible, ainsi que son CSS et vos styles. Cela peut inclure des informations personnelles affichées sur la page. N’utilisez donc pas le chat sur des pages que vous ne partageriez pas avec le fournisseur. Sa politique de confidentialité s’applique : <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
+        'Votre message est envoyé directement au fournisseur dont vous avez ajouté la clé d’API, avec les captures d’écran que vous joignez, l’adresse et le titre de la page, un plan de son contenu visible, son CSS et vos styles. Cela peut inclure des informations personnelles présentes sur la page. La politique de confidentialité du fournisseur s’applique : <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {
       title: 'Ligne de commande',
       body: [
-        'Quand vous activez <q>Autoriser les applications de cet ordinateur à contrôler Stylebot</q> dans les options, les applications exécutées sous votre compte peuvent lister vos onglets, lire des pages, prendre des captures d’écran, et lire et modifier vos styles, via une connexion locale que vous seul pouvez utiliser. Ce qu’elles lisent peut parvenir aux services qu’elles utilisent, comme le modèle derrière un agent de code. Désactivez ce réglage pour vous déconnecter.',
-      ],
-    },
-    fonts: {
-      title: 'Polices et CSS importé',
-      body: [
-        'Les polices Google Fonts de vos styles sont téléchargées depuis Google, qui voit votre adresse IP. Les feuilles de style que vous importez avec <code>@import</code> sont récupérées à leur adresse.',
+        'Quand vous activez <q>Autoriser les applications de cet ordinateur à contrôler Stylebot</q> dans les options, les applications exécutées sous votre compte peuvent lire vos onglets, vos pages et vos styles, prendre des captures d’écran et modifier vos styles, via une connexion locale. Ce qu’elles lisent peut parvenir aux services qu’elles utilisent, comme le modèle d’un agent de code.',
       ],
     },
     site: {
       title: 'Ce site',
       body: [
-        'stylebot.dev n’utilise ni publicités, ni cookies, et est hébergé sur GitHub Pages, qui conserve des journaux serveur standard. Plausible compte les visites par page, site référent, pays et type d’appareil, sans cookies ni rien qui vous identifie.',
-      ],
-    },
-    sharing: {
-      title: 'Partage',
-      body: [
-        'Stylebot ne collecte, ne vend ni ne partage vos données. Elles ne quittent votre navigateur que pour les services ci-dessus, quand vous les utilisez.',
-      ],
-    },
-    contact: {
-      title: 'Modifications et contact',
-      body: [
-        'Les modifications de cette politique sont listées dans l’<a href="{history}">historique du site sur GitHub</a>. Pour toute question, écrivez à <a href="mailto:{email}">{email}</a> ou ouvrez un <a href="{issues}">ticket GitHub</a>.',
+        'stylebot.dev n’utilise ni publicités, ni cookies. Il est hébergé sur GitHub Pages, qui conserve des journaux serveur, et Plausible compte les visites et les clics sans vous identifier.',
       ],
     },
     translation:

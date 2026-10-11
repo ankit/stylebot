@@ -345,55 +345,37 @@ const site: SiteMessages = {
     title: 'Privasi',
     description:
       'Apa yang dilakukan Stylebot dengan data Anda: tanpa server, tanpa akun, tanpa analitik.',
-    lede: 'Stylebot tidak punya server, akun, atau analitik. Gaya Anda tetap di browser kecuali Anda mengaktifkan sinkronisasi, chat, atau baris perintah, dan dalam hal itu gaya dikirim langsung ke layanan yang Anda pilih atau aplikasi yang Anda izinkan.',
+    lede: 'Stylebot tidak punya server, akun, atau analitik, dan tidak mengumpulkan, menjual, atau membagikan data Anda. Data hanya keluar dari browser Anda saat Anda memakai salah satu fitur di bawah.',
     updated: 'Terakhir diperbarui {date}',
     browser: {
-      title: 'Apa yang tetap di browser Anda',
+      title: 'Di browser Anda',
       body: [
-        'Gaya, profil, setelan, riwayat, percakapan chat, dan kunci API Anda disimpan di penyimpanan ekstensi browser, dan menghapus instalan Stylebot akan menghapusnya. Stylebot membaca halaman yang Anda kunjungi untuk mengubah gayanya, dan tidak mengirim apa pun dari halaman itu kecuali Anda memakai chat atau baris perintah.',
+        'Gaya, setelan, riwayat, percakapan chat, dan kunci API Anda disimpan di browser, dan menghapus instalan Stylebot akan menghapusnya. Google Fonts dan stylesheet yang Anda <code>@import</code> diunduh dari server tempatnya di-hosting, yang dapat melihat alamat IP Anda.',
       ],
     },
     sync: {
       title: 'Sinkronisasi Google Drive',
       body: [
-        'Saat Anda menghubungkan Google Drive di Opsi, gaya Anda disimpan ke sebuah file di Drive Anda sendiri. Stylebot hanya dapat melihat file yang dibuatnya. Token aksesnya tetap di browser Anda dan kedaluwarsa setelah satu jam. Putuskan sambungan di Opsi atau di <a href="https://myaccount.google.com/connections">Akun Google</a> Anda.',
+        'Menghubungkan Google Drive di Opsi akan menyimpan gaya Anda ke sebuah file di Drive Anda sendiri. Stylebot hanya dapat melihat file yang dibuatnya, dan token aksesnya tetap di browser Anda. Putuskan sambungan di Opsi atau di <a href="https://myaccount.google.com/connections">Akun Google</a> Anda.',
         'Penggunaan informasi yang diterima Stylebot dari Google API mematuhi <a href="https://developers.google.com/terms/api-services-user-data-policy">Kebijakan Data Pengguna Layanan Google API</a>, termasuk persyaratan Penggunaan Terbatas.',
       ],
     },
     chat: {
       title: 'Chat',
       body: [
-        'Saat Anda menambahkan kunci API dan mengirim pesan, browser Anda mengirimkannya langsung ke penyedia itu beserta pesan Anda, screenshot yang Anda lampirkan, alamat dan judul halaman, kerangka dari apa yang terlihat di halaman, serta CSS halaman dan gaya Anda. Ini bisa mencakup informasi pribadi yang tampil di halaman, jadi jangan memakai chat di halaman yang tidak ingin Anda bagikan kepada penyedia. Kebijakan mereka berlaku: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
+        'Pesan Anda dikirim langsung ke penyedia yang kunci API-nya Anda tambahkan, beserta screenshot yang Anda lampirkan, alamat dan judul halaman, kerangka dari konten yang terlihat, CSS halaman, dan gaya Anda. Ini bisa mencakup informasi pribadi di halaman. Kebijakan penyedia berlaku: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {
       title: 'Baris perintah',
       body: [
-        'Saat Anda mengaktifkan <q>Izinkan aplikasi di komputer ini mengontrol Stylebot</q> di Opsi, aplikasi yang berjalan atas nama Anda dapat melihat daftar tab, membaca halaman, mengambil screenshot, serta membaca dan mengubah gaya Anda, melalui koneksi lokal yang hanya bisa Anda gunakan. Apa yang dibaca aplikasi itu dapat sampai ke layanan yang dipakainya, seperti model di balik agen coding. Nonaktifkan setelan ini untuk memutuskan sambungan.',
-      ],
-    },
-    fonts: {
-      title: 'Font dan CSS yang diimpor',
-      body: [
-        'Google Fonts dalam gaya Anda diunduh dari Google, yang dapat melihat alamat IP Anda. Stylesheet yang Anda <code>@import</code> diambil dari alamatnya.',
+        'Mengaktifkan <q>Izinkan aplikasi di komputer ini mengontrol Stylebot</q> di Opsi memungkinkan aplikasi yang berjalan atas nama Anda membaca tab, halaman, dan gaya Anda, mengambil screenshot, serta mengubah gaya Anda, melalui koneksi lokal. Apa yang dibaca aplikasi itu dapat sampai ke layanan yang dipakainya, seperti model di balik agen coding.',
       ],
     },
     site: {
       title: 'Situs web ini',
       body: [
-        'stylebot.dev tidak memiliki iklan atau cookie dan di-hosting di GitHub Pages, yang menyimpan log server standar. Plausible menghitung kunjungan berdasarkan halaman, perujuk, negara, dan jenis perangkat, tanpa cookie atau apa pun yang mengidentifikasi Anda.',
-      ],
-    },
-    sharing: {
-      title: 'Berbagi',
-      body: [
-        'Stylebot tidak mengumpulkan, menjual, atau membagikan data Anda. Data hanya keluar dari browser Anda ke layanan di atas, saat Anda memakainya.',
-      ],
-    },
-    contact: {
-      title: 'Perubahan dan kontak',
-      body: [
-        'Perubahan pada kebijakan ini tercantum dalam <a href="{history}">riwayat situs di GitHub</a>. Kirim pertanyaan ke <a href="mailto:{email}">{email}</a> atau buat <a href="{issues}">issue di GitHub</a>.',
+        'stylebot.dev tidak memiliki iklan atau cookie. Situs ini di-hosting di GitHub Pages, yang menyimpan log server, dan Plausible menghitung kunjungan dan klik tanpa mengidentifikasi Anda.',
       ],
     },
     translation:

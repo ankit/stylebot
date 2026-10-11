@@ -361,55 +361,37 @@ export default {
     title: 'Privacy',
     description:
       'What Stylebot does with your data: no server, no account, no analytics.',
-    lede: 'Stylebot has no server, no account and no analytics. Your styles stay in your browser unless you turn on sync, chat or the command line, and then they go straight to a service you chose or an app you allowed.',
+    lede: "Stylebot has no server, no account and no analytics, and doesn't collect, sell or share your data. It only leaves your browser when you use one of the features below.",
     updated: 'Last updated {date}',
     browser: {
-      title: 'What stays in your browser',
+      title: 'In your browser',
       body: [
-        "Your styles, profiles, settings, history, chat conversations and API keys are saved in your browser's extension storage, and uninstalling Stylebot removes them. Stylebot reads the pages you visit to style them, and sends nothing from them unless you use chat or the command line.",
+        "Your styles, settings, history, chat conversations and API keys are saved in your browser, and uninstalling Stylebot removes them. Google Fonts and stylesheets you <code>@import</code> are downloaded from where they're hosted, which sees your IP address.",
       ],
     },
     sync: {
       title: 'Google Drive sync',
       body: [
-        'When you connect Google Drive in Options, your styles are saved to a file in your own Drive. Stylebot can only see the files it creates. Its access token stays in your browser and expires after an hour. Disconnect in Options or in your <a href="https://myaccount.google.com/connections">Google account</a>.',
+        'Connecting Google Drive in Options saves your styles to a file in your own Drive. Stylebot can only see files it creates, and its access token stays in your browser. Disconnect in Options or in your <a href="https://myaccount.google.com/connections">Google account</a>.',
         'Stylebot\'s use of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements.',
       ],
     },
     chat: {
       title: 'Chat',
       body: [
-        'When you add an API key and send a message, your browser sends it straight to that provider with your message, any screenshot you attach, the page\'s address and title, an outline of what\'s visible on the page, and its CSS and your styles. That can include personal information shown on the page, so don\'t use chat on pages you wouldn\'t share with the provider. Their policy applies: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
+        'Your message goes straight to the provider whose API key you added, with any screenshot you attach, the page\'s address and title, an outline of its visible content, its CSS and your styles. That can include personal information on the page. The provider\'s policy applies: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {
       title: 'Command line',
       body: [
-        'When you turn on <q>Let apps on this computer control Stylebot</q> in Options, apps running as you can list your tabs, read pages, take screenshots, and read and change your styles, through a local connection only you can use. What they read can reach the services they use, such as the model behind a coding agent. Turn the setting off to disconnect.',
-      ],
-    },
-    fonts: {
-      title: 'Fonts and imported CSS',
-      body: [
-        'Google Fonts in your styles are downloaded from Google, which sees your IP address. Stylesheets you <code>@import</code> are fetched from their address.',
+        "Turning on <q>Let apps on this computer control Stylebot</q> in Options lets apps running as you read your tabs, pages and styles, take screenshots and change your styles, over a local connection. What they read can reach the services they use, such as a coding agent's model.",
       ],
     },
     site: {
       title: 'This website',
       body: [
-        'stylebot.dev has no ads or cookies and is hosted on GitHub Pages, which keeps standard server logs. Plausible counts visits by page, referrer, country and device type, without cookies or anything that identifies you.',
-      ],
-    },
-    sharing: {
-      title: 'Sharing',
-      body: [
-        "Stylebot doesn't collect, sell or share your data. It only leaves your browser for the services above, when you use them.",
-      ],
-    },
-    contact: {
-      title: 'Changes and contact',
-      body: [
-        'Changes to this policy are listed in the <a href="{history}">site\'s history on GitHub</a>. Questions go to <a href="mailto:{email}">{email}</a> or a <a href="{issues}">GitHub issue</a>.',
+        'stylebot.dev has no ads or cookies. GitHub Pages hosts it and keeps server logs, and Plausible counts visits and clicks without identifying you.',
       ],
     },
     translation:
