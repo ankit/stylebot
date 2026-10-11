@@ -255,6 +255,16 @@ const config = {
         {
           from: '../node_modules/monaco-editor/min/**/*',
           to: 'monaco-editor/iframe/monaco-editor/',
+          // The editor only edits CSS. AMO's linter can't parse the TypeScript
+          // worker. Ignore patterns only match as absolute paths here.
+          globOptions: {
+            ignore: [
+              'language/{html,json,typescript}/**',
+              'assets/{html,json,ts}.worker-*.js',
+            ].map(pattern =>
+              path.join(__dirname, 'node_modules/monaco-editor/min/vs', pattern)
+            ),
+          },
         },
         {
           from: '../node_modules/requirejs/**/*',
