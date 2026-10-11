@@ -14,7 +14,10 @@
       v-if="open"
       ref="panel"
       class="anchored-menu-panel"
-      :class="[`align-${align}`, { 'flip-up': flipUp }]"
+      :class="[
+        `align-${align}`,
+        { 'flip-up': flipUp, 'keyboard-nav': keyboardNav },
+      ]"
       :style="{
         visibility: positioned ? 'visible' : 'hidden',
         transform: shiftX ? `translateX(${shiftX}px)` : undefined,
@@ -90,6 +93,7 @@ export default Vue.extend({
     // Set right before closing due to focus already having moved elsewhere
     // (e.g. Tab) — restoring focus to the trigger there would fight it.
     skipRestoreFocus: boolean;
+    keyboardNav: boolean;
   } {
     return {
       open: false,
@@ -100,6 +104,9 @@ export default Vue.extend({
       shiftX: 0,
       positioned: false,
       skipRestoreFocus: false,
+      // Safari leaves focus moved by the arrow keys out of :focus-visible
+      // after a click opened the menu, so rows highlight on this instead.
+      keyboardNav: false,
     };
   },
 
@@ -109,6 +116,7 @@ export default Vue.extend({
         this.previouslyFocused = this.activeElement();
         this.positioned = false;
         this.shiftX = 0;
+        this.keyboardNav = false;
         document.addEventListener('mousedown', this.onDocMousedown);
         // window, not document: capture on window always fires before the
         // editor's own capture-phase document listener, regardless of attach order.
@@ -307,6 +315,7 @@ export default Vue.extend({
       }
 
       event.preventDefault();
+      this.keyboardNav = true;
 
       // A combobox's text field sits at the top of the cycle, so Up from the
       // first item (or Down past the last) returns to it.

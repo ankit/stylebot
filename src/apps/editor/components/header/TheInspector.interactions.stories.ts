@@ -84,7 +84,7 @@ export const SwitchingModeStops: StoryObj = {
 
 export const PickSetsSelector: StoryObj = {
   ...editor({ inspecting: true }),
-  name: 'picking an element sets the selector and leaves inspecting',
+  name: 'picking an element sets the selector, leaves inspecting and focuses the inspector button',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -100,6 +100,7 @@ export const PickSetsSelector: StoryObj = {
     await expect(inspector(canvasElement).classList.contains('active')).toBe(
       false
     );
+    await expect(inspector(canvasElement)).toHaveFocus();
   },
 };
 

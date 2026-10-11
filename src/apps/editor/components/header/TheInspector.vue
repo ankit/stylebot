@@ -131,6 +131,12 @@ export default Vue.extend({
       this.preview.cancel();
       this.toggle();
       this.$emit('select', selector);
+
+      // Safari doesn't focus a clicked button, so the panel can be left
+      // without focus after a pick.
+      (this.$refs.button as HTMLElement | undefined)?.focus({
+        preventScroll: true,
+      });
     },
   },
 });

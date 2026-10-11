@@ -123,7 +123,10 @@ export default Vue.extend({
 
   &:hover,
   &:has(.row-name:focus-visible, .row-more:focus-visible),
+  .keyboard-nav &:has(.row-name:focus, .row-more:focus),
   &.menu-open {
+    --row-actions-shown: 1;
+
     background: var(--menu-item-hover);
   }
 
@@ -149,11 +152,7 @@ export default Vue.extend({
   pointer-events: none;
 
   &:has(+ .row-more) {
-    .profile-row:hover &,
-    .profile-row:has(.row-name:focus-visible, .row-more:focus-visible) &,
-    .menu-open & {
-      opacity: 0;
-    }
+    opacity: calc(1 - var(--row-actions-shown, 0));
   }
 }
 
@@ -180,18 +179,12 @@ export default Vue.extend({
   height: 22px;
   border-radius: 5px;
   color: var(--text-muted);
-  opacity: 0;
+  opacity: var(--row-actions-shown, 0);
   cursor: pointer;
-
-  .profile-row:hover &,
-  .profile-row:has(.row-name:focus-visible) &,
-  .menu-open &,
-  &:focus-visible {
-    opacity: 1;
-  }
 
   &:hover,
   &:focus-visible,
+  .keyboard-nav &:focus,
   .menu-open & {
     color: var(--text-primary);
     background: var(--field-surface-active);

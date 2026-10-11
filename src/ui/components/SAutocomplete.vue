@@ -669,11 +669,11 @@ export default Vue.extend({
 
 .autocomplete-menu {
   padding-right: 0 !important;
-  padding-left: 0 !important;
+  padding-left: 8px !important;
   border-radius: 9px !important;
   max-height: 240px !important;
   overflow-y: auto !important;
-  scrollbar-gutter: stable both-edges;
+  scrollbar-gutter: stable;
 }
 
 .autocomplete-option {

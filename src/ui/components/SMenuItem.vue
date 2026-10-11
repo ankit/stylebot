@@ -70,7 +70,8 @@ export default Vue.extend({
   cursor: pointer;
 
   &:hover,
-  &:focus-visible {
+  &:focus-visible,
+  .keyboard-nav &:focus {
     background: var(--menu-item-hover);
   }
 
@@ -78,7 +79,8 @@ export default Vue.extend({
     color: var(--danger);
 
     &:hover,
-    &:focus-visible {
+    &:focus-visible,
+    .keyboard-nav &:focus {
       background: var(--danger-background);
     }
   }

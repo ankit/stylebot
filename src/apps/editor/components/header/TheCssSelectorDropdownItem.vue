@@ -131,6 +131,7 @@ export default Vue.extend({
 
   &:hover,
   &:focus-visible,
+  .keyboard-nav &:focus,
   &.current {
     background: var(--menu-item-hover);
     box-shadow: none;
