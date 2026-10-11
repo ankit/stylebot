@@ -37,6 +37,7 @@ const strings = Object.fromEntries(
     type Locale,
   } from '../i18n/locales';
   import { LOCALE_CHOSEN_KEY } from '../lib/locale-choice';
+  import { track } from '../lib/analytics';
 
   const bar = document.querySelector<HTMLElement>('.locale-suggestion')!;
   const strings: Record<Locale, { suggest: string; dismiss: string }> =
@@ -68,9 +69,13 @@ const strings = Object.fromEntries(
         localStorage.setItem(LOCALE_CHOSEN_KEY, '1');
       } catch {}
     };
-    link.addEventListener('click', remember);
+    link.addEventListener('click', () => {
+      remember();
+      track('Language suggestion', { action: 'accept', locale: preferred });
+    });
     close.addEventListener('click', () => {
       remember();
+      track('Language suggestion', { action: 'dismiss', locale: preferred });
       bar.hidden = true;
     });
   }

@@ -131,6 +131,7 @@ const sites = await Promise.all(
             <template
               data-theme-data={i}
               data-note={theme.note}
+              data-file={theme.file}
               data-source={theme.file && SOURCE_BASE + theme.file}
             >
               {theme.css}
@@ -184,6 +185,7 @@ const sites = await Promise.all(
 
 <script>
   import { fmt } from '../i18n/format';
+  import { track } from '../lib/analytics';
 
   const COPIED_MS = 1600;
   const INSTALL_TIMEOUT_MS = 5000;
@@ -221,6 +223,8 @@ const sites = await Promise.all(
   const cssOf = (item: HTMLElement) =>
     themeData(item).content.textContent ?? '';
   const noteOf = (item: HTMLElement) => themeData(item).dataset.note;
+  const fileOf = (item: HTMLElement) =>
+    themeData(item).dataset.file!.replace(/\.css$/, '');
   const nameOf = (item: HTMLElement) =>
     item.querySelectorAll('.gallery-name')[activeOf(item)].textContent ?? '';
   const siteOf = (item: HTMLElement) =>
@@ -300,6 +304,7 @@ const sites = await Promise.all(
 
   async function copyItem(item: HTMLElement) {
     await copyText(cssOf(item));
+    track('Gallery copy', { theme: fileOf(item) });
     markCopied(item);
   }
 
@@ -356,6 +361,10 @@ const sites = await Promise.all(
   async function installItem(item: HTMLElement) {
     const key = keyOf(item);
     const name = await requestInstall(item);
+    track('Gallery install', {
+      theme: fileOf(item),
+      result: name ? 'installed' : 'failed',
+    });
 
     if (name) {
       installed.set(key, name);

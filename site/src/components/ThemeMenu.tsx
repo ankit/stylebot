@@ -2,6 +2,7 @@ import { useEffect, useState } from 'preact/hooks';
 import { STORAGE_KEY, THEMES, THEME_KEYS, type ThemeKey } from '../lib/themes';
 import { currentTheme } from '../lib/theme-state';
 import { fmt } from '../i18n/format';
+import { track } from '../lib/analytics';
 
 type Labels = { title: string; names: Record<ThemeKey, string> };
 
@@ -26,6 +27,7 @@ export default function ThemeMenu({ labels }: { labels: Labels }) {
       // Storage can be unavailable (private mode); the theme still applies.
     }
     window.dispatchEvent(new CustomEvent('themechange', { detail: key }));
+    track('Site theme', { theme: key });
     setTheme(key);
     setOpen(false);
   };

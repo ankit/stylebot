@@ -115,7 +115,7 @@ const altUrl = (code: (typeof LOCALES)[number]['code']) =>
             function (i) {
               plausible.o = i || {};
             };
-          plausible.init();
+          plausible.init({ outboundLinks: true });
         </script>
       </>
     )}

@@ -48,6 +48,8 @@ const command = lines.join(' && ');
 </div>
 
 <script>
+  import { track } from '../../lib/analytics';
+
   document
     .querySelectorAll<HTMLButtonElement>('.cli-cmd-copy')
     .forEach((button) => {
@@ -58,6 +60,7 @@ const command = lines.join(' && ');
         } catch {
           return;
         }
+        track('CLI copy', { command: button.dataset.copy! });
         button.classList.add('is-copied');
         button.title = button.dataset.copiedLabel!;
         clearTimeout(timer);

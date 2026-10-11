@@ -47,6 +47,7 @@ const path = unlocalizedPath(Astro.url.pathname);
 
 <script>
   import { LOCALE_CHOSEN_KEY } from '../lib/locale-choice';
+  import { track } from '../lib/analytics';
 
   const menu = document.querySelector<HTMLElement>('.lang-menu')!;
   const toggle = menu.querySelector<HTMLButtonElement>('[data-lang-toggle]')!;
@@ -72,6 +73,10 @@ const path = unlocalizedPath(Astro.url.pathname);
         localStorage.setItem(LOCALE_CHOSEN_KEY, '1');
       } catch {}
       const target = new URL(link.href);
+      track('Language change', {
+        from: document.documentElement.lang,
+        to: link.hreflang,
+      });
       target.hash = location.hash;
       link.href = target.href;
     }

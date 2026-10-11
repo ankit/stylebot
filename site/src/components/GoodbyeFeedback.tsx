@@ -1,16 +1,8 @@
 import { useState } from 'preact/hooks';
 import type { SiteMessages } from '../i18n';
+import { track } from '../lib/analytics';
 
 type Props = { messages: SiteMessages['goodbye']['feedback'] };
-
-declare global {
-  interface Window {
-    plausible?: (
-      event: string,
-      options?: { props: Record<string, string> },
-    ) => void;
-  }
-}
 
 // Same order as `reasons` in every locale, so reports don't split by language.
 const REASON_KEYS = [
@@ -39,14 +31,12 @@ export default function GoodbyeFeedback({ messages: t }: Props) {
   const send = () => {
     if (!ready) return;
     picked.forEach((reason) =>
-      window.plausible?.('Uninstall reason', {
-        props: { reason: REASON_KEYS[t.reasons.indexOf(reason)] },
+      track('Uninstall reason', {
+        reason: REASON_KEYS[t.reasons.indexOf(reason)],
       }),
     );
     if (note.trim()) {
-      window.plausible?.('Uninstall note', {
-        props: { note: note.trim().slice(0, 2000) },
-      });
+      track('Uninstall note', { note: note.trim().slice(0, 2000) });
     }
     setSent(true);
   };
