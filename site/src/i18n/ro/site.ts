@@ -191,15 +191,11 @@ const site: SiteMessages = {
   goodbye: {
     title: 'La revedere',
     description: 'Mulțumesc că ai folosit Stylebot.',
-    panda: 'Un panda pixelat care îți face cu mâna',
     heading: 'Mulțumesc că ai folosit Stylebot.',
     lede: 'Stilurile tale au fost eliminate din acest browser. Dacă ai activat sincronizarea, o copie de rezervă se află încă în Google Drive.',
     changedMind: 'Te-ai răzgândit?',
-    note: 'Lucrez la Stylebot din 2011. Mulțumesc că l-ai încercat și pentru orice părere îmi lași.',
-    signature: '— Ankit',
     feedback: {
       question: 'De ce l-ai dezinstalat?',
-      optional: 'Opțional, durează o secundă.',
       reasons: [
         'Nu mai aveam nevoie de el',
         'Greu de folosit',
@@ -210,8 +206,7 @@ const site: SiteMessages = {
       ],
       placeholder: 'Mai e ceva? (opțional)',
       send: 'Trimite feedback',
-      sendNote: 'Ajunge direct la dezvoltator.',
-      thanks: 'Mulțumesc. Citesc fiecare mesaj.',
+      thanks: 'Mulțumesc că ai trimis părerea ta.',
     },
   },
   manual: {

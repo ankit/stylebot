@@ -187,15 +187,11 @@ const site: SiteMessages = {
   goodbye: {
     title: '안녕히 가세요',
     description: 'Stylebot을 사용해 주셔서 감사합니다.',
-    panda: '손을 흔들며 작별 인사하는 픽셀 판다',
     heading: 'Stylebot을 사용해 주셔서 감사합니다.',
     lede: '이 브라우저에서 스타일이 삭제되었습니다. 동기화를 켰다면 Google Drive에 백업이 남아 있습니다.',
     changedMind: '마음이 바뀌셨나요?',
-    note: '2011년부터 Stylebot을 만들어 왔습니다. 사용해 주셔서, 그리고 남겨 주시는 의견에 감사드립니다.',
-    signature: '— Ankit',
     feedback: {
       question: '삭제한 이유가 무엇인가요?',
-      optional: '선택 사항이며, 금방 끝납니다.',
       reasons: [
         '더 이상 필요하지 않음',
         '사용하기 어려움',
@@ -206,8 +202,7 @@ const site: SiteMessages = {
       ],
       placeholder: '더 하실 말씀이 있나요? (선택 사항)',
       send: '의견 보내기',
-      sendNote: '개발자에게 바로 전달됩니다.',
-      thanks: '감사합니다. 보내 주신 의견은 모두 읽습니다.',
+      thanks: '의견을 보내 주셔서 감사합니다.',
     },
   },
   manual: {

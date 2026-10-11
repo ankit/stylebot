@@ -13,7 +13,6 @@ const {
 
 <Base title={t.title} description={t.description} noindex>
   <main class="gb">
-    <div class="gb-panda" role="img" aria-label={t.panda}></div>
     <h1>{t.heading}</h1>
     <p class="gb-lede">{t.lede}</p>
     <GoodbyeFeedback client:visible messages={t.feedback} />
@@ -21,9 +20,6 @@ const {
       <span>{t.changedMind}</span>
       <StoreLink index={0} format="reinstall" class="btn btn-outline" />
     </div>
-    <p class="gb-note">
-      {t.note} <span>{t.signature}</span>
-    </p>
   </main>
 </Base>
 
@@ -37,14 +33,6 @@ const {
     align-items: center;
     text-align: center;
     gap: 20px;
-  }
-
-  .gb-panda {
-    width: min(520px, 100%);
-    aspect-ratio: 3 / 2;
-    border-radius: 14px;
-    background: var(--fill);
-    border: 1px dashed var(--strong);
   }
 
   .gb h1 {
@@ -90,11 +78,6 @@ const {
   .gb-q {
     font: 600 15px/1.3 var(--ui);
     color: var(--ink);
-  }
-
-  .gb-q span {
-    font-weight: 400;
-    color: var(--muted);
   }
 
   .gb-reasons {
@@ -153,11 +136,6 @@ const {
     cursor: default;
   }
 
-  .gb-send span {
-    font: 400 12.5px/1.4 var(--ui);
-    color: var(--faint);
-  }
-
   .gb-reinstall {
     display: flex;
     flex-wrap: wrap;
@@ -172,17 +150,5 @@ const {
   .gb-reinstall .btn {
     padding: 10px 16px;
     font-size: 13.5px;
-  }
-
-  .gb-note {
-    margin: 18px 0 0;
-    max-width: 460px;
-    font: 400 14.5px/1.5 var(--ui);
-    color: var(--ink2);
-    text-wrap: pretty;
-  }
-
-  .gb-note span {
-    color: var(--muted);
   }
 </style>

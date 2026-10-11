@@ -204,15 +204,11 @@ export default {
   goodbye: {
     title: 'Goodbye',
     description: 'Thanks for using Stylebot.',
-    panda: 'A pixel panda waving goodbye',
     heading: 'Thanks for using Stylebot.',
     lede: 'Your styles were removed from this browser. If you turned on sync, a backup is still in your Google Drive.',
     changedMind: 'Changed your mind?',
-    note: 'I’ve been working on Stylebot since 2011. Thanks for giving it a try, and for any feedback you leave.',
-    signature: '— Ankit',
     feedback: {
       question: 'Why did you uninstall?',
-      optional: 'Optional, takes a second.',
       reasons: [
         'Didn’t need it anymore',
         'Hard to use',
@@ -223,8 +219,7 @@ export default {
       ],
       placeholder: 'Anything else? (optional)',
       send: 'Send feedback',
-      sendNote: 'Goes straight to the maintainer.',
-      thanks: 'Thank you. Every note gets read.',
+      thanks: 'Thanks for submitting the feedback.',
     },
   },
   manual: {

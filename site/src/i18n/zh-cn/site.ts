@@ -183,15 +183,11 @@ const site: SiteMessages = {
   goodbye: {
     title: '再见',
     description: '感谢使用 Stylebot。',
-    panda: '一只挥手告别的像素熊猫',
     heading: '感谢使用 Stylebot。',
     lede: '你的样式已从此浏览器中移除。如果开启过同步，Google Drive 中仍有一份备份。',
     changedMind: '改主意了？',
-    note: '我从 2011 年起就一直在做 Stylebot。感谢你试用它，也感谢你留下的任何反馈。',
-    signature: '— Ankit',
     feedback: {
       question: '为什么卸载？',
-      optional: '选填，只需一秒钟。',
       reasons: [
         '不再需要了',
         '不好用',
@@ -202,8 +198,7 @@ const site: SiteMessages = {
       ],
       placeholder: '还有什么想说的？（选填）',
       send: '发送反馈',
-      sendNote: '直接发给维护者。',
-      thanks: '谢谢你。每条反馈都会被认真阅读。',
+      thanks: '感谢你提交反馈。',
     },
   },
   manual: {

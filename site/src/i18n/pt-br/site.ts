@@ -189,15 +189,11 @@ const site: SiteMessages = {
   goodbye: {
     title: 'Até logo',
     description: 'Obrigado por usar o Stylebot.',
-    panda: 'Um panda pixelado acenando em despedida',
     heading: 'Obrigado por usar o Stylebot.',
     lede: 'Seus estilos foram removidos deste navegador. Se você ativou a sincronização, ainda há um backup no seu Google Drive.',
     changedMind: 'Mudou de ideia?',
-    note: 'Trabalho no Stylebot desde 2011. Obrigado por experimentar e por qualquer comentário que você deixar.',
-    signature: '— Ankit',
     feedback: {
       question: 'Por que você desinstalou?',
-      optional: 'Opcional, leva um segundo.',
       reasons: [
         'Não precisava mais',
         'Difícil de usar',
@@ -208,8 +204,7 @@ const site: SiteMessages = {
       ],
       placeholder: 'Algo mais? (opcional)',
       send: 'Enviar comentário',
-      sendNote: 'Vai direto para o mantenedor.',
-      thanks: 'Obrigado. Todo comentário é lido.',
+      thanks: 'Obrigado por enviar seu comentário.',
     },
   },
   manual: {

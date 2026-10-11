@@ -57,9 +57,7 @@ export default function GoodbyeFeedback({ messages: t }: Props) {
 
   return (
     <div class="gb-form">
-      <div class="gb-q">
-        {t.question} <span>{t.optional}</span>
-      </div>
+      <div class="gb-q">{t.question}</div>
       <div class="gb-reasons">
         {t.reasons.map((reason) => (
           <button
@@ -83,7 +81,6 @@ export default function GoodbyeFeedback({ messages: t }: Props) {
         <button class="btn btn-primary" disabled={!ready} onClick={send}>
           {t.send}
         </button>
-        <span>{t.sendNote}</span>
       </div>
     </div>
   );

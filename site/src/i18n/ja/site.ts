@@ -188,15 +188,11 @@ const site: SiteMessages = {
   goodbye: {
     title: 'さようなら',
     description: 'Stylebot をご利用いただきありがとうございました。',
-    panda: '手を振ってお別れするピクセルのパンダ',
     heading: 'Stylebot をご利用いただきありがとうございました。',
     lede: 'このブラウザからスタイルを削除しました。同期をオンにしていた場合、バックアップは Google Drive に残っています。',
     changedMind: '気が変わりましたか？',
-    note: '2011 年から Stylebot を開発しています。試していただき、またフィードバックをお寄せいただき、ありがとうございます。',
-    signature: '— Ankit',
     feedback: {
       question: 'アンインストールした理由は？',
-      optional: '任意です。すぐに終わります。',
       reasons: [
         'もう必要なくなった',
         '使いにくい',
@@ -207,8 +203,7 @@ const site: SiteMessages = {
       ],
       placeholder: 'ほかに何かあれば（任意）',
       send: 'フィードバックを送信',
-      sendNote: '開発者に直接届きます。',
-      thanks: 'ありがとうございます。すべてに目を通しています。',
+      thanks: 'フィードバックをお送りいただきありがとうございます。',
     },
   },
   manual: {

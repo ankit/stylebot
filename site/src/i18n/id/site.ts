@@ -189,15 +189,11 @@ const site: SiteMessages = {
   goodbye: {
     title: 'Sampai jumpa',
     description: 'Terima kasih telah memakai Stylebot.',
-    panda: 'Panda piksel melambaikan tangan',
     heading: 'Terima kasih telah memakai Stylebot.',
     lede: 'Gaya Anda telah dihapus dari browser ini. Jika Anda mengaktifkan sinkronisasi, cadangannya masih ada di Google Drive Anda.',
     changedMind: 'Berubah pikiran?',
-    note: 'Saya mengembangkan Stylebot sejak 2011. Terima kasih sudah mencobanya, dan atas masukan apa pun yang Anda berikan.',
-    signature: '— Ankit',
     feedback: {
       question: 'Mengapa Anda menghapus Stylebot?',
-      optional: 'Opsional, hanya sebentar.',
       reasons: [
         'Sudah tidak membutuhkannya',
         'Sulit digunakan',
@@ -208,8 +204,7 @@ const site: SiteMessages = {
       ],
       placeholder: 'Ada hal lain? (opsional)',
       send: 'Kirim masukan',
-      sendNote: 'Langsung dikirim ke pengelola.',
-      thanks: 'Terima kasih. Setiap masukan dibaca.',
+      thanks: 'Terima kasih telah mengirim masukan.',
     },
   },
   manual: {

@@ -189,15 +189,11 @@ const site: SiteMessages = {
   goodbye: {
     title: 'Tạm biệt',
     description: 'Cảm ơn bạn đã dùng Stylebot.',
-    panda: 'Chú gấu trúc pixel vẫy tay tạm biệt',
     heading: 'Cảm ơn bạn đã dùng Stylebot.',
     lede: 'Các kiểu của bạn đã được xóa khỏi trình duyệt này. Nếu bạn đã bật đồng bộ, bản sao lưu vẫn còn trong Google Drive của bạn.',
     changedMind: 'Bạn đổi ý?',
-    note: 'Tôi đã phát triển Stylebot từ năm 2011. Cảm ơn bạn đã dùng thử, và cảm ơn mọi góp ý bạn để lại.',
-    signature: '— Ankit',
     feedback: {
       question: 'Vì sao bạn gỡ cài đặt?',
-      optional: 'Không bắt buộc, chỉ mất vài giây.',
       reasons: [
         'Không cần dùng nữa',
         'Khó sử dụng',
@@ -208,8 +204,7 @@ const site: SiteMessages = {
       ],
       placeholder: 'Bạn muốn nói thêm gì không? (không bắt buộc)',
       send: 'Gửi góp ý',
-      sendNote: 'Gửi thẳng đến người duy trì dự án.',
-      thanks: 'Cảm ơn bạn. Mọi góp ý đều được đọc.',
+      thanks: 'Cảm ơn bạn đã gửi góp ý.',
     },
   },
   manual: {
