@@ -25,7 +25,7 @@ if (!process.env.STYLEBOT_GOOGLE_CLIENT_SECRET) {
 
 const rootDir = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
-  '..'
+  '../..'
 );
 const projectPath = path.join(rootDir, 'safari/Stylebot/Stylebot.xcodeproj');
 const exportOptionsPath = path.join(rootDir, 'safari/ExportOptions.plist');

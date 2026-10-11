@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 const rootDir = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
-  '..'
+  '../..'
 );
 const outputPath = path.join(rootDir, 'firefox-dist');
 const markerPath = path.join(outputPath, '.build-complete');

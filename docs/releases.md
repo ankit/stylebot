@@ -16,7 +16,7 @@ Day-to-day pull requests target `v4`. 3.x releases ship from `main`, and the rel
   - Run `yarn upload:safari` with `STYLEBOT_GOOGLE_CLIENT_SECRET` set to the Desktop OAuth client's secret — Drive sign-in needs it. It builds the extension, archives the app and uploads it to App Store Connect, signing with the Apple account signed in to Xcode, or with an App Store Connect API key when `APP_STORE_CONNECT_KEY_PATH`, `APP_STORE_CONNECT_KEY_ID` and `APP_STORE_CONNECT_ISSUER_ID` are set
   - The app and extension take their version from the manifest and a build number from the build's time, so there's nothing to bump in Xcode, and a rebuilt upload of the same version is accepted as a new build
   - For the listing, `yarn store:safari-text` writes each language's name, subtitle, keywords and description, from the store copy in the locale files, into `store/safari/listing/` to paste into App Store Connect. Screenshots are in `store/safari/`
-  - In App Store Connect, try the build through TestFlight, then add it to the new version and submit it for review
+  - In App Store Connect, try the build through TestFlight, then add it to the new version and submit it for review. Before installing it, quit Safari and run `yarn clean:safari`, which unregisters every other Stylebot.app so Safari loads only the TestFlight one
 
 ## CLI
 

@@ -10,11 +10,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const require = createRequire(import.meta.url);
-const { parseLocaleConfig } = require('./lib/parse-locale-config.js');
+const { parseLocaleConfig } = require('../lib/parse-locale-config.js');
 
 const rootDir = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
-  '..'
+  '../..'
 );
 const localesDir = path.join(rootDir, 'src/assets/_locales');
 const outDir = path.join(rootDir, 'store/safari/listing');
