@@ -29,7 +29,6 @@ const KEY_PATTERN = /^[a-z][a-z0-9_]*$/;
 // Kept for use outside the extension: the store listings.
 const UNREFERENCED_KEYS = new Set([
   'store_listing',
-  'privacy_policy',
   'app_store_subtitle',
   'app_store_keywords',
 ]);

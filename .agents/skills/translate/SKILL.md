@@ -37,8 +37,8 @@ Add back $site$
   wherever the sentence needs it. The validator fails on mismatches.
 - `language_code` isn't translated: it's the file's own locale with a hyphen
   (`ja`, `zh-TW`, `pt-BR`), set as the UI's `lang` so fonts follow it.
-- `store_listing` and `privacy_policy` are multi-paragraph store copy, not UI;
-  translate them too, keeping the paragraphs and bullet characters.
+- `store_listing` is multi-paragraph store copy, not UI;
+  translate it too, keeping the paragraphs and bullet characters.
 
 ## What to translate
 
@@ -64,7 +64,7 @@ validator, as one pass with its own PR.
 2. Read the whole file against `en.config`, top to bottom, applying "Sound
    native" below and the locale's per-language note. Fix untranslated
    strings, calques, typos and grammar, register and terminology drift.
-   Store copy (`store_listing`, `privacy_policy`) is the oldest text and
+   Store copy (`store_listing`) is the oldest text and
    usually needs the most.
 3. Look at it in the extension with `yarn dev:chrome:locale <code>`: the tab
    row, segmented controls, the shortcuts view, menus and the popup are
