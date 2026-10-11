@@ -1,1 +1,0 @@
-import{t as e}from"./analytics.BgF5Araw.js";var t=document.querySelector(`[data-video]`),n=document.querySelector(`.video-player`);t.addEventListener(`click`,r=>{r.preventDefault(),e(`Watch video`),n.querySelector(`iframe`).src=`https://www.youtube-nocookie.com/embed/${t.dataset.video}?autoplay=1&rel=0`,n.hidden=!1,t.hidden=!0});
