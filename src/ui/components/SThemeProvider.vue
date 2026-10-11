@@ -78,6 +78,7 @@ export default Vue.extend({
   // Menus and popovers
   --menu-surface: #23262b;
   --menu-border: #3a3e46;
+  --menu-item-hover: #33363e;
   --menu-shadow: rgb(0 0 0 / 45%);
 
   // Pills
@@ -172,6 +173,7 @@ export default Vue.extend({
   // Menus and popovers
   --menu-surface: #fff;
   --menu-border: #e2e4e9;
+  --menu-item-hover: #e7e9ee;
   --menu-shadow: rgb(0 0 0 / 20%);
 
   // Pills

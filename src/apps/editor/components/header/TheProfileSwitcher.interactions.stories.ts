@@ -90,6 +90,42 @@ export const SwitchProfile: StoryObj = {
   },
 };
 
+export const ArrowKeys: StoryObj = {
+  ...editor(WITH_PROFILES),
+  name: 'Up and Down step through profiles one row at a time, and Right and Left move between a row and its •••',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const menu = await openSwitcher(canvas);
+    const item = (name: string) => within(menu).getByRole('menuitem', { name });
+    const more = (name: string) =>
+      within(row(menu, name)).getByRole('button', { name: 'Profile actions' });
+
+    await user.keyboard('{ArrowDown}');
+    await expect(item('Default')).toHaveFocus();
+
+    await user.keyboard('{ArrowDown}');
+    await expect(item('Dark')).toHaveFocus();
+
+    await user.keyboard('{ArrowDown}');
+    await expect(item('Create profile')).toHaveFocus();
+
+    await user.keyboard('{ArrowUp}');
+    await expect(item('Dark')).toHaveFocus();
+
+    await user.keyboard('{ArrowRight}');
+    await expect(more('Dark')).toHaveFocus();
+
+    await user.keyboard('{ArrowDown}');
+    await expect(item('Create profile')).toHaveFocus();
+
+    await user.keyboard('{ArrowUp}{ArrowUp}{ArrowRight}');
+    await expect(more('Default')).toHaveFocus();
+
+    await user.keyboard('{ArrowLeft}');
+    await expect(item('Default')).toHaveFocus();
+  },
+};
+
 export const OpeningStopsInspecting: StoryObj = {
   ...editor({ ...WITH_PROFILES, inspecting: true }),
   name: 'opening the menu stops inspecting, so Enter in a name field saves it instead of picking an element',

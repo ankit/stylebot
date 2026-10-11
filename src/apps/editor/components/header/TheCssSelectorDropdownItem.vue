@@ -132,7 +132,7 @@ export default Vue.extend({
   &:hover,
   &:focus-visible,
   &.current {
-    background: var(--field-surface-hover);
+    background: var(--menu-item-hover);
     box-shadow: none;
   }
 }

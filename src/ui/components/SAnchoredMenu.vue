@@ -216,6 +216,10 @@ export default Vue.extend({
       list.scrollTop += itemTop - (list.clientHeight - item.offsetHeight) / 2;
     },
 
+    /**
+     * What Up and Down step through. A row's secondary button, marked
+     * data-menu-secondary, is left out so each row is one stop.
+     */
     focusableItems(): Array<HTMLElement> {
       const panel = this.$refs.panel as HTMLElement | undefined;
       return panel
@@ -223,7 +227,7 @@ export default Vue.extend({
             panel.querySelectorAll<HTMLElement>(
               'button, a[href], input, [tabindex]:not([tabindex="-1"])'
             )
-          )
+          ).filter(item => !item.hasAttribute('data-menu-secondary'))
         : [];
     },
 
@@ -310,7 +314,17 @@ export default Vue.extend({
       const cycle = field ? [field, ...items] : items;
 
       const active = this.activeElement();
-      const currentIndex = active ? cycle.indexOf(active) : -1;
+      let currentIndex = active ? cycle.indexOf(active) : -1;
+
+      // From a secondary button, step from the item it sits beside.
+      if (active?.hasAttribute('data-menu-secondary')) {
+        currentIndex =
+          cycle.filter(
+            item =>
+              item.compareDocumentPosition(active) &
+              Node.DOCUMENT_POSITION_FOLLOWING
+          ).length - 1;
+      }
       const delta = event.key === 'ArrowDown' ? 1 : -1;
 
       // From the field, move on from the current choice rather than the top.

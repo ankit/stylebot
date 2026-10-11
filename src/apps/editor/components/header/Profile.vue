@@ -13,11 +13,13 @@
     />
     <template v-else>
       <button
+        ref="name"
         type="button"
         class="row-name"
         role="menuitem"
         tabindex="-1"
         :aria-current="active ? 'true' : undefined"
+        @keydown.right="focusMore"
       >
         {{ name }}
       </button>
@@ -27,13 +29,16 @@
 
         <button
           v-if="actions"
+          ref="more"
           type="button"
           class="row-more"
           tabindex="-1"
+          data-menu-secondary
           :aria-label="t('profile_actions')"
           aria-haspopup="menu"
           :aria-expanded="menuOpen ? 'true' : 'false'"
           @click.stop="$emit('more', $event)"
+          @keydown.left="focusName"
         >
           <more-icon :size="14" />
         </button>
@@ -88,6 +93,16 @@ export default Vue.extend({
       default: '',
     },
   },
+
+  methods: {
+    focusMore(): void {
+      (this.$refs.more as HTMLElement | undefined)?.focus();
+    },
+
+    focusName(): void {
+      (this.$refs.name as HTMLElement | undefined)?.focus();
+    },
+  },
 });
 </script>
 
@@ -109,7 +124,7 @@ export default Vue.extend({
   &:hover,
   &:has(.row-name:focus-visible, .row-more:focus-visible),
   &.menu-open {
-    background: var(--field-surface-hover);
+    background: var(--menu-item-hover);
   }
 
   &.active {
@@ -176,6 +191,7 @@ export default Vue.extend({
   }
 
   &:hover,
+  &:focus-visible,
   .menu-open & {
     color: var(--text-primary);
     background: var(--field-surface-active);
