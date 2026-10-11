@@ -25,14 +25,25 @@ const {
         <div class="feature-mock" aria-hidden="true">
           <div data-ed class="mock-card">
             <div class="sync-head">
-              <div class="sync-status">
-                <span class="mock-title">{t.sync.connected}</span>
-                <span class="sync-pill">
-                  <span class="dot"></span>
-                  {t.sync.synced}
+              <span class="mock-title">{t.sync.connected}</span>
+              <span class="sync-pill">
+                <span class="dot"></span>
+                {t.sync.synced}
+              </span>
+            </div>
+            <div class="sync-grid">
+              <span class="muted">{t.sync.savedTo}</span>
+              <span class="sync-path">
+                you@gmail.com <span class="faint">›</span>
+                <span class="sync-file">
+                  stylebot/stylebot_v3_backup.json ↗
                 </span>
-              </div>
-              <span class="mock-btn sync-now">
+              </span>
+              <span class="muted">{t.sync.schedule}</span>
+              <span>{t.sync.scheduleValue}</span>
+            </div>
+            <div class="sync-foot">
+              <span class="mock-btn">
                 <svg
                   width="13"
                   height="13"
@@ -48,16 +59,7 @@ const {
                 </svg>
                 {t.sync.syncNow}
               </span>
-            </div>
-            <div class="sync-grid">
-              <span class="muted">{t.sync.savedTo}</span>
-              <span class="sync-path">
-                you@gmail.com <span class="faint">›</span>
-              </span>
               <span class="mock-link">{t.sync.disconnect}</span>
-              <span class="sync-file">stylebot/stylebot_v3_backup.json ↗</span>
-              <span class="muted">{t.sync.schedule}</span>
-              <span class="sync-schedule">{t.sync.scheduleValue}</span>
             </div>
           </div>
         </div>
@@ -411,8 +413,8 @@ const {
   .sync-grid {
     padding: 14px 16px;
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr) auto;
-    gap: 10px 14px;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px 18px;
   }
 
   .sync-path {
@@ -422,25 +424,17 @@ const {
     white-space: nowrap;
   }
 
-  .sync-schedule {
-    grid-column: span 2;
-  }
-
-  .sync-status {
+  .sync-foot {
+    padding: 0 16px 14px;
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
-  .sync-now {
-    margin-left: auto;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
   }
 
   .sync-file {
-    grid-column: 2 / span 2;
-    margin-top: -4px;
-    font: 400 11px/1.4 var(--mono);
+    margin-left: 0.3em;
+    font: 400 11.5px/1.4 var(--mono);
     color: var(--acc);
   }
 
@@ -721,7 +715,26 @@ const {
     color: var(--surface);
   }
 
+  @media (max-width: 639px) {
+    .feature {
+      flex-basis: min(440px, 90%);
+    }
+
+    .feature-mock {
+      height: auto;
+      min-height: 360px;
+      padding: 12px;
+    }
+  }
+
   @media (max-width: 420px) {
+    .chat-change-label {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
     .hist-row {
       gap: 10px;
     }

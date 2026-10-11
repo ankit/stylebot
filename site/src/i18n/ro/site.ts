@@ -26,7 +26,6 @@ const site: SiteMessages = {
   },
   store: {
     add: 'Adaugă în {store}',
-    addFree: 'Adaugă în {store} — e gratuit',
     reinstall: 'Reinstalează pentru {store}',
   },
   zoom: {
@@ -39,6 +38,10 @@ const site: SiteMessages = {
     titleWordHint: 'Dă clic pentru alt stil',
     lede: 'Arată spre ceva de pe pagină și modifică-l, sau pur și simplu descrie ce vrei. Stylebot scrie CSS-ul și îți încarcă stilul de fiecare dată când revii.',
     also: 'Disponibil și pentru {first} și {second}',
+    desktopOnly:
+      'Stylebot funcționează în <strong>Chrome, Firefox și Edge</strong> pe computer.',
+    watchVideo: 'Vezi cum funcționează',
+    video: 'Videoclip demonstrativ Stylebot',
     installTitle: 'Instalează Stylebot',
     installBody:
       'Gratuit și open source din 2011. Fără cont și fără urmărire. Stilurile tale rămân în browser, iar codul este pe GitHub.',

@@ -29,3 +29,5 @@ export const LINKS = {
 };
 
 export const CLI_PACKAGE = '@stylebot/cli';
+
+export const VIDEO_ID = 'V1pzGqrZicY';

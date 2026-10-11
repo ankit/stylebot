@@ -4,7 +4,7 @@ import { fmt, messagesFor } from '../i18n';
 
 type Props = {
   index: 0 | 1 | 2;
-  format: 'add' | 'add-free' | 'name' | 'reinstall';
+  format: 'add' | 'name' | 'reinstall';
   class?: string;
 };
 
@@ -13,7 +13,6 @@ const store = STORES[BROWSERS[index]];
 const { site: t } = messagesFor(Astro.url);
 const template = {
   add: t.store.add,
-  'add-free': t.store.addFree,
   name: '{store}',
   reinstall: t.store.reinstall,
 }[format];

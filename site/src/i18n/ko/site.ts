@@ -26,7 +26,6 @@ const site: SiteMessages = {
   },
   store: {
     add: '{store}에 추가',
-    addFree: '{store}에 추가 — 무료입니다',
     reinstall: '{store}에 다시 설치',
   },
   zoom: {
@@ -39,6 +38,10 @@ const site: SiteMessages = {
     titleWordHint: '클릭해 스타일 바꾸기',
     lede: '페이지에서 요소를 가리켜 바꾸거나, 원하는 모습을 말로 설명하세요. CSS는 Stylebot이 작성하고, 사이트를 다시 방문할 때마다 스타일을 불러옵니다.',
     also: '{first}, {second}에서도 사용 가능',
+    desktopOnly:
+      'Stylebot은 데스크톱용 <strong>Chrome, Firefox, Edge</strong>에서 사용할 수 있습니다.',
+    watchVideo: '사용 방법 보기',
+    video: 'Stylebot 데모 동영상',
     installTitle: 'Stylebot 설치',
     installBody:
       '2011년부터 무료 오픈 소스입니다. 계정도 추적도 없습니다. 스타일은 브라우저에 저장되고, 코드는 GitHub에 공개되어 있습니다.',

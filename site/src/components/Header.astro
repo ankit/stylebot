@@ -56,7 +56,11 @@ const themeLabels = {
       </a>
       {install &&
         (storeCta ? (
-          <StoreLink index={0} format="add" class="btn btn-primary btn-sm" />
+          <StoreLink
+            index={0}
+            format="add"
+            class="btn btn-primary btn-sm header-store"
+          />
         ) : (
           <a
             href={localizePath(locale, '/#install')}

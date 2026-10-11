@@ -26,7 +26,6 @@ const site: SiteMessages = {
   },
   store: {
     add: '加到 {store}',
-    addFree: '免費加到 {store}',
     reinstall: '重新安裝到 {store}',
   },
   zoom: {
@@ -39,6 +38,10 @@ const site: SiteMessages = {
     titleWordHint: '按一下換個風格',
     lede: '指向頁面上的元素直接修改，或者直接描述你想要的效果。Stylebot 會撰寫 CSS，每次回到網站都會自動載入你的樣式。',
     also: '也支援 {first} 和 {second}',
+    desktopOnly:
+      'Stylebot 支援電腦版 <strong>Chrome、Firefox 和 Edge</strong>。',
+    watchVideo: '觀看使用示範',
+    video: 'Stylebot 示範影片',
     installTitle: '安裝 Stylebot',
     installBody:
       '自 2011 年起免費開放原始碼。不需帳戶，也不追蹤。你的樣式保存在瀏覽器中，程式碼公開在 GitHub 上。',

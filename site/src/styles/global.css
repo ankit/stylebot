@@ -5,6 +5,8 @@
 }
 
 html {
+  --gutter: clamp(16px, 4vw, 24px);
+
   color-scheme: light;
 }
 
@@ -56,7 +58,7 @@ img {
 .container {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 var(--gutter);
 }
 
 .site-header {
@@ -79,7 +81,7 @@ img {
 .site-header-inner {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 0 24px;
+  padding: 0 var(--gutter);
   height: 56px;
   display: flex;
   align-items: center;
@@ -320,7 +322,7 @@ a.icon-btn:hover {
 .section-inner {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 72px 24px 80px;
+  padding: clamp(48px, 9vw, 72px) var(--gutter) clamp(56px, 10vw, 80px);
 }
 
 .section-head {
@@ -384,9 +386,18 @@ a.icon-btn:hover {
   border-top: 1px solid var(--border);
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 22px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 22px;
   font: 400 13px/1.4 var(--ui);
   color: var(--muted);
+}
+
+.site-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 22px;
 }
 
 .site-footer a {
@@ -397,14 +408,10 @@ a.icon-btn:hover {
   color: var(--link, var(--ink));
 }
 
-.site-footer-copy {
-  margin-left: auto;
-}
-
 .prose {
   max-width: 760px;
   margin: 0 auto;
-  padding: 64px 24px 0;
+  padding: 64px var(--gutter) 0;
   font: 400 16px/1.65 var(--ui);
   color: var(--ink2);
 }
@@ -523,12 +530,14 @@ a.icon-btn:hover {
   color: var(--ink);
 }
 
-@media (max-width: 420px) {
-  .site-header-inner {
-    padding: 0 16px;
+@media (max-width: 639px) {
+  .header-actions .header-store {
+    display: none;
   }
+}
 
-  .logo-name {
+@media (max-width: 420px) {
+  .site-header-inner:not(:has(.header-store)) .logo-name {
     display: none;
   }
 

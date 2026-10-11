@@ -7,6 +7,7 @@ import CliCommand from '../../components/cli/CliCommand.astro';
 import CliSection from '../../components/cli/CliSection.astro';
 import Quotes from '../../components/Quotes.astro';
 import Footer from '../../components/Footer.astro';
+import VideoPoster from '../../components/VideoPoster.astro';
 import StoreLink from '../../components/StoreLink.astro';
 import { CLI_PACKAGE, LINKS, STORES } from '../../lib/links';
 import {
@@ -361,7 +362,7 @@ const structuredData = {
       <p>{t.home.lede}</p>
       <div class="cta">
         <div class="cta-row">
-          <StoreLink index={0} format="add-free" class="btn btn-primary" />
+          <StoreLink index={0} format="add" class="btn btn-primary" />
           <span class="cta-also">
             {parts(t.home.also).map((part) =>
               part === '{first}' ? (
@@ -374,11 +375,32 @@ const structuredData = {
             )}
           </span>
         </div>
+        <div class="cta-desktop">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.4"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="1.5" y="2.5" width="13" height="8.5" rx="1.5"></rect>
+            <path d="M5.5 13.5h5M8 11v2.5" stroke-linecap="round"></path>
+          </svg>
+          <span set:html={t.home.desktopOnly} />
+        </div>
       </div>
     </div>
 
     <div class="demo-wrap">
-      <Demo client:visible messages={demo} />
+      <div class="demo-full">
+        <Demo client:visible messages={demo} />
+      </div>
+      <div class="demo-video">
+        <VideoPoster />
+      </div>
     </div>
 
     <CliSection />
@@ -449,7 +471,7 @@ const structuredData = {
   .hero {
     max-width: 760px;
     margin: 0 auto;
-    padding: 64px 24px 36px;
+    padding: clamp(48px, 10vw, 88px) var(--gutter) clamp(32px, 6vw, 44px);
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -567,6 +589,7 @@ const structuredData = {
   }
 
   .cta-also {
+    white-space: nowrap;
     font: 400 13px/1.4 var(--ui);
     color: var(--muted);
   }
@@ -587,7 +610,7 @@ const structuredData = {
   .demo-wrap {
     max-width: 1180px;
     margin: 0 auto;
-    padding: 0 24px 88px;
+    padding: 0 var(--gutter) clamp(56px, 10vw, 88px);
     display: flex;
     flex-direction: column;
     gap: 28px;
@@ -596,7 +619,7 @@ const structuredData = {
   .install {
     max-width: 1180px;
     margin: 0 auto;
-    padding: 80px 24px 0;
+    padding: clamp(56px, 10vw, 80px) var(--gutter) 0;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -642,13 +665,43 @@ const structuredData = {
     width: 100%;
   }
 
-  @media (max-width: 600px) {
-    .hero {
-      padding-top: 56px;
+  .demo-video,
+  .cta-desktop {
+    display: none;
+  }
+
+  @media (max-width: 639px) {
+    .cta-row,
+    .demo-full {
+      display: none;
     }
 
-    .demo-wrap {
-      padding-bottom: 64px;
+    .demo-video {
+      display: block;
+    }
+
+    .cta-desktop {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font: 400 14px/1.45 var(--ui);
+      color: var(--muted);
+      text-align: left;
+      text-wrap: pretty;
+    }
+
+    .cta-desktop svg {
+      flex: none;
+      color: var(--ink2);
+    }
+
+    .cta-desktop :global(strong) {
+      font-weight: 600;
+      color: var(--ink);
     }
   }
 </style>

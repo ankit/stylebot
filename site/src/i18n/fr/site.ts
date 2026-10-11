@@ -26,7 +26,6 @@ const site: SiteMessages = {
   },
   store: {
     add: 'Ajouter à {store}',
-    addFree: 'Ajouter à {store} — c’est gratuit',
     reinstall: 'Réinstaller pour {store}',
   },
   zoom: {
@@ -39,6 +38,10 @@ const site: SiteMessages = {
     titleWordHint: 'Cliquez pour relooker',
     lede: 'Désignez un élément de la page et modifiez-le, ou décrivez simplement ce que vous voulez. Stylebot écrit le CSS et applique votre style à chaque visite.',
     also: 'Aussi sur {first} et {second}',
+    desktopOnly:
+      'Stylebot fonctionne sur <strong>Chrome, Firefox et Edge</strong> sur ordinateur.',
+    watchVideo: 'Voir comment ça marche',
+    video: 'Vidéo de démonstration de Stylebot',
     installTitle: 'Installer Stylebot',
     installBody:
       'Gratuit et open source depuis 2011. Sans compte et sans pistage. Vos styles restent dans votre navigateur, et le code est sur GitHub.',

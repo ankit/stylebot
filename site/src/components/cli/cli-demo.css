@@ -290,3 +290,18 @@
 .cli-page-flash.is-on {
   opacity: 0.55;
 }
+
+@media (max-width: 639px) {
+  .cli-term,
+  .cli-page {
+    min-height: 320px;
+  }
+
+  .cli-page-body {
+    padding: 18px 16px 22px;
+  }
+
+  .cli-page-ad {
+    width: 56px;
+  }
+}

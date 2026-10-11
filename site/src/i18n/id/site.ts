@@ -26,7 +26,6 @@ const site: SiteMessages = {
   },
   store: {
     add: 'Tambahkan ke {store}',
-    addFree: 'Tambahkan ke {store} — gratis',
     reinstall: 'Instal ulang untuk {store}',
   },
   zoom: {
@@ -39,6 +38,10 @@ const site: SiteMessages = {
     titleWordHint: 'Klik untuk mengubah tampilan',
     lede: 'Tunjuk sesuatu di halaman lalu ubah, atau cukup jelaskan apa yang Anda inginkan. Stylebot menulis CSS-nya dan menerapkan gaya Anda setiap kali Anda kembali.',
     also: 'Juga tersedia di {first} dan {second}',
+    desktopOnly:
+      'Stylebot berjalan di <strong>Chrome, Firefox, dan Edge</strong> versi desktop.',
+    watchVideo: 'Lihat cara kerjanya',
+    video: 'Video demo Stylebot',
     installTitle: 'Instal Stylebot',
     installBody:
       'Gratis dan open source sejak 2011. Tanpa akun dan tanpa pelacakan. Gaya Anda tersimpan di browser, dan kodenya ada di GitHub.',

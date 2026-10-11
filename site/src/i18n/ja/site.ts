@@ -26,7 +26,6 @@ const site: SiteMessages = {
   },
   store: {
     add: '{store} に追加',
-    addFree: '{store} に追加（無料）',
     reinstall: '{store} に再インストール',
   },
   zoom: {
@@ -39,6 +38,10 @@ const site: SiteMessages = {
     titleWordHint: 'クリックで着せ替え',
     lede: 'ページ上の要素を指して変更するか、望む見た目を言葉で伝えるだけ。CSS は Stylebot が書き、サイトを開くたびにスタイルを読み込みます。',
     also: '{first} と {second} にも対応',
+    desktopOnly:
+      'Stylebot はパソコン版の <strong>Chrome、Firefox、Edge</strong> で使えます。',
+    watchVideo: '使い方を動画で見る',
+    video: 'Stylebot のデモ動画',
     installTitle: 'Stylebot をインストール',
     installBody:
       '2011 年から無料のオープンソースです。アカウント登録もトラッキングもありません。スタイルはブラウザに保存され、コードは GitHub で公開しています。',

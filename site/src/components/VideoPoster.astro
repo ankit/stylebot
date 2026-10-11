@@ -1,0 +1,131 @@
+---
+import { Image } from 'astro:assets';
+import poster from '../assets/video-poster.png';
+import { VIDEO_ID } from '../lib/links';
+import { messagesFor } from '../i18n';
+
+const {
+  site: { home: t },
+} = messagesFor(Astro.url);
+---
+
+<a
+  class="video-poster"
+  href={`https://www.youtube.com/watch?v=${VIDEO_ID}`}
+  data-video={VIDEO_ID}
+  aria-label={t.watchVideo}
+>
+  <Image
+    class="video-poster-img"
+    src={poster}
+    widths={[480, 800, 1280]}
+    sizes="(max-width: 639px) 100vw, 640px"
+    alt=""
+    loading="lazy"
+  />
+  <span class="video-play" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 12 12" fill="currentColor">
+      <path d="M3 1.8v8.4c0 .4.4.6.7.4l6.6-4.2c.3-.2.3-.6 0-.8L3.7 1.4c-.3-.2-.7 0-.7.4z"></path>
+    </svg>
+  </span>
+  <span class="video-label">{t.watchVideo}</span>
+</a>
+
+<div class="video-player" hidden>
+  <iframe
+    title={t.video}
+    allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+    allowfullscreen
+  ></iframe>
+</div>
+
+<script>
+  import { track } from '../lib/analytics';
+
+  const link = document.querySelector<HTMLAnchorElement>('[data-video]')!;
+  const player = document.querySelector<HTMLElement>('.video-player')!;
+
+  link.addEventListener('click', (ev) => {
+    ev.preventDefault();
+    track('Watch video');
+    player.querySelector('iframe')!.src =
+      `https://www.youtube-nocookie.com/embed/${link.dataset.video}?autoplay=1&rel=0`;
+    player.hidden = false;
+    link.hidden = true;
+  });
+</script>
+
+<style>
+  .video-poster {
+    position: relative;
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    background: var(--fill);
+    box-shadow: 0 16px 40px rgba(25, 27, 31, 0.1);
+  }
+
+  .video-poster[hidden] {
+    display: none;
+  }
+
+  .video-poster-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .video-play {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 64px;
+    height: 64px;
+    margin: -32px 0 0 -32px;
+    border-radius: 32px;
+    background: var(--ink);
+    color: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    transition: transform 0.15s;
+  }
+
+  .video-play svg {
+    margin-left: 3px;
+  }
+
+  .video-poster:hover .video-play {
+    transform: scale(1.06);
+  }
+
+  .video-label {
+    position: absolute;
+    left: 14px;
+    bottom: 12px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    background: var(--surface);
+    font: 600 13px/1 var(--ui);
+    color: var(--ink);
+  }
+
+  .video-player {
+    aspect-ratio: 16 / 9;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #000;
+  }
+
+  .video-player iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+</style>

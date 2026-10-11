@@ -26,7 +26,6 @@ const site: SiteMessages = {
   },
   store: {
     add: 'Thêm vào {store}',
-    addFree: 'Thêm vào {store} — miễn phí',
     reinstall: 'Cài lại cho {store}',
   },
   zoom: {
@@ -39,6 +38,10 @@ const site: SiteMessages = {
     titleWordHint: 'Nhấp để đổi mới',
     lede: 'Chỉ vào thứ bạn muốn trên trang rồi chỉnh sửa, hoặc chỉ cần mô tả điều bạn muốn. Stylebot viết CSS và áp dụng kiểu của bạn mỗi lần bạn quay lại.',
     also: 'Cũng có trên {first} và {second}',
+    desktopOnly:
+      'Stylebot chạy trên <strong>Chrome, Firefox và Edge</strong> dành cho máy tính.',
+    watchVideo: 'Xem cách hoạt động',
+    video: 'Video giới thiệu Stylebot',
     installTitle: 'Cài đặt Stylebot',
     installBody:
       'Miễn phí và mã nguồn mở từ năm 2011. Không cần tài khoản, không theo dõi. Kiểu của bạn nằm trong trình duyệt, còn mã nguồn có trên GitHub.',

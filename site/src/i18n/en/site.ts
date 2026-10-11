@@ -28,7 +28,6 @@ export default {
   },
   store: {
     add: 'Add to {store}',
-    addFree: 'Add to {store} — it’s free',
     reinstall: 'Reinstall for {store}',
   },
   zoom: {
@@ -45,6 +44,11 @@ export default {
     titleWordHint: 'Click to restyle',
     lede: 'Point at something on the page and change it, or just describe what you want. Stylebot writes the CSS and loads your style every time you come back.',
     also: 'Also on {first} and {second}',
+    // Shown on phones in place of the store buttons.
+    desktopOnly:
+      'Stylebot runs on <strong>Chrome, Firefox and Edge</strong> on desktop.',
+    watchVideo: 'Watch how it works',
+    video: 'Stylebot demo video',
     installTitle: 'Install Stylebot',
     installBody:
       'Free and open source since 2011. No account and no tracking. Your styles live in your browser, and the code is on GitHub.',
