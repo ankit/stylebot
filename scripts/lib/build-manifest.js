@@ -89,15 +89,17 @@ const addScripting = manifest => ({
 });
 
 /**
- * Adds the Chrome Web Store public key, for the store id that Drive sign-in's
- * OAuth redirect needs. Release builds leave it out: the store rejects an
- * uploaded manifest with a `key`.
+ * Adds the Chrome Web Store public key, or Edge Add-ons' for `store: 'edge'`,
+ * for the store id that Drive sign-in's OAuth redirect needs. Release builds
+ * leave it out: the stores reject an uploaded manifest with a `key`.
  */
-const buildChromeManifest = (manifest, { nodeEnv, preview }) => {
+const buildChromeManifest = (manifest, { nodeEnv, preview, store }) => {
   const scripting = addScripting(manifest);
 
   if (nodeEnv === 'development' || preview) {
-    return { ...scripting, ...readManifest('manifest-dev.json') };
+    const keyFile =
+      store === 'edge' ? 'manifest-edge-dev.json' : 'manifest-dev.json';
+    return { ...scripting, ...readManifest(keyFile) };
   }
 
   return scripting;
@@ -125,7 +127,7 @@ const addSiteDevServer = manifest => ({
  * Builds the extension manifest for a browser (undefined for Chrome and Edge,
  * which share one build) from the base manifest.
  */
-const buildManifest = (base, { browser, nodeEnv, preview }) => {
+const buildManifest = (base, { browser, nodeEnv, preview, store }) => {
   let manifest;
 
   if (browser === 'firefox') {
@@ -133,7 +135,7 @@ const buildManifest = (base, { browser, nodeEnv, preview }) => {
   } else if (browser === 'safari') {
     manifest = buildSafariManifest(base);
   } else {
-    manifest = buildChromeManifest(base, { nodeEnv, preview });
+    manifest = buildChromeManifest(base, { nodeEnv, preview, store });
   }
 
   if (nodeEnv === 'development') {

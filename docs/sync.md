@@ -46,6 +46,8 @@ Google's OAuth client is registered for the store extension's redirect URL, `htt
 
 Dev builds (`yarn watch`, `yarn dev:chrome`) and `yarn build:preview` (a production build in `preview-dist/`) add the store's public key to the manifest, so they get the store id and sign-in works. `yarn dev:chrome` runs in its own profile; if you load `dist/` unpacked in your everyday profile instead, disable the store install first, since the two share an id. Release builds (`yarn build`) leave the key out.
 
+Chrome and Edge give the store extension different ids, so the OAuth client lists both stores' redirect URLs. `yarn preview:edge` builds with the Edge store's key instead, to try sign-in under the Edge id.
+
 A fork needs its own client:
 
 1. In the [Google Cloud console](https://cloud.google.com/cloud-console), create a project and enable the **Google Drive API**.

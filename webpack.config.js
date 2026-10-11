@@ -283,6 +283,7 @@ const config = {
                 browser: process.env.BROWSER,
                 nodeEnv: process.env.NODE_ENV,
                 preview: isPreview,
+                store: process.env.STYLEBOT_STORE,
               }),
               null,
               2

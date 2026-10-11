@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
 
@@ -158,4 +159,33 @@ describe('CLI permissions', () => {
       expect(manifest).not.toHaveProperty('optional_host_permissions');
     }
   );
+});
+
+/**
+ * Derives an extension id from its public key, as Chromium does.
+ */
+const extensionId = (key: string) =>
+  [
+    ...crypto
+      .createHash('sha256')
+      .update(Buffer.from(key, 'base64'))
+      .digest('hex')
+      .slice(0, 32),
+  ]
+    .map(c => String.fromCharCode(97 + parseInt(c, 16)))
+    .join('');
+
+describe('store key', () => {
+  it.each([
+    ['Chrome', undefined, 'oiaejidbmkiecgbjeifoejpgmdaleoha'],
+    ['Edge', 'edge', 'mjolbpfednnbebfapicajpifliopnnai'],
+  ])('gives the %s preview build its store id', (_, store, id) => {
+    const manifest = buildManifest(base, {
+      nodeEnv: 'production',
+      preview: true,
+      store,
+    });
+
+    expect(extensionId(manifest.key as string)).toBe(id);
+  });
 });

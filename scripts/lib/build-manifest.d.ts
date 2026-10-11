@@ -8,7 +8,12 @@ export type Manifest = {
 
 export function buildManifest(
   base: Manifest,
-  options: { browser?: string; nodeEnv?: string; preview?: boolean }
+  options: {
+    browser?: string;
+    nodeEnv?: string;
+    preview?: boolean;
+    store?: string;
+  }
 ): Manifest;
 
 export function supportsCLI(browser?: string): boolean;
