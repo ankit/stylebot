@@ -120,7 +120,7 @@ describe('getAccessToken', () => {
     flows = [{ lastError: { message: 'User interaction required.' } }];
 
     await expect(getAccessToken({ interactive: false })).rejects.toMatchObject({
-      code: 'auth',
+      code: 'sign-in',
     });
 
     expect(interactiveCalls()).toHaveLength(0);
@@ -136,7 +136,7 @@ describe('getAccessToken', () => {
 
     expect(error).toBeInstanceOf(Error);
     expect(isSyncError(error)).toBe(true);
-    expect(error.code).toBe('auth');
+    expect(error.code).toBe('sign-in');
     expect(error.message).toBe('The user did not approve access.');
   });
 
@@ -146,14 +146,14 @@ describe('getAccessToken', () => {
       { url: 'https://abc.chromiumapp.org/#error=access_denied' },
     ];
 
-    await expect(getAccessToken()).rejects.toMatchObject({ code: 'auth' });
+    await expect(getAccessToken()).rejects.toMatchObject({ code: 'sign-in' });
   });
 
   it('rejects and does not cache when the token fails validation', async () => {
     flows = [{ url: redirectWith('wrong') }, { url: redirectWith('wrong') }];
     fetchMock.mockResponse(JSON.stringify({ aud: 'someone-else' }));
 
-    await expect(getAccessToken()).rejects.toMatchObject({ code: 'auth' });
+    await expect(getAccessToken()).rejects.toMatchObject({ code: 'sign-in' });
     expect(store[CACHE_KEY]).toBeUndefined();
   });
 
@@ -161,7 +161,7 @@ describe('getAccessToken', () => {
     flows = [{ url: redirectWith('token') }, { url: redirectWith('token') }];
     fetchMock.mockResponse('{}', { status: 500 });
 
-    await expect(getAccessToken()).rejects.toMatchObject({ code: 'auth' });
+    await expect(getAccessToken()).rejects.toMatchObject({ code: 'sign-in' });
   });
 });
 

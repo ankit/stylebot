@@ -88,13 +88,13 @@ const validate = async (
   });
 
   if (response.status !== 200) {
-    throw syncError('Token validation error', 'auth');
+    throw syncError('Token validation error', 'sign-in');
   }
 
   const json: { aud?: string } = await response.json();
 
   if (json.aud !== clientId) {
-    throw syncError('Token validation error', 'auth');
+    throw syncError('Token validation error', 'sign-in');
   }
 };
 
@@ -122,7 +122,7 @@ const authorize = (interactive: boolean): Promise<string | undefined> => {
 
         if (lastError) {
           reject(
-            syncError(lastError.message ?? 'Authorization failure', 'auth')
+            syncError(lastError.message ?? 'Authorization failure', 'sign-in')
           );
           return;
         }
@@ -139,7 +139,7 @@ const authorizeAndCache = async (
   const params = extractTokenParams((await authorize(interactive)) ?? '');
 
   if (!params) {
-    throw syncError('Authorization failure', 'auth');
+    throw syncError('Authorization failure', 'sign-in');
   }
 
   await validate(params.token, CLIENT_ID);
@@ -160,7 +160,7 @@ const getTabSignInToken = async (
     (interactive ? await signInInTab(SCOPES) : null);
 
   if (!issued) {
-    throw syncError('Sign-in needed', 'auth');
+    throw syncError('Sign-in needed', 'sign-in');
   }
 
   await validate(issued.token, DESKTOP_CLIENT_ID);

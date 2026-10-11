@@ -130,6 +130,20 @@ describe('TheGoogleDriveSync.vue', () => {
     expect(signIn.text()).not.toContain('synced_at_time');
   });
 
+  it('offers a sign-in in place of Sync now while a sign-in is pending', () => {
+    const enabled = {
+      googleDriveSyncEnabled: true,
+      googleDriveSyncState: syncState(new Date().toISOString()),
+      syncInProgress: false,
+    };
+
+    const synced = mountCard({ ...enabled, googleDriveSyncNeedsAuth: false });
+    expect(synced.find('button').text()).toBe('sync_now');
+
+    const signIn = mountCard({ ...enabled, googleDriveSyncNeedsAuth: true });
+    expect(signIn.find('button').text()).toBe('sign_in');
+  });
+
   it('lists conflicts with a way to open the style and to dismiss it', async () => {
     dispatch.mockClear();
 

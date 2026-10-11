@@ -2,6 +2,7 @@ import type { SyncErrorKey } from '@stylebot/types';
 
 export type SyncErrorCode =
   | 'auth'
+  | 'sign-in'
   | 'network'
   | 'not-found'
   | 'parse'
@@ -22,6 +23,7 @@ export const isSyncError = (e: unknown): e is SyncError =>
 
 const ERROR_KEYS: Record<SyncErrorCode, SyncErrorKey> = {
   auth: 'sync_error_auth',
+  'sign-in': 'sync_error_auth',
   network: 'sync_error_network',
   'not-found': 'sync_error_not_found',
   parse: 'sync_error_parse',

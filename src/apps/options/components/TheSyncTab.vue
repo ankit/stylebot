@@ -29,6 +29,7 @@
     <sync-status-banner
       v-if="syncStatus"
       :variant="syncStatus.type"
+      :title="syncStatus.detail"
       @dismiss="$store.dispatch('dismissSyncStatus')"
     >
       {{ t(syncStatus.messageKey, [syncStatus.detail || '']) }}

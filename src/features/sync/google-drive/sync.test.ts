@@ -16,6 +16,7 @@ import type { StyleMap, SyncState } from '@stylebot/types';
 
 import * as styleStorage from '../../../apps/background/styles';
 import type { SyncOptions } from './sync';
+import getAccessToken from './get-access-token';
 import { runGoogleDriveSync as runSync } from './sync';
 import {
   getSyncFileMetadata,
@@ -692,6 +693,32 @@ describe('runGoogleDriveSync', () => {
 
     await runGoogleDriveSync({ interactive: false });
     expect(store['google-drive-sync-needs-auth']).toBe(false);
+  });
+
+  it('does not sign in again after a sign-in fails, but retries a token Drive turned down', async () => {
+    seed({ styles: RED });
+    const mockedGetToken = getAccessToken as jest.MockedFunction<
+      typeof getAccessToken
+    >;
+
+    mockedGetToken.mockClear();
+    mockedGetToken.mockRejectedValueOnce(
+      Object.assign(new Error('Authorization failure'), { code: 'sign-in' })
+    );
+    await expect(runGoogleDriveSync()).resolves.toMatchObject({
+      ok: false,
+      errorKey: 'sync_error_auth',
+    });
+    expect(mockedGetToken).toBeCalledTimes(1);
+
+    mockedGetToken.mockClear();
+    mockedGetRemote.mockRejectedValueOnce(
+      Object.assign(new Error('Forbidden'), { code: 'auth' })
+    );
+    mockedGetRemote.mockResolvedValue(null);
+    mockedWrite.mockResolvedValue(remoteMetadata('remote-1'));
+    await expect(runGoogleDriveSync()).resolves.toMatchObject({ ok: true });
+    expect(mockedGetToken).toBeCalledTimes(2);
   });
 
   it('keeps why the last run failed until one succeeds', async () => {

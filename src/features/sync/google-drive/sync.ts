@@ -261,9 +261,11 @@ const run = async (
 
     return { ok: true, metadata };
   } catch (e) {
+    let error = e;
+
+    // Drive turned the token down, so it may have been revoked: drop it and
+    // try once more. A failed sign-in isn't retried, which would prompt again.
     if (isSyncError(e) && e.code === 'auth') {
-      // The cached token may simply have been revoked. Drop it and give the
-      // user one chance to re-consent before reporting a failure.
       await clearCachedToken();
 
       try {
@@ -272,21 +274,21 @@ const run = async (
 
         return { ok: true, metadata };
       } catch (retryError) {
-        if (
-          !options.interactive &&
-          isSyncError(retryError) &&
-          retryError.code === 'auth'
-        ) {
-          // A scheduled run has nobody to show an auth window to. Leave a
-          // flag for the UI and let the next manual sync do the sign-in.
-          await setSyncNeedsAuth(true);
-        }
-
-        return toFailure(retryError);
+        error = retryError;
       }
     }
 
-    return toFailure(e);
+    if (
+      !options.interactive &&
+      isSyncError(error) &&
+      (error.code === 'auth' || error.code === 'sign-in')
+    ) {
+      // A scheduled run has nobody to show an auth window to. Leave a
+      // flag for the UI and let the next manual sync do the sign-in.
+      await setSyncNeedsAuth(true);
+    }
+
+    return toFailure(error);
   }
 };
 

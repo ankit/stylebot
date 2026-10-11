@@ -34,7 +34,14 @@
         </div>
 
         <s-button
-          v-if="googleDriveSyncEnabled"
+          v-if="googleDriveSyncEnabled && needsAuth && !syncInProgress"
+          variant="primary"
+          @click="syncWithGoogleDrive"
+        >
+          {{ t('sign_in') }}
+        </s-button>
+        <s-button
+          v-else-if="googleDriveSyncEnabled"
           :disabled="syncInProgress"
           @click="syncWithGoogleDrive"
         >

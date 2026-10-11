@@ -138,7 +138,7 @@ describe('getAccessToken without an identity API', () => {
 
   it('asks for a sign-in rather than opening a tab when not interactive', async () => {
     await expect(getAccessToken({ interactive: false })).rejects.toMatchObject({
-      code: 'auth',
+      code: 'sign-in',
     });
 
     expect(chrome.tabs.create).not.toBeCalled();
@@ -149,7 +149,7 @@ describe('getAccessToken without an identity API', () => {
     tokenResponses = [{ error: 'invalid_grant' }];
 
     await expect(getAccessToken({ interactive: false })).rejects.toMatchObject({
-      code: 'auth',
+      code: 'sign-in',
     });
 
     expect(store[REFRESH_TOKEN_KEY]).toBeUndefined();
@@ -237,8 +237,24 @@ describe('getAccessToken without an identity API', () => {
       `${EXTENSION_PAGE}?error=access_denied&state=${state}`
     );
 
-    await expect(result).rejects.toMatchObject({ code: 'auth' });
+    await expect(result).rejects.toMatchObject({ code: 'sign-in' });
     expect(chrome.tabs.remove).toBeCalledWith(7);
+  });
+
+  it("fails the sign-in with Google's reason when it won't trade the code", async () => {
+    tokenResponses = [
+      { error: 'invalid_client', error_description: 'Unauthorized' },
+    ];
+    const result = getAccessToken({ interactive: true });
+    await signInTabOpened();
+    const state = openedAuthURL().searchParams.get('state');
+
+    await completeTabSignIn(redirectFor(state));
+
+    await expect(result).rejects.toMatchObject({
+      code: 'sign-in',
+      message: 'Authorization failure: invalid_client: Unauthorized',
+    });
   });
 
   it('keeps waiting when Safari swaps the tab id on the way back', async () => {
@@ -272,7 +288,7 @@ describe('getAccessToken without an identity API', () => {
     await closed;
     jest.useRealTimers();
 
-    expect(await result).toMatchObject({ code: 'auth' });
+    expect(await result).toMatchObject({ code: 'sign-in' });
     expect(
       chrome.declarativeNetRequest.updateDynamicRules
     ).toHaveBeenLastCalledWith({ removeRuleIds: [1] });

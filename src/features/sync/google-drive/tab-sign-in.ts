@@ -22,6 +22,7 @@ type TokenResponse = {
   expires_in?: number;
   refresh_token?: string;
   error?: string;
+  error_description?: string;
 };
 
 /**
@@ -88,6 +89,14 @@ export const refreshAccessToken = async (): Promise<IssuedToken | null> => {
     refresh_token: refreshToken,
   });
 
+  if (json.error) {
+    console.error(
+      'Google Drive token refresh failed:',
+      json.error,
+      json.error_description
+    );
+  }
+
   if (json.error === 'invalid_grant') {
     await chrome.storage.local.remove(REFRESH_TOKEN_KEY);
   }
@@ -140,6 +149,7 @@ type SignIn = {
   tabId: number;
   openerTabId?: number;
   status: 'pending' | 'done' | 'failed';
+  error?: string;
 };
 
 const getSignIns = async (): Promise<Array<SignIn>> => {
@@ -184,7 +194,14 @@ const waitForSignIn = (tabId: number): Promise<void> =>
         resolve();
       } else if (signIn.status === 'failed') {
         cleanUp();
-        reject(syncError('Authorization failure', 'auth'));
+        reject(
+          syncError(
+            signIn.error
+              ? `Authorization failure: ${signIn.error}`
+              : 'Authorization failure',
+            'sign-in'
+          )
+        );
       }
     };
 
@@ -208,7 +225,7 @@ const waitForSignIn = (tabId: number): Promise<void> =>
         ) {
           await removeRedirectRule();
         }
-        reject(syncError('Sign-in window closed', 'auth'));
+        reject(syncError('Sign-in window closed', 'sign-in'));
       }
     };
 
@@ -304,7 +321,7 @@ export const signInInTab = async (
 
   const issued = await refreshAccessToken();
   if (!issued) {
-    throw syncError('Authorization failure', 'auth');
+    throw syncError('Token refresh failure', 'sign-in');
   }
 
   return issued;
@@ -333,6 +350,7 @@ export const completeTabSignIn = async (
   }
 
   let refreshToken: string | undefined;
+  let error: string | undefined = code ? undefined : 'no code';
 
   try {
     if (code) {
@@ -343,7 +361,17 @@ export const completeTabSignIn = async (
         redirect_uri: REDIRECT_URI,
       });
       refreshToken = json.refresh_token;
+
+      if (!refreshToken) {
+        error = [json.error ?? 'no refresh token', json.error_description]
+          .filter(Boolean)
+          .join(': ');
+        console.error('Google Drive sign-in failed:', error);
+      }
     }
+  } catch (e) {
+    error = e instanceof Error ? e.message : String(e);
+    throw e;
   } finally {
     if (refreshToken) {
       await chrome.storage.local.set({ [REFRESH_TOKEN_KEY]: refreshToken });
@@ -357,7 +385,9 @@ export const completeTabSignIn = async (
       : [signIn];
 
     await setSignIns(
-      signIns.map(each => (closing.includes(each) ? { ...each, status } : each))
+      signIns.map(each =>
+        closing.includes(each) ? { ...each, status, error } : each
+      )
     );
     await removeRedirectRule();
 
