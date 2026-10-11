@@ -2,7 +2,7 @@
 
 Releases go through a pull request from a `release/vX.Y.Z` branch — the `release/` prefix is what triggers the Edge e2e suite, which doesn't run on ordinary PRs.
 
-Day-to-day pull requests target `v4`. 3.x releases ship from `main`, and the release workflow only runs on pull requests into it.
+Pull requests target `main`, and the release workflow only runs on pull requests into it.
 
 - Branch off `main` as `release/vX.Y.Z`
 - Add entry to `CHANGELOG`
