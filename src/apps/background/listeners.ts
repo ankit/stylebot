@@ -1,6 +1,7 @@
 import { ContextMenu, handleContextMenuClick } from './contextmenu';
 import { handleCommand } from './global-commands';
 import { configureSidePanelTabs, initSidePanelTabs } from './side-panel-tabs';
+import { checkEditorSidePanel, initSidePanelCheck } from './side-panel-check';
 import * as editorWindow from './editor-window';
 import { restoreOpenTabs } from './restore-tabs';
 
@@ -120,6 +121,7 @@ export const initListeners = (): void => {
 
   chrome.commands.onCommand.addListener(handleCommand);
   initSidePanelTabs();
+  initSidePanelCheck();
 
   // Scheduled syncs run without a user in front of them, so they never open an
   // auth window; a run that needs one leaves a flag for the UI instead.
@@ -347,6 +349,9 @@ export const initListeners = (): void => {
           break;
         case 'CloseEditorSidePanel':
           CloseEditorSidePanel(message, sender);
+          break;
+        case 'CheckEditorSidePanel':
+          checkEditorSidePanel(message.tabId);
           break;
 
         case 'ChatGetStatus':

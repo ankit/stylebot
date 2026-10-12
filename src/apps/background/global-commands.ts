@@ -4,11 +4,14 @@ import {
   closeEditorSidePanel,
   isEditorSidePanelOpen,
   isWebPageUrl,
-  supportsEditorSidePanel,
 } from '@stylebot/utils';
 
 import * as editorWindow from './editor-window';
 import { applyStylesToAllTabs, toggleForPage } from './styles';
+import {
+  canUseEditorSidePanel,
+  checkEditorSidePanel,
+} from './side-panel-check';
 
 const isCommandName = (command: string): command is StylebotCommandName =>
   COMMAND_NAMES.includes(command as StylebotCommandName);
@@ -61,7 +64,9 @@ const toggleEditorWithSidePanel = (tabId: number): void => {
   Promise.all([wasOpen, opened]).then(([open, didOpen]) => {
     if (open) {
       closeEditorSidePanel(tabId);
-    } else if (!didOpen) {
+    } else if (didOpen) {
+      checkEditorSidePanel(tabId);
+    } else {
       runInPage(tabId, 'stylebot');
     }
   });
@@ -96,7 +101,7 @@ export const handleCommand = (
   if (command === 'stylebot') {
     if (target.fromEditorWindow) {
       editorWindow.close(target.tabId);
-    } else if (supportsEditorSidePanel()) {
+    } else if (canUseEditorSidePanel()) {
       toggleEditorWithSidePanel(target.tabId);
     } else {
       runInPage(target.tabId, command);

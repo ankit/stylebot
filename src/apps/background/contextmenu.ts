@@ -10,6 +10,7 @@ import type { StylebotDockLocation } from '@stylebot/types';
 
 import { OpenOptionsPage } from './messages';
 import { getAll as getAllOptions } from './options';
+import { checkEditorSidePanel } from './side-panel-check';
 
 const CONTEXT_MENU_ID = 'stylebot-contextmenu';
 
@@ -147,7 +148,11 @@ export const handleContextMenuClick = (
           info.menuItemId === STYLE_ELEMENT_IN_SIDE_PANEL_MENU_ITEM_ID;
 
         if (sidePanel) {
-          openEditorSidePanel(tab.id).catch(() => undefined);
+          const tabId = tab.id;
+          openEditorSidePanel(tabId).then(
+            () => checkEditorSidePanel(tabId),
+            () => undefined
+          );
         }
 
         const message: OpenStylebotFromContextMenu = {

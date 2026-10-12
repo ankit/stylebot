@@ -1,4 +1,4 @@
-const SIDE_PANEL_IGNORED_KEY = 'sidePanelIgnoresTabs';
+export const SIDE_PANEL_IGNORED_KEY = 'sidePanelIgnoresTabs';
 
 /**
  * Whether this browser was found to ignore per-tab side panels (Vivaldi),

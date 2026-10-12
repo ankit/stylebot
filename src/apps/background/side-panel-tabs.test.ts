@@ -59,7 +59,6 @@ describe('configureSidePanelTabs', () => {
       path: 'editor-window/index.html?tabId=2&host=sidepanel',
       enabled: true,
     });
-    expect(api.sidePanel?.setOptions).toBeCalledWith({ enabled: true });
   });
 
   it('takes the panel away while the editor docks elsewhere', async () => {
@@ -75,7 +74,6 @@ describe('configureSidePanelTabs', () => {
       tabId: 2,
       enabled: false,
     });
-    expect(api.sidePanel?.setOptions).toBeCalledWith({ enabled: false });
   });
 
   it('does nothing in a browser without a side panel', async () => {

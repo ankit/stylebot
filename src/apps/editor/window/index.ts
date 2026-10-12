@@ -2,9 +2,9 @@ import { t } from '@stylebot/i18n';
 import { setPageBridge, RemotePageBridge } from '@stylebot/page-bridge';
 
 import { createStore, mountEditor } from '@stylebot/editor';
-import { getPageSupport, markSidePanelIgnoringTabs } from '@stylebot/utils';
+import { getPageSupport } from '@stylebot/utils';
 
-import { getAllOptions, openEditorWindow, setOption } from '../utils/chrome';
+import { openEditorWindow } from '../utils/chrome';
 import { initWindowListeners, initTabInfo } from './listeners';
 
 import './index.scss';
@@ -15,13 +15,11 @@ const host = params.get('host') === 'sidepanel' ? 'sidepanel' : 'window';
 
 document.documentElement.lang = t('language_code');
 
-const renderUnavailable = (
-  message = t('stylebot_cant_style_this_page')
-): void => {
+const renderUnavailable = (): void => {
   const app = document.getElementById('app');
   if (app) {
     app.className = 'editor-window-unavailable';
-    app.textContent = message;
+    app.textContent = t('stylebot_cant_style_this_page');
   }
 };
 
@@ -123,37 +121,10 @@ const watchTab = (showingEditor: boolean): void => {
 };
 
 /**
- * Handles the panel's default page, which a browser shows only when it
- * ignores the per-tab panels the editor needs. Vivaldi does, and hosts the
- * panel as a tab, which Chrome never does: then the editor moves into the
- * page for good, and the panel closes where the browser allows.
- */
-const leaveSidePanel = async (): Promise<void> => {
-  if (!(await chrome.tabs.getCurrent())) {
-    renderUnavailable();
-    return;
-  }
-
-  const { layout } = await getAllOptions();
-  if (layout.dockLocation === 'sidepanel') {
-    setOption('layout', { ...layout, dockLocation: 'right' });
-  }
-  await markSidePanelIgnoringTabs();
-
-  renderUnavailable(t('stylebot_opens_in_the_page_in_this_browser'));
-  window.close();
-};
-
-/**
  * Opens the editor on the tab, or says the tab can't be styled rather than
  * waiting on a page script that isn't there, as on a PDF or browser page.
  */
 const init = async (): Promise<void> => {
-  if (host === 'sidepanel' && !params.has('tabId')) {
-    leaveSidePanel();
-    return;
-  }
-
   if (!Number.isInteger(tabId) || tabId <= 0) {
     renderUnavailable();
     return;

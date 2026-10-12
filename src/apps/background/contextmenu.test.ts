@@ -12,6 +12,7 @@ jest.mock('@stylebot/utils', () => ({
 }));
 jest.mock('./messages', () => ({ OpenOptionsPage: jest.fn() }));
 jest.mock('./options', () => ({ getAll: jest.fn() }));
+jest.mock('./side-panel-check', () => ({ checkEditorSidePanel: jest.fn() }));
 
 const mockOptions = (overrides: Partial<StylebotOptions>) =>
   (getAllOptions as jest.Mock).mockResolvedValue({

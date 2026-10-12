@@ -227,6 +227,11 @@ export type OpenEditorSidePanel = {
   tabId?: number;
 };
 
+export type CheckEditorSidePanel = {
+  name: 'CheckEditorSidePanel';
+  tabId: number;
+};
+
 export type CloseEditorSidePanel = {
   name: 'CloseEditorSidePanel';
   tabId?: number;
@@ -314,6 +319,7 @@ type BackgroundPageMessage =
   | GetIsEditorWindowOpen
   | OpenEditorSidePanel
   | CloseEditorSidePanel
+  | CheckEditorSidePanel
   | ChatGetStatus
   | ChatConnect
   | ChatRemoveKey

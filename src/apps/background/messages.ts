@@ -114,6 +114,10 @@ import {
 
 import * as editorWindow from './editor-window';
 import {
+  canUseEditorSidePanel,
+  checkEditorSidePanel,
+} from './side-panel-check';
+import {
   supportsEditorSidePanel,
   openEditorSidePanel,
   closeEditorSidePanel,
@@ -569,13 +573,16 @@ export const OpenEditorSidePanel = (
   sendResponse: (response: OpenEditorSidePanelResponse) => void
 ): void => {
   const tabId = message.tabId ?? sender.tab?.id;
-  if (tabId === undefined || !supportsEditorSidePanel()) {
+  if (tabId === undefined || !canUseEditorSidePanel()) {
     sendResponse(false);
     return;
   }
 
   openEditorSidePanel(tabId).then(
-    () => sendResponse(true),
+    () => {
+      sendResponse(true);
+      checkEditorSidePanel(tabId);
+    },
     () => sendResponse(false)
   );
 };

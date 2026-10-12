@@ -33,9 +33,6 @@
       "run_at": "document_start"
     }
   ],
-  "side_panel": {
-    "default_path": "editor-window/index.html?host=sidepanel"
-  },
   "action": {
     "default_icon": {
       "16": "img/icon16.png",
