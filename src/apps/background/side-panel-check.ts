@@ -3,6 +3,7 @@ import {
   SIDE_PANEL_IGNORED_KEY,
   isEditorSidePanelOpen,
   isSidePanelIgnoringTabs,
+  openEditorSidePanel,
   supportsEditorSidePanel,
 } from '@stylebot/utils';
 
@@ -70,4 +71,18 @@ export const checkEditorSidePanel = async (tabId: number): Promise<void> => {
 
   const message: OpenStylebot = { name: 'OpenStylebot' };
   chrome.tabs.sendMessage(tabId, message, () => void chrome.runtime.lastError);
+};
+
+/**
+ * Opens the editor in the tab's side panel, then follows it up from here,
+ * since the background outlives whatever asked. Chrome only opens the panel
+ * during a user gesture, so callers must reach it before awaiting anything.
+ */
+export const openAndCheckEditorSidePanel = (tabId: number): Promise<void> => {
+  const opened = openEditorSidePanel(tabId);
+  opened.then(
+    () => checkEditorSidePanel(tabId),
+    () => undefined
+  );
+  return opened;
 };

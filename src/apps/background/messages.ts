@@ -115,11 +115,10 @@ import {
 import * as editorWindow from './editor-window';
 import {
   canUseEditorSidePanel,
-  checkEditorSidePanel,
+  openAndCheckEditorSidePanel,
 } from './side-panel-check';
 import {
   supportsEditorSidePanel,
-  openEditorSidePanel,
   closeEditorSidePanel,
   isEditorSidePanelOpen,
 } from '@stylebot/utils';
@@ -578,11 +577,8 @@ export const OpenEditorSidePanel = (
     return;
   }
 
-  openEditorSidePanel(tabId).then(
-    () => {
-      sendResponse(true);
-      checkEditorSidePanel(tabId);
-    },
+  openAndCheckEditorSidePanel(tabId).then(
+    () => sendResponse(true),
     () => sendResponse(false)
   );
 };
