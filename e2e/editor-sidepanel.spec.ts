@@ -7,6 +7,7 @@ import {
   waitForSidePanel,
   isSidePanelOpen,
   dockToSidePanel,
+  type SidePanel,
 } from './helpers';
 
 test.describe.configure({ retries: 2 });
@@ -164,21 +165,20 @@ test('the side panel opens with the inspector on', async ({
     .toMatch(/h1$/);
 });
 
-test('a panel opened without its tab edits the active tab, as in Vivaldi', async ({
-  context,
-  extension,
-  openPopup,
-}) => {
-  await dockToSidePanel(extension);
-
-  const page = await context.newPage();
-  await page.goto(`${baseUrl}/`);
+/*
+ * Opens the panel the way Vivaldi does: it ignores the tab's own panel and
+ * shows the manifest's default page, which isn't told which tab to edit.
+ */
+const openDefaultSidePanel = async (
+  page: Page,
+  context: BrowserContext,
+  extension: Extension,
+  openPopup: () => Promise<Popup>
+) => {
   await page.bringToFront();
-
   const popup = await openPopup();
   await keepPopupOpen(popup);
   await waitForEditorListener(popup);
-  // Vivaldi ignores the tab's own panel and shows the manifest's default.
   await popup.evaluate(() => {
     const setOptions = chrome.sidePanel.setOptions;
     chrome.sidePanel.setOptions = options =>
@@ -193,6 +193,32 @@ test('a panel opened without its tab edits the active tab, as in Vivaldi', async
   await expect
     .poll(() => panel.evaluate('location.search'))
     .toMatch(/tabId=\d+/);
+  return panel;
+};
+
+const isInspecting = (panel: SidePanel) =>
+  panel.evaluate(`!!document.querySelector('.stylebot-inspector.active')`);
+
+const setPanelVisibility = (panel: SidePanel, state: 'visible' | 'hidden') =>
+  panel.evaluate(`
+    Object.defineProperty(document, 'visibilityState', {
+      configurable: true,
+      get: () => '${state}',
+    });
+    document.dispatchEvent(new Event('visibilitychange'));
+  `);
+
+test('a panel opened without its tab edits the active tab, as in Vivaldi', async ({
+  context,
+  extension,
+  openPopup,
+}) => {
+  await dockToSidePanel(extension);
+
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/`);
+  const panel = await openDefaultSidePanel(page, context, extension, openPopup);
+
   await page.locator('h1').click({ force: true });
   await expect
     .poll(() =>
@@ -201,6 +227,25 @@ test('a panel opened without its tab edits the active tab, as in Vivaldi', async
       )
     )
     .toMatch(/h1$/);
+});
+
+test('a panel opened without its tab inspects only while it is shown', async ({
+  context,
+  extension,
+  openPopup,
+}) => {
+  await dockToSidePanel(extension);
+
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/`);
+  const panel = await openDefaultSidePanel(page, context, extension, openPopup);
+  await expect.poll(() => isInspecting(panel)).toBe(true);
+
+  await setPanelVisibility(panel, 'hidden');
+  await expect.poll(() => isInspecting(panel)).toBe(false);
+
+  await setPanelVisibility(panel, 'visible');
+  await expect.poll(() => isInspecting(panel)).toBe(true);
 });
 
 test('moving from the side panel to a window closes the panel', async ({

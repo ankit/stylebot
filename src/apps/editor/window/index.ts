@@ -90,9 +90,22 @@ const start = async (): Promise<void> => {
   await bridge.connect();
   await store.dispatch('initialize');
   // A context-menu pick arrives with the connection and is already chosen.
-  await store.dispatch('openStylebot', {
-    inspect: host === 'sidepanel' && !store.state.activeSelector,
-  });
+  const shouldInspect = () =>
+    host === 'sidepanel' &&
+    !store.state.activeSelector &&
+    (!followsActiveTab || document.visibilityState === 'visible');
+
+  await store.dispatch('openStylebot', { inspect: shouldInspect() });
+
+  // A panel per window (Vivaldi) loads, and stays loaded, while collapsed.
+  if (followsActiveTab) {
+    document.addEventListener('visibilitychange', () => {
+      store.commit(
+        'setInspecting',
+        shouldInspect() && store.state.options.mode === 'basic'
+      );
+    });
+  }
 
   if (host === 'window') {
     initWindowListeners(store);
