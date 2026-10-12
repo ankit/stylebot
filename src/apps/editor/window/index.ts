@@ -159,20 +159,36 @@ const shouldAttach = async (): Promise<boolean> =>
   (await getAllOptions()).layout.dockLocation === 'sidepanel';
 
 /**
+ * Closes the window's panel, since Vivaldi ignores closing it for a tab.
+ * By window first, then from inside, which Chrome's side panels allow.
+ */
+const closeWindowPanel = async (): Promise<void> => {
+  const windowId = Number(params.get('follow'));
+  await chrome.sidePanel.close?.({ windowId }).catch(() => undefined);
+  window.close();
+};
+
+/**
  * Starts over when the panel comes into view or the dock changes, so it
- * attaches to its tab or lets go of it.
+ * attaches to its tab or lets go of it. Moving the editor elsewhere closes
+ * the panel too, where the browser allows.
  */
 const reloadWhenAttachChanges = (attached: boolean): void => {
-  const check = async () => {
-    if ((await shouldAttach()) !== attached) {
-      window.location.reload();
+  const check = async (dockChanged: boolean) => {
+    if ((await shouldAttach()) === attached) {
+      return;
     }
+
+    if (attached && dockChanged) {
+      await closeWindowPanel();
+    }
+    window.location.reload();
   };
 
-  document.addEventListener('visibilitychange', check);
+  document.addEventListener('visibilitychange', () => check(false));
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'local' && changes['options']) {
-      check();
+      check(true);
     }
   });
 };

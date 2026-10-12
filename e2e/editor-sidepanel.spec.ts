@@ -216,7 +216,7 @@ test('a panel opened without its tab edits the active tab, as in Vivaldi', async
     .toMatch(/h1$/);
 });
 
-test('a panel opened without its tab lets go of it when the editor docks in the page', async ({
+test('a panel opened without its tab closes itself when the editor docks in the page', async ({
   context,
   extension,
   openPopup,
@@ -239,13 +239,7 @@ test('a panel opened without its tab lets go of it when the editor docks in the 
   await panel.evaluate(`${byLabel('Dock right in page')}.click()`);
 
   await expect(page.locator('#stylebot .stylebot.right')).toBeVisible();
-  await expect
-    .poll(() =>
-      panel.evaluate(
-        `document.querySelector('.editor-window-unavailable')?.textContent`
-      )
-    )
-    .toBe("Stylebot isn't set to open in the side panel.");
+  await expect.poll(() => isSidePanelOpen(extension)).toBe(false);
 });
 
 test('moving from the side panel to a window closes the panel', async ({
