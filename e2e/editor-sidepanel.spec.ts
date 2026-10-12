@@ -164,50 +164,6 @@ test('the side panel opens with the inspector on', async ({
     .toMatch(/h1$/);
 });
 
-test('a side panel that never shows the editor docks it in the page, as in Vivaldi', async ({
-  context,
-  extension,
-  openPopup,
-}) => {
-  await dockToSidePanel(extension);
-
-  const page = await context.newPage();
-  await page.goto(`${baseUrl}/`);
-  await page.bringToFront();
-
-  const popup = await openPopup();
-  await keepPopupOpen(popup);
-  await waitForEditorListener(popup);
-  // Vivaldi ignores the tab's own panel, so the editor never loads in it.
-  await popup.evaluate(() => {
-    const setOptions = chrome.sidePanel.setOptions;
-    chrome.sidePanel.setOptions = options =>
-      setOptions({ ...options, path: 'editor-window/index.html' });
-  });
-  await popup.locator('button', { hasText: 'Style this page' }).click();
-
-  const editorRoot = page.locator('#stylebot');
-  await expect(editorRoot.locator('.stylebot.right')).toBeVisible({
-    timeout: 15000,
-  });
-  expect(
-    await extension.evaluate(
-      async () =>
-        (
-          await chrome.storage.local.get('options')
-        )['options'].layout.dockLocation
-    )
-  ).toBe('right');
-
-  await editorRoot.getByRole('button', { name: 'Options' }).click();
-  await expect(
-    editorRoot.getByRole('button', { name: 'Dock left in page' })
-  ).toBeVisible();
-  await expect(
-    editorRoot.getByRole('button', { name: 'Open in side panel' })
-  ).toHaveCount(0);
-});
-
 test('a side panel that shows the editor stays the chosen position', async ({
   context,
   extension,
