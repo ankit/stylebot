@@ -81,6 +81,15 @@ describe('getAll', () => {
     expect((await getAll()).layout.dockLocation).toBe('sidepanel');
   });
 
+  it('docks right where the browser ignores per-tab side panels', async () => {
+    store = { sidePanelIgnoresTabs: true };
+    (chrome as unknown as { sidePanel: object }).sidePanel = {
+      open: jest.fn(),
+    };
+
+    expect((await getAll()).layout.dockLocation).toBe('right');
+  });
+
   it('docks right by default where the browser has no side panel', async () => {
     store = {};
 

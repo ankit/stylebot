@@ -37,6 +37,8 @@ export {
 } from './open-page';
 export {
   supportsEditorSidePanel,
+  isSidePanelIgnoringTabs,
+  markSidePanelIgnoringTabs,
   configureEditorSidePanel,
   openEditorSidePanel,
   closeEditorSidePanel,

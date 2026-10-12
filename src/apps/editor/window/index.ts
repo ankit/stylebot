@@ -2,9 +2,9 @@ import { t } from '@stylebot/i18n';
 import { setPageBridge, RemotePageBridge } from '@stylebot/page-bridge';
 
 import { createStore, mountEditor } from '@stylebot/editor';
-import { getPageSupport } from '@stylebot/utils';
+import { getPageSupport, markSidePanelIgnoringTabs } from '@stylebot/utils';
 
-import { getAllOptions, openEditorWindow } from '../utils/chrome';
+import { getAllOptions, openEditorWindow, setOption } from '../utils/chrome';
 import { initWindowListeners, initTabInfo } from './listeners';
 
 import './index.scss';
@@ -12,7 +12,6 @@ import './index.scss';
 const params = new URLSearchParams(window.location.search);
 const tabId = Number(params.get('tabId'));
 const host = params.get('host') === 'sidepanel' ? 'sidepanel' : 'window';
-const followsActiveTab = params.has('follow');
 
 document.documentElement.lang = t('language_code');
 
@@ -124,73 +123,25 @@ const watchTab = (showingEditor: boolean): void => {
 };
 
 /**
- * Reopens the panel on its window's active tab, with the tab in the URL so
- * the background can tell which tab the panel is showing.
+ * Handles the panel's default page, which a browser shows only when it
+ * ignores the per-tab panels the editor needs. Vivaldi does, and hosts the
+ * panel as a tab, which Chrome never does: then the editor moves into the
+ * page for good, and the panel closes where the browser allows.
  */
-const showActiveTab = async (windowId: number): Promise<boolean> => {
-  const [tab] = await chrome.tabs.query({ active: true, windowId });
-  if (tab?.id === undefined) {
-    return false;
+const leaveSidePanel = async (): Promise<void> => {
+  if (!(await chrome.tabs.getCurrent())) {
+    renderUnavailable();
+    return;
   }
 
-  window.location.replace(`?tabId=${tab.id}&host=sidepanel&follow=${windowId}`);
-  return true;
-};
+  const { layout } = await getAllOptions();
+  if (layout.dockLocation === 'sidepanel') {
+    setOption('layout', { ...layout, dockLocation: 'right' });
+  }
+  await markSidePanelIgnoringTabs();
 
-/**
- * Switches to whichever tab becomes active in the panel's window, for
- * browsers that show one panel per window, like Vivaldi.
- */
-const followActiveTab = (windowId: number): void => {
-  chrome.tabs.onActivated.addListener(activeInfo => {
-    if (activeInfo.windowId === windowId && activeInfo.tabId !== tabId) {
-      showActiveTab(windowId);
-    }
-  });
-};
-
-/**
- * Whether a panel per window should edit its tab: only while it's in view
- * and the side panel is the dock. Vivaldi keeps it loaded while collapsed,
- * and can't close it for a tab when the editor moves elsewhere.
- */
-const shouldAttach = async (): Promise<boolean> =>
-  document.visibilityState === 'visible' &&
-  (await getAllOptions()).layout.dockLocation === 'sidepanel';
-
-/**
- * Closes the window's panel, since Vivaldi ignores closing it for a tab.
- * By window first, then from inside, which Chrome's side panels allow.
- */
-const closeWindowPanel = async (): Promise<void> => {
-  const windowId = Number(params.get('follow'));
-  await chrome.sidePanel.close?.({ windowId }).catch(() => undefined);
+  renderUnavailable(t('stylebot_opens_in_the_page_in_this_browser'));
   window.close();
-};
-
-/**
- * Starts over when the panel comes into view or the dock changes, so it
- * attaches to its tab or lets go of it. Moving the editor elsewhere closes
- * the panel too, where the browser allows.
- */
-const reloadWhenAttachChanges = (attached: boolean): void => {
-  const check = async (dockChanged: boolean) => {
-    if ((await shouldAttach()) === attached) {
-      return;
-    }
-
-    if (attached && dockChanged) {
-      await closeWindowPanel();
-    }
-    window.location.reload();
-  };
-
-  document.addEventListener('visibilitychange', () => check(false));
-  chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local' && changes['options']) {
-      check(true);
-    }
-  });
 };
 
 /**
@@ -198,17 +149,9 @@ const reloadWhenAttachChanges = (attached: boolean): void => {
  * waiting on a page script that isn't there, as on a PDF or browser page.
  */
 const init = async (): Promise<void> => {
-  // Browsers that ignore per-tab panels (Vivaldi) open the manifest's default.
   if (host === 'sidepanel' && !params.has('tabId')) {
-    const { id } = await chrome.windows.getCurrent();
-    if (id === undefined || !(await showActiveTab(id))) {
-      renderUnavailable();
-    }
+    leaveSidePanel();
     return;
-  }
-
-  if (followsActiveTab) {
-    followActiveTab(Number(params.get('follow')));
   }
 
   if (!Number.isInteger(tabId) || tabId <= 0) {
@@ -221,22 +164,11 @@ const init = async (): Promise<void> => {
 
   watchTab(canStyle);
 
-  if (!canStyle) {
+  if (canStyle) {
+    start();
+  } else {
     renderUnavailable();
-    return;
   }
-
-  if (followsActiveTab) {
-    const attached = await shouldAttach();
-    reloadWhenAttachChanges(attached);
-
-    if (!attached) {
-      renderUnavailable(t('stylebot_isnt_set_to_open_in_the_side_panel'));
-      return;
-    }
-  }
-
-  start();
 };
 
 init();

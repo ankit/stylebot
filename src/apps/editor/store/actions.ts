@@ -56,6 +56,7 @@ import { getPageBridge } from '@stylebot/page-bridge';
 import type { AppliedDeclaration } from '@stylebot/page-bridge';
 
 import { PLACEHOLDER_PROPERTIES } from '../utils/computed-placeholder';
+import { loadSidePanelSupport } from '../utils/side-panel';
 import { expandProfiles, isForceImportant } from '@stylebot/saved-styles';
 
 import {
@@ -120,6 +121,7 @@ export default {
       getAllOptions(),
       getCommands(),
       getReadabilitySettings(),
+      loadSidePanelSupport(),
     ]);
 
     commit('setOptions', options);

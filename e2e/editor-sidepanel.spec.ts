@@ -164,17 +164,69 @@ test('the side panel opens with the inspector on', async ({
     .toMatch(/h1$/);
 });
 
-/*
- * Opens the panel the way Vivaldi does: it ignores the tab's own panel and
- * shows the manifest's default page, which isn't told which tab to edit.
- */
-const openDefaultSidePanel = async (
-  page: Page,
-  context: BrowserContext,
-  extension: Extension,
-  openPopup: () => Promise<Popup>
-) => {
+test('a browser that ignores per-tab panels gets the editor in the page, as Vivaldi does', async ({
+  context,
+  extension,
+  openPopup,
+}) => {
+  await dockToSidePanel(extension);
+
+  // Vivaldi shows the manifest's default panel page, hosted as a tab.
+  const panelUrl = `chrome-extension://${extension.id}/editor-window/index.html?host=sidepanel`;
+  const panelTabs = () =>
+    extension.evaluate(
+      async url =>
+        (await chrome.tabs.query({})).filter(tab => tab.url === url).length,
+      panelUrl
+    );
+  await extension.evaluate(url => chrome.tabs.create({ url }), panelUrl);
+
+  // It remembers the browser, moves the editor into the page and closes.
+  await expect
+    .poll(() =>
+      extension.evaluate(
+        async () =>
+          (
+            await chrome.storage.local.get('sidePanelIgnoresTabs')
+          )['sidePanelIgnoresTabs']
+      )
+    )
+    .toBe(true);
+  await expect.poll(panelTabs).toBe(0);
+  await expect
+    .poll(() =>
+      extension.evaluate(async () => {
+        const { options } = await chrome.storage.local.get('options');
+        return options.layout.dockLocation;
+      })
+    )
+    .toBe('right');
+
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/`);
+  const editorRoot = await openEditor(page, openPopup);
+
+  await expect(editorRoot.locator('.stylebot.right')).toBeVisible();
+  await editorRoot.getByRole('button', { name: 'Options' }).click();
+  await expect(
+    editorRoot.getByRole('button', { name: 'Dock left in page' })
+  ).toBeVisible();
+  await expect(
+    editorRoot.getByRole('button', { name: 'Open in side panel' })
+  ).toHaveCount(0);
+});
+
+test('a side panel that opens without its tab keeps the side panel in Chrome', async ({
+  context,
+  extension,
+  openPopup,
+}) => {
+  await dockToSidePanel(extension);
+
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/`);
   await page.bringToFront();
+
   const popup = await openPopup();
   await keepPopupOpen(popup);
   await waitForEditorListener(popup);
@@ -187,59 +239,22 @@ const openDefaultSidePanel = async (
       });
   });
   await popup.locator('button', { hasText: 'Style this page' }).click();
-  const panel = await waitForSidePanel(context, extension);
+  await expect.poll(() => isSidePanelOpen(extension)).toBe(true);
 
-  await expect
-    .poll(() => panel.evaluate('location.search'))
-    .toMatch(/tabId=\d+/);
-  return panel;
-};
-
-test('a panel opened without its tab edits the active tab, as in Vivaldi', async ({
-  context,
-  extension,
-  openPopup,
-}) => {
-  await dockToSidePanel(extension);
-
-  const page = await context.newPage();
-  await page.goto(`${baseUrl}/`);
-  const panel = await openDefaultSidePanel(page, context, extension, openPopup);
-
-  await page.locator('h1').click({ force: true });
-  await expect
-    .poll(() =>
-      panel.evaluate(
-        `document.querySelector('.autocomplete-chips .part')?.textContent.trim()`
-      )
-    )
-    .toMatch(/h1$/);
-});
-
-test('a panel opened without its tab closes itself when the editor docks in the page', async ({
-  context,
-  extension,
-  openPopup,
-}) => {
-  await dockToSidePanel(extension);
-
-  const page = await context.newPage();
-  await page.goto(`${baseUrl}/`);
-  const panel = await openDefaultSidePanel(page, context, extension, openPopup);
-  // Vivaldi can't close its panel for one tab.
-  await extension.evaluate(() => {
-    chrome.sidePanel.setOptions = async () => undefined;
-    (chrome.sidePanel as { close?: unknown }).close = async () => undefined;
-  });
-
-  await panel.evaluate(`${byLabel('Options')}.click()`);
-  await expect
-    .poll(() => panel.evaluate(`!!${byLabel('Dock right in page')}`))
-    .toBe(true);
-  await panel.evaluate(`${byLabel('Dock right in page')}.click()`);
-
-  await expect(page.locator('#stylebot .stylebot.right')).toBeVisible();
-  await expect.poll(() => isSidePanelOpen(extension)).toBe(false);
+  // Chrome doesn't host its panel as a tab, so nothing gets switched off.
+  await page.waitForTimeout(500);
+  expect(
+    await extension.evaluate(async () => {
+      const items = await chrome.storage.local.get([
+        'options',
+        'sidePanelIgnoresTabs',
+      ]);
+      return [
+        items['sidePanelIgnoresTabs'],
+        items['options'].layout.dockLocation,
+      ];
+    })
+  ).toEqual([undefined, 'sidepanel']);
 });
 
 test('moving from the side panel to a window closes the panel', async ({
