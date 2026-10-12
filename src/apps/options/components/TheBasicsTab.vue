@@ -4,6 +4,7 @@
 
     <s-list class="settings">
       <the-theme />
+      <the-position />
       <the-context-menu />
       <the-cli-access v-if="showCliAccess" />
     </s-list>
@@ -18,6 +19,7 @@ import Vue from 'vue';
 import { SHeading, SList } from '@stylebot/components';
 import { supportsCLI } from '@stylebot/settings';
 import TheTheme from './basics/TheTheme.vue';
+import ThePosition from './basics/ThePosition.vue';
 import TheContextMenu from './basics/TheContextMenu.vue';
 import TheCliAccess from './basics/TheCliAccess.vue';
 import TheKeyboardShortcuts from './basics/TheKeyboardShortcuts.vue';
@@ -29,6 +31,7 @@ export default Vue.extend({
     SHeading,
     SList,
     TheTheme,
+    ThePosition,
     TheContextMenu,
     TheCliAccess,
     TheKeyboardShortcuts,
