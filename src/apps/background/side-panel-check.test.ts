@@ -4,7 +4,7 @@ import {
 } from '@stylebot/utils';
 
 import { get as getOption, set as setOption } from './options';
-import { checkEditorSidePanel } from './side-panel-check';
+import { onEditorSidePanelOpened } from './side-panel-check';
 
 jest.mock('@stylebot/utils', () => ({
   ...jest.requireActual('@stylebot/utils'),
@@ -31,7 +31,7 @@ const openStylebot = () =>
   );
 
 const check = async () => {
-  const done = checkEditorSidePanel(7);
+  const done = onEditorSidePanelOpened(7);
   await jest.advanceTimersByTimeAsync(3000);
   await done;
 };
@@ -50,7 +50,7 @@ beforeEach(() => {
 
 afterEach(() => jest.useRealTimers());
 
-describe('checkEditorSidePanel', () => {
+describe('onEditorSidePanelOpened', () => {
   it('leaves the side panel alone once it shows the editor', async () => {
     (isEditorSidePanelOpen as jest.Mock)
       .mockResolvedValueOnce(false)
@@ -90,7 +90,7 @@ describe('checkEditorSidePanel', () => {
       dockLocation: 'right',
     });
 
-    await checkEditorSidePanel(7);
+    await onEditorSidePanelOpened(7);
 
     expect(isEditorSidePanelOpen).not.toBeCalled();
     expect(setOption).not.toBeCalled();

@@ -3,12 +3,12 @@ import type { StylebotOptions } from '@stylebot/types';
 
 import { ContextMenu, handleContextMenuClick } from './contextmenu';
 import { getAll as getAllOptions } from './options';
-import { openAndCheckEditorSidePanel } from './side-panel-check';
+import { openEditorSidePanelWithFallback } from './side-panel-check';
 
 jest.mock('./messages', () => ({ OpenOptionsPage: jest.fn() }));
 jest.mock('./options', () => ({ getAll: jest.fn() }));
 jest.mock('./side-panel-check', () => ({
-  openAndCheckEditorSidePanel: jest.fn(() => Promise.resolve()),
+  openEditorSidePanelWithFallback: jest.fn(() => Promise.resolve()),
 }));
 
 const mockOptions = (overrides: Partial<StylebotOptions>) =>
@@ -88,7 +88,7 @@ describe('handleContextMenuClick', () => {
       tab
     );
 
-    expect(openAndCheckEditorSidePanel).toBeCalledWith(7);
+    expect(openEditorSidePanelWithFallback).toBeCalledWith(7);
     expect(chrome.tabs.sendMessage).toBeCalledWith(7, {
       name: 'OpenStylebotFromContextMenu',
       sidePanel: true,
@@ -101,7 +101,7 @@ describe('handleContextMenuClick', () => {
       tab
     );
 
-    expect(openAndCheckEditorSidePanel).not.toBeCalled();
+    expect(openEditorSidePanelWithFallback).not.toBeCalled();
     expect(chrome.tabs.sendMessage).toBeCalledWith(7, {
       name: 'OpenStylebotFromContextMenu',
       sidePanel: false,

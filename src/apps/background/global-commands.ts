@@ -10,7 +10,7 @@ import * as editorWindow from './editor-window';
 import { applyStylesToAllTabs, toggleForPage } from './styles';
 import {
   canUseEditorSidePanel,
-  checkEditorSidePanel,
+  onEditorSidePanelOpened,
 } from './side-panel-check';
 
 const isCommandName = (command: string): command is StylebotCommandName =>
@@ -65,7 +65,7 @@ const toggleEditorWithSidePanel = (tabId: number): void => {
     if (open) {
       closeEditorSidePanel(tabId);
     } else if (didOpen) {
-      checkEditorSidePanel(tabId);
+      onEditorSidePanelOpened(tabId);
     } else {
       runInPage(tabId, 'stylebot');
     }

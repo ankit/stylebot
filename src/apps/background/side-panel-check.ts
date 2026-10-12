@@ -59,7 +59,7 @@ const waitForPanelHostedAsTab = async (tabId: number): Promise<boolean> => {
  * per-tab panels (Vivaldi) the panel closes itself, so the editor docks in
  * the page from now on, and opens there.
  */
-export const checkEditorSidePanel = async (tabId: number): Promise<void> => {
+export const onEditorSidePanelOpened = async (tabId: number): Promise<void> => {
   if (!(await waitForPanelHostedAsTab(tabId))) {
     return;
   }
@@ -74,14 +74,16 @@ export const checkEditorSidePanel = async (tabId: number): Promise<void> => {
 };
 
 /**
- * Opens the editor in the tab's side panel, then follows it up from here,
- * since the background outlives whatever asked. Chrome only opens the panel
- * during a user gesture, so callers must reach it before awaiting anything.
+ * Opens the editor in the tab's side panel, or in the page where the browser
+ * can't host it there. Chrome only opens the panel during a user gesture, so
+ * callers must reach it before awaiting anything.
  */
-export const openAndCheckEditorSidePanel = (tabId: number): Promise<void> => {
+export const openEditorSidePanelWithFallback = (
+  tabId: number
+): Promise<void> => {
   const opened = openEditorSidePanel(tabId);
   opened.then(
-    () => checkEditorSidePanel(tabId),
+    () => onEditorSidePanelOpened(tabId),
     () => undefined
   );
   return opened;

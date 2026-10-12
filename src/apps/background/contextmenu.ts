@@ -6,7 +6,7 @@ import type { StylebotDockLocation } from '@stylebot/types';
 
 import { OpenOptionsPage } from './messages';
 import { getAll as getAllOptions } from './options';
-import { openAndCheckEditorSidePanel } from './side-panel-check';
+import { openEditorSidePanelWithFallback } from './side-panel-check';
 
 const CONTEXT_MENU_ID = 'stylebot-contextmenu';
 
@@ -144,7 +144,7 @@ export const handleContextMenuClick = (
           info.menuItemId === STYLE_ELEMENT_IN_SIDE_PANEL_MENU_ITEM_ID;
 
         if (sidePanel) {
-          openAndCheckEditorSidePanel(tab.id).catch(() => undefined);
+          openEditorSidePanelWithFallback(tab.id).catch(() => undefined);
         }
 
         const message: OpenStylebotFromContextMenu = {

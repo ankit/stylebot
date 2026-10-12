@@ -115,7 +115,7 @@ import {
 import * as editorWindow from './editor-window';
 import {
   canUseEditorSidePanel,
-  openAndCheckEditorSidePanel,
+  openEditorSidePanelWithFallback,
 } from './side-panel-check';
 import {
   supportsEditorSidePanel,
@@ -577,7 +577,7 @@ export const OpenEditorSidePanel = (
     return;
   }
 
-  openAndCheckEditorSidePanel(tabId).then(
+  openEditorSidePanelWithFallback(tabId).then(
     () => sendResponse(true),
     () => sendResponse(false)
   );

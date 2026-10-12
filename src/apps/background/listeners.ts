@@ -1,7 +1,10 @@
 import { ContextMenu, handleContextMenuClick } from './contextmenu';
 import { handleCommand } from './global-commands';
 import { configureSidePanelTabs, initSidePanelTabs } from './side-panel-tabs';
-import { checkEditorSidePanel, initSidePanelCheck } from './side-panel-check';
+import {
+  onEditorSidePanelOpened,
+  initSidePanelCheck,
+} from './side-panel-check';
 import * as editorWindow from './editor-window';
 import { restoreOpenTabs } from './restore-tabs';
 
@@ -350,8 +353,8 @@ export const initListeners = (): void => {
         case 'CloseEditorSidePanel':
           CloseEditorSidePanel(message, sender);
           break;
-        case 'CheckEditorSidePanel':
-          checkEditorSidePanel(message.tabId);
+        case 'EditorSidePanelOpened':
+          onEditorSidePanelOpened(message.tabId);
           break;
 
         case 'ChatGetStatus':
