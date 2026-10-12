@@ -2,6 +2,7 @@ import type { StoryObj } from '@storybook/vue';
 
 import App from '@/apps/options/App.vue';
 import TheCliAccess from '@/apps/options/components/basics/TheCliAccess.vue';
+import ThePosition from '@/apps/options/components/basics/ThePosition.vue';
 import { createRouter } from '@/apps/options/router';
 import type { OptionsState, OptionsStateOverrides } from './options-store';
 import { createOptionsStore } from './options-store';
@@ -90,6 +91,32 @@ export const cliAccessCard = (
         components: { TheCliAccess },
         store,
         template: '<the-cli-access />',
+      };
+    },
+    play: async ({ canvasElement }) => {
+      await play?.(canvasElement, store);
+    },
+  };
+};
+
+/**
+ * Renders the editor Position row on its own. The play gets the store, to
+ * read what was saved.
+ */
+export const positionCard = (
+  overrides: OptionsStateOverrides = {},
+  play?: (root: HTMLElement, store: Store<OptionsState>) => Promise<void>
+): StoryObj => {
+  let store: Store<OptionsState>;
+
+  return {
+    render: () => {
+      store = createOptionsStore(overrides);
+
+      return {
+        components: { ThePosition },
+        store,
+        template: '<the-position />',
       };
     },
     play: async ({ canvasElement }) => {
