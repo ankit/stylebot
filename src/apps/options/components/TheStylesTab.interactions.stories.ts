@@ -61,3 +61,25 @@ export const SavingANewUrlDoesNotAsk: StoryObj = {
   }),
   name: 'saving a style for a URL with no style saves without asking',
 };
+
+export const LastRowMenuIsNotClipped: StoryObj = {
+  ...optionsPage('Styles', { styles: seededStyles }, async root => {
+    const canvas = within(root);
+    const triggers = canvas.getAllByRole('button', { name: 'More actions' });
+
+    await user.click(triggers[triggers.length - 1]);
+
+    const items = await canvas.findAllByRole('menuitem');
+
+    for (const item of items) {
+      const rect = item.getBoundingClientRect();
+      const hit = document.elementFromPoint(
+        rect.left + rect.width / 2,
+        rect.top + rect.height / 2
+      );
+
+      await expect(item.contains(hit)).toBe(true);
+    }
+  }),
+  name: 'the last row’s menu shows all of its items, not cut off by the list',
+};
