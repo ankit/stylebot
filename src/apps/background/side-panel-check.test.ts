@@ -1,5 +1,6 @@
 import {
   isEditorSidePanelOpen,
+  isSidePanelIgnoringTabs,
   markSidePanelIgnoringTabs,
 } from '@stylebot/utils';
 
@@ -12,6 +13,7 @@ import {
 jest.mock('@stylebot/utils', () => ({
   ...jest.requireActual('@stylebot/utils'),
   isEditorSidePanelOpen: jest.fn(),
+  isSidePanelIgnoringTabs: jest.fn(() => Promise.resolve(false)),
   markSidePanelIgnoringTabs: jest.fn(() => Promise.resolve()),
   supportsEditorSidePanel: () => true,
 }));
@@ -29,6 +31,7 @@ const layout = {
 beforeEach(() => {
   jest.useFakeTimers();
   jest.clearAllMocks();
+  (isSidePanelIgnoringTabs as jest.Mock).mockResolvedValue(false);
   (getOption as jest.Mock).mockResolvedValue(layout);
   global.chrome = {
     tabs: {
@@ -61,7 +64,7 @@ describe('checkEditorSidePanel', () => {
     (isEditorSidePanelOpen as jest.Mock).mockResolvedValue(false);
 
     const check = checkEditorSidePanel(7);
-    await jest.advanceTimersByTimeAsync(6000);
+    await jest.advanceTimersByTimeAsync(3000);
     await check;
 
     expect(markSidePanelIgnoringTabs).toBeCalled();
@@ -76,5 +79,18 @@ describe('checkEditorSidePanel', () => {
       expect.any(Function)
     );
     expect(canUseEditorSidePanel()).toBe(false);
+  });
+
+  it('docks the editor in the page at once once the browser is known', async () => {
+    (isSidePanelIgnoringTabs as jest.Mock).mockResolvedValue(true);
+
+    await checkEditorSidePanel(7);
+
+    expect(isEditorSidePanelOpen).not.toBeCalled();
+    expect(chrome.tabs.sendMessage).toBeCalledWith(
+      7,
+      { name: 'OpenStylebot' },
+      expect.any(Function)
+    );
   });
 });

@@ -1,4 +1,8 @@
 jest.mock('./editor-window', () => ({ close: jest.fn() }));
+jest.mock('./side-panel-check', () => ({
+  canUseEditorSidePanel: () => !!chrome.sidePanel,
+  checkEditorSidePanel: jest.fn(),
+}));
 jest.mock('./styles', () => ({
   toggleForPage: jest.fn(async () => undefined),
   applyStylesToAllTabs: jest.fn(async () => undefined),

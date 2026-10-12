@@ -176,7 +176,7 @@ test('a side panel that shows the editor stays the chosen position', async ({
   await openSidePanel(page, context, extension, openPopup);
 
   // Past the background's wait for the panel to load.
-  await page.waitForTimeout(6000);
+  await page.waitForTimeout(3000);
   expect(
     await extension.evaluate(async () => {
       const items = await chrome.storage.local.get([

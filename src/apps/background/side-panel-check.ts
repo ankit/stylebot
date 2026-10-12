@@ -9,7 +9,7 @@ import {
 
 import { get as getOption, set as setOption } from './options';
 
-const LOAD_TIMEOUT_MS = 5000;
+const LOAD_TIMEOUT_MS = 2000;
 const POLL_MS = 250;
 
 let ignoresTabs = false;
@@ -38,22 +38,39 @@ export const initSidePanelCheck = (): void => {
 };
 
 /**
- * Checks that a side panel just opened on the tab loaded the editor. A
- * browser that ignores per-tab panels (Vivaldi) shows an empty one instead:
- * then the editor docks in the page from now on, and opens there.
+ * Waits for the editor to show up in the tab's side panel.
  */
-export const checkEditorSidePanel = async (tabId: number): Promise<void> => {
+const waitForEditorSidePanel = async (tabId: number): Promise<boolean> => {
   for (let waited = 0; waited < LOAD_TIMEOUT_MS; waited += POLL_MS) {
     if (await isEditorSidePanelOpen(tabId)) {
-      return;
+      return true;
     }
     await new Promise(resolve => setTimeout(resolve, POLL_MS));
   }
+  return false;
+};
 
-  const layout = (await getOption('layout')) as StylebotLayout;
+/**
+ * Checks that a side panel just opened on the tab loaded the editor. A
+ * browser that ignores per-tab panels (Vivaldi) shows an empty one instead:
+ * then the editor docks in the page from now on, and opens there. Once that
+ * is known, as when the shortcut wakes the background, it doesn't wait.
+ */
+export const checkEditorSidePanel = async (tabId: number): Promise<void> => {
+  if (
+    !(await isSidePanelIgnoringTabs()) &&
+    (await waitForEditorSidePanel(tabId))
+  ) {
+    return;
+  }
+
   ignoresTabs = true;
   await markSidePanelIgnoringTabs();
-  await setOption('layout', { ...layout, dockLocation: 'right' });
+
+  const layout = (await getOption('layout')) as StylebotLayout;
+  if (layout.dockLocation === 'sidepanel') {
+    await setOption('layout', { ...layout, dockLocation: 'right' });
+  }
 
   const tab = await chrome.tabs.get(tabId).catch(() => undefined);
   if (tab) {
