@@ -7,7 +7,6 @@ import {
   waitForSidePanel,
   isSidePanelOpen,
   dockToSidePanel,
-  type SidePanel,
 } from './helpers';
 
 test.describe.configure({ retries: 2 });
@@ -196,18 +195,6 @@ const openDefaultSidePanel = async (
   return panel;
 };
 
-const isInspecting = (panel: SidePanel) =>
-  panel.evaluate(`!!document.querySelector('.stylebot-inspector.active')`);
-
-const setPanelVisibility = (panel: SidePanel, state: 'visible' | 'hidden') =>
-  panel.evaluate(`
-    Object.defineProperty(document, 'visibilityState', {
-      configurable: true,
-      get: () => '${state}',
-    });
-    document.dispatchEvent(new Event('visibilitychange'));
-  `);
-
 test('a panel opened without its tab edits the active tab, as in Vivaldi', async ({
   context,
   extension,
@@ -229,7 +216,7 @@ test('a panel opened without its tab edits the active tab, as in Vivaldi', async
     .toMatch(/h1$/);
 });
 
-test('a panel opened without its tab inspects only while it is shown', async ({
+test('a panel opened without its tab lets go of it when the editor docks in the page', async ({
   context,
   extension,
   openPopup,
@@ -239,13 +226,26 @@ test('a panel opened without its tab inspects only while it is shown', async ({
   const page = await context.newPage();
   await page.goto(`${baseUrl}/`);
   const panel = await openDefaultSidePanel(page, context, extension, openPopup);
-  await expect.poll(() => isInspecting(panel)).toBe(true);
+  // Vivaldi can't close its panel for one tab.
+  await extension.evaluate(() => {
+    chrome.sidePanel.setOptions = async () => undefined;
+    (chrome.sidePanel as { close?: unknown }).close = async () => undefined;
+  });
 
-  await setPanelVisibility(panel, 'hidden');
-  await expect.poll(() => isInspecting(panel)).toBe(false);
+  await panel.evaluate(`${byLabel('Options')}.click()`);
+  await expect
+    .poll(() => panel.evaluate(`!!${byLabel('Dock right in page')}`))
+    .toBe(true);
+  await panel.evaluate(`${byLabel('Dock right in page')}.click()`);
 
-  await setPanelVisibility(panel, 'visible');
-  await expect.poll(() => isInspecting(panel)).toBe(true);
+  await expect(page.locator('#stylebot .stylebot.right')).toBeVisible();
+  await expect
+    .poll(() =>
+      panel.evaluate(
+        `document.querySelector('.editor-window-unavailable')?.textContent`
+      )
+    )
+    .toBe("Stylebot isn't set to open in the side panel.");
 });
 
 test('moving from the side panel to a window closes the panel', async ({

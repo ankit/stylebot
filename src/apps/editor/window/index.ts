@@ -4,7 +4,7 @@ import { setPageBridge, RemotePageBridge } from '@stylebot/page-bridge';
 import { createStore, mountEditor } from '@stylebot/editor';
 import { getPageSupport } from '@stylebot/utils';
 
-import { openEditorWindow } from '../utils/chrome';
+import { getAllOptions, openEditorWindow } from '../utils/chrome';
 import { initWindowListeners, initTabInfo } from './listeners';
 
 import './index.scss';
@@ -16,11 +16,13 @@ const followsActiveTab = params.has('follow');
 
 document.documentElement.lang = t('language_code');
 
-const renderUnavailable = (): void => {
+const renderUnavailable = (
+  message = t('stylebot_cant_style_this_page')
+): void => {
   const app = document.getElementById('app');
   if (app) {
     app.className = 'editor-window-unavailable';
-    app.textContent = t('stylebot_cant_style_this_page');
+    app.textContent = message;
   }
 };
 
@@ -90,22 +92,9 @@ const start = async (): Promise<void> => {
   await bridge.connect();
   await store.dispatch('initialize');
   // A context-menu pick arrives with the connection and is already chosen.
-  const shouldInspect = () =>
-    host === 'sidepanel' &&
-    !store.state.activeSelector &&
-    (!followsActiveTab || document.visibilityState === 'visible');
-
-  await store.dispatch('openStylebot', { inspect: shouldInspect() });
-
-  // A panel per window (Vivaldi) loads, and stays loaded, while collapsed.
-  if (followsActiveTab) {
-    document.addEventListener('visibilitychange', () => {
-      store.commit(
-        'setInspecting',
-        shouldInspect() && store.state.options.mode === 'basic'
-      );
-    });
-  }
+  await store.dispatch('openStylebot', {
+    inspect: host === 'sidepanel' && !store.state.activeSelector,
+  });
 
   if (host === 'window') {
     initWindowListeners(store);
@@ -161,6 +150,34 @@ const followActiveTab = (windowId: number): void => {
 };
 
 /**
+ * Whether a panel per window should edit its tab: only while it's in view
+ * and the side panel is the dock. Vivaldi keeps it loaded while collapsed,
+ * and can't close it for a tab when the editor moves elsewhere.
+ */
+const shouldAttach = async (): Promise<boolean> =>
+  document.visibilityState === 'visible' &&
+  (await getAllOptions()).layout.dockLocation === 'sidepanel';
+
+/**
+ * Starts over when the panel comes into view or the dock changes, so it
+ * attaches to its tab or lets go of it.
+ */
+const reloadWhenAttachChanges = (attached: boolean): void => {
+  const check = async () => {
+    if ((await shouldAttach()) !== attached) {
+      window.location.reload();
+    }
+  };
+
+  document.addEventListener('visibilitychange', check);
+  chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'local' && changes['options']) {
+      check();
+    }
+  });
+};
+
+/**
  * Opens the editor on the tab, or says the tab can't be styled rather than
  * waiting on a page script that isn't there, as on a PDF or browser page.
  */
@@ -188,11 +205,22 @@ const init = async (): Promise<void> => {
 
   watchTab(canStyle);
 
-  if (canStyle) {
-    start();
-  } else {
+  if (!canStyle) {
     renderUnavailable();
+    return;
   }
+
+  if (followsActiveTab) {
+    const attached = await shouldAttach();
+    reloadWhenAttachChanges(attached);
+
+    if (!attached) {
+      renderUnavailable(t('stylebot_isnt_set_to_open_in_the_side_panel'));
+      return;
+    }
+  }
+
+  start();
 };
 
 init();
