@@ -2,7 +2,7 @@ import { t } from '@stylebot/i18n';
 import { setPageBridge, RemotePageBridge } from '@stylebot/page-bridge';
 
 import { createStore, mountEditor } from '@stylebot/editor';
-import { getPageSupport } from '@stylebot/utils';
+import { getPageSupport, markSidePanelIgnoringTabs } from '@stylebot/utils';
 
 import { openEditorWindow } from '../utils/chrome';
 import { initWindowListeners, initTabInfo } from './listeners';
@@ -130,7 +130,19 @@ const init = async (): Promise<void> => {
     return;
   }
 
-  const tab = await chrome.tabs.get(tabId).catch(() => undefined);
+  const [tab, hostTab] = await Promise.all([
+    chrome.tabs.get(tabId).catch(() => undefined),
+    host === 'sidepanel' ? chrome.tabs.getCurrent() : undefined,
+  ]);
+
+  // Vivaldi hosts side panels as tabs and shares one panel across them all,
+  // which the editor can't work in; the background then docks it in the page.
+  if (hostTab) {
+    await markSidePanelIgnoringTabs();
+    window.close();
+    return;
+  }
+
   const canStyle = await canStyleTab(tab);
 
   watchTab(canStyle);

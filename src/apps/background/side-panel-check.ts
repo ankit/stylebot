@@ -42,6 +42,10 @@ export const initSidePanelCheck = (): void => {
  */
 const waitForEditorSidePanel = async (tabId: number): Promise<boolean> => {
   for (let waited = 0; waited < LOAD_TIMEOUT_MS; waited += POLL_MS) {
+    // Set by the panel itself where the browser hosts it as a tab.
+    if (ignoresTabs) {
+      return false;
+    }
     if (await isEditorSidePanelOpen(tabId)) {
       return true;
     }
