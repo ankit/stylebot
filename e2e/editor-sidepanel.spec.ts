@@ -164,6 +164,45 @@ test('the side panel opens with the inspector on', async ({
     .toMatch(/h1$/);
 });
 
+test('a panel opened without its tab edits the active tab, as in Vivaldi', async ({
+  context,
+  extension,
+  openPopup,
+}) => {
+  await dockToSidePanel(extension);
+
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/`);
+  await page.bringToFront();
+
+  const popup = await openPopup();
+  await keepPopupOpen(popup);
+  await waitForEditorListener(popup);
+  // Vivaldi ignores the tab's own panel and shows the manifest's default.
+  await popup.evaluate(() => {
+    const setOptions = chrome.sidePanel.setOptions;
+    chrome.sidePanel.setOptions = options =>
+      setOptions({
+        ...options,
+        path: 'editor-window/index.html?host=sidepanel',
+      });
+  });
+  await popup.locator('button', { hasText: 'Style this page' }).click();
+  const panel = await waitForSidePanel(context, extension);
+
+  await expect
+    .poll(() => panel.evaluate('location.search'))
+    .toMatch(/tabId=\d+/);
+  await page.locator('h1').click({ force: true });
+  await expect
+    .poll(() =>
+      panel.evaluate(
+        `document.querySelector('.autocomplete-chips .part')?.textContent.trim()`
+      )
+    )
+    .toMatch(/h1$/);
+});
+
 test('moving from the side panel to a window closes the panel', async ({
   context,
   extension,

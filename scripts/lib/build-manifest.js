@@ -9,12 +9,17 @@ const readManifest = name =>
 const without = (list, ...removed) =>
   list.filter(item => !removed.includes(item));
 
+const withoutSidePanel = manifest => {
+  const { side_panel: _sidePanel, ...rest } = manifest;
+  return rest;
+};
+
 /**
  * Firefox runs the background as an event page under its own add-on id, and
  * has no per-tab side panel or favicon cache, so it warns on those permissions.
  */
 const buildFirefoxManifest = manifest => ({
-  ...manifest,
+  ...withoutSidePanel(manifest),
   ...readManifest('manifest-firefox.json'),
   permissions: without(manifest.permissions, 'sidePanel', 'favicon'),
 });
@@ -25,7 +30,7 @@ const buildFirefoxManifest = manifest => ({
  * extension page, and tokens refresh by fetch.
  */
 const buildSafariManifest = manifest => ({
-  ...manifest,
+  ...withoutSidePanel(manifest),
   action: {
     ...manifest.action,
     default_icon: {

@@ -12,6 +12,7 @@ import './index.scss';
 const params = new URLSearchParams(window.location.search);
 const tabId = Number(params.get('tabId'));
 const host = params.get('host') === 'sidepanel' ? 'sidepanel' : 'window';
+const followsActiveTab = params.has('follow');
 
 document.documentElement.lang = t('language_code');
 
@@ -121,10 +122,49 @@ const watchTab = (showingEditor: boolean): void => {
 };
 
 /**
+ * Reopens the panel on its window's active tab, with the tab in the URL so
+ * the background can tell which tab the panel is showing.
+ */
+const showActiveTab = async (windowId: number): Promise<boolean> => {
+  const [tab] = await chrome.tabs.query({ active: true, windowId });
+  if (tab?.id === undefined) {
+    return false;
+  }
+
+  window.location.replace(`?tabId=${tab.id}&host=sidepanel&follow=${windowId}`);
+  return true;
+};
+
+/**
+ * Switches to whichever tab becomes active in the panel's window, for
+ * browsers that show one panel per window, like Vivaldi.
+ */
+const followActiveTab = (windowId: number): void => {
+  chrome.tabs.onActivated.addListener(activeInfo => {
+    if (activeInfo.windowId === windowId && activeInfo.tabId !== tabId) {
+      showActiveTab(windowId);
+    }
+  });
+};
+
+/**
  * Opens the editor on the tab, or says the tab can't be styled rather than
  * waiting on a page script that isn't there, as on a PDF or browser page.
  */
 const init = async (): Promise<void> => {
+  // Browsers that ignore per-tab panels (Vivaldi) open the manifest's default.
+  if (host === 'sidepanel' && !params.has('tabId')) {
+    const { id } = await chrome.windows.getCurrent();
+    if (id === undefined || !(await showActiveTab(id))) {
+      renderUnavailable();
+    }
+    return;
+  }
+
+  if (followsActiveTab) {
+    followActiveTab(Number(params.get('follow')));
+  }
+
   if (!Number.isInteger(tabId) || tabId <= 0) {
     renderUnavailable();
     return;

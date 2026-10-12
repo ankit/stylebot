@@ -7,9 +7,10 @@ import {
 import { get as getOption } from './options';
 
 /**
- * Sets up the editor's side panel on the given tabs, or every tab, while the
- * side panel is the dock, and takes it away otherwise. The toggle shortcut
- * relies on this: it has to open the panel before it could read the dock.
+ * Sets up the editor's side panel on the given tabs, or every tab and the
+ * manifest's default panel, while the side panel is the dock, and takes it
+ * away otherwise. The toggle shortcut relies on this: it has to open the
+ * panel before it could read the dock.
  */
 export const configureSidePanelTabs = async (
   tabs?: Array<chrome.tabs.Tab>
@@ -20,6 +21,10 @@ export const configureSidePanelTabs = async (
 
   const layout = (await getOption('layout')) as StylebotLayout;
   const enabled = layout.dockLocation === 'sidepanel';
+
+  if (!tabs) {
+    chrome.sidePanel.setOptions({ enabled }).catch(() => undefined);
+  }
 
   (tabs ?? (await chrome.tabs.query({}))).forEach(tab => {
     if (tab.id !== undefined) {
