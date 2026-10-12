@@ -20,7 +20,7 @@ export default Vue.extend({
   border-radius: 14px;
 
   ::v-deep {
-    > * + * {
+    > :not(:first-child) {
       border-top: 1px solid var(--panel-border);
     }
 

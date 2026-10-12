@@ -72,18 +72,13 @@ export const chat = (
   page: { page?: string } = {}
 ): StoryObj => ({
   ...editor(
-    { ...overrides, options: { mode: 'chat', ...overrides.options } },
+    {
+      ...overrides,
+      options: { mode: 'chat', chat: true, ...overrides.options },
+    },
     page
   ),
   parameters: { chrome: { chat: chatOptions } },
-});
-
-/**
- * No key yet, with a coding agent connected through the CLI.
- */
-export const chatWithTerminal = (): StoryObj => ({
-  ...chat(),
-  parameters: { chrome: { chat: {}, storage: { 'cli-connected': true } } },
 });
 
 /**

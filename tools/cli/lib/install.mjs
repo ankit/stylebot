@@ -98,7 +98,7 @@ export const checklist = ({ browsers, stylebot, connected }) => {
       ? { done: true, text: 'Connected to Stylebot' }
       : {
           done: false,
-          text: 'Turn on "Let apps on this computer control Stylebot" in Stylebot\'s settings',
+          text: 'Turn on "Allow command line access" in Stylebot\'s settings',
           hint: 'Already on? Reload Stylebot. Stuck? stylebot.dev/cli',
         }
   );

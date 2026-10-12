@@ -1,7 +1,7 @@
 <template>
   <s-list-item padded>
     <template #title>
-      <h2 class="heading">{{ t('position') }}</h2>
+      <h3 class="heading">{{ t('editor_position') }}</h3>
     </template>
     <template #meta>
       <s-text variant="muted" size="large" as="span">

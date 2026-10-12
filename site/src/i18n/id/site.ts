@@ -82,7 +82,7 @@ const site: SiteMessages = {
         'Perintah ini mendaftarkan CLI ke Chrome dan Edge agar Stylebot dapat terhubung dengannya.',
       access: 'Aktifkan akses baris perintah',
       accessBody:
-        'Di opsi Stylebot, pada bagian Dasar, aktifkan <strong>Izinkan aplikasi di komputer ini mengontrol Stylebot</strong> dan berikan izin yang diminta browser.',
+        'Di opsi Stylebot, pada bagian Dasar, aktifkan <strong>Izinkan akses baris perintah</strong> dan berikan izin yang diminta browser.',
       plugin: 'Tambahkan plugin Claude Code',
       optional: 'Opsional',
       pluginBody: 'Di Claude Code, jalankan:',
@@ -162,7 +162,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: 'Chat',
-      body: 'Opsional. Hubungkan kunci Claude, OpenAI, atau Gemini Anda sendiri, lalu jelaskan perubahan di tab Chat dan Stylebot yang menulis CSS-nya. Tanpa kunci, tidak ada yang dikirim.',
+      body: 'Nonaktif secara default. Aktifkan di opsi, hubungkan kunci Claude, OpenAI, atau Gemini Anda sendiri, lalu jelaskan perubahan di tab Chat dan Stylebot yang menulis CSS-nya. Tanpa kunci, tidak ada yang dikirim.',
       prompt: 'Buat artikel ini lebih nyaman dibaca di malam hari',
       reply:
         'Latar diganti menjadi gelap dengan teks yang lebih hangat, dan isi artikel memakai serif yang lebih besar dengan jarak baris yang lebih lega.',
@@ -252,7 +252,7 @@ const site: SiteMessages = {
         'Perintah <code>stylebot</code> memungkinkan agen coding seperti Claude Code, Codex, atau Cursor mengubah tampilan situs langsung di browser Anda, memakai langganan Anda sendiri, bukan kunci API. Anda juga bisa menjalankan perintahnya sendiri.',
       setup: 'Penyiapan',
       setupBody:
-        'Instal CLI, hubungkan ke browser Anda, lalu aktifkan <strong>Izinkan aplikasi di komputer ini mengontrol Stylebot</strong> di Opsi. <a href="{cli}">Halaman CLI</a> memandu setiap langkahnya. Untuk saat ini hanya Chrome dan Edge.',
+        'Instal CLI, hubungkan ke browser Anda, lalu aktifkan <strong>Izinkan akses baris perintah</strong> di Opsi. <a href="{cli}">Halaman CLI</a> memandu setiap langkahnya. Untuk saat ini hanya Chrome dan Edge.',
       claudeCodeBody:
         'Tambahkan plugin Stylebot dan minta perubahan dengan <code>/stylebot</code>, misalnya tema gelap untuk sebuah situs.',
       privacy: 'Privasi',
@@ -261,7 +261,7 @@ const site: SiteMessages = {
     },
     chat: {
       intro:
-        'Chat bersifat opsional dan tetap nonaktif sampai Anda menghubungkan kunci API. Chat cocok untuk perbaikan cepat: jelaskan perubahan yang Anda inginkan dan Stylebot yang menulis CSS-nya. Anda bisa memilih elemen untuk menunjuk bagian tertentu, atau melampirkan screenshot untuk memperlihatkan maksud Anda. Untuk perubahan yang lebih besar, seperti tema yang benar-benar baru, gunakan <a href="#cli">CLI</a>.',
+        'Chat nonaktif secara default. Untuk menambahkan tabnya ke editor, aktifkan <strong>Chat</strong> di opsi Stylebot, di bagian Dasar, lalu hubungkan kunci API. Chat cocok untuk perbaikan cepat: jelaskan perubahan yang Anda inginkan dan Stylebot yang menulis CSS-nya. Anda bisa memilih elemen untuk menunjuk bagian tertentu, atau melampirkan screenshot untuk memperlihatkan maksud Anda. Untuk perubahan yang lebih besar, seperti tema yang benar-benar baru, gunakan <a href="#cli">CLI</a>.',
       shot: 'Tab Chat setelah meminta tema hutan dengan font serif yang mudah dibaca di Hacker News',
       key: 'Gunakan kunci Anda sendiri',
       keyBody:
@@ -364,7 +364,7 @@ const site: SiteMessages = {
     cli: {
       title: 'Baris perintah',
       body: [
-        'Mengaktifkan <q>Izinkan aplikasi di komputer ini mengontrol Stylebot</q> di Opsi memungkinkan aplikasi yang berjalan atas nama Anda membaca tab, halaman, dan gaya Anda, mengambil screenshot, serta mengubah gaya Anda, melalui koneksi lokal. Apa yang dibaca aplikasi itu dapat sampai ke layanan yang dipakainya, seperti model di balik agen coding.',
+        'Mengaktifkan <q>Izinkan akses baris perintah</q> di Opsi memungkinkan aplikasi yang berjalan atas nama Anda membaca tab, halaman, dan gaya Anda, mengambil screenshot, serta mengubah gaya Anda, melalui koneksi lokal. Apa yang dibaca aplikasi itu dapat sampai ke layanan yang dipakainya, seperti model di balik agen coding.',
       ],
     },
     site: {

@@ -51,7 +51,7 @@ describe('diagnoseConnection', () => {
 
   it('asks to turn on the setting when the host has never started', () => {
     expect(load()({ code: 'ENOENT' })).toBe(
-      'Not connected yet. Turn on "Let apps on this computer control Stylebot" in Stylebot\'s settings — stylebot.dev/cli'
+      'Not connected yet. Turn on "Allow command line access" in Stylebot\'s settings — stylebot.dev/cli'
     );
   });
 

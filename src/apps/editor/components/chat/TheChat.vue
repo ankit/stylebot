@@ -18,15 +18,7 @@
         <chat-thread @fill="fill" />
         <chat-composer ref="composer" @providers="showProviders" />
       </template>
-      <chat-terminal
-        v-else-if="cliConnected && !settingUpChat"
-        @chat="settingUpChat = true"
-      />
-      <chat-setup
-        v-else
-        :cli-connected="cliConnected"
-        @terminal="settingUpChat = false"
-      />
+      <chat-setup v-else />
     </template>
   </div>
 </template>
@@ -34,17 +26,11 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import {
-  getCliConnected,
-  onCliConnectedChange,
-  supportsCLI,
-} from '@stylebot/settings';
 import type { ChatStatus } from '@stylebot/types';
 
 import ChatProviders from './ChatProviders.vue';
 import ChatClearConfirmation from './ChatClearConfirmation.vue';
 import ChatSetup from './ChatSetup.vue';
-import ChatTerminal from './ChatTerminal.vue';
 import ChatThread from './ChatThread.vue';
 import ChatComposer from './ChatComposer.vue';
 
@@ -55,22 +41,13 @@ export default Vue.extend({
     ChatProviders,
     ChatClearConfirmation,
     ChatSetup,
-    ChatTerminal,
     ChatThread,
     ChatComposer,
   },
 
-  data(): {
-    showingProviders: boolean;
-    cliConnected: boolean;
-    settingUpChat: boolean;
-    stopWatchingCli: (() => void) | null;
-  } {
+  data(): { showingProviders: boolean } {
     return {
       showingProviders: false,
-      cliConnected: false,
-      settingUpChat: false,
-      stopWatchingCli: null,
     };
   },
 
@@ -109,20 +86,12 @@ export default Vue.extend({
     },
   },
 
-  async mounted() {
+  mounted() {
     this.$store.dispatch('chat/load');
-
-    if (supportsCLI()) {
-      this.stopWatchingCli = onCliConnectedChange(connected => {
-        this.cliConnected = connected;
-      });
-      this.cliConnected = await getCliConnected();
-    }
   },
 
   beforeDestroy() {
     this.setConfirmingClear(false);
-    this.stopWatchingCli?.();
   },
 
   methods: {

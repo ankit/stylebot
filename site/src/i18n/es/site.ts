@@ -82,7 +82,7 @@ const site: SiteMessages = {
         'Así la CLI queda registrada en Chrome y Edge, para que Stylebot pueda comunicarse con ella.',
       access: 'Activa el acceso por línea de comandos',
       accessBody:
-        'En las opciones de Stylebot, en Básico, activa <strong>Permitir que las apps de este ordenador controlen Stylebot</strong> y acepta los permisos que pida el navegador.',
+        'En las opciones de Stylebot, en Básico, activa <strong>Permitir el acceso desde la línea de comandos</strong> y acepta los permisos que pida el navegador.',
       plugin: 'Añade el plugin de Claude Code',
       optional: 'Opcional',
       pluginBody: 'En Claude Code, ejecuta:',
@@ -161,7 +161,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: 'Chat',
-      body: 'Opcional. Conecta tu propia clave de Claude, OpenAI o Gemini, describe un cambio en la pestaña Chat y Stylebot escribe el CSS. Sin una clave, no se envía nada.',
+      body: 'Desactivado por defecto. Actívalo en las opciones, conecta tu propia clave de Claude, OpenAI o Gemini, describe un cambio en la pestaña Chat y Stylebot escribe el CSS. Sin una clave, no se envía nada.',
       prompt: 'Haz que el artículo se lea mejor de noche',
       reply:
         'He puesto un fondo oscuro con texto más cálido, y el cuerpo en una serifa más grande con más interlineado.',
@@ -252,7 +252,7 @@ const site: SiteMessages = {
         'El comando <code>stylebot</code> permite que un agente de programación como Claude Code, Codex o Cursor cambie el estilo de los sitios directamente en tu navegador, con tu propia suscripción en lugar de una clave de API. También puedes ejecutar los comandos tú mismo.',
       setup: 'Configuración',
       setupBody:
-        'Instala la CLI, conéctala a tus navegadores y luego activa <strong>Permitir que las apps de este ordenador controlen Stylebot</strong> en Opciones. La <a href="{cli}">página de la CLI</a> explica cada paso. Por ahora, solo en Chrome y Edge.',
+        'Instala la CLI, conéctala a tus navegadores y luego activa <strong>Permitir el acceso desde la línea de comandos</strong> en Opciones. La <a href="{cli}">página de la CLI</a> explica cada paso. Por ahora, solo en Chrome y Edge.',
       claudeCodeBody:
         'Añade el plugin de Stylebot y pide un cambio con <code>/stylebot</code>, como un tema oscuro para un sitio.',
       privacy: 'Privacidad',
@@ -261,7 +261,7 @@ const site: SiteMessages = {
     },
     chat: {
       intro:
-        'El chat es opcional y está desactivado hasta que conectas una clave de API. Es ideal para ajustes rápidos: describe el cambio que quieres y Stylebot escribe el CSS. Puedes elegir un elemento para señalar algo concreto, o adjuntar una captura de pantalla para mostrar lo que quieres decir. Para cambios más grandes, como un tema completamente nuevo, usa la <a href="#cli">CLI</a>.',
+        'El chat está desactivado por defecto. Para añadir su pestaña al editor, activa <strong>Chat</strong> en las opciones de Stylebot, en Básico, y luego conecta una clave de API. Es ideal para ajustes rápidos: describe el cambio que quieres y Stylebot escribe el CSS. Puedes elegir un elemento para señalar algo concreto, o adjuntar una captura de pantalla para mostrar lo que quieres decir. Para cambios más grandes, como un tema completamente nuevo, usa la <a href="#cli">CLI</a>.',
       shot: 'La pestaña Chat tras pedir un tema de bosque con una fuente serif legible en Hacker News',
       key: 'Usa tu propia clave',
       keyBody:
@@ -367,7 +367,7 @@ const site: SiteMessages = {
     cli: {
       title: 'Línea de comandos',
       body: [
-        'Al activar <q>Permitir que las apps de este ordenador controlen Stylebot</q> en Opciones, las apps que se ejecutan con tu usuario pueden leer tus pestañas, páginas y estilos, hacer capturas de pantalla y cambiar tus estilos, a través de una conexión local. Lo que lean puede llegar a los servicios que usen, como el modelo de un agente de programación.',
+        'Al activar <q>Permitir el acceso desde la línea de comandos</q> en Opciones, las apps que se ejecutan con tu usuario pueden leer tus pestañas, páginas y estilos, hacer capturas de pantalla y cambiar tus estilos, a través de una conexión local. Lo que lean puede llegar a los servicios que usen, como el modelo de un agente de programación.',
       ],
     },
     site: {

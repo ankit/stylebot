@@ -82,7 +82,7 @@ const site: SiteMessages = {
         'Chrome과 Edge에 CLI를 등록해 Stylebot이 CLI에 연결할 수 있게 합니다.',
       access: '명령줄 액세스 켜기',
       accessBody:
-        'Stylebot 옵션의 일반 페이지에서 <strong>이 컴퓨터의 앱이 Stylebot을 제어하도록 허용</strong>을 켜고, 브라우저가 요청하는 권한을 허용하세요.',
+        'Stylebot 옵션의 일반 페이지에서 <strong>명령줄 액세스 허용</strong>을 켜고, 브라우저가 요청하는 권한을 허용하세요.',
       plugin: 'Claude Code 플러그인 추가',
       optional: '선택 사항',
       pluginBody: 'Claude Code에서 다음을 실행하세요:',
@@ -161,7 +161,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: '채팅',
-      body: '선택 사항입니다. Claude, OpenAI, Gemini 키를 직접 연결한 뒤 채팅 탭에서 원하는 변경을 설명하면 Stylebot이 CSS를 작성합니다. 키가 없으면 아무것도 전송되지 않습니다.',
+      body: '기본적으로 꺼져 있습니다. 옵션에서 켜고 Claude, OpenAI, Gemini 키를 직접 연결한 뒤 채팅 탭에서 원하는 변경을 설명하면 Stylebot이 CSS를 작성합니다. 키가 없으면 아무것도 전송되지 않습니다.',
       prompt: '밤에 기사 읽기 편하게 해 줘',
       reply:
         '어두운 배경에 따뜻한 글자색으로 바꾸고, 본문은 더 큰 세리프 글꼴에 줄 간격을 넓혔습니다.',
@@ -250,7 +250,7 @@ const site: SiteMessages = {
         '<code>stylebot</code> 명령을 사용하면 Claude Code, Codex, Cursor 같은 코딩 에이전트가 API 키 대신 사용 중인 구독으로 브라우저에서 바로 사이트 스타일을 바꿀 수 있습니다. 명령을 직접 실행할 수도 있습니다.',
       setup: '설정',
       setupBody:
-        'CLI를 설치하고 브라우저에 연결한 다음, 옵션에서 <strong>이 컴퓨터의 앱이 Stylebot을 제어하도록 허용</strong>을 켜세요. 각 단계는 <a href="{cli}">CLI 페이지</a>에서 안내합니다. 현재는 Chrome과 Edge만 지원합니다.',
+        'CLI를 설치하고 브라우저에 연결한 다음, 옵션에서 <strong>명령줄 액세스 허용</strong>을 켜세요. 각 단계는 <a href="{cli}">CLI 페이지</a>에서 안내합니다. 현재는 Chrome과 Edge만 지원합니다.',
       claudeCodeBody:
         'Stylebot 플러그인을 추가하고 <code>/stylebot</code>으로 사이트에 다크 테마를 적용하는 등의 변경을 요청하세요.',
       privacy: '개인정보 보호',
@@ -259,7 +259,7 @@ const site: SiteMessages = {
     },
     chat: {
       intro:
-        '채팅은 선택 사항이며, API 키를 연결하기 전까지 꺼져 있습니다. 간단한 수정에 알맞으며, 원하는 변경을 설명하면 Stylebot이 CSS를 작성합니다. 요소를 선택해 대상을 가리키거나, 스크린샷을 첨부해 원하는 모습을 보여 줄 수도 있습니다. 완전히 새로운 테마처럼 큰 변경에는 <a href="#cli">CLI</a>를 사용하세요.',
+        '채팅은 기본적으로 꺼져 있습니다. 편집기에 탭을 추가하려면 Stylebot 옵션의 일반에서 <strong>채팅</strong>을 켠 뒤 API 키를 연결하세요. 간단한 수정에 알맞으며, 원하는 변경을 설명하면 Stylebot이 CSS를 작성합니다. 요소를 선택해 대상을 가리키거나, 스크린샷을 첨부해 원하는 모습을 보여 줄 수도 있습니다. 완전히 새로운 테마처럼 큰 변경에는 <a href="#cli">CLI</a>를 사용하세요.',
       shot: 'Hacker News에서 읽기 쉬운 세리프 글꼴의 숲 테마를 요청한 뒤의 채팅 탭',
       key: '내 API 키 사용',
       keyBody:
@@ -361,7 +361,7 @@ const site: SiteMessages = {
     cli: {
       title: '명령줄',
       body: [
-        '옵션에서 <q>이 컴퓨터의 앱이 Stylebot을 제어하도록 허용</q>을 켜면, 사용자 권한으로 실행되는 앱이 로컬 연결을 통해 탭, 페이지, 스타일을 읽고, 스크린샷을 찍고, 스타일을 변경할 수 있습니다. 앱이 읽은 내용은 코딩 에이전트의 모델처럼 앱이 사용하는 서비스로 전달될 수 있습니다.',
+        '옵션에서 <q>명령줄 액세스 허용</q>을 켜면, 사용자 권한으로 실행되는 앱이 로컬 연결을 통해 탭, 페이지, 스타일을 읽고, 스크린샷을 찍고, 스타일을 변경할 수 있습니다. 앱이 읽은 내용은 코딩 에이전트의 모델처럼 앱이 사용하는 서비스로 전달될 수 있습니다.',
       ],
     },
     site: {

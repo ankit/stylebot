@@ -80,7 +80,7 @@ const site: SiteMessages = {
       connectBody: '这会在 Chrome 和 Edge 中注册 CLI，让 Stylebot 能连接到它。',
       access: '开启命令行访问',
       accessBody:
-        '在 Stylebot 设置的“基本”中，开启<strong>允许此电脑上的应用控制 Stylebot</strong>，并允许浏览器请求的权限。',
+        '在 Stylebot 设置的“基本”中，开启<strong>允许命令行访问</strong>，并允许浏览器请求的权限。',
       plugin: '添加 Claude Code 插件',
       optional: '可选',
       pluginBody: '在 Claude Code 中运行：',
@@ -158,7 +158,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: '聊天',
-      body: '可选功能。连接你自己的 Claude、OpenAI 或 Gemini 密钥，然后在“聊天”标签页中描述改动，Stylebot 就会编写 CSS。没有密钥时，不会发送任何内容。',
+      body: '默认关闭。在选项中开启后，连接你自己的 Claude、OpenAI 或 Gemini 密钥，然后在“聊天”标签页中描述改动，Stylebot 就会编写 CSS。没有密钥时，不会发送任何内容。',
       prompt: '让这篇文章在夜里读起来更舒服',
       reply:
         '已换成深色背景和更暖的文字，正文改用更大的衬线字体，并加大了行距。',
@@ -245,7 +245,7 @@ const site: SiteMessages = {
         '借助 <code>stylebot</code> 命令，Claude Code、Codex、Cursor 等编程智能体可以直接在你的浏览器中修改网站样式，使用你自己的订阅，无需 API 密钥。你也可以自己运行这些命令。',
       setup: '配置',
       setupBody:
-        '安装 CLI，将它连接到你的浏览器，然后在设置中开启<strong>允许此电脑上的应用控制 Stylebot</strong>。<a href="{cli}">CLI 页面</a>会逐步带你完成。目前仅支持 Chrome 和 Edge。',
+        '安装 CLI，将它连接到你的浏览器，然后在设置中开启<strong>允许命令行访问</strong>。<a href="{cli}">CLI 页面</a>会逐步带你完成。目前仅支持 Chrome 和 Edge。',
       claudeCodeBody:
         '添加 Stylebot 插件，然后用 <code>/stylebot</code> 提出改动，例如为某个网站换上深色主题。',
       privacy: '隐私',
@@ -254,7 +254,7 @@ const site: SiteMessages = {
     },
     chat: {
       intro:
-        '聊天是可选功能，在你连接 API 密钥之前一直处于关闭状态。它最适合快速修改：描述你想要的改动，Stylebot 就会编写 CSS。可以选取元素来指明要改的地方，也可以附加截图来说明你的意思。更大的改动，比如整套新主题，请使用 <a href="#cli">CLI</a>。',
+        '聊天默认关闭。要在编辑器中添加它的标签页，请在 Stylebot 选项的“基本”中开启<strong>聊天</strong>，然后连接 API 密钥。它最适合快速修改：描述你想要的改动，Stylebot 就会编写 CSS。可以选取元素来指明要改的地方，也可以附加截图来说明你的意思。更大的改动，比如整套新主题，请使用 <a href="#cli">CLI</a>。',
       shot: '“聊天”标签页：在 Hacker News 上要求换成森林主题和易读的衬线字体之后',
       key: '使用你自己的密钥',
       keyBody:
@@ -353,7 +353,7 @@ const site: SiteMessages = {
     cli: {
       title: '命令行',
       body: [
-        '在设置中开启<q>允许此电脑上的应用控制 Stylebot</q>后，以你的身份运行的应用就能通过本地连接读取你的标签页、页面和样式，截取屏幕截图，以及更改你的样式。它们读取的内容可能会发送到它们所用的服务，例如编程智能体的模型。',
+        '在设置中开启<q>允许命令行访问</q>后，以你的身份运行的应用就能通过本地连接读取你的标签页、页面和样式，截取屏幕截图，以及更改你的样式。它们读取的内容可能会发送到它们所用的服务，例如编程智能体的模型。',
       ],
     },
     site: {

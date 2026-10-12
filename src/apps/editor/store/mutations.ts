@@ -39,7 +39,11 @@ export default {
   },
 
   setOptions(state: State, options: StylebotOptions): void {
-    state.options = options;
+    // With Chat hidden, a saved Chat mode opens Basic instead.
+    state.options =
+      !options.chat && options.mode === 'chat'
+        ? { ...options, mode: 'basic' }
+        : options;
   },
 
   setUrl(state: State, url: string): void {

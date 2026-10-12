@@ -82,7 +82,7 @@ const site: SiteMessages = {
         'Così la CLI viene registrata in Chrome ed Edge e Stylebot può raggiungerla.',
       access: 'Attiva l’accesso da riga di comando',
       accessBody:
-        'Nelle opzioni di Stylebot, in Generali, attiva <strong>Consenti alle app di questo computer di controllare Stylebot</strong> e concedi ciò che chiede il browser.',
+        "Nelle opzioni di Stylebot, in Generali, attiva <strong>Consenti l'accesso da riga di comando</strong> e concedi ciò che chiede il browser.",
       plugin: 'Aggiungi il plugin per Claude Code',
       optional: 'Facoltativo',
       pluginBody: 'In Claude Code, esegui:',
@@ -161,7 +161,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: 'Chat',
-      body: 'Facoltativa. Collega la tua chiave di Claude, OpenAI o Gemini, poi descrivi una modifica nella scheda Chat e Stylebot scrive il CSS. Senza chiave non viene inviato nulla.',
+      body: 'Disattivata per impostazione predefinita. Attivala nelle opzioni, collega la tua chiave di Claude, OpenAI o Gemini, poi descrivi una modifica nella scheda Chat e Stylebot scrive il CSS. Senza chiave non viene inviato nulla.',
       prompt: 'Rendi l’articolo più facile da leggere di notte',
       reply:
         'Ho messo uno sfondo scuro con testo più caldo e un corpo serif più grande, con più interlinea.',
@@ -251,7 +251,7 @@ const site: SiteMessages = {
         'Il comando <code>stylebot</code> permette a un agente di programmazione come Claude Code, Codex o Cursor di personalizzare i siti direttamente nel tuo browser, usando il tuo abbonamento invece di una chiave API. Puoi eseguire i comandi anche tu.',
       setup: 'Configurazione',
       setupBody:
-        'Installa la CLI, collegala ai tuoi browser, poi attiva <strong>Consenti alle app di questo computer di controllare Stylebot</strong> nelle Opzioni. La <a href="{cli}">pagina sulla CLI</a> ti guida passo passo. Per ora solo Chrome ed Edge.',
+        'Installa la CLI, collegala ai tuoi browser, poi attiva <strong>Consenti l\'accesso da riga di comando</strong> nelle Opzioni. La <a href="{cli}">pagina sulla CLI</a> ti guida passo passo. Per ora solo Chrome ed Edge.',
       claudeCodeBody:
         'Aggiungi il plugin di Stylebot e chiedi una modifica con <code>/stylebot</code>, ad esempio un tema scuro per un sito.',
       privacy: 'Privacy',
@@ -260,7 +260,7 @@ const site: SiteMessages = {
     },
     chat: {
       intro:
-        'Chat è facoltativa e resta disattivata finché non colleghi una chiave API. È l’ideale per piccoli ritocchi: descrivi la modifica che vuoi e Stylebot scrive il CSS. Puoi scegliere un elemento per indicare a cosa ti riferisci, o allegare uno screenshot per mostrare cosa intendi. Per modifiche più ampie, come un tema tutto nuovo, usa la <a href="#cli">CLI</a>.',
+        'Chat è disattivata per impostazione predefinita. Per aggiungere la sua scheda all’editor, attiva <strong>Chat</strong> nelle opzioni di Stylebot, in Generali, poi collega una chiave API. È l’ideale per piccoli ritocchi: descrivi la modifica che vuoi e Stylebot scrive il CSS. Puoi scegliere un elemento per indicare a cosa ti riferisci, o allegare uno screenshot per mostrare cosa intendi. Per modifiche più ampie, come un tema tutto nuovo, usa la <a href="#cli">CLI</a>.',
       shot: 'La scheda Chat dopo aver chiesto un tema ispirato alla foresta con un carattere serif leggibile su Hacker News',
       key: 'Usa la tua chiave',
       keyBody:
@@ -365,7 +365,7 @@ const site: SiteMessages = {
     cli: {
       title: 'Riga di comando',
       body: [
-        'Attivando <q>Consenti alle app di questo computer di controllare Stylebot</q> nelle Opzioni, le app eseguite con il tuo utente possono leggere le tue schede, le pagine e i tuoi stili, acquisire screenshot e modificare i tuoi stili, tramite una connessione locale. Ciò che leggono può arrivare ai servizi che usano, come il modello di un agente di programmazione.',
+        "Attivando <q>Consenti l'accesso da riga di comando</q> nelle Opzioni, le app eseguite con il tuo utente possono leggere le tue schede, le pagine e i tuoi stili, acquisire screenshot e modificare i tuoi stili, tramite una connessione locale. Ciò che leggono può arrivare ai servizi che usano, come il modello di un agente di programmazione.",
       ],
     },
     site: {

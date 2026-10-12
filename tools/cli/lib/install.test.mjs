@@ -181,10 +181,7 @@ describe('checklist', () => {
       [true, 'Set up the stylebot command'],
       [true, 'Found Edge'],
       [false, 'Add Stylebot to your browser'],
-      [
-        false,
-        'Turn on "Let apps on this computer control Stylebot" in Stylebot\'s settings',
-      ],
+      [false, 'Turn on "Allow command line access" in Stylebot\'s settings'],
     ]);
   });
 

@@ -64,7 +64,7 @@ export const ButtonAndShortcutToggle: StoryObj = {
 };
 
 export const SwitchingModeStops: StoryObj = {
-  ...editor({ inspecting: true }),
+  ...editor({ inspecting: true, options: { chat: true } }),
   name: 'switching to Chat stops inspecting, and picking again in Chat keeps it on',
   play: async ({ canvasElement }) => {
     const store = storeOf(canvasElement);

@@ -16,3 +16,18 @@ export const Default = optionsPage('Basics');
 export const NoShortcuts = optionsPage('Basics', {
   commands: { style: '', stylebot: '', grayscale: '', readability: '' },
 });
+
+export const CliWaiting = {
+  ...optionsPage('Basics', { options: { cliAccess: true } }),
+  parameters: { chrome: { permissions: { granted: true } } },
+};
+
+export const CliConnected = {
+  ...optionsPage('Basics', { options: { cliAccess: true } }),
+  parameters: {
+    chrome: {
+      permissions: { granted: true },
+      storage: { 'cli-connected': true },
+    },
+  },
+};

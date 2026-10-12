@@ -14,7 +14,7 @@ npm install -g @stylebot/cli
 stylebot install
 ```
 
-`stylebot install` registers the CLI with your browsers. Then turn on **Let apps on this computer control Stylebot** in Stylebot's settings.
+`stylebot install` registers the CLI with your browsers. Then turn on **Allow command line access** in Stylebot's settings.
 
 ## Commands
 

@@ -234,7 +234,10 @@ export default Vue.extend({
       }
 
       // Switch to chat
-      if (event.key === this.editorCommands.chat) {
+      if (
+        event.key === this.editorCommands.chat &&
+        this.$store.state.options.chat
+      ) {
         event.preventDefault();
         event.stopPropagation();
 

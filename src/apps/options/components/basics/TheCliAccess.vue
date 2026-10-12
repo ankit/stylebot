@@ -1,48 +1,61 @@
 <template>
-  <s-list-item padded interactive @click="onRowClick">
-    <template #title>
-      <h2 class="heading">
-        <label for="cli-access">
-          {{ t('let_apps_on_this_computer_control_stylebot') }}
-        </label>
-      </h2>
-    </template>
-    <template #meta>
-      <span class="details">
-        <s-text variant="muted" size="large" as="span">
-          {{ t('let_apps_on_this_computer_control_stylebot_description') }}
-        </s-text>
+  <basics-section :label="t('command_line')">
+    <div>
+      <s-list-item padded interactive @click="onRowClick">
+        <template #title>
+          <h3 class="heading">
+            <label for="cli-access">{{ t('allow_command_line_access') }}</label>
+          </h3>
+        </template>
+        <template #meta>
+          <s-text variant="muted" size="large" as="span">
+            <span>
+              <template v-for="(part, i) in descriptionParts">
+                <a
+                  v-if="part.link"
+                  :key="i"
+                  class="cli-link"
+                  :href="cliGuideUrl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  v-text="part.text"
+                />
+                <template v-else>{{ part.text }}</template>
+              </template>
+            </span>
+          </s-text>
+        </template>
 
-        <span
-          v-if="enabled"
-          class="status"
-          :class="{ connected }"
-          role="status"
-          aria-live="polite"
-        >
-          <span class="status-dot" aria-hidden="true" />
-          <template v-if="connected">
-            {{ t('connected_to_your_terminal') }}
-          </template>
-          <template v-else>
-            {{ t('not_connected_run_this_in_your_terminal') }}
-            <code class="command">{{ installCommand }}</code>
-          </template>
-        </span>
-      </span>
-    </template>
+        <template #trailing>
+          <s-toggle-switch
+            ref="toggle"
+            size="lg"
+            track-end
+            input-id="cli-access"
+            :value="enabled"
+            @change="setEnabled"
+          />
+        </template>
+      </s-list-item>
 
-    <template #trailing>
-      <s-toggle-switch
-        ref="toggle"
-        size="lg"
-        track-end
-        input-id="cli-access"
-        :value="enabled"
-        @change="setEnabled"
-      />
-    </template>
-  </s-list-item>
+      <div v-if="enabled" class="setup">
+        <ol v-if="!connected" class="steps">
+          <li v-for="(step, i) in steps" :key="step.command" class="step">
+            <span class="step-number" aria-hidden="true">{{ i + 1 }}</span>
+            <span class="step-title">{{ step.title }}</span>
+            <cli-command class="step-command" :command="step.command" />
+          </li>
+        </ol>
+
+        <div class="status" :class="{ connected }" role="status">
+          <span class="status-badge" aria-hidden="true">
+            <span class="status-dot" />
+          </span>
+          {{ connected ? t('connected') : t('waiting_for_connection') }}
+        </div>
+      </div>
+    </div>
+  </basics-section>
 </template>
 
 <script lang="ts">
@@ -56,11 +69,20 @@ import {
   requestCliPermissions,
   removeCliPermissions,
 } from '@stylebot/settings';
+import { getSiteUrl } from '@stylebot/utils';
+
+import BasicsSection from './BasicsSection.vue';
+import CliCommand from './CliCommand.vue';
+
+// An invisible separator, which no translation holds.
+const MARK = '⁣';
 
 export default Vue.extend({
   name: 'TheCliAccess',
 
   components: {
+    BasicsSection,
+    CliCommand,
     SListItem,
     SToggleSwitch,
     SText,
@@ -70,14 +92,40 @@ export default Vue.extend({
     enabled: boolean;
     connected: boolean;
     stopWatching: (() => void) | null;
-    installCommand: string;
   } {
     return {
       enabled: false,
       connected: false,
       stopWatching: null,
-      installCommand: 'stylebot install',
     };
+  },
+
+  computed: {
+    cliGuideUrl(): string {
+      return getSiteUrl('/cli');
+    },
+
+    descriptionParts(): Array<{ text: string; link: boolean }> {
+      return this.t('allow_command_line_access_description', [MARK])
+        .split(MARK)
+        .flatMap((text, i) => [
+          ...(i ? [{ text: this.t('stylebot_cli'), link: true }] : []),
+          { text, link: false },
+        ]);
+    },
+
+    steps(): Array<{ title: string; command: string }> {
+      return [
+        {
+          title: this.t('install_the_cli'),
+          command: 'npm install -g @stylebot/cli',
+        },
+        {
+          title: this.t('connect_it_to_your_browser'),
+          command: 'stylebot install',
+        },
+      ];
+    },
   },
 
   async created(): Promise<void> {
@@ -97,8 +145,8 @@ export default Vue.extend({
 
   methods: {
     onRowClick(event: MouseEvent): void {
-      // The switch and its heading label toggle on their own.
-      if (!(event.target as Element).closest('label, .status')) {
+      // The switch, its heading label and the guide link act on their own.
+      if (!(event.target as Element).closest('label, a')) {
         (this.$refs.toggle as InstanceType<typeof SToggleSwitch>).toggle();
       }
     },
@@ -134,45 +182,100 @@ export default Vue.extend({
   font: inherit;
 }
 
-.details {
+.cli-link {
+  border-radius: 3px;
+  color: var(--accent-text);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  @include focus-ring;
+}
+
+.setup {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-  min-width: 0;
+  gap: 14px;
+  padding: 16px 20px 18px;
+  border-top: 1px solid var(--panel-border);
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.step-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--field-border);
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.step-title {
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--text-body);
+}
+
+.step-command {
+  grid-column: 2;
 }
 
 .status {
-  display: inline-flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
   align-items: center;
-  gap: 6px;
-  min-height: 24px;
-  padding: 0 10px 0 8px;
-  border-radius: 12px;
-  background: var(--field-surface);
-  font-size: 12px;
+  gap: 12px;
+  font-size: 13px;
   font-weight: 500;
-  color: var(--text-secondary);
-  cursor: auto;
+  line-height: 20px;
+  color: var(--text-body);
 
   &.connected {
-    background: var(--success-background);
     color: var(--success);
   }
 }
 
-.command {
-  font-family: var(--font-mono);
-  color: var(--text-primary);
+.status-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--warning-background);
+
+  .connected & {
+    background: var(--success-background);
+  }
 }
 
 .status-dot {
-  flex: none;
-  width: 6px;
-  height: 6px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: var(--text-faint);
+  background: var(--warning);
 
   .connected & {
     background: var(--success);

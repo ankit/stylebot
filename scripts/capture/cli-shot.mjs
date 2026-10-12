@@ -105,7 +105,7 @@ const startCliBrowser = async () => {
   await options.goto(`chrome-extension://${id}/options.html#/basics`);
   await options
     .getByRole('heading', {
-      name: 'Let apps on this computer control Stylebot',
+      name: 'Allow command line access',
     })
     .click();
   for (let i = 0; i < 30 && !(await cli(['tabs'])).ok; i++) {

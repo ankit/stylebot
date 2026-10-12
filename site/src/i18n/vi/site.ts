@@ -82,7 +82,7 @@ const site: SiteMessages = {
         'Lệnh này đăng ký CLI với Chrome và Edge để Stylebot kết nối được với CLI.',
       access: 'Bật quyền truy cập dòng lệnh',
       accessBody:
-        'Trong tùy chọn của Stylebot, ở mục Cơ bản, bật <strong>Cho phép ứng dụng trên máy tính này điều khiển Stylebot</strong> và cấp các quyền mà trình duyệt yêu cầu.',
+        'Trong tùy chọn của Stylebot, ở mục Cơ bản, bật <strong>Cho phép truy cập từ dòng lệnh</strong> và cấp các quyền mà trình duyệt yêu cầu.',
       plugin: 'Thêm plugin Claude Code',
       optional: 'Không bắt buộc',
       pluginBody: 'Trong Claude Code, chạy:',
@@ -161,7 +161,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: 'Trò chuyện',
-      body: 'Không bắt buộc. Kết nối khóa Claude, OpenAI hoặc Gemini của riêng bạn, rồi mô tả thay đổi trong thẻ Trò chuyện và Stylebot sẽ viết CSS. Không có khóa thì không có gì được gửi đi.',
+      body: 'Mặc định tắt. Bật trong tùy chọn, kết nối khóa Claude, OpenAI hoặc Gemini của riêng bạn, rồi mô tả thay đổi trong thẻ Trò chuyện và Stylebot sẽ viết CSS. Không có khóa thì không có gì được gửi đi.',
       prompt: 'Làm bài viết dễ đọc hơn vào ban đêm',
       reply:
         'Đã chuyển sang nền tối với chữ ấm hơn, thân bài dùng phông serif lớn hơn và giãn dòng rộng hơn.',
@@ -252,7 +252,7 @@ const site: SiteMessages = {
         'Lệnh <code>stylebot</code> cho phép trợ lý lập trình như Claude Code, Codex hay Cursor đổi giao diện trang web ngay trong trình duyệt của bạn, dùng gói đăng ký của bạn thay vì khóa API. Bạn cũng có thể tự chạy các lệnh.',
       setup: 'Thiết lập',
       setupBody:
-        'Cài đặt CLI, kết nối CLI với trình duyệt, rồi bật <strong>Cho phép ứng dụng trên máy tính này điều khiển Stylebot</strong> trong Tùy chọn. <a href="{cli}">Trang CLI</a> hướng dẫn từng bước. Hiện chỉ hỗ trợ Chrome và Edge.',
+        'Cài đặt CLI, kết nối CLI với trình duyệt, rồi bật <strong>Cho phép truy cập từ dòng lệnh</strong> trong Tùy chọn. <a href="{cli}">Trang CLI</a> hướng dẫn từng bước. Hiện chỉ hỗ trợ Chrome và Edge.',
       claudeCodeBody:
         'Thêm plugin Stylebot rồi yêu cầu thay đổi bằng <code>/stylebot</code>, chẳng hạn giao diện tối cho trang web.',
       privacy: 'Quyền riêng tư',
@@ -261,7 +261,7 @@ const site: SiteMessages = {
     },
     chat: {
       intro:
-        'Trò chuyện là tính năng không bắt buộc và luôn tắt cho đến khi bạn kết nối khóa API. Tính năng này rất hợp cho những chỉnh sửa nhanh: mô tả thay đổi bạn muốn và Stylebot sẽ viết CSS. Bạn có thể chọn phần tử để chỉ rõ chỗ cần sửa, hoặc đính kèm ảnh chụp màn hình để minh họa ý bạn. Với thay đổi lớn hơn, như cả giao diện mới, hãy dùng <a href="#cli">CLI</a>.',
+        'Trò chuyện mặc định tắt. Để thêm thẻ này vào trình chỉnh sửa, hãy bật <strong>Trò chuyện</strong> trong tùy chọn của Stylebot, mục Cơ bản, rồi kết nối khóa API. Tính năng này rất hợp cho những chỉnh sửa nhanh: mô tả thay đổi bạn muốn và Stylebot sẽ viết CSS. Bạn có thể chọn phần tử để chỉ rõ chỗ cần sửa, hoặc đính kèm ảnh chụp màn hình để minh họa ý bạn. Với thay đổi lớn hơn, như cả giao diện mới, hãy dùng <a href="#cli">CLI</a>.',
       shot: 'Thẻ Trò chuyện sau khi yêu cầu giao diện rừng xanh với phông serif dễ đọc trên Hacker News',
       key: 'Dùng khóa của riêng bạn',
       keyBody:
@@ -367,7 +367,7 @@ const site: SiteMessages = {
     cli: {
       title: 'Dòng lệnh',
       body: [
-        'Bật <q>Cho phép ứng dụng trên máy tính này điều khiển Stylebot</q> trong Tùy chọn sẽ cho phép các ứng dụng chạy dưới tài khoản của bạn đọc các thẻ, trang và kiểu của bạn, chụp ảnh màn hình và thay đổi kiểu của bạn, qua kết nối cục bộ. Những gì ứng dụng đọc được có thể đến các dịch vụ mà ứng dụng sử dụng, chẳng hạn mô hình của trợ lý lập trình.',
+        'Bật <q>Cho phép truy cập từ dòng lệnh</q> trong Tùy chọn sẽ cho phép các ứng dụng chạy dưới tài khoản của bạn đọc các thẻ, trang và kiểu của bạn, chụp ảnh màn hình và thay đổi kiểu của bạn, qua kết nối cục bộ. Những gì ứng dụng đọc được có thể đến các dịch vụ mà ứng dụng sử dụng, chẳng hạn mô hình của trợ lý lập trình.',
       ],
     },
     site: {

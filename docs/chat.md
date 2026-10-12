@@ -2,6 +2,8 @@
 
 The Chat tab turns a request in words ("make this a Gruvbox dark theme") into CSS for the site you're on. You bring your own API key: there's no Stylebot backend and no billing. This page is the map; the code comments carry the detail.
 
+Chat is off by default: the tab and its shortcut appear once it's turned on under Basics in Options. Anyone upgrading who had already used it, with a saved key, a conversation or the editor left on Chat, keeps it on.
+
 ## A reply, end to end
 
 ```mermaid

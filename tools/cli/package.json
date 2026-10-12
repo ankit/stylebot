@@ -1,6 +1,6 @@
 {
   "name": "@stylebot/cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Restyle websites in your browser from the command line with the Stylebot extension",
   "keywords": [
     "stylebot",

@@ -228,9 +228,7 @@ test('with the setting off, a command says to turn it on', async () => {
 
   expect(code).toBe(1);
   // Edge may not have saved the unpacked extension to its preferences yet, so the CLI also says to add it.
-  expect(stderr).toMatch(
-    /turn on "Let apps on this computer control Stylebot"/i
-  );
+  expect(stderr).toMatch(/turn on "Allow command line access"/i);
 });
 
 test('turning the setting on in Options connects the CLI', async () => {
@@ -239,12 +237,12 @@ test('turning the setting on in Options connects the CLI', async () => {
   // A real click, so the permissions request has its user gesture.
   await options
     .getByRole('heading', {
-      name: 'Let apps on this computer control Stylebot',
+      name: 'Allow command line access',
     })
     .click();
   await expect(
     options.getByRole('checkbox', {
-      name: /Let apps on this computer control Stylebot/,
+      name: /Allow command line access/,
     })
   ).toBeChecked();
 

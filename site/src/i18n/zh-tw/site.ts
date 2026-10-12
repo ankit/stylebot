@@ -80,7 +80,7 @@ const site: SiteMessages = {
       connectBody: '這會向 Chrome 和 Edge 註冊 CLI，讓 Stylebot 能與它連線。',
       access: '開啟命令列存取',
       accessBody:
-        '在 Stylebot 的選項中，於「基本」下開啟 <strong>允許這台電腦上的應用程式控制 Stylebot</strong>，並允許瀏覽器要求的權限。',
+        '在 Stylebot 的選項中，於「基本」下開啟 <strong>允許命令列存取</strong>，並允許瀏覽器要求的權限。',
       plugin: '加入 Claude Code 外掛程式',
       optional: '選用',
       pluginBody: '在 Claude Code 中執行：',
@@ -158,7 +158,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: '聊天',
-      body: '選用功能。連接你自己的 Claude、OpenAI 或 Gemini 金鑰，然後在聊天分頁中描述變更，Stylebot 就會撰寫 CSS。沒有金鑰時，不會傳送任何內容。',
+      body: '預設為關閉。在選項中開啟後，連接你自己的 Claude、OpenAI 或 Gemini 金鑰，然後在聊天分頁中描述變更，Stylebot 就會撰寫 CSS。沒有金鑰時，不會傳送任何內容。',
       prompt: '讓文章在晚上更好讀',
       reply:
         '已改為深色背景配上較暖的文字色，內文也改用較大的襯線字型，並加大行距。',
@@ -245,7 +245,7 @@ const site: SiteMessages = {
         '<code>stylebot</code> 指令讓 Claude Code、Codex、Cursor 等程式設計代理直接在你的瀏覽器中修改網站樣式，使用你自己的訂閱方案，不需要 API 金鑰。你也可以自己執行這些指令。',
       setup: '設定',
       setupBody:
-        '安裝 CLI、連接到你的瀏覽器，然後在選項中開啟 <strong>允許這台電腦上的應用程式控制 Stylebot</strong>。<a href="{cli}">CLI 頁面</a>會逐步說明每個步驟。目前僅支援 Chrome 和 Edge。',
+        '安裝 CLI、連接到你的瀏覽器，然後在選項中開啟 <strong>允許命令列存取</strong>。<a href="{cli}">CLI 頁面</a>會逐步說明每個步驟。目前僅支援 Chrome 和 Edge。',
       claudeCodeBody:
         '加入 Stylebot 外掛程式，再用 <code>/stylebot</code> 要求變更，例如為網站套用深色主題。',
       privacy: '隱私權',
@@ -254,7 +254,7 @@ const site: SiteMessages = {
     },
     chat: {
       intro:
-        '聊天是選用功能，在你連接 API 金鑰之前都是關閉的。它最適合快速修正：描述你想要的變更，Stylebot 就會撰寫 CSS。你可以選取元素來指明對象，或附加螢幕截圖說明你的意思。若是較大的變更，例如整套新主題，請使用 <a href="#cli">CLI</a>。',
+        '聊天預設為關閉。若要在編輯器中加入它的分頁，請在 Stylebot 選項的「基本」中開啟<strong>聊天</strong>，然後連接 API 金鑰。它最適合快速修正：描述你想要的變更，Stylebot 就會撰寫 CSS。你可以選取元素來指明對象，或附加螢幕截圖說明你的意思。若是較大的變更，例如整套新主題，請使用 <a href="#cli">CLI</a>。',
       shot: '在 Hacker News 上要求森林主題和易讀襯線字型後的聊天分頁',
       key: '使用你自己的金鑰',
       keyBody:
@@ -354,7 +354,7 @@ const site: SiteMessages = {
     cli: {
       title: '命令列',
       body: [
-        '在選項中開啟 <q>允許這台電腦上的應用程式控制 Stylebot</q> 後，以你的身分執行的應用程式就能透過本機連線讀取你的分頁、頁面和樣式，擷取螢幕畫面，以及變更你的樣式。它們讀取的內容可能會傳送到它們使用的服務，例如程式設計代理的模型。',
+        '在選項中開啟 <q>允許命令列存取</q> 後，以你的身分執行的應用程式就能透過本機連線讀取你的分頁、頁面和樣式，擷取螢幕畫面，以及變更你的樣式。它們讀取的內容可能會傳送到它們使用的服務，例如程式設計代理的模型。',
       ],
     },
     site: {

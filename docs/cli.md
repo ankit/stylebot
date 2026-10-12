@@ -40,7 +40,7 @@ This copies the CLI's native messaging host into `~/.stylebot/` and registers it
 
 A browser counts as installed once it has run, which leaves a `Local State` file in its user data folder, so run `install` again after installing a new browser.
 
-Then turn on **Let apps on this computer control Stylebot** in Stylebot's options, under Basics, and allow what the browser asks for. The extension connects to the host while the setting is on; turning it off disconnects it and gives back the permission to talk to the host. If it was already on before you installed, reload the extension or restart the browser. The host runs only while the browser does.
+Then turn on **Allow command line access** in Stylebot's options, under Basics, and allow what the browser asks for. The extension connects to the host while the setting is on; turning it off disconnects it and gives back the permission to talk to the host. If it was already on before you installed, reload the extension or restart the browser. The host runs only while the browser does.
 
 ### When it can't connect
 

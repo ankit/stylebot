@@ -82,7 +82,7 @@ const site: SiteMessages = {
         'Damit wird die CLI bei Chrome und Edge registriert, sodass Stylebot sie erreichen kann.',
       access: 'Befehlszeilenzugriff aktivieren',
       accessBody:
-        'Aktivieren Sie in den Optionen von Stylebot unter „Grundeinstellungen“ <strong>Apps auf diesem Computer Stylebot steuern lassen</strong> und erlauben Sie, was der Browser abfragt.',
+        'Aktivieren Sie in den Optionen von Stylebot unter „Grundeinstellungen“ <strong>Befehlszeilenzugriff erlauben</strong> und erlauben Sie, was der Browser abfragt.',
       plugin: 'Claude Code-Plugin hinzufügen',
       optional: 'Optional',
       pluginBody: 'Führen Sie in Claude Code Folgendes aus:',
@@ -161,7 +161,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: 'Chat',
-      body: 'Optional. Verbinden Sie Ihren eigenen Schlüssel für Claude, OpenAI oder Gemini, beschreiben Sie dann im Chat-Tab eine Änderung, und Stylebot schreibt das CSS. Ohne Schlüssel wird nichts gesendet.',
+      body: 'Standardmäßig aus. Aktivieren Sie den Chat in den Optionen, verbinden Sie Ihren eigenen Schlüssel für Claude, OpenAI oder Gemini, beschreiben Sie dann im Chat-Tab eine Änderung, und Stylebot schreibt das CSS. Ohne Schlüssel wird nichts gesendet.',
       prompt: 'Mach den Artikel nachts besser lesbar',
       reply:
         'Auf einen dunklen Hintergrund mit wärmerem Text umgestellt und den Fließtext in einer größeren Serifenschrift mit mehr Zeilenabstand gesetzt.',
@@ -252,7 +252,7 @@ const site: SiteMessages = {
         'Mit dem Befehl <code>stylebot</code> kann ein Coding-Agent wie Claude Code, Codex oder Cursor Websites direkt in Ihrem Browser umgestalten – mit Ihrem eigenen Abo statt einem API-Schlüssel. Sie können die Befehle auch selbst ausführen.',
       setup: 'Einrichtung',
       setupBody:
-        'Installieren Sie die CLI, verbinden Sie sie mit Ihren Browsern und aktivieren Sie dann in den Optionen <strong>Apps auf diesem Computer Stylebot steuern lassen</strong>. Die <a href="{cli}">CLI-Seite</a> führt durch jeden Schritt. Vorerst nur für Chrome und Edge.',
+        'Installieren Sie die CLI, verbinden Sie sie mit Ihren Browsern und aktivieren Sie dann in den Optionen <strong>Befehlszeilenzugriff erlauben</strong>. Die <a href="{cli}">CLI-Seite</a> führt durch jeden Schritt. Vorerst nur für Chrome und Edge.',
       claudeCodeBody:
         'Fügen Sie das Stylebot-Plugin hinzu und bitten Sie mit <code>/stylebot</code> um eine Änderung, etwa ein dunkles Design für eine Website.',
       privacy: 'Datenschutz',
@@ -261,7 +261,7 @@ const site: SiteMessages = {
     },
     chat: {
       intro:
-        'Der Chat ist optional und bleibt aus, bis Sie einen API-Schlüssel verbinden. Er eignet sich ideal für schnelle Korrekturen: Beschreiben Sie die gewünschte Änderung, und Stylebot schreibt das CSS. Sie können ein Element auswählen, um auf etwas zu zeigen, oder einen Screenshot anhängen, um zu zeigen, was Sie meinen. Für größere Änderungen, etwa ein ganz neues Design, nutzen Sie die <a href="#cli">CLI</a>.',
+        'Der Chat ist standardmäßig aus. Um seinen Tab zum Editor hinzuzufügen, aktivieren Sie <strong>Chat</strong> in den Optionen von Stylebot unter Grundeinstellungen und verbinden Sie dann einen API-Schlüssel. Er eignet sich ideal für schnelle Korrekturen: Beschreiben Sie die gewünschte Änderung, und Stylebot schreibt das CSS. Sie können ein Element auswählen, um auf etwas zu zeigen, oder einen Screenshot anhängen, um zu zeigen, was Sie meinen. Für größere Änderungen, etwa ein ganz neues Design, nutzen Sie die <a href="#cli">CLI</a>.',
       shot: 'Der Chat-Tab nach der Bitte um ein Wald-Design mit gut lesbarer Serifenschrift auf Hacker News',
       key: 'Eigener Schlüssel',
       keyBody:
@@ -364,7 +364,7 @@ const site: SiteMessages = {
     cli: {
       title: 'Befehlszeile',
       body: [
-        'Wenn Sie in den Optionen <q>Apps auf diesem Computer Stylebot steuern lassen</q> aktivieren, können Apps, die unter Ihrem Benutzerkonto laufen, über eine lokale Verbindung Ihre Tabs, Seiten und Stile lesen, Screenshots aufnehmen und Ihre Stile ändern. Was sie lesen, kann an die Dienste gelangen, die sie nutzen, etwa an das Modell eines Coding-Agenten.',
+        'Wenn Sie in den Optionen <q>Befehlszeilenzugriff erlauben</q> aktivieren, können Apps, die unter Ihrem Benutzerkonto laufen, über eine lokale Verbindung Ihre Tabs, Seiten und Stile lesen, Screenshots aufnehmen und Ihre Stile ändern. Was sie lesen, kann an die Dienste gelangen, die sie nutzen, etwa an das Modell eines Coding-Agenten.',
       ],
     },
     site: {

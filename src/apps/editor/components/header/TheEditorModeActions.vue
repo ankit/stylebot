@@ -57,7 +57,7 @@ export default Vue.extend({
       shortcut: string;
       disabled: boolean;
     }> {
-      return [
+      const tabs = [
         {
           value: 'basic',
           label: this.t('basic_mode'),
@@ -87,6 +87,10 @@ export default Vue.extend({
           disabled: this.readability,
         },
       ];
+
+      return this.$store.state.options.chat
+        ? tabs
+        : tabs.filter(({ value }) => value !== 'chat');
     },
   },
 

@@ -7,6 +7,7 @@ import type {
 export const defaultOptions: StylebotOptions = {
   mode: 'basic',
   contextMenu: true,
+  chat: false,
   fonts: [
     'Inter',
     'Source Sans 3',

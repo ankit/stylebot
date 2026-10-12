@@ -93,7 +93,7 @@ export default {
       access: 'Turn on command line access',
       // "Basics" and the bolded setting are labels in Stylebot's Options page; use the extension's own translation.
       accessBody:
-        "In Stylebot's options, under Basics, turn on <strong>Let apps on this computer control Stylebot</strong> and allow what the browser asks for.",
+        "In Stylebot's options, under Basics, turn on <strong>Allow command line access</strong> and allow what the browser asks for.",
       plugin: 'Add the Claude Code plugin',
       optional: 'Optional',
       pluginBody: 'In Claude Code, run:',
@@ -176,7 +176,7 @@ export default {
     // A picture of Stylebot's Chat tab; updated, undo and placeholder are labels from the extension, so use its own translations.
     chat: {
       title: 'Chat',
-      body: 'Optional. Connect your own Claude, OpenAI or Gemini key, then describe a change in the Chat tab and Stylebot writes the CSS. Without a key, nothing is sent anywhere.',
+      body: 'Off by default. Turn it on in Options, connect your own Claude, OpenAI or Gemini key, then describe a change in the Chat tab and Stylebot writes the CSS. Without a key, nothing is sent anywhere.',
       prompt: 'Make the article easier to read at night',
       reply:
         'Switched to a dark background with warmer text, and set the body in a larger serif with more line spacing.',
@@ -269,7 +269,7 @@ export default {
       setup: 'Setup',
       // The bolded setting is a label in Stylebot's Options page; use the extension's own translation.
       setupBody:
-        'Install the CLI, connect it to your browsers, then turn on <strong>Let apps on this computer control Stylebot</strong> in Options. The <a href="{cli}">CLI page</a> walks through each step. Chrome and Edge only for now.',
+        'Install the CLI, connect it to your browsers, then turn on <strong>Allow command line access</strong> in Options. The <a href="{cli}">CLI page</a> walks through each step. Chrome and Edge only for now.',
       claudeCodeBody:
         'Add the Stylebot plugin and ask for a change with <code>/stylebot</code>, such as a dark theme for a site.',
       privacy: 'Privacy',
@@ -277,8 +277,9 @@ export default {
         'CLI access is off until you turn it on. Stylebot and the CLI talk only to each other, on this computer; an agent sends what it reads to its own provider.',
     },
     chat: {
+      // "Basics" and the bolded setting are labels in Stylebot's Options page; use the extension's own translation.
       intro:
-        'Chat is optional and stays off until you connect an API key. It\'s ideal for quick fixes: describe the change you want and Stylebot writes the CSS. You can pick an element to point it at something, or attach a screenshot to show what you mean. For bigger changes, like a whole new theme, use the <a href="#cli">CLI</a>.',
+        'Chat is off by default. To add its tab to the editor, turn on <strong>Chat</strong> in Stylebot\'s options, under Basics, then connect an API key. It\'s ideal for quick fixes: describe the change you want and Stylebot writes the CSS. You can pick an element to point it at something, or attach a screenshot to show what you mean. For bigger changes, like a whole new theme, use the <a href="#cli">CLI</a>.',
       shot: 'The Chat tab after asking for a forest theme with a readable serif font on Hacker News',
       key: 'Bring your own key',
       keyBody:
@@ -380,7 +381,7 @@ export default {
     cli: {
       title: 'Command line',
       body: [
-        "Turning on <q>Let apps on this computer control Stylebot</q> in Options lets apps running as you read your tabs, pages and styles, take screenshots and change your styles, over a local connection. What they read can reach the services they use, such as a coding agent's model.",
+        "Turning on <q>Allow command line access</q> in Options lets apps running as you read your tabs, pages and styles, take screenshots and change your styles, over a local connection. What they read can reach the services they use, such as a coding agent's model.",
       ],
     },
     site: {

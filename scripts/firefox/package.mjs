@@ -46,8 +46,9 @@ when the user turns the feature on:
 - **Chat** sends the user's message, the page's address and title, an
   outline of the page, its CSS and any attached screenshot straight to the AI
   provider they pick (Anthropic, OpenAI or Google), using an API key they
-  paste into Stylebot. Without a key Chat only asks for one; to try it, open
-  the editor's Chat tab, choose "Here in Chat" and paste a key of your own.
+  paste into Stylebot. Chat is off until turned on under Basics in Options;
+  without a key it only asks for one. To try it, turn it on, open the
+  editor's Chat tab and paste a key of your own.
 - **Sync** signs in with Google through \`identity\` and stores styles in the
   user's own Google Drive, with the \`drive.file\` scope, so it only sees files
   it created.

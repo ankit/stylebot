@@ -5,6 +5,7 @@ jest.mock('./styles-modified-time-update', () =>
   jest.fn(async () => undefined)
 );
 jest.mock('./sync-storage-update', () => jest.fn(async () => undefined));
+jest.mock('./chat-option-update', () => jest.fn(async () => undefined));
 
 import { MIGRATION_ERRORS_KEY } from './index';
 

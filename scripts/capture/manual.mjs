@@ -33,6 +33,7 @@ const APPEARANCES = ['light', 'dark'];
 const CHAT_KEY = {
   'chat-api-key-anthropic': 'sk-ant-manual-screenshot-placeholder',
   'chat-provider': 'anthropic',
+  options: { chat: true },
 };
 
 const hackerNews = () =>

@@ -1,9 +1,9 @@
 <template>
   <s-list-item padded interactive @click="onRowClick">
     <template #title>
-      <h2 class="heading">
+      <h3 class="heading">
         <label for="context-menu">{{ t('right_click_menu') }}</label>
-      </h2>
+      </h3>
     </template>
     <template #meta>
       <s-text variant="muted" size="large" as="span">

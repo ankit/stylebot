@@ -82,7 +82,7 @@ const site: SiteMessages = {
         'Isto regista a CLI no Chrome e no Edge, para que o Stylebot a consiga encontrar.',
       access: 'Ative o acesso por linha de comandos',
       accessBody:
-        'Nas opções do Stylebot, em Geral, ative <strong>Permitir que as aplicações deste computador controlem o Stylebot</strong> e aceite o que o navegador pedir.',
+        'Nas opções do Stylebot, em Geral, ative <strong>Permitir acesso pela linha de comandos</strong> e aceite o que o navegador pedir.',
       plugin: 'Adicione o plugin do Claude Code',
       optional: 'Opcional',
       pluginBody: 'No Claude Code, execute:',
@@ -161,7 +161,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: 'Chat',
-      body: 'Opcional. Ligue a sua própria chave do Claude, OpenAI ou Gemini, descreva uma alteração no separador Chat e o Stylebot escreve o CSS. Sem uma chave, nada é enviado.',
+      body: 'Desativado por predefinição. Ative-o nas opções, ligue a sua própria chave do Claude, OpenAI ou Gemini, descreva uma alteração no separador Chat e o Stylebot escreve o CSS. Sem uma chave, nada é enviado.',
       prompt: 'Torne o artigo mais fácil de ler à noite',
       reply:
         'Mudei para um fundo escuro com texto mais quente, e pus o corpo numa serifa maior, com mais espaço entre linhas.',
@@ -251,7 +251,7 @@ const site: SiteMessages = {
         'O comando <code>stylebot</code> permite que um agente de programação como o Claude Code, o Codex ou o Cursor altere o estilo dos sites diretamente no seu navegador, com a sua própria subscrição em vez de uma chave de API. Também pode executar os comandos.',
       setup: 'Configuração',
       setupBody:
-        'Instale a CLI, ligue-a aos seus navegadores e depois ative <strong>Permitir que as aplicações deste computador controlem o Stylebot</strong> nas Opções. A <a href="{cli}">página da CLI</a> explica cada passo. Por agora, apenas no Chrome e no Edge.',
+        'Instale a CLI, ligue-a aos seus navegadores e depois ative <strong>Permitir acesso pela linha de comandos</strong> nas Opções. A <a href="{cli}">página da CLI</a> explica cada passo. Por agora, apenas no Chrome e no Edge.',
       claudeCodeBody:
         'Adicione o plugin do Stylebot e peça uma alteração com <code>/stylebot</code>, como um tema escuro para um site.',
       privacy: 'Privacidade',
@@ -260,7 +260,7 @@ const site: SiteMessages = {
     },
     chat: {
       intro:
-        'O Chat é opcional e fica desativado até ligar uma chave de API. É ideal para ajustes rápidos: descreva a alteração que quer e o Stylebot escreve o CSS. Pode escolher um elemento para indicar algo concreto, ou anexar uma captura de ecrã para mostrar o que quer dizer. Para alterações maiores, como um tema totalmente novo, use a <a href="#cli">CLI</a>.',
+        'O Chat está desativado por predefinição. Para adicionar o separador ao editor, ative <strong>Chat</strong> nas opções do Stylebot, em Geral, e depois ligue uma chave de API. É ideal para ajustes rápidos: descreva a alteração que quer e o Stylebot escreve o CSS. Pode escolher um elemento para indicar algo concreto, ou anexar uma captura de ecrã para mostrar o que quer dizer. Para alterações maiores, como um tema totalmente novo, use a <a href="#cli">CLI</a>.',
       shot: 'O separador Chat depois de pedir um tema de floresta com um tipo de letra serifado e legível no Hacker News',
       key: 'Use a sua própria chave',
       keyBody:
@@ -368,7 +368,7 @@ const site: SiteMessages = {
     cli: {
       title: 'Linha de comandos',
       body: [
-        'Ativar <q>Permitir que as aplicações deste computador controlem o Stylebot</q> nas Opções permite que as aplicações executadas com a sua conta de utilizador leiam os seus separadores, páginas e estilos, tirem capturas de ecrã e alterem os seus estilos, através de uma ligação local. O que leem pode chegar aos serviços que usam, como o modelo de um agente de programação.',
+        'Ativar <q>Permitir acesso pela linha de comandos</q> nas Opções permite que as aplicações executadas com a sua conta de utilizador leiam os seus separadores, páginas e estilos, tirem capturas de ecrã e alterem os seus estilos, através de uma ligação local. O que leem pode chegar aos serviços que usam, como o modelo de um agente de programação.',
       ],
     },
     site: {

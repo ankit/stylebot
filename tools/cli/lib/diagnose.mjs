@@ -19,10 +19,10 @@ export const diagnoseConnection = ({ code, repinned }) => {
   if (code !== 'ECONNREFUSED' && !fs.existsSync(HOST_STARTED_PATH)) {
     // Only on evidence: no profile to look in leaves the setting as the likely cause.
     if (findStylebot()?.length === 0) {
-      return 'No browser has Stylebot yet. Add it from stylebot.dev, then turn on "Let apps on this computer control Stylebot" in its settings — stylebot.dev/cli';
+      return 'No browser has Stylebot yet. Add it from stylebot.dev, then turn on "Allow command line access" in its settings — stylebot.dev/cli';
     }
 
-    return 'Not connected yet. Turn on "Let apps on this computer control Stylebot" in Stylebot\'s settings — stylebot.dev/cli';
+    return 'Not connected yet. Turn on "Allow command line access" in Stylebot\'s settings — stylebot.dev/cli';
   }
 
   return 'No browser is running Stylebot. Open Chrome (or Edge) with Stylebot.';

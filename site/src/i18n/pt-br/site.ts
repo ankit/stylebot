@@ -82,7 +82,7 @@ const site: SiteMessages = {
         'Isso registra a CLI no Chrome e no Edge, para que o Stylebot consiga acessá-la.',
       access: 'Ative o acesso por linha de comando',
       accessBody:
-        'Nas opções do Stylebot, em Geral, ative <strong>Permitir que apps deste computador controlem o Stylebot</strong> e permita o que o navegador pedir.',
+        'Nas opções do Stylebot, em Geral, ative <strong>Permitir acesso pela linha de comando</strong> e permita o que o navegador pedir.',
       plugin: 'Adicione o plugin do Claude Code',
       optional: 'Opcional',
       pluginBody: 'No Claude Code, execute:',
@@ -161,7 +161,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: 'Chat',
-      body: 'Opcional. Conecte sua própria chave do Claude, OpenAI ou Gemini, descreva uma mudança na aba Chat e o Stylebot escreve o CSS. Sem uma chave, nada é enviado.',
+      body: 'Desativado por padrão. Ative nas opções, conecte sua própria chave do Claude, OpenAI ou Gemini, descreva uma mudança na aba Chat e o Stylebot escreve o CSS. Sem uma chave, nada é enviado.',
       prompt: 'Deixe o artigo mais fácil de ler à noite',
       reply:
         'Mudei para um fundo escuro com texto mais quente e coloquei o corpo em uma fonte serifada maior, com mais espaço entre as linhas.',
@@ -252,7 +252,7 @@ const site: SiteMessages = {
         'O comando <code>stylebot</code> permite que um agente de programação como o Claude Code, o Codex ou o Cursor mude o estilo dos sites direto no seu navegador, usando a sua própria assinatura, sem chave de API. Você também pode executar os comandos.',
       setup: 'Configuração',
       setupBody:
-        'Instale a CLI, conecte aos seus navegadores e ative <strong>Permitir que apps deste computador controlem o Stylebot</strong> nas Opções. A <a href="{cli}">página da CLI</a> explica cada passo. Por enquanto, só no Chrome e no Edge.',
+        'Instale a CLI, conecte aos seus navegadores e ative <strong>Permitir acesso pela linha de comando</strong> nas Opções. A <a href="{cli}">página da CLI</a> explica cada passo. Por enquanto, só no Chrome e no Edge.',
       claudeCodeBody:
         'Adicione o plugin do Stylebot e peça uma mudança com <code>/stylebot</code>, como um tema escuro para um site.',
       privacy: 'Privacidade',
@@ -261,7 +261,7 @@ const site: SiteMessages = {
     },
     chat: {
       intro:
-        'O Chat é opcional e fica desativado até você conectar uma chave de API. Ele é ideal para ajustes rápidos: descreva a mudança que você quer e o Stylebot escreve o CSS. Você pode escolher um elemento para indicar algo específico ou anexar uma captura de tela para mostrar o que quer dizer. Para mudanças maiores, como um tema totalmente novo, use a <a href="#cli">CLI</a>.',
+        'O Chat vem desativado por padrão. Para adicionar a aba dele ao editor, ative <strong>Chat</strong> nas opções do Stylebot, em Geral, e depois conecte uma chave de API. Ele é ideal para ajustes rápidos: descreva a mudança que você quer e o Stylebot escreve o CSS. Você pode escolher um elemento para indicar algo específico ou anexar uma captura de tela para mostrar o que quer dizer. Para mudanças maiores, como um tema totalmente novo, use a <a href="#cli">CLI</a>.',
       shot: 'A aba Chat depois de pedir um tema de floresta com uma fonte serifada legível no Hacker News',
       key: 'Use sua própria chave',
       keyBody:
@@ -366,7 +366,7 @@ const site: SiteMessages = {
     cli: {
       title: 'Linha de comando',
       body: [
-        'Ativar <q>Permitir que apps deste computador controlem o Stylebot</q> nas Opções permite que os apps executados com o seu usuário leiam suas abas, páginas e estilos, tirem capturas de tela e alterem seus estilos, por uma conexão local. O que eles leem pode chegar aos serviços que usam, como o modelo de um agente de programação.',
+        'Ativar <q>Permitir acesso pela linha de comando</q> nas Opções permite que os apps executados com o seu usuário leiam suas abas, páginas e estilos, tirem capturas de tela e alterem seus estilos, por uma conexão local. O que eles leem pode chegar aos serviços que usam, como o modelo de um agente de programação.',
       ],
     },
     site: {

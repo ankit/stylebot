@@ -1,3 +1,4 @@
+import ChatOptionUpdate from './chat-option-update';
 import CommandsToBrowser from './commands-to-browser';
 import DefaultShortcutUpdate from './default-shortcut-update';
 import StylesMetadataUpdate from './styles-metadata-update';
@@ -24,6 +25,7 @@ export const migrations: Array<Migration> = [
   { name: 'styles-metadata-update', run: StylesMetadataUpdate },
   { name: 'styles-modified-time-update', run: StylesModifiedTimeUpdate },
   { name: 'sync-storage-update', run: SyncStorageUpdate },
+  { name: 'chat-option-update', run: ChatOptionUpdate },
 ];
 
 /**

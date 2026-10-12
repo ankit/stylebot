@@ -19,18 +19,23 @@ export const SetInBrowser: StoryObj = {
     const canvas = within(root);
     const sendMessage = spyOn(chrome.runtime, 'sendMessage');
 
-    await expect(
-      canvas.getByText('Shortcuts are set in your browser.')
-    ).toBeVisible();
     await expect(root.querySelector('.recorder')).toBeNull();
     // Reader mode and grayscale come without a shortcut.
-    await expect(canvas.getAllByText('Not set')).toHaveLength(2);
+    const notSet = canvas.getAllByRole('button', { name: 'Not set' });
+    await expect(notSet).toHaveLength(2);
 
-    await user.click(canvas.getByRole('button', { name: 'Change shortcuts' }));
+    await user.click(
+      canvas.getByRole('button', { name: 'Change in browser settings' })
+    );
+    await expect(sendMessage).toHaveBeenCalledWith({
+      name: 'OpenShortcutsPage',
+    });
 
+    sendMessage.mockClear();
+    await user.click(notSet[0]);
     await expect(sendMessage).toHaveBeenCalledWith({
       name: 'OpenShortcutsPage',
     });
   }),
-  name: 'shortcuts show as keys with a button to change them in the browser',
+  name: 'shortcuts show as keys, and the header link or a missing one opens the browser’s shortcut settings',
 };

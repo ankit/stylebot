@@ -1,50 +1,38 @@
 <template>
-  <div>
-    <div class="header">
-      <div class="title-block">
-        <s-heading as="h2" size="lg">{{ t('keyboard_shortcuts') }}</s-heading>
-        <s-text variant="muted" size="large" class="description">
-          {{
-            safari
-              ? t('change_shortcuts_in_safari_settings_extensions')
-              : t('shortcuts_are_set_in_your_browser')
-          }}
-        </s-text>
-      </div>
+  <basics-section :label="t('keyboard_shortcuts')">
+    <template #action>
+      <s-text v-if="safari" variant="muted" class="action">
+        {{ t('change_shortcuts_in_safari_settings_extensions') }}
+      </s-text>
+      <s-link-button v-else class="action" @click="openShortcutsPage">
+        {{ t('change_in_browser_settings') }}
+      </s-link-button>
+    </template>
 
-      <s-button v-if="!safari" @click="openShortcutsPage">
-        {{ t('change_shortcuts') }}
-      </s-button>
-    </div>
-
-    <s-list class="rows">
-      <shortcut-row
-        v-for="row in rows"
-        :key="row.settingKey"
-        :label="t(row.labelKey)"
-      >
-        <s-shortcut-chip
-          v-if="commands[row.settingKey]"
-          :value="commands[row.settingKey]"
-        />
-        <s-text v-else variant="muted">{{ t('not_set') }}</s-text>
-      </shortcut-row>
-    </s-list>
-  </div>
+    <shortcut-row
+      v-for="row in rows"
+      :key="row.settingKey"
+      :label="t(row.labelKey)"
+    >
+      <s-shortcut-chip
+        v-if="commands[row.settingKey]"
+        :value="commands[row.settingKey]"
+      />
+      <s-text v-else-if="safari" variant="muted">{{ t('not_set') }}</s-text>
+      <s-link-button v-else class="not-set" @click="openShortcutsPage">
+        {{ t('not_set') }}
+      </s-link-button>
+    </shortcut-row>
+  </basics-section>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 import type { StylebotCommandName, StylebotCommands } from '@stylebot/types';
-import {
-  SButton,
-  SHeading,
-  SList,
-  SShortcutChip,
-  SText,
-} from '@stylebot/components';
+import { SLinkButton, SShortcutChip, SText } from '@stylebot/components';
 import { isSafari, openShortcutsPage } from '@stylebot/utils';
 
+import BasicsSection from './BasicsSection.vue';
 import ShortcutRow from './ShortcutRow.vue';
 
 type ShortcutSetting = { labelKey: string; settingKey: StylebotCommandName };
@@ -53,10 +41,9 @@ export default Vue.extend({
   name: 'TheKeyboardShortcuts',
 
   components: {
+    BasicsSection,
     ShortcutRow,
-    SButton,
-    SHeading,
-    SList,
+    SLinkButton,
     SShortcutChip,
     SText,
   },
@@ -88,22 +75,13 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.header {
-  display: flex;
-  align-items: flex-end;
-  gap: 16px;
+.action {
+  font-size: 13px;
+  line-height: 1.2;
 }
 
-.title-block {
-  flex: 1;
-  min-width: 0;
-}
-
-.description {
-  margin-top: 6px;
-}
-
-.rows {
-  margin-top: 16px;
+.basics-section .not-set {
+  font-weight: 400;
+  color: var(--text-muted);
 }
 </style>

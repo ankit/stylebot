@@ -82,7 +82,7 @@ const site: SiteMessages = {
         'Astfel, CLI-ul este înregistrat în Chrome și Edge, ca Stylebot să poată comunica cu el.',
       access: 'Activează accesul din linia de comandă',
       accessBody:
-        'În opțiunile Stylebot, la „De bază”, activează <strong>Permite aplicațiilor de pe acest computer să controleze Stylebot</strong> și acceptă ce îți cere browserul.',
+        'În opțiunile Stylebot, la „De bază”, activează <strong>Permite accesul din linia de comandă</strong> și acceptă ce îți cere browserul.',
       plugin: 'Adaugă pluginul Claude Code',
       optional: 'Opțional',
       pluginBody: 'În Claude Code, rulează:',
@@ -163,7 +163,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: 'Chat',
-      body: 'Opțional. Conectează propria cheie Claude, OpenAI sau Gemini, apoi descrie o modificare în fila Chat, iar Stylebot scrie CSS-ul. Fără cheie, nu se trimite nimic.',
+      body: 'Dezactivat implicit. Activează-l în opțiuni, conectează propria cheie Claude, OpenAI sau Gemini, apoi descrie o modificare în fila Chat, iar Stylebot scrie CSS-ul. Fără cheie, nu se trimite nimic.',
       prompt: 'Fă articolul mai ușor de citit noaptea',
       reply:
         'Am trecut la un fundal întunecat cu text mai cald și am pus corpul textului într-un serif mai mare, cu rânduri mai aerisite.',
@@ -254,7 +254,7 @@ const site: SiteMessages = {
         'Comanda <code>stylebot</code> îi permite unui agent de programare precum Claude Code, Codex sau Cursor să schimbe stilul site-urilor direct în browserul tău, cu propriul abonament, fără cheie API. Comenzile le poți rula și singur.',
       setup: 'Configurare',
       setupBody:
-        'Instalează CLI, conectează-l la browserele tale, apoi activează <strong>Permite aplicațiilor de pe acest computer să controleze Stylebot</strong> în Opțiuni. <a href="{cli}">Pagina despre CLI</a> te ghidează pas cu pas. Deocamdată doar în Chrome și Edge.',
+        'Instalează CLI, conectează-l la browserele tale, apoi activează <strong>Permite accesul din linia de comandă</strong> în Opțiuni. <a href="{cli}">Pagina despre CLI</a> te ghidează pas cu pas. Deocamdată doar în Chrome și Edge.',
       claudeCodeBody:
         'Adaugă pluginul Stylebot și cere o modificare cu <code>/stylebot</code>, de exemplu o temă întunecată pentru un site.',
       privacy: 'Confidențialitate',
@@ -263,7 +263,7 @@ const site: SiteMessages = {
     },
     chat: {
       intro:
-        'Chatul este opțional și rămâne dezactivat până conectezi o cheie API. E ideal pentru remedieri rapide: descrie modificarea pe care o vrei, iar Stylebot scrie CSS-ul. Poți alege un element ca să arăți spre ceva anume sau poți atașa o captură de ecran ca să arăți ce ai în minte. Pentru modificări mai mari, cum ar fi o temă complet nouă, folosește <a href="#cli">CLI-ul</a>.',
+        'Chatul este dezactivat implicit. Ca să-i adaugi fila în editor, activează <strong>Chat</strong> în opțiunile Stylebot, la De bază, apoi conectează o cheie API. E ideal pentru remedieri rapide: descrie modificarea pe care o vrei, iar Stylebot scrie CSS-ul. Poți alege un element ca să arăți spre ceva anume sau poți atașa o captură de ecran ca să arăți ce ai în minte. Pentru modificări mai mari, cum ar fi o temă complet nouă, folosește <a href="#cli">CLI-ul</a>.',
       shot: 'Fila Chat pe Hacker News, după cererea unei teme în nuanțe de pădure, cu un font serif ușor de citit',
       key: 'Folosește propria cheie',
       keyBody:
@@ -368,7 +368,7 @@ const site: SiteMessages = {
     cli: {
       title: 'Linia de comandă',
       body: [
-        'Dacă activezi <q>Permite aplicațiilor de pe acest computer să controleze Stylebot</q> în Opțiuni, aplicațiile care rulează în numele tău îți pot citi filele, paginile și stilurile, pot face capturi de ecran și îți pot modifica stilurile, printr-o conexiune locală. Ce citesc poate ajunge la serviciile pe care le folosesc, cum ar fi modelul unui agent de programare.',
+        'Dacă activezi <q>Permite accesul din linia de comandă</q> în Opțiuni, aplicațiile care rulează în numele tău îți pot citi filele, paginile și stilurile, pot face capturi de ecran și îți pot modifica stilurile, printr-o conexiune locală. Ce citesc poate ajunge la serviciile pe care le folosesc, cum ar fi modelul unui agent de programare.',
       ],
     },
     site: {

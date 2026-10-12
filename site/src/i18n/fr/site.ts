@@ -82,7 +82,7 @@ const site: SiteMessages = {
         'Cette commande enregistre la CLI auprès de Chrome et d’Edge, pour que Stylebot puisse la joindre.',
       access: 'Activez l’accès en ligne de commande',
       accessBody:
-        'Dans les options de Stylebot, sous Général, activez <strong>Autoriser les applications de cet ordinateur à contrôler Stylebot</strong> et accordez ce que le navigateur demande.',
+        'Dans les options de Stylebot, sous Général, activez <strong>Autoriser l’accès en ligne de commande</strong> et accordez ce que le navigateur demande.',
       plugin: 'Ajoutez le plugin Claude Code',
       optional: 'Facultatif',
       pluginBody: 'Dans Claude Code, exécutez :',
@@ -161,7 +161,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: 'Chat',
-      body: 'Facultatif. Connectez votre propre clé Claude, OpenAI ou Gemini, puis décrivez une modification dans l’onglet Chat et Stylebot écrit le CSS. Sans clé, rien n’est envoyé.',
+      body: 'Désactivé par défaut. Activez-le dans les options, connectez votre propre clé Claude, OpenAI ou Gemini, puis décrivez une modification dans l’onglet Chat et Stylebot écrit le CSS. Sans clé, rien n’est envoyé.',
       prompt: 'Rends l’article plus lisible la nuit',
       reply:
         'J’ai mis un fond sombre et un texte plus chaud, et passé le corps du texte dans une serif plus grande, avec plus d’interligne.',
@@ -252,7 +252,7 @@ const site: SiteMessages = {
         'La commande <code>stylebot</code> permet à un agent de code comme Claude Code, Codex ou Cursor de modifier le style des sites directement dans votre navigateur, avec votre propre abonnement plutôt qu’une clé d’API. Vous pouvez aussi lancer les commandes vous-même.',
       setup: 'Configuration',
       setupBody:
-        'Installez la CLI, connectez-la à vos navigateurs, puis activez <strong>Autoriser les applications de cet ordinateur à contrôler Stylebot</strong> dans les options. La <a href="{cli}">page CLI</a> détaille chaque étape. Chrome et Edge uniquement pour l’instant.',
+        'Installez la CLI, connectez-la à vos navigateurs, puis activez <strong>Autoriser l’accès en ligne de commande</strong> dans les options. La <a href="{cli}">page CLI</a> détaille chaque étape. Chrome et Edge uniquement pour l’instant.',
       claudeCodeBody:
         'Ajoutez le plugin Stylebot et demandez une modification avec <code>/stylebot</code>, par exemple un thème sombre pour un site.',
       privacy: 'Confidentialité',
@@ -261,7 +261,7 @@ const site: SiteMessages = {
     },
     chat: {
       intro:
-        'Le Chat est facultatif et reste désactivé tant que vous n’avez pas connecté de clé d’API. Il est idéal pour les retouches rapides : décrivez la modification souhaitée et Stylebot écrit le CSS. Vous pouvez choisir un élément pour cibler quelque chose de précis, ou joindre une capture d’écran pour montrer ce que vous voulez dire. Pour des changements plus importants, comme un thème entièrement nouveau, utilisez la <a href="#cli">CLI</a>.',
+        'Le Chat est désactivé par défaut. Pour ajouter son onglet à l’éditeur, activez <strong>Chat</strong> dans les options de Stylebot, sous Général, puis connectez une clé d’API. Il est idéal pour les retouches rapides : décrivez la modification souhaitée et Stylebot écrit le CSS. Vous pouvez choisir un élément pour cibler quelque chose de précis, ou joindre une capture d’écran pour montrer ce que vous voulez dire. Pour des changements plus importants, comme un thème entièrement nouveau, utilisez la <a href="#cli">CLI</a>.',
       shot: 'L’onglet Chat après avoir demandé un thème forêt avec une police serif lisible sur Hacker News',
       key: 'Utilisez votre propre clé',
       keyBody:
@@ -366,7 +366,7 @@ const site: SiteMessages = {
     cli: {
       title: 'Ligne de commande',
       body: [
-        'Quand vous activez <q>Autoriser les applications de cet ordinateur à contrôler Stylebot</q> dans les options, les applications exécutées sous votre compte peuvent lire vos onglets, vos pages et vos styles, prendre des captures d’écran et modifier vos styles, via une connexion locale. Ce qu’elles lisent peut parvenir aux services qu’elles utilisent, comme le modèle d’un agent de code.',
+        'Quand vous activez <q>Autoriser l’accès en ligne de commande</q> dans les options, les applications exécutées sous votre compte peuvent lire vos onglets, vos pages et vos styles, prendre des captures d’écran et modifier vos styles, via une connexion locale. Ce qu’elles lisent peut parvenir aux services qu’elles utilisent, comme le modèle d’un agent de code.',
       ],
     },
     site: {

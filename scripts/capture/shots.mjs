@@ -220,6 +220,7 @@ export const SHOTS = [
       await seed(browser, {
         'chat-api-key-anthropic': 'sk-ant-store-screenshot-placeholder',
         'chat-provider': 'anthropic',
+        options: { chat: true },
         'chat-thread-craigslist.org': chatThread(
           'make this look like a modern app',
           'Gave Craigslist a modern app look: a warm off-white page with each category in its own rounded white card, Fraunces headings over Inter text, the boroughs as soft pill buttons, and purple for the logo, today’s date and a pill-shaped **post an ad** button.',
