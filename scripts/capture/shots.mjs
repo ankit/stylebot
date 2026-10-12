@@ -2,7 +2,6 @@
 // takes all of them, and Safari all but the CLI.
 
 import fs from 'node:fs';
-import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -20,9 +19,6 @@ import {
   wait,
 } from './browser.mjs';
 import { captureCli } from './cli-shot.mjs';
-
-const require = createRequire(import.meta.url);
-const postcss = require('postcss');
 
 const THEMES_DIR = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -42,9 +38,6 @@ export const gallery = (site, name) =>
 // out a little wider and scaled into the space.
 const GITHUB_WIDTH = 1012;
 
-// Craigslist's three columns need more room than sits beside the panel.
-const CRAIGSLIST_WIDTH = 1180;
-
 const hackerNews = active => {
   const list = [
     { name: 'Night Shift', css: gallery('hn', 'night-shift') },
@@ -58,42 +51,6 @@ const hackerNews = active => {
     css: list[index].css,
     activeProfile: index ? `profile-${index}` : 'default',
   };
-};
-
-/**
- * A finished Chat exchange whose reply wrote `css`, so its change card counts
- * the same lines the style holds.
- */
-const chatThread = (request, reply, css) => {
-  const edits = [];
-  postcss.parse(css).walkRules(rule =>
-    edits.push({
-      selector: rule.selector,
-      declarations: rule.nodes
-        .filter(node => node.type === 'decl')
-        .map(({ prop, value }) => ({ property: prop, value })),
-    })
-  );
-
-  return [
-    { role: 'user', id: 'u1', text: request },
-    {
-      role: 'assistant',
-      id: 'a1',
-      text: reply,
-      edits,
-      previous: edits.flatMap(({ selector, declarations }) =>
-        declarations.map(({ property }) => ({
-          selector,
-          property,
-          value: null,
-        }))
-      ),
-      applied: true,
-      model: 'claude-sonnet-5-5',
-      usage: { inputTokens: 18400, outputTokens: 3100, cacheReadTokens: 0 },
-    },
-  ];
 };
 
 const history = () => {
@@ -139,6 +96,8 @@ export const SHOTS = [
         browser.context,
         'https://en.wikipedia.org/wiki/Ikigai'
       );
+      // Wikipedia's fundraising and campaign banners come and go.
+      await page.addStyleTag({ content: '#centralNotice { display: none; }' });
       const panel = await openPanel(browser, page);
       await page.locator('#firstHeading').hover();
       await wait(900);
@@ -211,39 +170,7 @@ export const SHOTS = [
     run: file => captureCli(file, gallery('hn', 'newspaper')),
   },
   {
-    name: '5-chat',
-    about: 'Chat restyling Craigslist as a modern app',
-    appearance: 'dark',
-    run: async (browser, file, options) => {
-      const css = theme('craigslist-modern');
-      // A placeholder, so Chat shows its composer; no reply is ever requested.
-      await seed(browser, {
-        'chat-api-key-anthropic': 'sk-ant-store-screenshot-placeholder',
-        'chat-provider': 'anthropic',
-        options: { chat: true },
-        'chat-thread-craigslist.org': chatThread(
-          'make this look like a modern app',
-          'Gave Craigslist a modern app look: a warm off-white page with each category in its own rounded white card, Fraunces headings over Inter text, the boroughs as soft pill buttons, and purple for the logo, today’s date and a pill-shaped **post an ad** button.',
-          css
-        ),
-        styles: { 'craigslist.org': profiles({ name: 'Modern', css }) },
-      });
-      const page = await openSite(
-        browser.context,
-        'https://www.craigslist.org/area/newyork',
-        { width: CRAIGSLIST_WIDTH }
-      );
-      const panel = await openPanel(browser, page);
-      await showTab(panel, 'Chat');
-      await panel.mouse.move(0, 0);
-      await capture(browser.context, file, page, panel, {
-        appearance: 'dark',
-        ...options,
-      });
-    },
-  },
-  {
-    name: '6-readability',
+    name: '5-readability',
     about: 'Readability: Wikipedia with its settings open',
     appearance: 'light',
     run: async (browser, file, options) => {
@@ -267,7 +194,7 @@ export const SHOTS = [
     },
   },
   {
-    name: '7-version-history',
+    name: '6-version-history',
     about: 'Version history in Options',
     appearance: 'dark',
     run: async (browser, file, options) => {

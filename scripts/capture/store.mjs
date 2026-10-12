@@ -16,7 +16,7 @@ import { SHOTS } from './shots.mjs';
 const USAGE = `usage: yarn capture:store [--safari] [--only <name>...] [--no-build]
 
   --safari    take the Mac App Store's set, at 2560×1600, into store/safari/
-  --only      retake just these shots, by name or number (e.g. --only 5-chat 2)
+  --only      retake just these shots, by name or number (e.g. --only 5-readability 2)
   --no-build  skip the rebuild (dist must already be current)
 
 Shots:

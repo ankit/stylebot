@@ -158,6 +158,10 @@ export const openPanel = async (browser, page) => {
   // Cards and menus appear at once rather than animating in.
   await panel.emulateMedia({ reducedMotion: 'reduce' });
   await panel.setViewportSize({ width: PANEL_WIDTH, height: HEIGHT });
+  // Shown in a tab, the panel would take itself for Vivaldi's and close.
+  await panel.addInitScript(() => {
+    chrome.tabs.getCurrent = async () => undefined;
+  });
   await panel.goto(
     `chrome-extension://${browser.id}/editor-window/index.html?tabId=${tabId}&host=sidepanel`
   );
