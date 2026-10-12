@@ -1,3 +1,11 @@
+## Version 4.0.1 (October 2026)
+
+- Make Chat optional: it stays hidden until you turn it on in the options page's Basics, and stays on if you already use it (#1183)
+- Redesign the options page's Basics, adding the editor's position and setup for the `stylebot` command line (#1187)
+- Open the editor docked in the page in Vivaldi, which can't show it in the side panel (#1185)
+- Fix row menus being cut off in the options page's Styles list (#1188)
+- Make the extension smaller to download
+
 ## Version 4.0.0 (October 2026)
 
 - Redesign the editor, with dark mode, grouped Basic controls that show the page's own values, color palettes and an eyedropper, hover previews for colors and fonts, in-place editing of any other property, and undo/redo (#1109, #1108, #1103, #1101, #1158, #1055, #1124, #916)
