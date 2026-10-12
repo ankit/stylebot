@@ -51,7 +51,7 @@ const site: SiteMessages = {
     copied: 'Copiato',
     copyCommand: 'Copia {command}',
     title: 'Funziona con il tuo agente di programmazione',
-    body: 'Claude Code, Codex, Cursor o qualsiasi agente che esegue comandi può usare Stylebot dal terminale.',
+    body: 'Stylebot ha una CLI, quindi qualsiasi agente che esegue comandi può cambiare lo stile di un sito.',
     guide: 'Configura la CLI →',
     demo: {
       terminal: 'Terminale · agente di programmazione',
@@ -161,7 +161,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: 'Chat',
-      body: 'Niente agente di programmazione? Descrivi una modifica nella scheda Chat e Stylebot scrive il CSS. Usa la tua chiave di Claude, OpenAI o Gemini, che resta nel tuo browser.',
+      body: 'Facoltativa. Collega la tua chiave di Claude, OpenAI o Gemini, poi descrivi una modifica nella scheda Chat e Stylebot scrive il CSS. Senza chiave non viene inviato nulla.',
       prompt: 'Rendi l’articolo più facile da leggere di notte',
       reply:
         'Ho messo uno sfondo scuro con testo più caldo e un corpo serif più grande, con più interlinea.',
@@ -179,9 +179,9 @@ const site: SiteMessages = {
     yourTurnBody:
       'Apri un sito qualsiasi e premi la scorciatoia. Non cambia nulla finché non lo fai tu.',
     manual: 'Manuale',
-    agentTitle: 'Collega il tuo agente di programmazione',
+    agentTitle: 'Usi un agente di programmazione?',
     agentBody:
-      'Claude Code, Codex, Cursor o qualsiasi agente che esegue comandi può usare Stylebot dal terminale.',
+      'Puoi anche aggiungere la CLI di Stylebot, così il tuo agente può cambiare lo stile dei siti per te.',
     agentPrompt: 'dai a questo sito un tema Everforest con caratteri più belli',
     agentReply: 'Ho applicato i colori Everforest, con Lora e Newsreader.',
   },
@@ -215,11 +215,11 @@ const site: SiteMessages = {
     toc: {
       start: 'Per iniziare',
       profiles: 'Profili',
-      cli: 'Riga di comando',
-      chat: 'Chat',
-      presets: 'Leggibilità e scala di grigi',
-      sync: 'Sincronizzazione, backup e cronologia',
+      presets: 'Preimpostazioni',
+      sync: 'Sincronizzazione e cronologia versioni',
       urls: 'Regole URL',
+      cli: 'CLI',
+      chat: 'Chat',
       shortcuts: 'Scorciatoie da tastiera',
       help: 'Aiuto e supporto',
     },
@@ -248,19 +248,19 @@ const site: SiteMessages = {
     },
     cli: {
       intro:
-        'Il comando <code>stylebot</code> permette a un agente di programmazione come Claude Code, Codex o Cursor di personalizzare i siti direttamente nel tuo browser, usando il tuo abbonamento invece di una chiave API. È il modo migliore per far personalizzare un sito a un agente, e puoi eseguire i comandi anche tu.',
+        'Il comando <code>stylebot</code> permette a un agente di programmazione come Claude Code, Codex o Cursor di personalizzare i siti direttamente nel tuo browser, usando il tuo abbonamento invece di una chiave API. Puoi eseguire i comandi anche tu.',
       setup: 'Configurazione',
       setupBody:
-        'Installa la CLI, collegala ai tuoi browser, poi attiva <strong>Consenti alle app di questo computer di controllare Stylebot</strong> nelle Opzioni. La <a href="{cli}">pagina sulla riga di comando</a> ti guida passo passo. Per ora solo Chrome ed Edge.',
+        'Installa la CLI, collegala ai tuoi browser, poi attiva <strong>Consenti alle app di questo computer di controllare Stylebot</strong> nelle Opzioni. La <a href="{cli}">pagina sulla CLI</a> ti guida passo passo. Per ora solo Chrome ed Edge.',
       claudeCodeBody:
         'Aggiungi il plugin di Stylebot e chiedi una modifica con <code>/stylebot</code>, ad esempio un tema scuro per un sito.',
       privacy: 'Privacy',
       privacyBody:
-        'L’accesso da riga di comando è disattivato finché non lo attivi. Stylebot e la CLI comunicano solo tra loro, su questo computer; un agente invia ciò che legge al proprio provider.',
+        'L’accesso alla CLI è disattivato finché non lo attivi. Stylebot e la CLI comunicano solo tra loro, su questo computer; un agente invia ciò che legge al proprio provider.',
     },
     chat: {
       intro:
-        'Chat è l’ideale per piccoli ritocchi. Descrivi la modifica che vuoi nella scheda Chat e Stylebot scrive il CSS. Puoi scegliere un elemento per indicare a cosa ti riferisci, o allegare uno screenshot per mostrare cosa intendi. Per modifiche più ampie, come un tema tutto nuovo, usa la <a href="#cli">riga di comando</a>.',
+        'Chat è facoltativa e resta disattivata finché non colleghi una chiave API. È l’ideale per piccoli ritocchi: descrivi la modifica che vuoi e Stylebot scrive il CSS. Puoi scegliere un elemento per indicare a cosa ti riferisci, o allegare uno screenshot per mostrare cosa intendi. Per modifiche più ampie, come un tema tutto nuovo, usa la <a href="#cli">CLI</a>.',
       shot: 'La scheda Chat dopo aver chiesto un tema ispirato alla foresta con un carattere serif leggibile su Hacker News',
       key: 'Usa la tua chiave',
       keyBody:
@@ -274,7 +274,7 @@ const site: SiteMessages = {
     },
     presets: {
       intro:
-        'Si trovano entrambe nella scheda Preimpostazioni e si sommano alle tue modifiche. <strong>Leggibilità</strong> trasforma gli articoli di un sito in una vista di lettura pulita, con tema, carattere, dimensione e larghezza a scelta, e lascia stare le pagine che non sono articoli. <strong>Scala di grigi</strong> toglie il colore al sito, con l’intensità che vuoi.',
+        'La scheda Preimpostazioni ne ha due, ed entrambe si sommano alle tue modifiche. <strong>Leggibilità</strong> trasforma gli articoli di un sito in una vista di lettura pulita, con tema, carattere, dimensione e larghezza a scelta, e lascia stare le pagine che non sono articoli. <strong>Scala di grigi</strong> toglie il colore al sito, con l’intensità che vuoi.',
       shot: 'L’articolo di Wikipedia sulla Matematica nella vista Leggibilità, con le impostazioni di lettura aperte',
     },
     sync: {
@@ -359,7 +359,7 @@ const site: SiteMessages = {
     chat: {
       title: 'Chat',
       body: [
-        'Il tuo messaggio va direttamente al provider di cui hai aggiunto la chiave API, insieme agli eventuali screenshot allegati, all’indirizzo e al titolo della pagina, a una struttura dei suoi contenuti visibili, al suo CSS e ai tuoi stili. Possono esserci informazioni personali presenti nella pagina. Si applicano le norme del provider: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
+        'Chat è disattivata finché non aggiungi una chiave API, e prima non viene inviato nulla. Il tuo messaggio va direttamente al provider di cui hai aggiunto la chiave API, insieme agli eventuali screenshot allegati, all’indirizzo e al titolo della pagina, a una struttura dei suoi contenuti visibili, al suo CSS e ai tuoi stili. Possono esserci informazioni personali presenti nella pagina. Si applicano le norme del provider: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {

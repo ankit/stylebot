@@ -76,7 +76,6 @@ const demo: DemoMessages = {
       basic: '基础',
       code: '代码',
       presets: '预设',
-      chat: '聊天',
     },
     basic: {
       hide: '隐藏',

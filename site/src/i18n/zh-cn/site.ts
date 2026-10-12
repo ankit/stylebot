@@ -51,7 +51,7 @@ const site: SiteMessages = {
     copied: '已复制',
     copyCommand: '复制 {command}',
     title: '与你的编程智能体协作',
-    body: 'Claude Code、Codex、Cursor 或任何能运行命令的智能体，都可以在终端中使用 Stylebot。',
+    body: 'Stylebot 提供 CLI，任何能运行命令的智能体都可以重新设计网站的样式。',
     guide: '设置 CLI →',
     demo: {
       terminal: '终端 · 编程智能体',
@@ -158,7 +158,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: '聊天',
-      body: '没有编程智能体？在“聊天”标签页中描述改动，Stylebot 就会编写 CSS。使用你自己的 Claude、OpenAI 或 Gemini 密钥，密钥只保存在你的浏览器中。',
+      body: '可选功能。连接你自己的 Claude、OpenAI 或 Gemini 密钥，然后在“聊天”标签页中描述改动，Stylebot 就会编写 CSS。没有密钥时，不会发送任何内容。',
       prompt: '让这篇文章在夜里读起来更舒服',
       reply:
         '已换成深色背景和更暖的文字，正文改用更大的衬线字体，并加大了行距。',
@@ -174,9 +174,8 @@ const site: SiteMessages = {
     yourTurn: '轮到你了。',
     yourTurnBody: '打开任意网站，按下快捷键。在你动手之前，什么都不会改变。',
     manual: '手册',
-    agentTitle: '连接你的编程智能体',
-    agentBody:
-      'Claude Code、Codex、Cursor 或任何能运行命令的智能体，都可以在终端中使用 Stylebot。',
+    agentTitle: '在用编程智能体？',
+    agentBody: '你也可以添加 Stylebot CLI，让智能体帮你修改网站样式。',
     agentPrompt: '给这个网站换上 Everforest 主题，字体也弄好看点',
     agentReply: '已换成 Everforest 配色，字体用了 Lora 和 Newsreader。',
   },
@@ -210,11 +209,11 @@ const site: SiteMessages = {
     toc: {
       start: '入门',
       profiles: '方案',
-      cli: '命令行',
-      chat: '聊天',
-      presets: '简阅和灰度',
-      sync: '同步、备份和历史',
+      presets: '预设',
+      sync: '同步和版本历史',
       urls: 'URL 规则',
+      cli: 'CLI',
+      chat: '聊天',
       shortcuts: '快捷键',
       help: '帮助和支持',
     },
@@ -243,19 +242,19 @@ const site: SiteMessages = {
     },
     cli: {
       intro:
-        '借助 <code>stylebot</code> 命令，Claude Code、Codex、Cursor 等编程智能体可以直接在你的浏览器中修改网站样式，使用你自己的订阅，无需 API 密钥。这是让智能体设置网站样式的最佳方式，你也可以自己运行这些命令。',
+        '借助 <code>stylebot</code> 命令，Claude Code、Codex、Cursor 等编程智能体可以直接在你的浏览器中修改网站样式，使用你自己的订阅，无需 API 密钥。你也可以自己运行这些命令。',
       setup: '配置',
       setupBody:
-        '安装 CLI，将它连接到你的浏览器，然后在设置中开启<strong>允许此电脑上的应用控制 Stylebot</strong>。<a href="{cli}">命令行页面</a>会逐步带你完成。目前仅支持 Chrome 和 Edge。',
+        '安装 CLI，将它连接到你的浏览器，然后在设置中开启<strong>允许此电脑上的应用控制 Stylebot</strong>。<a href="{cli}">CLI 页面</a>会逐步带你完成。目前仅支持 Chrome 和 Edge。',
       claudeCodeBody:
         '添加 Stylebot 插件，然后用 <code>/stylebot</code> 提出改动，例如为某个网站换上深色主题。',
       privacy: '隐私',
       privacyBody:
-        '命令行访问默认关闭，需要你手动开启。Stylebot 和 CLI 只在这台电脑上相互通信；智能体会把它读取的内容发送给自己的服务商。',
+        'CLI 访问默认关闭，需要你手动开启。Stylebot 和 CLI 只在这台电脑上相互通信；智能体会把它读取的内容发送给自己的服务商。',
     },
     chat: {
       intro:
-        '聊天最适合快速修改。在“聊天”标签页中描述你想要的改动，Stylebot 就会编写 CSS。可以选取元素来指明要改的地方，也可以附加截图来说明你的意思。更大的改动，比如整套新主题，请使用<a href="#cli">命令行</a>。',
+        '聊天是可选功能，在你连接 API 密钥之前一直处于关闭状态。它最适合快速修改：描述你想要的改动，Stylebot 就会编写 CSS。可以选取元素来指明要改的地方，也可以附加截图来说明你的意思。更大的改动，比如整套新主题，请使用 <a href="#cli">CLI</a>。',
       shot: '“聊天”标签页：在 Hacker News 上要求换成森林主题和易读的衬线字体之后',
       key: '使用你自己的密钥',
       keyBody:
@@ -268,7 +267,7 @@ const site: SiteMessages = {
     },
     presets: {
       intro:
-        '两者都在“预设”标签页中，并且可以与你自己的改动叠加。<strong>简阅</strong>把网站的文章变成整洁的阅读视图，主题、字体、字号和宽度均可自选；不是文章的页面不受影响。<strong>灰度</strong>去除网站的色彩，强度可调。',
+        '“预设”标签页中有两种预设，都可以与你自己的改动叠加。<strong>简阅</strong>把网站的文章变成整洁的阅读视图，主题、字体、字号和宽度均可自选；不是文章的页面不受影响。<strong>灰度</strong>去除网站的色彩，强度可调。',
       shot: '维基百科“数学”条目的简阅视图，已打开“阅读设置”',
     },
     sync: {
@@ -348,7 +347,7 @@ const site: SiteMessages = {
     chat: {
       title: '聊天',
       body: [
-        '你的消息会直接发送给你添加了 API 密钥的服务商，一同发送的还有你附加的截图、页面的地址和标题、页面可见内容的概要、页面的 CSS 和你的样式。其中可能包含页面上的个人信息。适用该服务商的政策：<a href="https://www.anthropic.com/legal/privacy">Anthropic</a>、<a href="https://openai.com/policies/privacy-policy/">OpenAI</a>、<a href="https://ai.google.dev/gemini-api/terms">Google</a>。',
+        '在你添加 API 密钥之前，聊天处于关闭状态，不会发送任何内容。你的消息会直接发送给你添加了 API 密钥的服务商，一同发送的还有你附加的截图、页面的地址和标题、页面可见内容的概要、页面的 CSS 和你的样式。其中可能包含页面上的个人信息。适用该服务商的政策：<a href="https://www.anthropic.com/legal/privacy">Anthropic</a>、<a href="https://openai.com/policies/privacy-policy/">OpenAI</a>、<a href="https://ai.google.dev/gemini-api/terms">Google</a>。',
       ],
     },
     cli: {

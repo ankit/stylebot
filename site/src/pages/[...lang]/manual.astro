@@ -120,37 +120,6 @@ const shortcutGroups = [
           <p set:html={rich(t.profiles.manage)} />
         </section>
 
-        <section id="cli">
-          <h2>{t.toc.cli}</h2>
-          <p set:html={rich(t.cli.intro)} />
-          <Terms>
-            <Term term={t.cli.setup}>
-              <Fragment
-                set:html={rich(t.cli.setupBody, {
-                  cli: localizePath(locale, LINKS.cli),
-                })}
-              />
-            </Term>
-            <Term term="Claude Code">
-              <Fragment set:html={rich(t.cli.claudeCodeBody)} />
-            </Term>
-            <Term term={t.cli.privacy}>{t.cli.privacyBody}</Term>
-          </Terms>
-        </section>
-
-        <section id="chat">
-          <h2>{t.toc.chat}</h2>
-          <p set:html={rich(t.chat.intro)} />
-          <Shot label={t.chat.shot} src={chatShot} dark={chatDarkShot} />
-          <Terms>
-            <Term term={t.chat.key}>{t.chat.keyBody}</Term>
-            <Term term={t.chat.changes}>
-              <Fragment set:html={t.chat.changesBody} />
-            </Term>
-            <Term term={t.chat.cost}>{t.chat.costBody}</Term>
-          </Terms>
-        </section>
-
         <section id="presets">
           <h2>{t.toc.presets}</h2>
           <p set:html={rich(t.presets.intro)} />
@@ -198,6 +167,37 @@ const shortcutGroups = [
                 {meaning}
               </Term>
             ))}
+          </Terms>
+        </section>
+
+        <section id="cli">
+          <h2>{t.toc.cli}</h2>
+          <p set:html={rich(t.cli.intro)} />
+          <Terms>
+            <Term term={t.cli.setup}>
+              <Fragment
+                set:html={rich(t.cli.setupBody, {
+                  cli: localizePath(locale, LINKS.cli),
+                })}
+              />
+            </Term>
+            <Term term="Claude Code">
+              <Fragment set:html={rich(t.cli.claudeCodeBody)} />
+            </Term>
+            <Term term={t.cli.privacy}>{t.cli.privacyBody}</Term>
+          </Terms>
+        </section>
+
+        <section id="chat">
+          <h2>{t.toc.chat}</h2>
+          <p set:html={rich(t.chat.intro)} />
+          <Shot label={t.chat.shot} src={chatShot} dark={chatDarkShot} />
+          <Terms>
+            <Term term={t.chat.key}>{t.chat.keyBody}</Term>
+            <Term term={t.chat.changes}>
+              <Fragment set:html={t.chat.changesBody} />
+            </Term>
+            <Term term={t.chat.cost}>{t.chat.costBody}</Term>
           </Terms>
         </section>
 

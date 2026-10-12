@@ -51,7 +51,7 @@ const site: SiteMessages = {
     copied: 'Kopiert',
     copyCommand: '{command} kopieren',
     title: 'Funktioniert mit Ihrem Coding-Agenten',
-    body: 'Claude Code, Codex, Cursor oder jeder andere Agent, der Befehle ausführt, kann Stylebot über das Terminal nutzen.',
+    body: 'Stylebot hat eine CLI, sodass jeder Agent, der Befehle ausführen kann, eine Website umgestalten kann.',
     guide: 'CLI einrichten →',
     demo: {
       terminal: 'Terminal · Coding-Agent',
@@ -161,7 +161,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: 'Chat',
-      body: 'Kein Coding-Agent? Beschreiben Sie im Chat-Tab eine Änderung, und Stylebot schreibt das CSS. Mit Ihrem eigenen Schlüssel für Claude, OpenAI oder Gemini, der in Ihrem Browser bleibt.',
+      body: 'Optional. Verbinden Sie Ihren eigenen Schlüssel für Claude, OpenAI oder Gemini, beschreiben Sie dann im Chat-Tab eine Änderung, und Stylebot schreibt das CSS. Ohne Schlüssel wird nichts gesendet.',
       prompt: 'Mach den Artikel nachts besser lesbar',
       reply:
         'Auf einen dunklen Hintergrund mit wärmerem Text umgestellt und den Fließtext in einer größeren Serifenschrift mit mehr Zeilenabstand gesetzt.',
@@ -179,9 +179,9 @@ const site: SiteMessages = {
     yourTurnBody:
       'Öffnen Sie eine beliebige Website und drücken Sie die Tastenkombination. Bis dahin ändert sich nichts.',
     manual: 'Handbuch',
-    agentTitle: 'Verbinden Sie Ihren Coding-Agenten',
+    agentTitle: 'Sie nutzen einen Coding-Agenten?',
     agentBody:
-      'Claude Code, Codex, Cursor oder jeder andere Agent, der Befehle ausführt, kann Stylebot über das Terminal nutzen.',
+      'Sie können auch die Stylebot-CLI hinzufügen. Dann kann Ihr Agent Websites für Sie umgestalten.',
     agentPrompt:
       'gib dieser Seite ein Everforest-Design mit schöneren Schriften',
     agentReply: 'Auf Everforest-Farben mit Lora und Newsreader umgestellt.',
@@ -216,11 +216,11 @@ const site: SiteMessages = {
     toc: {
       start: 'Erste Schritte',
       profiles: 'Profile',
-      cli: 'Befehlszeile',
-      chat: 'Chat',
-      presets: 'Lesbarkeit und Graustufen',
-      sync: 'Synchronisierung, Backup und Verlauf',
+      presets: 'Voreinstellungen',
+      sync: 'Synchronisierung und Versionsverlauf',
       urls: 'URL-Regeln',
+      cli: 'CLI',
+      chat: 'Chat',
       shortcuts: 'Tastenkombinationen',
       help: 'Hilfe und Support',
     },
@@ -249,19 +249,19 @@ const site: SiteMessages = {
     },
     cli: {
       intro:
-        'Mit dem Befehl <code>stylebot</code> kann ein Coding-Agent wie Claude Code, Codex oder Cursor Websites direkt in Ihrem Browser umgestalten – mit Ihrem eigenen Abo statt einem API-Schlüssel. So lassen Sie eine Website am besten von einem Agenten gestalten, und Sie können die Befehle auch selbst ausführen.',
+        'Mit dem Befehl <code>stylebot</code> kann ein Coding-Agent wie Claude Code, Codex oder Cursor Websites direkt in Ihrem Browser umgestalten – mit Ihrem eigenen Abo statt einem API-Schlüssel. Sie können die Befehle auch selbst ausführen.',
       setup: 'Einrichtung',
       setupBody:
-        'Installieren Sie die CLI, verbinden Sie sie mit Ihren Browsern und aktivieren Sie dann in den Optionen <strong>Apps auf diesem Computer Stylebot steuern lassen</strong>. Die <a href="{cli}">Seite zur Befehlszeile</a> führt durch jeden Schritt. Vorerst nur für Chrome und Edge.',
+        'Installieren Sie die CLI, verbinden Sie sie mit Ihren Browsern und aktivieren Sie dann in den Optionen <strong>Apps auf diesem Computer Stylebot steuern lassen</strong>. Die <a href="{cli}">CLI-Seite</a> führt durch jeden Schritt. Vorerst nur für Chrome und Edge.',
       claudeCodeBody:
         'Fügen Sie das Stylebot-Plugin hinzu und bitten Sie mit <code>/stylebot</code> um eine Änderung, etwa ein dunkles Design für eine Website.',
       privacy: 'Datenschutz',
       privacyBody:
-        'Der Befehlszeilenzugriff ist ausgeschaltet, bis Sie ihn aktivieren. Stylebot und die CLI kommunizieren nur miteinander, auf diesem Computer; ein Agent sendet, was er liest, an seinen eigenen Anbieter.',
+        'Der CLI-Zugriff ist ausgeschaltet, bis Sie ihn aktivieren. Stylebot und die CLI kommunizieren nur miteinander, auf diesem Computer; ein Agent sendet, was er liest, an seinen eigenen Anbieter.',
     },
     chat: {
       intro:
-        'Der Chat eignet sich ideal für schnelle Korrekturen. Beschreiben Sie im Chat-Tab die gewünschte Änderung, und Stylebot schreibt das CSS. Sie können ein Element auswählen, um auf etwas zu zeigen, oder einen Screenshot anhängen, um zu zeigen, was Sie meinen. Für größere Änderungen, etwa ein ganz neues Design, nutzen Sie die <a href="#cli">Befehlszeile</a>.',
+        'Der Chat ist optional und bleibt aus, bis Sie einen API-Schlüssel verbinden. Er eignet sich ideal für schnelle Korrekturen: Beschreiben Sie die gewünschte Änderung, und Stylebot schreibt das CSS. Sie können ein Element auswählen, um auf etwas zu zeigen, oder einen Screenshot anhängen, um zu zeigen, was Sie meinen. Für größere Änderungen, etwa ein ganz neues Design, nutzen Sie die <a href="#cli">CLI</a>.',
       shot: 'Der Chat-Tab nach der Bitte um ein Wald-Design mit gut lesbarer Serifenschrift auf Hacker News',
       key: 'Eigener Schlüssel',
       keyBody:
@@ -275,7 +275,7 @@ const site: SiteMessages = {
     },
     presets: {
       intro:
-        'Beide finden Sie im Tab „Voreinstellungen“, und sie lassen sich mit Ihren eigenen Änderungen kombinieren. <strong>Lesbarkeit</strong> verwandelt die Artikel einer Website in eine aufgeräumte Leseansicht, mit Design, Schriftart, Größe und Breite Ihrer Wahl; Seiten, die keine Artikel sind, bleiben unverändert. <strong>Graustufen</strong> entfernt die Farbe von der Website, in beliebiger Stärke.',
+        'Im Tab „Voreinstellungen“ finden Sie zwei, und beide lassen sich mit Ihren eigenen Änderungen kombinieren. <strong>Lesbarkeit</strong> verwandelt die Artikel einer Website in eine aufgeräumte Leseansicht, mit Design, Schriftart, Größe und Breite Ihrer Wahl; Seiten, die keine Artikel sind, bleiben unverändert. <strong>Graustufen</strong> entfernt die Farbe von der Website, in beliebiger Stärke.',
       shot: 'Der Wikipedia-Artikel über Mathematik in der Lesbarkeitsansicht, mit geöffneten Leseeinstellungen',
     },
     sync: {
@@ -358,7 +358,7 @@ const site: SiteMessages = {
     chat: {
       title: 'Chat',
       body: [
-        'Ihre Nachricht geht direkt an den Anbieter, dessen API-Schlüssel Sie hinzugefügt haben, zusammen mit angehängten Screenshots, Adresse und Titel der Seite, einer Übersicht ihrer sichtbaren Inhalte, ihrem CSS und Ihren Stilen. Darin können personenbezogene Daten von der Seite stecken. Es gilt die Datenschutzerklärung des Anbieters: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
+        'Der Chat ist aus, bis Sie einen API-Schlüssel hinzufügen, und vorher wird nichts gesendet. Ihre Nachricht geht direkt an den Anbieter, dessen API-Schlüssel Sie hinzugefügt haben, zusammen mit angehängten Screenshots, Adresse und Titel der Seite, einer Übersicht ihrer sichtbaren Inhalte, ihrem CSS und Ihren Stilen. Darin können personenbezogene Daten von der Seite stecken. Es gilt die Datenschutzerklärung des Anbieters: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {

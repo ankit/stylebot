@@ -51,7 +51,7 @@ const site: SiteMessages = {
     copied: '복사됨',
     copyCommand: '{command} 복사',
     title: '코딩 에이전트와 함께 쓰세요',
-    body: 'Claude Code, Codex, Cursor 등 명령을 실행할 수 있는 에이전트라면 터미널에서 Stylebot을 사용할 수 있습니다.',
+    body: 'Stylebot에는 CLI가 있어서, 명령을 실행할 수 있는 에이전트라면 사이트 스타일을 바꿀 수 있습니다.',
     guide: 'CLI 설정하기 →',
     demo: {
       terminal: '터미널 · 코딩 에이전트',
@@ -161,7 +161,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: '채팅',
-      body: '코딩 에이전트가 없으신가요? 채팅 탭에서 원하는 변경을 설명하면 Stylebot이 CSS를 작성합니다. Claude, OpenAI, Gemini 키를 직접 연결해 사용하며, 키는 브라우저에만 저장됩니다.',
+      body: '선택 사항입니다. Claude, OpenAI, Gemini 키를 직접 연결한 뒤 채팅 탭에서 원하는 변경을 설명하면 Stylebot이 CSS를 작성합니다. 키가 없으면 아무것도 전송되지 않습니다.',
       prompt: '밤에 기사 읽기 편하게 해 줘',
       reply:
         '어두운 배경에 따뜻한 글자색으로 바꾸고, 본문은 더 큰 세리프 글꼴에 줄 간격을 넓혔습니다.',
@@ -178,9 +178,9 @@ const site: SiteMessages = {
     yourTurnBody:
       '아무 사이트나 열고 단축키를 누르세요. 그 전까지는 아무것도 바뀌지 않습니다.',
     manual: '설명서',
-    agentTitle: '코딩 에이전트를 연결하세요',
+    agentTitle: '코딩 에이전트를 쓰시나요?',
     agentBody:
-      'Claude Code, Codex, Cursor 등 명령을 실행할 수 있는 에이전트라면 터미널에서 Stylebot을 사용할 수 있습니다.',
+      'Stylebot CLI를 추가하면 에이전트가 사이트 스타일을 대신 바꿔 줍니다.',
     agentPrompt: '이 사이트에 Everforest 테마 입히고 글꼴도 더 예쁘게 바꿔 줘',
     agentReply: 'Everforest 색상에 Lora와 Newsreader 글꼴을 적용했습니다.',
   },
@@ -214,11 +214,11 @@ const site: SiteMessages = {
     toc: {
       start: '시작하기',
       profiles: '프로필',
-      cli: '명령줄',
-      chat: '채팅',
-      presets: '가독성 모드와 회색조 모드',
-      sync: '동기화, 백업, 기록',
+      presets: '프리셋',
+      sync: '동기화 및 버전 기록',
       urls: 'URL 규칙',
+      cli: 'CLI',
+      chat: '채팅',
       shortcuts: '키보드 단축키',
       help: '도움말 및 지원',
     },
@@ -247,19 +247,19 @@ const site: SiteMessages = {
     },
     cli: {
       intro:
-        '<code>stylebot</code> 명령을 사용하면 Claude Code, Codex, Cursor 같은 코딩 에이전트가 API 키 대신 사용 중인 구독으로 브라우저에서 바로 사이트 스타일을 바꿀 수 있습니다. 에이전트에게 사이트 스타일을 맡기는 가장 좋은 방법이며, 명령을 직접 실행할 수도 있습니다.',
+        '<code>stylebot</code> 명령을 사용하면 Claude Code, Codex, Cursor 같은 코딩 에이전트가 API 키 대신 사용 중인 구독으로 브라우저에서 바로 사이트 스타일을 바꿀 수 있습니다. 명령을 직접 실행할 수도 있습니다.',
       setup: '설정',
       setupBody:
-        'CLI를 설치하고 브라우저에 연결한 다음, 옵션에서 <strong>이 컴퓨터의 앱이 Stylebot을 제어하도록 허용</strong>을 켜세요. 각 단계는 <a href="{cli}">명령줄 페이지</a>에서 안내합니다. 현재는 Chrome과 Edge만 지원합니다.',
+        'CLI를 설치하고 브라우저에 연결한 다음, 옵션에서 <strong>이 컴퓨터의 앱이 Stylebot을 제어하도록 허용</strong>을 켜세요. 각 단계는 <a href="{cli}">CLI 페이지</a>에서 안내합니다. 현재는 Chrome과 Edge만 지원합니다.',
       claudeCodeBody:
         'Stylebot 플러그인을 추가하고 <code>/stylebot</code>으로 사이트에 다크 테마를 적용하는 등의 변경을 요청하세요.',
       privacy: '개인정보 보호',
       privacyBody:
-        '명령줄 액세스는 직접 켜기 전까지 꺼져 있습니다. Stylebot과 CLI는 이 컴퓨터 안에서 서로만 통신하며, 에이전트는 읽은 내용을 자신의 제공업체로 보냅니다.',
+        'CLI 액세스는 직접 켜기 전까지 꺼져 있습니다. Stylebot과 CLI는 이 컴퓨터 안에서 서로만 통신하며, 에이전트는 읽은 내용을 자신의 제공업체로 보냅니다.',
     },
     chat: {
       intro:
-        '채팅은 간단한 수정에 알맞습니다. 채팅 탭에서 원하는 변경을 설명하면 Stylebot이 CSS를 작성합니다. 요소를 선택해 대상을 가리키거나, 스크린샷을 첨부해 원하는 모습을 보여 줄 수도 있습니다. 완전히 새로운 테마처럼 큰 변경에는 <a href="#cli">명령줄</a>을 사용하세요.',
+        '채팅은 선택 사항이며, API 키를 연결하기 전까지 꺼져 있습니다. 간단한 수정에 알맞으며, 원하는 변경을 설명하면 Stylebot이 CSS를 작성합니다. 요소를 선택해 대상을 가리키거나, 스크린샷을 첨부해 원하는 모습을 보여 줄 수도 있습니다. 완전히 새로운 테마처럼 큰 변경에는 <a href="#cli">CLI</a>를 사용하세요.',
       shot: 'Hacker News에서 읽기 쉬운 세리프 글꼴의 숲 테마를 요청한 뒤의 채팅 탭',
       key: '내 API 키 사용',
       keyBody:
@@ -273,7 +273,7 @@ const site: SiteMessages = {
     },
     presets: {
       intro:
-        '두 기능 모두 프리셋 탭에 있으며, 직접 만든 변경 사항과 함께 적용됩니다. <strong>가독성 모드</strong>는 사이트의 기사를 깔끔한 읽기 화면으로 바꾸고 테마, 글꼴, 크기, 너비를 고를 수 있게 하며, 기사가 아닌 페이지는 그대로 둡니다. <strong>회색조 모드</strong>는 사이트에서 색을 빼며, 강도는 원하는 대로 조절할 수 있습니다.',
+        '프리셋 탭에는 두 가지가 있으며, 모두 직접 만든 변경 사항과 함께 적용됩니다. <strong>가독성 모드</strong>는 사이트의 기사를 깔끔한 읽기 화면으로 바꾸고 테마, 글꼴, 크기, 너비를 고를 수 있게 하며, 기사가 아닌 페이지는 그대로 둡니다. <strong>회색조 모드</strong>는 사이트에서 색을 빼며, 강도는 원하는 대로 조절할 수 있습니다.',
       shot: '읽기 설정을 연 채 가독성 모드로 본 Wikipedia의 수학 문서',
     },
     sync: {
@@ -355,7 +355,7 @@ const site: SiteMessages = {
     chat: {
       title: '채팅',
       body: [
-        '메시지는 API 키를 추가한 제공업체로 바로 전송되며, 첨부한 스크린샷, 페이지의 주소와 제목, 보이는 내용의 개요, 페이지의 CSS와 스타일도 함께 전송됩니다. 여기에는 페이지에 표시된 개인정보가 포함될 수 있습니다. 제공업체의 정책이 적용됩니다: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
+        '채팅은 API 키를 추가하기 전까지 꺼져 있으며, 그 전에는 아무것도 전송되지 않습니다. 메시지는 API 키를 추가한 제공업체로 바로 전송되며, 첨부한 스크린샷, 페이지의 주소와 제목, 보이는 내용의 개요, 페이지의 CSS와 스타일도 함께 전송됩니다. 여기에는 페이지에 표시된 개인정보가 포함될 수 있습니다. 제공업체의 정책이 적용됩니다: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {

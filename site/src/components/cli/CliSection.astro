@@ -36,13 +36,15 @@ const {
   }
 
   .cli-head {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
     gap: 28px 56px;
-    align-items: end;
+    align-items: flex-end;
   }
 
   .cli-intro {
+    flex: 1 1 360px;
     display: flex;
     flex-direction: column;
     gap: 14px;
@@ -61,9 +63,7 @@ const {
   }
 
   .cli-setup {
-    width: 100%;
-    max-width: 440px;
-    justify-self: end;
+    flex: 0 1 440px;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -85,11 +85,5 @@ const {
   .cli-guide:hover {
     background: var(--hover);
     color: var(--ink);
-  }
-
-  @media (max-width: 800px) {
-    .cli-setup {
-      justify-self: start;
-    }
   }
 </style>

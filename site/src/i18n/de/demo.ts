@@ -83,7 +83,6 @@ const demo: DemoMessages = {
       basic: 'Einfach',
       code: 'Code',
       presets: 'Voreinstellungen',
-      chat: 'Chat',
     },
     basic: {
       hide: 'Ausblenden',

@@ -79,7 +79,6 @@ const demo: DemoMessages = {
       basic: 'Cơ bản',
       code: 'Mã',
       presets: 'Mẫu có sẵn',
-      chat: 'Trò chuyện',
     },
     basic: {
       hide: 'Ẩn',

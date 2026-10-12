@@ -51,7 +51,7 @@ const site: SiteMessages = {
     copied: 'コピーしました',
     copyCommand: '{command} をコピー',
     title: 'コーディングエージェントと連携',
-    body: 'Claude Code、Codex、Cursor など、コマンドを実行できるエージェントなら、ターミナルから Stylebot を使えます。',
+    body: 'Stylebot には CLI があるので、コマンドを実行できるエージェントならサイトのスタイルを変えられます。',
     guide: 'CLI を設定 →',
     demo: {
       terminal: 'ターミナル · コーディングエージェント',
@@ -161,7 +161,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: 'チャット',
-      body: 'コーディングエージェントがなくても大丈夫。チャットタブで変更内容を伝えると、Stylebot が CSS を書きます。Claude、OpenAI、Gemini のキーは自分のものを使い、キーはブラウザ内に保存されます。',
+      body: '使うかどうかは自由です。Claude、OpenAI、Gemini のキーを自分で接続し、チャットタブで変更内容を伝えると、Stylebot が CSS を書きます。キーがなければ何も送信されません。',
       prompt: '記事を夜でも読みやすくして',
       reply:
         '背景を暗く、文字を暖色にし、本文を行間の広い大きめのセリフ体にしました。',
@@ -178,9 +178,9 @@ const site: SiteMessages = {
     yourTurnBody:
       '好きなサイトを開いて、ショートカットを押してください。押すまでは何も変わりません。',
     manual: 'マニュアル',
-    agentTitle: 'コーディングエージェントを接続',
+    agentTitle: 'コーディングエージェントを使っていますか？',
     agentBody:
-      'Claude Code、Codex、Cursor など、コマンドを実行できるエージェントなら、ターミナルから Stylebot を使えます。',
+      'Stylebot の CLI を追加すれば、エージェントがサイトのスタイルを変えてくれます。',
     agentPrompt: 'このサイトを Everforest テーマにして、フォントもいい感じに',
     agentReply:
       'Everforest の配色にして、フォントを Lora と Newsreader にしました。',
@@ -215,11 +215,11 @@ const site: SiteMessages = {
     toc: {
       start: 'はじめに',
       profiles: 'プロファイル',
-      cli: 'コマンドライン',
-      chat: 'チャット',
-      presets: 'リーダーモードとグレースケール',
-      sync: '同期、バックアップ、履歴',
+      presets: 'プリセット',
+      sync: '同期とバージョン履歴',
       urls: 'URL ルール',
+      cli: 'CLI',
+      chat: 'チャット',
       shortcuts: 'キーボードショートカット',
       help: 'ヘルプとサポート',
     },
@@ -248,19 +248,19 @@ const site: SiteMessages = {
     },
     cli: {
       intro:
-        '<code>stylebot</code> コマンドを使うと、Claude Code、Codex、Cursor などのコーディングエージェントが、API キーではなくご自身のサブスクリプションで、ブラウザ上のサイトのスタイルを直接変更できます。エージェントにサイトのスタイルを任せるなら、これが最適な方法です。コマンドを自分で実行することもできます。',
+        '<code>stylebot</code> コマンドを使うと、Claude Code、Codex、Cursor などのコーディングエージェントが、API キーではなくご自身のサブスクリプションで、ブラウザ上のサイトのスタイルを直接変更できます。コマンドを自分で実行することもできます。',
       setup: '設定',
       setupBody:
-        'CLI をインストールしてブラウザに接続し、オプションで<strong>このパソコンのアプリに Stylebot の操作を許可</strong>をオンにします。各手順は<a href="{cli}">コマンドラインのページ</a>で説明しています。現在は Chrome と Edge のみに対応しています。',
+        'CLI をインストールしてブラウザに接続し、オプションで<strong>このパソコンのアプリに Stylebot の操作を許可</strong>をオンにします。各手順は<a href="{cli}">CLI のページ</a>で説明しています。現在は Chrome と Edge のみに対応しています。',
       claudeCodeBody:
         'Stylebot プラグインを追加し、<code>/stylebot</code> で変更を頼みます（サイトをダークテーマにする、など）。',
       privacy: 'プライバシー',
       privacyBody:
-        'コマンドラインからのアクセスは、オンにするまでオフです。Stylebot と CLI はこのパソコン上で互いにやり取りするだけです。エージェントは読み取った内容を自身のプロバイダーに送信します。',
+        'CLI からのアクセスは、オンにするまでオフです。Stylebot と CLI はこのパソコン上で互いにやり取りするだけです。エージェントは読み取った内容を自身のプロバイダーに送信します。',
     },
     chat: {
       intro:
-        'チャットはちょっとした修正に最適です。チャットタブで望む変更を伝えると、Stylebot が CSS を書きます。要素を選んで対象を示したり、スクリーンショットを添付して意図を伝えたりもできます。テーマを丸ごと作るような大きな変更には、<a href="#cli">コマンドライン</a>を使いましょう。',
+        'チャットは任意の機能で、API キーを接続するまではオフのままです。ちょっとした修正に最適で、望む変更を伝えると Stylebot が CSS を書きます。要素を選んで対象を示したり、スクリーンショットを添付して意図を伝えたりもできます。テーマを丸ごと作るような大きな変更には、<a href="#cli">CLI</a> を使いましょう。',
       shot: 'Hacker News で、読みやすいセリフ体の森のテーマを頼んだあとのチャットタブ',
       key: '自分の API キーを使う',
       keyBody:
@@ -274,7 +274,7 @@ const site: SiteMessages = {
     },
     presets: {
       intro:
-        'どちらもプリセットタブにあり、自分で加えた変更と組み合わせられます。<strong>リーダーモード</strong>はサイトの記事をすっきり読みやすい表示に切り替え、テーマ、フォント、サイズ、幅を選べます。記事以外のページはそのままです。<strong>グレースケール</strong>はサイトから色を取り除き、強さも自由に調整できます。',
+        'プリセットタブには 2 つのプリセットがあり、どちらも自分で加えた変更と組み合わせられます。<strong>リーダーモード</strong>はサイトの記事をすっきり読みやすい表示に切り替え、テーマ、フォント、サイズ、幅を選べます。記事以外のページはそのままです。<strong>グレースケール</strong>はサイトから色を取り除き、強さも自由に調整できます。',
       shot: 'リーダーモードで表示した Wikipedia の「数学」の記事（読書設定を開いた状態）',
     },
     sync: {
@@ -356,7 +356,7 @@ const site: SiteMessages = {
     chat: {
       title: 'チャット',
       body: [
-        'メッセージは、API キーを追加したプロバイダーに直接送信されます。あわせて、添付したスクリーンショット、ページのアドレスとタイトル、表示されている内容の概要、ページの CSS とスタイルも送信されます。ページ上の個人情報が含まれることがあります。プロバイダーのポリシーが適用されます（<a href="https://www.anthropic.com/legal/privacy">Anthropic</a>、<a href="https://openai.com/policies/privacy-policy/">OpenAI</a>、<a href="https://ai.google.dev/gemini-api/terms">Google</a>）。',
+        'チャットは API キーを追加するまでオフで、それまでは何も送信されません。メッセージは、API キーを追加したプロバイダーに直接送信されます。あわせて、添付したスクリーンショット、ページのアドレスとタイトル、表示されている内容の概要、ページの CSS とスタイルも送信されます。ページ上の個人情報が含まれることがあります。プロバイダーのポリシーが適用されます（<a href="https://www.anthropic.com/legal/privacy">Anthropic</a>、<a href="https://openai.com/policies/privacy-policy/">OpenAI</a>、<a href="https://ai.google.dev/gemini-api/terms">Google</a>）。',
       ],
     },
     cli: {

@@ -51,7 +51,7 @@ const site: SiteMessages = {
     copied: 'Copiat',
     copyCommand: 'Copiază {command}',
     title: 'Funcționează cu agentul tău de programare',
-    body: 'Claude Code, Codex, Cursor sau orice agent care rulează comenzi poate folosi Stylebot din terminal.',
+    body: 'Stylebot are un CLI, așa că orice agent care rulează comenzi poate schimba stilul unui site.',
     guide: 'Configurează CLI →',
     demo: {
       terminal: 'Terminal · agent de programare',
@@ -163,7 +163,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: 'Chat',
-      body: 'Nu ai un agent de programare? Descrie o modificare în fila Chat, iar Stylebot scrie CSS-ul. Folosește propria cheie Claude, OpenAI sau Gemini. Cheia rămâne în browserul tău.',
+      body: 'Opțional. Conectează propria cheie Claude, OpenAI sau Gemini, apoi descrie o modificare în fila Chat, iar Stylebot scrie CSS-ul. Fără cheie, nu se trimite nimic.',
       prompt: 'Fă articolul mai ușor de citit noaptea',
       reply:
         'Am trecut la un fundal întunecat cu text mai cald și am pus corpul textului într-un serif mai mare, cu rânduri mai aerisite.',
@@ -181,9 +181,9 @@ const site: SiteMessages = {
     yourTurnBody:
       'Deschide orice site și apasă comanda rapidă. Nimic nu se schimbă până nu o faci tu.',
     manual: 'Manual',
-    agentTitle: 'Conectează-ți agentul de programare',
+    agentTitle: 'Folosești un agent de programare?',
     agentBody:
-      'Claude Code, Codex, Cursor sau orice agent care rulează comenzi poate folosi Stylebot din terminal.',
+      'Poți adăuga și CLI-ul Stylebot, ca agentul tău să schimbe stilul site-urilor pentru tine.',
     agentPrompt:
       'pune pe site-ul ăsta o temă Everforest cu fonturi mai frumoase',
     agentReply: 'Am trecut la culorile Everforest, cu Lora și Newsreader.',
@@ -218,11 +218,11 @@ const site: SiteMessages = {
     toc: {
       start: 'Primii pași',
       profiles: 'Profiluri',
-      cli: 'Linia de comandă',
-      chat: 'Chat',
-      presets: 'Lizibilitate și alb-negru',
-      sync: 'Sincronizare, copii de rezervă și istoric',
+      presets: 'Presetări',
+      sync: 'Sincronizare și istoricul versiunilor',
       urls: 'Reguli URL',
+      cli: 'CLI',
+      chat: 'Chat',
       shortcuts: 'Comenzi rapide',
       help: 'Ajutor și asistență',
     },
@@ -251,19 +251,19 @@ const site: SiteMessages = {
     },
     cli: {
       intro:
-        'Comanda <code>stylebot</code> îi permite unui agent de programare precum Claude Code, Codex sau Cursor să schimbe stilul site-urilor direct în browserul tău, cu propriul abonament, fără cheie API. Este cel mai bun mod de a lăsa un agent să stilizeze un site, iar comenzile le poți rula și singur.',
+        'Comanda <code>stylebot</code> îi permite unui agent de programare precum Claude Code, Codex sau Cursor să schimbe stilul site-urilor direct în browserul tău, cu propriul abonament, fără cheie API. Comenzile le poți rula și singur.',
       setup: 'Configurare',
       setupBody:
-        'Instalează CLI, conectează-l la browserele tale, apoi activează <strong>Permite aplicațiilor de pe acest computer să controleze Stylebot</strong> în Opțiuni. <a href="{cli}">Pagina despre linia de comandă</a> te ghidează pas cu pas. Deocamdată doar în Chrome și Edge.',
+        'Instalează CLI, conectează-l la browserele tale, apoi activează <strong>Permite aplicațiilor de pe acest computer să controleze Stylebot</strong> în Opțiuni. <a href="{cli}">Pagina despre CLI</a> te ghidează pas cu pas. Deocamdată doar în Chrome și Edge.',
       claudeCodeBody:
         'Adaugă pluginul Stylebot și cere o modificare cu <code>/stylebot</code>, de exemplu o temă întunecată pentru un site.',
       privacy: 'Confidențialitate',
       privacyBody:
-        'Accesul din linia de comandă este dezactivat până îl activezi. Stylebot și CLI-ul comunică doar între ele, pe acest calculator; un agent trimite ce citește propriului furnizor.',
+        'Accesul prin CLI este dezactivat până îl activezi. Stylebot și CLI-ul comunică doar între ele, pe acest calculator; un agent trimite ce citește propriului furnizor.',
     },
     chat: {
       intro:
-        'Fila Chat e ideală pentru remedieri rapide. Descrie acolo modificarea pe care o vrei, iar Stylebot scrie CSS-ul. Poți alege un element ca să arăți spre ceva anume sau poți atașa o captură de ecran ca să arăți ce ai în minte. Pentru modificări mai mari, cum ar fi o temă complet nouă, folosește <a href="#cli">linia de comandă</a>.',
+        'Chatul este opțional și rămâne dezactivat până conectezi o cheie API. E ideal pentru remedieri rapide: descrie modificarea pe care o vrei, iar Stylebot scrie CSS-ul. Poți alege un element ca să arăți spre ceva anume sau poți atașa o captură de ecran ca să arăți ce ai în minte. Pentru modificări mai mari, cum ar fi o temă complet nouă, folosește <a href="#cli">CLI-ul</a>.',
       shot: 'Fila Chat pe Hacker News, după cererea unei teme în nuanțe de pădure, cu un font serif ușor de citit',
       key: 'Folosește propria cheie',
       keyBody:
@@ -277,7 +277,7 @@ const site: SiteMessages = {
     },
     presets: {
       intro:
-        'Ambele sunt în fila Presetări și se combină cu propriile tale modificări. <strong>Lizibilitate</strong> transformă articolele unui site într-o vizualizare de citire curată, cu temă, font, mărime și lățime la alegere; paginile care nu sunt articole rămân neatinse. <strong>Alb-negru</strong> elimină culorile de pe site, cu orice intensitate.',
+        'Fila Presetări are două, și ambele se combină cu propriile tale modificări. <strong>Lizibilitate</strong> transformă articolele unui site într-o vizualizare de citire curată, cu temă, font, mărime și lățime la alegere; paginile care nu sunt articole rămân neatinse. <strong>Alb-negru</strong> elimină culorile de pe site, cu orice intensitate.',
       shot: 'Articolul Wikipedia despre matematică în vizualizarea Lizibilitate, cu Setări de citire deschise',
     },
     sync: {
@@ -362,7 +362,7 @@ const site: SiteMessages = {
     chat: {
       title: 'Chat',
       body: [
-        'Mesajul tău ajunge direct la furnizorul a cărui cheie API ai adăugat-o, împreună cu orice captură de ecran atașată, adresa și titlul paginii, o schiță a conținutului vizibil, CSS-ul paginii și stilurile tale. Acestea pot include informații personale de pe pagină. Se aplică politica furnizorului: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
+        'Chatul este dezactivat până adaugi o cheie API și nu se trimite nimic înainte de asta. Mesajul tău ajunge direct la furnizorul a cărui cheie API ai adăugat-o, împreună cu orice captură de ecran atașată, adresa și titlul paginii, o schiță a conținutului vizibil, CSS-ul paginii și stilurile tale. Acestea pot include informații personale de pe pagină. Se aplică politica furnizorului: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {

@@ -59,7 +59,7 @@ export default {
     // {command} is a terminal command, such as npm install -g @stylebot/cli.
     copyCommand: 'Copy {command}',
     title: 'Works with your coding agent',
-    body: 'Claude Code, Codex, Cursor or any agent that runs commands can use Stylebot from the terminal.',
+    body: 'Stylebot has a CLI, so any agent that can run commands can restyle a site.',
     guide: 'Set up the CLI →',
     // An animation of a coding agent restyling a made-up news site's article.
     demo: {
@@ -176,7 +176,7 @@ export default {
     // A picture of Stylebot's Chat tab; updated, undo and placeholder are labels from the extension, so use its own translations.
     chat: {
       title: 'Chat',
-      body: 'No coding agent? Describe a change in the Chat tab and Stylebot writes the CSS. Bring your own Claude, OpenAI or Gemini key. It stays in your browser.',
+      body: 'Optional. Connect your own Claude, OpenAI or Gemini key, then describe a change in the Chat tab and Stylebot writes the CSS. Without a key, nothing is sent anywhere.',
       prompt: 'Make the article easier to read at night',
       reply:
         'Switched to a dark background with warmer text, and set the body in a larger serif with more line spacing.',
@@ -193,9 +193,9 @@ export default {
     yourTurnBody:
       'Open any site and press the shortcut. Nothing changes until you do.',
     manual: 'Manual',
-    agentTitle: 'Connect your coding agent',
+    agentTitle: 'Using a coding agent?',
     agentBody:
-      'Claude Code, Codex, Cursor or any agent that runs commands can use Stylebot from the terminal.',
+      'You can also add the Stylebot CLI, so your agent can restyle sites for you.',
     // What the person asks their coding agent; Everforest is a color theme's name
     agentPrompt: 'give this site an Everforest theme with nicer fonts',
     // The coding agent's reply; Lora and Newsreader are font names
@@ -231,11 +231,11 @@ export default {
     toc: {
       start: 'Getting started',
       profiles: 'Profiles',
-      cli: 'Command line',
-      chat: 'Chat',
-      presets: 'Readability and grayscale',
-      sync: 'Sync, backup and history',
+      presets: 'Presets',
+      sync: 'Sync and version history',
       urls: 'URL rules',
+      cli: 'CLI',
+      chat: 'Chat',
       shortcuts: 'Keyboard shortcuts',
       help: 'Help and support',
     },
@@ -265,20 +265,20 @@ export default {
     },
     cli: {
       intro:
-        "The <code>stylebot</code> command lets a coding agent like Claude Code, Codex or Cursor restyle sites right in your browser, using your own subscription instead of an API key. It's the best way to have an agent style a site, and you can run the commands yourself too.",
+        'The <code>stylebot</code> command lets a coding agent like Claude Code, Codex or Cursor restyle sites right in your browser, using your own subscription instead of an API key. You can run the commands yourself too.',
       setup: 'Setup',
       // The bolded setting is a label in Stylebot's Options page; use the extension's own translation.
       setupBody:
-        'Install the CLI, connect it to your browsers, then turn on <strong>Let apps on this computer control Stylebot</strong> in Options. The <a href="{cli}">command line page</a> walks through each step. Chrome and Edge only for now.',
+        'Install the CLI, connect it to your browsers, then turn on <strong>Let apps on this computer control Stylebot</strong> in Options. The <a href="{cli}">CLI page</a> walks through each step. Chrome and Edge only for now.',
       claudeCodeBody:
         'Add the Stylebot plugin and ask for a change with <code>/stylebot</code>, such as a dark theme for a site.',
       privacy: 'Privacy',
       privacyBody:
-        'Command line access is off until you turn it on. Stylebot and the CLI talk only to each other, on this computer; an agent sends what it reads to its own provider.',
+        'CLI access is off until you turn it on. Stylebot and the CLI talk only to each other, on this computer; an agent sends what it reads to its own provider.',
     },
     chat: {
       intro:
-        'Chat is ideal for quick fixes. Describe the change you want in the Chat tab and Stylebot writes the CSS. You can pick an element to point it at something, or attach a screenshot to show what you mean. For bigger changes, like a whole new theme, use the <a href="#cli">command line</a>.',
+        'Chat is optional and stays off until you connect an API key. It\'s ideal for quick fixes: describe the change you want and Stylebot writes the CSS. You can pick an element to point it at something, or attach a screenshot to show what you mean. For bigger changes, like a whole new theme, use the <a href="#cli">CLI</a>.',
       shot: 'The Chat tab after asking for a forest theme with a readable serif font on Hacker News',
       key: 'Bring your own key',
       keyBody:
@@ -292,7 +292,7 @@ export default {
     },
     presets: {
       intro:
-        "Both are in the Presets tab and stack with your own changes. <strong>Readability</strong> turns a site's articles into a clean reading view, with a choice of theme, font, size and width; it leaves pages that aren't articles alone. <strong>Grayscale</strong> removes color from the site, at any strength.",
+        "The Presets tab has two, and both stack with your own changes. <strong>Readability</strong> turns a site's articles into a clean reading view, with a choice of theme, font, size and width; it leaves pages that aren't articles alone. <strong>Grayscale</strong> removes color from the site, at any strength.",
       shot: 'The Wikipedia article on Mathematics in the Readability view, with Reading settings open',
     },
     sync: {
@@ -374,7 +374,7 @@ export default {
     chat: {
       title: 'Chat',
       body: [
-        'Your message goes straight to the provider whose API key you added, with any screenshot you attach, the page\'s address and title, an outline of its visible content, its CSS and your styles. That can include personal information on the page. The provider\'s policy applies: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
+        'Chat is off until you add an API key, and nothing is sent before then. Your message goes straight to the provider whose API key you added, with any screenshot you attach, the page\'s address and title, an outline of its visible content, its CSS and your styles. That can include personal information on the page. The provider\'s policy applies: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {

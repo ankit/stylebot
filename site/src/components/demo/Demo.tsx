@@ -1068,9 +1068,6 @@ export default class Demo extends Component<Props, State> {
                     <span data-t="tab-presets" style={tab('presets')}>
                       {m.editor.tabs.presets}
                     </span>
-                    <span data-t="tab-chat" style={tab('chat')}>
-                      {m.editor.tabs.chat}
-                    </span>
                   </div>
 
                   <div style="flex:1;min-height:0;overflow:hidden;background:var(--fill)">

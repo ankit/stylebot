@@ -88,7 +88,6 @@ export default {
       basic: 'Basic',
       code: 'Code',
       presets: 'Presets',
-      chat: 'Chat',
     },
     basic: {
       hide: 'Hide',

@@ -81,7 +81,6 @@ const demo: DemoMessages = {
       basic: 'Di base',
       code: 'Codice',
       presets: 'Preimpostazioni',
-      chat: 'Chat',
     },
     basic: {
       hide: 'Nascondi',

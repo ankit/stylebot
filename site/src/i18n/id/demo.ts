@@ -81,7 +81,6 @@ const demo: DemoMessages = {
       basic: 'Dasar',
       code: 'Kode',
       presets: 'Preset',
-      chat: 'Chat',
     },
     basic: {
       hide: 'Sembunyikan',

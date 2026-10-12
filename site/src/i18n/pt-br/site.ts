@@ -51,7 +51,7 @@ const site: SiteMessages = {
     copied: 'Copiado',
     copyCommand: 'Copiar {command}',
     title: 'Funciona com seu agente de programação',
-    body: 'O Claude Code, o Codex, o Cursor ou qualquer agente que execute comandos pode usar o Stylebot pelo terminal.',
+    body: 'O Stylebot tem uma CLI, então qualquer agente que execute comandos pode mudar o estilo de um site.',
     guide: 'Configurar a CLI →',
     demo: {
       terminal: 'Terminal · agente de programação',
@@ -161,7 +161,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: 'Chat',
-      body: 'Não usa um agente de programação? Descreva uma mudança na aba Chat e o Stylebot escreve o CSS. Use sua própria chave do Claude, OpenAI ou Gemini. Ela fica no seu navegador.',
+      body: 'Opcional. Conecte sua própria chave do Claude, OpenAI ou Gemini, descreva uma mudança na aba Chat e o Stylebot escreve o CSS. Sem uma chave, nada é enviado.',
       prompt: 'Deixe o artigo mais fácil de ler à noite',
       reply:
         'Mudei para um fundo escuro com texto mais quente e coloquei o corpo em uma fonte serifada maior, com mais espaço entre as linhas.',
@@ -179,9 +179,9 @@ const site: SiteMessages = {
     yourTurnBody:
       'Abra qualquer site e pressione o atalho. Nada muda até você fazer isso.',
     manual: 'Manual',
-    agentTitle: 'Conecte seu agente de programação',
+    agentTitle: 'Usa um agente de programação?',
     agentBody:
-      'O Claude Code, o Codex, o Cursor ou qualquer agente que execute comandos pode usar o Stylebot pelo terminal.',
+      'Você também pode adicionar a CLI do Stylebot para que seu agente mude o estilo dos sites para você.',
     agentPrompt:
       'coloca um tema Everforest neste site, com fontes mais bonitas',
     agentReply: 'Mudei para as cores do Everforest, com Lora e Newsreader.',
@@ -216,11 +216,11 @@ const site: SiteMessages = {
     toc: {
       start: 'Primeiros passos',
       profiles: 'Perfis',
-      cli: 'Linha de comando',
-      chat: 'Chat',
-      presets: 'Modo legível e escala de cinza',
-      sync: 'Sincronização, backup e histórico',
+      presets: 'Predefinições',
+      sync: 'Sincronização e histórico de versões',
       urls: 'Regras de URL',
+      cli: 'CLI',
+      chat: 'Chat',
       shortcuts: 'Atalhos de teclado',
       help: 'Ajuda e suporte',
     },
@@ -249,19 +249,19 @@ const site: SiteMessages = {
     },
     cli: {
       intro:
-        'O comando <code>stylebot</code> permite que um agente de programação como o Claude Code, o Codex ou o Cursor mude o estilo dos sites direto no seu navegador, usando a sua própria assinatura, sem chave de API. É a melhor forma de pedir a um agente que estilize um site, e você também pode executar os comandos.',
+        'O comando <code>stylebot</code> permite que um agente de programação como o Claude Code, o Codex ou o Cursor mude o estilo dos sites direto no seu navegador, usando a sua própria assinatura, sem chave de API. Você também pode executar os comandos.',
       setup: 'Configuração',
       setupBody:
-        'Instale a CLI, conecte aos seus navegadores e ative <strong>Permitir que apps deste computador controlem o Stylebot</strong> nas Opções. A <a href="{cli}">página da linha de comando</a> explica cada passo. Por enquanto, só no Chrome e no Edge.',
+        'Instale a CLI, conecte aos seus navegadores e ative <strong>Permitir que apps deste computador controlem o Stylebot</strong> nas Opções. A <a href="{cli}">página da CLI</a> explica cada passo. Por enquanto, só no Chrome e no Edge.',
       claudeCodeBody:
         'Adicione o plugin do Stylebot e peça uma mudança com <code>/stylebot</code>, como um tema escuro para um site.',
       privacy: 'Privacidade',
       privacyBody:
-        'O acesso por linha de comando fica desativado até você ativá-lo. O Stylebot e a CLI só se comunicam entre si, neste computador; um agente envia o que lê ao próprio provedor.',
+        'O acesso à CLI fica desativado até você ativá-lo. O Stylebot e a CLI só se comunicam entre si, neste computador; um agente envia o que lê ao próprio provedor.',
     },
     chat: {
       intro:
-        'O Chat é ideal para ajustes rápidos. Descreva a mudança que você quer na aba Chat e o Stylebot escreve o CSS. Você pode escolher um elemento para indicar algo específico ou anexar uma captura de tela para mostrar o que quer dizer. Para mudanças maiores, como um tema totalmente novo, use a <a href="#cli">linha de comando</a>.',
+        'O Chat é opcional e fica desativado até você conectar uma chave de API. Ele é ideal para ajustes rápidos: descreva a mudança que você quer e o Stylebot escreve o CSS. Você pode escolher um elemento para indicar algo específico ou anexar uma captura de tela para mostrar o que quer dizer. Para mudanças maiores, como um tema totalmente novo, use a <a href="#cli">CLI</a>.',
       shot: 'A aba Chat depois de pedir um tema de floresta com uma fonte serifada legível no Hacker News',
       key: 'Use sua própria chave',
       keyBody:
@@ -275,7 +275,7 @@ const site: SiteMessages = {
     },
     presets: {
       intro:
-        'Os dois ficam na aba Predefinições e se somam às suas próprias mudanças. O <strong>Modo legível</strong> transforma os artigos de um site em uma leitura limpa, com tema, fonte, tamanho e largura à sua escolha; páginas que não são artigos ficam como estão. A <strong>Escala de cinza</strong> remove a cor do site, na intensidade que você quiser.',
+        'A aba Predefinições tem duas, e as duas se somam às suas próprias mudanças. O <strong>Modo legível</strong> transforma os artigos de um site em uma leitura limpa, com tema, fonte, tamanho e largura à sua escolha; páginas que não são artigos ficam como estão. A <strong>Escala de cinza</strong> remove a cor do site, na intensidade que você quiser.',
       shot: 'O artigo da Wikipédia sobre Matemática no modo legível, com as configurações de leitura abertas',
     },
     sync: {
@@ -360,7 +360,7 @@ const site: SiteMessages = {
     chat: {
       title: 'Chat',
       body: [
-        'Sua mensagem vai direto para o provedor cuja chave de API você adicionou, junto com qualquer captura de tela que você anexar, o endereço e o título da página, uma estrutura do conteúdo visível dela, o CSS dela e seus estilos. Isso pode incluir informações pessoais da página. Vale a política do provedor: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
+        'O Chat fica desativado até você adicionar uma chave de API, e nada é enviado antes disso. Sua mensagem vai direto para o provedor cuja chave de API você adicionou, junto com qualquer captura de tela que você anexar, o endereço e o título da página, uma estrutura do conteúdo visível dela, o CSS dela e seus estilos. Isso pode incluir informações pessoais da página. Vale a política do provedor: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {

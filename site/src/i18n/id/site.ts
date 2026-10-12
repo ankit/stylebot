@@ -51,7 +51,7 @@ const site: SiteMessages = {
     copied: 'Disalin',
     copyCommand: 'Salin {command}',
     title: 'Bekerja dengan agen coding Anda',
-    body: 'Claude Code, Codex, Cursor, atau agen apa pun yang bisa menjalankan perintah dapat memakai Stylebot dari terminal.',
+    body: 'Stylebot punya CLI, jadi agen apa pun yang bisa menjalankan perintah dapat mengubah gaya situs.',
     guide: 'Siapkan CLI →',
     demo: {
       terminal: 'Terminal · agen coding',
@@ -162,7 +162,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: 'Chat',
-      body: 'Tidak memakai agen coding? Jelaskan perubahan di tab Chat dan Stylebot yang menulis CSS-nya. Gunakan kunci Claude, OpenAI, atau Gemini Anda sendiri. Kunci tetap tersimpan di browser Anda.',
+      body: 'Opsional. Hubungkan kunci Claude, OpenAI, atau Gemini Anda sendiri, lalu jelaskan perubahan di tab Chat dan Stylebot yang menulis CSS-nya. Tanpa kunci, tidak ada yang dikirim.',
       prompt: 'Buat artikel ini lebih nyaman dibaca di malam hari',
       reply:
         'Latar diganti menjadi gelap dengan teks yang lebih hangat, dan isi artikel memakai serif yang lebih besar dengan jarak baris yang lebih lega.',
@@ -180,9 +180,9 @@ const site: SiteMessages = {
     yourTurnBody:
       'Buka situs mana pun dan tekan pintasannya. Tidak ada yang berubah sampai Anda melakukannya.',
     manual: 'Panduan',
-    agentTitle: 'Hubungkan agen coding Anda',
+    agentTitle: 'Memakai agen coding?',
     agentBody:
-      'Claude Code, Codex, Cursor, atau agen apa pun yang bisa menjalankan perintah dapat memakai Stylebot dari terminal.',
+      'Anda juga bisa menambahkan CLI Stylebot, jadi agen Anda dapat mengubah gaya situs untuk Anda.',
     agentPrompt: 'beri situs ini tema Everforest dengan font yang lebih bagus',
     agentReply: 'Warna diganti ke Everforest dengan Lora dan Newsreader.',
   },
@@ -216,11 +216,11 @@ const site: SiteMessages = {
     toc: {
       start: 'Memulai',
       profiles: 'Profil',
-      cli: 'Baris perintah',
-      chat: 'Chat',
-      presets: 'Mode baca dan skala abu-abu',
-      sync: 'Sinkronisasi, cadangan, dan riwayat',
+      presets: 'Preset',
+      sync: 'Sinkronisasi dan riwayat versi',
       urls: 'Aturan URL',
+      cli: 'CLI',
+      chat: 'Chat',
       shortcuts: 'Pintasan keyboard',
       help: 'Bantuan dan dukungan',
     },
@@ -249,19 +249,19 @@ const site: SiteMessages = {
     },
     cli: {
       intro:
-        'Perintah <code>stylebot</code> memungkinkan agen coding seperti Claude Code, Codex, atau Cursor mengubah tampilan situs langsung di browser Anda, memakai langganan Anda sendiri, bukan kunci API. Inilah cara terbaik meminta agen mengubah gaya situs, dan Anda juga bisa menjalankan perintahnya sendiri.',
+        'Perintah <code>stylebot</code> memungkinkan agen coding seperti Claude Code, Codex, atau Cursor mengubah tampilan situs langsung di browser Anda, memakai langganan Anda sendiri, bukan kunci API. Anda juga bisa menjalankan perintahnya sendiri.',
       setup: 'Penyiapan',
       setupBody:
-        'Instal CLI, hubungkan ke browser Anda, lalu aktifkan <strong>Izinkan aplikasi di komputer ini mengontrol Stylebot</strong> di Opsi. <a href="{cli}">Halaman baris perintah</a> memandu setiap langkahnya. Untuk saat ini hanya Chrome dan Edge.',
+        'Instal CLI, hubungkan ke browser Anda, lalu aktifkan <strong>Izinkan aplikasi di komputer ini mengontrol Stylebot</strong> di Opsi. <a href="{cli}">Halaman CLI</a> memandu setiap langkahnya. Untuk saat ini hanya Chrome dan Edge.',
       claudeCodeBody:
         'Tambahkan plugin Stylebot dan minta perubahan dengan <code>/stylebot</code>, misalnya tema gelap untuk sebuah situs.',
       privacy: 'Privasi',
       privacyBody:
-        'Akses baris perintah nonaktif sampai Anda mengaktifkannya. Stylebot dan CLI hanya berkomunikasi satu sama lain, di komputer ini; agen mengirim apa yang dibacanya ke penyedianya sendiri.',
+        'Akses CLI nonaktif sampai Anda mengaktifkannya. Stylebot dan CLI hanya berkomunikasi satu sama lain, di komputer ini; agen mengirim apa yang dibacanya ke penyedianya sendiri.',
     },
     chat: {
       intro:
-        'Chat cocok untuk perbaikan cepat. Jelaskan perubahan yang Anda inginkan di tab Chat dan Stylebot yang menulis CSS-nya. Anda bisa memilih elemen untuk menunjuk bagian tertentu, atau melampirkan screenshot untuk memperlihatkan maksud Anda. Untuk perubahan yang lebih besar, seperti tema yang benar-benar baru, gunakan <a href="#cli">baris perintah</a>.',
+        'Chat bersifat opsional dan tetap nonaktif sampai Anda menghubungkan kunci API. Chat cocok untuk perbaikan cepat: jelaskan perubahan yang Anda inginkan dan Stylebot yang menulis CSS-nya. Anda bisa memilih elemen untuk menunjuk bagian tertentu, atau melampirkan screenshot untuk memperlihatkan maksud Anda. Untuk perubahan yang lebih besar, seperti tema yang benar-benar baru, gunakan <a href="#cli">CLI</a>.',
       shot: 'Tab Chat setelah meminta tema hutan dengan font serif yang mudah dibaca di Hacker News',
       key: 'Gunakan kunci Anda sendiri',
       keyBody:
@@ -275,7 +275,7 @@ const site: SiteMessages = {
     },
     presets: {
       intro:
-        'Keduanya ada di tab Preset dan dapat digabungkan dengan perubahan Anda sendiri. <strong>Mode baca</strong> mengubah artikel di situs menjadi tampilan baca yang bersih, dengan pilihan tema, font, ukuran, dan lebar; halaman yang bukan artikel dibiarkan apa adanya. <strong>Skala abu-abu</strong> menghilangkan warna dari situs, dengan tingkat yang bisa diatur.',
+        'Tab Preset berisi dua preset, dan keduanya dapat digabungkan dengan perubahan Anda sendiri. <strong>Mode baca</strong> mengubah artikel di situs menjadi tampilan baca yang bersih, dengan pilihan tema, font, ukuran, dan lebar; halaman yang bukan artikel dibiarkan apa adanya. <strong>Skala abu-abu</strong> menghilangkan warna dari situs, dengan tingkat yang bisa diatur.',
       shot: 'Artikel Wikipedia tentang Matematika dalam Mode baca, dengan Setelan baca terbuka',
     },
     sync: {
@@ -358,7 +358,7 @@ const site: SiteMessages = {
     chat: {
       title: 'Chat',
       body: [
-        'Pesan Anda dikirim langsung ke penyedia yang kunci API-nya Anda tambahkan, beserta screenshot yang Anda lampirkan, alamat dan judul halaman, kerangka dari konten yang terlihat, CSS halaman, dan gaya Anda. Ini bisa mencakup informasi pribadi di halaman. Kebijakan penyedia berlaku: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
+        'Chat nonaktif sampai Anda menambahkan kunci API, dan tidak ada yang dikirim sebelum itu. Pesan Anda dikirim langsung ke penyedia yang kunci API-nya Anda tambahkan, beserta screenshot yang Anda lampirkan, alamat dan judul halaman, kerangka dari konten yang terlihat, CSS halaman, dan gaya Anda. Ini bisa mencakup informasi pribadi di halaman. Kebijakan penyedia berlaku: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {

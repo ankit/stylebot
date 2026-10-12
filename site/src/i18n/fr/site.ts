@@ -51,7 +51,7 @@ const site: SiteMessages = {
     copied: 'Copié',
     copyCommand: 'Copier {command}',
     title: 'Fonctionne avec votre agent de code',
-    body: 'Claude Code, Codex, Cursor ou tout agent capable d’exécuter des commandes peut utiliser Stylebot depuis le terminal.',
+    body: 'Stylebot dispose d’une CLI : tout agent capable d’exécuter des commandes peut donc restyler un site.',
     guide: 'Configurer la CLI →',
     demo: {
       terminal: 'Terminal · agent de code',
@@ -161,7 +161,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: 'Chat',
-      body: 'Pas d’agent de code ? Décrivez une modification dans l’onglet Chat et Stylebot écrit le CSS. Utilisez votre propre clé Claude, OpenAI ou Gemini. Elle reste dans votre navigateur.',
+      body: 'Facultatif. Connectez votre propre clé Claude, OpenAI ou Gemini, puis décrivez une modification dans l’onglet Chat et Stylebot écrit le CSS. Sans clé, rien n’est envoyé.',
       prompt: 'Rends l’article plus lisible la nuit',
       reply:
         'J’ai mis un fond sombre et un texte plus chaud, et passé le corps du texte dans une serif plus grande, avec plus d’interligne.',
@@ -179,9 +179,9 @@ const site: SiteMessages = {
     yourTurnBody:
       'Ouvrez n’importe quel site et appuyez sur le raccourci. Rien ne change tant que vous ne l’avez pas fait.',
     manual: 'Manuel',
-    agentTitle: 'Connectez votre agent de code',
+    agentTitle: 'Vous utilisez un agent de code ?',
     agentBody:
-      'Claude Code, Codex, Cursor ou tout agent capable d’exécuter des commandes peut utiliser Stylebot depuis le terminal.',
+      'Vous pouvez aussi ajouter la CLI de Stylebot : votre agent pourra restyler les sites pour vous.',
     agentPrompt:
       'donne à ce site un thème Everforest avec de plus jolies polices',
     agentReply: 'C’est fait : couleurs Everforest, avec Lora et Newsreader.',
@@ -216,11 +216,11 @@ const site: SiteMessages = {
     toc: {
       start: 'Premiers pas',
       profiles: 'Profils',
-      cli: 'Ligne de commande',
-      chat: 'Chat',
-      presets: 'Lisibilité et niveaux de gris',
-      sync: 'Synchronisation, sauvegarde et historique',
+      presets: 'Préréglages',
+      sync: 'Synchronisation et historique des versions',
       urls: 'Règles d’URL',
+      cli: 'CLI',
+      chat: 'Chat',
       shortcuts: 'Raccourcis clavier',
       help: 'Aide et assistance',
     },
@@ -249,19 +249,19 @@ const site: SiteMessages = {
     },
     cli: {
       intro:
-        'La commande <code>stylebot</code> permet à un agent de code comme Claude Code, Codex ou Cursor de modifier le style des sites directement dans votre navigateur, avec votre propre abonnement plutôt qu’une clé d’API. C’est la meilleure façon de faire styliser un site par un agent, et vous pouvez aussi lancer les commandes vous-même.',
+        'La commande <code>stylebot</code> permet à un agent de code comme Claude Code, Codex ou Cursor de modifier le style des sites directement dans votre navigateur, avec votre propre abonnement plutôt qu’une clé d’API. Vous pouvez aussi lancer les commandes vous-même.',
       setup: 'Configuration',
       setupBody:
-        'Installez la CLI, connectez-la à vos navigateurs, puis activez <strong>Autoriser les applications de cet ordinateur à contrôler Stylebot</strong> dans les options. La <a href="{cli}">page Ligne de commande</a> détaille chaque étape. Chrome et Edge uniquement pour l’instant.',
+        'Installez la CLI, connectez-la à vos navigateurs, puis activez <strong>Autoriser les applications de cet ordinateur à contrôler Stylebot</strong> dans les options. La <a href="{cli}">page CLI</a> détaille chaque étape. Chrome et Edge uniquement pour l’instant.',
       claudeCodeBody:
         'Ajoutez le plugin Stylebot et demandez une modification avec <code>/stylebot</code>, par exemple un thème sombre pour un site.',
       privacy: 'Confidentialité',
       privacyBody:
-        'L’accès en ligne de commande reste désactivé tant que vous ne l’activez pas. Stylebot et la CLI ne communiquent qu’entre eux, sur cet ordinateur ; un agent envoie ce qu’il lit à son propre fournisseur.',
+        'L’accès à la CLI reste désactivé tant que vous ne l’activez pas. Stylebot et la CLI ne communiquent qu’entre eux, sur cet ordinateur ; un agent envoie ce qu’il lit à son propre fournisseur.',
     },
     chat: {
       intro:
-        'Le Chat est idéal pour les retouches rapides. Décrivez la modification souhaitée dans l’onglet Chat et Stylebot écrit le CSS. Vous pouvez choisir un élément pour cibler quelque chose de précis, ou joindre une capture d’écran pour montrer ce que vous voulez dire. Pour des changements plus importants, comme un thème entièrement nouveau, utilisez la <a href="#cli">ligne de commande</a>.',
+        'Le Chat est facultatif et reste désactivé tant que vous n’avez pas connecté de clé d’API. Il est idéal pour les retouches rapides : décrivez la modification souhaitée et Stylebot écrit le CSS. Vous pouvez choisir un élément pour cibler quelque chose de précis, ou joindre une capture d’écran pour montrer ce que vous voulez dire. Pour des changements plus importants, comme un thème entièrement nouveau, utilisez la <a href="#cli">CLI</a>.',
       shot: 'L’onglet Chat après avoir demandé un thème forêt avec une police serif lisible sur Hacker News',
       key: 'Utilisez votre propre clé',
       keyBody:
@@ -275,7 +275,7 @@ const site: SiteMessages = {
     },
     presets: {
       intro:
-        'Les deux se trouvent dans l’onglet Préréglages et se combinent avec vos propres modifications. <strong>Lisibilité</strong> transforme les articles d’un site en une vue de lecture épurée, avec le choix du thème, de la police, de la taille et de la largeur ; les pages qui ne sont pas des articles restent intactes. <strong>Niveaux de gris</strong> retire la couleur du site, à l’intensité de votre choix.',
+        'L’onglet Préréglages en propose deux, qui se combinent avec vos propres modifications. <strong>Lisibilité</strong> transforme les articles d’un site en une vue de lecture épurée, avec le choix du thème, de la police, de la taille et de la largeur ; les pages qui ne sont pas des articles restent intactes. <strong>Niveaux de gris</strong> retire la couleur du site, à l’intensité de votre choix.',
       shot: 'L’article de Wikipédia sur les mathématiques dans la vue Lisibilité, avec les paramètres de lecture ouverts',
     },
     sync: {
@@ -360,7 +360,7 @@ const site: SiteMessages = {
     chat: {
       title: 'Chat',
       body: [
-        'Votre message est envoyé directement au fournisseur dont vous avez ajouté la clé d’API, avec les captures d’écran que vous joignez, l’adresse et le titre de la page, un plan de son contenu visible, son CSS et vos styles. Cela peut inclure des informations personnelles présentes sur la page. La politique de confidentialité du fournisseur s’applique : <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
+        'Le Chat reste désactivé tant que vous n’avez pas ajouté de clé d’API, et rien n’est envoyé avant. Votre message est envoyé directement au fournisseur dont vous avez ajouté la clé d’API, avec les captures d’écran que vous joignez, l’adresse et le titre de la page, un plan de son contenu visible, son CSS et vos styles. Cela peut inclure des informations personnelles présentes sur la page. La politique de confidentialité du fournisseur s’applique : <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {

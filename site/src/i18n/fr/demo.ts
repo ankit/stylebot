@@ -84,7 +84,6 @@ const demo: DemoMessages = {
       basic: 'De base',
       code: 'Code',
       presets: 'Préréglages',
-      chat: 'Chat',
     },
     basic: {
       hide: 'Masquer',

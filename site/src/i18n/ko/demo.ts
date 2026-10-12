@@ -80,7 +80,6 @@ const demo: DemoMessages = {
       basic: '기본',
       code: '코드',
       presets: '프리셋',
-      chat: '채팅',
     },
     basic: {
       hide: '숨기기',

@@ -51,7 +51,7 @@ const site: SiteMessages = {
     copied: 'Đã sao chép',
     copyCommand: 'Sao chép {command}',
     title: 'Dùng được với trợ lý lập trình của bạn',
-    body: 'Claude Code, Codex, Cursor hay bất kỳ trợ lý nào chạy được lệnh đều có thể dùng Stylebot từ terminal.',
+    body: 'Stylebot có CLI, nên bất kỳ trợ lý nào chạy được lệnh đều có thể đổi giao diện trang web.',
     guide: 'Thiết lập CLI →',
     demo: {
       terminal: 'Terminal · trợ lý lập trình',
@@ -161,7 +161,7 @@ const site: SiteMessages = {
     },
     chat: {
       title: 'Trò chuyện',
-      body: 'Không dùng trợ lý lập trình? Mô tả thay đổi trong thẻ Trò chuyện và Stylebot sẽ viết CSS. Dùng khóa Claude, OpenAI hoặc Gemini của riêng bạn. Khóa chỉ nằm trong trình duyệt của bạn.',
+      body: 'Không bắt buộc. Kết nối khóa Claude, OpenAI hoặc Gemini của riêng bạn, rồi mô tả thay đổi trong thẻ Trò chuyện và Stylebot sẽ viết CSS. Không có khóa thì không có gì được gửi đi.',
       prompt: 'Làm bài viết dễ đọc hơn vào ban đêm',
       reply:
         'Đã chuyển sang nền tối với chữ ấm hơn, thân bài dùng phông serif lớn hơn và giãn dòng rộng hơn.',
@@ -179,9 +179,9 @@ const site: SiteMessages = {
     yourTurnBody:
       'Mở trang web bất kỳ và nhấn phím tắt. Trang chỉ thay đổi khi bạn bắt tay vào chỉnh.',
     manual: 'Hướng dẫn',
-    agentTitle: 'Kết nối trợ lý lập trình của bạn',
+    agentTitle: 'Bạn dùng trợ lý lập trình?',
     agentBody:
-      'Claude Code, Codex, Cursor hay bất kỳ trợ lý nào chạy được lệnh đều có thể dùng Stylebot từ terminal.',
+      'Bạn cũng có thể thêm CLI của Stylebot để trợ lý đổi giao diện trang web giúp bạn.',
     agentPrompt:
       'đổi trang này sang giao diện Everforest, phông chữ đẹp hơn nhé',
     agentReply: 'Đã chuyển sang màu Everforest, dùng phông Lora và Newsreader.',
@@ -216,11 +216,11 @@ const site: SiteMessages = {
     toc: {
       start: 'Bắt đầu',
       profiles: 'Hồ sơ',
-      cli: 'Dòng lệnh',
-      chat: 'Trò chuyện',
-      presets: 'Chế độ đọc và thang độ xám',
-      sync: 'Đồng bộ, sao lưu và lịch sử',
+      presets: 'Mẫu có sẵn',
+      sync: 'Đồng bộ và lịch sử phiên bản',
       urls: 'Quy tắc URL',
+      cli: 'CLI',
+      chat: 'Trò chuyện',
       shortcuts: 'Phím tắt',
       help: 'Trợ giúp và hỗ trợ',
     },
@@ -249,19 +249,19 @@ const site: SiteMessages = {
     },
     cli: {
       intro:
-        'Lệnh <code>stylebot</code> cho phép trợ lý lập trình như Claude Code, Codex hay Cursor đổi giao diện trang web ngay trong trình duyệt của bạn, dùng gói đăng ký của bạn thay vì khóa API. Đây là cách tốt nhất để nhờ trợ lý tạo kiểu cho trang web, và bạn cũng có thể tự chạy các lệnh.',
+        'Lệnh <code>stylebot</code> cho phép trợ lý lập trình như Claude Code, Codex hay Cursor đổi giao diện trang web ngay trong trình duyệt của bạn, dùng gói đăng ký của bạn thay vì khóa API. Bạn cũng có thể tự chạy các lệnh.',
       setup: 'Thiết lập',
       setupBody:
-        'Cài đặt CLI, kết nối CLI với trình duyệt, rồi bật <strong>Cho phép ứng dụng trên máy tính này điều khiển Stylebot</strong> trong Tùy chọn. <a href="{cli}">Trang dòng lệnh</a> hướng dẫn từng bước. Hiện chỉ hỗ trợ Chrome và Edge.',
+        'Cài đặt CLI, kết nối CLI với trình duyệt, rồi bật <strong>Cho phép ứng dụng trên máy tính này điều khiển Stylebot</strong> trong Tùy chọn. <a href="{cli}">Trang CLI</a> hướng dẫn từng bước. Hiện chỉ hỗ trợ Chrome và Edge.',
       claudeCodeBody:
         'Thêm plugin Stylebot rồi yêu cầu thay đổi bằng <code>/stylebot</code>, chẳng hạn giao diện tối cho trang web.',
       privacy: 'Quyền riêng tư',
       privacyBody:
-        'Quyền truy cập dòng lệnh ở trạng thái tắt cho đến khi bạn bật. Stylebot và CLI chỉ giao tiếp với nhau, trên máy tính này; trợ lý lập trình gửi những gì đọc được đến nhà cung cấp của mình.',
+        'Quyền truy cập CLI ở trạng thái tắt cho đến khi bạn bật. Stylebot và CLI chỉ giao tiếp với nhau, trên máy tính này; trợ lý lập trình gửi những gì đọc được đến nhà cung cấp của mình.',
     },
     chat: {
       intro:
-        'Thẻ Trò chuyện rất hợp cho những chỉnh sửa nhanh. Mô tả thay đổi bạn muốn tại đây và Stylebot sẽ viết CSS. Bạn có thể chọn phần tử để chỉ rõ chỗ cần sửa, hoặc đính kèm ảnh chụp màn hình để minh họa ý bạn. Với thay đổi lớn hơn, như cả giao diện mới, hãy dùng <a href="#cli">dòng lệnh</a>.',
+        'Trò chuyện là tính năng không bắt buộc và luôn tắt cho đến khi bạn kết nối khóa API. Tính năng này rất hợp cho những chỉnh sửa nhanh: mô tả thay đổi bạn muốn và Stylebot sẽ viết CSS. Bạn có thể chọn phần tử để chỉ rõ chỗ cần sửa, hoặc đính kèm ảnh chụp màn hình để minh họa ý bạn. Với thay đổi lớn hơn, như cả giao diện mới, hãy dùng <a href="#cli">CLI</a>.',
       shot: 'Thẻ Trò chuyện sau khi yêu cầu giao diện rừng xanh với phông serif dễ đọc trên Hacker News',
       key: 'Dùng khóa của riêng bạn',
       keyBody:
@@ -275,7 +275,7 @@ const site: SiteMessages = {
     },
     presets: {
       intro:
-        'Cả hai đều nằm trong thẻ Mẫu có sẵn và kết hợp được với thay đổi của riêng bạn. <strong>Chế độ đọc</strong> biến bài viết trên trang web thành chế độ đọc gọn gàng, với giao diện, phông chữ, cỡ chữ và chiều rộng tùy chọn; những trang không phải bài viết được giữ nguyên. <strong>Thang độ xám</strong> loại bỏ màu sắc khỏi trang web, ở mức độ tùy chọn.',
+        'Thẻ Mẫu có sẵn có hai mẫu, và cả hai đều kết hợp được với thay đổi của riêng bạn. <strong>Chế độ đọc</strong> biến bài viết trên trang web thành chế độ đọc gọn gàng, với giao diện, phông chữ, cỡ chữ và chiều rộng tùy chọn; những trang không phải bài viết được giữ nguyên. <strong>Thang độ xám</strong> loại bỏ màu sắc khỏi trang web, ở mức độ tùy chọn.',
       shot: 'Bài viết Wikipedia về Toán học ở chế độ đọc, với Cài đặt đọc đang mở',
     },
     sync: {
@@ -361,7 +361,7 @@ const site: SiteMessages = {
     chat: {
       title: 'Trò chuyện',
       body: [
-        'Tin nhắn của bạn được gửi thẳng đến nhà cung cấp có khóa API mà bạn đã thêm, kèm ảnh chụp màn hình bạn đính kèm (nếu có), địa chỉ và tiêu đề của trang, dàn ý nội dung hiển thị, CSS của trang và các kiểu của bạn. Những nội dung này có thể chứa thông tin cá nhân trên trang. Chính sách của nhà cung cấp sẽ được áp dụng: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
+        'Trò chuyện luôn tắt cho đến khi bạn thêm khóa API, và trước đó không có gì được gửi đi. Tin nhắn của bạn được gửi thẳng đến nhà cung cấp có khóa API mà bạn đã thêm, kèm ảnh chụp màn hình bạn đính kèm (nếu có), địa chỉ và tiêu đề của trang, dàn ý nội dung hiển thị, CSS của trang và các kiểu của bạn. Những nội dung này có thể chứa thông tin cá nhân trên trang. Chính sách của nhà cung cấp sẽ được áp dụng: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {
