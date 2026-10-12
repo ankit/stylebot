@@ -3,7 +3,6 @@ import {
   SIDE_PANEL_IGNORED_KEY,
   isEditorSidePanelOpen,
   isSidePanelIgnoringTabs,
-  markSidePanelIgnoringTabs,
   supportsEditorSidePanel,
 } from '@stylebot/utils';
 
@@ -38,16 +37,16 @@ export const initSidePanelCheck = (): void => {
 };
 
 /**
- * Waits for the editor to show up in the tab's side panel.
+ * Waits for the side panel to report that the browser hosts it as a tab,
+ * which it does as it loads (Vivaldi), or for the editor to show up in it.
  */
-const waitForEditorSidePanel = async (tabId: number): Promise<boolean> => {
+const waitForPanelHostedAsTab = async (tabId: number): Promise<boolean> => {
   for (let waited = 0; waited < LOAD_TIMEOUT_MS; waited += POLL_MS) {
-    // Set by the panel itself where the browser hosts it as a tab.
-    if (ignoresTabs) {
-      return false;
+    if (await isSidePanelIgnoringTabs()) {
+      return true;
     }
     if (await isEditorSidePanelOpen(tabId)) {
-      return true;
+      return false;
     }
     await new Promise(resolve => setTimeout(resolve, POLL_MS));
   }
@@ -55,30 +54,18 @@ const waitForEditorSidePanel = async (tabId: number): Promise<boolean> => {
 };
 
 /**
- * Checks that a side panel just opened on the tab loaded the editor. A
- * browser that ignores per-tab panels (Vivaldi) shows an empty one instead:
- * then the editor docks in the page from now on, and opens there. Once that
- * is known, as when the shortcut wakes the background, it doesn't wait.
+ * Follows up a side panel just opened on the tab. In a browser that ignores
+ * per-tab panels (Vivaldi) the panel closes itself, so the editor docks in
+ * the page from now on, and opens there.
  */
 export const checkEditorSidePanel = async (tabId: number): Promise<void> => {
-  if (
-    !(await isSidePanelIgnoringTabs()) &&
-    (await waitForEditorSidePanel(tabId))
-  ) {
+  if (!(await waitForPanelHostedAsTab(tabId))) {
     return;
   }
-
-  ignoresTabs = true;
-  await markSidePanelIgnoringTabs();
 
   const layout = (await getOption('layout')) as StylebotLayout;
   if (layout.dockLocation === 'sidepanel') {
     await setOption('layout', { ...layout, dockLocation: 'right' });
-  }
-
-  const tab = await chrome.tabs.get(tabId).catch(() => undefined);
-  if (tab) {
-    chrome.sidePanel.close?.({ windowId: tab.windowId }).catch(() => undefined);
   }
 
   const message: OpenStylebot = { name: 'OpenStylebot' };
