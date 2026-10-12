@@ -1,8 +1,6 @@
 <template>
   <s-list-item compact>
-    <template #meta>
-      <s-text as="span" size="large" medium class="label">{{ label }}</s-text>
-    </template>
+    <template #title>{{ label }}</template>
     <template #trailing><slot /></template>
   </s-list-item>
 </template>
@@ -10,14 +8,13 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { SListItem, SText } from '@stylebot/components';
+import { SListItem } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'ShortcutRow',
 
   components: {
     SListItem,
-    SText,
   },
 
   props: {
@@ -28,9 +25,3 @@ export default Vue.extend({
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.label {
-  @include truncate;
-}
-</style>
