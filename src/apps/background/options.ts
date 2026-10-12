@@ -1,6 +1,9 @@
 import type { StylebotOptions } from '@stylebot/types';
 import { defaultOptions } from '@stylebot/settings';
-import { supportsEditorSidePanel } from '@stylebot/utils';
+import {
+  isSidePanelIgnoringTabs,
+  supportsEditorSidePanel,
+} from '@stylebot/utils';
 
 /**
  * Layers stored options over the defaults so keys added in later releases
@@ -13,7 +16,7 @@ export const getAll = async (): Promise<StylebotOptions> => {
   // Without a side panel the editor docks in the page, where it used to.
   if (
     options.layout.dockLocation === 'sidepanel' &&
-    !supportsEditorSidePanel()
+    (!supportsEditorSidePanel() || (await isSidePanelIgnoringTabs()))
   ) {
     return { ...options, layout: { ...options.layout, dockLocation: 'right' } };
   }

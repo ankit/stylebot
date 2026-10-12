@@ -114,8 +114,11 @@ import {
 
 import * as editorWindow from './editor-window';
 import {
+  canUseEditorSidePanel,
+  openEditorSidePanelWithFallback,
+} from './side-panel-check';
+import {
   supportsEditorSidePanel,
-  openEditorSidePanel,
   closeEditorSidePanel,
   isEditorSidePanelOpen,
 } from '@stylebot/utils';
@@ -569,12 +572,12 @@ export const OpenEditorSidePanel = (
   sendResponse: (response: OpenEditorSidePanelResponse) => void
 ): void => {
   const tabId = message.tabId ?? sender.tab?.id;
-  if (tabId === undefined || !supportsEditorSidePanel()) {
+  if (tabId === undefined || !canUseEditorSidePanel()) {
     sendResponse(false);
     return;
   }
 
-  openEditorSidePanel(tabId).then(
+  openEditorSidePanelWithFallback(tabId).then(
     () => sendResponse(true),
     () => sendResponse(false)
   );

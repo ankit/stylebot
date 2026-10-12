@@ -1,3 +1,21 @@
+export const SIDE_PANEL_IGNORED_KEY = 'sidePanelIgnoresTabs';
+
+/**
+ * Whether this browser was found to ignore per-tab side panels (Vivaldi),
+ * which the editor needs. Readable from content scripts too.
+ */
+export const isSidePanelIgnoringTabs = async (): Promise<boolean> =>
+  !!(await chrome.storage.local.get(SIDE_PANEL_IGNORED_KEY))[
+    SIDE_PANEL_IGNORED_KEY
+  ];
+
+/**
+ * Remembers that this browser ignores per-tab side panels, so the editor
+ * stays in the page from now on.
+ */
+export const markSidePanelIgnoringTabs = (): Promise<void> =>
+  chrome.storage.local.set({ [SIDE_PANEL_IGNORED_KEY]: true });
+
 /**
  * Whether this browser can host the editor in its side panel. Content
  * scripts can't see chrome.sidePanel, so they can't use this.

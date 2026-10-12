@@ -1,15 +1,12 @@
 import { t } from '@stylebot/i18n';
 import type { OpenStylebotFromContextMenu } from '@stylebot/types';
-import {
-  getPageSupport,
-  supportsEditorSidePanel,
-  openEditorSidePanel,
-} from '@stylebot/utils';
+import { getPageSupport, supportsEditorSidePanel } from '@stylebot/utils';
 
 import type { StylebotDockLocation } from '@stylebot/types';
 
 import { OpenOptionsPage } from './messages';
 import { getAll as getAllOptions } from './options';
+import { openEditorSidePanelWithFallback } from './side-panel-check';
 
 const CONTEXT_MENU_ID = 'stylebot-contextmenu';
 
@@ -147,7 +144,7 @@ export const handleContextMenuClick = (
           info.menuItemId === STYLE_ELEMENT_IN_SIDE_PANEL_MENU_ITEM_ID;
 
         if (sidePanel) {
-          openEditorSidePanel(tab.id).catch(() => undefined);
+          openEditorSidePanelWithFallback(tab.id).catch(() => undefined);
         }
 
         const message: OpenStylebotFromContextMenu = {

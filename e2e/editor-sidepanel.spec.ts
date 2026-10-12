@@ -164,6 +164,34 @@ test('the side panel opens with the inspector on', async ({
     .toMatch(/h1$/);
 });
 
+test('a side panel that shows the editor stays the chosen position', async ({
+  context,
+  extension,
+  openPopup,
+}) => {
+  await dockToSidePanel(extension);
+
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/`);
+  await openSidePanel(page, context, extension, openPopup);
+
+  // Past the background's wait for the panel to load.
+  await page.waitForTimeout(3000);
+  expect(
+    await extension.evaluate(async () => {
+      const items = await chrome.storage.local.get([
+        'options',
+        'sidePanelIgnoresTabs',
+      ]);
+      return [
+        items['sidePanelIgnoresTabs'],
+        items['options'].layout.dockLocation,
+      ];
+    })
+  ).toEqual([undefined, 'sidepanel']);
+  expect(await isSidePanelOpen(extension)).toBe(true);
+});
+
 test('moving from the side panel to a window closes the panel', async ({
   context,
   extension,

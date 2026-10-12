@@ -9,6 +9,7 @@ import type {
   DisableStyle,
   SetActiveProfile,
   StylebotOptions,
+  EditorSidePanelOpened,
 } from '@stylebot/types';
 import { STYLES_KEY, getStylesForPage } from '@stylebot/saved-styles';
 import { defaultOptions } from '@stylebot/settings';
@@ -120,8 +121,16 @@ export const openStylebotSidePanel = (tab: chrome.tabs.Tab): void => {
     return;
   }
 
+  const message: EditorSidePanelOpened = {
+    name: 'EditorSidePanelOpened',
+    tabId: tab.id,
+  };
+
   openEditorSidePanel(tab.id).then(
-    () => window.close(),
+    () => {
+      chrome.runtime.sendMessage(message);
+      window.close();
+    },
     () => toggleStylebot(tab)
   );
 };
