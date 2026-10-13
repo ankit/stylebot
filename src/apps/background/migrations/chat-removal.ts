@@ -1,16 +1,8 @@
-const MIGRATION_KEY = 'migration_chat_removal';
-
 /**
  * Clears what Chat left behind once it was removed: its API keys, model
  * choices and threads, and an editor left on Chat, which opens Basic.
  */
 const ChatRemoval = async (): Promise<void> => {
-  const flag = await chrome.storage.local.get([MIGRATION_KEY]);
-
-  if (flag[MIGRATION_KEY]) {
-    return;
-  }
-
   const items = await chrome.storage.local.get(null);
   const keys = Object.keys(items).filter(key => key.startsWith('chat-'));
 
@@ -23,8 +15,6 @@ const ChatRemoval = async (): Promise<void> => {
   if (options?.mode === 'chat') {
     await chrome.storage.local.set({ options: { ...options, mode: 'basic' } });
   }
-
-  await chrome.storage.local.set({ [MIGRATION_KEY]: true });
 };
 
 export default ChatRemoval;
