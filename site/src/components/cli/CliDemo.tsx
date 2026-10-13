@@ -8,6 +8,14 @@ const TAB = '54432929';
 const STEP_MS = 800;
 const STEPS = 17;
 const LAST = STEPS - 1;
+const PHONE = '(max-width: 639px)';
+
+// The steps of the loop where something changes; commands run between them.
+const ASK = 1;
+const COMMANDS_FROM = 2;
+const RESTYLED = 7;
+const SCREENSHOT = 9;
+const DONE = 10;
 
 const COMMANDS = [
   [`stylebot open ${SITE}`, `Opened tab ${TAB}`],
@@ -34,37 +42,54 @@ export default function CliDemo({
       return;
     }
 
+    let start: ReturnType<typeof setTimeout> | undefined;
     let timer: ReturnType<typeof setInterval> | undefined;
     const observer = new IntersectionObserver(
       ([entry]) => {
+        clearTimeout(start);
         clearInterval(timer);
-        if (entry.isIntersecting) {
-          timer = setInterval(() => setStep((s) => (s + 1) % STEPS), STEP_MS);
-        }
+        if (!entry.isIntersecting) return;
+        // Side by side, typing starts at once so the terminal never sits
+        // empty; phones open on the page before it's restyled, for a moment.
+        const phone = matchMedia(PHONE).matches;
+        if (!phone) setStep((s) => s || ASK);
+        start = setTimeout(
+          () => {
+            timer = setInterval(() => setStep((s) => (s + 1) % STEPS), STEP_MS);
+          },
+          phone ? STEP_MS * 2 : 0,
+        );
       },
-      { threshold: 0.3 },
+      { threshold: 0.15 },
     );
     observer.observe(root.current!);
     return () => {
       observer.disconnect();
+      clearTimeout(start);
       clearInterval(timer);
     };
   }, []);
 
   const at = (n: number) => step >= n && step < LAST;
-  const after = at(7);
+  const after = at(RESTYLED);
+  // On phones the two share one window: the page, the terminal, the page.
+  const showsPage = step < ASK || step >= DONE;
 
   return (
-    <div ref={root} class="cli-demo" aria-hidden="true">
+    <div
+      ref={root}
+      class={`cli-demo${showsPage ? ' shows-page' : ''}`}
+      aria-hidden="true"
+    >
       <div class="cli-term">
         <div class="cli-term-title">{t.terminal}</div>
         <div class="cli-term-body">
           <div class="cli-term-ask">
             <span class="cli-term-caret">&gt;</span>
-            <Typer text={fmt(t.prompt, { site: SITE })} on={at(1)} />
+            <Typer text={fmt(t.prompt, { site: SITE })} on={at(ASK)} />
           </div>
           {COMMANDS.map(([command, output], i) => {
-            const start = 2 + i * 2;
+            const start = COMMANDS_FROM + i * 2;
             return (
               <div class={`cli-term-row${at(start) ? ' is-on' : ''}`}>
                 <div class="cli-term-cmd">
@@ -79,7 +104,7 @@ export default function CliDemo({
               </div>
             );
           })}
-          <div class={`cli-term-row cli-term-done${at(10) ? ' is-on' : ''}`}>
+          <div class={`cli-term-row cli-term-done${at(DONE) ? ' is-on' : ''}`}>
             {t.done}
           </div>
         </div>
@@ -99,7 +124,7 @@ export default function CliDemo({
           </div>
           <div class="cli-page-ad">{t.ad}</div>
         </div>
-        <div class={`cli-page-flash${step === 9 ? ' is-on' : ''}`} />
+        <div class={`cli-page-flash${step === SCREENSHOT ? ' is-on' : ''}`} />
       </div>
     </div>
   );

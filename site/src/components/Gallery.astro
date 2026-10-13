@@ -2,7 +2,7 @@
 import { Image, getImage } from 'astro:assets';
 import SbIcon from './SbIcon';
 import { Check, Copy } from './icons';
-import { GALLERY } from '../lib/gallery';
+import { GALLERY, type GallerySite } from '../lib/gallery';
 import { LINKS } from '../lib/links';
 import { fmt, messagesFor } from '../i18n';
 
@@ -19,6 +19,12 @@ const strings = {
 };
 
 const SOURCE_BASE = `${LINKS.github}/blob/main/site/src/assets/gallery/`;
+
+/**
+ * The custom properties that crop a site's screenshots on phones.
+ */
+const cropStyle = ({ phoneCrop: { x, y, width } }: GallerySite) =>
+  `--crop-x: ${x}; --crop-y: ${y}; --crop-w: ${width}`;
 
 const sites = await Promise.all(
   GALLERY.map(async (site) => ({
@@ -55,6 +61,7 @@ const sites = await Promise.all(
           data-gallery={site.id}
           data-site={site.url}
           data-active="0"
+          style={cropStyle(site)}
         >
           <span class="gallery-site">{site.site}</span>
           <div class="gallery-shot">
@@ -72,8 +79,8 @@ const sites = await Promise.all(
               >
                 <Image
                   src={theme.image}
-                  widths={[480, 720, 960]}
-                  sizes="(min-width: 1180px) 360px, (min-width: 700px) 45vw, 100vw"
+                  widths={[480, 720, 960, 1920]}
+                  sizes="(min-width: 1180px) 360px, (min-width: 700px) 45vw, (min-width: 640px) 100vw, 260vw"
                   loading={i === 0 ? 'eager' : 'lazy'}
                   alt={fmt(t.alt, { site: site.site, name: theme.name })}
                 />
@@ -188,6 +195,7 @@ const sites = await Promise.all(
   import { track } from '../lib/analytics';
 
   const COPIED_MS = 1600;
+  const phone = matchMedia('(max-width: 639px)');
   const INSTALL_TIMEOUT_MS = 5000;
   let resetTimer: ReturnType<typeof setTimeout> | undefined;
   let lightboxItem: HTMLElement | null = null;
@@ -438,6 +446,8 @@ const sites = await Promise.all(
   }
 
   function open(item: HTMLElement) {
+    // Phones show a readable crop in the card, so there's nothing to enlarge.
+    if (phone.matches) return;
     lightboxItem = item;
     preload(item);
     renderLightbox(item);
@@ -868,16 +878,66 @@ const sites = await Promise.all(
     background: rgba(255, 255, 255, 0.24);
   }
 
-  @media (max-width: 600px) {
-    .lightbox {
-      padding: 16px;
-    }
-  }
-
   @media (max-width: 639px) {
     .gallery-copy,
-    .lightbox-copy {
+    .gallery-hint {
       display: none;
+    }
+
+    .gallery-open {
+      cursor: default;
+    }
+
+    .gallery-grid {
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: min(400px, calc(100% - 28px));
+      gap: 12px;
+      margin: 0 calc(-1 * var(--gutter));
+      padding: 0 var(--gutter) 4px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: var(--gutter);
+      scrollbar-width: none;
+    }
+
+    .gallery-grid::-webkit-scrollbar {
+      display: none;
+    }
+
+    .gallery-item {
+      scroll-snap-align: start;
+    }
+
+    .gallery-shot {
+      aspect-ratio: 4 / 3;
+      box-shadow: none;
+    }
+
+    .gallery-open img {
+      width: calc(100% / var(--crop-w));
+      max-width: none;
+      height: auto;
+      margin: calc(-100% * var(--crop-y) / var(--crop-w)) 0 0
+        calc(-100% * var(--crop-x) / var(--crop-w));
+    }
+
+    .gallery-chips {
+      gap: 8px;
+    }
+
+    .gallery-chip {
+      min-height: 36px;
+      margin: 0;
+      padding: 0 12px 0 10px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      font-size: 14px;
+    }
+
+    .gallery-chip[aria-pressed='true'] {
+      border-color: var(--strong);
+      background: var(--fill);
     }
   }
 </style>

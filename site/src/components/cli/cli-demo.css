@@ -292,16 +292,60 @@
 }
 
 @media (max-width: 639px) {
+  .cli-demo {
+    grid-template-columns: 1fr;
+  }
+
   .cli-term,
   .cli-page {
-    min-height: 320px;
+    grid-area: 1 / 1;
+    height: 340px;
+    min-height: 0;
+    transition:
+      opacity 0.4s,
+      transform 0.4s;
+  }
+
+  .cli-demo.shows-page .cli-term,
+  .cli-demo:not(.shows-page) .cli-page {
+    opacity: 0;
+    transform: scale(0.98);
+    pointer-events: none;
+  }
+
+  .cli-term-title {
+    padding: 9px 14px;
+  }
+
+  .cli-term-body {
+    padding: 12px 14px 14px;
+    gap: 8px;
+    font-size: 12px;
   }
 
   .cli-page-body {
-    padding: 18px 16px 22px;
+    padding: 16px 16px 0;
+    overflow: hidden;
   }
 
   .cli-page-ad {
     width: 56px;
+  }
+
+  .is-after .cli-page-col {
+    gap: 8px;
+  }
+
+  .is-after .cli-page-h1 {
+    font-size: 22px;
+  }
+
+  .is-after .cli-page-dek {
+    font-size: 14px;
+  }
+
+  .is-after .cli-page-text {
+    font-size: 13.5px;
+    line-height: 1.6;
   }
 }

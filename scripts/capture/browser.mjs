@@ -10,11 +10,21 @@ import { rootDir } from '../lib/cli.mjs';
 
 const require = createRequire(import.meta.url);
 const { chromium } = require('@playwright/test');
+// The site already depends on sharp, for Astro's images.
+export const sharp = createRequire(path.join(rootDir, 'site/package.json'))(
+  'sharp'
+);
 
 export const WIDTH = 1280;
 export const HEIGHT = 800;
 export const PANEL_WIDTH = 360;
 export const PAGE_WIDTH = WIDTH - PANEL_WIDTH - 1;
+
+/**
+ * The site's phone tour crops each shot to the panel, at Chrome's narrowest
+ * side panel, and a strip of the page, so its text reads on a phone.
+ */
+export const PHONE = { panel: 320, strip: 48, height: 320 };
 
 const DIVIDER = { light: '#d9d9de', dark: '#2c2f35' };
 
@@ -168,7 +178,7 @@ export const openSite = async (
  * panel's width. Playwright can't reach the real side panel, and this is the
  * same page connected to the same tab.
  */
-export const openPanel = async (browser, page) => {
+export const openPanel = async (browser, page, width = PANEL_WIDTH) => {
   const url = page.url();
   const tabId = await browser.evaluate(
     async url => (await chrome.tabs.query({})).find(tab => tab.url === url)?.id,
@@ -178,7 +188,7 @@ export const openPanel = async (browser, page) => {
   const panel = await browser.context.newPage();
   // Cards and menus appear at once rather than animating in.
   await panel.emulateMedia({ reducedMotion: 'reduce' });
-  await panel.setViewportSize({ width: PANEL_WIDTH, height: HEIGHT });
+  await panel.setViewportSize({ width, height: HEIGHT });
   // Shown in a tab, the panel would take itself for Vivaldi's and close.
   await panel.addInitScript(() => {
     chrome.tabs.getCurrent = async () => undefined;
@@ -288,34 +298,63 @@ export const slide = (
 };
 
 /**
- * Saves the page, with the panel beside it when there is one, as one shot, or
- * as a slide when given one. The page takes the space openSite gave it.
+ * Saves the part of a 2x screen inside `crop` as a WebP for the site, at 2x.
+ */
+export const cutOut = async (context, { image, width }, file, crop) => {
+  const cut = await render(
+    context,
+    `<body style="margin:0;overflow:hidden">
+      <img src="data:image/png;base64,${image.toString(
+        'base64'
+      )}" style="display:block;width:${width}px;margin:${-crop.y}px 0 0 ${-crop.x}px">
+    </body>`,
+    null,
+    { scale: 'device', width: crop.width, height: crop.height }
+  );
+  await sharp(cut).webp({ quality: 90 }).toFile(file);
+};
+
+/**
+ * Saves the page, with the panel beside it when there is one, as one shot, as
+ * a slide when given one, or cut out for the phone tour. The page takes the
+ * space openSite gave it.
  */
 export const capture = async (
   context,
   file,
   page,
   panel,
-  { appearance, scale, slide: frame }
+  { appearance, scale, slide: frame, phone }
 ) => {
   const [site, side] = await Promise.all([png(page), panel && png(panel)]);
   const viewport = page.viewportSize();
   const space = Math.round((viewport.width * HEIGHT) / viewport.height);
-  const width = space + (side ? PANEL_WIDTH + 1 : 0);
+  const panelWidth = panel?.viewportSize().width ?? 0;
+  const width = space + (side ? panelWidth + 1 : 0);
   const img = (data, width) =>
     `<img src="data:image/png;base64,${data}" style="display:block;width:${width}px;height:${HEIGHT}px">`;
 
+  // Slides and phone cut-outs are made from the screen at 2x.
+  const reframed = Boolean(frame || phone);
   const image = await render(
     context,
     `<body style="margin:0;display:flex;gap:1px;background:${
       DIVIDER[appearance]
     }">
       ${img(site, space)}
-      ${side ? img(side, PANEL_WIDTH) : ''}
+      ${side ? img(side, panelWidth) : ''}
     </body>`,
-    frame ? null : file,
-    { scale: frame ? 'device' : scale, width }
+    reframed ? null : file,
+    { scale: reframed ? 'device' : scale, width }
   );
+  if (phone) {
+    return cutOut(context, { image, width }, file, {
+      x: space - PHONE.strip,
+      y: 0,
+      width: PHONE.strip + 1 + panelWidth,
+      height: PHONE.height,
+    });
+  }
   return frame
     ? slide(context, { image, width }, file, { ...frame, scale })
     : image;

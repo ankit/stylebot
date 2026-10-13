@@ -40,7 +40,12 @@ const site: SiteMessages = {
     also: '{first}, {second}에서도 사용 가능',
     desktopOnly:
       'Stylebot은 데스크톱용 <strong>Chrome, Firefox, Edge</strong>에서 사용할 수 있습니다.',
-    video: 'Stylebot 데모 동영상',
+    tour: {
+      label: '기능 둘러보기',
+      pick: '무엇이든 가리키고 스타일을 바꾸세요.',
+      code: '원할 땐 CSS를 직접 쓰세요.',
+      profiles: '클릭 한 번으로 디자인 전환.',
+    },
     installTitle: 'Stylebot 설치',
     installBody:
       '2011년부터 무료 오픈 소스입니다. 계정도 추적도 없습니다. 스타일은 브라우저에 저장되고, 코드는 GitHub에 공개되어 있습니다.',

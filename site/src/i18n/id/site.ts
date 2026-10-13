@@ -40,7 +40,12 @@ const site: SiteMessages = {
     also: 'Juga tersedia di {first} dan {second}',
     desktopOnly:
       'Stylebot berjalan di <strong>Chrome, Firefox, dan Edge</strong> versi desktop.',
-    video: 'Video demo Stylebot',
+    tour: {
+      label: 'Tur fitur',
+      pick: 'Tunjuk apa saja. Ubah tampilannya.',
+      code: 'Tulis CSS kapan pun Anda mau.',
+      profiles: 'Ganti tampilan dengan sekali klik.',
+    },
     installTitle: 'Instal Stylebot',
     installBody:
       'Gratis dan open source sejak 2011. Tanpa akun dan tanpa pelacakan. Gaya Anda tersimpan di browser, dan kodenya ada di GitHub.',

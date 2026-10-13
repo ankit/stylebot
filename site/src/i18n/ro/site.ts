@@ -40,7 +40,12 @@ const site: SiteMessages = {
     also: 'Disponibil și pentru {first} și {second}',
     desktopOnly:
       'Stylebot funcționează în <strong>Chrome, Firefox și Edge</strong> pe computer.',
-    video: 'Videoclip demonstrativ Stylebot',
+    tour: {
+      label: 'Turul funcțiilor',
+      pick: 'Arată spre orice. Schimbă-i aspectul.',
+      code: 'Scrie CSS când vrei.',
+      profiles: 'Schimbă aspectul dintr-un clic.',
+    },
     installTitle: 'Instalează Stylebot',
     installBody:
       'Gratuit și open source din 2011. Fără cont și fără urmărire. Stilurile tale rămân în browser, iar codul este pe GitHub.',

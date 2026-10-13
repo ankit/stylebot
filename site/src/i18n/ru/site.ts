@@ -40,7 +40,12 @@ const site: SiteMessages = {
     also: 'Также для {first} и {second}',
     desktopOnly:
       'Stylebot работает в <strong>Chrome, Firefox и Edge</strong> на компьютере.',
-    video: 'Демо-видео Stylebot',
+    tour: {
+      label: 'Обзор возможностей',
+      pick: 'Укажите на что угодно. Измените вид.',
+      code: 'Пишите CSS, когда захотите.',
+      profiles: 'Меняйте оформление в один клик.',
+    },
     installTitle: 'Установите Stylebot',
     installBody:
       'Бесплатно и с открытым исходным кодом с 2011 года. Без аккаунта и без отслеживания. Ваши стили хранятся в браузере, а код — на GitHub.',

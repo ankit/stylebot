@@ -3,7 +3,6 @@
 //
 //   yarn capture:manual [<name>...] [--no-build]
 
-import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -17,6 +16,7 @@ import {
   openSite,
   profiles,
   seed,
+  sharp,
   showTab,
   style,
   syncState,
@@ -25,9 +25,6 @@ import {
 import { gallery, theme } from './shots.mjs';
 
 const OUT_DIR = path.join(rootDir, 'site/src/assets/manual');
-
-// The site already depends on sharp, for Astro's images.
-const sharp = createRequire(path.join(rootDir, 'site/package.json'))('sharp');
 
 const APPEARANCES = ['light', 'dark'];
 

@@ -9,6 +9,7 @@ import { rootDir } from '../lib/cli.mjs';
 import {
   WIDTH,
   HEIGHT,
+  PHONE,
   capture,
   openPanel,
   openSite,
@@ -38,6 +39,17 @@ export const gallery = (site, name) =>
 // GitHub wraps the repo's last-commit row at the panel's width, so it's laid
 // out a little wider and scaled into the space.
 const GITHUB_WIDTH = 1012;
+
+/**
+ * The width a store slide or the phone tour lays the page out at, if either.
+ */
+const pageWidth = options => (options.slide ?? options.phone)?.pageWidth;
+
+/**
+ * Opens the panel beside a page, at the phone tour's width when it's for that.
+ */
+const openPanelFor = (browser, page, options) =>
+  openPanel(browser, page, options.phone && PHONE.panel);
 
 const hackerNews = active => {
   const list = [
@@ -107,6 +119,7 @@ export const SHOTS = [
       accent: 'pink',
       pageWidth: 480,
     },
+    phone: { pageWidth: 400 },
     run: async (browser, file, options) => {
       await seed(browser, {
         styles: {
@@ -120,11 +133,11 @@ export const SHOTS = [
       const page = await openSite(
         browser.context,
         'https://en.wikipedia.org/wiki/Ikigai',
-        { space: options.slide?.pageWidth }
+        { space: pageWidth(options) }
       );
       // Wikipedia's fundraising and campaign banners come and go.
       await page.addStyleTag({ content: '#centralNotice { display: none; }' });
-      const panel = await openPanel(browser, page);
+      const panel = await openPanelFor(browser, page, options);
       await page.locator('#firstHeading').hover();
       await wait(900);
       await capture(browser.context, file, page, panel, {
@@ -142,6 +155,7 @@ export const SHOTS = [
       accent: 'blue',
       pageWidth: 600,
     },
+    phone: { pageWidth: 400 },
     run: async (browser, file, options) => {
       await seed(browser, {
         styles: {
@@ -155,8 +169,8 @@ export const SHOTS = [
       const page = await openSite(
         browser.context,
         'https://github.com/ankit/stylebot',
-        options.slide
-          ? { space: options.slide.pageWidth }
+        pageWidth(options)
+          ? { space: pageWidth(options) }
           : { width: GITHUB_WIDTH }
       );
       // The repo's topics name Chrome, which the Mac App Store doesn't allow.
@@ -164,7 +178,7 @@ export const SHOTS = [
         content:
           'header.HeaderMktg, [class*="TopicTagGroup"] { display: none !important; }',
       });
-      const panel = await openPanel(browser, page);
+      const panel = await openPanelFor(browser, page, options);
       await showTab(panel, 'Code');
       await wait(1500);
       await capture(browser.context, file, page, panel, {
@@ -182,6 +196,7 @@ export const SHOTS = [
       accent: 'yellow',
       pageWidth: 480,
     },
+    phone: { pageWidth: 400 },
     run: async (browser, file, options) => {
       await seed(browser, {
         styles: { 'news.ycombinator.com': hackerNews('Newspaper Dark') },
@@ -189,9 +204,9 @@ export const SHOTS = [
       const page = await openSite(
         browser.context,
         'https://news.ycombinator.com/',
-        { space: options.slide?.pageWidth }
+        { space: pageWidth(options) }
       );
-      const panel = await openPanel(browser, page);
+      const panel = await openPanelFor(browser, page, options);
       await showTab(panel);
       await panel.getByRole('button', { name: 'Switch profile' }).click();
       await wait(600);
@@ -247,11 +262,7 @@ export const SHOTS = [
         'version-history': history(),
       });
 
-      const page = await openOptions(
-        browser,
-        'history',
-        options.slide?.pageWidth
-      );
+      const page = await openOptions(browser, 'history', pageWidth(options));
       await page.locator('[aria-expanded]').nth(1).click();
       await wait(600);
       await capture(browser.context, file, page, null, {
@@ -274,7 +285,7 @@ export const SHOTS = [
         styles: { 'news.ycombinator.com': hackerNews('Newspaper') },
         ...syncState(),
       });
-      const page = await openOptions(browser, 'sync', options.slide?.pageWidth);
+      const page = await openOptions(browser, 'sync', pageWidth(options));
       await wait(600);
       await capture(browser.context, file, page, null, {
         appearance: 'dark',
@@ -298,7 +309,7 @@ export const SHOTS = [
       const page = await openSite(
         browser.context,
         'https://en.wikipedia.org/wiki/Blue_Prince',
-        { full: true, space: options.slide?.pageWidth }
+        { full: true, space: pageWidth(options) }
       );
       await wait(2500);
       await page.getByRole('button', { name: /Aa/ }).first().click();

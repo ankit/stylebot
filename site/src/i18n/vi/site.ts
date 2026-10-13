@@ -40,7 +40,12 @@ const site: SiteMessages = {
     also: 'Cũng có trên {first} và {second}',
     desktopOnly:
       'Stylebot chạy trên <strong>Chrome, Firefox và Edge</strong> dành cho máy tính.',
-    video: 'Video giới thiệu Stylebot',
+    tour: {
+      label: 'Giới thiệu tính năng',
+      pick: 'Trỏ vào bất cứ thứ gì. Đổi giao diện.',
+      code: 'Viết CSS khi bạn muốn.',
+      profiles: 'Đổi giao diện chỉ với một cú nhấp.',
+    },
     installTitle: 'Cài đặt Stylebot',
     installBody:
       'Miễn phí và mã nguồn mở từ năm 2011. Không cần tài khoản, không theo dõi. Kiểu của bạn nằm trong trình duyệt, còn mã nguồn có trên GitHub.',

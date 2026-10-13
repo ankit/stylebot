@@ -37,6 +37,11 @@ export type GallerySite = {
   id: string;
   site: string;
   url: string;
+  /*
+   * The part of the screenshots a phone shows, so their text stays readable:
+   * left, top and width as fractions of the screenshot's width.
+   */
+  phoneCrop: { x: number; y: number; width: number };
   themes: GalleryTheme[];
 };
 
@@ -45,6 +50,7 @@ export const GALLERY: GallerySite[] = [
     id: 'wikipedia',
     site: 'Wikipedia',
     url: 'wikipedia.org',
+    phoneCrop: { x: 0.19, y: 0, width: 0.34 },
     themes: [
       {
         name: 'Parchment & Ink',
@@ -66,6 +72,7 @@ export const GALLERY: GallerySite[] = [
     id: 'github',
     site: 'GitHub',
     url: 'github.com',
+    phoneCrop: { x: 0.03, y: 0.06, width: 0.34 },
     themes: [
       {
         name: 'Dracula',
@@ -94,6 +101,7 @@ export const GALLERY: GallerySite[] = [
     id: 'nytimes',
     site: 'The New York Times',
     url: 'nytimes.com',
+    phoneCrop: { x: 0.27, y: 0, width: 0.42 },
     themes: [
       {
         name: 'Midnight Edition',
@@ -122,6 +130,7 @@ export const GALLERY: GallerySite[] = [
     id: 'hn',
     site: 'Hacker News',
     url: 'news.ycombinator.com',
+    phoneCrop: { x: 0.2, y: 0.02, width: 0.43 },
     themes: [
       {
         name: 'Newspaper',
@@ -150,6 +159,7 @@ export const GALLERY: GallerySite[] = [
     id: 'gmail',
     site: 'Gmail',
     url: 'mail.google.com',
+    phoneCrop: { x: 0.05, y: 0.05, width: 0.38 },
     themes: [
       {
         name: 'Midnight Mailroom',
