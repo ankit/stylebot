@@ -5,7 +5,7 @@ const site: SiteMessages = {
     title: 'Stylebot - 随心改造任何网站',
     titleSuffix: '{title} - Stylebot',
     description:
-      '指向页面上的任何内容直接修改，或者描述你想要的效果，Stylebot 会编写 CSS。免费开源，支持 Chrome、Firefox 和 Edge。',
+      '指向页面上的任何内容直接修改。Stylebot 会编写 CSS，并在你每次回访时加载。免费开源，支持 Chrome、Firefox 和 Edge。',
   },
   header: {
     home: 'Stylebot 首页',
@@ -36,7 +36,7 @@ const site: SiteMessages = {
     title: '随心{word}任何网站。',
     titleWord: '改造',
     titleWordHint: '点击换个样式',
-    lede: '指向页面上的任何内容直接修改，或者只需描述你想要的效果。Stylebot 会编写 CSS，并在你每次回访时加载你的样式。',
+    lede: '指向页面上的任何内容直接修改。Stylebot 会编写 CSS，并在你每次回访时加载你的样式。',
     also: '也支持 {first} 和 {second}',
     desktopOnly:
       'Stylebot 支持电脑版 <strong>Chrome、Firefox 和 Edge</strong>。',

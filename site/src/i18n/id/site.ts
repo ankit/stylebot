@@ -5,7 +5,7 @@ const site: SiteMessages = {
     title: 'Stylebot - Ubah tampilan situs web mana pun',
     titleSuffix: '{title} - Stylebot',
     description:
-      'Tunjuk sesuatu di halaman lalu ubah, atau jelaskan apa yang Anda inginkan. Stylebot yang menulis CSS-nya. Gratis dan open source untuk Chrome, Firefox, dan Edge.',
+      'Tunjuk sesuatu di halaman lalu ubah. Stylebot menulis CSS-nya dan menerapkannya setiap kali Anda kembali. Gratis dan open source untuk Chrome, Firefox, dan Edge.',
   },
   header: {
     home: 'Beranda Stylebot',
@@ -36,7 +36,7 @@ const site: SiteMessages = {
     title: '{word} tampilan situs web mana pun.',
     titleWord: 'Ubah',
     titleWordHint: 'Klik untuk mengubah tampilan',
-    lede: 'Tunjuk sesuatu di halaman lalu ubah, atau cukup jelaskan apa yang Anda inginkan. Stylebot menulis CSS-nya dan menerapkan gaya Anda setiap kali Anda kembali.',
+    lede: 'Tunjuk sesuatu di halaman lalu ubah. Stylebot menulis CSS-nya dan menerapkan gaya Anda setiap kali Anda kembali.',
     also: 'Juga tersedia di {first} dan {second}',
     desktopOnly:
       'Stylebot berjalan di <strong>Chrome, Firefox, dan Edge</strong> versi desktop.',

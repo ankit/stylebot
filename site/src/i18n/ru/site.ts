@@ -5,7 +5,7 @@ const site: SiteMessages = {
     title: 'Stylebot — меняйте вид любого сайта',
     titleSuffix: '{title} — Stylebot',
     description:
-      'Укажите на элемент страницы и измените его или опишите, что хотите. Stylebot напишет CSS. Бесплатно и с открытым исходным кодом для Chrome, Firefox и Edge.',
+      'Укажите на элемент страницы и измените его. Stylebot напишет CSS и будет применять его при каждом посещении. Бесплатно и с открытым исходным кодом для Chrome, Firefox и Edge.',
   },
   header: {
     home: 'Stylebot — главная',
@@ -36,7 +36,7 @@ const site: SiteMessages = {
     title: '{word} любой сайт.',
     titleWord: 'Оформите',
     titleWordHint: 'Нажмите, чтобы сменить стиль',
-    lede: 'Укажите на элемент страницы и измените его или просто опишите, что хотите. Stylebot напишет CSS и будет применять ваш стиль при каждом посещении.',
+    lede: 'Укажите на элемент страницы и измените его. Stylebot напишет CSS и будет применять ваш стиль при каждом посещении.',
     also: 'Также для {first} и {second}',
     desktopOnly:
       'Stylebot работает в <strong>Chrome, Firefox и Edge</strong> на компьютере.',

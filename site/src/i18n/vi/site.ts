@@ -5,7 +5,7 @@ const site: SiteMessages = {
     title: 'Stylebot - Thay đổi giao diện mọi trang web',
     titleSuffix: '{title} - Stylebot',
     description:
-      'Chỉ vào thứ bạn muốn trên trang rồi chỉnh sửa, hoặc mô tả điều bạn muốn. Stylebot sẽ viết CSS. Miễn phí và mã nguồn mở cho Chrome, Firefox và Edge.',
+      'Chỉ vào thứ bạn muốn trên trang rồi chỉnh sửa. Stylebot viết CSS và áp dụng mỗi lần bạn quay lại. Miễn phí và mã nguồn mở cho Chrome, Firefox và Edge.',
   },
   header: {
     home: 'Trang chủ Stylebot',
@@ -36,7 +36,7 @@ const site: SiteMessages = {
     title: '{word} giao diện mọi trang web.',
     titleWord: 'Đổi mới',
     titleWordHint: 'Nhấp để đổi mới',
-    lede: 'Chỉ vào thứ bạn muốn trên trang rồi chỉnh sửa, hoặc chỉ cần mô tả điều bạn muốn. Stylebot viết CSS và áp dụng kiểu của bạn mỗi lần bạn quay lại.',
+    lede: 'Chỉ vào thứ bạn muốn trên trang rồi chỉnh sửa. Stylebot viết CSS và áp dụng kiểu của bạn mỗi lần bạn quay lại.',
     also: 'Cũng có trên {first} và {second}',
     desktopOnly:
       'Stylebot chạy trên <strong>Chrome, Firefox và Edge</strong> dành cho máy tính.',

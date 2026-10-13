@@ -5,7 +5,7 @@ const site: SiteMessages = {
     title: 'Stylebot - 어떤 웹사이트든 내 스타일로',
     titleSuffix: '{title} - Stylebot',
     description:
-      '페이지에서 요소를 가리켜 바꾸거나 원하는 모습을 설명하세요. CSS는 Stylebot이 작성합니다. Chrome, Firefox, Edge용 무료 오픈 소스 확장 프로그램입니다.',
+      '페이지에서 요소를 가리켜 바꾸세요. CSS는 Stylebot이 작성하고, 사이트를 다시 방문할 때마다 불러옵니다. Chrome, Firefox, Edge용 무료 오픈 소스 확장 프로그램입니다.',
   },
   header: {
     home: 'Stylebot 홈',
@@ -36,7 +36,7 @@ const site: SiteMessages = {
     title: '어떤 웹사이트든 내 {word}로.',
     titleWord: '스타일',
     titleWordHint: '클릭해 스타일 바꾸기',
-    lede: '페이지에서 요소를 가리켜 바꾸거나, 원하는 모습을 말로 설명하세요. CSS는 Stylebot이 작성하고, 사이트를 다시 방문할 때마다 스타일을 불러옵니다.',
+    lede: '페이지에서 요소를 가리켜 바꾸세요. CSS는 Stylebot이 작성하고, 사이트를 다시 방문할 때마다 스타일을 불러옵니다.',
     also: '{first}, {second}에서도 사용 가능',
     desktopOnly:
       'Stylebot은 데스크톱용 <strong>Chrome, Firefox, Edge</strong>에서 사용할 수 있습니다.',

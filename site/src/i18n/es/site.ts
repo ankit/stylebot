@@ -5,7 +5,7 @@ const site: SiteMessages = {
     title: 'Stylebot - Cambia el estilo de cualquier web',
     titleSuffix: '{title} - Stylebot',
     description:
-      'Señala algo en una página y cámbialo, o describe lo que quieres. Stylebot escribe el CSS. Gratis y de código abierto para Chrome, Firefox y Edge.',
+      'Señala algo en una página y cámbialo. Stylebot escribe el CSS y lo carga cada vez que vuelves. Gratis y de código abierto para Chrome, Firefox y Edge.',
   },
   header: {
     home: 'Inicio de Stylebot',
@@ -36,7 +36,7 @@ const site: SiteMessages = {
     title: '{word} cualquier web.',
     titleWord: 'Rediseña',
     titleWordHint: 'Haz clic para cambiar el estilo',
-    lede: 'Señala algo en la página y cámbialo, o simplemente describe lo que quieres. Stylebot escribe el CSS y carga tu estilo cada vez que vuelves.',
+    lede: 'Señala algo en la página y cámbialo. Stylebot escribe el CSS y carga tu estilo cada vez que vuelves.',
     also: 'También en {first} y {second}',
     desktopOnly:
       'Stylebot funciona en <strong>Chrome, Firefox y Edge</strong> para ordenador.',

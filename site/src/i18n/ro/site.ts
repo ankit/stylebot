@@ -5,7 +5,7 @@ const site: SiteMessages = {
     title: 'Stylebot - Schimbă aspectul oricărui site',
     titleSuffix: '{title} - Stylebot',
     description:
-      'Arată spre ceva de pe o pagină și modifică-l, sau descrie ce vrei. Stylebot scrie CSS-ul. Gratuit și open source pentru Chrome, Firefox și Edge.',
+      'Arată spre ceva de pe o pagină și modifică-l. Stylebot scrie CSS-ul și îl încarcă de fiecare dată când revii. Gratuit și open source pentru Chrome, Firefox și Edge.',
   },
   header: {
     home: 'Pagina principală Stylebot',
@@ -36,7 +36,7 @@ const site: SiteMessages = {
     title: '{word} orice site.',
     titleWord: 'Stilizează',
     titleWordHint: 'Dă clic pentru alt stil',
-    lede: 'Arată spre ceva de pe pagină și modifică-l, sau pur și simplu descrie ce vrei. Stylebot scrie CSS-ul și îți încarcă stilul de fiecare dată când revii.',
+    lede: 'Arată spre ceva de pe pagină și modifică-l. Stylebot scrie CSS-ul și îți încarcă stilul de fiecare dată când revii.',
     also: 'Disponibil și pentru {first} și {second}',
     desktopOnly:
       'Stylebot funcționează în <strong>Chrome, Firefox și Edge</strong> pe computer.',

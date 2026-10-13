@@ -5,7 +5,7 @@ const site: SiteMessages = {
     title: 'Stylebot - どんなサイトも自分好みに',
     titleSuffix: '{title} - Stylebot',
     description:
-      'ページ上の要素を指して変更するか、望む見た目を言葉で伝えるだけ。CSS は Stylebot が書きます。Chrome、Firefox、Edge 向けの無料のオープンソース拡張機能です。',
+      'ページ上の要素を指して変更するだけ。CSS は Stylebot が書き、サイトを開くたびに読み込みます。Chrome、Firefox、Edge 向けの無料のオープンソース拡張機能です。',
   },
   header: {
     home: 'Stylebot ホーム',
@@ -36,7 +36,7 @@ const site: SiteMessages = {
     title: 'どんなサイトも、{word}に。',
     titleWord: '自分好み',
     titleWordHint: 'クリックで着せ替え',
-    lede: 'ページ上の要素を指して変更するか、望む見た目を言葉で伝えるだけ。CSS は Stylebot が書き、サイトを開くたびにスタイルを読み込みます。',
+    lede: 'ページ上の要素を指して変更するだけ。CSS は Stylebot が書き、サイトを開くたびにスタイルを読み込みます。',
     also: '{first} と {second} にも対応',
     desktopOnly:
       'Stylebot はパソコン版の <strong>Chrome、Firefox、Edge</strong> で使えます。',

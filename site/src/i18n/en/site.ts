@@ -7,7 +7,7 @@ export default {
     title: 'Stylebot - Restyle any website',
     titleSuffix: '{title} - Stylebot',
     description:
-      'Point at something on a page and change it, or describe what you want. Stylebot writes the CSS. Free and open source for Chrome, Firefox and Edge.',
+      'Point at something on a page and change it. Stylebot writes the CSS and loads it every time you come back. Free and open source for Chrome, Firefox and Edge.',
   },
   header: {
     home: 'Stylebot home',
@@ -42,7 +42,7 @@ export default {
     titleWord: 'Restyle',
     // Tooltip on titleWord.
     titleWordHint: 'Click to restyle',
-    lede: 'Point at something on the page and change it, or just describe what you want. Stylebot writes the CSS and loads your style every time you come back.',
+    lede: 'Point at something on the page and change it. Stylebot writes the CSS and loads your style every time you come back.',
     also: 'Also on {first} and {second}',
     // Shown on phones in place of the store buttons.
     desktopOnly:
