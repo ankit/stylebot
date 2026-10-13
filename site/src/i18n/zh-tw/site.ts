@@ -379,7 +379,7 @@ const site: SiteMessages = {
     },
     r40: {
       description:
-        'Stylebot 4.0 帶來重新設計的編輯器、供程式設計代理使用的命令列、設定檔、側邊面板、聊天、版本記錄和同步。',
+        'Stylebot 4.0 帶來重新設計的編輯器、供程式設計代理使用的命令列、設定檔、側邊面板、版本記錄和同步。',
       lede: '重新設計的編輯器、供程式設計代理使用的命令列、設定檔，以及側邊面板。',
       toc: {
         editor: '重新設計的編輯器',
@@ -388,7 +388,6 @@ const site: SiteMessages = {
         panel: '側邊面板',
         history: '版本記錄',
         sync: '同步',
-        chat: '聊天',
         more: '更多改進',
       },
       editorTitle: '重新設計的編輯器',
@@ -416,11 +415,6 @@ const site: SiteMessages = {
       syncTitle: '同步',
       syncBody:
         'Google Drive 同步更加穩定。來自不同電腦的編輯會合併，不會遺失任何內容。每 30 分鐘會自動同步一次，編輯後也會立即同步。',
-      chatTitle: '聊天',
-      chatBody:
-        '沒有程式設計代理？描述你想要的效果，或挑選建議的外觀，Stylebot 就會撰寫 CSS。使用你自己的 Claude、OpenAI 或 Gemini 金鑰。',
-      chatAlt:
-        '聊天分頁為頁面建議的外觀：「溫馨」、「寧靜」和「只有連結是彩色」',
       moreTitle: '更多改進',
       moreItems: [
         '全新的 stylebot.dev',

@@ -393,7 +393,7 @@ const site: SiteMessages = {
     },
     r40: {
       description:
-        'Stylebot 4.0 menghadirkan editor yang didesain ulang, baris perintah untuk agen coding, profil, panel samping, Chat, riwayat versi, dan sinkronisasi.',
+        'Stylebot 4.0 menghadirkan editor yang didesain ulang, baris perintah untuk agen coding, profil, panel samping, riwayat versi, dan sinkronisasi.',
       lede: 'Editor yang didesain ulang, baris perintah untuk agen coding, profil, dan panel samping.',
       toc: {
         editor: 'Editor baru',
@@ -402,7 +402,6 @@ const site: SiteMessages = {
         panel: 'Panel samping',
         history: 'Riwayat versi',
         sync: 'Sinkronisasi',
-        chat: 'Chat',
         more: 'Dan lainnya',
       },
       editorTitle: 'Editor yang didesain ulang',
@@ -432,11 +431,6 @@ const site: SiteMessages = {
       syncTitle: 'Sinkronisasi',
       syncBody:
         'Sinkronisasi Google Drive kini lebih andal. Editan dari komputer yang berbeda digabungkan, jadi tidak ada yang hilang. Sinkronisasi berjalan otomatis setiap 30 menit dan tepat setelah Anda mengedit.',
-      chatTitle: 'Chat',
-      chatBody:
-        'Tidak memakai agen coding? Jelaskan apa yang Anda inginkan, atau pilih tampilan yang disarankan, dan Stylebot yang menulis CSS-nya. Gunakan kunci Claude, OpenAI, atau Gemini Anda sendiri.',
-      chatAlt:
-        'Tab Chat menyarankan tampilan untuk halaman: Nyaman, Tenang, dan Hanya tautan berwarna',
       moreTitle: 'Dan lainnya',
       moreItems: [
         'stylebot.dev yang baru',

@@ -378,7 +378,7 @@ const site: SiteMessages = {
     },
     r40: {
       description:
-        'Stylebot 4.0 带来重新设计的编辑器、面向编程智能体的命令行、方案、侧边栏、聊天、版本历史和同步。',
+        'Stylebot 4.0 带来重新设计的编辑器、面向编程智能体的命令行、方案、侧边栏、版本历史和同步。',
       lede: '重新设计的编辑器、面向编程智能体的命令行、方案和侧边栏。',
       toc: {
         editor: '重新设计的编辑器',
@@ -387,7 +387,6 @@ const site: SiteMessages = {
         panel: '侧边栏',
         history: '版本历史',
         sync: '同步',
-        chat: '聊天',
         more: '更多',
       },
       editorTitle: '重新设计的编辑器',
@@ -415,10 +414,6 @@ const site: SiteMessages = {
       syncTitle: '同步',
       syncBody:
         'Google Drive 同步更加稳定，会合并来自不同电脑的改动，不会丢失任何内容。每 30 分钟自动同步一次，编辑后也会立即同步。',
-      chatTitle: '聊天',
-      chatBody:
-        '没有编程智能体？描述你想要的效果，或选一个推荐的风格，Stylebot 就会编写 CSS。使用你自己的 Claude、OpenAI 或 Gemini 密钥。',
-      chatAlt: '“聊天”标签页为页面推荐的风格：“温馨”“宁静”和“只有链接是彩色”',
       moreTitle: '更多',
       moreItems: [
         '全新的 stylebot.dev',

@@ -390,7 +390,7 @@ const site: SiteMessages = {
     },
     r40: {
       description:
-        'Stylebot 4.0은 새롭게 디자인한 편집기, 코딩 에이전트를 위한 명령줄, 프로필, 측면 패널, 채팅, 버전 기록, 동기화를 제공합니다.',
+        'Stylebot 4.0은 새롭게 디자인한 편집기, 코딩 에이전트를 위한 명령줄, 프로필, 측면 패널, 버전 기록, 동기화를 제공합니다.',
       lede: '새롭게 디자인한 편집기, 코딩 에이전트를 위한 명령줄, 프로필, 측면 패널.',
       toc: {
         editor: '새 편집기',
@@ -399,7 +399,6 @@ const site: SiteMessages = {
         panel: '측면 패널',
         history: '버전 기록',
         sync: '동기화',
-        chat: '채팅',
         more: '그 밖의 기능',
       },
       editorTitle: '새롭게 디자인한 편집기',
@@ -429,11 +428,6 @@ const site: SiteMessages = {
       syncTitle: '동기화',
       syncBody:
         'Google Drive 동기화가 더 안정적입니다. 여러 컴퓨터의 변경 사항을 병합하므로 잃어버리는 내용이 없습니다. 30분마다, 그리고 편집 직후에 자동으로 실행됩니다.',
-      chatTitle: '채팅',
-      chatBody:
-        '코딩 에이전트가 없으신가요? 원하는 것을 설명하거나 제안된 스타일을 고르면 Stylebot이 CSS를 작성합니다. Claude, OpenAI, Gemini 키를 직접 연결해 사용하세요.',
-      chatAlt:
-        '페이지에 어울리는 스타일을 제안하는 채팅 탭: 아늑하게, 차분하게, 링크만 컬러로',
       moreTitle: '그 밖의 기능',
       moreItems: [
         '새로워진 stylebot.dev',

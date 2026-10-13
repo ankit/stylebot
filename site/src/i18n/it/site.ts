@@ -395,7 +395,7 @@ const site: SiteMessages = {
     },
     r40: {
       description:
-        'Stylebot 4.0 porta un editor ridisegnato, una riga di comando per gli agenti di programmazione, i profili, il pannello laterale, Chat, la cronologia versioni e la sincronizzazione.',
+        'Stylebot 4.0 porta un editor ridisegnato, una riga di comando per gli agenti di programmazione, i profili, il pannello laterale, la cronologia versioni e la sincronizzazione.',
       lede: 'Un editor ridisegnato, una riga di comando per gli agenti di programmazione, i profili e il pannello laterale.',
       toc: {
         editor: 'Editor ridisegnato',
@@ -404,7 +404,6 @@ const site: SiteMessages = {
         panel: 'Pannello laterale',
         history: 'Cronologia versioni',
         sync: 'Sincronizzazione',
-        chat: 'Chat',
         more: 'E altro ancora',
       },
       editorTitle: 'Un editor ridisegnato',
@@ -435,11 +434,6 @@ const site: SiteMessages = {
       syncTitle: 'Sincronizzazione',
       syncBody:
         'La sincronizzazione con Google Drive è più affidabile. Le modifiche fatte su computer diversi vengono unite, così non se ne perde nessuna. Parte da sola ogni 30 minuti e subito dopo ogni modifica.',
-      chatTitle: 'Chat',
-      chatBody:
-        'Niente agente di programmazione? Descrivi cosa vuoi, o scegli uno stile suggerito, e Stylebot scrive il CSS. Usa la tua chiave di Claude, OpenAI o Gemini.',
-      chatAlt:
-        'La scheda Chat che suggerisce stili per la pagina: Accogliente, Calmo e Solo i link a colori',
       moreTitle: 'E altro ancora',
       moreItems: [
         'Un nuovo stylebot.dev',

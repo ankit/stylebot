@@ -398,7 +398,7 @@ const site: SiteMessages = {
     },
     r40: {
       description:
-        'Stylebot 4.0 aduce un editor reproiectat, o linie de comandă pentru agenții de programare, profiluri, un panou lateral, Chat, istoricul versiunilor și sincronizare.',
+        'Stylebot 4.0 aduce un editor reproiectat, o linie de comandă pentru agenții de programare, profiluri, un panou lateral, istoricul versiunilor și sincronizare.',
       lede: 'Un editor reproiectat, o linie de comandă pentru agenții de programare, profiluri și un panou lateral.',
       toc: {
         editor: 'Editor reproiectat',
@@ -407,7 +407,6 @@ const site: SiteMessages = {
         panel: 'Panou lateral',
         history: 'Istoricul versiunilor',
         sync: 'Sincronizare',
-        chat: 'Chat',
         more: 'Și altele',
       },
       editorTitle: 'Un editor reproiectat',
@@ -438,11 +437,6 @@ const site: SiteMessages = {
       syncTitle: 'Sincronizare',
       syncBody:
         'Sincronizarea cu Google Drive este mai robustă. Modificările de pe calculatoare diferite sunt combinate, așa că nu se pierde nimic. Rulează singură la fiecare 30 de minute și imediat după ce faci o modificare.',
-      chatTitle: 'Chat',
-      chatBody:
-        'Nu ai un agent de programare? Descrie ce vrei sau alege un aspect sugerat, iar Stylebot scrie CSS-ul. Folosește propria cheie Claude, OpenAI sau Gemini.',
-      chatAlt:
-        'Fila Chat sugerând aspecte pentru pagină: Primitor, Liniștit și Doar linkurile colorate',
       moreTitle: 'Și altele',
       moreItems: [
         'Un nou stylebot.dev',

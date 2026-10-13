@@ -391,7 +391,7 @@ const site: SiteMessages = {
     },
     r40: {
       description:
-        'Stylebot 4.0 では、エディタを一新し、コーディングエージェント向けのコマンドライン、プロファイル、サイドパネル、チャット、バージョン履歴、同期を追加しました。',
+        'Stylebot 4.0 では、エディタを一新し、コーディングエージェント向けのコマンドライン、プロファイル、サイドパネル、バージョン履歴、同期を追加しました。',
       lede: 'エディタを一新し、コーディングエージェント向けのコマンドライン、プロファイル、サイドパネルを追加しました。',
       toc: {
         editor: 'エディタを一新',
@@ -400,7 +400,6 @@ const site: SiteMessages = {
         panel: 'サイドパネル',
         history: 'バージョン履歴',
         sync: '同期',
-        chat: 'チャット',
         more: 'その他',
       },
       editorTitle: 'エディタを一新',
@@ -430,11 +429,6 @@ const site: SiteMessages = {
       syncTitle: '同期',
       syncBody:
         'Google Drive 同期がより安定しました。別のパソコンでの編集はマージされるので、失われることはありません。同期は 30 分ごとと、編集した直後に自動で行われます。',
-      chatTitle: 'チャット',
-      chatBody:
-        'コーディングエージェントがなくても大丈夫。望む見た目を伝えるか、提案から選ぶと、Stylebot が CSS を書きます。Claude、OpenAI、Gemini のキーは自分のものを使います。',
-      chatAlt:
-        'ページに合わせて「ほっこり」「落ち着き」「リンクだけカラー」を提案するチャットタブ',
       moreTitle: 'その他',
       moreItems: [
         '新しい stylebot.dev',

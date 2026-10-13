@@ -394,7 +394,7 @@ const site: SiteMessages = {
     },
     r40: {
       description:
-        'Stylebot 4.0 bringt einen neu gestalteten Editor, eine Befehlszeile für Coding-Agenten, Profile, einen Seitenbereich, Chat, einen Versionsverlauf und Synchronisierung.',
+        'Stylebot 4.0 bringt einen neu gestalteten Editor, eine Befehlszeile für Coding-Agenten, Profile, einen Seitenbereich, einen Versionsverlauf und Synchronisierung.',
       lede: 'Ein neu gestalteter Editor, eine Befehlszeile für Coding-Agenten, Profile und ein Seitenbereich.',
       toc: {
         editor: 'Neuer Editor',
@@ -403,7 +403,6 @@ const site: SiteMessages = {
         panel: 'Seitenbereich',
         history: 'Versionsverlauf',
         sync: 'Synchronisierung',
-        chat: 'Chat',
         more: 'Und mehr',
       },
       editorTitle: 'Ein neu gestalteter Editor',
@@ -435,11 +434,6 @@ const site: SiteMessages = {
       syncTitle: 'Synchronisierung',
       syncBody:
         'Die Google Drive-Synchronisierung ist robuster. Änderungen von verschiedenen Computern werden zusammengeführt, sodass keine verloren geht. Sie läuft automatisch alle 30 Minuten und direkt nach jeder Änderung.',
-      chatTitle: 'Chat',
-      chatBody:
-        'Kein Coding-Agent? Beschreiben Sie, was Sie möchten, oder wählen Sie einen vorgeschlagenen Look, und Stylebot schreibt das CSS. Mit Ihrem eigenen Schlüssel für Claude, OpenAI oder Gemini.',
-      chatAlt:
-        'Der Chat-Tab schlägt Looks für die Seite vor: „Gemütlich“, „Ruhig“ und „Nur Links in Farbe“',
       moreTitle: 'Und mehr',
       moreItems: [
         'Ein neues stylebot.dev',

@@ -397,7 +397,7 @@ const site: SiteMessages = {
     },
     r40: {
       description:
-        'Stylebot 4.0 mang đến trình chỉnh sửa được thiết kế lại, dòng lệnh cho trợ lý lập trình, hồ sơ, bảng bên, Trò chuyện, lịch sử phiên bản và đồng bộ.',
+        'Stylebot 4.0 mang đến trình chỉnh sửa được thiết kế lại, dòng lệnh cho trợ lý lập trình, hồ sơ, bảng bên, lịch sử phiên bản và đồng bộ.',
       lede: 'Trình chỉnh sửa được thiết kế lại, dòng lệnh cho trợ lý lập trình, hồ sơ và bảng bên.',
       toc: {
         editor: 'Trình chỉnh sửa mới',
@@ -406,7 +406,6 @@ const site: SiteMessages = {
         panel: 'Bảng bên',
         history: 'Lịch sử phiên bản',
         sync: 'Đồng bộ',
-        chat: 'Trò chuyện',
         more: 'Và hơn thế nữa',
       },
       editorTitle: 'Trình chỉnh sửa được thiết kế lại',
@@ -437,11 +436,6 @@ const site: SiteMessages = {
       syncTitle: 'Đồng bộ',
       syncBody:
         'Đồng bộ Google Drive ổn định hơn. Thay đổi từ các máy tính khác nhau được gộp lại, nên không mất gì cả. Stylebot tự đồng bộ 30 phút một lần và ngay sau khi bạn chỉnh sửa.',
-      chatTitle: 'Trò chuyện',
-      chatBody:
-        'Không dùng trợ lý lập trình? Mô tả điều bạn muốn, hoặc chọn giao diện được gợi ý, và Stylebot sẽ viết CSS. Dùng khóa Claude, OpenAI hoặc Gemini của riêng bạn.',
-      chatAlt:
-        'Thẻ Trò chuyện gợi ý giao diện cho trang: Ấm cúng, Tĩnh lặng và Chỉ liên kết có màu',
       moreTitle: 'Và hơn thế nữa',
       moreItems: [
         'stylebot.dev mới',

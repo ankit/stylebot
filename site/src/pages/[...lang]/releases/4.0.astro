@@ -5,9 +5,7 @@ import ImageZoom from '../../../components/ImageZoom.astro';
 import CliCommand from '../../../components/cli/CliCommand.astro';
 import { CLI_PACKAGE, LINKS } from '../../../lib/links';
 import { crisp } from '../../../lib/screenshots';
-import agent from '../../../assets/manual/agent-chat.png';
 import profiles from '../../../assets/manual/popup-profiles.png';
-import agentDark from '../../../assets/manual/agent-chat-dark.png';
 import profilesDark from '../../../assets/manual/popup-profiles-dark.png';
 import editor from '../../../assets/manual/editor-panel.png';
 import editorDark from '../../../assets/manual/editor-panel-dark.png';
@@ -76,14 +74,6 @@ const cards = [
     dark: syncDark,
     alt: m.sync.shot,
     wide: true,
-  },
-  {
-    id: 'chat',
-    title: r.chatTitle,
-    body: r.chatBody,
-    light: agent,
-    dark: agentDark,
-    alt: r.chatAlt,
   },
 ];
 ---

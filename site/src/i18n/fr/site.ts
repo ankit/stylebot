@@ -396,7 +396,7 @@ const site: SiteMessages = {
     },
     r40: {
       description:
-        'Stylebot 4.0 apporte un éditeur repensé, une ligne de commande pour les agents de code, des profils, un panneau latéral, le Chat, l’historique des versions et la synchronisation.',
+        'Stylebot 4.0 apporte un éditeur repensé, une ligne de commande pour les agents de code, des profils, un panneau latéral, l’historique des versions et la synchronisation.',
       lede: 'Un éditeur repensé, une ligne de commande pour les agents de code, des profils et un panneau latéral.',
       toc: {
         editor: 'Éditeur repensé',
@@ -405,7 +405,6 @@ const site: SiteMessages = {
         panel: 'Panneau latéral',
         history: 'Historique des versions',
         sync: 'Synchronisation',
-        chat: 'Chat',
         more: 'Et plus encore',
       },
       editorTitle: 'Un éditeur repensé',
@@ -437,11 +436,6 @@ const site: SiteMessages = {
       syncTitle: 'Synchronisation',
       syncBody:
         'La synchronisation Google Drive est plus fiable. Les modifications faites sur différents ordinateurs sont fusionnées, pour que rien ne se perde. Elle s’exécute d’elle-même toutes les 30 minutes et juste après chaque modification.',
-      chatTitle: 'Chat',
-      chatBody:
-        'Pas d’agent de code ? Décrivez ce que vous voulez, ou choisissez une apparence suggérée, et Stylebot écrit le CSS. Utilisez votre propre clé Claude, OpenAI ou Gemini.',
-      chatAlt:
-        'L’onglet Chat, qui suggère des apparences pour la page : Douillet, Apaisant et Seuls les liens en couleur',
       moreTitle: 'Et plus encore',
       moreItems: [
         'Un nouveau stylebot.dev',

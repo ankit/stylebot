@@ -409,7 +409,7 @@ export default {
     },
     r40: {
       description:
-        'Stylebot 4.0 brings a redesigned editor, a command line for coding agents, profiles, a side panel, Chat, version history and sync.',
+        'Stylebot 4.0 brings a redesigned editor, a command line for coding agents, profiles, a side panel, version history and sync.',
       lede: 'A redesigned editor, a command line for coding agents, profiles, and a side panel.',
       toc: {
         editor: 'Redesigned editor',
@@ -418,7 +418,6 @@ export default {
         panel: 'Side panel',
         history: 'Version history',
         sync: 'Sync',
-        chat: 'Chat',
         more: 'And more',
       },
       editorTitle: 'A redesigned editor',
@@ -450,12 +449,6 @@ export default {
       syncTitle: 'Sync',
       syncBody:
         'Google Drive sync is more robust. Edits from different computers are merged, so none get lost. It runs on its own every 30 minutes and right after you edit.',
-      chatTitle: 'Chat',
-      chatBody:
-        'No coding agent? Describe what you want, or pick a suggested look, and Stylebot writes the CSS. Bring your own Claude, OpenAI or Gemini key.',
-      // Cozy, Calm and Only the links in color are suggestions shown in the screenshot; use the extension's own translation.
-      chatAlt:
-        'The Chat tab suggesting looks for the page: Cozy, Calm, and Only the links in color',
       moreTitle: 'And more',
       moreItems: [
         'A new stylebot.dev',
