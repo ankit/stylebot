@@ -49,7 +49,7 @@ export const migrations: Array<Migration> = [
  * The completion keys already recorded, or none when storage can't be read,
  * which only reruns migrations that are idempotent anyway.
  */
-const completed = async (): Promise<Record<string, unknown>> => {
+const readCompletionKeys = async (): Promise<Record<string, unknown>> => {
   try {
     return await chrome.storage.local.get(
       migrations.map(migration => completionKey(migration.name))
@@ -68,13 +68,13 @@ const completed = async (): Promise<Record<string, unknown>> => {
  */
 const runAll = async (): Promise<void> => {
   const errors: Record<string, string> = {};
-  const done = await completed();
-  const finished: Record<string, true> = {};
+  const recorded = await readCompletionKeys();
+  const newlyDone: Record<string, true> = {};
 
   for (const migration of migrations) {
     const key = completionKey(migration.name);
 
-    if (!migration.everyStart && done[key]) {
+    if (!migration.everyStart && recorded[key]) {
       continue;
     }
 
@@ -82,7 +82,7 @@ const runAll = async (): Promise<void> => {
       await migration.run();
 
       if (!migration.everyStart) {
-        finished[key] = true;
+        newlyDone[key] = true;
       }
     } catch (e) {
       console.error(`Migration ${migration.name} failed`, e);
@@ -91,8 +91,8 @@ const runAll = async (): Promise<void> => {
   }
 
   try {
-    if (Object.keys(finished).length > 0) {
-      await chrome.storage.local.set(finished);
+    if (Object.keys(newlyDone).length > 0) {
+      await chrome.storage.local.set(newlyDone);
     }
   } catch (e) {
     console.error('Could not record completed migrations', e);
