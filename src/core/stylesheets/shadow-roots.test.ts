@@ -191,6 +191,21 @@ describe('shadow-roots', () => {
         jest.useRealTimers();
       }
     });
+
+    it("doesn't recheck custom elements already defined without a shadow root", async () => {
+      jest.useFakeTimers();
+
+      try {
+        customElements.define('defined-light', class extends HTMLElement {});
+        setShadowRootCSS('example', 'tr { color: red; }');
+        document.body.appendChild(document.createElement('defined-light'));
+        await Promise.resolve();
+
+        expect(jest.getTimerCount()).toBe(0);
+      } finally {
+        jest.useRealTimers();
+      }
+    });
   });
 
   describe('with constructable stylesheets', () => {
@@ -274,6 +289,48 @@ describe('shadow-roots', () => {
       await flush();
 
       expect(getOpenShadowRoots()).toEqual([first.root, second.root]);
+    });
+
+    it('finds nested roots without a style watching the page', () => {
+      const outer = attachHost(document.body, '<div class="inner"></div>');
+      const inner = attachHost(
+        outer.root.querySelector('.inner') as HTMLElement
+      );
+
+      expect(getOpenShadowRoots()).toEqual([outer.root, inner.root]);
+      expect((window as any)[SHADOW_ROOT_REGISTRY_KEY]).toBeUndefined();
+    });
+  });
+
+  describe('watching the page', () => {
+    it("doesn't start for a style without css", () => {
+      setShadowRootCSS('example', '');
+
+      expect((window as any)[SHADOW_ROOT_REGISTRY_KEY]).toBeUndefined();
+    });
+
+    it('stops once every style is cleared, and starts again with css', async () => {
+      setShadowRootCSS('a', 'tr { color: red; }');
+      setShadowRootCSS('b', 'tr { color: blue; }');
+      setShadowRootCSS('a', '');
+      const whileOn = attachHost();
+      await flush();
+
+      expect(styleIn(whileOn.root, 'b')?.textContent).toBe(
+        'tr { color: blue; }'
+      );
+
+      setShadowRootCSS('b', '');
+      const whileOff = attachHost();
+      await flush();
+
+      expect(styleIn(whileOff.root, 'b')).toBeNull();
+
+      setShadowRootCSS('b', 'tr { color: green; }');
+
+      expect(styleIn(whileOff.root, 'b')?.textContent).toBe(
+        'tr { color: green; }'
+      );
     });
   });
 });
