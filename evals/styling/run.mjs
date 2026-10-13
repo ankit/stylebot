@@ -1,23 +1,22 @@
 /*
- * Evaluates Chat's styling replies: runs each case against recorded pages for
- * two versions of Stylebot (git refs), with every model call made through
- * headless Claude Code, then scores the result. See docs/chat-evals.md.
+ * Evaluates Stylebot's AI styling path: runs each case's requests through
+ * headless Claude Code with the /stylebot skill and the stylebot CLI, against
+ * recorded pages in a browser with the extension, for two versions of
+ * Stylebot (git refs), then scores the page. See docs/styling-evals.md.
  */
 import { createHash } from 'node:crypto';
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 
-import { askClaude } from './claude.mjs';
-import {
-  buildEditStream,
-  buildRef,
-  buildScorer,
-  checkoutRef,
-} from './bundles.mjs';
+import { preparePlugin, runAgent, toolCallsIn } from './agent.mjs';
+import { launchExtensionBrowser, launchOptions } from './browser.mjs';
 import { measureChecks, scoreChecks } from './checks.mjs';
+import { replayHars } from './replay.mjs';
+import { buildExtension, buildScorer, checkoutRef, toolsOf } from './refs.mjs';
 
 const require = createRequire(import.meta.url);
 const { chromium } = require('playwright');
@@ -32,32 +31,22 @@ const VIEWPORT = { width: 1280, height: 900 };
 const MAX_SHOT_HEIGHT = 2000;
 const BROAD_MATCHES = 300;
 const STYLE_ID = 'stylebot-eval-css';
+const DEFAULT_MODEL = 'claude-sonnet-5-5';
 // The page check's problem types, under their current and earlier names.
 const UNREADABLE = ['unreadable-text', 'unreadable'];
-// List prices in dollars per million tokens, input and output, uncached.
-const PRICES = {
-  'claude-haiku-4-5': [1, 5],
-  'claude-sonnet-5': [2, 10],
-  'claude-sonnet-5-5': [2, 10],
-  'claude-opus-5': [5, 25],
-  'claude-opus-5-5': [4, 20],
-  'claude-fable-5-1': [10, 50],
-};
 
 const { values: args } = parseArgs({
   options: {
-    base: { type: 'string', default: 'v4' },
+    base: { type: 'string', default: 'main' },
     head: { type: 'string', default: '.' },
-    model: { type: 'string' },
+    model: { type: 'string', default: DEFAULT_MODEL },
     effort: { type: 'string' },
-    thinking: { type: 'string' },
     'head-model': { type: 'string' },
     'head-effort': { type: 'string' },
-    'head-thinking': { type: 'string' },
     cases: { type: 'string' },
     tags: { type: 'string' },
     runs: { type: 'string', default: '1' },
-    concurrency: { type: 'string', default: '6' },
+    concurrency: { type: 'string', default: '4' },
     record: { type: 'boolean', default: false },
     fresh: { type: 'boolean', default: false },
     references: { type: 'boolean', default: false },
@@ -65,18 +54,6 @@ const { values: args } = parseArgs({
 });
 
 const log = (...parts) => console.log(...parts);
-
-/**
- * The edits with their selectors' partly hashed classes swapped for stable
- * matchers by the page, as the extension applies them.
- */
-const withStableSelectors = async (page, edits) => {
-  const selectors = await page.evaluate(
-    list => window.StylebotEval.getStableSelectors(list),
-    edits.map(edit => edit.selector)
-  );
-  return edits.map((edit, i) => ({ ...edit, selector: selectors[i] }));
-};
 
 const slug = url =>
   url
@@ -86,6 +63,10 @@ const slug = url =>
     .toLowerCase();
 
 const harFor = url => path.join(PAGES, `${slug(url)}.har`);
+
+const harsOf = testCase => [
+  ...new Set(testCase.steps.map(step => harFor(step.url))),
+];
 
 /**
  * Records each page once (or again with --record), so every run and
@@ -119,8 +100,16 @@ const recordPages = async (browser, urls) => {
   }
 };
 
-const openPage = async (context, url, scripts) => {
+/**
+ * A context of the plain browser, with no extension: for the unstyled
+ * page, references and the page check.
+ */
+const plainContext = browser =>
+  browser.newContext({ viewport: VIEWPORT, bypassCSP: true });
+
+const openPage = async (context, url, scripts = []) => {
   const page = await context.newPage();
+  await page.setViewportSize(VIEWPORT);
   await page.goto(url, { waitUntil: 'load' });
   await page.waitForTimeout(500);
   for (const script of scripts) {
@@ -130,15 +119,12 @@ const openPage = async (context, url, scripts) => {
 };
 
 /**
- * The stylesheet as Stylebot injects it: every declaration forced, and the
- * Google Fonts the model named imported.
+ * Family names from the stylesheet's font-family declarations.
  */
-const pageCssFor = css => {
-  const root = postcss.parse(css);
+const fontFamilies = root => {
   const families = new Set();
 
   root.walkDecls(decl => {
-    decl.important = true;
     if (
       decl.prop === 'font-family' ||
       (decl.prop.startsWith('--') && /font|family|typeface/i.test(decl.prop))
@@ -153,7 +139,20 @@ const pageCssFor = css => {
     }
   });
 
-  const imports = [...families].map(
+  return [...families];
+};
+
+/**
+ * The stylesheet as Stylebot injects it: every declaration forced, and the
+ * Google Fonts it names imported.
+ */
+const pageCssFor = css => {
+  const root = postcss.parse(css);
+  root.walkDecls(decl => {
+    decl.important = true;
+  });
+
+  const imports = fontFamilies(root).map(
     family =>
       `@import url('https://fonts.googleapis.com/css2?family=${encodeURIComponent(
         family
@@ -161,6 +160,22 @@ const pageCssFor = css => {
   );
 
   return [...imports, root.toString()].join('\n');
+};
+
+/**
+ * The stylesheet's rules as the page check takes edits.
+ */
+const editsOf = css => {
+  const edits = [];
+  postcss.parse(css).walkRules(rule => {
+    const declarations = rule.nodes
+      .filter(node => node.type === 'decl')
+      .map(decl => ({ property: decl.prop, value: decl.value }));
+    if (declarations.length) {
+      edits.push({ selector: rule.selector, declarations });
+    }
+  });
+  return edits;
 };
 
 const injectCss = (page, css) =>
@@ -201,61 +216,11 @@ const screenshot = async (page, file) => {
   await page.setViewportSize(VIEWPORT);
 };
 
-const tag = (name, body) => `<${name}>\n${body}\n</${name}>`;
-
 // A step's request as the summary shows it, naming the element it's about.
 const requestText = step =>
   step.scope
-    ? `${step.text} (about the picked element: ${step.scope})`
+    ? `${step.text} (about the element at the selector ${step.scope})`
     : step.text;
-
-/**
- * The thread as one prompt, since headless Claude Code takes a single
- * message: each turn as the extension would replay it, the page as it
- * stands for versions that send it after the thread, then the ask.
- */
-const transcriptFor = (ref, turns, context) => {
-  const { userMessageText, tool } = ref.node;
-  const parts = turns.flatMap(turn => {
-    if (turn.role === 'user') {
-      return [tag('user', userMessageText(turn))];
-    }
-
-    const rounds = tool.roundsOf
-      ? tool.roundsOf(turn)
-      : [{ text: turn.text, edits: turn.edits, matches: turn.matches }];
-
-    return rounds.flatMap(round => [
-      ...(round.text ? [tag('assistant', round.text)] : []),
-      ...(round.edits.length
-        ? [
-            tag('apply_css', JSON.stringify({ edits: round.edits })),
-            tag(
-              'apply_css_result',
-              tool.roundsOf
-                ? tool.toolResultFor(turn, round)
-                : tool.toolResultFor(turn)
-            ),
-          ]
-        : []),
-    ]);
-  });
-
-  return [
-    tag('conversation', [...parts, ...(context ? [context] : [])].join('\n')),
-    'Continue as the assistant from the end of the conversation. Reply as JSON: "text" is what you say to the user, and "edits" are the edits of your apply_css call, or an empty list when you make no call.',
-  ].join('\n\n');
-};
-
-const replySchema = ref => ({
-  type: 'object',
-  additionalProperties: false,
-  required: ['text', 'edits'],
-  properties: {
-    text: { type: 'string' },
-    edits: ref.node.tool.TOOL_SCHEMA.properties.edits,
-  },
-});
 
 /**
  * A case's reference: a stylesheet for the result it should get, or null
@@ -272,18 +237,12 @@ const referenceFor = testCase => {
  * and the ones about the request should fail without it.
  */
 const runReference = async ({ browser, testCase, css, dir }) => {
-  const context = await browser.newContext({
-    viewport: VIEWPORT,
-    bypassCSP: true,
-  });
-  for (const step of testCase.steps) {
-    await context.routeFromHAR(harFor(step.url), { notFound: 'fallback' });
-  }
+  const context = await plainContext(browser);
 
   const checks = [];
   for (const [index, step] of testCase.steps.entries()) {
     const last = index === testCase.steps.length - 1;
-    const page = await openPage(context, step.url, []);
+    const page = await openPage(context, step.url);
     const unstyled = await measureChecks(page, step.checks);
     if (last) {
       await screenshot(page, path.join(dir, 'before.png'));
@@ -309,284 +268,204 @@ const runReference = async ({ browser, testCase, css, dir }) => {
 };
 
 /**
- * What a call would cost at list prices without caching, as a one-off
- * reply from the extension does; NaN for a model with no listed price.
+ * The CLI's answer as JSON, or null when the command failed.
  */
-const costOf = ({ model, usage }) => {
-  const [input, output] = PRICES[model] ?? [NaN, NaN];
-  return (usage.input * input + usage.output * output) / 1e6;
+const cliJson = async (browser, cliArgs) => {
+  const { ok, out } = await browser.cli([...cliArgs, '--json']);
+  try {
+    return ok ? JSON.parse(out) : null;
+  } catch {
+    return null;
+  }
 };
 
-let turnCount = 0;
-const turnId = () => `t${++turnCount}`;
+/**
+ * Opens the url in the extension's browser, where Stylebot applies the
+ * saved style as it does on any visit, and returns the page with the css
+ * Stylebot has for its tab.
+ */
+const openStyled = async (browser, url) => {
+  const page = await openPage(browser.context, url);
+  await settle(page);
+  const tabs = (await cliJson(browser, ['tabs'])) ?? [];
+  const tab = tabs.filter(t => t.url === page.url()).pop();
+  const style = tab && (await cliJson(browser, ['css', 'get', String(tab.id)]));
+  return { page, css: style?.css ?? '' };
+};
 
 /**
- * One case for one variant: each step's message and reply, with the fix
- * round when the variant has the page check, the step's measured checks,
- * then the page check's counts on the final page.
+ * The page check's problems and the selectors' match counts for the final
+ * stylesheet, on a fresh copy of the unstyled page in the plain browser,
+ * so every version is counted the same way.
  */
-const runCase = async ({
-  browser,
-  testCase,
-  variant,
-  scorer,
-  createEditStream,
-  dir,
-}) => {
-  const { ref } = variant;
-  const context = await browser.newContext({
-    viewport: VIEWPORT,
-    bypassCSP: true,
-  });
-  for (const step of testCase.steps) {
-    await context.routeFromHAR(harFor(step.url), { notFound: 'fallback' });
-  }
-
-  const turns = [];
-  const calls = [];
-  let undoneFixes = 0;
-  let css = '';
-  let page = null;
-  const checks = [];
-
-  for (const [index, step] of testCase.steps.entries()) {
-    await page?.close();
-    page = await openPage(context, step.url, [ref.pageScript]);
-
-    if (index === testCase.steps.length - 1) {
-      await screenshot(page, path.join(dir, 'before.png'));
-    }
-
-    const unstyled = await measureChecks(page, step.checks);
-    await injectCss(page, css);
-
-    const previousUser = [...turns]
-      .reverse()
-      .find(turn => turn.role === 'user');
-    turns.push({
-      role: 'user',
-      id: turnId(),
-      text: step.text,
-      href: step.url,
-      // A picked element, as the inspector would send it with the message.
-      ...(step.scope ? { scope: step.scope } : {}),
-      ...(previousUser && previousUser.href !== step.url
-        ? { newPage: true }
-        : {}),
-    });
-
-    const assistant = {
-      role: 'assistant',
-      id: turnId(),
-      text: '',
-      edits: [],
-      previous: [],
-      applied: true,
-      model: variant.model,
-    };
-    const rounds = [];
-
-    for (;;) {
-      const facts = await page.evaluate(
-        selector => ({
-          url: location.href,
-          title: document.title,
-          outline: window.StylebotEval.getPageOutline(),
-          pageCss: window.StylebotEval.getPageCssContext(selector),
-        }),
-        step.scope ?? ''
-      );
-      const pageFacts = {
-        ...facts,
-        css,
-        ...(step.scope ? { selector: step.scope } : {}),
-      };
-      // Newer versions send the page after the thread instead of in the system prompt.
-      const system = ref.node.buildPageContext
-        ? ref.node.INSTRUCTIONS
-        : ref.node.buildSystemPrompt(pageFacts);
-      const replyTurn = rounds.length
-        ? {
-            ...assistant,
-            ...combine(rounds),
-            ...(ref.node.tool.roundsOf ? { rounds } : {}),
-          }
-        : null;
-      const prompt = transcriptFor(
-        ref,
-        replyTurn ? [...turns, replyTurn] : turns,
-        ref.node.buildPageContext?.(pageFacts)
-      );
-
-      const reply = await askClaude({
-        model: variant.model,
-        system,
-        prompt,
-        schema: replySchema(ref),
-        thinking: variant.thinking,
-        effort: variant.effort,
-        createEditStream,
-      });
-      calls.push({
-        usage: reply.usage,
-        ms: reply.ms,
-        model: reply.model,
-        wallMs: reply.wallMs,
-        firstEditMs: reply.firstEditMs,
-        lastEditMs: reply.lastEditMs,
-      });
-
-      const { text } = reply.output;
-      // As the extension does: partly hashed classes saved by their stable part.
-      const edits = variant.ref.features.stableSelectors
-        ? await withStableSelectors(page, reply.output.edits)
-        : reply.output.edits;
-      const round = { text, edits };
-      const checking = variant.ref.features.pageCheck && edits.length;
-      const cssBefore = css;
-
-      if (checking) {
-        await page.evaluate(e => window.StylebotEval.startStyleCheck(e), edits);
-      }
-
-      if (edits.length) {
-        css = ref.node.applyEdits(css, edits).css;
-        await injectCss(page, css);
-        round.matches = await page.evaluate(
-          selectors => window.StylebotEval.countMatches(selectors),
-          edits.map(edit => edit.selector)
-        );
-      }
-
-      if (checking) {
-        const problems = await page.evaluate(() =>
-          window.StylebotEval.checkStyle()
-        );
-        if (problems.length) {
-          round.problems = problems;
-        }
-      }
-
-      // As the extension does: a fix that made text hard to read is undone.
-      if (
-        rounds.length &&
-        round.problems?.some(p => UNREADABLE.includes(p.type))
-      ) {
-        css = cssBefore;
-        await injectCss(page, css);
-        undoneFixes++;
-        break;
-      }
-
-      rounds.push(round);
-
-      // Checkouts from before the fix rule moved into the tool fixed problems only.
-      const { needsFix, MAX_FIX_ROUNDS = 1 } = ref.node.tool;
-      const fix = needsFix ? needsFix(round) : Boolean(round.problems?.length);
-      if (!fix || rounds.length > MAX_FIX_ROUNDS) {
-        break;
-      }
-    }
-
-    const done = { ...assistant, ...combine(rounds) };
-    if (
-      ref.node.tool.roundsOf &&
-      (rounds.length > 1 || rounds.some(round => round.problems))
-    ) {
-      done.rounds = rounds;
-    }
-    turns.push(done);
-
-    if (step.checks?.length) {
-      await settle(page);
-      const styled = await measureChecks(page, step.checks);
-      checks.push(...scoreChecks(step.checks, unstyled, styled));
-    }
-  }
-
-  await page.close();
-
-  /* Scored on a fresh copy of the last page, so the check compares the final
-   * stylesheet against the page as it was. */
-  const last = testCase.steps[testCase.steps.length - 1];
-  const fresh = await openPage(context, last.url, scorer ? [scorer] : []);
-  const allEdits = turns
-    .filter(turn => turn.role === 'assistant')
-    .flatMap(turn => turn.edits);
+const checkPage = async ({ context, url, css, scorer }) => {
+  const page = await openPage(context, url, scorer ? [scorer] : []);
+  const edits = editsOf(css);
   if (scorer) {
-    await fresh.evaluate(
-      e => window.StylebotScore.startStyleCheck(e),
-      allEdits
-    );
+    await page.evaluate(e => window.StylebotScore.startStyleCheck(e), edits);
   }
-  await injectCss(fresh, css);
+  await injectCss(page, css);
   const problems = scorer
-    ? await fresh.evaluate(() => window.StylebotScore.checkStyle())
+    ? await page.evaluate(() => window.StylebotScore.checkStyle())
     : null;
-  const count = types =>
-    problems ? problems.filter(p => types.includes(p.type)).length : null;
-  await screenshot(fresh, path.join(dir, 'after.png'));
-  await context.close();
-
-  const replies = turns.filter(turn => turn.role === 'assistant');
-  const matches = replies.flatMap(turn => turn.matches ?? []);
-
-  const result = {
-    case: testCase.id,
-    variant: variant.name,
-    checks,
-    unreadable: count(UNREADABLE),
-    missedSurfaces: count(['missed-surface', 'clashing']),
-    overridden: count(['overridden-declaration', 'no-effect']),
-    zeroMatch: matches.filter(count => !count).length,
-    broad: matches.filter(count => count > BROAD_MATCHES).length,
-    asked: replies.some(turn => !turn.edits.length),
-    calls: calls.length,
-    undoneFixes,
-    tokensIn: calls.reduce((sum, call) => sum + call.usage.input, 0),
-    tokensOut: calls.reduce((sum, call) => sum + call.usage.output, 0),
-    thinkingTokens: calls.reduce((sum, call) => sum + call.usage.thinking, 0),
-    cost: calls.reduce((sum, call) => sum + costOf(call), 0),
-    models: [...new Set(calls.map(call => call.model))],
-    seconds: Math.round(calls.reduce((sum, call) => sum + call.ms, 0) / 1000),
-    // The first call's: when its first edit and its last were complete, and
-    // when the whole reply was in, in seconds from the call's start.
-    firstEdit: secondsOf(calls[0]?.firstEditMs),
-    lastEdit: secondsOf(calls[0]?.lastEditMs),
-    replyIn: secondsOf(calls[0]?.wallMs),
-    problems,
-    turns,
-    css,
-  };
-
-  fs.writeFileSync(
-    path.join(dir, 'result.json'),
-    JSON.stringify(result, null, 2)
+  const matches = await page.evaluate(
+    selectors =>
+      selectors.map(selector => {
+        try {
+          return document.querySelectorAll(selector).length;
+        } catch {
+          return 0;
+        }
+      }),
+    edits.map(edit => edit.selector)
   );
-  return result;
+  await page.close();
+  return { problems, matches };
 };
 
-function secondsOf(ms) {
-  return typeof ms === 'number' ? Math.round(ms / 100) / 10 : null;
-}
-
 /**
- * A reply's calls as one turn: their text and edits together.
+ * One case for one variant: a fresh browser with that version's extension
+ * and CLI, then each step's request as a turn of the same Claude Code
+ * session, the step's checks measured on the page Stylebot styles, and the
+ * page check's counts on the final stylesheet.
  */
-function combine(rounds) {
-  const matches = rounds.every(round => round.matches)
-    ? rounds.flatMap(round => round.matches)
-    : undefined;
+const runCase = async ({ plain, testCase, variant, scorer, dir }) => {
+  const task = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'sbe-')));
+  const context = await plainContext(plain);
+  let browser = null;
 
-  return {
-    text: rounds
-      .map(round => round.text)
-      .filter(Boolean)
-      .join('\n\n'),
-    edits: rounds.flatMap(round => round.edits),
-    ...(matches ? { matches } : {}),
-  };
-}
+  try {
+    browser = await launchExtensionBrowser({
+      dir: task,
+      build: variant.build,
+      cli: variant.cli,
+      hars: harsOf(testCase),
+      viewport: VIEWPORT,
+    });
+    const { plugin, work, allowedTools } = preparePlugin(variant.plugin, task);
+    const cwd = path.join(task, 'cwd');
+    fs.mkdirSync(cwd);
+    const transcript = path.join(dir, 'transcript.jsonl');
+
+    const results = [];
+    const checks = [];
+    let session = null;
+    let css = '';
+
+    for (const [index, step] of testCase.steps.entries()) {
+      const last = index === testCase.steps.length - 1;
+      const unstyledPage = await openPage(context, step.url);
+      const unstyled = await measureChecks(unstyledPage, step.checks);
+      if (last) {
+        await screenshot(unstyledPage, path.join(dir, 'before.png'));
+      }
+      await unstyledPage.close();
+
+      const newPage = !index || testCase.steps[index - 1].url !== step.url;
+      const result = await runAgent({
+        prompt: newPage
+          ? `/stylebot ${step.url} ${requestText(step)}`
+          : requestText(step),
+        cwd,
+        bin: browser.bin,
+        plugin,
+        allowedTools,
+        model: variant.model,
+        effort: variant.effort,
+        session,
+        persist: testCase.steps.length > 1,
+        transcript,
+      });
+      results.push(result);
+      session = result.session_id;
+
+      const styled = await openStyled(browser, step.url);
+      css = styled.css;
+      if (step.checks?.length) {
+        checks.push(
+          ...scoreChecks(
+            step.checks,
+            unstyled,
+            await measureChecks(styled.page, step.checks)
+          )
+        );
+      }
+      if (last) {
+        await screenshot(styled.page, path.join(dir, 'after.png'));
+      }
+      await styled.page.close();
+    }
+
+    const { problems, matches } = await checkPage({
+      context,
+      url: testCase.steps[testCase.steps.length - 1].url,
+      css,
+      scorer,
+    });
+    const count = types =>
+      problems ? problems.filter(p => types.includes(p.type)).length : null;
+    fs.cpSync(work, path.join(dir, 'work'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'final.css'), css);
+
+    const calls = toolCallsIn(transcript);
+    const commands = calls
+      .filter(call => call.name === 'Bash')
+      .map(call => call.input.command);
+    const usage = key =>
+      results.reduce((sum, result) => sum + (result.usage?.[key] ?? 0), 0);
+
+    return {
+      case: testCase.id,
+      variant: variant.name,
+      checks,
+      unreadable: count(UNREADABLE),
+      missedSurfaces: count(['missed-surface', 'clashing']),
+      overridden: count(['overridden-declaration', 'no-effect']),
+      zeroMatch: matches.filter(n => !n).length,
+      broad: matches.filter(n => n > BROAD_MATCHES).length,
+      asked: !css.trim(),
+      failedTurns: results.filter(result => result.is_error).length,
+      turns: results.reduce((sum, result) => sum + (result.num_turns ?? 0), 0),
+      commands: commands.length,
+      saves: commands.filter(command => /\bcss set\b/.test(command)).length,
+      screenshots: commands.filter(command => /\bscreenshot\b/.test(command))
+        .length,
+      denied: results.reduce(
+        (sum, result) => sum + (result.permission_denials?.length ?? 0),
+        0
+      ),
+      tokensIn:
+        usage('input_tokens') +
+        usage('cache_read_input_tokens') +
+        usage('cache_creation_input_tokens'),
+      tokensOut: usage('output_tokens'),
+      cost: results.reduce(
+        (sum, result) => sum + (result.total_cost_usd ?? 0),
+        0
+      ),
+      models: [
+        ...new Set(
+          results.flatMap(result =>
+            Object.keys(result.modelUsage ?? {}).map(m =>
+              m.replace(/-\d{8}$/, '')
+            )
+          )
+        ),
+      ],
+      seconds: Math.round(
+        results.reduce((sum, result) => sum + (result.duration_ms ?? 0), 0) /
+          1000
+      ),
+      replies: results.map(result => result.result ?? ''),
+      problems,
+      css,
+    };
+  } finally {
+    await browser?.context.close().catch(() => undefined);
+    await context.close();
+    fs.rmSync(task, { recursive: true, force: true });
+  }
+};
 
 const pool = async (tasks, size) => {
   const results = [];
@@ -612,11 +491,8 @@ const average = values => {
 };
 
 const mean = values => {
-  const numbers = values.filter(value => typeof value === 'number');
-  return numbers.length
-    ? Math.round((numbers.reduce((a, b) => a + b, 0) / numbers.length) * 10) /
-        10
-    : '–';
+  const value = average(values);
+  return value === null ? '–' : Math.round(value * 10) / 10;
 };
 
 const dollars = value =>
@@ -625,33 +501,12 @@ const dollars = value =>
     : '–';
 
 /**
- * How a version calls the model, as the summary labels it.
+ * How a version runs the agent, as the summary labels it.
  */
 const setupOf = variant =>
-  [
-    variant.model,
-    variant.effort && `effort ${variant.effort}`,
-    variant.thinking && `thinking ${variant.thinking}`,
-  ]
+  [variant.model, variant.effort && `effort ${variant.effort}`]
     .filter(Boolean)
     .join(', ');
-
-/**
- * How a version's Chat calls a Claude model: the effort it sends, and no
- * thinking for Haiku, which only thinks when asked. Without a model, its
- * default one.
- */
-const chatSetupFor = (node, model) => {
-  const provider = node.claude;
-  const id = model ?? provider?.defaultModel ?? 'claude-haiku-4-5';
-  const known = provider?.models.find(entry => entry.id === id);
-
-  return {
-    model: id,
-    effort: known?.requestOptions?.output_config?.effort,
-    thinking: /haiku/i.test(id) ? 'off' : undefined,
-  };
-};
 
 const summarise = (results, variants, cases, references) => {
   const columns = [
@@ -661,15 +516,14 @@ const summarise = (results, variants, cases, references) => {
     'overridden',
     'zero-match',
     'asked',
-    'undone fixes',
-    'calls',
+    'denied',
+    'turns',
+    'commands',
+    'saves',
     'tokens in',
     'tokens out',
     'cost',
     'seconds',
-    'first edit',
-    'last edit',
-    'reply in',
   ];
   const row = (label, rows) => {
     const ok = rows.filter(r => !r.error);
@@ -687,15 +541,14 @@ const summarise = (results, variants, cases, references) => {
       mean(ok.map(r => r.overridden)),
       mean(ok.map(r => r.zeroMatch)),
       ok.filter(r => r.asked).length,
-      ok.reduce((sum, r) => sum + (r.undoneFixes ?? 0), 0),
-      mean(ok.map(r => r.calls)),
-      Math.round(mean(ok.map(r => r.tokensIn))) || '–',
-      Math.round(mean(ok.map(r => r.tokensOut))) || '–',
+      mean(ok.map(r => r.denied)),
+      mean(ok.map(r => r.turns)),
+      mean(ok.map(r => r.commands)),
+      mean(ok.map(r => r.saves)),
+      Math.round(average(ok.map(r => r.tokensIn))) || '–',
+      Math.round(average(ok.map(r => r.tokensOut))) || '–',
       dollars(average(ok.map(r => r.cost))),
       mean(ok.map(r => r.seconds)),
-      mean(ok.map(r => r.firstEdit)),
-      mean(ok.map(r => r.lastEdit)),
-      mean(ok.map(r => r.replyIn)),
     ].join(' | ')} |${
       rows.length - ok.length ? ` ${rows.length - ok.length} failed` : ''
     }`;
@@ -708,7 +561,7 @@ const summarise = (results, variants, cases, references) => {
 
   const overall = variants.map(v =>
     row(
-      `**${v.name}**: ${v.ref.label} · ${setupOf(v)}`,
+      `**${v.name}**: ${v.label} · ${setupOf(v)}`,
       results.filter(r => r.variant === v.name)
     )
   );
@@ -802,8 +655,8 @@ const summarise = (results, variants, cases, references) => {
   );
 
   return [
-    `# Chat eval`,
-    `${args.runs} run(s) per case. Cost is estimated at list prices without caching, as a one-off reply pays, with thinking billed as output; tokens, cost and seconds are means per case. First edit, last edit and reply in time the case's first call, in seconds from its start: when its first and last edits were complete, as Chat applying edits while they stream would apply them, and when the whole reply was in, as a version applying them at the end would. Checks are measured on the page after each step, and on the unstyled page and with the case's reference stylesheet when it has one; the rest are means per case, except asked, which counts cases with a reply that made no edits, and undone fixes, which counts fix-up calls taken back for making text hard to read.`,
+    `# Styling eval`,
+    `${args.runs} run(s) per case. Each case runs /stylebot in headless Claude Code with that version's skill and CLI. Checks are measured on the page Stylebot styles after each step, and on the unstyled page and with the case's reference stylesheet when it has one. Tokens, cost (as Claude Code estimates it) and seconds are means per case, as are turns (the agent's model calls), commands (stylebot commands it ran), saves (css set) and denied (tool calls refused as outside what the skill allows). Unreadable, missed surfaces, overridden and zero-match are counted on the final stylesheet; asked counts cases that ended with no CSS saved.`,
     ...(variants.length
       ? [
           `## Overall`,
@@ -824,7 +677,7 @@ const hash = (...parts) =>
 
 /**
  * Runs work whose output lands in dir, or copies it from the cache when
- * the same key ran before: the same code, case, run and models.
+ * the same key ran before: the same code, case, run and model.
  */
 const cached = async (key, dir, work) => {
   const entry = path.join(CACHE, 'results', key);
@@ -836,11 +689,11 @@ const cached = async (key, dir, work) => {
   }
 
   const result = await work();
-  fs.mkdirSync(entry, { recursive: true });
   fs.writeFileSync(
     path.join(dir, 'result.json'),
     JSON.stringify(result, null, 2)
   );
+  fs.mkdirSync(entry, { recursive: true });
   fs.cpSync(dir, entry, { recursive: true });
   return result;
 };
@@ -858,7 +711,9 @@ const main = async () => {
       (!tags || c.tags.some(tag => tags.includes(tag))) &&
       (!args.references || referenceFor(c))
   );
-  const nodeModules = path.join(REPO, 'node_modules');
+  if (!cases.length) {
+    throw new Error('No cases match.');
+  }
 
   const variants = [];
   // With --references, only the references run: no versions, no model calls.
@@ -869,76 +724,45 @@ const main = async () => {
         ['head', args.head],
       ]) {
     const checkout = checkoutRef(REPO, CACHE, refName);
-    const built = await buildRef(
-      checkout.root,
-      path.join(CACHE, 'build', name),
-      nodeModules
-    );
+    log(`Building ${name}: ${checkout.label}`);
     const head = name === 'head';
-    const chat = chatSetupFor(
-      built.node,
-      (head && args['head-model']) || args.model
-    );
-    const model = chat.model;
-    const effort = (head && args['head-effort']) || args.effort || chat.effort;
-    const thinking =
-      (head && args['head-thinking']) || args.thinking || chat.thinking;
-    if (thinking && !['on', 'off'].includes(thinking)) {
-      throw new Error(`--thinking takes on or off, not ${thinking}`);
-    }
     const variant = {
       name,
+      label: checkout.label,
       root: checkout.root,
-      model,
-      effort,
-      thinking,
-      ref: { ...built, label: checkout.label },
+      build: buildExtension(REPO, CACHE, checkout),
+      ...toolsOf(checkout.root),
+      model: (head && args['head-model']) || args.model,
+      effort: (head && args['head-effort']) || args.effort,
     };
+    variant.key = hash(checkout.key, variant.model, variant.effort ?? '');
     variants.push(variant);
-    log(
-      `${name}: ${checkout.label} · ${setupOf(variant)}${
-        built.features.pageCheck ? ', with page check' : ''
-      }${built.features.stableSelectors ? ', with stable selectors' : ''}`
-    );
+    log(`${name}: ${checkout.label} · ${setupOf(variant)}`);
   }
 
   const scorer = await buildScorer(
     [REPO, ...variants.map(variant => variant.root)],
-    path.join(CACHE, 'build')
+    path.join(CACHE, 'scorer')
   );
   if (!scorer && !args.references) {
     log(
-      'No page check in either version yet: no unreadable or missed-surface counts.'
+      'No page check in either version: no unreadable or missed-surface counts.'
     );
   }
 
-  /* What a result depends on besides its case and run: the code each
-   * version runs and how it calls the model, and the harness and scorer. */
+  // What a result depends on besides its case and run: the harness and scorer.
   const harness = hash(
-    ...['run.mjs', 'claude.mjs', 'bundles.mjs', 'checks.mjs'].map(file =>
-      fs.readFileSync(path.join(HERE, file), 'utf8')
+    ...['run.mjs', 'agent.mjs', 'browser.mjs', 'refs.mjs', 'checks.mjs'].map(
+      file => fs.readFileSync(path.join(HERE, file), 'utf8')
     ),
     scorer ?? ''
   );
-  variants.forEach(variant => {
-    variant.key = hash(
-      variant.ref.nodeScript,
-      variant.ref.pageScript,
-      variant.model,
-      variant.effort ?? '',
-      variant.thinking ?? ''
-    );
-  });
-  const createEditStream = await buildEditStream(
-    REPO,
-    path.join(CACHE, 'build')
-  );
   const resultKey = (variant, testCase, run) =>
     hash(harness, variant.key, JSON.stringify(testCase), String(run));
-  const browser = await chromium.launch();
-  await recordPages(browser, [
-    ...new Set(cases.flatMap(c => c.steps.map(s => s.url))),
-  ]);
+  const plain = await chromium.launch(launchOptions({}));
+  const urls = [...new Set(cases.flatMap(c => c.steps.map(s => s.url)))];
+  await recordPages(plain, urls);
+  await replayHars(plain, urls.map(harFor));
 
   const outDir = path.join(
     HERE,
@@ -960,14 +784,7 @@ const main = async () => {
             run: run + 1,
             key,
             ...(await cached(key, dir, () =>
-              runCase({
-                browser,
-                testCase,
-                variant,
-                scorer,
-                createEditStream,
-                dir,
-              })
+              runCase({ plain, testCase, variant, scorer, dir })
             )),
           };
           const passed = result.checks.filter(check => check.pass).length;
@@ -978,7 +795,9 @@ const main = async () => {
               result.checks.length
                 ? `${passed}/${result.checks.length} checks`
                 : 'no checks'
-            }, ${result.problems ? result.problems.length : '–'} problems`
+            }, ${result.turns} turns, ${result.commands} commands, ${dollars(
+              result.cost
+            )}, ${result.seconds}s`
           );
           return result;
         } catch (error) {
@@ -1001,7 +820,7 @@ const main = async () => {
       fs.mkdirSync(dir, { recursive: true });
       try {
         const result = await runReference({
-          browser,
+          browser: plain,
           testCase,
           css: referenceFor(testCase),
           dir,
@@ -1027,17 +846,16 @@ const main = async () => {
       .filter(Boolean)
       .map(result => [result.case, result])
   );
-  await browser.close();
+  await plain.close();
 
   const ran = results.filter(r => !r.error && !r.cached);
-  const calls = ran.reduce((sum, r) => sum + r.calls, 0);
   const spent = ran.reduce((sum, r) => sum + (r.cost ?? 0), 0);
   const summary = summarise(results, variants, cases, references);
   fs.writeFileSync(path.join(outDir, 'summary.md'), summary);
   log(
-    `\n${summary}\n\n${calls} model calls, about ${dollars(
+    `\n${summary}\n\n${ran.length} agent runs, about ${dollars(
       spent
-    )} at list prices, in ${Math.round(
+    )} as Claude Code estimates it, in ${Math.round(
       (Date.now() - started) / 1000
     )}s.\nResults in ${outDir}`
   );

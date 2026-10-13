@@ -10,7 +10,7 @@
 ## Testing
 
 - [e2e](e2e.md) — the Playwright suite against the real extension
-- [Chat evals](chat-evals.md) — measuring whether a change makes Chat's replies better
+- [Styling evals](styling-evals.md) — measuring whether a change makes Claude restyle pages better through the CLI
 
 ## Architecture
 

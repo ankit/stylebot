@@ -23,9 +23,9 @@ export default tseslint.config(
       '.edge-dev-profile*',
       '.history',
       '.claude',
-      'evals/chat/.cache',
-      'evals/chat/pages',
-      'evals/chat/results',
+      'evals/styling/.cache',
+      'evals/styling/pages',
+      'evals/styling/results',
 
       // Separate Gatsby project with its own toolchain.
       'site',

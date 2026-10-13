@@ -19,8 +19,8 @@ playwright-report
 storybook-static
 junit.xml
 .claude/worktrees
-evals/chat/.cache
-evals/chat/pages
-evals/chat/results
+evals/styling/.cache
+evals/styling/pages
+evals/styling/results
 e2e/.cache
 store/safari/listing
