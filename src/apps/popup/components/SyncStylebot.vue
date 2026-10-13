@@ -39,7 +39,7 @@
       type="button"
       class="sync-button"
       :disabled="syncInProgress"
-      @click="sync"
+      @click="sync()"
     >
       <arrow-repeat-icon :size="13" :spinning="syncInProgress" />
       <s-text as="span" size="label" variant="muted" class="sync-button-label">
@@ -116,8 +116,9 @@ export default Vue.extend({
 
     // Opening the popup is when stale styles would show, so pick up what
     // other devices pushed. A sign-in can't happen here, so leave that be.
+    // With a last sync time to show, it runs without the spinner.
     if (!this.needsAuth) {
-      this.sync();
+      this.sync(Boolean(this.syncTime));
     }
   },
 
@@ -142,13 +143,15 @@ export default Vue.extend({
      * Joins a run already in flight in the background rather than queueing.
      * An earlier failure stays on screen until this run's result replaces it.
      */
-    sync(): void {
+    sync(quiet = false): void {
       const message: RunGoogleDriveSync = {
         name: 'RunGoogleDriveSync',
         interactive: false,
       };
 
-      this.syncInProgress = true;
+      if (!quiet) {
+        this.syncInProgress = true;
+      }
 
       chrome.runtime.sendMessage(
         message,

@@ -76,17 +76,28 @@ describe('SyncStylebot.vue', () => {
     );
   });
 
-  it('keeps the last sync time on screen while it syncs', async () => {
+  it('syncs on open behind the last sync time, without a spinner', async () => {
     const wrapper = await openStrip('earlier');
 
     expect(wrapper.text()).toContain('synced_at_time');
-    expect(wrapper.find('.sync-button').attributes('disabled')).toBeDefined();
+    expect(wrapper.find('.sync-button').attributes('disabled')).toBeUndefined();
   });
 
   it('says it is syncing when it never has', async () => {
     const wrapper = await openStrip(undefined);
 
     expect(wrapper.text()).toContain('sync_in_progress');
+    expect(wrapper.find('.sync-button').attributes('disabled')).toBeDefined();
+  });
+
+  it('spins while a sync the user started runs', async () => {
+    const wrapper = await openStrip('earlier');
+
+    respond({ ok: true, metadata });
+    await flush();
+    await wrapper.find('.sync-button').trigger('click');
+
+    expect(wrapper.find('.sync-button').attributes('disabled')).toBeDefined();
   });
 
   it('reports success and tells the popup', async () => {
