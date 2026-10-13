@@ -11,10 +11,12 @@ import { rootDir } from '../lib/cli.mjs';
 import {
   HEIGHT,
   WIDTH,
+  WINDOW,
   closeWelcomeTabs,
   launchOptions,
   loadExtension,
   render,
+  slide,
   wait,
 } from './browser.mjs';
 
@@ -22,14 +24,32 @@ const require = createRequire(import.meta.url);
 const { chromium } = require('@playwright/test');
 
 const SITE = 'news.ycombinator.com';
-const PROFILE = 'Claude: Newspaper';
+const PROFILE = 'Newspaper';
 const CSS_FILE = '~/.stylebot/work/hn.css';
 const PROMPT = '/stylebot make Hacker News look like a newspaper';
-// What Claude says it did; rewrite it when the theme changes.
+// What the agent says it did; rewrite it when the theme changes.
 const SUMMARY = `Hacker News is now a broadsheet: a Playfair Display masthead with a dateline, small-caps section links, Old Standard type on newsprint, and a rule between stories. It’s saved as the “${PROFILE}” profile, so your own style is one switch away.`;
 
-const TERMINAL_WIDTH = 620;
-const PAGE_WIDTH = WIDTH - TERMINAL_WIDTH - 1;
+// A slide shows the session at its own size, in larger type, so it lays the
+// two out in the slide's window and folds tool output further.
+const LAYOUTS = {
+  shot: {
+    width: WIDTH,
+    height: HEIGHT,
+    terminal: 620,
+    font: 13.5,
+    gap: 16,
+    keep: 3,
+  },
+  slide: {
+    width: WINDOW.width,
+    height: WINDOW.height,
+    terminal: 600,
+    font: 15,
+    gap: 12,
+    keep: 0,
+  },
+};
 
 const escape = text => text.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 
@@ -151,30 +171,42 @@ const toolCall = (name, args, lines) => `
     )
     .join('')}`;
 
-const terminal = ({ tab, steps, pageImage }) => `
+const terminal = ({ tab, steps, pageImage, layout }) => `
 <html><head><style>
-  body { margin: 0; display: flex; gap: 1px; height: ${HEIGHT}px; background: #000; font-family: Menlo, monospace; }
-  .term { width: ${TERMINAL_WIDTH}px; background: #1a1a1a; color: #e6e6e6; font-size: 13.5px; line-height: 1.6; display: flex; flex-direction: column; }
+  body { margin: 0; display: flex; gap: 1px; height: ${
+    layout.height
+  }px; background: #000; font-family: Menlo, monospace; }
+  .term { width: ${
+    layout.terminal
+  }px; background: #1a1a1a; color: #e6e6e6; font-size: ${
+  layout.font
+}px; line-height: 1.6; display: flex; flex-direction: column; }
   .bar { height: 34px; display: flex; align-items: center; gap: 8px; padding: 0 14px; background: #262626; color: #9a9a9a; font: 12px -apple-system, system-ui, sans-serif; }
   .bar i { width: 12px; height: 12px; border-radius: 50%; }
   .bar span { flex: 1; text-align: center; margin-right: 52px; }
   .body { padding: 16px 18px; overflow: hidden; }
   .ask { color: #fff; background: #2a2a2a; padding: 6px 10px; border-radius: 4px; margin-bottom: 16px; }
-  .step { margin-top: 16px; padding-left: 18px; text-indent: -18px; }
+  .step { margin-top: ${layout.gap}px; padding-left: 18px; text-indent: -18px; }
   .step b { color: #fff; }
   .word { white-space: nowrap; }
   .ok { color: #4eba65; }
   .out { color: #9a9a9a; white-space: pre; padding-left: 16px; overflow: hidden; text-overflow: ellipsis; }
   .say { display: flex; gap: 9px; margin-top: 20px; }
   .prompt { border: 1px solid #444; border-radius: 6px; padding: 8px 10px; color: #777; margin-top: 18px; }
-  img { display: block; width: ${PAGE_WIDTH}px; height: ${HEIGHT}px; }
+  img { display: block; width: ${pageWidth(layout)}px; height: ${
+  layout.height
+}px; }
 </style></head><body>
   <div class="term">
-    <div class="bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>claude</span></div>
+    <div class="bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>Terminal</span></div>
     <div class="body">
       <div class="ask">&gt; ${escape(PROMPT)}</div>
       ${toolCall('Bash', `stylebot open ${SITE}`, steps.open.split('\n'))}
-      ${toolCall('Bash', `stylebot outline ${tab}`, fold(steps.outline, 3))}
+      ${toolCall(
+        'Bash',
+        `stylebot outline ${tab}`,
+        fold(steps.outline, layout.keep)
+      )}
       ${toolCall('Write', CSS_FILE, [
         `Wrote ${steps.cssLines} lines to ${CSS_FILE}`,
       ])}
@@ -186,7 +218,7 @@ const terminal = ({ tab, steps, pageImage }) => `
       ${toolCall(
         'Bash',
         `stylebot css set ${SITE} --file ${CSS_FILE}`,
-        fold(steps.css, 3)
+        fold(steps.css, layout.keep)
       )}
       <div class="say"><span>⏺</span><span>${escape(SUMMARY)}</span></div>
       <div class="prompt">&gt;</div>
@@ -195,11 +227,14 @@ const terminal = ({ tab, steps, pageImage }) => `
   <img src="data:image/png;base64,${pageImage}">
 </body></html>`;
 
+const pageWidth = layout => layout.width - layout.terminal - 1;
+
 /**
  * Restyles Hacker News with `css` through the CLI and saves the session
- * beside the restyled page.
+ * beside the restyled page, as a slide when given one.
  */
-export const captureCli = async (file, css) => {
+export const captureCli = async (file, css, { slide: frame } = {}) => {
+  const layout = LAYOUTS[frame ? 'slide' : 'shot'];
   const browser = await startCliBrowser();
 
   try {
@@ -221,15 +256,19 @@ export const captureCli = async (file, css) => {
     await wait(2500);
 
     const page = browser.context.pages().find(p => p.url().includes(SITE));
-    await page.setViewportSize({ width: PAGE_WIDTH, height: HEIGHT });
+    await page.setViewportSize({
+      width: pageWidth(layout),
+      height: layout.height,
+    });
     await wait(1500);
     const pageImage = (await page.screenshot()).toString('base64');
 
-    await render(
+    const image = await render(
       browser.context,
       terminal({
         tab,
         pageImage,
+        layout,
         steps: {
           open,
           outline,
@@ -238,8 +277,14 @@ export const captureCli = async (file, css) => {
           cssLines: css.trimEnd().split('\n').length,
         },
       }),
-      file
+      frame ? null : file,
+      frame
+        ? { scale: 'device', width: layout.width, height: layout.height }
+        : {}
     );
+    if (frame) {
+      await slide(browser.context, { image, width: layout.width }, file, frame);
+    }
   } finally {
     await browser.close();
   }

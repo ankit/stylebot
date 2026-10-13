@@ -113,6 +113,28 @@ export const profiles = (...list) =>
   });
 
 /**
+ * Seeded sync state that reads as connected and synced a few minutes ago.
+ */
+export const syncState = () => {
+  const syncedAt = new Date(Date.now() - 3 * 60 * 1000).toISOString();
+  return {
+    'google-drive-sync-enabled': true,
+    'google-drive-sync-state': {
+      remoteRevision: syncedAt,
+      localRevision: syncedAt,
+      lastSyncedAt: syncedAt,
+      account: { email: 'you@gmail.com' },
+      metadata: {
+        id: 'manual',
+        modifiedTime: syncedAt,
+        webViewLink: 'https://drive.google.com/',
+        webContentLink: 'https://drive.google.com/',
+      },
+    },
+  };
+};
+
+/**
  * Writes items straight to storage, dropping the compiled styles so pages ask
  * the background to rebuild them.
  */
@@ -123,19 +145,18 @@ export const seed = (browser, items) =>
   }, items);
 
 /**
- * Opens a site in its own tab. `width` lays the page out wider than the space
- * it gets in the shot, for sites whose layout wraps at the panel's width.
+ * Opens a site in its own tab, in `space` pixels of the shot. `width` lays the
+ * page out wider than that, for sites whose layout wraps at the panel's width.
  */
 export const openSite = async (
   context,
   url,
-  { width = PAGE_WIDTH, full = false } = {}
+  { full = false, space = full ? WIDTH : PAGE_WIDTH, width = space } = {}
 ) => {
   const page = await context.newPage();
-  const space = full ? WIDTH : PAGE_WIDTH;
   await page.setViewportSize({
-    width: full ? WIDTH : width,
-    height: Math.round((HEIGHT * (full ? WIDTH : width)) / space),
+    width,
+    height: Math.round((HEIGHT * width) / space),
   });
   await page.goto(url, { waitUntil: 'load' });
   await page.waitForTimeout(2000);
@@ -186,9 +207,14 @@ const png = async page => (await page.screenshot()).toString('base64');
  * Renders html at the store's size and saves it as a PNG, returning it too.
  * `scale: 'device'` keeps the 2x pixels instead.
  */
-export const render = async (context, html, file, { scale = 'css' } = {}) => {
+export const render = async (
+  context,
+  html,
+  file,
+  { scale = 'css', width = WIDTH, height = HEIGHT } = {}
+) => {
   const page = await context.newPage();
-  await page.setViewportSize({ width: WIDTH, height: HEIGHT });
+  await page.setViewportSize({ width, height });
   await page.setContent(html);
   await page.waitForTimeout(300);
   // Drawn at 2x and saved at the store's size, which keeps text sharp.
@@ -197,29 +223,100 @@ export const render = async (context, html, file, { scale = 'css' } = {}) => {
   return image;
 };
 
+const ACCENTS = {
+  pink: '#ec4d86',
+  blue: '#1c9fc4',
+  yellow: '#e0a218',
+  indigo: '#2563eb',
+};
+
 /**
- * Saves the page, with the panel beside it when there is one, as one shot.
+ * Where a slide's screen sits: below the title, bleeding off the bottom edge.
+ */
+export const WINDOW = {
+  top: 172,
+  side: 72,
+  radius: 14,
+  width: WIDTH - 72 * 2,
+  height: HEIGHT - 172,
+};
+
+/**
+ * Renders a screen as a listing slide: the title above, and the part of the
+ * screen from `crop` on enlarged into a window below it, so the UI still reads
+ * at the size the store shows its images. `*word*` in the title is marked.
+ */
+export const slide = (
+  context,
+  { image, width },
+  file,
+  { title, accent, crop = {}, scale }
+) => {
+  const { x = 0, y = 0 } = crop;
+  const zoom = WINDOW.width / (crop.width ?? width - x);
+  const color = ACCENTS[accent];
+  // Punctuation after the mark tucks in against its padding.
+  const heading = title.replace(
+    /\*(.+?)\*([.,!?]?)/,
+    (_, word, mark) =>
+      `<mark style="background:${color}40;color:inherit;padding:0 8px;margin:0 ${
+        mark ? -6 : -2
+      }px 0 -2px;border-radius:8px">${word}</mark>${mark}`
+  );
+
+  return render(
+    context,
+    `<body style="margin:0;height:${HEIGHT}px;overflow:hidden;background:#f6f3ee;font-family:-apple-system,system-ui,sans-serif">
+      <h1 style="margin:0;padding-top:56px;text-align:center;font-size:56px;line-height:1.1;font-weight:700;letter-spacing:-0.03em;color:#16171a">${heading}</h1>
+      <div style="position:absolute;top:${WINDOW.top}px;left:${
+      WINDOW.side
+    }px;width:${WINDOW.width}px;height:${
+      WINDOW.height + WINDOW.radius
+    }px;overflow:hidden;border-radius:${
+      WINDOW.radius
+    }px;box-shadow:0 0 0 1px #0000001f,0 20px 60px #00000033">
+        <img src="data:image/png;base64,${image.toString(
+          'base64'
+        )}" style="display:block;width:${width * zoom}px;margin:${
+      -y * zoom
+    }px 0 0 ${-x * zoom}px">
+      </div>
+    </body>`,
+    file,
+    { scale }
+  );
+};
+
+/**
+ * Saves the page, with the panel beside it when there is one, as one shot, or
+ * as a slide when given one. The page takes the space openSite gave it.
  */
 export const capture = async (
   context,
   file,
   page,
   panel,
-  { appearance, scale }
+  { appearance, scale, slide: frame }
 ) => {
   const [site, side] = await Promise.all([png(page), panel && png(panel)]);
-  const image = (data, width) =>
+  const viewport = page.viewportSize();
+  const space = Math.round((viewport.width * HEIGHT) / viewport.height);
+  const width = space + (side ? PANEL_WIDTH + 1 : 0);
+  const img = (data, width) =>
     `<img src="data:image/png;base64,${data}" style="display:block;width:${width}px;height:${HEIGHT}px">`;
 
-  return render(
+  const image = await render(
     context,
     `<body style="margin:0;display:flex;gap:1px;background:${
       DIVIDER[appearance]
     }">
-      ${image(site, side ? PAGE_WIDTH : WIDTH)}
-      ${side ? image(side, PANEL_WIDTH) : ''}
+      ${img(site, space)}
+      ${side ? img(side, PANEL_WIDTH) : ''}
     </body>`,
-    file,
-    { scale }
+    frame ? null : file,
+    { scale: frame ? 'device' : scale, width }
   );
+  return frame
+    ? slide(context, { image, width }, file, { ...frame, scale })
+    : image;
 };

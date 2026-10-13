@@ -16,6 +16,7 @@ import {
   seed,
   showTab,
   style,
+  syncState,
   wait,
 } from './browser.mjs';
 import { captureCli } from './cli-shot.mjs';
@@ -77,11 +78,35 @@ const history = () => {
   }));
 };
 
+/**
+ * Opens a page of Options, hiding the version an unreleased build reports,
+ * which is still the last release's.
+ */
+const openOptions = async (browser, route, width = WIDTH) => {
+  const page = await browser.context.newPage();
+  await page.setViewportSize({ width, height: HEIGHT });
+  await page.goto(`chrome-extension://${browser.id}/options.html#/${route}`);
+  await wait(1500);
+  await page.evaluate(() => {
+    for (const el of document.querySelectorAll('body *')) {
+      if (!el.children.length && /^v\d+\.\d+/.test(el.textContent.trim())) {
+        el.style.visibility = 'hidden';
+      }
+    }
+  });
+  return page;
+};
+
 export const SHOTS = [
   {
     name: '1-pick-element',
     about: 'Picking an element: Wikipedia in Slate',
     appearance: 'dark',
+    slide: {
+      title: 'Point at *anything*. Restyle it.',
+      accent: 'pink',
+      pageWidth: 480,
+    },
     run: async (browser, file, options) => {
       await seed(browser, {
         styles: {
@@ -94,7 +119,8 @@ export const SHOTS = [
       // An article without images up top, so Slate's two columns stay full.
       const page = await openSite(
         browser.context,
-        'https://en.wikipedia.org/wiki/Ikigai'
+        'https://en.wikipedia.org/wiki/Ikigai',
+        { space: options.slide?.pageWidth }
       );
       // Wikipedia's fundraising and campaign banners come and go.
       await page.addStyleTag({ content: '#centralNotice { display: none; }' });
@@ -111,6 +137,11 @@ export const SHOTS = [
     name: '2-code',
     about: 'The Code tab: GitHub in Dracula',
     appearance: 'dark',
+    slide: {
+      title: 'Write *CSS* when you want to.',
+      accent: 'blue',
+      pageWidth: 600,
+    },
     run: async (browser, file, options) => {
       await seed(browser, {
         styles: {
@@ -124,10 +155,15 @@ export const SHOTS = [
       const page = await openSite(
         browser.context,
         'https://github.com/ankit/stylebot',
-        {
-          width: GITHUB_WIDTH,
-        }
+        options.slide
+          ? { space: options.slide.pageWidth }
+          : { width: GITHUB_WIDTH }
       );
+      // The repo's topics name Chrome, which the Mac App Store doesn't allow.
+      await page.addStyleTag({
+        content:
+          'header.HeaderMktg, [class*="TopicTagGroup"] { display: none !important; }',
+      });
       const panel = await openPanel(browser, page);
       await showTab(panel, 'Code');
       await wait(1500);
@@ -141,13 +177,19 @@ export const SHOTS = [
     name: '3-profiles',
     about: 'Profiles: Hacker News in Newspaper Dark',
     appearance: 'dark',
+    slide: {
+      title: 'Switch *looks* in a click.',
+      accent: 'yellow',
+      pageWidth: 480,
+    },
     run: async (browser, file, options) => {
       await seed(browser, {
         styles: { 'news.ycombinator.com': hackerNews('Newspaper Dark') },
       });
       const page = await openSite(
         browser.context,
-        'https://news.ycombinator.com/'
+        'https://news.ycombinator.com/',
+        { space: options.slide?.pageWidth }
       );
       const panel = await openPanel(browser, page);
       await showTab(panel);
@@ -161,42 +203,28 @@ export const SHOTS = [
   },
   {
     name: '4-cli',
-    about: 'Claude Code restyling Hacker News through the CLI',
+    about: 'The CLI restyling Hacker News from a terminal',
     appearance: 'light',
+    slide: {
+      title: 'Restyle from the *command line*.',
+      accent: 'indigo',
+    },
     // Runs its own browser, set up for the CLI.
     standalone: true,
     // Safari builds don't carry the CLI.
     cli: true,
-    run: file => captureCli(file, gallery('hn', 'newspaper')),
+    run: (file, options) =>
+      captureCli(file, gallery('hn', 'newspaper'), options),
   },
   {
-    name: '5-readability',
-    about: 'Readability: Wikipedia with its settings open',
-    appearance: 'light',
-    run: async (browser, file, options) => {
-      await seed(browser, {
-        styles: { 'en.wikipedia.org': style('', { readability: true }) },
-      });
-      const page = await openSite(
-        browser.context,
-        'https://en.wikipedia.org/wiki/Blue_Prince',
-        {
-          full: true,
-        }
-      );
-      await wait(2500);
-      await page.getByRole('button', { name: /Aa/ }).first().click();
-      await wait(800);
-      await capture(browser.context, file, page, null, {
-        appearance: 'light',
-        ...options,
-      });
-    },
-  },
-  {
-    name: '6-version-history',
+    name: '5-version-history',
     about: 'Version history in Options',
     appearance: 'dark',
+    slide: {
+      title: 'Go back to *any version*.',
+      accent: 'blue',
+      pageWidth: 880,
+    },
     run: async (browser, file, options) => {
       const sites = [
         'news.ycombinator.com',
@@ -219,22 +247,64 @@ export const SHOTS = [
         'version-history': history(),
       });
 
-      const page = await browser.context.newPage();
-      await page.setViewportSize({ width: WIDTH, height: HEIGHT });
-      await page.goto(`chrome-extension://${browser.id}/options.html#/history`);
-      await wait(1500);
+      const page = await openOptions(
+        browser,
+        'history',
+        options.slide?.pageWidth
+      );
       await page.locator('[aria-expanded]').nth(1).click();
-      // An unreleased build still reports the last release's version.
-      await page.evaluate(() => {
-        for (const el of document.querySelectorAll('body *')) {
-          if (!el.children.length && /^v\d+\.\d+/.test(el.textContent.trim())) {
-            el.style.visibility = 'hidden';
-          }
-        }
-      });
       await wait(600);
       await capture(browser.context, file, page, null, {
         appearance: 'dark',
+        ...options,
+      });
+    },
+  },
+  {
+    name: '6-sync',
+    about: 'Sync in Options, connected to Google Drive',
+    appearance: 'dark',
+    slide: {
+      title: 'Your styles, on *every computer*.',
+      accent: 'yellow',
+      pageWidth: 880,
+    },
+    run: async (browser, file, options) => {
+      await seed(browser, {
+        styles: { 'news.ycombinator.com': hackerNews('Newspaper') },
+        ...syncState(),
+      });
+      const page = await openOptions(browser, 'sync', options.slide?.pageWidth);
+      await wait(600);
+      await capture(browser.context, file, page, null, {
+        appearance: 'dark',
+        ...options,
+      });
+    },
+  },
+  {
+    name: '7-readability',
+    about: 'Readability: Wikipedia with its settings open',
+    appearance: 'light',
+    slide: {
+      title: 'Read without the *clutter*.',
+      accent: 'pink',
+      pageWidth: 900,
+    },
+    run: async (browser, file, options) => {
+      await seed(browser, {
+        styles: { 'en.wikipedia.org': style('', { readability: true }) },
+      });
+      const page = await openSite(
+        browser.context,
+        'https://en.wikipedia.org/wiki/Blue_Prince',
+        { full: true, space: options.slide?.pageWidth }
+      );
+      await wait(2500);
+      await page.getByRole('button', { name: /Aa/ }).first().click();
+      await wait(800);
+      await capture(browser.context, file, page, null, {
+        appearance: 'light',
         ...options,
       });
     },

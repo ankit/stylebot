@@ -18,7 +18,7 @@ image still takes a look, because the sites it shows change under it.
 yarn capture:store
 ```
 
-- `--only 5-readability 2` retakes some shots, by name or number; `--no-build` reuses `dist/`.
+- `--only 7-readability 2` retakes some shots, by name or number; `--no-build` reuses `dist/`.
 - `--safari` takes the Mac App Store set into `store/safari/` instead: every shot but the CLI, which Safari builds don't carry, at 2560×1600. Safari can't be automated with an extension loaded, so these are rendered in headless Chrome too; no browser UI shows, and the panel looks the same.
 - It takes about a minute. A shot that fails says why and the others still run.
 - The command line shot drives the real CLI in a temporary HOME, as its e2e spec does, so
@@ -34,6 +34,9 @@ Open each PNG and check, before saying they're done:
   justified into big gaps, a menu cut off at the edge.
 - **The panel is in the theme it should be.** Every shot's Stylebot panel is dark; pages
   alternate between dark and light so the set doesn't read as a dark-mode extension.
+- **The slide's crop shows what its headline is about.** Every store gets slides: a
+  headline over an enlarged crop of the screen, so the UI reads at the size
+  the store shows its images. Nothing that matters should be cut at the window's edges.
 - **The terminal's last line still describes the page beside it.** It's written by hand
   (`SUMMARY` in `cli-shot.mjs`); rewrite it whenever the Newspaper theme changes.
 
@@ -42,7 +45,9 @@ Send the user the images in order, then commit them once they're happy.
 ## Changing a shot
 
 Each shot is an entry in `scripts/capture/shots.mjs`: the site, the theme it's seeded
-with, and what's opened or hovered. Gallery themes come from `site/src/assets/gallery/`,
+with, what's opened or hovered, and its `slide` — the headline (`*word*` is highlighted),
+accent, and either a narrower `pageWidth` to lay the page out at or a `crop`.
+Keep the copy free of product names other than Stylebot's. Gallery themes come from `site/src/assets/gallery/`,
 including the Hacker News profiles the gallery also lists; Modern, which it doesn't, is kept
 in `scripts/capture/themes/`. When the user updates one in their browser, refresh its
 copy with `yarn stylebot css get news.ycombinator.com --profile "<name>"`, keeping the
