@@ -10,6 +10,7 @@ import type {
   SetActiveProfile,
   StylebotOptions,
   EditorSidePanelOpened,
+  RestoreTab,
 } from '@stylebot/types';
 import { STYLES_KEY, getStylesForPage } from '@stylebot/saved-styles';
 import { defaultOptions } from '@stylebot/settings';
@@ -21,7 +22,10 @@ import {
   supportsEditorSidePanel,
   openEditorSidePanel,
   getBrowserCommands,
+  getPageSupport,
+  isWebPageUrl,
 } from '@stylebot/utils';
+import type { PageSupport } from '@stylebot/utils';
 
 export const getCurrentTab = (
   callback: (tab: chrome.tabs.Tab) => void
@@ -31,6 +35,35 @@ export const getCurrentTab = (
       callback(tab);
     }
   });
+};
+
+/**
+ * Whether Stylebot can style the tab, first putting it back into a page an
+ * update left for later, which would otherwise ask to be reloaded.
+ */
+export const getRestoredPageSupport = async (
+  tab: chrome.tabs.Tab
+): Promise<PageSupport> => {
+  const support = await getPageSupport(tab);
+
+  if (
+    support !== 'unreachable' ||
+    tab.id === undefined ||
+    !isWebPageUrl(tab.url ?? '')
+  ) {
+    return support;
+  }
+
+  const message: RestoreTab = { name: 'RestoreTab', tabId: tab.id };
+
+  await new Promise<void>(resolve =>
+    chrome.runtime.sendMessage(message, () => {
+      void chrome.runtime.lastError;
+      resolve();
+    })
+  );
+
+  return getPageSupport(tab);
 };
 
 export const enableStyle = (url: string): void => {

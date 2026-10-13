@@ -61,6 +61,7 @@ export type GetRecentColorsResponse = Array<string>;
 export type AddRecentColorResponse = Array<string>;
 export type GetIsEditorWindowOpenResponse = boolean;
 export type OpenEditorSidePanelResponse = boolean;
+export type RestoreTabResponse = { ok: true };
 
 type BackgroundPageMessageResponse =
   | GetAllOptionsResponse
@@ -83,6 +84,7 @@ type BackgroundPageMessageResponse =
   | GetRecentColorsResponse
   | AddRecentColorResponse
   | GetIsEditorWindowOpenResponse
-  | OpenEditorSidePanelResponse;
+  | OpenEditorSidePanelResponse
+  | RestoreTabResponse;
 
 export default BackgroundPageMessageResponse;

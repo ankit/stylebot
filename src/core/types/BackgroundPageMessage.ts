@@ -235,6 +235,11 @@ export type GetIsEditorWindowOpen = {
   tabId?: number;
 };
 
+export type RestoreTab = {
+  name: 'RestoreTab';
+  tabId: number;
+};
+
 type BackgroundPageMessage =
   | SetStyle
   | EnableStyle
@@ -276,6 +281,7 @@ type BackgroundPageMessage =
   | GetIsEditorWindowOpen
   | OpenEditorSidePanel
   | CloseEditorSidePanel
-  | EditorSidePanelOpened;
+  | EditorSidePanelOpened
+  | RestoreTab;
 
 export default BackgroundPageMessage;

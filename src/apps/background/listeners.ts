@@ -6,7 +6,7 @@ import {
   initSidePanelCheck,
 } from './side-panel-check';
 import * as editorWindow from './editor-window';
-import { restoreOpenTabs } from './restore-tabs';
+import { restoreOpenTabs, restoreTab } from './restore-tabs';
 
 import {
   GetCommands,
@@ -199,8 +199,10 @@ export const initListeners = (): void => {
     }
   });
 
-  // Listen when a tab is activated to refresh the context-menu.
+  // A tab shown for the first time since an update gets Stylebot back, then
+  // its context menu is refreshed.
   chrome.tabs.onActivated.addListener(async activeInfo => {
+    await restoreTab(activeInfo.tabId);
     const option = await getOption('contextMenu');
 
     if (option) {
@@ -351,6 +353,9 @@ export const initListeners = (): void => {
           break;
         case 'EditorSidePanelOpened':
           onEditorSidePanelOpened(message.tabId);
+          break;
+        case 'RestoreTab':
+          restoreTab(message.tabId).then(() => sendResponse({ ok: true }));
           break;
       }
 

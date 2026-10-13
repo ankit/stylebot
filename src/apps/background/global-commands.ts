@@ -7,6 +7,7 @@ import {
 } from '@stylebot/utils';
 
 import * as editorWindow from './editor-window';
+import { restoreTab } from './restore-tabs';
 import { applyStylesToAllTabs, toggleForPage } from './styles';
 import {
   canUseEditorSidePanel,
@@ -42,10 +43,17 @@ const getTarget = (
   return { tabId: tab.id, fromEditorWindow: false };
 };
 
+/**
+ * Sends the command to the page, once a tab an update left for later has
+ * Stylebot back.
+ */
 const runInPage = (tabId: number, command: StylebotCommandName): void => {
   const message: RunCommand = { name: 'RunCommand', command };
-  // Reading lastError marks a page without the content script as handled.
-  chrome.tabs.sendMessage(tabId, message, () => void chrome.runtime.lastError);
+
+  restoreTab(tabId).then(() =>
+    // Reading lastError marks a page without the content script as handled.
+    chrome.tabs.sendMessage(tabId, message, () => void chrome.runtime.lastError)
+  );
 };
 
 /**

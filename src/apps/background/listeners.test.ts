@@ -12,7 +12,10 @@ jest.mock('./editor-window', () => ({
   forgetWindow: jest.fn(),
 }));
 jest.mock('./messages', () => ({}));
-jest.mock('./restore-tabs', () => ({ restoreOpenTabs: jest.fn() }));
+jest.mock('./restore-tabs', () => ({
+  restoreOpenTabs: jest.fn(),
+  restoreTab: jest.fn(async () => undefined),
+}));
 jest.mock('./badge', () => ({ updateBadge: jest.fn() }));
 jest.mock('./options', () => ({ get: jest.fn(), pruneRetired: jest.fn() }));
 jest.mock('./sync-scheduler', () => ({
@@ -28,7 +31,7 @@ jest.mock('@stylebot/sync', () => ({
 
 import { initListeners } from './listeners';
 import { pruneRetired } from './options';
-import { restoreOpenTabs } from './restore-tabs';
+import { restoreOpenTabs, restoreTab } from './restore-tabs';
 
 type InstalledDetails = { reason: string; previousVersion?: string };
 type OnInstalled = (details: InstalledDetails) => Promise<void>;
@@ -147,5 +150,16 @@ describe('onInstalled', () => {
       url: 'https://stylebot.dev/welcome',
     });
     expect(restoreOpenTabs).not.toBeCalled();
+  });
+});
+
+describe('onActivated', () => {
+  it('restores a tab left for later when it is first shown', async () => {
+    const { api } = makeChrome('4.0.0');
+    const [[onActivated]] = api.tabs.onActivated.addListener.mock.calls;
+
+    await onActivated({ tabId: 5, windowId: 1 });
+
+    expect(restoreTab).toBeCalledWith(5);
   });
 });

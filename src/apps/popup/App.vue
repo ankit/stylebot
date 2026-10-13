@@ -117,6 +117,7 @@ import {
   enableStyle,
   disableStyle,
   setActiveProfile,
+  getRestoredPageSupport,
 } from './utils';
 
 import { getGoogleDriveSyncEnabled } from '@stylebot/sync';
@@ -133,7 +134,6 @@ import type {
   StylebotLayout,
   StylebotDockLocation,
 } from '@stylebot/types';
-import { getPageSupport } from '@stylebot/utils';
 import type { PageSupport } from '@stylebot/utils';
 
 export default Vue.extend({
@@ -263,7 +263,7 @@ export default Vue.extend({
   created() {
     getCurrentTab(async tab => {
       this.tab = tab;
-      this.pageSupport = await getPageSupport(tab);
+      this.pageSupport = await getRestoredPageSupport(tab);
 
       if (this.pageSupport !== 'supported') {
         return;

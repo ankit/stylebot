@@ -1,6 +1,7 @@
 import { getStylesForPage } from '@stylebot/saved-styles';
 import type { InspectPage, PageInspection } from '@stylebot/types';
 
+import { restoreTab } from '../restore-tabs';
 import { getAll } from '../styles';
 
 /**
@@ -56,14 +57,16 @@ export const resolveStyleUrl = async (target: unknown): Promise<string> => {
 };
 
 /**
- * Asks a tab's page about itself and resolves to its answer, rejecting
- * when nothing there answers.
+ * Asks a tab's page about itself, once a tab an update left for later has
+ * Stylebot back, and resolves to its answer, rejecting when nothing answers.
  */
-export const inspectTab = <T>(
+export const inspectTab = async <T>(
   tabId: number,
   inspection: PageInspection
-): Promise<T> =>
-  new Promise((resolve, reject) => {
+): Promise<T> => {
+  await restoreTab(tabId);
+
+  return new Promise((resolve, reject) => {
     const message: InspectPage = { name: 'InspectPage', inspection };
 
     chrome.tabs.sendMessage(tabId, message, (response: T) => {
@@ -82,6 +85,7 @@ export const inspectTab = <T>(
       }
     });
   });
+};
 
 /**
  * A tab showing a page the style for a url pattern applies to, to check it

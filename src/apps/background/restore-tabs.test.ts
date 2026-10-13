@@ -1,7 +1,7 @@
 import { getPageSupport, isEditorSidePanelOpen } from '@stylebot/utils';
 
 import * as editorWindow from './editor-window';
-import { findOpenEditors, restoreOpenTabs } from './restore-tabs';
+import { findOpenEditors, restoreOpenTabs, restoreTab } from './restore-tabs';
 
 jest.mock('./editor-window', () => ({ isOpen: jest.fn(), open: jest.fn() }));
 jest.mock('@stylebot/utils', () => ({
@@ -17,12 +17,16 @@ const sendMessage = jest.fn();
 
 // Tabs whose page still answers, as one loaded since the reload does.
 let connected: Array<number>;
+let session: Record<string, unknown>;
+let tabs: Array<chrome.tabs.Tab>;
 
 const injected = () =>
   executeScript.mock.calls.map(([call]) => call).filter(call => call.files);
 
 beforeEach(() => {
   connected = [];
+  session = {};
+  tabs = [{ id: 1, active: true }, { id: 2 }, {}] as Array<chrome.tabs.Tab>;
   executeScript.mockReset().mockResolvedValue([]);
   sendMessage.mockReset().mockResolvedValue(undefined);
   (getPageSupport as jest.Mock).mockImplementation(
@@ -46,8 +50,28 @@ beforeEach(() => {
       }),
     },
     tabs: {
-      query: jest.fn(async () => [{ id: 1 }, { id: 2 }, {}]),
+      query: jest.fn(async () => tabs),
+      get: jest.fn(async (tabId: number) => {
+        const tab = tabs.find(({ id }) => id === tabId);
+        if (!tab) {
+          throw new Error('No tab');
+        }
+        return tab;
+      }),
       sendMessage,
+    },
+    storage: {
+      session: {
+        get: jest.fn(async (key: string) =>
+          key in session ? { [key]: session[key] } : {}
+        ),
+        set: jest.fn(async (items: Record<string, unknown>) => {
+          Object.assign(session, items);
+        }),
+        remove: jest.fn(async (key: string) => {
+          delete session[key];
+        }),
+      },
     },
     scripting: { executeScript },
     sidePanel: { open: sidePanelOpen },
@@ -55,7 +79,7 @@ beforeEach(() => {
 });
 
 describe('restoreOpenTabs', () => {
-  it('runs each content script again in the tabs it matches, in its frames', async () => {
+  it('runs each content script again in the active tab, in its frames', async () => {
     await restoreOpenTabs({});
 
     expect(chrome.tabs.query).toBeCalledWith({
@@ -65,18 +89,23 @@ describe('restoreOpenTabs', () => {
     expect(injected()).toEqual([
       { target: { tabId: 1, allFrames: false }, files: ['editor/index.js'] },
       { target: { tabId: 1, allFrames: true }, files: ['inject-css/index.js'] },
-      { target: { tabId: 2, allFrames: false }, files: ['editor/index.js'] },
-      { target: { tabId: 2, allFrames: true }, files: ['inject-css/index.js'] },
     ]);
   });
 
-  it('leaves alone a tab whose page still answers', async () => {
-    connected = [2];
+  it('runs the scripts right away in a tab with Stylebot open', async () => {
+    await restoreOpenTabs({ 2: 'window' });
+
+    expect(injected().map(call => call.target.tabId)).toEqual([1, 1, 2, 2]);
+    expect(editorWindow.open).toBeCalledWith(2);
+  });
+
+  it('leaves alone an active tab whose page still answers', async () => {
+    connected = [1];
 
     await restoreOpenTabs({});
 
-    expect(getPageSupport).toBeCalledWith({ id: 2 });
-    expect(injected().map(call => call.target.tabId)).toEqual([1, 1]);
+    expect(getPageSupport).toBeCalledWith(tabs[0]);
+    expect(injected()).toEqual([]);
   });
 
   it('injects once when two restores find the same tab', async () => {
@@ -87,7 +116,7 @@ describe('restoreOpenTabs', () => {
 
     await Promise.all([restoreOpenTabs({}), restoreOpenTabs({})]);
 
-    expect(injected()).toHaveLength(4);
+    expect(injected()).toHaveLength(2);
   });
 
   it('carries on past a tab it may not script', async () => {
@@ -96,7 +125,7 @@ describe('restoreOpenTabs', () => {
     );
 
     await expect(restoreOpenTabs({})).resolves.toBeUndefined();
-    expect(executeScript).toBeCalledTimes(4);
+    expect(executeScript).toBeCalledTimes(2);
   });
 
   it('opens Stylebot again in the tabs it was open in', async () => {
@@ -157,5 +186,58 @@ describe('restoreOpenTabs', () => {
     await restoreOpenTabs();
 
     expect(chrome.tabs.query).not.toBeCalled();
+  });
+});
+
+describe('restoreTab', () => {
+  it('runs the scripts in a tab left for later, once', async () => {
+    await restoreOpenTabs({});
+    executeScript.mockClear();
+
+    await restoreTab(2);
+    await restoreTab(2);
+
+    expect(injected()).toEqual([
+      { target: { tabId: 2, allFrames: false }, files: ['editor/index.js'] },
+      { target: { tabId: 2, allFrames: true }, files: ['inject-css/index.js'] },
+    ]);
+  });
+
+  it('injects once when the tab is restored twice at the same time', async () => {
+    await restoreOpenTabs({});
+    executeScript.mockClear();
+
+    await Promise.all([restoreTab(2), restoreTab(2)]);
+
+    expect(injected()).toHaveLength(2);
+  });
+
+  it('leaves alone a tab left for later whose page loaded since', async () => {
+    await restoreOpenTabs({});
+    executeScript.mockClear();
+    connected = [2];
+
+    await restoreTab(2);
+
+    expect(injected()).toEqual([]);
+  });
+
+  it('keeps a discarded tab for later', async () => {
+    await restoreOpenTabs({});
+    executeScript.mockClear();
+    tabs[1].discarded = true;
+
+    await restoreTab(2);
+    expect(injected()).toEqual([]);
+
+    tabs[1].discarded = false;
+    await restoreTab(2);
+    expect(injected()).toHaveLength(2);
+  });
+
+  it('does nothing in a tab no restore left for later', async () => {
+    await restoreTab(2);
+
+    expect(executeScript).not.toBeCalled();
   });
 });

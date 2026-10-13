@@ -86,10 +86,13 @@ type ContentScript = NonNullable<
   chrome.runtime.Manifest['content_scripts']
 >[number];
 
-type TabScripts = Map<
-  number,
-  { tab: chrome.tabs.Tab; scripts: Array<ContentScript> }
->;
+// Each tab's content scripts, by their index in the manifest.
+type TabScripts = Map<number, { tab: chrome.tabs.Tab; scripts: Array<number> }>;
+
+const pendingKey = (tabId: number): string => `restore-tab-${tabId}`;
+
+const getContentScripts = (): Array<ContentScript> =>
+  chrome.runtime.getManifest().content_scripts ?? [];
 
 /**
  * Runs the scripts in a tab, unless its page already answers this copy of
@@ -97,20 +100,21 @@ type TabScripts = Map<
  */
 const inject = async (
   tab: chrome.tabs.Tab,
-  scripts: Array<ContentScript>
+  scripts: Array<number>
 ): Promise<void> => {
   if (tab.id === undefined || (await getPageSupport(tab)) !== 'unreachable') {
     return;
   }
 
   const tabId = tab.id;
+  const contentScripts = getContentScripts();
 
   await Promise.all(
-    scripts.map(script =>
+    scripts.map(i =>
       chrome.scripting
         .executeScript({
-          target: { tabId, allFrames: !!script.all_frames },
-          files: script.js ?? [],
+          target: { tabId, allFrames: !!contentScripts[i]?.all_frames },
+          files: contentScripts[i]?.js ?? [],
         })
         // A page the extension can't script, or one closed meanwhile.
         .catch(() => undefined)
@@ -122,11 +126,9 @@ const inject = async (
  * Finds the tabs each content script matches, leaving out discarded ones,
  * which get the scripts when they load again.
  */
-const findTabScripts = async (
-  scripts: Array<ContentScript>
-): Promise<TabScripts> => {
+const findTabScripts = async (): Promise<TabScripts> => {
   const matches = await Promise.all(
-    scripts.map(script =>
+    getContentScripts().map(script =>
       chrome.tabs.query({ url: script.matches, discarded: false })
     )
   );
@@ -136,7 +138,7 @@ const findTabScripts = async (
     tabs.forEach(tab => {
       if (tab.id !== undefined) {
         const found = tabScripts.get(tab.id)?.scripts ?? [];
-        tabScripts.set(tab.id, { tab, scripts: [...found, scripts[i]] });
+        tabScripts.set(tab.id, { tab, scripts: [...found, i] });
       }
     })
   );
@@ -144,12 +146,29 @@ const findTabScripts = async (
   return tabScripts;
 };
 
+/**
+ * Puts Stylebot back right away where it's in view or was open: the active
+ * tab of each window and the tabs with the editor. The rest wait until they
+ * are first shown, so an update doesn't run the scripts in every tab at once.
+ */
 const restore = async (
   found: Promise<TabScripts>,
   open?: OpenEditors
 ): Promise<void> => {
   const tabScripts = await found;
   const editors = open ?? (await findOpenEditors());
+  const later = [...tabScripts].filter(
+    ([tabId, { tab }]) => !tab.active && !editors[tabId]
+  );
+
+  if (later.length) {
+    await chrome.storage.session.set(
+      Object.fromEntries(
+        later.map(([tabId, { scripts }]) => [pendingKey(tabId), scripts])
+      )
+    );
+  }
+
   const tabIds = new Set([
     ...tabScripts.keys(),
     ...Object.keys(editors).map(Number),
@@ -159,7 +178,7 @@ const restore = async (
     [...tabIds].map(async tabId => {
       const injecting = tabScripts.get(tabId);
 
-      if (injecting) {
+      if (injecting && (injecting.tab.active || editors[tabId])) {
         await inject(injecting.tab, injecting.scripts);
       }
 
@@ -176,7 +195,8 @@ let restoring = Promise.resolve();
  * Runs the content scripts again in the tabs they match whose copies a reload
  * or update cut off, since Chrome only injects into new pages, then opens
  * Stylebot again where it was showing: in `open`, or else wherever a cut-off
- * panel is left on the page. Needs scripting, so it does nothing without it.
+ * panel is left on the page. Tabs out of view are left for `restoreTab`.
+ * Needs scripting, so it does nothing without it.
  */
 export const restoreOpenTabs = (open?: OpenEditors): Promise<void> => {
   if (!chrome.scripting) {
@@ -186,12 +206,59 @@ export const restoreOpenTabs = (open?: OpenEditors): Promise<void> => {
   // Tabs are found right away, so one opened after this call, which gets the
   // content scripts from Chrome, is left alone. Restores then run one at a
   // time, so a tab two of them find is only injected once.
-  const found = findTabScripts(
-    chrome.runtime.getManifest().content_scripts ?? []
-  );
+  const found = findTabScripts();
 
   restoring = restoring
     .then(() => restore(found, open))
     .catch(e => console.error('Stylebot: could not restore open tabs', e));
   return restoring;
+};
+
+/**
+ * Restores a tab `restoreOpenTabs` left for later, once. A discarded tab
+ * stays pending, since the page it loads again gets the scripts anyway.
+ */
+const restorePending = async (tabId: number): Promise<void> => {
+  const key = pendingKey(tabId);
+  const { [key]: scripts } = await chrome.storage.session.get(key);
+
+  if (!Array.isArray(scripts)) {
+    return;
+  }
+
+  const tab = await chrome.tabs.get(tabId).catch(() => undefined);
+
+  if (tab?.discarded) {
+    return;
+  }
+
+  await chrome.storage.session.remove(key);
+
+  if (tab) {
+    await inject(tab, scripts);
+  }
+};
+
+const restoringTabs = new Map<number, Promise<void>>();
+
+/**
+ * Puts Stylebot back into a tab an update or reload left for later, as it's
+ * shown or about to be used, and resolves once its page can answer. A tab
+ * already being restored isn't injected twice.
+ */
+export const restoreTab = (tabId: number): Promise<void> => {
+  if (!chrome.scripting || !chrome.storage?.session) {
+    return Promise.resolve();
+  }
+
+  let restoringTab = restoringTabs.get(tabId);
+
+  if (!restoringTab) {
+    restoringTab = restorePending(tabId)
+      .catch(e => console.error('Stylebot: could not restore tab', e))
+      .finally(() => restoringTabs.delete(tabId));
+    restoringTabs.set(tabId, restoringTab);
+  }
+
+  return restoringTab;
 };

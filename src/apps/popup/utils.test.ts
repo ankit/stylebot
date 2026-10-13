@@ -1,4 +1,17 @@
-import { getCommands, getOption, getStyles, onEnterOrSpace } from './utils';
+import { getPageSupport } from '@stylebot/utils';
+
+import {
+  getCommands,
+  getOption,
+  getRestoredPageSupport,
+  getStyles,
+  onEnterOrSpace,
+} from './utils';
+
+jest.mock('@stylebot/utils', () => ({
+  ...jest.requireActual('@stylebot/utils'),
+  getPageSupport: jest.fn(),
+}));
 
 const keydown = (key: string): KeyboardEvent =>
   new KeyboardEvent('keydown', { key });
@@ -127,5 +140,48 @@ describe('getOption and getCommands', () => {
       grayscale: '',
     });
     expect(chrome.runtime.sendMessage).not.toHaveBeenCalled();
+  });
+});
+
+describe('getRestoredPageSupport', () => {
+  const tab = { id: 3, url: 'https://example.com/' } as chrome.tabs.Tab;
+  const sendMessage = jest.fn((_message, callback) => callback());
+
+  beforeEach(() => {
+    sendMessage.mockClear();
+    global.chrome = {
+      runtime: { sendMessage, lastError: undefined },
+    } as unknown as typeof chrome;
+  });
+
+  it('restores a page that does not answer, then asks it again', async () => {
+    (getPageSupport as jest.Mock)
+      .mockResolvedValueOnce('unreachable')
+      .mockResolvedValueOnce('supported');
+
+    expect(await getRestoredPageSupport(tab)).toBe('supported');
+    expect(sendMessage).toBeCalledWith(
+      { name: 'RestoreTab', tabId: 3 },
+      expect.any(Function)
+    );
+  });
+
+  it('leaves alone a page that answers', async () => {
+    (getPageSupport as jest.Mock).mockResolvedValueOnce('supported');
+
+    expect(await getRestoredPageSupport(tab)).toBe('supported');
+    expect(sendMessage).not.toBeCalled();
+  });
+
+  it('leaves alone a browser page', async () => {
+    (getPageSupport as jest.Mock).mockResolvedValueOnce('unreachable');
+
+    expect(
+      await getRestoredPageSupport({
+        id: 3,
+        url: 'chrome://settings',
+      } as chrome.tabs.Tab)
+    ).toBe('unreachable');
+    expect(sendMessage).not.toBeCalled();
   });
 });

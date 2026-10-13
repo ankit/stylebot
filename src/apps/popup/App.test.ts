@@ -7,8 +7,12 @@ import StyleComponent from './components/Style.vue';
 import ToggleStylebot from './components/ToggleStylebot.vue';
 import SyncStylebot from './components/SyncStylebot.vue';
 import UnsupportedPage from './components/UnsupportedPage.vue';
-import { getCurrentTab, getStyles, getCommands } from './utils';
-import { getPageSupport } from '@stylebot/utils';
+import {
+  getCurrentTab,
+  getStyles,
+  getCommands,
+  getRestoredPageSupport,
+} from './utils';
 import type { PageSupport } from '@stylebot/utils';
 import { getGoogleDriveSyncEnabled } from '../../features/sync/google-drive/sync-metadata';
 
@@ -19,11 +23,7 @@ jest.mock('./utils', () => ({
   getOption: jest.fn(),
   getIsStylebotOpen: jest.fn(),
   getIsPageReaderable: jest.fn(),
-}));
-
-jest.mock('@stylebot/utils', () => ({
-  ...jest.requireActual('@stylebot/utils'),
-  getPageSupport: jest.fn(),
+  getRestoredPageSupport: jest.fn(),
 }));
 
 jest.mock('../../features/sync/google-drive/sync-metadata', () => ({
@@ -43,7 +43,7 @@ const openPopup = async (url: string, support: PageSupport = 'supported') => {
   (getCurrentTab as jest.Mock).mockImplementation(cb =>
     cb({ id: 1, url } as chrome.tabs.Tab)
   );
-  (getPageSupport as jest.Mock).mockResolvedValue(support);
+  (getRestoredPageSupport as jest.Mock).mockResolvedValue(support);
 
   const wrapper = shallowMount(App);
   await flush();
