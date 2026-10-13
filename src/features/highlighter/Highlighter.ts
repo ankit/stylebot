@@ -226,6 +226,7 @@ class Highlighter {
     window.addEventListener('pointerdown', this.onPointerDown, true);
     window.addEventListener('pointerover', this.onPointerOver, true);
     window.addEventListener('pointermove', this.onPointerMove, true);
+    window.addEventListener('pointerout', this.onPointerOut, true);
     window.addEventListener('pointerup', this.onPointerUp, true);
     window.addEventListener('keydown', this.onKeyDown, true);
   };
@@ -238,6 +239,7 @@ class Highlighter {
     window.removeEventListener('pointerdown', this.onPointerDown, true);
     window.removeEventListener('pointerover', this.onPointerOver, true);
     window.removeEventListener('pointermove', this.onPointerMove, true);
+    window.removeEventListener('pointerout', this.onPointerOut, true);
     window.removeEventListener('pointerup', this.onPointerUp, true);
     window.removeEventListener('keydown', this.onKeyDown, true);
   };
@@ -360,6 +362,19 @@ class Highlighter {
     if (el !== this.pointerElement) {
       this.hoverElement(el);
     }
+  };
+
+  /**
+   * Hides the overlay once the pointer leaves the page, e.g. for a side panel
+   * or pop-out window. The element stays current so keys typed there still work.
+   */
+  onPointerOut = (event: PointerEvent): void => {
+    if (event.relatedTarget) {
+      return;
+    }
+
+    this.pointerElement = null;
+    this.hideOverlay();
   };
 
   hoverElement = (el: HTMLElement): void => {

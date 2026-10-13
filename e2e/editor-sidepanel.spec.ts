@@ -301,3 +301,37 @@ test('arrow keys and Enter typed in the side panel drive the inspector', async (
     )
     .toMatch(/body$/);
 });
+
+test('the inspector hides its overlay while the pointer is off the page', async ({
+  context,
+  extension,
+  openPopup,
+}) => {
+  await dockToSidePanel(extension);
+
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/`);
+  const panel = await openSidePanel(page, context, extension, openPopup);
+  await expect
+    .poll(() =>
+      panel.evaluate(`!!document.querySelector('.stylebot-inspector.active')`)
+    )
+    .toBe(true);
+
+  const overlay = page.locator('#stylebot-overlay');
+
+  await page.locator('h1').hover();
+  await expect(overlay).not.toHaveCount(0);
+
+  await page.evaluate(() =>
+    document
+      .querySelector('h1')
+      ?.dispatchEvent(new PointerEvent('pointerout', { bubbles: true }))
+  );
+  await expect(overlay).toHaveCount(0);
+
+  await panel.evaluate(
+    `document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true }))`
+  );
+  await expect(overlay).not.toHaveCount(0);
+});
