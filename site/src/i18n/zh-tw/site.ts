@@ -311,7 +311,7 @@ const site: SiteMessages = {
     browser: {
       title: '瀏覽器中的資料',
       body: [
-        '你的樣式、設定、記錄、聊天對話和 API 金鑰都儲存在瀏覽器中，解除安裝 Stylebot 就會移除這些資料。Google Fonts 字型和透過 <code>@import</code> 匯入的樣式表會從其託管位置下載，託管方會看到你的 IP 位址。',
+        '你的樣式、設定和記錄都儲存在瀏覽器中，解除安裝 Stylebot 就會移除這些資料。Google Fonts 字型和透過 <code>@import</code> 匯入的樣式表會從其託管位置下載，託管方會看到你的 IP 位址。',
       ],
     },
     sync: {
@@ -319,12 +319,6 @@ const site: SiteMessages = {
       body: [
         '在選項中連線 Google Drive 後，你的樣式會儲存到你自己 Drive 中的一個檔案。Stylebot 只看得到它自己建立的檔案，它的存取權杖保存在你的瀏覽器中。你可以在選項或你的 <a href="https://myaccount.google.com/connections">Google 帳戶</a>中中斷連線。',
         'Stylebot 對於從 Google API 取得之資訊的使用方式，遵循 <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API 服務使用者資料政策</a>，包括「有限使用」規定。',
-      ],
-    },
-    chat: {
-      title: '聊天',
-      body: [
-        '在你新增 API 金鑰之前，聊天都是關閉的，不會傳送任何內容。你的訊息會直接傳送給你新增了 API 金鑰的供應商，一併傳送的還有你附加的螢幕截圖、頁面的 URL 和標題、頁面可見內容的大綱、頁面的 CSS 和你的樣式。其中可能包含頁面上的個人資訊。適用該供應商的政策：<a href="https://www.anthropic.com/legal/privacy">Anthropic</a>、<a href="https://openai.com/policies/privacy-policy/">OpenAI</a>、<a href="https://ai.google.dev/gemini-api/terms">Google</a>。',
       ],
     },
     cli: {

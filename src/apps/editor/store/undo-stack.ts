@@ -18,26 +18,11 @@ export const COALESCE_WINDOW_MS = 500;
 
 export const emptyUndoStack = (): UndoStack => ({ past: [], future: [] });
 
-const CHAT_SOURCE = 'chat:';
-
-/**
- * The undo source for a chat reply's changes, made and taken back.
- */
-export const getChatSourceId = (turnId: string): string =>
-  `${CHAT_SOURCE}${turnId}`;
-
-/**
- * The chat reply an undo source belongs to; null for any other source.
- */
-export const getChatTurnId = (source: string): string | null =>
-  source.startsWith(CHAT_SOURCE) ? source.slice(CHAT_SOURCE.length) : null;
-
 /**
  * When a change joins the latest step from the same source: within the
- * coalescing window, always (a chat reply whose edits stream in), or never
- * (a click that must stay its own step).
+ * coalescing window, or never (a click that must stay its own step).
  */
-export type UndoMerge = 'recent' | 'always' | 'never';
+export type UndoMerge = 'recent' | 'never';
 
 /**
  * Records the css a change is about to replace, extending the latest step
@@ -53,8 +38,8 @@ export const recordChange = (
   const last = stack.past[stack.past.length - 1];
   const merges =
     last?.source === source &&
-    (merge === 'always' ||
-      (merge === 'recent' && at - last.at < COALESCE_WINDOW_MS));
+    merge === 'recent' &&
+    at - last.at < COALESCE_WINDOW_MS;
 
   if (merges) {
     return {
@@ -68,15 +53,6 @@ export const recordChange = (
     future: [],
   };
 };
-
-/**
- * Drops the latest step when it came from the source, for a change taken
- * back before it was ever meant to be undone (a chat reply that failed).
- */
-export const discardChange = (stack: UndoStack, source: string): UndoStack =>
-  stack.past[stack.past.length - 1]?.source === source
-    ? { ...stack, past: stack.past.slice(0, -1) }
-    : stack;
 
 export type UndoMove = {
   undoStack: UndoStack;

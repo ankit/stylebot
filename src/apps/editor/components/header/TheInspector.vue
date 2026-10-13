@@ -67,7 +67,7 @@ export default Vue.extend({
     },
 
     disabled(): boolean {
-      return !['basic', 'chat'].includes(this.mode);
+      return this.mode !== 'basic';
     },
   },
 
@@ -80,7 +80,7 @@ export default Vue.extend({
       }
     },
 
-    // Chat picks only on request, so inspecting left on from Basic stops too.
+    // Only Basic inspects, so inspecting left on stops on leaving it.
     mode(newValue: StylebotEditingMode): void {
       if (newValue !== 'basic' && this.active) {
         this.$store.commit('setInspecting', false);

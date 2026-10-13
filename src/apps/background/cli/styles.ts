@@ -1,9 +1,9 @@
-import { describeStyleCheck } from '@stylebot/chat';
 import { addGoogleFontImports } from '@stylebot/google-fonts';
 import { expandProfiles } from '@stylebot/saved-styles';
-import type { ChatCssEdit, StyleCheckReport } from '@stylebot/types';
+import type { CssEdit, StyleCheckReport } from '@stylebot/types';
 
 import { applyStylesToAllTabs, getAll, set } from '../styles';
+import { describeStyleCheck } from './style-report';
 import { EMPTY_STYLE, activeCss, resolveProfileId } from './profiles';
 import {
   allDeclarations,
@@ -23,8 +23,8 @@ import {
 import type { CliCommands } from './types';
 
 /**
- * The css with Google Fonts imports added for the families it names, as
- * Chat adds them, and the families it newly imports.
+ * The css with Google Fonts imports added for the families it names, and
+ * the families it newly imports.
  */
 const addFontImports = async (
   css: string
@@ -49,7 +49,7 @@ const addFontImports = async (
 const startCheck = async (
   url: string,
   target: unknown,
-  edits: Array<ChatCssEdit>
+  edits: Array<CssEdit>
 ): Promise<number | null> => {
   const tabId = (await findTabShowing(url, target))?.id;
 
@@ -65,7 +65,7 @@ const startCheck = async (
 
 /**
  * What the check started on a tab found once the style has applied, with
- * Chat's wording of it; null when the page can't say.
+ * its wording for the terminal; null when the page can't say.
  */
 const finishCheck = async (
   tabId: number,

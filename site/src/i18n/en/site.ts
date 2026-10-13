@@ -335,7 +335,7 @@ export default {
     browser: {
       title: 'In your browser',
       body: [
-        "Your styles, settings, history, chat conversations and API keys are saved in your browser, and uninstalling Stylebot removes them. Google Fonts and stylesheets you <code>@import</code> are downloaded from where they're hosted, which sees your IP address.",
+        "Your styles, settings and history are saved in your browser, and uninstalling Stylebot removes them. Google Fonts and stylesheets you <code>@import</code> are downloaded from where they're hosted, which sees your IP address.",
       ],
     },
     sync: {
@@ -343,12 +343,6 @@ export default {
       body: [
         'Connecting Google Drive in Options saves your styles to a file in your own Drive. Stylebot can only see files it creates, and its access token stays in your browser. Disconnect in Options or in your <a href="https://myaccount.google.com/connections">Google account</a>.',
         'Stylebot\'s use of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements.',
-      ],
-    },
-    chat: {
-      title: 'Chat',
-      body: [
-        'Chat is off until you add an API key, and nothing is sent before then. Your message goes straight to the provider whose API key you added, with any screenshot you attach, the page\'s address and title, an outline of its visible content, its CSS and your styles. That can include personal information on the page. The provider\'s policy applies: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {

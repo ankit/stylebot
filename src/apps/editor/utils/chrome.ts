@@ -31,17 +31,6 @@ import type {
   OpenEditorSidePanel,
   OpenEditorSidePanelResponse,
   CloseEditorSidePanel,
-  ChatGetStatus,
-  ChatConnect,
-  ChatRemoveKey,
-  ChatSetModel,
-  ChatGetThread,
-  ChatSetThread,
-  ChatStatusResponse,
-  ChatConnectResponse,
-  ChatGetThreadResponse,
-  ChatProviderId,
-  ChatTurn,
 } from '@stylebot/types';
 
 export const getAllOptions = (): Promise<StylebotOptions> => {
@@ -272,47 +261,3 @@ export const requestCloseEditorSidePanel = (tabId?: number): void => {
   const message: CloseEditorSidePanel = { name: 'CloseEditorSidePanel', tabId };
   chrome.runtime.sendMessage(message);
 };
-
-export const chatGetStatus = (): Promise<ChatStatusResponse> =>
-  chrome.runtime.sendMessage<ChatGetStatus, ChatStatusResponse>({
-    name: 'ChatGetStatus',
-  });
-
-export const chatConnect = (
-  provider: ChatProviderId,
-  key: string
-): Promise<ChatConnectResponse> =>
-  chrome.runtime.sendMessage<ChatConnect, ChatConnectResponse>({
-    name: 'ChatConnect',
-    provider,
-    key,
-  });
-
-export const chatGetThread = (url: string): Promise<ChatGetThreadResponse> =>
-  chrome.runtime.sendMessage<ChatGetThread, ChatGetThreadResponse>({
-    name: 'ChatGetThread',
-    url,
-  });
-
-export const chatSetThread = (url: string, turns: Array<ChatTurn>): void => {
-  const message: ChatSetThread = { name: 'ChatSetThread', url, turns };
-  chrome.runtime.sendMessage(message);
-};
-
-export const chatRemoveKey = (
-  provider: ChatProviderId
-): Promise<ChatStatusResponse> =>
-  chrome.runtime.sendMessage<ChatRemoveKey, ChatStatusResponse>({
-    name: 'ChatRemoveKey',
-    provider,
-  });
-
-export const chatSetModel = (
-  provider: ChatProviderId,
-  model: string
-): Promise<ChatStatusResponse> =>
-  chrome.runtime.sendMessage<ChatSetModel, ChatStatusResponse>({
-    name: 'ChatSetModel',
-    provider,
-    model,
-  });

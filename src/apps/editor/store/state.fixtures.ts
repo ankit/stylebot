@@ -21,7 +21,6 @@ const mockState: State = {
   profiles: [{ id: 'default', name: '' }],
   activeProfile: 'default',
   undoStack: emptyUndoStack(),
-  codeHighlight: null,
   enabled: true,
   url: document.domain,
 

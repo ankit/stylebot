@@ -1,4 +1,4 @@
-export type StylebotEditingMode = 'basic' | 'magic' | 'code' | 'chat';
+export type StylebotEditingMode = 'basic' | 'magic' | 'code';
 
 export type StylebotBasicModeSections = {
   text: boolean;
@@ -30,8 +30,6 @@ export type StylebotAppearance = 'light' | 'dark' | 'system';
 
 export type StylebotOptions = {
   contextMenu: boolean;
-  // Shows the Chat tab in the editor.
-  chat: boolean;
   fonts: StylebotFonts;
   layout: StylebotLayout;
   mode: StylebotEditingMode;

@@ -318,7 +318,7 @@ const site: SiteMessages = {
     browser: {
       title: 'ブラウザ内',
       body: [
-        'スタイル、設定、履歴、チャットの会話、API キーはブラウザに保存され、Stylebot をアンインストールすると削除されます。Google Fonts と <code>@import</code> したスタイルシートはそれぞれのホストからダウンロードされ、ホストには IP アドレスが伝わります。',
+        'スタイル、設定、履歴はブラウザに保存され、Stylebot をアンインストールすると削除されます。Google Fonts と <code>@import</code> したスタイルシートはそれぞれのホストからダウンロードされ、ホストには IP アドレスが伝わります。',
       ],
     },
     sync: {
@@ -326,12 +326,6 @@ const site: SiteMessages = {
       body: [
         'オプションで Google Drive に接続すると、スタイルがご自身の Drive 内のファイルに保存されます。Stylebot が見られるのは自身が作成したファイルだけで、アクセストークンはブラウザに保存されます。接続の解除は、オプションか <a href="https://myaccount.google.com/connections">Google アカウント</a>で行えます。',
         'Stylebot による Google API から受け取った情報の使用は、限定使用の要件を含め、<a href="https://developers.google.com/terms/api-services-user-data-policy">Google API サービスのユーザーデータに関するポリシー</a>に準拠しています。',
-      ],
-    },
-    chat: {
-      title: 'チャット',
-      body: [
-        'チャットは API キーを追加するまでオフで、それまでは何も送信されません。メッセージは、API キーを追加したプロバイダーに直接送信されます。あわせて、添付したスクリーンショット、ページのアドレスとタイトル、表示されている内容の概要、ページの CSS とスタイルも送信されます。ページ上の個人情報が含まれることがあります。プロバイダーのポリシーが適用されます（<a href="https://www.anthropic.com/legal/privacy">Anthropic</a>、<a href="https://openai.com/policies/privacy-policy/">OpenAI</a>、<a href="https://ai.google.dev/gemini-api/terms">Google</a>）。',
       ],
     },
     cli: {

@@ -320,7 +320,7 @@ const site: SiteMessages = {
     browser: {
       title: 'In Ihrem Browser',
       body: [
-        'Ihre Stile, Einstellungen, der Verlauf, Chat-Unterhaltungen und API-Schlüssel werden in Ihrem Browser gespeichert und beim Deinstallieren von Stylebot entfernt. Google Fonts und Stylesheets, die Sie per <code>@import</code> einbinden, werden von ihrem jeweiligen Server geladen, der dabei Ihre IP-Adresse sieht.',
+        'Ihre Stile, Einstellungen, und der Verlauf werden in Ihrem Browser gespeichert und beim Deinstallieren von Stylebot entfernt. Google Fonts und Stylesheets, die Sie per <code>@import</code> einbinden, werden von ihrem jeweiligen Server geladen, der dabei Ihre IP-Adresse sieht.',
       ],
     },
     sync: {
@@ -328,12 +328,6 @@ const site: SiteMessages = {
       body: [
         'Wenn Sie Google Drive in den Optionen verbinden, werden Ihre Stile in einer Datei in Ihrem eigenen Drive gespeichert. Stylebot sieht nur die Dateien, die es selbst erstellt, und sein Zugriffstoken bleibt in Ihrem Browser. Trennen Sie die Verbindung in den Optionen oder in Ihrem <a href="https://myaccount.google.com/connections">Google-Konto</a>.',
         'Die Nutzung von Informationen, die Stylebot von Google APIs erhält, entspricht der <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, einschließlich der Anforderungen zur eingeschränkten Nutzung (Limited Use).',
-      ],
-    },
-    chat: {
-      title: 'Chat',
-      body: [
-        'Der Chat ist aus, bis Sie einen API-Schlüssel hinzufügen, und vorher wird nichts gesendet. Ihre Nachricht geht direkt an den Anbieter, dessen API-Schlüssel Sie hinzugefügt haben, zusammen mit angehängten Screenshots, Adresse und Titel der Seite, einer Übersicht ihrer sichtbaren Inhalte, ihrem CSS und Ihren Stilen. Darin können personenbezogene Daten von der Seite stecken. Es gilt die Datenschutzerklärung des Anbieters: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {

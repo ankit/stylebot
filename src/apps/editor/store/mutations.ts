@@ -4,6 +4,7 @@ import type {
   CssDeclaration,
   StylebotOptions,
   StylebotCommands,
+  StylebotEditingMode,
   ReadabilitySettings,
 } from '@stylebot/types';
 
@@ -12,6 +13,8 @@ import type { State, CssSelectorMetadata, EditorProfile, EditorTab } from './';
 import type { UndoStack } from './undo-stack';
 import type { PageSnapshot, SelectorAlternatives } from '@stylebot/page-bridge';
 import type { AppliedDeclaration } from '@stylebot/page-bridge';
+
+const EDITING_MODES: Array<StylebotEditingMode> = ['basic', 'magic', 'code'];
 
 export default {
   setVisible(state: State, visible: boolean): void {
@@ -39,11 +42,10 @@ export default {
   },
 
   setOptions(state: State, options: StylebotOptions): void {
-    // With Chat hidden, a saved Chat mode opens Basic instead.
-    state.options =
-      !options.chat && options.mode === 'chat'
-        ? { ...options, mode: 'basic' }
-        : options;
+    // A mode saved by an older version, like Chat, opens Basic instead.
+    state.options = EDITING_MODES.includes(options.mode)
+      ? options
+      : { ...options, mode: 'basic' };
   },
 
   setUrl(state: State, url: string): void {
@@ -64,10 +66,6 @@ export default {
 
   setCss(state: State, css: string): void {
     state.css = css;
-  },
-
-  setCodeHighlight(state: State, ranges: State['codeHighlight']): void {
-    state.codeHighlight = ranges;
   },
 
   setUndoStack(state: State, undoStack: UndoStack): void {

@@ -137,9 +137,6 @@ export default Vue.extend({
             { label: this.t('basic_mode'), key: keys.basic },
             { label: this.t('code_mode'), key: keys.code },
             { label: this.t('presets_mode'), key: keys.magic },
-            ...(this.$store.state.options.chat
-              ? [{ label: this.t('chat_mode'), key: keys.chat }]
-              : []),
           ],
         },
         hasSidePanel()

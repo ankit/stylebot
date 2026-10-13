@@ -7,7 +7,7 @@ const oneLine = selector => selector.replace(/\s*\n\s*/g, ' ');
 
 /**
  * What css set did: where it saved, the fonts it imported, and, when a tab
- * shows the site, how the page took it, worded as Chat's model is told.
+ * shows the site, how the page took it.
  */
 const describeSave = ({
   url,

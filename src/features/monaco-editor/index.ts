@@ -1,5 +1,3 @@
-import type { CssLineRange } from '@stylebot/types';
-
 export { default as MonacoEditor } from './MonacoEditor.vue';
 
 export type IframeCssUpdatedMessage = {
@@ -41,15 +39,7 @@ export type ParentThemeUpdateMessage = {
   theme: 'light' | 'dark';
 };
 
-// Marks lines (1-based, as in the css last sent) until the text next changes,
-// and scrolls the first into view.
-export type ParentHighlightLinesMessage = {
-  type: 'stylebotHighlightLines';
-  ranges: Array<CssLineRange>;
-};
-
 export type ParentMessage =
   | ParentUpdateCssMessage
-  | ParentHighlightLinesMessage
   | ParentFocusEditorMessage
   | ParentThemeUpdateMessage;

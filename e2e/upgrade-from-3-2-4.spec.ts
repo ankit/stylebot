@@ -275,7 +275,7 @@ test('upgrading from 3.2.4 keeps styles and settings, and syncs without dropping
         .toEqual({ done: true, errors: null, lastSyncedAt: LAST_SYNCED_AT });
     });
 
-    await test.step('the settings are kept, the retired ones dropped, and Chat starts hidden', async () => {
+    await test.step('the settings are kept and the retired ones dropped', async () => {
       const {
         basicModeSections: _basicModeSections,
         colorPalette: _colorPalette,
@@ -289,7 +289,7 @@ test('upgrading from 3.2.4 keeps styles and settings, and syncs without dropping
             return items.options;
           })
         )
-        .toEqual({ ...kept, chat: false });
+        .toEqual(kept);
     });
 
     await test.step('the styles are kept and applied', async () => {

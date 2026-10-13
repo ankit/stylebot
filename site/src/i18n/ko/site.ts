@@ -317,7 +317,7 @@ const site: SiteMessages = {
     browser: {
       title: '브라우저 안',
       body: [
-        '스타일, 설정, 기록, 채팅 대화, API 키는 브라우저에 저장되며, Stylebot을 삭제하면 함께 삭제됩니다. Google Fonts 글꼴과 <code>@import</code>로 가져온 스타일시트는 호스팅된 곳에서 다운로드되며, 이때 그곳에 IP 주소가 전달됩니다.',
+        '스타일, 설정, 기록은 브라우저에 저장되며, Stylebot을 삭제하면 함께 삭제됩니다. Google Fonts 글꼴과 <code>@import</code>로 가져온 스타일시트는 호스팅된 곳에서 다운로드되며, 이때 그곳에 IP 주소가 전달됩니다.',
       ],
     },
     sync: {
@@ -325,12 +325,6 @@ const site: SiteMessages = {
       body: [
         '옵션에서 Google Drive를 연결하면 스타일이 본인의 Drive에 있는 파일에 저장됩니다. Stylebot은 자신이 만든 파일만 볼 수 있으며, 액세스 토큰은 브라우저에 보관됩니다. 연결은 옵션이나 <a href="https://myaccount.google.com/connections">Google 계정</a>에서 해제할 수 있습니다.',
         'Google API에서 받은 정보에 대한 Stylebot의 사용은 제한적 사용 요구사항을 포함한 <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API 서비스 사용자 데이터 정책</a>을 준수합니다.',
-      ],
-    },
-    chat: {
-      title: '채팅',
-      body: [
-        '채팅은 API 키를 추가하기 전까지 꺼져 있으며, 그 전에는 아무것도 전송되지 않습니다. 메시지는 API 키를 추가한 제공업체로 바로 전송되며, 첨부한 스크린샷, 페이지의 주소와 제목, 보이는 내용의 개요, 페이지의 CSS와 스타일도 함께 전송됩니다. 여기에는 페이지에 표시된 개인정보가 포함될 수 있습니다. 제공업체의 정책이 적용됩니다: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {

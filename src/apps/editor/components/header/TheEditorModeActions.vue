@@ -1,24 +1,12 @@
 <template>
   <div class="mode-actions">
     <s-tabs ref="tabs" :value="mode" :tabs="tabs" @change="setMode" />
-
-    <s-icon-button
-      v-if="chatConnected"
-      class="new-chat"
-      :size="26"
-      :tooltip="t('new_chat')"
-      :disabled="!hasTurns"
-      @click="newChat"
-    >
-      <compose-icon :size="16" />
-    </s-icon-button>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { SIconButton, STabs } from '@stylebot/components';
-import { ComposeIcon } from '@stylebot/icons';
+import { STabs } from '@stylebot/components';
 
 import { KEYBOARD_FOCUS } from '@stylebot/utils';
 
@@ -28,22 +16,12 @@ export default Vue.extend({
   name: 'TheEditorModeActions',
 
   components: {
-    ComposeIcon,
-    SIconButton,
     STabs,
   },
 
   computed: {
     mode(): string {
       return this.$store.state.options.mode;
-    },
-
-    chatConnected(): boolean {
-      return this.mode === 'chat' && !!this.$store.state.chat.status?.connected;
-    },
-
-    hasTurns(): boolean {
-      return this.$store.state.chat.turns.length > 0;
     },
 
     readability(): boolean {
@@ -57,7 +35,7 @@ export default Vue.extend({
       shortcut: string;
       disabled: boolean;
     }> {
-      const tabs = [
+      return [
         {
           value: 'basic',
           label: this.t('basic_mode'),
@@ -79,28 +57,13 @@ export default Vue.extend({
           shortcut: 'p',
           disabled: false,
         },
-        {
-          value: 'chat',
-          label: this.t('chat_mode'),
-          title: this.t('chat_mode_description'),
-          shortcut: 't',
-          disabled: this.readability,
-        },
       ];
-
-      return this.$store.state.options.chat
-        ? tabs
-        : tabs.filter(({ value }) => value !== 'chat');
     },
   },
 
   methods: {
     focusModeTab(): void {
       (this.$refs.tabs as unknown as TabsRef).focusSelectedTab(KEYBOARD_FOCUS);
-    },
-
-    newChat(): void {
-      this.$store.commit('chat/setConfirmingClear', true);
     },
 
     setMode(mode: string): void {
@@ -112,19 +75,11 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .mode-actions {
-  position: relative;
   margin-top: 16px;
   margin-bottom: -1px;
 }
 
 .mode-actions .tabs {
   margin: 0 var(--panel-gutter);
-}
-
-.new-chat {
-  position: absolute;
-  top: 2px;
-  right: calc(var(--panel-gutter) - 1px);
-  color: var(--icon-color);
 }
 </style>

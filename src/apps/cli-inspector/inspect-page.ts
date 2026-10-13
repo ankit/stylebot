@@ -1,4 +1,3 @@
-import type { ChatSuggestionContext } from '@stylebot/chat';
 import { getFragileSelector } from '@stylebot/css';
 import {
   checkStyle,
@@ -17,6 +16,7 @@ import type {
   PageInspection,
   PointerResult,
   StyleCheckReport,
+  SuggestionContext,
 } from '@stylebot/types';
 
 import { usePointer } from './pointer';
@@ -42,15 +42,14 @@ const finishCheck = async (
 };
 
 /**
- * Answers what the background asks about the page, with the same readers
- * the editor and Chat use.
+ * Answers what the background asks about the page.
  */
 export const inspectPage = async (
   inspection: PageInspection,
   host: InspectorHost
 ): Promise<
   | string
-  | ChatSuggestionContext
+  | SuggestionContext
   | Record<string, string>
   | Array<number | null>
   | StyleCheckReport
