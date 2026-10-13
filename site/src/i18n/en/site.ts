@@ -173,17 +173,6 @@ export default {
       grayscale: 'Grayscale',
       grayscaleBody: 'Apply grayscale to the page.',
     },
-    // A picture of Stylebot's Chat tab; updated, undo and placeholder are labels from the extension, so use its own translations.
-    chat: {
-      title: 'Chat',
-      body: 'Off by default. Turn it on in Options, connect your own Claude, OpenAI or Gemini key, then describe a change in the Chat tab and Stylebot writes the CSS. Without a key, nothing is sent anywhere.',
-      prompt: 'Make the article easier to read at night',
-      reply:
-        'Switched to a dark background with warmer text, and set the body in a larger serif with more line spacing.',
-      updated: 'Updated styles',
-      undo: 'Undo',
-      placeholder: 'Describe a change',
-    },
   },
   welcome: {
     title: 'Welcome',

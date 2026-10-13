@@ -159,16 +159,6 @@ const site: SiteMessages = {
       grayscale: 'Scala di grigi',
       grayscaleBody: 'Applica la scala di grigi alla pagina.',
     },
-    chat: {
-      title: 'Chat',
-      body: 'Disattivata per impostazione predefinita. Attivala nelle opzioni, collega la tua chiave di Claude, OpenAI o Gemini, poi descrivi una modifica nella scheda Chat e Stylebot scrive il CSS. Senza chiave non viene inviato nulla.',
-      prompt: 'Rendi l’articolo più facile da leggere di notte',
-      reply:
-        'Ho messo uno sfondo scuro con testo più caldo e un corpo serif più grande, con più interlinea.',
-      updated: 'Stili aggiornati',
-      undo: 'Annulla',
-      placeholder: 'Descrivi una modifica',
-    },
   },
   welcome: {
     title: 'Benvenuto',

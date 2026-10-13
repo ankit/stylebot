@@ -159,16 +159,6 @@ const site: SiteMessages = {
       grayscale: '회색조 모드',
       grayscaleBody: '페이지에 회색조 스타일을 적용합니다.',
     },
-    chat: {
-      title: '채팅',
-      body: '기본적으로 꺼져 있습니다. 옵션에서 켜고 Claude, OpenAI, Gemini 키를 직접 연결한 뒤 채팅 탭에서 원하는 변경을 설명하면 Stylebot이 CSS를 작성합니다. 키가 없으면 아무것도 전송되지 않습니다.',
-      prompt: '밤에 기사 읽기 편하게 해 줘',
-      reply:
-        '어두운 배경에 따뜻한 글자색으로 바꾸고, 본문은 더 큰 세리프 글꼴에 줄 간격을 넓혔습니다.',
-      updated: '스타일 업데이트됨',
-      undo: '실행 취소',
-      placeholder: '변경 사항 설명',
-    },
   },
   welcome: {
     title: '환영합니다',

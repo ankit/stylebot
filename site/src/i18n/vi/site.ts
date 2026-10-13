@@ -159,16 +159,6 @@ const site: SiteMessages = {
       grayscale: 'Thang độ xám',
       grayscaleBody: 'Hiển thị trang ở thang độ xám.',
     },
-    chat: {
-      title: 'Trò chuyện',
-      body: 'Mặc định tắt. Bật trong tùy chọn, kết nối khóa Claude, OpenAI hoặc Gemini của riêng bạn, rồi mô tả thay đổi trong thẻ Trò chuyện và Stylebot sẽ viết CSS. Không có khóa thì không có gì được gửi đi.',
-      prompt: 'Làm bài viết dễ đọc hơn vào ban đêm',
-      reply:
-        'Đã chuyển sang nền tối với chữ ấm hơn, thân bài dùng phông serif lớn hơn và giãn dòng rộng hơn.',
-      updated: 'Đã cập nhật kiểu',
-      undo: 'Hoàn tác',
-      placeholder: 'Mô tả thay đổi bạn muốn',
-    },
   },
   welcome: {
     title: 'Chào mừng',

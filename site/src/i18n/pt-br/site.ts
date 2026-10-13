@@ -159,16 +159,6 @@ const site: SiteMessages = {
       grayscale: 'Escala de cinza',
       grayscaleBody: 'Aplicar escala de cinza à página.',
     },
-    chat: {
-      title: 'Chat',
-      body: 'Desativado por padrão. Ative nas opções, conecte sua própria chave do Claude, OpenAI ou Gemini, descreva uma mudança na aba Chat e o Stylebot escreve o CSS. Sem uma chave, nada é enviado.',
-      prompt: 'Deixe o artigo mais fácil de ler à noite',
-      reply:
-        'Mudei para um fundo escuro com texto mais quente e coloquei o corpo em uma fonte serifada maior, com mais espaço entre as linhas.',
-      updated: 'Estilos atualizados',
-      undo: 'Desfazer',
-      placeholder: 'Descreva uma mudança',
-    },
   },
   welcome: {
     title: 'Boas-vindas',

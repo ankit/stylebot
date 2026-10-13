@@ -160,16 +160,6 @@ const site: SiteMessages = {
       grayscale: 'Skala abu-abu',
       grayscaleBody: 'Terapkan skala abu-abu pada halaman.',
     },
-    chat: {
-      title: 'Chat',
-      body: 'Nonaktif secara default. Aktifkan di opsi, hubungkan kunci Claude, OpenAI, atau Gemini Anda sendiri, lalu jelaskan perubahan di tab Chat dan Stylebot yang menulis CSS-nya. Tanpa kunci, tidak ada yang dikirim.',
-      prompt: 'Buat artikel ini lebih nyaman dibaca di malam hari',
-      reply:
-        'Latar diganti menjadi gelap dengan teks yang lebih hangat, dan isi artikel memakai serif yang lebih besar dengan jarak baris yang lebih lega.',
-      updated: 'Gaya diperbarui',
-      undo: 'Urungkan',
-      placeholder: 'Jelaskan perubahan',
-    },
   },
   welcome: {
     title: 'Selamat datang',

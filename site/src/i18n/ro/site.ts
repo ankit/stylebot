@@ -161,16 +161,6 @@ const site: SiteMessages = {
       grayscale: 'Alb-negru',
       grayscaleBody: 'Aplică modul alb-negru pe pagină.',
     },
-    chat: {
-      title: 'Chat',
-      body: 'Dezactivat implicit. Activează-l în opțiuni, conectează propria cheie Claude, OpenAI sau Gemini, apoi descrie o modificare în fila Chat, iar Stylebot scrie CSS-ul. Fără cheie, nu se trimite nimic.',
-      prompt: 'Fă articolul mai ușor de citit noaptea',
-      reply:
-        'Am trecut la un fundal întunecat cu text mai cald și am pus corpul textului într-un serif mai mare, cu rânduri mai aerisite.',
-      updated: 'Stiluri actualizate',
-      undo: 'Anulează',
-      placeholder: 'Descrie o modificare',
-    },
   },
   welcome: {
     title: 'Bun venit',

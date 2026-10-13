@@ -159,16 +159,6 @@ const site: SiteMessages = {
       grayscale: 'Niveaux de gris',
       grayscaleBody: 'Applique les niveaux de gris à la page.',
     },
-    chat: {
-      title: 'Chat',
-      body: 'Désactivé par défaut. Activez-le dans les options, connectez votre propre clé Claude, OpenAI ou Gemini, puis décrivez une modification dans l’onglet Chat et Stylebot écrit le CSS. Sans clé, rien n’est envoyé.',
-      prompt: 'Rends l’article plus lisible la nuit',
-      reply:
-        'J’ai mis un fond sombre et un texte plus chaud, et passé le corps du texte dans une serif plus grande, avec plus d’interligne.',
-      updated: 'Styles mis à jour',
-      undo: 'Annuler',
-      placeholder: 'Décrivez un changement',
-    },
   },
   welcome: {
     title: 'Bienvenue',

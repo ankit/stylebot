@@ -159,16 +159,6 @@ const site: SiteMessages = {
       grayscale: 'Graustufen',
       grayscaleBody: 'Wenden Sie Graustufen auf die Seite an.',
     },
-    chat: {
-      title: 'Chat',
-      body: 'Standardmäßig aus. Aktivieren Sie den Chat in den Optionen, verbinden Sie Ihren eigenen Schlüssel für Claude, OpenAI oder Gemini, beschreiben Sie dann im Chat-Tab eine Änderung, und Stylebot schreibt das CSS. Ohne Schlüssel wird nichts gesendet.',
-      prompt: 'Mach den Artikel nachts besser lesbar',
-      reply:
-        'Auf einen dunklen Hintergrund mit wärmerem Text umgestellt und den Fließtext in einer größeren Serifenschrift mit mehr Zeilenabstand gesetzt.',
-      updated: 'Stile aktualisiert',
-      undo: 'Rückgängig',
-      placeholder: 'Beschreiben Sie eine Änderung',
-    },
   },
   welcome: {
     title: 'Willkommen',

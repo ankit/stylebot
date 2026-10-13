@@ -156,16 +156,6 @@ const site: SiteMessages = {
       grayscale: '灰度',
       grayscaleBody: '將灰度應用於該頁面',
     },
-    chat: {
-      title: '聊天',
-      body: '預設為關閉。在選項中開啟後，連接你自己的 Claude、OpenAI 或 Gemini 金鑰，然後在聊天分頁中描述變更，Stylebot 就會撰寫 CSS。沒有金鑰時，不會傳送任何內容。',
-      prompt: '讓文章在晚上更好讀',
-      reply:
-        '已改為深色背景配上較暖的文字色，內文也改用較大的襯線字型，並加大行距。',
-      updated: '已更新樣式',
-      undo: '復原',
-      placeholder: '描述一項變更',
-    },
   },
   welcome: {
     title: '歡迎',

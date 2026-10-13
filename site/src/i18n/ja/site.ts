@@ -159,16 +159,6 @@ const site: SiteMessages = {
       grayscale: 'グレースケール',
       grayscaleBody: 'ページをグレースケールで表示します。',
     },
-    chat: {
-      title: 'チャット',
-      body: '初期設定ではオフです。オプションでオンにして Claude、OpenAI、Gemini のキーを自分で接続し、チャットタブで変更内容を伝えると、Stylebot が CSS を書きます。キーがなければ何も送信されません。',
-      prompt: '記事を夜でも読みやすくして',
-      reply:
-        '背景を暗く、文字を暖色にし、本文を行間の広い大きめのセリフ体にしました。',
-      updated: 'スタイルを更新しました',
-      undo: '元に戻す',
-      placeholder: '変更内容を入力',
-    },
   },
   welcome: {
     title: 'ようこそ',
