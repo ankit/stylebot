@@ -12,7 +12,10 @@ jest.mock('./editor-window', () => ({
   forgetWindow: jest.fn(),
 }));
 jest.mock('./messages', () => ({}));
-jest.mock('./restore-tabs', () => ({ restoreOpenTabs: jest.fn() }));
+jest.mock('./restore-tabs', () => ({
+  restoreOpenTabs: jest.fn(),
+  restoreTab: jest.fn(async () => undefined),
+}));
 jest.mock('./badge', () => ({ updateBadge: jest.fn() }));
 jest.mock('./options', () => ({ get: jest.fn(), pruneRetired: jest.fn() }));
 jest.mock('./sync-scheduler', () => ({
@@ -30,7 +33,7 @@ jest.mock('@stylebot/sync', () => ({
 import { ContextMenu } from './contextmenu';
 import { initListeners } from './listeners';
 import { get as getOption, pruneRetired } from './options';
-import { restoreOpenTabs } from './restore-tabs';
+import { restoreOpenTabs, restoreTab } from './restore-tabs';
 
 type InstalledDetails = { reason: string; previousVersion?: string };
 type OnInstalled = (details: InstalledDetails) => Promise<void>;
@@ -56,6 +59,7 @@ const makeChrome = (version: string) => {
     },
     tabs: {
       create: jest.fn(),
+      get: jest.fn(),
       sendMessage: jest.fn(),
       onRemoved: event(),
       onUpdated: event(),
@@ -150,6 +154,31 @@ describe('onInstalled', () => {
       url: 'https://stylebot.dev/welcome',
     });
     expect(restoreOpenTabs).not.toBeCalled();
+  });
+});
+
+describe('onActivated', () => {
+  it('restores a tab left for later when it is first shown', async () => {
+    const { api } = makeChrome('4.0.0');
+    const [[onActivated]] = api.tabs.onActivated.addListener.mock.calls;
+
+    await onActivated({ tabId: 5, windowId: 1 });
+
+    expect(restoreTab).toBeCalledWith(5);
+  });
+
+  it('refreshes the context menu only for a tab still showing once restored', async () => {
+    const { api } = makeChrome('4.0.0');
+    const [[onActivated]] = api.tabs.onActivated.addListener.mock.calls;
+    (getOption as jest.Mock).mockResolvedValue(true);
+
+    api.tabs.get.mockResolvedValueOnce({ id: 5, active: false });
+    await onActivated({ tabId: 5, windowId: 1 });
+    expect(ContextMenu.update).not.toBeCalled();
+
+    api.tabs.get.mockResolvedValueOnce({ id: 6, active: true });
+    await onActivated({ tabId: 6, windowId: 1 });
+    expect(ContextMenu.update).toBeCalledWith({ id: 6, active: true });
   });
 });
 

@@ -441,3 +441,143 @@ test('updating from 3.2.4 brings Stylebot back to a tab left open with the edito
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('updating from 3.2.4 puts Stylebot back into background tabs as they are shown', async ({
+  engine,
+}, testInfo) => {
+  test.skip(
+    process.env.STYLEBOT_BROWSER === 'firefox',
+    `The ${RELEASE} release zip is the Chrome and Edge build`
+  );
+  test.setTimeout(120_000);
+
+  const zip = await getReleaseZip();
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'stylebot-lazy-'));
+  const extensionDir = path.join(root, 'extension');
+  execFileSync('unzip', ['-q', zip, '-d', extensionDir]);
+
+  const paths = ['/editor', '/background', '/popup', '/message', '/active'];
+  const server = await startTestServer(
+    Object.fromEntries(paths.map(p => [p, PAGE_HTML]))
+  );
+  const context = await engine.launch(path.join(root, 'profile'), {
+    headless: testInfo.project.use.headless ?? true,
+    viewport: null,
+    colorScheme: null,
+  });
+
+  /**
+   * The id of the tab showing the page at `pagePath`.
+   */
+  const tabId = (extension: Extension, pagePath: string) =>
+    extension.evaluate(async url => {
+      const tabs = await chrome.tabs.query({});
+      return tabs.find(tab => tab.url === url)!.id!;
+    }, `${server.baseUrl}${pagePath}`);
+
+  /**
+   * Whether the page at `pagePath` answers this copy of Stylebot.
+   */
+  const answers = (extension: Extension, pagePath: string) =>
+    tabId(extension, pagePath).then(id =>
+      extension.evaluate(
+        id =>
+          chrome.tabs
+            .sendMessage(id, { name: 'GetCanStylePage' })
+            .then(canStyle => canStyle === true)
+            .catch(() => false),
+        id
+      )
+    );
+
+  const activate = (extension: Extension, pagePath: string) =>
+    tabId(extension, pagePath).then(id =>
+      extension.evaluate(id => chrome.tabs.update(id, { active: true }), id)
+    );
+
+  try {
+    await context.route('https://stylebot.dev/**', route =>
+      route.fulfill({ contentType: 'text/html', body: '' })
+    );
+
+    const old = await engine.loadExtension(context, extensionDir);
+    await waitForVersion(old, RELEASE);
+    await old.evaluate(styles => chrome.storage.local.set({ styles }), {
+      localhost: stylesFrom324.localhost,
+    });
+
+    const pages = Object.fromEntries(
+      await Promise.all(
+        paths.map(async pagePath => {
+          const page = await context.newPage();
+          await page.goto(`${server.baseUrl}${pagePath}`);
+          await expect(page.locator('h1')).toHaveCSS('color', 'rgb(0, 128, 0)');
+          return [pagePath, page] as const;
+        })
+      )
+    );
+    const editorRoot = pages['/editor'].locator('#stylebot');
+
+    await test.step(`open the ${RELEASE} editor in a tab, then show another`, async () => {
+      const id = await tabId(old, '/editor');
+      await expect(async () => {
+        await old.evaluate(
+          id => chrome.tabs.sendMessage(id, { name: 'OpenStylebot' }),
+          id
+        );
+        await expect(editorRoot.locator('.stylebot')).toBeVisible({
+          timeout: 1000,
+        });
+      }).toPass();
+      await activate(old, '/active');
+    });
+
+    const extension = await updateToBuild(engine, context, extensionDir, old);
+
+    await test.step('the active tab and the tab with the editor are restored right away', async () => {
+      await expect.poll(() => answers(extension, '/active')).toBe(true);
+      await expect.poll(() => answers(extension, '/editor')).toBe(true);
+      await expect(editorRoot.locator('.stylebot-content')).toBeVisible();
+    });
+
+    await test.step('a background tab is left alone until it is shown', async () => {
+      expect(await answers(extension, '/background')).toBe(false);
+      await expect(pages['/background'].locator('h1')).toHaveCSS(
+        'color',
+        'rgb(0, 128, 0)'
+      );
+
+      await activate(extension, '/background');
+      await expect.poll(() => answers(extension, '/background')).toBe(true);
+    });
+
+    await test.step('the popup restores a tab it is asked about', async () => {
+      const popup = await engine.openPopup(context, extension);
+      const id = await tabId(extension, '/message');
+
+      await popup.evaluate(
+        id => chrome.runtime.sendMessage({ name: 'RestoreTab', tabId: id }),
+        id
+      );
+      expect(await answers(extension, '/message')).toBe(true);
+      await popup.close();
+    });
+
+    await test.step('the popup on a tab shown for the first time offers to style it', async () => {
+      await activate(extension, '/popup');
+      const popup = await engine.openPopup(context, extension);
+
+      await expect
+        .poll(() =>
+          popup.locator('button', { hasText: 'Edit style' }).isVisible()
+        )
+        .toBe(true);
+      expect(await popup.locator('.unsupported-page').isVisible()).toBe(false);
+      await popup.close();
+    });
+  } finally {
+    await context.close().catch(() => {});
+    await server.close();
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});

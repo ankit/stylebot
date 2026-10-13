@@ -1,4 +1,7 @@
 jest.mock('./editor-window', () => ({ close: jest.fn() }));
+jest.mock('./restore-tabs', () => ({
+  restoreTab: jest.fn(async () => undefined),
+}));
 jest.mock('./side-panel-check', () => ({
   canUseEditorSidePanel: () => !!chrome.sidePanel,
   onEditorSidePanelOpened: jest.fn(),
@@ -9,6 +12,7 @@ jest.mock('./styles', () => ({
 }));
 
 import * as editorWindow from './editor-window';
+import { restoreTab } from './restore-tabs';
 import { applyStylesToAllTabs, toggleForPage } from './styles';
 import { handleCommand } from './global-commands';
 
@@ -66,11 +70,13 @@ describe('handleCommand', () => {
     jest.clearAllMocks();
   });
 
-  it('asks the page to carry out a shortcut that acts on it', () => {
+  it('asks the page to carry out a shortcut that acts on it', async () => {
     const api = makeChrome();
 
     handleCommand('readability', PAGE);
+    await flush();
 
+    expect(restoreTab).toBeCalledWith(7);
     expect(api.tabs.sendMessage).toBeCalledWith(
       7,
       { name: 'RunCommand', command: 'readability' },
@@ -113,10 +119,11 @@ describe('handleCommand', () => {
     );
   });
 
-  it('leaves the editor to the page in a browser without a side panel', () => {
+  it('leaves the editor to the page in a browser without a side panel', async () => {
     const api = makeChrome({ sidePanel: false });
 
     handleCommand('stylebot', PAGE);
+    await flush();
 
     expect(api.tabs.sendMessage).toBeCalledWith(
       7,
@@ -125,7 +132,7 @@ describe('handleCommand', () => {
     );
   });
 
-  it('acts on the edited tab when the separate editor window has focus', () => {
+  it('acts on the edited tab when the separate editor window has focus', async () => {
     const api = makeChrome();
     const editorWindowTab = {
       id: 20,
@@ -134,6 +141,7 @@ describe('handleCommand', () => {
 
     handleCommand('stylebot', editorWindowTab);
     handleCommand('readability', editorWindowTab);
+    await flush();
 
     expect(editorWindow.close).toBeCalledWith(7);
     expect(api.tabs.sendMessage).toBeCalledWith(

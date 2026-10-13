@@ -4,7 +4,11 @@ export { throttle } from './throttle';
 export { splitCommaList } from './split-comma-list';
 export { isMac } from './is-mac';
 export { isSafari } from './is-safari';
-export { getPageSupport, isWebPageUrl } from './page-support';
+export {
+  getPageSupport,
+  getRestorePendingKey,
+  isWebPageUrl,
+} from './page-support';
 export type { PageSupport } from './page-support';
 export { resolveAppearance, getSystemPreference } from './resolve-appearance';
 
