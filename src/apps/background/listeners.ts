@@ -200,7 +200,7 @@ export const initListeners = (): void => {
   });
 
   // A tab shown for the first time since an update gets Stylebot back, then
-  // its context menu is refreshed.
+  // its context menu is refreshed, unless another tab was shown meanwhile.
   chrome.tabs.onActivated.addListener(async activeInfo => {
     await restoreTab(activeInfo.tabId);
     const option = await getOption('contextMenu');
@@ -210,7 +210,7 @@ export const initListeners = (): void => {
         .get(activeInfo.tabId)
         .catch(() => undefined);
 
-      if (tab) {
+      if (tab?.active) {
         ContextMenu.update(tab);
       }
     }

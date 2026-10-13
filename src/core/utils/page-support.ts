@@ -15,6 +15,13 @@ export const isWebPageUrl = (url: string): boolean =>
   /^(https?|file):/.test(url);
 
 /**
+ * The session storage key under which a tab an update left for later waits
+ * for Stylebot to be put back, holding its content scripts' manifest indexes.
+ */
+export const getRestorePendingKey = (tabId: number): string =>
+  `restore-tab-${tabId}`;
+
+/**
  * Asks the tab's page script whether it can style the page. Browser and
  * extension pages have no page script, so they aren't asked.
  */

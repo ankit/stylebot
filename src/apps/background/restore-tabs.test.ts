@@ -6,6 +6,7 @@ import { findOpenEditors, restoreOpenTabs, restoreTab } from './restore-tabs';
 jest.mock('./editor-window', () => ({ isOpen: jest.fn(), open: jest.fn() }));
 jest.mock('@stylebot/utils', () => ({
   getPageSupport: jest.fn(),
+  getRestorePendingKey: (tabId: number) => `restore-tab-${tabId}`,
   isEditorSidePanelOpen: jest.fn(),
   supportsEditorSidePanel: () => true,
 }));
@@ -50,7 +51,9 @@ beforeEach(() => {
       }),
     },
     tabs: {
-      query: jest.fn(async () => tabs),
+      query: jest.fn(async ({ active }: chrome.tabs.QueryInfo) =>
+        active ? tabs.filter(tab => tab.active) : tabs
+      ),
       get: jest.fn(async (tabId: number) => {
         const tab = tabs.find(({ id }) => id === tabId);
         if (!tab) {
@@ -233,6 +236,25 @@ describe('restoreTab', () => {
     tabs[1].discarded = false;
     await restoreTab(2);
     expect(injected()).toHaveLength(2);
+  });
+
+  it('restores a tab shown while the update was sorting the tabs', async () => {
+    const queried = chrome.tabs.query as jest.Mock;
+    queried.mockImplementation(async ({ active }: chrome.tabs.QueryInfo) => {
+      if (!active) {
+        return tabs.map(tab => ({ ...tab }));
+      }
+      tabs[1].active = true;
+      return tabs.filter(tab => tab.active);
+    });
+
+    await restoreOpenTabs({});
+
+    expect(
+      injected()
+        .map(call => call.target.tabId)
+        .sort()
+    ).toEqual([1, 1, 2, 2]);
   });
 
   it('does nothing in a tab no restore left for later', async () => {

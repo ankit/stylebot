@@ -30,7 +30,8 @@ jest.mock('@stylebot/sync', () => ({
 }));
 
 import { initListeners } from './listeners';
-import { pruneRetired } from './options';
+import { ContextMenu } from './contextmenu';
+import { get as getOption, pruneRetired } from './options';
 import { restoreOpenTabs, restoreTab } from './restore-tabs';
 
 type InstalledDetails = { reason: string; previousVersion?: string };
@@ -57,6 +58,7 @@ const makeChrome = (version: string) => {
     },
     tabs: {
       create: jest.fn(),
+      get: jest.fn(),
       onRemoved: event(),
       onUpdated: event(),
       onActivated: event(),
@@ -161,5 +163,19 @@ describe('onActivated', () => {
     await onActivated({ tabId: 5, windowId: 1 });
 
     expect(restoreTab).toBeCalledWith(5);
+  });
+
+  it('refreshes the context menu only for a tab still showing once restored', async () => {
+    const { api } = makeChrome('4.0.0');
+    const [[onActivated]] = api.tabs.onActivated.addListener.mock.calls;
+    (getOption as jest.Mock).mockResolvedValue(true);
+
+    api.tabs.get.mockResolvedValueOnce({ id: 5, active: false });
+    await onActivated({ tabId: 5, windowId: 1 });
+    expect(ContextMenu.update).not.toBeCalled();
+
+    api.tabs.get.mockResolvedValueOnce({ id: 6, active: true });
+    await onActivated({ tabId: 6, windowId: 1 });
+    expect(ContextMenu.update).toBeCalledWith({ id: 6, active: true });
   });
 });

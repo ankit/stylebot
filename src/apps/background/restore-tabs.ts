@@ -1,5 +1,6 @@
 import {
   getPageSupport,
+  getRestorePendingKey,
   isEditorSidePanelOpen,
   supportsEditorSidePanel,
 } from '@stylebot/utils';
@@ -89,8 +90,6 @@ type ContentScript = NonNullable<
 // Each tab's content scripts, by their index in the manifest.
 type TabScripts = Map<number, { tab: chrome.tabs.Tab; scripts: Array<number> }>;
 
-const pendingKey = (tabId: number): string => `restore-tab-${tabId}`;
-
 const getContentScripts = (): Array<ContentScript> =>
   chrome.runtime.getManifest().content_scripts ?? [];
 
@@ -157,36 +156,44 @@ const restore = async (
 ): Promise<void> => {
   const tabScripts = await found;
   const editors = open ?? (await findOpenEditors());
-  const later = [...tabScripts].filter(
-    ([tabId, { tab }]) => !tab.active && !editors[tabId]
+  const now: TabScripts = new Map();
+  const later: TabScripts = new Map();
+
+  tabScripts.forEach((entry, tabId) =>
+    (entry.tab.active || editors[tabId] ? now : later).set(tabId, entry)
   );
 
-  if (later.length) {
+  if (later.size) {
     await chrome.storage.session.set(
       Object.fromEntries(
-        later.map(([tabId, { scripts }]) => [pendingKey(tabId), scripts])
+        [...later].map(([tabId, { scripts }]) => [
+          getRestorePendingKey(tabId),
+          scripts,
+        ])
       )
     );
   }
 
-  const tabIds = new Set([
-    ...tabScripts.keys(),
-    ...Object.keys(editors).map(Number),
-  ]);
+  // A tab shown while the tabs were being sorted missed its activation.
+  const shown = await chrome.tabs.query({ active: true });
+  const tabIds = new Set([...now.keys(), ...Object.keys(editors).map(Number)]);
 
-  await Promise.all(
-    [...tabIds].map(async tabId => {
-      const injecting = tabScripts.get(tabId);
+  await Promise.all([
+    ...shown
+      .filter(({ id }) => id !== undefined && later.has(id))
+      .map(({ id }) => restoreTab(id as number)),
+    ...[...tabIds].map(async tabId => {
+      const injecting = now.get(tabId);
 
-      if (injecting && (injecting.tab.active || editors[tabId])) {
+      if (injecting) {
         await inject(injecting.tab, injecting.scripts);
       }
 
       if (editors[tabId]) {
         await reopen(tabId, editors[tabId]);
       }
-    })
-  );
+    }),
+  ]);
 };
 
 let restoring = Promise.resolve();
@@ -219,7 +226,7 @@ export const restoreOpenTabs = (open?: OpenEditors): Promise<void> => {
  * stays pending, since the page it loads again gets the scripts anyway.
  */
 const restorePending = async (tabId: number): Promise<void> => {
-  const key = pendingKey(tabId);
+  const key = getRestorePendingKey(tabId);
   const { [key]: scripts } = await chrome.storage.session.get(key);
 
   if (!Array.isArray(scripts)) {
@@ -232,11 +239,12 @@ const restorePending = async (tabId: number): Promise<void> => {
     return;
   }
 
-  await chrome.storage.session.remove(key);
-
   if (tab) {
     await inject(tab, scripts);
   }
+
+  // Removed only now, so a popup opened meanwhile still waits for the inject.
+  await chrome.storage.session.remove(key);
 };
 
 const restoringTabs = new Map<number, Promise<void>>();

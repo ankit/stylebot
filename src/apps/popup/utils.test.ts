@@ -146,11 +146,18 @@ describe('getOption and getCommands', () => {
 describe('getRestoredPageSupport', () => {
   const tab = { id: 3, url: 'https://example.com/' } as chrome.tabs.Tab;
   const sendMessage = jest.fn((_message, callback) => callback());
+  let session: Record<string, unknown>;
 
   beforeEach(() => {
     sendMessage.mockClear();
+    session = { 'restore-tab-3': [0, 1] };
     global.chrome = {
       runtime: { sendMessage, lastError: undefined },
+      storage: {
+        session: {
+          get: jest.fn(async (key: string) => ({ [key]: session[key] })),
+        },
+      },
     } as unknown as typeof chrome;
   });
 
@@ -164,6 +171,14 @@ describe('getRestoredPageSupport', () => {
       { name: 'RestoreTab', tabId: 3 },
       expect.any(Function)
     );
+  });
+
+  it('leaves the background asleep for a page no update left for later', async () => {
+    session = {};
+    (getPageSupport as jest.Mock).mockResolvedValueOnce('unreachable');
+
+    expect(await getRestoredPageSupport(tab)).toBe('unreachable');
+    expect(sendMessage).not.toBeCalled();
   });
 
   it('leaves alone a page that answers', async () => {

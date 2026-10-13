@@ -23,6 +23,7 @@ import {
   openEditorSidePanel,
   getBrowserCommands,
   getPageSupport,
+  getRestorePendingKey,
   isWebPageUrl,
 } from '@stylebot/utils';
 import type { PageSupport } from '@stylebot/utils';
@@ -37,9 +38,17 @@ export const getCurrentTab = (
   });
 };
 
+const isRestorePending = async (tabId: number): Promise<boolean> => {
+  const key = getRestorePendingKey(tabId);
+  const items = await chrome.storage.session?.get(key).catch(() => undefined);
+
+  return !!items?.[key];
+};
+
 /**
  * Whether Stylebot can style the tab, first putting it back into a page an
- * update left for later, which would otherwise ask to be reloaded.
+ * update left for later, which would otherwise ask to be reloaded. Only such
+ * a page wakes the background.
  */
 export const getRestoredPageSupport = async (
   tab: chrome.tabs.Tab
@@ -49,7 +58,8 @@ export const getRestoredPageSupport = async (
   if (
     support !== 'unreachable' ||
     tab.id === undefined ||
-    !isWebPageUrl(tab.url ?? '')
+    !isWebPageUrl(tab.url ?? '') ||
+    !(await isRestorePending(tab.id))
   ) {
     return support;
   }
