@@ -4,7 +4,7 @@ import {
   getPrimaryFontFamily,
   isFontFamilyProperty,
 } from '@stylebot/css';
-import type { ChatCssEdit } from '@stylebot/types';
+import type { CssEdit } from '@stylebot/types';
 
 import { resolveGoogleFont } from './fonts';
 
@@ -15,7 +15,7 @@ import { resolveGoogleFont } from './fonts';
  */
 export const addGoogleFontImports = async (
   css: string,
-  edits: Array<ChatCssEdit>
+  edits: Array<CssEdit>
 ): Promise<string> => {
   const families = edits.flatMap(edit =>
     edit.declarations

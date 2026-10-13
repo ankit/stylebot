@@ -30,12 +30,6 @@ const sharp = createRequire(path.join(rootDir, 'site/package.json'))('sharp');
 
 const APPEARANCES = ['light', 'dark'];
 
-const CHAT_KEY = {
-  'chat-api-key-anthropic': 'sk-ant-manual-screenshot-placeholder',
-  'chat-provider': 'anthropic',
-  options: { chat: true },
-};
-
 const hackerNews = () =>
   profiles(
     { name: 'Newspaper', css: gallery('hn', 'newspaper') },
@@ -167,27 +161,6 @@ const SHOTS = [
       return around(panel, [
         panel.locator('.header'),
         panel.getByRole('button', { name: 'Add property' }),
-      ]);
-    },
-  },
-  {
-    name: 'agent-chat',
-    about: "Chat's suggestions, before anything is asked",
-    run: async (browser, { appearance }) => {
-      await seed(browser, {
-        ...CHAT_KEY,
-        styles: { 'en.wikipedia.org': wikipedia(appearance) },
-      });
-      const page = await openSite(
-        browser.context,
-        'https://en.wikipedia.org/wiki/Ikigai'
-      );
-      const panel = await openPanel(browser, page);
-      await showTab(panel, 'Chat');
-      await panel.mouse.move(0, 0);
-      return around(panel, [
-        panel.locator('.chat-empty-title'),
-        panel.locator('.chat-composer'),
       ]);
     },
   },

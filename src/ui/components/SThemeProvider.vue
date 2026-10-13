@@ -33,7 +33,6 @@ export default Vue.extend({
   --panel-surface: #1c1e22;
   --card-surface: #1f2026;
   --tab-surface: #141519;
-  --chat-surface: #1b1c20;
   --code-surface: #1a1b1e;
   --panel-shadow: rgb(0 0 0 / 34%);
 
@@ -126,7 +125,6 @@ export default Vue.extend({
   --panel-surface: #fff;
   --card-surface: #fff;
   --tab-surface: #f7f8fa;
-  --chat-surface: #f7f8fa;
   --code-surface: #fcfcfd;
   --panel-shadow: rgb(0 0 0 / 16%);
 

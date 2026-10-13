@@ -323,7 +323,7 @@ const site: SiteMessages = {
     browser: {
       title: 'Trong trình duyệt của bạn',
       body: [
-        'Kiểu, cài đặt, lịch sử, các cuộc trò chuyện và khóa API của bạn được lưu trong trình duyệt, và gỡ cài đặt Stylebot sẽ xóa tất cả. Google Fonts và các bảng kiểu bạn <code>@import</code> được tải từ nơi lưu trữ chúng, và nơi đó thấy được địa chỉ IP của bạn.',
+        'Kiểu, cài đặt và lịch sử của bạn được lưu trong trình duyệt, và gỡ cài đặt Stylebot sẽ xóa tất cả. Google Fonts và các bảng kiểu bạn <code>@import</code> được tải từ nơi lưu trữ chúng, và nơi đó thấy được địa chỉ IP của bạn.',
       ],
     },
     sync: {
@@ -331,12 +331,6 @@ const site: SiteMessages = {
       body: [
         'Khi bạn kết nối Google Drive trong Tùy chọn, các kiểu của bạn được lưu vào một tệp trong Drive của chính bạn. Stylebot chỉ thấy được các tệp do Stylebot tạo, và mã truy cập được giữ trong trình duyệt của bạn. Hãy ngắt kết nối trong Tùy chọn hoặc trong <a href="https://myaccount.google.com/connections">tài khoản Google</a> của bạn.',
         'Việc Stylebot sử dụng thông tin nhận được từ các API của Google tuân thủ <a href="https://developers.google.com/terms/api-services-user-data-policy">Chính sách về dữ liệu người dùng của Dịch vụ API của Google</a>, bao gồm các yêu cầu về Sử dụng có giới hạn.',
-      ],
-    },
-    chat: {
-      title: 'Trò chuyện',
-      body: [
-        'Trò chuyện luôn tắt cho đến khi bạn thêm khóa API, và trước đó không có gì được gửi đi. Tin nhắn của bạn được gửi thẳng đến nhà cung cấp có khóa API mà bạn đã thêm, kèm ảnh chụp màn hình bạn đính kèm (nếu có), địa chỉ và tiêu đề của trang, dàn ý nội dung hiển thị, CSS của trang và các kiểu của bạn. Những nội dung này có thể chứa thông tin cá nhân trên trang. Chính sách của nhà cung cấp sẽ được áp dụng: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {

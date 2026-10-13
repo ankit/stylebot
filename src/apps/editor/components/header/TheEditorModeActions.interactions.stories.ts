@@ -110,26 +110,3 @@ export const ReadabilityToggleForcesPresets: StoryObj = {
     );
   },
 };
-
-export const ChatHiddenByDefault: StoryObj = {
-  ...editor(WITH_RULE),
-  name: 'Chat has no tab and t does nothing until Chat is turned on',
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const store = storeOf(canvasElement);
-
-    await expect(canvas.queryByRole('tab', { name: 'Chat' })).toBeNull();
-    await pressKey('t');
-    await expect(store.state.options.mode).toBe('basic');
-
-    store.commit('setOptions', { ...store.state.options, chat: true });
-    await user.click(await canvas.findByRole('tab', { name: 'Chat' }));
-    await expect(store.state.options.mode).toBe('chat');
-
-    store.commit('setOptions', { ...store.state.options, chat: false });
-    await waitFor(() =>
-      expect(canvas.queryByRole('tab', { name: 'Chat' })).toBeNull()
-    );
-    await expect(store.state.options.mode).toBe('basic');
-  },
-};

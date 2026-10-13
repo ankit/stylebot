@@ -1,14 +1,13 @@
+import type { SuggestionContext } from '@stylebot/types';
+
 import {
   CREATIVE_SUGGESTIONS,
   getCreativeSuggestions,
   getPracticalSuggestions,
-} from '@stylebot/chat';
-import type { ChatSuggestionContext } from '@stylebot/chat';
-
+} from './suggestions';
 import { inspectTab, resolveTab } from './targets';
 import type { CliCommands } from './types';
 
-// As many as Chat's empty state deals.
 const SUGGESTION_COUNT = 3;
 
 const DEFAULT_COMPUTED_PROPERTIES = [
@@ -30,10 +29,10 @@ const DEFAULT_COMPUTED_PROPERTIES = [
 export const inspectCommands: CliCommands = {
   async suggestions({ tab }) {
     const { id } = await resolveTab(tab);
-    // Like Chat, a page that can't be read still gets suggestions.
-    const context = await inspectTab<ChatSuggestionContext>(id as number, {
+    // A page that can't be read still gets suggestions.
+    const context = await inspectTab<SuggestionContext>(id as number, {
       kind: 'suggestionContext',
-    }).catch((): ChatSuggestionContext => ({ signals: null, article: false }));
+    }).catch((): SuggestionContext => ({ signals: null, article: false }));
 
     const practical = getPracticalSuggestions(context);
     const creative = getCreativeSuggestions(

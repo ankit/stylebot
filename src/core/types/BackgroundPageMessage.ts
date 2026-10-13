@@ -1,7 +1,6 @@
 import type { StyleMap } from './styles';
 import type { StylebotOptions } from './options';
 import type { ReadabilitySettings } from './readability';
-import type { ChatProviderId, ChatTurn } from './chat';
 
 export type SetStyle = {
   name: 'SetStyle';
@@ -242,41 +241,6 @@ export type GetIsEditorWindowOpen = {
   tabId?: number;
 };
 
-export type ChatGetStatus = {
-  name: 'ChatGetStatus';
-};
-
-// Checks the key with the provider before storing it.
-export type ChatConnect = {
-  name: 'ChatConnect';
-  provider: ChatProviderId;
-  key: string;
-};
-
-export type ChatRemoveKey = {
-  name: 'ChatRemoveKey';
-  provider: ChatProviderId;
-};
-
-// Replies come from this provider, with this model, from now on.
-export type ChatSetModel = {
-  name: 'ChatSetModel';
-  provider: ChatProviderId;
-  model: string;
-};
-
-export type ChatGetThread = {
-  name: 'ChatGetThread';
-  url: string;
-};
-
-// An empty list clears the site's thread.
-export type ChatSetThread = {
-  name: 'ChatSetThread';
-  url: string;
-  turns: Array<ChatTurn>;
-};
-
 type BackgroundPageMessage =
   | SetStyle
   | EnableStyle
@@ -319,12 +283,6 @@ type BackgroundPageMessage =
   | GetIsEditorWindowOpen
   | OpenEditorSidePanel
   | CloseEditorSidePanel
-  | EditorSidePanelOpened
-  | ChatGetStatus
-  | ChatConnect
-  | ChatRemoveKey
-  | ChatSetModel
-  | ChatGetThread
-  | ChatSetThread;
+  | EditorSidePanelOpened;
 
 export default BackgroundPageMessage;

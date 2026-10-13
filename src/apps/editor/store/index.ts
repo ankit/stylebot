@@ -4,7 +4,6 @@ import Vuex from 'vuex';
 
 import type {
   CssDeclaration,
-  CssLineRange,
   StylebotOptions,
   StylebotCommands,
   ReadabilitySettings,
@@ -26,7 +25,6 @@ import getters from './getters';
 import actions from './actions';
 import mutations from './mutations';
 import type { UndoStack } from './undo-stack';
-import { createChatModule } from './chat';
 import { emptyUndoStack } from './undo-stack';
 
 /**
@@ -76,8 +74,6 @@ export type State = {
   activeProfile: string;
   // Undo/redo trail of css, kept only while the editor is open.
   undoStack: UndoStack;
-  // Lines for the code editor to mark next time it shows, then cleared.
-  codeHighlight: Array<CssLineRange> | null;
   enabled: boolean;
   readability: boolean;
   forceImportant: boolean;
@@ -123,7 +119,6 @@ export const createStore = (host: EditorHost): Store<State> => {
       profiles: [{ id: DEFAULT_PROFILE_ID, name: '' }],
       activeProfile: DEFAULT_PROFILE_ID,
       undoStack: emptyUndoStack(),
-      codeHighlight: null,
       enabled: true,
       readability: false,
       forceImportant: true,
@@ -152,9 +147,5 @@ export const createStore = (host: EditorHost): Store<State> => {
     getters,
     actions,
     mutations,
-
-    modules: {
-      chat: createChatModule(),
-    },
   });
 };

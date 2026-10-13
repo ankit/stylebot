@@ -1,7 +1,7 @@
 import type { Style } from './styles';
 import type { ReadabilitySettings } from './readability';
 import type { StylebotCommandName } from './commands';
-import type { ChatCssEdit, ChatStyleProblem } from './chat';
+import type { CssEdit, StyleProblem } from './page-reading';
 
 export type ToggleStylebot = {
   name: 'ToggleStylebot';
@@ -77,7 +77,7 @@ export type PageInspection =
   | { kind: 'pageRules'; selector: string }
   | { kind: 'computedStyles'; selector: string; properties: Array<string> }
   | { kind: 'matchCount'; selectors: Array<string> }
-  | { kind: 'startCheck'; edits: Array<ChatCssEdit> }
+  | { kind: 'startCheck'; edits: Array<CssEdit> }
   | { kind: 'finishCheck'; selectors: Array<string> }
   | { kind: 'pointer'; action: PointerAction };
 
@@ -137,7 +137,7 @@ export type FragileSelector = {
 
 export type StyleCheckReport = {
   matchCounts: Array<number | null>;
-  styleProblems: Array<ChatStyleProblem>;
+  styleProblems: Array<StyleProblem>;
   fragileSelectors: Array<FragileSelector>;
 };
 

@@ -320,7 +320,7 @@ const site: SiteMessages = {
     browser: {
       title: 'Di browser Anda',
       body: [
-        'Gaya, setelan, riwayat, percakapan chat, dan kunci API Anda disimpan di browser, dan menghapus instalan Stylebot akan menghapusnya. Google Fonts dan stylesheet yang Anda <code>@import</code> diunduh dari server tempatnya di-hosting, yang dapat melihat alamat IP Anda.',
+        'Gaya, setelan, dan riwayat Anda disimpan di browser, dan menghapus instalan Stylebot akan menghapusnya. Google Fonts dan stylesheet yang Anda <code>@import</code> diunduh dari server tempatnya di-hosting, yang dapat melihat alamat IP Anda.',
       ],
     },
     sync: {
@@ -328,12 +328,6 @@ const site: SiteMessages = {
       body: [
         'Menghubungkan Google Drive di Opsi akan menyimpan gaya Anda ke sebuah file di Drive Anda sendiri. Stylebot hanya dapat melihat file yang dibuatnya, dan token aksesnya tetap di browser Anda. Putuskan sambungan di Opsi atau di <a href="https://myaccount.google.com/connections">Akun Google</a> Anda.',
         'Penggunaan informasi yang diterima Stylebot dari Google API mematuhi <a href="https://developers.google.com/terms/api-services-user-data-policy">Kebijakan Data Pengguna Layanan Google API</a>, termasuk persyaratan Penggunaan Terbatas.',
-      ],
-    },
-    chat: {
-      title: 'Chat',
-      body: [
-        'Chat nonaktif sampai Anda menambahkan kunci API, dan tidak ada yang dikirim sebelum itu. Pesan Anda dikirim langsung ke penyedia yang kunci API-nya Anda tambahkan, beserta screenshot yang Anda lampirkan, alamat dan judul halaman, kerangka dari konten yang terlihat, CSS halaman, dan gaya Anda. Ini bisa mencakup informasi pribadi di halaman. Kebijakan penyedia berlaku: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {

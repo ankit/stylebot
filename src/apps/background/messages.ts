@@ -82,14 +82,6 @@ import type {
   SetAllStylesResponse,
   GetRecentColorsResponse,
   AddRecentColorResponse,
-  ChatConnect as ChatConnectType,
-  ChatRemoveKey as ChatRemoveKeyType,
-  ChatSetModel as ChatSetModelType,
-  ChatGetThread as ChatGetThreadType,
-  ChatSetThread as ChatSetThreadType,
-  ChatStatusResponse,
-  ChatConnectResponse,
-  ChatGetThreadResponse,
 } from '@stylebot/types';
 import { completeTabSignIn } from '@stylebot/sync';
 import { syncStyles } from './sync';
@@ -122,14 +114,6 @@ import {
   closeEditorSidePanel,
   isEditorSidePanelOpen,
 } from '@stylebot/utils';
-import {
-  getChatStatus,
-  connectChat,
-  removeChatKey,
-  setChatModel,
-  getChatThread,
-  setChatThread,
-} from './chat';
 
 export const DisableStyle = async (
   message: DisableStyleType
@@ -604,53 +588,4 @@ export const GetIsEditorWindowOpen = async (
       ((await editorWindow.isOpen(tabId)) ||
         (supportsEditorSidePanel() && (await isEditorSidePanelOpen(tabId))))
   );
-};
-
-export const ChatGetStatus = async (
-  sendResponse: (response: ChatStatusResponse) => void
-): Promise<void> => {
-  sendResponse(await getChatStatus());
-};
-
-export const ChatConnect = async (
-  message: ChatConnectType,
-  sendResponse: (response: ChatConnectResponse) => void
-): Promise<void> => {
-  try {
-    sendResponse(await connectChat(message.provider, message.key));
-  } catch (e) {
-    // A missed sendResponse would leave the Connect button checking forever.
-    sendResponse({
-      ok: false,
-      errorKey: 'chat_error_provider',
-      errorDetail: e instanceof Error ? e.message : undefined,
-    });
-  }
-};
-
-export const ChatRemoveKey = async (
-  message: ChatRemoveKeyType,
-  sendResponse: (response: ChatStatusResponse) => void
-): Promise<void> => {
-  sendResponse(await removeChatKey(message.provider));
-};
-
-export const ChatSetModel = async (
-  message: ChatSetModelType,
-  sendResponse: (response: ChatStatusResponse) => void
-): Promise<void> => {
-  sendResponse(await setChatModel(message.provider, message.model));
-};
-
-export const ChatGetThread = async (
-  message: ChatGetThreadType,
-  sendResponse: (response: ChatGetThreadResponse) => void
-): Promise<void> => {
-  sendResponse(await getChatThread(message.url));
-};
-
-export const ChatSetThread = async (
-  message: ChatSetThreadType
-): Promise<void> => {
-  await setChatThread(message.url, message.turns);
 };

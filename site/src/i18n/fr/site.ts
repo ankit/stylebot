@@ -322,7 +322,7 @@ const site: SiteMessages = {
     browser: {
       title: 'Dans votre navigateur',
       body: [
-        'Vos styles, paramètres, historique, conversations de chat et clés d’API sont enregistrés dans votre navigateur, et la désinstallation de Stylebot les supprime. Les polices Google Fonts et les feuilles de style que vous importez avec <code>@import</code> sont téléchargées depuis leur hébergeur, qui voit votre adresse IP.',
+        'Vos styles, paramètres et historique sont enregistrés dans votre navigateur, et la désinstallation de Stylebot les supprime. Les polices Google Fonts et les feuilles de style que vous importez avec <code>@import</code> sont téléchargées depuis leur hébergeur, qui voit votre adresse IP.',
       ],
     },
     sync: {
@@ -330,12 +330,6 @@ const site: SiteMessages = {
       body: [
         'Quand vous connectez Google Drive dans les options, vos styles sont enregistrés dans un fichier de votre propre Drive. Stylebot ne voit que les fichiers qu’il crée, et son jeton d’accès reste dans votre navigateur. Déconnectez-vous dans les options ou dans votre <a href="https://myaccount.google.com/connections">compte Google</a>.',
         'L’utilisation par Stylebot des informations reçues des API Google respecte le <a href="https://developers.google.com/terms/api-services-user-data-policy">Règlement sur les données utilisateur des services d’API Google</a>, y compris les exigences relatives à l’utilisation limitée.',
-      ],
-    },
-    chat: {
-      title: 'Chat',
-      body: [
-        'Le Chat reste désactivé tant que vous n’avez pas ajouté de clé d’API, et rien n’est envoyé avant. Votre message est envoyé directement au fournisseur dont vous avez ajouté la clé d’API, avec les captures d’écran que vous joignez, l’adresse et le titre de la page, un plan de son contenu visible, son CSS et vos styles. Cela peut inclure des informations personnelles présentes sur la page. La politique de confidentialité du fournisseur s’applique : <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {

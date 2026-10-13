@@ -35,17 +35,10 @@ const mockBridge = {
   unhighlight: jest.fn(),
   getPageColors: jest.fn(),
   getComputedStyles: jest.fn(),
-  getPageOutline: jest.fn(),
-  getPageSignals: jest.fn(),
   getAppliedDeclarations: jest.fn(),
   getPageDeclarations: jest.fn(),
   getSelectorAlternatives: jest.fn(),
-  getPageCssContext: jest.fn(),
   countMatches: jest.fn(),
-  getStableSelectors: jest.fn(),
-  startStyleCheck: jest.fn(),
-  extendStyleCheck: jest.fn(),
-  checkStyle: jest.fn(),
   openInPage: jest.fn(),
   focusPage: jest.fn(),
   on: jest.fn(),
@@ -177,21 +170,6 @@ describe('actions', () => {
       });
     });
 
-    it('flips the chat reply whose change it steps over', () => {
-      const state = {
-        ...mockState,
-        css: 'current',
-        undoStack: {
-          past: [{ css: 'older', source: 'chat:r1', at: 1 }],
-          future: [],
-        },
-      };
-
-      actions.undo({ state, commit: mockCommit, dispatch: mockDispatch });
-
-      expect(mockDispatch).toBeCalledWith('chat/flipTurn', 'r1');
-    });
-
     it('does nothing with an empty stack', () => {
       actions.undo({
         state: mockState,
@@ -225,21 +203,6 @@ describe('actions', () => {
         css: 'newer',
         record: false,
       });
-    });
-
-    it('flips the chat reply whose change it steps over', () => {
-      const state = {
-        ...mockState,
-        css: 'current',
-        undoStack: {
-          past: [],
-          future: [{ css: 'newer', source: 'chat:r1', at: 0 }],
-        },
-      };
-
-      actions.redo({ state, commit: mockCommit, dispatch: mockDispatch });
-
-      expect(mockDispatch).toBeCalledWith('chat/flipTurn', 'r1');
     });
 
     it('does nothing with nothing undone', () => {

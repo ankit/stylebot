@@ -90,9 +90,9 @@ yarn stylebot computed-styles body color font-size --tab 54432929
 yarn stylebot match-count '.titleline > a' '.subline' --tab 54432929
 ```
 
-These read the page the way Chat does, so an agent can look at a page before styling it without another browser tool.
+These read the page so an agent can look at a page before styling it without another browser tool.
 
-- `suggestions` prints the three requests Chat's empty state would offer for the page: up to two that suit it, and a creative look.
+- `suggestions` prints styling requests for the page: up to two that suit it, and a creative look.
 - `css-variables` prints the page's css variables, as the `:root` and `body` rules that set them, so a style can override them.
 - `page-rules` prints the page's own rules for the elements a selector matches (the first five). Cross-origin stylesheets can't be read, so they're only counted.
 - `computed-styles` prints computed values on the first element a selector matches: the properties named, or common layout, color and type ones.
@@ -122,8 +122,8 @@ yarn stylebot css set news.ycombinator.com < hn.css
 - `styles` lists saved styles.
 - `css get` prints a style's css.
 - `css set` saves css from stdin or `--file` and applies it to open tabs right away. Empty css deletes the style.
-  - It refuses css that doesn't parse, saying at which line, and adds Google Fonts imports for the families the css names, as Chat does. It also saves a selector's partly generated class names by their stable part, as Chat does, and says which it changed.
-  - When the profile it saves is the one in use and an open tab shows the site (the tab named, else an active one), it checks the page and reports back as Chat's model is told after each edit: how many elements each selector matched, text the change made hard to read, and surfaces a theme change missed. It also flags selectors still built on class names the site generates, which have no stable part. With no such tab, or when the profile isn't in use, it says the style wasn't checked and why.
+  - It refuses css that doesn't parse, saying at which line, and adds Google Fonts imports for the families the css names. It also saves a selector's partly generated class names by their stable part, and says which it changed.
+  - When the profile it saves is the one in use and an open tab shows the site (the tab named, else an active one), it checks the page and reports back: how many elements each selector matched, text the change made hard to read, and surfaces a theme change missed. It also flags selectors still built on class names the site generates, which have no stable part. With no such tab, or when the profile isn't in use, it says the style wasn't checked and why.
 
 ### Profiles
 
@@ -160,7 +160,7 @@ claude plugin marketplace add ./
 claude plugin install stylebot@stylebot
 ```
 
-Then ask for a look, such as "give Hacker News a dark theme", and Claude picks the plugin up on its own; or run `/stylebot <site> <what to change>`. Without saying what to change, it offers the suggestions Chat shows for the page. The skill holds the styling guidance, adapted from Chat's.
+Then ask for a look, such as "give Hacker News a dark theme", and Claude picks the plugin up on its own; or run `/stylebot <site> <what to change>`. Without saying what to change, it offers suggestions for the page. The skill holds the styling guidance.
 
 It runs without permission prompts: the skill pre-approves `stylebot` commands and reading and writing files in `~/.stylebot/work/`, where it keeps its CSS and screenshots. When you name a profile, it updates that one; otherwise its changes go into a new profile named after the look, such as "Claude: Dark", so switching back to your own style is one profile change.
 

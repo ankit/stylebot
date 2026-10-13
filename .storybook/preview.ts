@@ -167,9 +167,6 @@ const preview: Preview = {
       resetHoverSettled();
       resetPageBridge(parameters.pageBridge);
 
-      // The page's own background, which Chat reads to tell a dark page.
-      document.body.style.backgroundColor = parameters.pageBackground ?? '';
-
       // Composites read their appearance from options, so the toolbar theme
       // flows through the shim as well as the outer SThemeProvider.
       installChrome({

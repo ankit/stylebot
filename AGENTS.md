@@ -6,7 +6,7 @@ Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of
 
 - `src/` — extension source, grouped into tiers. Each folder directly inside a tier is a package, imported as `@stylebot/<folder>` (resolved by `scripts/lib/src-packages.js`; `@stylebot/inject-css` keeps its old name for `apps/content`):
   - `src/apps/` — webpack entries and HTML pages: `background`, `popup`, `options`, `editor` (with the pop-out window in `editor/window`), `content` (the content script), `reader` (the readability UI bundle), `cli-inspector` (what the CLI reads and does on a page, loaded on its first request), `monaco-iframe`
-  - `src/features/` — capabilities shared by apps: `chat`, `sync`, `history`, `page-bridge`, `highlighter`, `google-fonts`, `readability` (eligibility and reader lifecycle), `monaco-editor`
+  - `src/features/` — capabilities shared by apps: `sync`, `history`, `page-bridge`, `highlighter`, `google-fonts`, `readability` (eligibility and reader lifecycle), `monaco-editor`
   - `src/ui/` — `components`, `icons`, `scss`
   - `src/core/` — `css`, `stylesheets`, `saved-styles`, `types`, `settings`, `i18n`, `utils`
   - `src/assets/` — `manifest` (base manifest plus dev and Firefox overrides), `icon` (the extension icon: SVG sources and the PNGs the build copies to `img/`), `fonts`, `_locales` (i18n strings per locale)
@@ -19,7 +19,7 @@ Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of
 - `dist/` — Chrome/Edge build output; `firefox-dist/` — Firefox build output; `preview-dist/` — `yarn build:preview` output
 - `store/` — store listing art (promo tiles, screenshots) per store; not part of the build. `yarn capture:store` retakes the screenshots; `store/video/` makes the demo video (see its README)
 - `site/` — stylebot.dev static site
-- `docs/` — developer docs: setup, releases, translation, e2e, architecture (editor, selectors, CSS, readability, profiles, sync, chat)
+- `docs/` — developer docs: setup, releases, translation, e2e, architecture (editor, selectors, CSS, readability, profiles, sync)
 - `patches/` — patch-package patches applied to dependencies on install
 
 ## Workflow
@@ -67,7 +67,7 @@ Stories:
 A mock stands in for a module or browser API; a fixture is seeded data or a seeded surface that tests and stories build on.
 
 - Jest: no `__mocks__/` or `__fixtures__/` folders. Mock with `jest.mock()` in the test, passing a factory when automocking isn't enough; shared test data goes in a `*.fixtures.ts` file beside the code that uses it, as tests do in `*.test.ts`.
-- Storybook: `.storybook/mocks/` holds only stand-ins (the chrome shim, the chat background, modules aliased in `main.ts`); `.storybook/fixtures/` holds the seeded stores and the surface factories stories spread (`editor`, `chat`, `popup`, `optionsPage`).
+- Storybook: `.storybook/mocks/` holds only stand-ins (the chrome shim, modules aliased in `main.ts`); `.storybook/fixtures/` holds the seeded stores and the surface factories stories spread (`editor`, `popup`, `optionsPage`).
 - e2e: `e2e/fixtures.ts` holds Playwright fixtures.
 
 ## Side effects

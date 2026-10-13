@@ -22,9 +22,6 @@ import type {
 
 import { isMac, toBrowserShortcut } from '@stylebot/utils';
 
-import type { ChatShimOptions } from './chat';
-import { createChatShim } from './chat';
-
 /**
  * A response a story can leave unresolved, to show the surface still waiting.
  */
@@ -45,7 +42,6 @@ export type ChromeShimOptions = {
   pageSupport?: 'supported' | 'unsupported' | 'unreachable';
   googleDriveSync?: Pending<RunGoogleDriveSyncResponse>;
   versionHistory?: Pending<VersionHistory>;
-  chat?: ChatShimOptions;
   // Optional permissions already granted, and how the prompt answers a request.
   permissions?: { granted?: boolean; allowRequest?: boolean };
 };
@@ -109,7 +105,6 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     url: overrides.tabUrl ?? 'https://example.com/article',
   };
 
-  const chat = createChatShim(overrides.chat);
   const permissions = {
     granted: false,
     allowRequest: true,
@@ -184,8 +179,6 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     UndoRestore: () => ({ ok: true }),
 
     OpenEditorSidePanel: () => true,
-
-    ...chat.runtimeResponses,
   };
 
   const tabResponses: Record<string, () => unknown> = {
@@ -201,7 +194,6 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     runtime: {
       sendMessage: (message: { name: string }, callback?: Callback) =>
         respond(callback, runtimeResponses[message.name]?.(message)),
-      connect: chat.connect,
       getURL: (p: string) => `/${p}`,
       getManifest: () => ({ version: MANIFEST_VERSION }),
       onMessage: {

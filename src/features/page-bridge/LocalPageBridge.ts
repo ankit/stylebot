@@ -16,12 +16,7 @@ import {
   isReaderable,
 } from '@stylebot/readability';
 
-import type {
-  ChatCssEdit,
-  ChatPageSignals,
-  ChatStyleProblem,
-  CssDeclaration,
-} from '@stylebot/types';
+import type { CssDeclaration } from '@stylebot/types';
 import {
   injectStylesheet,
   queryWithShadowRoots,
@@ -37,16 +32,7 @@ import type {
 import { PageBridgeEmitter } from './PageBridgeEmitter';
 import { getPageColors } from './page-colors';
 import { getComputedStyles } from './computed-styles';
-import {
-  checkStyle,
-  countMatches,
-  getPageCssContext,
-  getPageOutline,
-  getPageSignals,
-  getStableSelectors,
-  startStyleCheck,
-  extendStyleCheck,
-} from './chat';
+import { countMatches } from './page-reading';
 import { getAppliedDeclarations } from './applied-declarations';
 import type { AppliedDeclaration } from './applied-declarations';
 import { getPageDeclarations } from './page-declarations';
@@ -246,34 +232,8 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
     return Promise.resolve(styles);
   }
 
-  getPageOutline(): Promise<string> {
-    return Promise.resolve(getPageOutline());
-  }
-
-  getPageSignals(): Promise<ChatPageSignals> {
-    return Promise.resolve(getPageSignals());
-  }
-
   countMatches(selectors: Array<string>): Promise<Array<number | null>> {
     return Promise.resolve(countMatches(selectors));
-  }
-
-  getStableSelectors(selectors: Array<string>): Promise<Array<string>> {
-    return Promise.resolve(getStableSelectors(selectors));
-  }
-
-  startStyleCheck(edits: Array<ChatCssEdit>): Promise<void> {
-    startStyleCheck(edits);
-    return Promise.resolve();
-  }
-
-  extendStyleCheck(edits: Array<ChatCssEdit>): Promise<void> {
-    extendStyleCheck(edits);
-    return Promise.resolve();
-  }
-
-  checkStyle(): Promise<Array<ChatStyleProblem>> {
-    return checkStyle();
   }
 
   getSelectorAlternatives(selector: string): Promise<SelectorAlternatives> {
@@ -321,10 +281,6 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
     const el = this.elementFor(selector);
 
     return Promise.resolve(el ? getPageDeclarations(el) : []);
-  }
-
-  getPageCssContext(selector: string): Promise<string> {
-    return Promise.resolve(getPageCssContext(selector));
   }
 
   openInPage(): void {

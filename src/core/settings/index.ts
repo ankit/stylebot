@@ -7,7 +7,6 @@ import type {
 export const defaultOptions: StylebotOptions = {
   mode: 'basic',
   contextMenu: true,
-  chat: false,
   fonts: [
     'Inter',
     'Source Sans 3',
@@ -48,7 +47,6 @@ export const defaultEditorCommands: StylebotEditorCommands = {
   basic: 'b',
   magic: 'p',
   code: 'c',
-  chat: 't',
   help: '?',
   hide: 'h',
   dockLeft: 'l',

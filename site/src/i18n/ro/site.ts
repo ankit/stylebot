@@ -324,7 +324,7 @@ const site: SiteMessages = {
     browser: {
       title: 'În browser',
       body: [
-        'Stilurile, setările, istoricul, conversațiile din chat și cheile API sunt salvate în browser, iar dezinstalarea Stylebot le elimină. Fonturile Google Fonts și foile de stil importate cu <code>@import</code> sunt descărcate de pe serverele care le găzduiesc, iar acestea îți văd adresa IP.',
+        'Stilurile, setările și istoricul sunt salvate în browser, iar dezinstalarea Stylebot le elimină. Fonturile Google Fonts și foile de stil importate cu <code>@import</code> sunt descărcate de pe serverele care le găzduiesc, iar acestea îți văd adresa IP.',
       ],
     },
     sync: {
@@ -332,12 +332,6 @@ const site: SiteMessages = {
       body: [
         'Când conectezi Google Drive în Opțiuni, stilurile tale sunt salvate într-un fișier din propriul tău Drive. Stylebot poate vedea doar fișierele pe care le creează, iar tokenul său de acces rămâne în browser. Te poți deconecta din Opțiuni sau din <a href="https://myaccount.google.com/connections">contul Google</a>.',
         'Utilizarea de către Stylebot a informațiilor primite de la API-urile Google respectă <a href="https://developers.google.com/terms/api-services-user-data-policy">Politica privind datele utilizatorilor pentru serviciile API Google</a>, inclusiv cerințele de utilizare limitată.',
-      ],
-    },
-    chat: {
-      title: 'Chat',
-      body: [
-        'Chatul este dezactivat până adaugi o cheie API și nu se trimite nimic înainte de asta. Mesajul tău ajunge direct la furnizorul a cărui cheie API ai adăugat-o, împreună cu orice captură de ecran atașată, adresa și titlul paginii, o schiță a conținutului vizibil, CSS-ul paginii și stilurile tale. Acestea pot include informații personale de pe pagină. Se aplică politica furnizorului: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {

@@ -105,8 +105,8 @@ meaning, then let the language's own grammar and word order carry it.
   sounds foreign in many languages. Restructure, or name the thing ("this
   feature", "AI", "Stylebot").
 - **Feature names aren't sentence subjects** unless that's natural in the
-  language: "Chat uses your own API key" becomes "this feature uses…", not the
-  tab label used as a noun.
+  language: "Sync keeps your styles in Drive" becomes "this feature keeps…", not
+  the tab label used as a noun.
 - **Follow the platform's wording.** For common actions and settings (save,
   undo, sign in, dark mode, shortcut), use the terms Chrome and the OS use in
   that language.

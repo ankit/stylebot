@@ -322,7 +322,7 @@ const site: SiteMessages = {
     browser: {
       title: 'No seu navegador',
       body: [
-        'Seus estilos, configurações, histórico, conversas do chat e chaves de API ficam salvos no seu navegador, e desinstalar o Stylebot remove tudo isso. As fontes do Google Fonts e as folhas de estilo que você importa com <code>@import</code> são baixadas de onde estão hospedadas, e quem as hospeda vê seu endereço IP.',
+        'Seus estilos, configurações e histórico ficam salvos no seu navegador, e desinstalar o Stylebot remove tudo isso. As fontes do Google Fonts e as folhas de estilo que você importa com <code>@import</code> são baixadas de onde estão hospedadas, e quem as hospeda vê seu endereço IP.',
       ],
     },
     sync: {
@@ -330,12 +330,6 @@ const site: SiteMessages = {
       body: [
         'Ao conectar o Google Drive nas Opções, seus estilos são salvos em um arquivo no seu próprio Drive. O Stylebot só consegue ver os arquivos que ele cria, e o token de acesso fica no seu navegador. Desconecte nas Opções ou na sua <a href="https://myaccount.google.com/connections">Conta do Google</a>.',
         'O uso que o Stylebot faz das informações recebidas das APIs do Google segue a <a href="https://developers.google.com/terms/api-services-user-data-policy">Política de dados do usuário dos serviços de API do Google</a>, incluindo os requisitos de uso limitado.',
-      ],
-    },
-    chat: {
-      title: 'Chat',
-      body: [
-        'O Chat fica desativado até você adicionar uma chave de API, e nada é enviado antes disso. Sua mensagem vai direto para o provedor cuja chave de API você adicionou, junto com qualquer captura de tela que você anexar, o endereço e o título da página, uma estrutura do conteúdo visível dela, o CSS dela e seus estilos. Isso pode incluir informações pessoais da página. Vale a política do provedor: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {
