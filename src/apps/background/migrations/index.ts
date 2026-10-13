@@ -20,13 +20,8 @@ export const completionKey = (name: string): string =>
   `migration_${name.replace(/-/g, '_')}`;
 
 /**
- * One-off repairs of stored data left by earlier versions, run in order.
- * Each runs until it succeeds once, then is skipped by its completion key.
- * Set `everyStart` only for a repair that data can still need after it has
- * run, such as data synced from a machine on an older version. Each must be
- * idempotent. The flags default_shortcut_update_complete and
- * migration_sync_storage_update_complete predate the completion keys and
- * are still checked by their migrations, since upgraders already have them.
+ * Idempotent repairs of data left by earlier versions, run in order until
+ * each succeeds once. `everyStart` is for repairs synced data can still need.
  */
 export const migrations: Array<Migration> = [
   { name: 'default-shortcut-update', run: DefaultShortcutUpdate },
