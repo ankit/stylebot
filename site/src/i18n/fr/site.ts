@@ -200,8 +200,8 @@ const site: SiteMessages = {
   manual: {
     title: 'Manuel',
     description:
-      'Comment utiliser Stylebot : styliser un site, les profils, la ligne de commande, le Chat, la synchronisation, les règles d’URL et les raccourcis.',
-    lede: 'Le fonctionnement de Stylebot, de votre premier style aux profils, au Chat et à la synchronisation.',
+      'Comment utiliser Stylebot : styliser un site, les profils, la ligne de commande, la synchronisation, les règles d’URL et les raccourcis.',
+    lede: 'Le fonctionnement de Stylebot, de votre premier style aux profils et à la synchronisation.',
     sections: 'Sections du manuel',
     toc: {
       start: 'Premiers pas',
@@ -210,7 +210,6 @@ const site: SiteMessages = {
       sync: 'Synchronisation et historique des versions',
       urls: 'Règles d’URL',
       cli: 'CLI',
-      chat: 'Chat',
       shortcuts: 'Raccourcis clavier',
       help: 'Aide et assistance',
     },
@@ -248,20 +247,6 @@ const site: SiteMessages = {
       privacy: 'Confidentialité',
       privacyBody:
         'L’accès à la CLI reste désactivé tant que vous ne l’activez pas. Stylebot et la CLI ne communiquent qu’entre eux, sur cet ordinateur ; un agent envoie ce qu’il lit à son propre fournisseur.',
-    },
-    chat: {
-      intro:
-        'Le Chat est désactivé par défaut. Pour ajouter son onglet à l’éditeur, activez <strong>Chat</strong> dans les options de Stylebot, sous Général, puis connectez une clé d’API. Il est idéal pour les retouches rapides : décrivez la modification souhaitée et Stylebot écrit le CSS. Vous pouvez choisir un élément pour cibler quelque chose de précis, ou joindre une capture d’écran pour montrer ce que vous voulez dire. Pour des changements plus importants, comme un thème entièrement nouveau, utilisez la <a href="#cli">CLI</a>.',
-      shot: 'L’onglet Chat après avoir demandé un thème forêt avec une police serif lisible sur Hacker News',
-      key: 'Utilisez votre propre clé',
-      keyBody:
-        'Connectez une clé d’API Claude, OpenAI ou Gemini. Les clés sont enregistrées uniquement sur cet ordinateur, jamais synchronisées. Les messages vont directement de votre navigateur au fournisseur.',
-      changes: 'Où vont les modifications',
-      changesBody:
-        'Chaque modification est appliquée immédiatement et ajoutée à la feuille de style du profil actuel. Cliquez sur <strong>N lignes ajoutées</strong> pour la voir dans Code, ou annulez-la depuis le chat.',
-      cost: 'Coût',
-      costBody:
-        'Le nombre de jetons sous la zone de message indique ce que la conversation a consommé, avec un coût estimé.',
     },
     presets: {
       intro:

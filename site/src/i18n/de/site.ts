@@ -200,8 +200,8 @@ const site: SiteMessages = {
   manual: {
     title: 'Handbuch',
     description:
-      'So nutzen Sie Stylebot: Websites gestalten, Profile, die Befehlszeile, Chat, Synchronisierung, URL-Regeln und Tastenkombinationen.',
-    lede: 'So funktioniert Stylebot, von Ihrem ersten Stil bis zu Profilen, Chat und Synchronisierung.',
+      'So nutzen Sie Stylebot: Websites gestalten, Profile, die Befehlszeile, Synchronisierung, URL-Regeln und Tastenkombinationen.',
+    lede: 'So funktioniert Stylebot, von Ihrem ersten Stil bis zu Profilen und Synchronisierung.',
     sections: 'Abschnitte des Handbuchs',
     toc: {
       start: 'Erste Schritte',
@@ -210,7 +210,6 @@ const site: SiteMessages = {
       sync: 'Synchronisierung und Versionsverlauf',
       urls: 'URL-Regeln',
       cli: 'CLI',
-      chat: 'Chat',
       shortcuts: 'Tastenkombinationen',
       help: 'Hilfe und Support',
     },
@@ -248,20 +247,6 @@ const site: SiteMessages = {
       privacy: 'Datenschutz',
       privacyBody:
         'Der CLI-Zugriff ist ausgeschaltet, bis Sie ihn aktivieren. Stylebot und die CLI kommunizieren nur miteinander, auf diesem Computer; ein Agent sendet, was er liest, an seinen eigenen Anbieter.',
-    },
-    chat: {
-      intro:
-        'Der Chat ist standardmäßig aus. Um seinen Tab zum Editor hinzuzufügen, aktivieren Sie <strong>Chat</strong> in den Optionen von Stylebot unter Grundeinstellungen und verbinden Sie dann einen API-Schlüssel. Er eignet sich ideal für schnelle Korrekturen: Beschreiben Sie die gewünschte Änderung, und Stylebot schreibt das CSS. Sie können ein Element auswählen, um auf etwas zu zeigen, oder einen Screenshot anhängen, um zu zeigen, was Sie meinen. Für größere Änderungen, etwa ein ganz neues Design, nutzen Sie die <a href="#cli">CLI</a>.',
-      shot: 'Der Chat-Tab nach der Bitte um ein Wald-Design mit gut lesbarer Serifenschrift auf Hacker News',
-      key: 'Eigener Schlüssel',
-      keyBody:
-        'Verbinden Sie einen API-Schlüssel für Claude, OpenAI oder Gemini. Schlüssel werden nur auf diesem Computer gespeichert und nie synchronisiert. Nachrichten gehen direkt von Ihrem Browser an den Anbieter.',
-      changes: 'Wohin Änderungen gehen',
-      changesBody:
-        'Jede Änderung wird sofort angewendet und dem Stylesheet des aktuellen Profils hinzugefügt. Klicken Sie auf <strong>N Zeilen hinzugefügt</strong>, um sie unter „Code“ zu sehen, oder machen Sie sie im Chat rückgängig.',
-      cost: 'Kosten',
-      costBody:
-        'Die Token-Anzahl unter dem Eingabefeld zeigt, wie viel die Unterhaltung verbraucht hat, samt geschätzten Kosten.',
     },
     presets: {
       intro:

@@ -214,8 +214,8 @@ export default {
   manual: {
     title: 'Manual',
     description:
-      'How to use Stylebot: styling a site, profiles, the command line, Chat, sync, URL rules and shortcuts.',
-    lede: 'How Stylebot works, from your first style to profiles, Chat and sync.',
+      'How to use Stylebot: styling a site, profiles, the command line, sync, URL rules and shortcuts.',
+    lede: 'How Stylebot works, from your first style to profiles and sync.',
     sections: 'Manual sections',
     toc: {
       start: 'Getting started',
@@ -224,7 +224,6 @@ export default {
       sync: 'Sync and version history',
       urls: 'URL rules',
       cli: 'CLI',
-      chat: 'Chat',
       shortcuts: 'Keyboard shortcuts',
       help: 'Help and support',
     },
@@ -264,21 +263,6 @@ export default {
       privacy: 'Privacy',
       privacyBody:
         'CLI access is off until you turn it on. Stylebot and the CLI talk only to each other, on this computer; an agent sends what it reads to its own provider.',
-    },
-    chat: {
-      // "Basics" and the bolded setting are labels in Stylebot's Options page; use the extension's own translation.
-      intro:
-        'Chat is off by default. To add its tab to the editor, turn on <strong>Chat</strong> in Stylebot\'s options, under Basics, then connect an API key. It\'s ideal for quick fixes: describe the change you want and Stylebot writes the CSS. You can pick an element to point it at something, or attach a screenshot to show what you mean. For bigger changes, like a whole new theme, use the <a href="#cli">CLI</a>.',
-      shot: 'The Chat tab after asking for a forest theme with a readable serif font on Hacker News',
-      key: 'Bring your own key',
-      keyBody:
-        'Connect a Claude, OpenAI or Gemini API key. Keys are saved on this computer only and never synced. Messages go straight from your browser to the provider.',
-      changes: 'Where changes go',
-      changesBody:
-        "Each change is applied right away and added to the current profile's stylesheet. Click <strong>Added N lines</strong> to see it in Code, or undo it from the chat.",
-      cost: 'Cost',
-      costBody:
-        'The token count under the message box shows what the conversation has used, with an estimated cost.',
     },
     presets: {
       intro:

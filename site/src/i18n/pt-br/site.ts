@@ -200,8 +200,8 @@ const site: SiteMessages = {
   manual: {
     title: 'Manual',
     description:
-      'Como usar o Stylebot: estilizar um site, perfis, a linha de comando, o Chat, sincronização, regras de URL e atalhos.',
-    lede: 'Como o Stylebot funciona, do seu primeiro estilo aos perfis, ao Chat e à sincronização.',
+      'Como usar o Stylebot: estilizar um site, perfis, a linha de comando, sincronização, regras de URL e atalhos.',
+    lede: 'Como o Stylebot funciona, do seu primeiro estilo aos perfis e à sincronização.',
     sections: 'Seções do manual',
     toc: {
       start: 'Primeiros passos',
@@ -210,7 +210,6 @@ const site: SiteMessages = {
       sync: 'Sincronização e histórico de versões',
       urls: 'Regras de URL',
       cli: 'CLI',
-      chat: 'Chat',
       shortcuts: 'Atalhos de teclado',
       help: 'Ajuda e suporte',
     },
@@ -248,20 +247,6 @@ const site: SiteMessages = {
       privacy: 'Privacidade',
       privacyBody:
         'O acesso à CLI fica desativado até você ativá-lo. O Stylebot e a CLI só se comunicam entre si, neste computador; um agente envia o que lê ao próprio provedor.',
-    },
-    chat: {
-      intro:
-        'O Chat vem desativado por padrão. Para adicionar a aba dele ao editor, ative <strong>Chat</strong> nas opções do Stylebot, em Geral, e depois conecte uma chave de API. Ele é ideal para ajustes rápidos: descreva a mudança que você quer e o Stylebot escreve o CSS. Você pode escolher um elemento para indicar algo específico ou anexar uma captura de tela para mostrar o que quer dizer. Para mudanças maiores, como um tema totalmente novo, use a <a href="#cli">CLI</a>.',
-      shot: 'A aba Chat depois de pedir um tema de floresta com uma fonte serifada legível no Hacker News',
-      key: 'Use sua própria chave',
-      keyBody:
-        'Conecte uma chave de API do Claude, OpenAI ou Gemini. As chaves ficam salvas apenas neste computador e nunca são sincronizadas. As mensagens vão direto do seu navegador para o provedor.',
-      changes: 'Para onde vão as mudanças',
-      changesBody:
-        'Cada mudança é aplicada na hora e adicionada à folha de estilo do perfil atual. Clique em <strong>N linhas adicionadas</strong> para vê-la em Código, ou desfaça pelo chat.',
-      cost: 'Custo',
-      costBody:
-        'A contagem de tokens abaixo da caixa de mensagem mostra quanto a conversa já usou, com um custo estimado.',
     },
     presets: {
       intro:

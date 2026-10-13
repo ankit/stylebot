@@ -193,8 +193,8 @@ const site: SiteMessages = {
   manual: {
     title: '使用手冊',
     description:
-      'Stylebot 使用方式：設定網站樣式、設定檔、命令列、聊天、同步、URL 規則和快速鍵。',
-    lede: 'Stylebot 怎麼運作：從你的第一個樣式，到設定檔、聊天和同步。',
+      'Stylebot 使用方式：設定網站樣式、設定檔、命令列、同步、URL 規則和快速鍵。',
+    lede: 'Stylebot 怎麼運作：從你的第一個樣式，到設定檔和同步。',
     sections: '使用手冊章節',
     toc: {
       start: '開始使用',
@@ -203,7 +203,6 @@ const site: SiteMessages = {
       sync: '同步和版本記錄',
       urls: 'URL 規則',
       cli: 'CLI',
-      chat: '聊天',
       shortcuts: '快速鍵',
       help: '說明與支援',
     },
@@ -241,19 +240,6 @@ const site: SiteMessages = {
       privacy: '隱私權',
       privacyBody:
         'CLI 存取在你開啟之前都是關閉的。Stylebot 和 CLI 只在這台電腦上彼此溝通；代理則會把讀取到的內容傳送給它自己的供應商。',
-    },
-    chat: {
-      intro:
-        '聊天預設為關閉。若要在編輯器中加入它的分頁，請在 Stylebot 選項的「基本」中開啟<strong>聊天</strong>，然後連接 API 金鑰。它最適合快速修正：描述你想要的變更，Stylebot 就會撰寫 CSS。你可以選取元素來指明對象，或附加螢幕截圖說明你的意思。若是較大的變更，例如整套新主題，請使用 <a href="#cli">CLI</a>。',
-      shot: '在 Hacker News 上要求森林主題和易讀襯線字型後的聊天分頁',
-      key: '使用你自己的金鑰',
-      keyBody:
-        '連線 Claude、OpenAI 或 Gemini 的 API 金鑰。金鑰只儲存在這台電腦上，永不同步。訊息會直接從你的瀏覽器傳送到供應商。',
-      changes: '變更會加到哪裡',
-      changesBody:
-        '每項變更都會立即套用，並加入目前設定檔的樣式表。按一下 <strong>新增 N 行</strong> 即可在程式碼分頁中查看，也可以從聊天中復原。',
-      cost: '費用',
-      costBody: '訊息框下方的 token 數會顯示這段對話的用量，以及預估費用。',
     },
     presets: {
       intro:

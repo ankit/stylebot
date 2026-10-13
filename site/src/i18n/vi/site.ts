@@ -200,8 +200,8 @@ const site: SiteMessages = {
   manual: {
     title: 'Hướng dẫn',
     description:
-      'Cách dùng Stylebot: tạo kiểu cho trang web, hồ sơ, dòng lệnh, Trò chuyện, đồng bộ, quy tắc URL và phím tắt.',
-    lede: 'Cách Stylebot hoạt động, từ kiểu đầu tiên đến hồ sơ, Trò chuyện và đồng bộ.',
+      'Cách dùng Stylebot: tạo kiểu cho trang web, hồ sơ, dòng lệnh, đồng bộ, quy tắc URL và phím tắt.',
+    lede: 'Cách Stylebot hoạt động, từ kiểu đầu tiên đến hồ sơ và đồng bộ.',
     sections: 'Các mục hướng dẫn',
     toc: {
       start: 'Bắt đầu',
@@ -210,7 +210,6 @@ const site: SiteMessages = {
       sync: 'Đồng bộ và lịch sử phiên bản',
       urls: 'Quy tắc URL',
       cli: 'CLI',
-      chat: 'Trò chuyện',
       shortcuts: 'Phím tắt',
       help: 'Trợ giúp và hỗ trợ',
     },
@@ -248,20 +247,6 @@ const site: SiteMessages = {
       privacy: 'Quyền riêng tư',
       privacyBody:
         'Quyền truy cập CLI ở trạng thái tắt cho đến khi bạn bật. Stylebot và CLI chỉ giao tiếp với nhau, trên máy tính này; trợ lý lập trình gửi những gì đọc được đến nhà cung cấp của mình.',
-    },
-    chat: {
-      intro:
-        'Trò chuyện mặc định tắt. Để thêm thẻ này vào trình chỉnh sửa, hãy bật <strong>Trò chuyện</strong> trong tùy chọn của Stylebot, mục Cơ bản, rồi kết nối khóa API. Tính năng này rất hợp cho những chỉnh sửa nhanh: mô tả thay đổi bạn muốn và Stylebot sẽ viết CSS. Bạn có thể chọn phần tử để chỉ rõ chỗ cần sửa, hoặc đính kèm ảnh chụp màn hình để minh họa ý bạn. Với thay đổi lớn hơn, như cả giao diện mới, hãy dùng <a href="#cli">CLI</a>.',
-      shot: 'Thẻ Trò chuyện sau khi yêu cầu giao diện rừng xanh với phông serif dễ đọc trên Hacker News',
-      key: 'Dùng khóa của riêng bạn',
-      keyBody:
-        'Kết nối khóa API của Claude, OpenAI hoặc Gemini. Khóa chỉ được lưu trên máy tính này và không bao giờ được đồng bộ. Tin nhắn đi thẳng từ trình duyệt của bạn đến nhà cung cấp.',
-      changes: 'Thay đổi được lưu ở đâu',
-      changesBody:
-        'Mỗi thay đổi được áp dụng ngay và thêm vào bảng kiểu của hồ sơ hiện tại. Nhấp <strong>Đã thêm N dòng</strong> để xem trong thẻ Mã, hoặc hoàn tác ngay trong cuộc trò chuyện.',
-      cost: 'Chi phí',
-      costBody:
-        'Số token bên dưới ô tin nhắn cho biết cuộc trò chuyện đã dùng bao nhiêu, kèm chi phí ước tính.',
     },
     presets: {
       intro:

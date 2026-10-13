@@ -200,8 +200,8 @@ const site: SiteMessages = {
   manual: {
     title: 'Panduan',
     description:
-      'Cara memakai Stylebot: mengubah gaya situs, profil, baris perintah, Chat, sinkronisasi, aturan URL, dan pintasan.',
-    lede: 'Cara kerja Stylebot, dari gaya pertama Anda hingga profil, Chat, dan sinkronisasi.',
+      'Cara memakai Stylebot: mengubah gaya situs, profil, baris perintah, sinkronisasi, aturan URL, dan pintasan.',
+    lede: 'Cara kerja Stylebot, dari gaya pertama Anda hingga profil dan sinkronisasi.',
     sections: 'Bagian panduan',
     toc: {
       start: 'Memulai',
@@ -210,7 +210,6 @@ const site: SiteMessages = {
       sync: 'Sinkronisasi dan riwayat versi',
       urls: 'Aturan URL',
       cli: 'CLI',
-      chat: 'Chat',
       shortcuts: 'Pintasan keyboard',
       help: 'Bantuan dan dukungan',
     },
@@ -248,20 +247,6 @@ const site: SiteMessages = {
       privacy: 'Privasi',
       privacyBody:
         'Akses CLI nonaktif sampai Anda mengaktifkannya. Stylebot dan CLI hanya berkomunikasi satu sama lain, di komputer ini; agen mengirim apa yang dibacanya ke penyedianya sendiri.',
-    },
-    chat: {
-      intro:
-        'Chat nonaktif secara default. Untuk menambahkan tabnya ke editor, aktifkan <strong>Chat</strong> di opsi Stylebot, di bagian Dasar, lalu hubungkan kunci API. Chat cocok untuk perbaikan cepat: jelaskan perubahan yang Anda inginkan dan Stylebot yang menulis CSS-nya. Anda bisa memilih elemen untuk menunjuk bagian tertentu, atau melampirkan screenshot untuk memperlihatkan maksud Anda. Untuk perubahan yang lebih besar, seperti tema yang benar-benar baru, gunakan <a href="#cli">CLI</a>.',
-      shot: 'Tab Chat setelah meminta tema hutan dengan font serif yang mudah dibaca di Hacker News',
-      key: 'Gunakan kunci Anda sendiri',
-      keyBody:
-        'Hubungkan kunci API Claude, OpenAI, atau Gemini. Kunci hanya disimpan di komputer ini dan tidak pernah disinkronkan. Pesan dikirim langsung dari browser Anda ke penyedia.',
-      changes: 'Ke mana perubahan disimpan',
-      changesBody:
-        'Setiap perubahan langsung diterapkan dan ditambahkan ke stylesheet profil saat ini. Klik <strong>Ditambahkan N baris</strong> untuk melihatnya di Kode, atau urungkan dari chat.',
-      cost: 'Biaya',
-      costBody:
-        'Jumlah token di bawah kotak pesan menunjukkan pemakaian percakapan sejauh ini, beserta perkiraan biayanya.',
     },
     presets: {
       intro:

@@ -202,8 +202,8 @@ const site: SiteMessages = {
   manual: {
     title: 'Manual',
     description:
-      'Cum folosești Stylebot: stilizarea unui site, profiluri, linia de comandă, Chat, sincronizare, reguli URL și comenzi rapide.',
-    lede: 'Cum funcționează Stylebot, de la primul stil la profiluri, Chat și sincronizare.',
+      'Cum folosești Stylebot: stilizarea unui site, profiluri, linia de comandă, sincronizare, reguli URL și comenzi rapide.',
+    lede: 'Cum funcționează Stylebot, de la primul stil la profiluri și sincronizare.',
     sections: 'Secțiunile manualului',
     toc: {
       start: 'Primii pași',
@@ -212,7 +212,6 @@ const site: SiteMessages = {
       sync: 'Sincronizare și istoricul versiunilor',
       urls: 'Reguli URL',
       cli: 'CLI',
-      chat: 'Chat',
       shortcuts: 'Comenzi rapide',
       help: 'Ajutor și asistență',
     },
@@ -250,20 +249,6 @@ const site: SiteMessages = {
       privacy: 'Confidențialitate',
       privacyBody:
         'Accesul prin CLI este dezactivat până îl activezi. Stylebot și CLI-ul comunică doar între ele, pe acest calculator; un agent trimite ce citește propriului furnizor.',
-    },
-    chat: {
-      intro:
-        'Chatul este dezactivat implicit. Ca să-i adaugi fila în editor, activează <strong>Chat</strong> în opțiunile Stylebot, la De bază, apoi conectează o cheie API. E ideal pentru remedieri rapide: descrie modificarea pe care o vrei, iar Stylebot scrie CSS-ul. Poți alege un element ca să arăți spre ceva anume sau poți atașa o captură de ecran ca să arăți ce ai în minte. Pentru modificări mai mari, cum ar fi o temă complet nouă, folosește <a href="#cli">CLI-ul</a>.',
-      shot: 'Fila Chat pe Hacker News, după cererea unei teme în nuanțe de pădure, cu un font serif ușor de citit',
-      key: 'Folosește propria cheie',
-      keyBody:
-        'Conectează o cheie API Claude, OpenAI sau Gemini. Cheile sunt salvate doar pe acest calculator și nu sunt sincronizate niciodată. Mesajele merg direct din browser la furnizor.',
-      changes: 'Unde ajung modificările',
-      changesBody:
-        'Fiecare modificare se aplică imediat și se adaugă în foaia de stil a profilului curent. Dă clic pe <strong>N linii adăugate</strong> ca s-o vezi în Cod sau anuleaz-o din chat.',
-      cost: 'Cost',
-      costBody:
-        'Numărul de tokenuri de sub caseta de mesaj arată cât a folosit conversația, cu un cost estimat.',
     },
     presets: {
       intro:
