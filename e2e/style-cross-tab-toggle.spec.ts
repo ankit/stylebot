@@ -89,3 +89,64 @@ test('with the editor open, a style turned off elsewhere stays off from the firs
   await page.reload();
   await expect(page.locator('h1')).not.toHaveCSS('color', 'rgb(255, 0, 128)');
 });
+
+test('a style turned off is removed even after another tab on the site rewrote the cache', async ({
+  context,
+  extension,
+  openPopup,
+}) => {
+  await servePage(context, PAGE_HTML);
+  await seedStyles(extension, {
+    'localhost/a': { css: 'h1 { color: rgb(255, 0, 128); }', enabled: true },
+  });
+
+  const tabA = await context.newPage();
+  await tabA.goto('http://localhost/a');
+  await expect(tabA.locator('h1')).toHaveCSS('color', 'rgb(255, 0, 128)');
+
+  // The cache is one per origin, so this tab's load replaces tabA's entry.
+  const tabB = await context.newPage();
+  await tabB.goto('http://localhost/b');
+  await expect
+    .poll(() =>
+      tabB.evaluate(() =>
+        JSON.parse(localStorage.getItem('stylebot-cache') ?? '{}').styles?.some(
+          (style: { url: string }) => style.url === 'localhost/a'
+        )
+      )
+    )
+    .toBe(false);
+
+  const popup = await openPopup();
+  await popup.evaluate(() => {
+    chrome.runtime.sendMessage({ name: 'DisableStyle', url: 'localhost/a' });
+  });
+
+  await expect(tabA.locator('h1')).not.toHaveCSS('color', 'rgb(255, 0, 128)');
+});
+
+test('a style turned off is removed even after the page cleared its localStorage', async ({
+  context,
+  extension,
+  openPopup,
+}) => {
+  await servePage(context, PAGE_HTML);
+  await seedStyles(extension, {
+    localhost: { css: 'h1 { color: rgb(255, 0, 128); }', enabled: true },
+  });
+
+  const page = await context.newPage();
+  await page.goto(PAGE_URL);
+  await expect(page.locator('h1')).toHaveCSS('color', 'rgb(255, 0, 128)');
+  await expect
+    .poll(() => page.evaluate(() => localStorage.getItem('stylebot-cache')))
+    .not.toBeNull();
+  await page.evaluate(() => localStorage.clear());
+
+  const popup = await openPopup();
+  await popup.evaluate(() => {
+    chrome.runtime.sendMessage({ name: 'DisableStyle', url: 'localhost' });
+  });
+
+  await expect(page.locator('h1')).not.toHaveCSS('color', 'rgb(255, 0, 128)');
+});

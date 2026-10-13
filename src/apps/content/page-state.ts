@@ -36,8 +36,8 @@ const enabledUrls = (state?: CachedState | null): Set<string> =>
   );
 
 /**
- * Applies a page state: the reader, then each enabled style. Stylesheets that
- * `previous` had enabled and this state doesn't are removed.
+ * Applies a page state: the reader, then each enabled style. Removes disabled
+ * styles too, since `previous` is shared by the origin's tabs and can be stale.
  */
 export const applyPageState = (
   state: CachedState,
@@ -54,7 +54,12 @@ export const applyPageState = (
 
   const nextUrls = enabledUrls(state);
 
-  enabledUrls(previous).forEach(url => {
+  const knownUrls = new Set([
+    ...state.styles.map(style => style.url),
+    ...enabledUrls(previous),
+  ]);
+
+  knownUrls.forEach(url => {
     if (!nextUrls.has(url)) {
       removeStylesheet(url);
     }

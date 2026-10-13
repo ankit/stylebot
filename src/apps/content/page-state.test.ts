@@ -85,6 +85,12 @@ describe('applyPageState', () => {
     expect(stylesheet.removeStylesheet).toHaveBeenCalledWith('a');
   });
 
+  it('removes a disabled stylesheet the previous state did not record', () => {
+    applyPageState({ styles: [style('a', '.a{}', false)], readability: false });
+
+    expect(stylesheet.removeStylesheet).toHaveBeenCalledWith('a');
+  });
+
   it('removes nothing without a previous state', () => {
     applyPageState({ styles: [], readability: false });
 

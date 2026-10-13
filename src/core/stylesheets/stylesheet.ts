@@ -166,12 +166,18 @@ export const injectStylesheet = (
 export const removeStylesheet = (id: string): void => {
   bumpInjectionVersion(id);
 
-  [getStylesheetId(id), getImportsStylesheetId(id)].forEach(stylesheetId => {
-    const el = document.getElementById(stylesheetId);
+  const elements = [getStylesheetId(id), getImportsStylesheetId(id)]
+    .map(stylesheetId => document.getElementById(stylesheetId))
+    .filter((el): el is HTMLElement => el !== null);
 
-    if (el) {
-      el.textContent = '';
-    }
+  // Shadow roots only ever get a style once its <style> exists, so a style
+  // never injected here has nothing to clear.
+  if (elements.length === 0) {
+    return;
+  }
+
+  elements.forEach(el => {
+    el.textContent = '';
   });
 
   setShadowRootCSS(id, '');
