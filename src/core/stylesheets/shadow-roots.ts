@@ -23,6 +23,8 @@ type Registry = {
   stylesheets: Map<string, Stylesheet>;
   constructable: boolean;
   observer: MutationObserver;
+  // Only while some stylesheet has CSS to mirror.
+  observing: boolean;
   // Custom elements seen without a shadow root, rechecked on a back-off.
   pendingElements: Set<Element>;
   pendingCheck: { timer: number; step: number } | null;
@@ -214,22 +216,56 @@ const createRegistry = (): Registry => {
     stylesheets: new Map(),
     constructable: supportsConstructableStylesheets(),
     observer: new MutationObserver(records => onMutations(registry, records)),
+    observing: false,
     pendingElements: new Set(),
     pendingCheck: null,
   };
 
+  return registry;
+};
+
+const startObserving = (registry: Registry): void => {
+  if (registry.observing) {
+    return;
+  }
+
+  registry.observing = true;
   registry.observer.observe(document, { childList: true, subtree: true });
   scanSubtree(registry, document);
 
   // Catches roots attached to plain elements by scripts during load, which
   // the mutation observer can't see.
   if (document.readyState !== 'complete') {
-    window.addEventListener('load', () => scanSubtree(registry, document), {
-      once: true,
-    });
+    window.addEventListener(
+      'load',
+      () => {
+        if (registry.observing) {
+          scanSubtree(registry, document);
+        }
+      },
+      { once: true }
+    );
+  }
+};
+
+/**
+ * Stops watching the page once no stylesheet has CSS left to mirror. Roots
+ * keep their emptied sheets, and are found again if a style comes back.
+ */
+const stopObserving = (registry: Registry): void => {
+  if (!registry.observing) {
+    return;
   }
 
-  return registry;
+  registry.observing = false;
+  registry.observer.disconnect();
+  registry.roots.clear();
+  registry.pendingElements.clear();
+
+  if (registry.pendingCheck) {
+    window.clearTimeout(registry.pendingCheck.timer);
+    registry.pendingCheck = null;
+  }
 };
 
 const getRegistry = (): Registry => {
@@ -255,13 +291,7 @@ const createStylesheet = (registry: Registry, css: string): Stylesheet => {
   }
 };
 
-/**
- * Sets the CSS for a stylesheet id in every open shadow root, now and as
- * roots appear later. An empty string clears it, mirroring how the
- * document-level <style> is emptied rather than removed.
- */
-export const setShadowRootCSS = (id: string, css: string): void => {
-  const registry = getRegistry();
+const updateStylesheet = (registry: Registry, id: string, css: string) => {
   const existing = registry.stylesheets.get(id);
 
   if (!existing) {
@@ -287,11 +317,81 @@ export const setShadowRootCSS = (id: string, css: string): void => {
 };
 
 /**
- * Every open shadow root found on the page so far, for features that query
- * the DOM with a selector and would otherwise miss shadow-tree matches.
+ * Sets the CSS for a stylesheet id in every open shadow root, now and as
+ * roots appear later. An empty string clears it, mirroring how the
+ * document-level <style> is emptied rather than removed. The page is only
+ * watched while some stylesheet has CSS.
+ */
+export const setShadowRootCSS = (id: string, css: string): void => {
+  const holder = getRegistryHolder();
+
+  if (!css && !holder[SHADOW_ROOT_REGISTRY_KEY]) {
+    return;
+  }
+
+  const registry = getRegistry();
+
+  updateStylesheet(registry, id, css);
+
+  const hasCSS = Array.from(registry.stylesheets.values()).some(
+    stylesheet => stylesheet.css
+  );
+
+  if (hasCSS) {
+    startObserving(registry);
+  } else {
+    stopObserving(registry);
+  }
+};
+
+let rootsSnapshot: Array<ShadowRoot> | null = null;
+
+/**
+ * Finds every open root on the page from scratch, for queries made while
+ * no style is watching the page. Kept until the current task's microtasks
+ * run, so a burst of queries scans once.
+ */
+const snapshotOpenShadowRoots = (): Array<ShadowRoot> => {
+  if (rootsSnapshot) {
+    return rootsSnapshot;
+  }
+
+  const roots: Array<ShadowRoot> = [];
+  const scopes: Array<Document | ShadowRoot> = [document];
+
+  while (scopes.length > 0) {
+    const descendants = (
+      scopes.pop() as Document | ShadowRoot
+    ).querySelectorAll('*');
+
+    for (let i = 0; i < descendants.length; i++) {
+      const root = descendants[i].shadowRoot;
+
+      if (root && !isStylebotHost(descendants[i])) {
+        roots.push(root);
+        scopes.push(root);
+      }
+    }
+  }
+
+  rootsSnapshot = roots;
+  queueMicrotask(() => {
+    rootsSnapshot = null;
+  });
+
+  return roots;
+};
+
+/**
+ * Every open shadow root on the page, for features that query the DOM with
+ * a selector and would otherwise miss shadow-tree matches.
  */
 export const getOpenShadowRoots = (): Array<ShadowRoot> => {
-  return Array.from(getRegistry().roots);
+  const registry = getRegistryHolder()[SHADOW_ROOT_REGISTRY_KEY];
+
+  return registry?.observing
+    ? Array.from(registry.roots)
+    : snapshotOpenShadowRoots();
 };
 
 /**

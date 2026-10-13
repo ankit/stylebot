@@ -290,5 +290,47 @@ describe('shadow-roots', () => {
 
       expect(getOpenShadowRoots()).toEqual([first.root, second.root]);
     });
+
+    it('finds nested roots without a style watching the page', () => {
+      const outer = attachHost(document.body, '<div class="inner"></div>');
+      const inner = attachHost(
+        outer.root.querySelector('.inner') as HTMLElement
+      );
+
+      expect(getOpenShadowRoots()).toEqual([outer.root, inner.root]);
+      expect((window as any)[SHADOW_ROOT_REGISTRY_KEY]).toBeUndefined();
+    });
+  });
+
+  describe('watching the page', () => {
+    it("doesn't start for a style without css", () => {
+      setShadowRootCSS('example', '');
+
+      expect((window as any)[SHADOW_ROOT_REGISTRY_KEY]).toBeUndefined();
+    });
+
+    it('stops once every style is cleared, and starts again with css', async () => {
+      setShadowRootCSS('a', 'tr { color: red; }');
+      setShadowRootCSS('b', 'tr { color: blue; }');
+      setShadowRootCSS('a', '');
+      const whileOn = attachHost();
+      await flush();
+
+      expect(styleIn(whileOn.root, 'b')?.textContent).toBe(
+        'tr { color: blue; }'
+      );
+
+      setShadowRootCSS('b', '');
+      const whileOff = attachHost();
+      await flush();
+
+      expect(styleIn(whileOff.root, 'b')).toBeNull();
+
+      setShadowRootCSS('b', 'tr { color: green; }');
+
+      expect(styleIn(whileOff.root, 'b')?.textContent).toBe(
+        'tr { color: green; }'
+      );
+    });
   });
 });
