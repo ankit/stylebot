@@ -80,6 +80,7 @@ export default Vue.extend({
   align-items: center;
   gap: 10px;
   max-width: 320px;
+  min-height: 17px;
   --card-edge: color-mix(in srgb, var(--text-primary) 18%, var(--menu-surface));
 
   padding: 8px 12px;
@@ -111,6 +112,7 @@ export default Vue.extend({
 .selector {
   min-width: 0;
   overflow-wrap: anywhere;
+  text-box: trim-both cap alphabetic;
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--field-ink);
