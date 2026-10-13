@@ -101,7 +101,7 @@ describe('TheGoogleDriveSync.vue', () => {
     expect(wrapper.text()).toContain('stylebot/stylebot_v3_backup.json');
   });
 
-  it('disables Sync Now while a sync is already running', () => {
+  it('disables Sync Now while a sync is already running, keeping the synced pill', () => {
     const wrapper = mountCard({
       googleDriveSyncEnabled: true,
       googleDriveSyncState: syncState(new Date().toISOString()),
@@ -109,6 +109,8 @@ describe('TheGoogleDriveSync.vue', () => {
     });
 
     expect(wrapper.find('button[disabled]').exists()).toBe(true);
+    expect(wrapper.text()).toContain('synced_at_time');
+    expect(wrapper.text()).not.toContain('sync_in_progress');
   });
 
   it('states the schedule, and flags a pending sign-in in place of the synced pill', () => {

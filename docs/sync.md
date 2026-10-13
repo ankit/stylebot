@@ -12,7 +12,7 @@ Keeps a user's styles the same on every browser they sign in to, using a single 
 | local | `google-drive-sync-enabled`        | the user's setting; kept apart from the state so it is cheap to read and never contends with a run's write                                                                                |
 | local | `google-drive-access-token`        | the cached token and its expiry                                                                                                                                                           |
 | local | `google-drive-sync-needs-auth`     | set by a scheduled run that could not get a token silently                                                                                                                                |
-| local | `google-drive-refresh-token`       | Safari only: the refresh token that keeps runs silent; removed on disconnect                                                                                                              |
+| local | `google-drive-refresh-token`       | the refresh token that keeps runs silent; removed on disconnect                                                                                                                           |
 
 The base is a second copy of the style map: the one both sides agreed on at the end of the last sync. Storage is not a concern — the extension declares `unlimitedStorage` — and it is only ever read by a run.
 
@@ -30,7 +30,7 @@ Without a base — first sync, reinstall, or a profile that synced before it was
 
 `chrome.alarms`, so the MV3 service worker need not stay alive: every 30 minutes, 30 seconds after the last local edit settles, on browser start, and on **Sync now**. Sync's own writes are marked as such, so a pull does not schedule a push. Overlapping runs coalesce into one.
 
-Scheduled runs are non-interactive: the token comes from the cache, then a silent auth flow; if that fails, `needs-auth` is set and the Sync tab and popup ask for a sign-in rather than opening a window with nobody in front of it. The cached token is retired a minute early so a run does not fail halfway with a 401; a 401 anyway clears it and retries once.
+Scheduled runs are non-interactive: the token comes from the cache, then the refresh token; if neither works, `needs-auth` is set and the Sync tab and popup ask for a sign-in rather than opening a window with nobody in front of it. The cached token is retired a minute early so a run does not fail halfway with a 401; a 401 anyway clears it and retries once.
 
 ## Failure modes, by design
 
@@ -40,27 +40,29 @@ Scheduled runs are non-interactive: the token comes from the cache, then a silen
 - **Disconnect during a run** — the run's final state write is refused, so reconnecting starts clean.
 - **A style deleted on both devices** — stays deleted.
 
+## Signing in
+
+Every browser signs in against a **Desktop app** OAuth client, with PKCE and offline access, and keeps the refresh token it gets. Scheduled runs trade it for access tokens with a plain request, so they never depend on the browser's Google session, its cookies, or which of several accounts is signed in. When Google stops honouring it, the next interactive sync signs in again.
+
+A Desktop client only accepts a loopback redirect, so the browser has to catch Google's redirect to `127.0.0.1` before anything loads:
+
+- **Chrome, Edge and Safari** sign in in an ordinary tab. A redirect rule the extension adds for the sign-in sends the loopback address to an extension page, which hands the code to the background; it closes the tab and returns to the one the user started from. Where the rule can't run, such as with the extension's site access limited, the background reads the code off the tab's loopback address instead. The sign-in in progress is kept in storage rather than memory, since the background may unload while the user is on Google's page; whichever background receives the code finishes it, and a second sync brings the open sign-in tab forward instead of opening another.
+- **Firefox** signs in through its own auth window, which accepts a loopback address of its own and intercepts it, so it needs no redirect rule.
+
+Google treats a Desktop client's secret as public, since it ships inside the extension, but it is kept out of the repository: builds read it from `STYLEBOT_GOOGLE_CLIENT_SECRET`. A release build fails without it; CI and development builds only warn, and sign-in fails in them.
+
+### Profiles signed in before refresh tokens
+
+Chrome, Edge and Firefox used to sign in against a **Web application** client through the browser's identity API, which gives only hour-long tokens and renews them with a hidden sign-in that fails whenever Google wants a click. Until such a profile has a refresh token, scheduled runs still renew that way, so a sign-in that keeps working isn't interrupted; its next interactive sync moves it to the Desktop client. This fallback is meant to go once most profiles have moved.
+
 ## Using sync from a local build or a fork
 
-Google's OAuth client is registered for the store extension's redirect URL, `https://<extension id>.chromiumapp.org/`. An unpacked build gets a different id from its path, so sign-in fails with `redirect_uri_mismatch`.
-
-Dev builds (`yarn watch`, `yarn dev:chrome`) and `yarn build:preview` (a production build in `preview-dist/`) add the store's public key to the manifest, so they get the store id and sign-in works. `yarn dev:chrome` runs in its own profile; if you load `dist/` unpacked in your everyday profile instead, disable the store install first, since the two share an id. Release builds (`yarn build`) leave the key out.
-
-Chrome and Edge give the store extension different ids, so the OAuth client lists both stores' redirect URLs. `yarn preview:edge` builds with the Edge store's key instead, to try sign-in under the Edge id.
+Signing in no longer depends on the extension's id, so an unpacked build can sign in as long as it was built with the client secret. Only the fallback above needs the store id, since the Web application client is registered for the store extension's redirect URL, `https://<extension id>.chromiumapp.org/`; dev builds (`yarn watch`, `yarn dev:chrome`) and `yarn build:preview` add the store's public key to get it, and `yarn preview:edge` builds with the Edge store's key instead.
 
 A fork needs its own client:
 
 1. In the [Google Cloud console](https://cloud.google.com/cloud-console), create a project and enable the **Google Drive API**.
-2. Under **OAuth consent screen**, choose Internal (local use, or within an organisation) or External (a published fork), and add the scope `https://www.googleapis.com/auth/drive.file`.
-3. Under **Credentials**, create an **OAuth client ID** of type Web application, with `https://<your extension id>.chromiumapp.org/` as an authorised redirect URI — `chrome.identity.getRedirectURL()` returns it.
-4. Replace the `CLIENT_ID` constant in the sync code with your client ID.
+2. Under **OAuth consent screen**, choose Internal (local use, or within an organisation) or External (a published fork), add the scope `https://www.googleapis.com/auth/drive.file`, and publish it: refresh tokens for a consent screen left in testing expire after a week.
+3. Under **Credentials**, create an **OAuth client ID** of type Desktop app. Replace the Desktop client ID in the sync code with it, and build with its secret in `STYLEBOT_GOOGLE_CLIENT_SECRET`.
 
-## Safari
-
-Safari has no identity API, so there is no browser-run sign-in window and no silent re-authorization. Sign-in instead runs in an ordinary tab, against a separate **Desktop app** OAuth client in the same Cloud project — Drive only shows a client the files its own project created, so it has to be the same project.
-
-1. The tab opens Google's consent page with PKCE, asking for offline access.
-2. Google redirects to a loopback address, the only kind a Desktop client accepts. A redirect rule the extension adds for the sign-in sends that address to an extension page before anything loads; the page hands the code to the background, which closes the tab and returns to the one the user started from. The sign-in in progress is kept in storage rather than memory, since Safari may unload the background while the user is on Google's page; whichever background receives the code finishes it, and a second sync brings the open sign-in tab forward instead of opening another.
-3. The code is exchanged for an access token and a refresh token. The refresh token is kept, so scheduled runs get new access tokens without the user; when Google stops honouring it, the next interactive sync signs in again.
-
-Google treats a Desktop client's secret as public, since it ships inside the extension, but it is kept out of the repository: Safari builds read it from `STYLEBOT_GOOGLE_CLIENT_SECRET` at build time.
+Drive only shows a client the files its own project created, so every client that reads the sync file has to be in the same project.

@@ -4,9 +4,10 @@ import { isUnavailable } from './http';
 import {
   DESKTOP_CLIENT_ID,
   refreshAccessToken,
-  signInInTab,
-  usesTabSignIn,
-} from './tab-sign-in';
+  type IssuedToken,
+} from './desktop-client';
+import { signInWithIdentityAPI, usesIdentitySignIn } from './identity-sign-in';
+import { signInWithRedirectRule } from './redirect-rule-sign-in';
 
 export type AccessToken = string;
 
@@ -110,7 +111,7 @@ const validate = async (
  * Wraps the callback API: @types/chrome has no promise overload for
  * launchWebAuthFlow, unlike the storage calls elsewhere in sync.
  */
-const authorize = (interactive: boolean): Promise<string | undefined> => {
+const authorizeSilently = (): Promise<string | undefined> => {
   return new Promise((resolve, reject) => {
     const redirectURL = chrome.identity.getRedirectURL();
 
@@ -121,11 +122,11 @@ const authorize = (interactive: boolean): Promise<string | undefined> => {
     authURL += `&scope=${encodeURIComponent(SCOPES.join(' '))}`;
 
     chrome.identity.launchWebAuthFlow(
-      { interactive, url: authURL },
+      { interactive: false, url: authURL },
       responseURL => {
-        // Set when the user closes the auth window, and when a
-        // non-interactive flow needs consent. Leaving it unread also makes
-        // Chrome log an unchecked-lastError warning.
+        // Set when the flow needs the user, such as to pick an account.
+        // Leaving it unread also makes Chrome log an unchecked-lastError
+        // warning.
         const lastError = chrome.runtime.lastError;
 
         if (lastError) {
@@ -141,10 +142,13 @@ const authorize = (interactive: boolean): Promise<string | undefined> => {
   });
 };
 
-const authorizeAndCache = async (
-  interactive: boolean
-): Promise<AccessToken> => {
-  const params = extractTokenParams((await authorize(interactive)) ?? '');
+/**
+ * Renews a token for the web client profiles signed in to before refresh
+ * tokens, until their next interactive sync signs them in again. It only works
+ * while Google can finish without the user.
+ */
+const renewWebClientToken = async (): Promise<AccessToken> => {
+  const params = extractTokenParams((await authorizeSilently()) ?? '');
 
   if (!params) {
     throw syncError('Authorization failure', 'sign-in');
@@ -156,30 +160,15 @@ const authorizeAndCache = async (
   return params.token;
 };
 
-/**
- * Where there's no identity API: a stored refresh token keeps scheduled runs
- * silent, and only an interactive run opens a sign-in tab.
- */
-const getTabSignInToken = async (
-  interactive: boolean
-): Promise<AccessToken> => {
-  const issued =
-    (await refreshAccessToken()) ??
-    (interactive ? await signInInTab(SCOPES) : null);
-
-  if (!issued) {
-    throw syncError('Sign-in needed', 'sign-in');
-  }
-
-  await validate(issued.token, DESKTOP_CLIENT_ID);
-  await setCachedToken(issued.token, issued.expiresIn);
-
-  return issued.token;
-};
+const signIn = (): Promise<IssuedToken> =>
+  usesIdentitySignIn()
+    ? signInWithIdentityAPI(SCOPES)
+    : signInWithRedirectRule(SCOPES);
 
 /**
- * Resolves a usable token, preferring the cache and then a silent flow, so a
- * routine sync does not raise an auth window on every run.
+ * Resolves a usable token: the cached one, else one from the stored refresh
+ * token. Only an interactive run signs in; a scheduled one falls back to the
+ * web client's silent renewal where the identity API has it.
  */
 export default async (
   { interactive }: { interactive: boolean } = { interactive: true }
@@ -190,17 +179,21 @@ export default async (
     return cached;
   }
 
-  if (usesTabSignIn()) {
-    return getTabSignInToken(interactive);
-  }
+  const issued = await refreshAccessToken();
 
-  try {
-    return await authorizeAndCache(false);
-  } catch (e) {
-    if (!interactive) {
-      throw e;
+  if (!issued && !interactive) {
+    // Safari has no identity API.
+    if (typeof chrome.identity?.launchWebAuthFlow === 'function') {
+      return renewWebClientToken();
     }
+
+    throw syncError('Sign-in needed', 'sign-in');
   }
 
-  return authorizeAndCache(true);
+  const token = issued ?? (await signIn());
+
+  await validate(token.token, DESKTOP_CLIENT_ID);
+  await setCachedToken(token.token, token.expiresIn);
+
+  return token.token;
 };

@@ -20,29 +20,12 @@ const buildFirefoxManifest = manifest => ({
 });
 
 /**
- * Safari blurs toolbar icons below 19pt and has no identity API, so Drive
- * sign-in runs in a tab: Google's loopback redirect is rerouted to an
- * extension page, and tokens refresh by fetch.
+ * Drive sign-in in a tab: a redirect rule reroutes Google's loopback redirect
+ * to an extension page, which has to be web accessible for it.
  */
-const buildSafariManifest = manifest => ({
+const addTabSignIn = manifest => ({
   ...manifest,
-  action: {
-    ...manifest.action,
-    default_icon: {
-      ...manifest.action.default_icon,
-      19: 'img/icon19.png',
-      38: 'img/icon38.png',
-    },
-  },
-  permissions: [
-    ...without(manifest.permissions, 'sidePanel', 'identity', 'favicon'),
-    'declarativeNetRequestWithHostAccess',
-  ],
-  host_permissions: [
-    ...manifest.host_permissions,
-    'https://oauth2.googleapis.com/*',
-    'http://127.0.0.1/*',
-  ],
+  permissions: [...manifest.permissions, 'declarativeNetRequestWithHostAccess'],
   web_accessible_resources: [
     ...manifest.web_accessible_resources,
     {
@@ -51,6 +34,34 @@ const buildSafariManifest = manifest => ({
     },
   ],
 });
+
+/**
+ * Safari blurs toolbar icons below 19pt and has no identity API. It doesn't
+ * get access to every site, so it lists the hosts sign-in uses.
+ */
+const buildSafariManifest = manifest =>
+  addTabSignIn({
+    ...manifest,
+    action: {
+      ...manifest.action,
+      default_icon: {
+        ...manifest.action.default_icon,
+        19: 'img/icon19.png',
+        38: 'img/icon38.png',
+      },
+    },
+    permissions: without(
+      manifest.permissions,
+      'sidePanel',
+      'identity',
+      'favicon'
+    ),
+    host_permissions: [
+      ...manifest.host_permissions,
+      'https://oauth2.googleapis.com/*',
+      'http://127.0.0.1/*',
+    ],
+  });
 
 // Chrome and Edge share one build, which runs with no BROWSER set.
 const CHROME = 'chrome';
@@ -94,7 +105,7 @@ const addScripting = manifest => ({
  * leave it out: the stores reject an uploaded manifest with a `key`.
  */
 const buildChromeManifest = (manifest, { nodeEnv, preview, store }) => {
-  const scripting = addScripting(manifest);
+  const scripting = addTabSignIn(addScripting(manifest));
 
   if (nodeEnv === 'development' || preview) {
     const keyFile =

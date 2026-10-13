@@ -12,7 +12,10 @@ export {
 } from './google-drive/sync-metadata';
 
 export { runGoogleDriveSync } from './google-drive/sync';
-export { completeTabSignIn } from './google-drive/tab-sign-in';
+export {
+  handleSignInRedirect,
+  isSignInRedirect,
+} from './google-drive/redirect-rule-sign-in';
 
 export { formatSyncTime } from './format-sync-time';
 

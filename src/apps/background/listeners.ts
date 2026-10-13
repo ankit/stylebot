@@ -16,6 +16,7 @@ import {
   OpenOptionsPage,
   OpenShortcutsPage,
   GoogleSignInRedirect,
+  syncAfterSignInRedirect,
   OpenDonatePage,
   OpenReportIssuePage,
   SetStyle,
@@ -58,7 +59,11 @@ import {
   isSyncAlarm,
   updatePeriodicSync,
 } from './sync-scheduler';
-import { getGoogleDriveSyncEnabled, SYNC_ISSUE_KEYS } from '@stylebot/sync';
+import {
+  getGoogleDriveSyncEnabled,
+  isSignInRedirect,
+  SYNC_ISSUE_KEYS,
+} from '@stylebot/sync';
 import { syncStyles } from './sync';
 
 import type {
@@ -170,6 +175,12 @@ export const initListeners = (): void => {
 
   chrome.windows.onRemoved.addListener(windowId => {
     editorWindow.forgetWindow(windowId);
+  });
+
+  chrome.tabs.onUpdated.addListener((tabId, { url }) => {
+    if (url && isSignInRedirect(url)) {
+      syncAfterSignInRedirect(url, tabId);
+    }
   });
 
   chrome.tabs.onUpdated.addListener(async (tabId, _, tab) => {

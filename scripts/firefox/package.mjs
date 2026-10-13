@@ -24,7 +24,7 @@ function run(command, args, options = {}) {
 /**
  * The build steps AMO reviewers follow to rebuild the extension from source.
  */
-function getBuildInstructions(version) {
+function getBuildInstructions(version, clientSecret) {
   const nodeVersion = readFileSync(path.join(root, '.nvmrc'), 'utf8').trim();
 
   return `# Building Stylebot ${version} for Firefox
@@ -32,11 +32,13 @@ function getBuildInstructions(version) {
 Requirements: Node.js ${nodeVersion} and Yarn 1 (classic). Any OS with a POSIX shell.
 
 1. \`yarn install --frozen-lockfile\`
-2. \`yarn build:firefox\`
+2. \`STYLEBOT_GOOGLE_CLIENT_SECRET=${clientSecret} yarn build:firefox\`
 
 The built extension is written to \`firefox-dist/\`, which matches the uploaded
-package. No environment variables or network access beyond the npm registry
-are needed.
+package. The variable is the secret of Stylebot's Google sign-in client for
+installed apps, which Google treats as public since it ships in the package;
+it's kept out of the repository only. No network access beyond the npm
+registry is needed.
 
 ## Notes for reviewers
 
@@ -67,6 +69,16 @@ if (status.trim()) {
   process.exit(1);
 }
 
+const clientSecret = process.env.STYLEBOT_GOOGLE_CLIENT_SECRET;
+
+if (!clientSecret) {
+  console.error(
+    'Set STYLEBOT_GOOGLE_CLIENT_SECRET to the Desktop OAuth client secret; ' +
+      'Google Drive sign-in needs it.'
+  );
+  process.exit(1);
+}
+
 const { version } = JSON.parse(
   readFileSync(path.join(root, 'package.json'), 'utf8')
 );
@@ -85,7 +97,10 @@ run('zip', ['-r', '-X', '-q', extensionZip, '.', '-x', '.build-complete'], {
 run('git', [
   'archive',
   '--format=zip',
-  `--add-virtual-file=AMO-BUILD.md:${getBuildInstructions(version)}`,
+  `--add-virtual-file=AMO-BUILD.md:${getBuildInstructions(
+    version,
+    clientSecret
+  )}`,
   '-o',
   sourceZip,
   'HEAD',

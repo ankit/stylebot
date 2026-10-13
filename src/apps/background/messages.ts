@@ -79,7 +79,7 @@ import type {
   GetRecentColorsResponse,
   AddRecentColorResponse,
 } from '@stylebot/types';
-import { completeTabSignIn } from '@stylebot/sync';
+import { handleSignInRedirect } from '@stylebot/sync';
 import { syncStyles } from './sync';
 
 import {
@@ -403,17 +403,23 @@ export const GetGoogleFontFile = async (
 };
 
 /**
- * Finishes a tab sign-in, then syncs: the run that opened the tab may have
- * gone with a background Safari unloaded while the user was on Google's page.
+ * Handles Google's sign-in redirect, then syncs: the run that opened the
+ * tab may have gone with a background unloaded while the user was on
+ * Google's page.
  */
-export const GoogleSignInRedirect = async (
-  message: GoogleSignInRedirectType,
-  sender: chrome.runtime.MessageSender
+export const syncAfterSignInRedirect = async (
+  url: string,
+  tabId?: number
 ): Promise<void> => {
-  if (await completeTabSignIn(message.url, sender.tab?.id)) {
+  if (await handleSignInRedirect(url, tabId)) {
     syncStyles({ interactive: false });
   }
 };
+
+export const GoogleSignInRedirect = (
+  message: GoogleSignInRedirectType,
+  sender: chrome.runtime.MessageSender
+): Promise<void> => syncAfterSignInRedirect(message.url, sender.tab?.id);
 
 export const RunGoogleDriveSync = async (
   message: RunGoogleDriveSyncType,

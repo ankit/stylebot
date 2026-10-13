@@ -1,12 +1,24 @@
 import fetchMock from 'jest-fetch-mock';
 
 import getAccessToken, { clearCachedToken } from './get-access-token';
+import { DESKTOP_CLIENT_ID, REFRESH_TOKEN_KEY } from './desktop-client';
+import { signInWithIdentityAPI } from './identity-sign-in';
+import { signInWithRedirectRule } from './redirect-rule-sign-in';
 import { isSyncError } from '../errors';
 
-const CLIENT_ID =
+jest.mock('./redirect-rule-sign-in', () => ({
+  signInWithRedirectRule: jest.fn(),
+}));
+jest.mock('./identity-sign-in', () => ({
+  ...jest.requireActual('./identity-sign-in'),
+  signInWithIdentityAPI: jest.fn(),
+}));
+
+const WEB_CLIENT_ID =
   '662998053209-s49tq55ic3td87m08gi8vpjqm5t7r9st.apps.googleusercontent.com';
 
 const CACHE_KEY = 'google-drive-access-token';
+const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 
 type FlowResult = { url?: string; lastError?: { message: string } };
 
@@ -14,7 +26,9 @@ let store: Record<string, unknown>;
 let flows: Array<FlowResult>;
 let launchWebAuthFlow: jest.Mock;
 
-const mockChrome = () => {
+const mockChrome = ({
+  extensionURL = 'chrome-extension://abc/',
+}: { extensionURL?: string } = {}) => {
   launchWebAuthFlow = jest.fn(
     (
       _options: { interactive: boolean; url: string },
@@ -31,7 +45,10 @@ const mockChrome = () => {
   );
 
   global.chrome = {
-    runtime: { lastError: undefined },
+    runtime: {
+      lastError: undefined,
+      getURL: (path: string) => `${extensionURL}${path}`,
+    },
     identity: {
       getRedirectURL: () => 'https://abc.chromiumapp.org/',
       launchWebAuthFlow,
@@ -53,19 +70,32 @@ const mockChrome = () => {
 const redirectWith = (token: string, expiresIn = 3600) =>
   `https://abc.chromiumapp.org/#access_token=${token}&expires_in=${expiresIn}&token_type=Bearer`;
 
-const mockValidTokenInfo = () =>
-  fetchMock.mockResponse(JSON.stringify({ aud: CLIENT_ID }));
+/**
+ * Answers token refreshes with `refreshed` and tokeninfo with the client the
+ * token belongs to.
+ */
+const mockGoogle = ({
+  refreshed,
+  aud = WEB_CLIENT_ID,
+}: {
+  refreshed?: Record<string, unknown>;
+  aud?: string;
+}) =>
+  fetchMock.mockResponse(async request =>
+    request.url === TOKEN_URL
+      ? JSON.stringify(refreshed ?? {})
+      : JSON.stringify({ aud })
+  );
 
-const interactiveCalls = () =>
+const interactiveFlows = () =>
   launchWebAuthFlow.mock.calls.filter(([options]) => options.interactive);
-
-const silentCalls = () =>
-  launchWebAuthFlow.mock.calls.filter(([options]) => !options.interactive);
 
 beforeEach(() => {
   store = {};
   flows = [];
   fetchMock.resetMocks();
+  jest.mocked(signInWithRedirectRule).mockReset();
+  jest.mocked(signInWithIdentityAPI).mockReset();
   mockChrome();
 });
 
@@ -78,97 +108,128 @@ describe('getAccessToken', () => {
     expect(fetchMock).not.toBeCalled();
   });
 
-  it('ignores an expired cached token and authorizes again', async () => {
+  it('gets a new token from the refresh token, with no auth flow', async () => {
     store[CACHE_KEY] = { token: 'stale', expiresAt: Date.now() - 1 };
-    flows = [{ url: redirectWith('fresh') }];
-    mockValidTokenInfo();
-
-    await expect(getAccessToken()).resolves.toBe('fresh');
-    expect(launchWebAuthFlow).toBeCalled();
-  });
-
-  it('tries silently first and caches the result with its expiry', async () => {
-    flows = [{ url: redirectWith('silent', 1800) }];
-    mockValidTokenInfo();
+    store[REFRESH_TOKEN_KEY] = 'refresh-1';
+    mockGoogle({
+      refreshed: { access_token: 'fresh', expires_in: 1800 },
+      aud: DESKTOP_CLIENT_ID,
+    });
 
     const before = Date.now();
-    await expect(getAccessToken()).resolves.toBe('silent');
+    await expect(getAccessToken({ interactive: false })).resolves.toBe('fresh');
 
-    expect(silentCalls()).toHaveLength(1);
-    expect(interactiveCalls()).toHaveLength(0);
+    expect(launchWebAuthFlow).not.toBeCalled();
+    expect(signInWithRedirectRule).not.toBeCalled();
 
     const cached = store[CACHE_KEY] as { token: string; expiresAt: number };
-    expect(cached.token).toBe('silent');
+    expect(cached.token).toBe('fresh');
     // 1800s minus the 60s skew.
     expect(cached.expiresAt).toBeGreaterThanOrEqual(before + 1740_000 - 1000);
     expect(cached.expiresAt).toBeLessThanOrEqual(Date.now() + 1740_000);
   });
 
-  it('escalates to an interactive flow exactly once when the silent one fails', async () => {
-    flows = [
-      { lastError: { message: 'User interaction required.' } },
-      { url: redirectWith('interactive') },
-    ];
-    mockValidTokenInfo();
+  it('signs in with the Desktop client when an interactive run has no refresh token', async () => {
+    jest
+      .mocked(signInWithRedirectRule)
+      .mockResolvedValue({ token: 'signed-in', expiresIn: 3600 });
+    mockGoogle({ aud: DESKTOP_CLIENT_ID });
 
-    await expect(getAccessToken()).resolves.toBe('interactive');
-    expect(silentCalls()).toHaveLength(1);
-    expect(interactiveCalls()).toHaveLength(1);
+    await expect(getAccessToken()).resolves.toBe('signed-in');
+
+    expect(signInWithRedirectRule).toBeCalledTimes(1);
+    expect(launchWebAuthFlow).not.toBeCalled();
+    expect((store[CACHE_KEY] as { token: string }).token).toBe('signed-in');
   });
 
-  it('does not raise an auth window when interactive is disallowed', async () => {
+  it('signs in through the auth window on Firefox', async () => {
+    mockChrome({ extensionURL: 'moz-extension://abc/' });
+    jest
+      .mocked(signInWithIdentityAPI)
+      .mockResolvedValue({ token: 'signed-in', expiresIn: 3600 });
+    mockGoogle({ aud: DESKTOP_CLIENT_ID });
+
+    await expect(getAccessToken()).resolves.toBe('signed-in');
+
+    expect(signInWithIdentityAPI).toBeCalledTimes(1);
+    expect(signInWithRedirectRule).not.toBeCalled();
+  });
+
+  it('falls back to the web client silently when a scheduled run has no refresh token', async () => {
+    flows = [{ url: redirectWith('silent') }];
+    mockGoogle({});
+
+    await expect(getAccessToken({ interactive: false })).resolves.toBe(
+      'silent'
+    );
+
+    expect(launchWebAuthFlow).toBeCalledTimes(1);
+    expect(interactiveFlows()).toHaveLength(0);
+    expect(signInWithRedirectRule).not.toBeCalled();
+  });
+
+  it('asks for a sign-in without opening anything when the fallback needs the user', async () => {
     flows = [{ lastError: { message: 'User interaction required.' } }];
 
-    await expect(getAccessToken({ interactive: false })).rejects.toMatchObject({
-      code: 'sign-in',
-    });
-
-    expect(interactiveCalls()).toHaveLength(0);
-  });
-
-  it('rejects with a real Error carrying an auth code when the user cancels', async () => {
-    flows = [
-      { lastError: { message: 'The user did not approve access.' } },
-      { lastError: { message: 'The user did not approve access.' } },
-    ];
-
-    const error = await getAccessToken().catch(e => e);
+    const error = await getAccessToken({ interactive: false }).catch(e => e);
 
     expect(error).toBeInstanceOf(Error);
     expect(isSyncError(error)).toBe(true);
     expect(error.code).toBe('sign-in');
-    expect(error.message).toBe('The user did not approve access.');
+    expect(error.message).toBe('User interaction required.');
+    expect(interactiveFlows()).toHaveLength(0);
+    expect(signInWithRedirectRule).not.toBeCalled();
+  });
+
+  it('falls back to the web client once Google stops honouring the refresh token', async () => {
+    store[REFRESH_TOKEN_KEY] = 'revoked';
+    flows = [{ url: redirectWith('silent') }];
+    fetchMock.mockResponse(async request =>
+      request.url === TOKEN_URL
+        ? JSON.stringify({ error: 'invalid_grant' })
+        : JSON.stringify({ aud: WEB_CLIENT_ID })
+    );
+
+    await expect(getAccessToken({ interactive: false })).resolves.toBe(
+      'silent'
+    );
+    expect(store[REFRESH_TOKEN_KEY]).toBeUndefined();
   });
 
   it('rejects when the redirect carries no access token', async () => {
-    flows = [
-      { url: 'https://abc.chromiumapp.org/#error=access_denied' },
-      { url: 'https://abc.chromiumapp.org/#error=access_denied' },
-    ];
+    flows = [{ url: 'https://abc.chromiumapp.org/#error=access_denied' }];
 
-    await expect(getAccessToken()).rejects.toMatchObject({ code: 'sign-in' });
+    await expect(getAccessToken({ interactive: false })).rejects.toMatchObject({
+      code: 'sign-in',
+    });
   });
 
   it('rejects and does not cache when the token fails validation', async () => {
-    flows = [{ url: redirectWith('wrong') }, { url: redirectWith('wrong') }];
-    fetchMock.mockResponse(JSON.stringify({ aud: 'someone-else' }));
+    flows = [{ url: redirectWith('wrong') }];
+    mockGoogle({ aud: 'someone-else' });
 
-    await expect(getAccessToken()).rejects.toMatchObject({ code: 'sign-in' });
+    await expect(getAccessToken({ interactive: false })).rejects.toMatchObject({
+      code: 'sign-in',
+    });
     expect(store[CACHE_KEY]).toBeUndefined();
   });
 
   it('reports a network error when the tokeninfo endpoint is down', async () => {
-    flows = [{ url: redirectWith('token') }, { url: redirectWith('token') }];
+    flows = [{ url: redirectWith('token') }];
     fetchMock.mockResponse('{}', { status: 500 });
 
-    await expect(getAccessToken()).rejects.toMatchObject({ code: 'network' });
+    await expect(getAccessToken({ interactive: false })).rejects.toMatchObject({
+      code: 'network',
+    });
   });
 
   it('asks for a sign-in when the tokeninfo endpoint rejects the token', async () => {
-    flows = [{ url: redirectWith('token') }, { url: redirectWith('token') }];
+    flows = [{ url: redirectWith('token') }];
     fetchMock.mockResponse('{}', { status: 400 });
 
-    await expect(getAccessToken()).rejects.toMatchObject({ code: 'sign-in' });
+    await expect(getAccessToken({ interactive: false })).rejects.toMatchObject({
+      code: 'sign-in',
+    });
   });
 });
 

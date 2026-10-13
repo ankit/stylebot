@@ -113,7 +113,7 @@ test.describe('Sync tab', () => {
   // not match the registered redirect anyway. So this asserts the flag and the
   // in-progress state only; the failure path is covered by the unit tests and
   // TheSyncTab's component test, which do not need a real Drive.
-  test('persists the enabled flag and shows a sync in progress', async ({
+  test('persists the enabled flag and disables Sync now while syncing', async ({
     context,
     extension,
   }) => {
@@ -130,7 +130,6 @@ test.describe('Sync tab', () => {
       page.getByRole('button', { name: 'Disconnect' })
     ).toBeVisible();
     await expect(page.getByRole('button', { name: 'Sync now' })).toBeDisabled();
-    await expect(page.getByText('Syncing…')).toBeVisible();
 
     await expect
       .poll(

@@ -38,6 +38,9 @@ const RELEASE_INSTALL_WARNING_FIELDS = {
       // the content scripts already match every site (checked against 3.2.4
       // with getPermissionWarningsByManifest on Chrome and Edge).
       'scripting',
+      // No warning either, checked the same way: its redirect only applies
+      // to hosts <all_urls> already covers.
+      'declarativeNetRequestWithHostAccess',
     ],
     host_permissions: [...GOOGLE_HOSTS, '<all_urls>'],
     content_script_matches: CONTENT_SCRIPT_MATCHES,

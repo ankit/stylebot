@@ -1,12 +1,12 @@
 import fetchMock from 'jest-fetch-mock';
 
 import getAccessToken from './get-access-token';
+import { DESKTOP_CLIENT_ID, REFRESH_TOKEN_KEY } from './desktop-client';
 import {
   CLOSE_GRACE_MS,
-  DESKTOP_CLIENT_ID,
-  REFRESH_TOKEN_KEY,
-  completeTabSignIn,
-} from './tab-sign-in';
+  handleSignInRedirect,
+  isSignInRedirect,
+} from './redirect-rule-sign-in';
 
 const CACHE_KEY = 'google-drive-access-token';
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
@@ -180,7 +180,7 @@ describe('getAccessToken without an identity API', () => {
     expect(auth.searchParams.get('access_type')).toBe('offline');
 
     await expect(
-      completeTabSignIn(redirectFor(auth.searchParams.get('state')))
+      handleSignInRedirect(redirectFor(auth.searchParams.get('state')))
     ).resolves.toBe(true);
     await expect(result).resolves.toBe('signed-in');
 
@@ -213,9 +213,25 @@ describe('getAccessToken without an identity API', () => {
     changeListeners = [];
     removedListeners = [];
 
-    await expect(completeTabSignIn(redirectFor(state))).resolves.toBe(true);
+    await expect(handleSignInRedirect(redirectFor(state))).resolves.toBe(true);
     expect(store[REFRESH_TOKEN_KEY]).toBe('r-3');
     expect(chrome.tabs.remove).toBeCalledWith(7);
+  });
+
+  it('finishes a sign-in from the loopback address the redirect rule missed', async () => {
+    tokenResponses = [{ access_token: 'a', refresh_token: 'r-4' }];
+
+    getAccessToken({ interactive: true }).catch(() => undefined);
+    await signInTabOpened();
+    const state = openedAuthURL().searchParams.get('state');
+    const loopback = `http://127.0.0.1/stylebot-auth?code=c-1&state=${state}`;
+
+    expect(isSignInRedirect(loopback)).toBe(true);
+    expect(isSignInRedirect(redirectFor(state))).toBe(false);
+
+    await expect(handleSignInRedirect(loopback, 9)).resolves.toBe(true);
+    expect(store[REFRESH_TOKEN_KEY]).toBe('r-4');
+    expect(chrome.tabs.remove).toBeCalledWith(9);
   });
 
   it('brings back the open sign-in tab instead of opening another', async () => {
@@ -235,7 +251,9 @@ describe('getAccessToken without an identity API', () => {
     getAccessToken({ interactive: true }).catch(() => undefined);
     await signInTabOpened();
 
-    await expect(completeTabSignIn(redirectFor('forged'))).resolves.toBe(false);
+    await expect(handleSignInRedirect(redirectFor('forged'))).resolves.toBe(
+      false
+    );
     expect(tokenRequests).toHaveLength(0);
   });
 
@@ -244,7 +262,7 @@ describe('getAccessToken without an identity API', () => {
     await signInTabOpened();
     const state = openedAuthURL().searchParams.get('state');
 
-    await completeTabSignIn(
+    await handleSignInRedirect(
       `${EXTENSION_PAGE}?error=access_denied&state=${state}`
     );
 
@@ -260,7 +278,7 @@ describe('getAccessToken without an identity API', () => {
     await signInTabOpened();
     const state = openedAuthURL().searchParams.get('state');
 
-    await completeTabSignIn(redirectFor(state));
+    await handleSignInRedirect(redirectFor(state));
 
     await expect(result).rejects.toMatchObject({
       code: 'sign-in',
@@ -281,7 +299,7 @@ describe('getAccessToken without an identity API', () => {
     // Safari reports the tab removed as it moves to the extension page.
     jest.useFakeTimers();
     removedListeners.forEach(listener => listener(7));
-    await completeTabSignIn(redirectFor(state), 9);
+    await handleSignInRedirect(redirectFor(state), 9);
     await jest.advanceTimersByTimeAsync(CLOSE_GRACE_MS);
     jest.useRealTimers();
 

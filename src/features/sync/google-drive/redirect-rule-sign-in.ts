@@ -1,116 +1,25 @@
 import { syncError } from '../errors';
-import { isUnavailable } from './http';
+import {
+  REFRESH_TOKEN_KEY,
+  getAuthURL,
+  getRandomString,
+  refreshAccessToken,
+  requestToken,
+  type IssuedToken,
+} from './desktop-client';
 
-export const DESKTOP_CLIENT_ID =
-  '662998053209-uqalajpc4ei0nvdk164lmul35nbeocas.apps.googleusercontent.com';
-
-// Set at build time so it stays out of the repo; Google treats a Desktop
-// client's secret as public, since it ships in every copy of the extension.
-const DESKTOP_CLIENT_SECRET = process.env.STYLEBOT_GOOGLE_CLIENT_SECRET ?? '';
-
-// Never reached: a redirect rule sends it to the extension's own page first.
+// A redirect rule sends it to the extension's own page before it loads.
 const REDIRECT_URI = 'http://127.0.0.1/stylebot-auth';
 const REDIRECT_PAGE = 'google-sign-in/index.html';
 const REDIRECT_RULE_ID = 1;
 
-const TOKEN_URL = 'https://oauth2.googleapis.com/token';
-export const REFRESH_TOKEN_KEY = 'google-drive-refresh-token';
-
-export type IssuedToken = { token: string; expiresIn: number };
-
-type TokenResponse = {
-  access_token?: string;
-  expires_in?: number;
-  refresh_token?: string;
-  error?: string;
-  error_description?: string;
-};
-
 /**
- * Whether sign-in has to go through a tab: Safari has no identity API, so
- * there's no browser-run auth window to open.
+ * Whether a tab landed on the loopback redirect itself, which happens when
+ * the redirect rule can't run, such as with the extension's site access
+ * limited.
  */
-export const usesTabSignIn = (): boolean => !chrome.identity?.launchWebAuthFlow;
-
-const base64Url = (bytes: Uint8Array): string =>
-  btoa(String.fromCharCode(...bytes))
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
-
-const randomString = (): string =>
-  base64Url(crypto.getRandomValues(new Uint8Array(32)));
-
-const challengeFor = async (verifier: string): Promise<string> =>
-  base64Url(
-    new Uint8Array(
-      await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier))
-    )
-  );
-
-const requestToken = async (
-  params: Record<string, string>
-): Promise<TokenResponse> => {
-  const response = await fetch(TOKEN_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      client_id: DESKTOP_CLIENT_ID,
-      client_secret: DESKTOP_CLIENT_SECRET,
-      ...params,
-    }),
-  });
-
-  if (isUnavailable(response.status)) {
-    throw syncError(
-      `Google sign-in unavailable (${response.status})`,
-      'network'
-    );
-  }
-
-  return response.json();
-};
-
-const toIssuedToken = (json: TokenResponse): IssuedToken | null =>
-  json.access_token
-    ? {
-        token: json.access_token,
-        expiresIn:
-          json.expires_in && json.expires_in > 0 ? json.expires_in : 3600,
-      }
-    : null;
-
-/**
- * Trades the stored refresh token for a new access token, without the user.
- * Resolves null when there's none, or Google no longer honours it.
- */
-export const refreshAccessToken = async (): Promise<IssuedToken | null> => {
-  const items = await chrome.storage.local.get(REFRESH_TOKEN_KEY);
-  const refreshToken: string | undefined = items[REFRESH_TOKEN_KEY];
-
-  if (!refreshToken) {
-    return null;
-  }
-
-  const json = await requestToken({
-    grant_type: 'refresh_token',
-    refresh_token: refreshToken,
-  });
-
-  if (json.error) {
-    console.error(
-      'Google Drive token refresh failed:',
-      json.error,
-      json.error_description
-    );
-  }
-
-  if (json.error === 'invalid_grant') {
-    await chrome.storage.local.remove(REFRESH_TOKEN_KEY);
-  }
-
-  return toIssuedToken(json);
-};
+export const isSignInRedirect = (url: string): boolean =>
+  url.startsWith(`${REDIRECT_URI}?`);
 
 /**
  * Sends Google's redirect to the extension's own page, keeping its query,
@@ -260,23 +169,15 @@ const startSignIn = async (scopes: Array<string>): Promise<number> => {
     }
   }
 
-  const verifier = randomString();
-  const state = randomString();
+  const verifier = getRandomString();
+  const state = getRandomString();
 
-  const authURL = new URL('https://accounts.google.com/o/oauth2/v2/auth');
-  authURL.search = new URLSearchParams({
-    client_id: DESKTOP_CLIENT_ID,
-    redirect_uri: REDIRECT_URI,
-    response_type: 'code',
-    scope: scopes.join(' '),
-    code_challenge: await challengeFor(verifier),
-    code_challenge_method: 'S256',
+  const authURL = await getAuthURL({
+    scopes,
+    redirectURI: REDIRECT_URI,
+    verifier,
     state,
-    // A refresh token only comes with offline access, and on a repeat
-    // sign-in only when the consent screen is shown again.
-    access_type: 'offline',
-    prompt: 'consent',
-  }).toString();
+  });
 
   const [opener] = await chrome.tabs.query({
     active: true,
@@ -284,7 +185,7 @@ const startSignIn = async (scopes: Array<string>): Promise<number> => {
   });
 
   await addRedirectRule();
-  const tab = await chrome.tabs.create({ url: authURL.toString() });
+  const tab = await chrome.tabs.create({ url: authURL });
   const tabId = tab.id as number;
 
   await setSignIns([
@@ -321,7 +222,7 @@ const openSignInTab = (scopes: Array<string>): Promise<number> => {
  * Signs in to Google in a tab and resolves with a fresh access token once
  * the background has stored the refresh token the sign-in returned.
  */
-export const signInInTab = async (
+export const signInWithRedirectRule = async (
   scopes: Array<string>
 ): Promise<IssuedToken> => {
   const tabId = await openSignInTab(scopes);
@@ -341,7 +242,7 @@ export const signInInTab = async (
  * every sign-in tab, including the redirected one. Resolves whether a
  * sign-in completed.
  */
-export const completeTabSignIn = async (
+export const handleSignInRedirect = async (
   url: string,
   redirectTabId?: number
 ): Promise<boolean> => {

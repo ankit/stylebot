@@ -96,7 +96,8 @@ yarn build             # -> dist/     Chrome Web Store + Edge Add-ons
 yarn package:firefox   # -> release/  AMO extension zip + source zip
 ```
 
-Zip `dist/` by hand. `yarn package:firefox` needs a clean working tree: it builds Firefox
+Both need `STYLEBOT_GOOGLE_CLIENT_SECRET` set to the Desktop OAuth client's secret; Drive
+sign-in fails without it, so the build refuses to run. Zip `dist/` by hand. `yarn package:firefox` needs a clean working tree: it builds Firefox
 and writes both zips AMO asks for, the extension and the source it was built from, with
 build steps for reviewers. Upload by hand; there is no automated store upload.
 

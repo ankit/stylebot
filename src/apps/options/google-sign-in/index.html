@@ -7,17 +7,35 @@
     <style>
       body {
         display: flex;
+        flex-direction: column;
+        gap: 16px;
         align-items: center;
         justify-content: center;
         min-height: 100vh;
         margin: 0;
-        font: 14px system-ui, sans-serif;
-        opacity: 0.7;
+        font: 18px/1.4 system-ui, sans-serif;
+        color: #52525b;
+      }
+
+      img {
+        width: 48px;
+        height: 48px;
+      }
+
+      p {
+        margin: 0;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body {
+          color: #a1a1aa;
+        }
       }
     </style>
   </head>
 
   <body>
+    <img src="../img/icon128.png" alt="" />
     <p id="status"></p>
 
     <script type="text/javascript" src="index.js"></script>

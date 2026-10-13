@@ -15,10 +15,6 @@
             <s-badge v-if="needsAuth" variant="danger">
               {{ t('sync_needs_sign_in') }}
             </s-badge>
-            <s-badge v-else-if="syncInProgress" variant="muted">
-              <arrow-repeat-icon :size="12" spinning />
-              {{ t('sync_in_progress') }}
-            </s-badge>
             <s-badge
               v-else-if="googleDriveSyncLastModifiedTime"
               variant="success"

@@ -32,16 +32,13 @@ const cliDefinitions = {
   'process.env.STYLEBOT_CLI': JSON.stringify(String(isCLISupported)),
 };
 
-// Safari's Drive sign-in can't exchange codes without it, so a release
-// built without it would ship with sign-in broken.
-if (
-  process.env.BROWSER === 'safari' &&
-  !process.env.STYLEBOT_GOOGLE_CLIENT_SECRET
-) {
+// Drive sign-in can't exchange codes or refresh tokens without it, so a
+// release built without it would ship with sign-in broken. CI builds only test.
+if (!process.env.STYLEBOT_GOOGLE_CLIENT_SECRET) {
   const message =
-    'STYLEBOT_GOOGLE_CLIENT_SECRET is not set; Google Drive sign-in will fail in this Safari build.';
+    'STYLEBOT_GOOGLE_CLIENT_SECRET is not set; Google Drive sign-in will fail in this build.';
 
-  if (process.env.NODE_ENV === 'production') {
+  if (process.env.NODE_ENV === 'production' && !process.env.CI) {
     throw new Error(message);
   }
   console.warn(`Warning: ${message}`);
@@ -344,7 +341,7 @@ const backgroundPageConfig = {
     new webpack.DefinePlugin({
       global: 'this',
       ...cliDefinitions,
-      // Safari's Google sign-in client secret, kept out of the repo.
+      // Google sign-in's Desktop client secret, kept out of the repo.
       'process.env.STYLEBOT_GOOGLE_CLIENT_SECRET': JSON.stringify(
         process.env.STYLEBOT_GOOGLE_CLIENT_SECRET ?? ''
       ),
