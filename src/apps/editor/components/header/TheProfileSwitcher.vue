@@ -7,6 +7,7 @@
       align="start"
       :boundary="header"
       :keep-open-on-escape="editing !== null || !!rowMenu"
+      @open="stopInspecting"
       @escape="onEscape"
       @close="reset"
     >
@@ -17,10 +18,7 @@
           :class="{ open }"
           :aria-label="t('switch_profile')"
           :aria-expanded="open ? 'true' : 'false'"
-          @click="
-            stopInspecting();
-            toggle();
-          "
+          @click="toggle"
         >
           <span class="trigger-name">{{ activeName }}</span>
           <chevron-down-icon :size="10" class="trigger-chevron" />

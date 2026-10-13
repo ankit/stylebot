@@ -1,5 +1,9 @@
 <template>
-  <s-anchored-menu v-if="total" class="chat-usage-anchor">
+  <s-anchored-menu
+    v-if="total"
+    class="chat-usage-anchor"
+    @open="stopInspecting"
+  >
     <template #trigger="{ toggle, open }">
       <button
         type="button"
@@ -109,6 +113,10 @@ export default Vue.extend({
   },
 
   methods: {
+    stopInspecting(): void {
+      this.$store.commit('setInspecting', false);
+    },
+
     format(count: number): string {
       return compact.format(count);
     },

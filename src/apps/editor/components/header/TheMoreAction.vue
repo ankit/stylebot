@@ -1,5 +1,5 @@
 <template>
-  <s-anchored-menu class="more-action-anchor">
+  <s-anchored-menu class="more-action-anchor" @open="stopInspecting">
     <template #trigger="{ toggle }">
       <s-icon-button :size="24" :tooltip="t('view_options')" @click="toggle">
         <more-icon :size="16" />
@@ -212,6 +212,10 @@ export default Vue.extend({
   },
 
   methods: {
+    stopInspecting(): void {
+      this.$store.commit('setInspecting', false);
+    },
+
     dock(dockLocation: StylebotDockLocation): void {
       this.$store.dispatch('setDockLocation', dockLocation);
     },

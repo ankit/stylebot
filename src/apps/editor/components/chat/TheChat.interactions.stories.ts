@@ -521,6 +521,25 @@ export const ShowsThePickedElement: StoryObj = {
   },
 };
 
+export const ModelMenuStopsInspecting: StoryObj = {
+  ...chat({ connected: ['anthropic'] }),
+  name: 'opening the model menu while picking stops picking',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    await user.click(
+      await canvas.findByRole('button', {
+        name: 'Select an element in the page to style it',
+      })
+    );
+    await expect(store.state.inspecting).toBe(true);
+
+    await openModelMenu(canvas);
+    await expect(store.state.inspecting).toBe(false);
+  },
+};
+
 export const FocusesTheFieldOnReopen: StoryObj = {
   ...chat({ connected: ['anthropic'] }),
   name: 'reopening the editor on the Chat tab focuses the message field',

@@ -3,7 +3,7 @@ import { expect, within } from '@storybook/test';
 
 import TheMoreAction from './TheMoreAction.vue';
 import { editor, WITH_RULE } from '@stylebot/storybook/fixtures/editor';
-import { openEditorMenu } from '@stylebot/storybook/story-helpers';
+import { openEditorMenu, storeOf } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
   title: 'Tests/Editor/Options menu',
@@ -13,6 +13,18 @@ const meta: Meta = {
 };
 
 export default meta;
+
+export const OpeningStopsInspecting: StoryObj = {
+  ...editor({ ...WITH_RULE, inspecting: true }),
+  name: 'opening the Options menu stops inspecting, so a click on the page to close it doesn’t pick an element',
+  play: async ({ canvasElement }) => {
+    const store = storeOf(canvasElement);
+
+    await expect(store.state.inspecting).toBe(true);
+    await openEditorMenu(within(canvasElement), 'Options');
+    await expect(store.state.inspecting).toBe(false);
+  },
+};
 
 export const MenuContents: StoryObj = {
   ...editor(WITH_RULE),

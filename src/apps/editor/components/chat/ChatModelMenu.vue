@@ -1,5 +1,5 @@
 <template>
-  <s-anchored-menu class="chat-model-anchor">
+  <s-anchored-menu class="chat-model-anchor" @open="stopInspecting">
     <template #trigger="{ toggle, open }">
       <button
         type="button"
@@ -168,6 +168,10 @@ export default Vue.extend({
   },
 
   methods: {
+    stopInspecting(): void {
+      this.$store.commit('setInspecting', false);
+    },
+
     /**
      * Swaps the rows for another provider's models, or back. Focus moves
      * to the menu first: the clicked row is about to go, and focus lost
