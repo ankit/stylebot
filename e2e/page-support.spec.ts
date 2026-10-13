@@ -11,6 +11,12 @@ const PDF = `%PDF-1.1
 trailer << /Root 1 0 R >>
 %%EOF`;
 
+// A 1x1 PNG.
+const PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+  'base64'
+);
+
 let baseUrl: string;
 let closePageServer: () => Promise<void>;
 
@@ -19,6 +25,7 @@ test.beforeAll(async () => {
     // A web page whose URL ends in .pdf, like a comment page about a PDF.
     '/entry/report.pdf': PAGE_HTML,
     '/report': { body: PDF, headers: { 'Content-Type': 'application/pdf' } },
+    '/photo.png': { body: PNG, headers: { 'Content-Type': 'image/png' } },
     '/data': {
       body: '{"hello":"world"}',
       headers: { 'Content-Type': 'application/json' },
@@ -43,6 +50,32 @@ test('styles a web page whose url ends in .pdf, and offers the editor', async ({
 
   await expect
     .poll(() => page.locator('h1').evaluate(el => getComputedStyle(el).color))
+    .toBe('rgb(255, 0, 0)');
+
+  const popup = await openPopup();
+
+  await expect
+    .poll(() => popup.locator('button', { hasText: 'Edit style' }).isVisible())
+    .toBe(true);
+});
+
+test('styles an image opened in its own tab, and offers the editor', async ({
+  context,
+  extension,
+  openPopup,
+}) => {
+  await seedStyles(extension, {
+    localhost: { css: 'body { background: rgb(255, 0, 0); }', enabled: true },
+  });
+
+  const page = await context.newPage();
+  await page.goto(`${baseUrl}/photo.png`);
+  await page.bringToFront();
+
+  await expect
+    .poll(() =>
+      page.evaluate(() => getComputedStyle(document.body).backgroundColor)
+    )
     .toBe('rgb(255, 0, 0)');
 
   const popup = await openPopup();

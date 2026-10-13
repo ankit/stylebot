@@ -282,9 +282,18 @@ describe('isStylableDocument', () => {
     expect(isStylableDocument('application/xhtml+xml')).toBe(true);
   });
 
-  it('is false for pdf, json and xml files', () => {
+  it('is true for image, video, audio and text files', () => {
+    expect(isStylableDocument('image/png')).toBe(true);
+    expect(isStylableDocument('image/jpeg')).toBe(true);
+    expect(isStylableDocument('video/mp4')).toBe(true);
+    expect(isStylableDocument('audio/mpeg')).toBe(true);
+    expect(isStylableDocument('text/plain')).toBe(true);
+  });
+
+  it('is false for pdf, json, xml and svg files', () => {
     expect(isStylableDocument('application/pdf')).toBe(false);
     expect(isStylableDocument('application/json')).toBe(false);
     expect(isStylableDocument('text/xml')).toBe(false);
+    expect(isStylableDocument('image/svg+xml')).toBe(false);
   });
 });

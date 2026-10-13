@@ -104,6 +104,33 @@ describe('getSyncFileMetadata', () => {
     }
   );
 
+  it.each(['rateLimitExceeded', 'userRateLimitExceeded'])(
+    'reports a network error when Drive answers 403 %s',
+    async reason => {
+      fetchMock.mockResponseOnce(
+        JSON.stringify({ error: { code: 403, errors: [{ reason }] } }),
+        { status: 403 }
+      );
+
+      await expect(getSyncFileMetadata(ACCESS_TOKEN)).rejects.toMatchObject({
+        code: 'network',
+      });
+    }
+  );
+
+  it('reports an auth error when Drive answers 403 for any other reason', async () => {
+    fetchMock.mockResponseOnce(
+      JSON.stringify({
+        error: { code: 403, errors: [{ reason: 'forbidden' }] },
+      }),
+      { status: 403 }
+    );
+
+    await expect(getSyncFileMetadata(ACCESS_TOKEN)).rejects.toMatchObject({
+      code: 'auth',
+    });
+  });
+
   it('reports an unknown error for a request Drive turns down', async () => {
     fetchMock.mockResponseOnce('{}', { status: 400 });
 
