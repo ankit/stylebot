@@ -183,11 +183,22 @@ export const initListeners = (): void => {
     }
   });
 
-  chrome.tabs.onUpdated.addListener(async (tabId, _, tab) => {
+  // Only loads and URL changes: title, favicon and audio updates on a loaded
+  // tab fire this too, and chatty tabs would keep waking the worker.
+  chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+    if (
+      (changeInfo.status !== 'complete' && !changeInfo.url) ||
+      tab.status !== 'complete'
+    ) {
+      return;
+    }
+
     const option = await getOption('contextMenu');
 
-    if (option && tab.status === 'complete') {
-      ContextMenu.update(tab);
+    if (option) {
+      if (tab.active) {
+        ContextMenu.update(tab);
+      }
 
       const message: TabUpdated = {
         name: 'TabUpdated',

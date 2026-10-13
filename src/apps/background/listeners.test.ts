@@ -23,11 +23,13 @@ jest.mock('./sync-scheduler', () => ({
 jest.mock('@stylebot/sync', () => ({
   runGoogleDriveSync: jest.fn(),
   getGoogleDriveSyncEnabled: jest.fn(),
+  isSignInRedirect: () => false,
   SYNC_ISSUE_KEYS: [],
 }));
 
+import { ContextMenu } from './contextmenu';
 import { initListeners } from './listeners';
-import { pruneRetired } from './options';
+import { get as getOption, pruneRetired } from './options';
 import { restoreOpenTabs } from './restore-tabs';
 
 type InstalledDetails = { reason: string; previousVersion?: string };
@@ -54,6 +56,7 @@ const makeChrome = (version: string) => {
     },
     tabs: {
       create: jest.fn(),
+      sendMessage: jest.fn(),
       onRemoved: event(),
       onUpdated: event(),
       onActivated: event(),
@@ -147,5 +150,88 @@ describe('onInstalled', () => {
       url: 'https://stylebot.dev/welcome',
     });
     expect(restoreOpenTabs).not.toBeCalled();
+  });
+});
+
+type OnUpdated = (
+  tabId: number,
+  changeInfo: chrome.tabs.TabChangeInfo,
+  tab: Partial<chrome.tabs.Tab>
+) => Promise<void>;
+
+describe('onUpdated', () => {
+  const loadedTab = {
+    id: 1,
+    url: 'https://example.com/',
+    status: 'complete',
+    active: true,
+  };
+
+  /**
+   * Fires the tab update listener that refreshes the context menu and tells
+   * the page, with the contextMenu option on.
+   */
+  const fireUpdated = async (
+    changeInfo: chrome.tabs.TabChangeInfo,
+    tab: Partial<chrome.tabs.Tab> = loadedTab
+  ) => {
+    const { api } = makeChrome('4.0.0');
+    const listeners = api.tabs.onUpdated.addListener.mock.calls.map(
+      ([listener]) => listener as OnUpdated
+    );
+
+    await Promise.all(listeners.map(listener => listener(1, changeInfo, tab)));
+
+    return api;
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (getOption as jest.Mock).mockResolvedValue(true);
+  });
+
+  it('refreshes the menu and tells the page when a load completes', async () => {
+    const api = await fireUpdated({ status: 'complete' });
+
+    expect(ContextMenu.update).toBeCalledWith(loadedTab);
+    expect(api.tabs.sendMessage).toBeCalledWith(1, { name: 'TabUpdated' });
+  });
+
+  it('tells the page about a URL change on a loaded tab', async () => {
+    const api = await fireUpdated({ url: 'https://example.com/next' });
+
+    expect(api.tabs.sendMessage).toBeCalledWith(1, { name: 'TabUpdated' });
+  });
+
+  it.each([
+    ['title', { title: 'Inbox (3)' }],
+    ['favicon', { favIconUrl: 'https://example.com/unread.ico' }],
+    ['audible', { audible: true }],
+  ])('does nothing on a %s change to a loaded tab', async (_, changeInfo) => {
+    const api = await fireUpdated(changeInfo);
+
+    expect(getOption).not.toBeCalled();
+    expect(ContextMenu.update).not.toBeCalled();
+    expect(api.tabs.sendMessage).not.toBeCalled();
+  });
+
+  it('waits for a navigation that is still loading', async () => {
+    const api = await fireUpdated(
+      { url: 'https://example.com/next', status: 'loading' },
+      { ...loadedTab, status: 'loading' }
+    );
+
+    expect(ContextMenu.update).not.toBeCalled();
+    expect(api.tabs.sendMessage).not.toBeCalled();
+  });
+
+  it('tells a background tab without refreshing the menu', async () => {
+    const api = await fireUpdated(
+      { status: 'complete' },
+      { ...loadedTab, active: false }
+    );
+
+    expect(ContextMenu.update).not.toBeCalled();
+    expect(api.tabs.sendMessage).toBeCalledWith(1, { name: 'TabUpdated' });
   });
 });
