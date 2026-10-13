@@ -144,6 +144,17 @@ describe('getAccessToken without an identity API', () => {
     expect(chrome.tabs.create).not.toBeCalled();
   });
 
+  it('keeps the refresh token and reports a network error while Google is down', async () => {
+    store[REFRESH_TOKEN_KEY] = 'refresh-1';
+    fetchMock.mockResponseOnce('{}', { status: 503 });
+
+    await expect(getAccessToken({ interactive: false })).rejects.toMatchObject({
+      code: 'network',
+    });
+
+    expect(store[REFRESH_TOKEN_KEY]).toBe('refresh-1');
+  });
+
   it('forgets a refresh token Google no longer honours', async () => {
     store[REFRESH_TOKEN_KEY] = 'revoked';
     tokenResponses = [{ error: 'invalid_grant' }];

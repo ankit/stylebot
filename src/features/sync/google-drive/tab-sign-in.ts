@@ -1,4 +1,5 @@
 import { syncError } from '../errors';
+import { isUnavailable } from './http';
 
 export const DESKTOP_CLIENT_ID =
   '662998053209-uqalajpc4ei0nvdk164lmul35nbeocas.apps.googleusercontent.com';
@@ -59,6 +60,13 @@ const requestToken = async (
       ...params,
     }),
   });
+
+  if (isUnavailable(response.status)) {
+    throw syncError(
+      `Google sign-in unavailable (${response.status})`,
+      'network'
+    );
+  }
 
   return response.json();
 };

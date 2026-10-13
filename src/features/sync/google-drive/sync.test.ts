@@ -723,16 +723,29 @@ describe('runGoogleDriveSync', () => {
 
   it('keeps why the last run failed until one succeeds', async () => {
     seed({ styles: RED });
-    mockedGetRemote.mockRejectedValue(new TypeError('Failed to fetch'));
+    mockedGetRemote.mockRejectedValue(new Error('Drive said no'));
 
     await runGoogleDriveSync({ interactive: false });
-    expect(store['google-drive-sync-error']).toBe('sync_error_network');
+    expect(store['google-drive-sync-error']).toBe('sync_error_unknown');
 
     mockedGetRemote.mockResolvedValue(null);
     mockedWrite.mockResolvedValue(remoteMetadata('remote-1'));
 
     await runGoogleDriveSync({ interactive: false });
     expect(store['google-drive-sync-error']).toBeUndefined();
+  });
+
+  it('keeps no failure when the connection dropped, leaving an earlier one', async () => {
+    seed({ styles: RED });
+    mockedGetRemote.mockRejectedValue(new TypeError('Failed to fetch'));
+
+    await runGoogleDriveSync({ interactive: false });
+    expect(store['google-drive-sync-error']).toBeUndefined();
+
+    store['google-drive-sync-error'] = 'sync_error_parse';
+
+    await runGoogleDriveSync({ interactive: false });
+    expect(store['google-drive-sync-error']).toBe('sync_error_parse');
   });
 
   it('keeps no failure once sync is off', async () => {

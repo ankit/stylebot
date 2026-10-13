@@ -1,5 +1,6 @@
 // Code from https://github.com/mdn/webextensions-examples/tree/master/google-userinfo
 import { syncError } from '../errors';
+import { isUnavailable } from './http';
 import {
   DESKTOP_CLIENT_ID,
   refreshAccessToken,
@@ -86,6 +87,13 @@ const validate = async (
   const response = await fetch(`${validationBaseURL}?access_token=${token}`, {
     method: 'GET',
   });
+
+  if (isUnavailable(response.status)) {
+    throw syncError(
+      `Token validation unavailable (${response.status})`,
+      'network'
+    );
+  }
 
   if (response.status !== 200) {
     throw syncError('Token validation error', 'sign-in');

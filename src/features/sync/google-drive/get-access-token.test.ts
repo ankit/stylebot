@@ -157,9 +157,16 @@ describe('getAccessToken', () => {
     expect(store[CACHE_KEY]).toBeUndefined();
   });
 
-  it('rejects when the tokeninfo endpoint itself fails', async () => {
+  it('reports a network error when the tokeninfo endpoint is down', async () => {
     flows = [{ url: redirectWith('token') }, { url: redirectWith('token') }];
     fetchMock.mockResponse('{}', { status: 500 });
+
+    await expect(getAccessToken()).rejects.toMatchObject({ code: 'network' });
+  });
+
+  it('asks for a sign-in when the tokeninfo endpoint rejects the token', async () => {
+    flows = [{ url: redirectWith('token') }, { url: redirectWith('token') }];
+    fetchMock.mockResponse('{}', { status: 400 });
 
     await expect(getAccessToken()).rejects.toMatchObject({ code: 'sign-in' });
   });

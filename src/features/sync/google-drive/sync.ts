@@ -293,16 +293,19 @@ const run = async (
 };
 
 /**
- * Keeps the failure until a run succeeds. Nothing is kept once sync is off:
- * disconnecting already cleared it, and a run still in flight must not put it
- * back.
+ * Keeps the failure until a run succeeds. A dropped connection isn't kept:
+ * the next run retries it, so it's nothing for the toolbar icon to flag.
+ * Nor is anything once sync is off, so a late run can't undo a disconnect.
  */
 const recordOutcome = async (
   response: RunGoogleDriveSyncResponse
 ): Promise<void> => {
   if (response.ok) {
     await setSyncError(null);
-  } else if (await getGoogleDriveSyncEnabled()) {
+  } else if (
+    response.errorKey !== 'sync_error_network' &&
+    (await getGoogleDriveSyncEnabled())
+  ) {
     await setSyncError(response.errorKey);
   }
 };

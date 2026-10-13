@@ -92,6 +92,25 @@ describe('getSyncFileMetadata', () => {
       /Google Drive API request failed \(401/
     );
   });
+
+  it.each([429, 500, 503])(
+    'reports a network error when Drive answers %i',
+    async status => {
+      fetchMock.mockResponseOnce('{}', { status });
+
+      await expect(getSyncFileMetadata(ACCESS_TOKEN)).rejects.toMatchObject({
+        code: 'network',
+      });
+    }
+  );
+
+  it('reports an unknown error for a request Drive turns down', async () => {
+    fetchMock.mockResponseOnce('{}', { status: 400 });
+
+    await expect(getSyncFileMetadata(ACCESS_TOKEN)).rejects.toMatchObject({
+      code: 'unknown',
+    });
+  });
 });
 
 describe('writeSyncFile', () => {
