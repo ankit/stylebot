@@ -7,7 +7,7 @@ jest.mock('./styles-modified-time-update', () =>
 jest.mock('./sync-storage-update', () => jest.fn(async () => undefined));
 jest.mock('./chat-removal', () => jest.fn(async () => undefined));
 
-import { MIGRATION_ERRORS_KEY } from './index';
+import { MIGRATION_ERRORS_KEY, completionKey } from './index';
 
 /**
  * A fresh copy of the module and its migrations, since runMigrations runs
@@ -29,13 +29,20 @@ const runOf = (
 ): jest.Mock =>
   jest.mocked(migrations.find(migration => migration.name === name)!.run);
 
-const set = jest.fn(async () => undefined);
+let stored: Record<string, unknown>;
+const get = jest.fn(async (keys: Array<string>) =>
+  Object.fromEntries(
+    keys.filter(key => key in stored).map(key => [key, stored[key]])
+  )
+);
+const set = jest.fn(async (_items: Record<string, unknown>) => undefined);
 const remove = jest.fn(async () => undefined);
 
 describe('runMigrations', () => {
   beforeEach(() => {
+    stored = {};
     global.chrome = {
-      storage: { local: { set, remove } },
+      storage: { local: { get, set, remove } },
     } as unknown as typeof chrome;
     jest.spyOn(console, 'error').mockImplementation(() => undefined);
   });
@@ -77,7 +84,43 @@ describe('runMigrations', () => {
     await load().runMigrations();
 
     expect(remove).toBeCalledWith(MIGRATION_ERRORS_KEY);
-    expect(set).not.toBeCalled();
+    expect(set).not.toBeCalledWith(
+      expect.objectContaining({ [MIGRATION_ERRORS_KEY]: expect.anything() })
+    );
+  });
+
+  it('records each migration that succeeds, except those run every start', async () => {
+    const loaded = load();
+    runOf(loaded, 'chat-removal').mockRejectedValueOnce(new Error('quota'));
+
+    await loaded.runMigrations();
+
+    expect(set).toBeCalledWith({
+      [completionKey('default-shortcut-update')]: true,
+      [completionKey('commands-to-browser')]: true,
+      [completionKey('sync-storage-update')]: true,
+    });
+  });
+
+  it('skips a migration once it is done, but not one run every start', async () => {
+    stored[completionKey('chat-removal')] = true;
+    stored[completionKey('styles-metadata-update')] = true;
+    const loaded = load();
+
+    await loaded.runMigrations();
+
+    expect(runOf(loaded, 'chat-removal')).not.toBeCalled();
+    expect(runOf(loaded, 'styles-metadata-update')).toBeCalled();
+    expect(runOf(loaded, 'commands-to-browser')).toBeCalled();
+  });
+
+  it('runs them all when the completed ones cannot be read', async () => {
+    get.mockRejectedValueOnce(new Error('quota'));
+    const { migrations, runMigrations } = load();
+
+    await expect(runMigrations()).resolves.toBeUndefined();
+
+    migrations.forEach(migration => expect(migration.run).toBeCalled());
   });
 
   it('resolves even when the failures cannot be recorded', async () => {

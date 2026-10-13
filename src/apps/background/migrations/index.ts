@@ -10,40 +10,87 @@ export const MIGRATION_ERRORS_KEY = 'migration_errors';
 export type Migration = {
   name: string;
   run: () => Promise<void>;
+  everyStart?: boolean;
 };
 
 /**
- * One-off repairs of stored data left by earlier versions, run in order on
- * every background start. Each is idempotent and cheap once it has nothing
- * to do. A migration that needs a completion flag stores it under a
- * `migration_` prefixed key; default_shortcut_update_complete predates the
- * convention and is left alone, since renaming it would rerun that reset.
+ * The key that records a migration as done, e.g. `migration_chat_removal`.
+ */
+export const completionKey = (name: string): string =>
+  `migration_${name.replace(/-/g, '_')}`;
+
+/**
+ * Idempotent repairs of data left by earlier versions, run in order until
+ * each succeeds once. `everyStart` is for repairs synced data can still need.
  */
 export const migrations: Array<Migration> = [
   { name: 'default-shortcut-update', run: DefaultShortcutUpdate },
   { name: 'commands-to-browser', run: CommandsToBrowser },
-  { name: 'styles-metadata-update', run: StylesMetadataUpdate },
-  { name: 'styles-modified-time-update', run: StylesModifiedTimeUpdate },
+  {
+    name: 'styles-metadata-update',
+    run: StylesMetadataUpdate,
+    everyStart: true,
+  },
+  {
+    name: 'styles-modified-time-update',
+    run: StylesModifiedTimeUpdate,
+    everyStart: true,
+  },
   { name: 'sync-storage-update', run: SyncStorageUpdate },
   { name: 'chat-removal', run: ChatRemoval },
 ];
 
 /**
- * Runs every migration, each on its own: one that throws is recorded under
- * MIGRATION_ERRORS_KEY and the rest still run, so startup is never left
- * half done. The record is cleared once a start runs them all cleanly.
- * Never rejects.
+ * The completion keys already recorded, or none when storage can't be read,
+ * which only reruns migrations that are idempotent anyway.
+ */
+const readCompletionKeys = async (): Promise<Record<string, unknown>> => {
+  try {
+    return await chrome.storage.local.get(
+      migrations.map(migration => completionKey(migration.name))
+    );
+  } catch (e) {
+    console.error('Could not read completed migrations', e);
+    return {};
+  }
+};
+
+/**
+ * Runs every migration not yet done, each on its own: one that throws is
+ * recorded under MIGRATION_ERRORS_KEY and the rest still run, so startup is
+ * never left half done. The record is cleared once a start runs them all
+ * cleanly. Never rejects.
  */
 const runAll = async (): Promise<void> => {
   const errors: Record<string, string> = {};
+  const recorded = await readCompletionKeys();
+  const newlyDone: Record<string, true> = {};
 
   for (const migration of migrations) {
+    const key = completionKey(migration.name);
+
+    if (!migration.everyStart && recorded[key]) {
+      continue;
+    }
+
     try {
       await migration.run();
+
+      if (!migration.everyStart) {
+        newlyDone[key] = true;
+      }
     } catch (e) {
       console.error(`Migration ${migration.name} failed`, e);
       errors[migration.name] = e instanceof Error ? e.message : String(e);
     }
+  }
+
+  try {
+    if (Object.keys(newlyDone).length > 0) {
+      await chrome.storage.local.set(newlyDone);
+    }
+  } catch (e) {
+    console.error('Could not record completed migrations', e);
   }
 
   try {

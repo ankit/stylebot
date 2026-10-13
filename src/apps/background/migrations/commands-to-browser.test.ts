@@ -13,9 +13,7 @@ const makeChrome = (
     commands: { update: canUpdate ? jest.fn() : undefined },
     storage: {
       local: {
-        get: jest.fn(async (keys: Array<string>) =>
-          Object.fromEntries(keys.map(key => [key, store[key]]))
-        ),
+        get: jest.fn(async (key: string) => ({ [key]: store[key] })),
         set: jest.fn(async (values: Record<string, unknown>) => {
           Object.assign(store, values);
         }),
@@ -49,7 +47,6 @@ describe('commandsToBrowser', () => {
       grayscale: 'alt+g',
     });
     expect(store.commands).toBeUndefined();
-    expect(store.migration_commands_to_browser).toBe(true);
   });
 
   it('only drops them where the browser keeps that to itself', async () => {
@@ -62,19 +59,5 @@ describe('commandsToBrowser', () => {
 
     expect(setCommands).not.toBeCalled();
     expect(store.commands).toBeUndefined();
-  });
-
-  it('runs once', async () => {
-    makeChrome(
-      {
-        commands: { stylebot: 'ctrl+shift+e' },
-        migration_commands_to_browser: true,
-      },
-      { canUpdate: true }
-    );
-
-    await commandsToBrowser();
-
-    expect(setCommands).not.toBeCalled();
   });
 });
