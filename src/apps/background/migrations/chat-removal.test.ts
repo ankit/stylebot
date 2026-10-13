@@ -8,7 +8,13 @@ beforeEach(() => {
   global.chrome = {
     storage: {
       local: {
-        get: jest.fn(async () => ({ ...store })),
+        get: jest.fn(async (keys: Array<string> | null) =>
+          keys === null
+            ? { ...store }
+            : Object.fromEntries(
+                keys.filter(key => key in store).map(key => [key, store[key]])
+              )
+        ),
         set: jest.fn(async (items: Record<string, unknown>) => {
           Object.assign(store, items);
         }),
@@ -30,7 +36,7 @@ describe('ChatRemoval', () => {
 
     await ChatRemoval();
 
-    expect(store).toEqual({ styles: {} });
+    expect(store).toEqual({ styles: {}, migration_chat_removal: true });
   });
 
   it('opens Basic for an editor left on Chat', async () => {
@@ -46,7 +52,21 @@ describe('ChatRemoval', () => {
 
     await ChatRemoval();
 
-    expect(chrome.storage.local.set).not.toHaveBeenCalled();
+    expect(store).toEqual({
+      options: { mode: 'basic' },
+      migration_chat_removal: true,
+    });
     expect(chrome.storage.local.remove).not.toHaveBeenCalled();
+  });
+
+  it('skips reading all of storage once it has run', async () => {
+    store['migration_chat_removal'] = true;
+    store['chat-provider'] = 'anthropic';
+
+    await ChatRemoval();
+
+    expect(chrome.storage.local.get).toHaveBeenCalledTimes(1);
+    expect(chrome.storage.local.get).not.toHaveBeenCalledWith(null);
+    expect(store['chat-provider']).toBe('anthropic');
   });
 });
