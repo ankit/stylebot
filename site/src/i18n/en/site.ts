@@ -214,8 +214,8 @@ export default {
   manual: {
     title: 'Manual',
     description:
-      'How to use Stylebot: styling a site, profiles, the command line, Chat, sync, URL rules and shortcuts.',
-    lede: 'How Stylebot works, from your first style to profiles, Chat and sync.',
+      'How to use Stylebot: styling a site, profiles, the command line, sync, URL rules and shortcuts.',
+    lede: 'How Stylebot works, from your first style to profiles and sync.',
     sections: 'Manual sections',
     toc: {
       start: 'Getting started',
@@ -224,7 +224,6 @@ export default {
       sync: 'Sync and version history',
       urls: 'URL rules',
       cli: 'CLI',
-      chat: 'Chat',
       shortcuts: 'Keyboard shortcuts',
       help: 'Help and support',
     },
@@ -264,21 +263,6 @@ export default {
       privacy: 'Privacy',
       privacyBody:
         'CLI access is off until you turn it on. Stylebot and the CLI talk only to each other, on this computer; an agent sends what it reads to its own provider.',
-    },
-    chat: {
-      // "Basics" and the bolded setting are labels in Stylebot's Options page; use the extension's own translation.
-      intro:
-        'Chat is off by default. To add its tab to the editor, turn on <strong>Chat</strong> in Stylebot\'s options, under Basics, then connect an API key. It\'s ideal for quick fixes: describe the change you want and Stylebot writes the CSS. You can pick an element to point it at something, or attach a screenshot to show what you mean. For bigger changes, like a whole new theme, use the <a href="#cli">CLI</a>.',
-      shot: 'The Chat tab after asking for a forest theme with a readable serif font on Hacker News',
-      key: 'Bring your own key',
-      keyBody:
-        'Connect a Claude, OpenAI or Gemini API key. Keys are saved on this computer only and never synced. Messages go straight from your browser to the provider.',
-      changes: 'Where changes go',
-      changesBody:
-        "Each change is applied right away and added to the current profile's stylesheet. Click <strong>Added N lines</strong> to see it in Code, or undo it from the chat.",
-      cost: 'Cost',
-      costBody:
-        'The token count under the message box shows what the conversation has used, with an estimated cost.',
     },
     presets: {
       intro:
@@ -351,7 +335,7 @@ export default {
     browser: {
       title: 'In your browser',
       body: [
-        "Your styles, settings, history, chat conversations and API keys are saved in your browser, and uninstalling Stylebot removes them. Google Fonts and stylesheets you <code>@import</code> are downloaded from where they're hosted, which sees your IP address.",
+        "Your styles, settings and history are saved in your browser, and uninstalling Stylebot removes them. Google Fonts and stylesheets you <code>@import</code> are downloaded from where they're hosted, which sees your IP address.",
       ],
     },
     sync: {
@@ -359,12 +343,6 @@ export default {
       body: [
         'Connecting Google Drive in Options saves your styles to a file in your own Drive. Stylebot can only see files it creates, and its access token stays in your browser. Disconnect in Options or in your <a href="https://myaccount.google.com/connections">Google account</a>.',
         'Stylebot\'s use of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements.',
-      ],
-    },
-    chat: {
-      title: 'Chat',
-      body: [
-        'Chat is off until you add an API key, and nothing is sent before then. Your message goes straight to the provider whose API key you added, with any screenshot you attach, the page\'s address and title, an outline of its visible content, its CSS and your styles. That can include personal information on the page. The provider\'s policy applies: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {
@@ -431,7 +409,7 @@ export default {
     },
     r40: {
       description:
-        'Stylebot 4.0 brings a redesigned editor, a command line for coding agents, profiles, a side panel, Chat, version history and sync.',
+        'Stylebot 4.0 brings a redesigned editor, a command line for coding agents, profiles, a side panel, version history and sync.',
       lede: 'A redesigned editor, a command line for coding agents, profiles, and a side panel.',
       toc: {
         editor: 'Redesigned editor',
@@ -440,7 +418,6 @@ export default {
         panel: 'Side panel',
         history: 'Version history',
         sync: 'Sync',
-        chat: 'Chat',
         more: 'And more',
       },
       editorTitle: 'A redesigned editor',
@@ -472,12 +449,6 @@ export default {
       syncTitle: 'Sync',
       syncBody:
         'Google Drive sync is more robust. Edits from different computers are merged, so none get lost. It runs on its own every 30 minutes and right after you edit.',
-      chatTitle: 'Chat',
-      chatBody:
-        'No coding agent? Describe what you want, or pick a suggested look, and Stylebot writes the CSS. Bring your own Claude, OpenAI or Gemini key.',
-      // Cozy, Calm and Only the links in color are suggestions shown in the screenshot; use the extension's own translation.
-      chatAlt:
-        'The Chat tab suggesting looks for the page: Cozy, Calm, and Only the links in color',
       moreTitle: 'And more',
       moreItems: [
         'A new stylebot.dev',

@@ -6,8 +6,6 @@ import Keys from '../../components/manual/Keys.astro';
 import Shot from '../../components/manual/Shot.astro';
 import Term from '../../components/manual/Term.astro';
 import Terms from '../../components/manual/Terms.astro';
-import chatShot from '../../assets/manual/chat.webp';
-import chatDarkShot from '../../assets/manual/chat-dark.webp';
 import basicShot from '../../assets/manual/basic-editor.webp';
 import basicDarkShot from '../../assets/manual/basic-editor-dark.webp';
 import popupProfilesShot from '../../assets/manual/popup-profiles.png';
@@ -185,19 +183,6 @@ const shortcutGroups = [
               <Fragment set:html={rich(t.cli.claudeCodeBody)} />
             </Term>
             <Term term={t.cli.privacy}>{t.cli.privacyBody}</Term>
-          </Terms>
-        </section>
-
-        <section id="chat">
-          <h2>{t.toc.chat}</h2>
-          <p set:html={rich(t.chat.intro)} />
-          <Shot label={t.chat.shot} src={chatShot} dark={chatDarkShot} />
-          <Terms>
-            <Term term={t.chat.key}>{t.chat.keyBody}</Term>
-            <Term term={t.chat.changes}>
-              <Fragment set:html={t.chat.changesBody} />
-            </Term>
-            <Term term={t.chat.cost}>{t.chat.costBody}</Term>
           </Terms>
         </section>
 

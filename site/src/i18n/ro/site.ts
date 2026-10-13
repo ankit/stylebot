@@ -202,8 +202,8 @@ const site: SiteMessages = {
   manual: {
     title: 'Manual',
     description:
-      'Cum folosești Stylebot: stilizarea unui site, profiluri, linia de comandă, Chat, sincronizare, reguli URL și comenzi rapide.',
-    lede: 'Cum funcționează Stylebot, de la primul stil la profiluri, Chat și sincronizare.',
+      'Cum folosești Stylebot: stilizarea unui site, profiluri, linia de comandă, sincronizare, reguli URL și comenzi rapide.',
+    lede: 'Cum funcționează Stylebot, de la primul stil la profiluri și sincronizare.',
     sections: 'Secțiunile manualului',
     toc: {
       start: 'Primii pași',
@@ -212,7 +212,6 @@ const site: SiteMessages = {
       sync: 'Sincronizare și istoricul versiunilor',
       urls: 'Reguli URL',
       cli: 'CLI',
-      chat: 'Chat',
       shortcuts: 'Comenzi rapide',
       help: 'Ajutor și asistență',
     },
@@ -250,20 +249,6 @@ const site: SiteMessages = {
       privacy: 'Confidențialitate',
       privacyBody:
         'Accesul prin CLI este dezactivat până îl activezi. Stylebot și CLI-ul comunică doar între ele, pe acest calculator; un agent trimite ce citește propriului furnizor.',
-    },
-    chat: {
-      intro:
-        'Chatul este dezactivat implicit. Ca să-i adaugi fila în editor, activează <strong>Chat</strong> în opțiunile Stylebot, la De bază, apoi conectează o cheie API. E ideal pentru remedieri rapide: descrie modificarea pe care o vrei, iar Stylebot scrie CSS-ul. Poți alege un element ca să arăți spre ceva anume sau poți atașa o captură de ecran ca să arăți ce ai în minte. Pentru modificări mai mari, cum ar fi o temă complet nouă, folosește <a href="#cli">CLI-ul</a>.',
-      shot: 'Fila Chat pe Hacker News, după cererea unei teme în nuanțe de pădure, cu un font serif ușor de citit',
-      key: 'Folosește propria cheie',
-      keyBody:
-        'Conectează o cheie API Claude, OpenAI sau Gemini. Cheile sunt salvate doar pe acest calculator și nu sunt sincronizate niciodată. Mesajele merg direct din browser la furnizor.',
-      changes: 'Unde ajung modificările',
-      changesBody:
-        'Fiecare modificare se aplică imediat și se adaugă în foaia de stil a profilului curent. Dă clic pe <strong>N linii adăugate</strong> ca s-o vezi în Cod sau anuleaz-o din chat.',
-      cost: 'Cost',
-      costBody:
-        'Numărul de tokenuri de sub caseta de mesaj arată cât a folosit conversația, cu un cost estimat.',
     },
     presets: {
       intro:
@@ -339,7 +324,7 @@ const site: SiteMessages = {
     browser: {
       title: 'În browser',
       body: [
-        'Stilurile, setările, istoricul, conversațiile din chat și cheile API sunt salvate în browser, iar dezinstalarea Stylebot le elimină. Fonturile Google Fonts și foile de stil importate cu <code>@import</code> sunt descărcate de pe serverele care le găzduiesc, iar acestea îți văd adresa IP.',
+        'Stilurile, setările și istoricul sunt salvate în browser, iar dezinstalarea Stylebot le elimină. Fonturile Google Fonts și foile de stil importate cu <code>@import</code> sunt descărcate de pe serverele care le găzduiesc, iar acestea îți văd adresa IP.',
       ],
     },
     sync: {
@@ -347,12 +332,6 @@ const site: SiteMessages = {
       body: [
         'Când conectezi Google Drive în Opțiuni, stilurile tale sunt salvate într-un fișier din propriul tău Drive. Stylebot poate vedea doar fișierele pe care le creează, iar tokenul său de acces rămâne în browser. Te poți deconecta din Opțiuni sau din <a href="https://myaccount.google.com/connections">contul Google</a>.',
         'Utilizarea de către Stylebot a informațiilor primite de la API-urile Google respectă <a href="https://developers.google.com/terms/api-services-user-data-policy">Politica privind datele utilizatorilor pentru serviciile API Google</a>, inclusiv cerințele de utilizare limitată.',
-      ],
-    },
-    chat: {
-      title: 'Chat',
-      body: [
-        'Chatul este dezactivat până adaugi o cheie API și nu se trimite nimic înainte de asta. Mesajul tău ajunge direct la furnizorul a cărui cheie API ai adăugat-o, împreună cu orice captură de ecran atașată, adresa și titlul paginii, o schiță a conținutului vizibil, CSS-ul paginii și stilurile tale. Acestea pot include informații personale de pe pagină. Se aplică politica furnizorului: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {
@@ -419,7 +398,7 @@ const site: SiteMessages = {
     },
     r40: {
       description:
-        'Stylebot 4.0 aduce un editor reproiectat, o linie de comandă pentru agenții de programare, profiluri, un panou lateral, Chat, istoricul versiunilor și sincronizare.',
+        'Stylebot 4.0 aduce un editor reproiectat, o linie de comandă pentru agenții de programare, profiluri, un panou lateral, istoricul versiunilor și sincronizare.',
       lede: 'Un editor reproiectat, o linie de comandă pentru agenții de programare, profiluri și un panou lateral.',
       toc: {
         editor: 'Editor reproiectat',
@@ -428,7 +407,6 @@ const site: SiteMessages = {
         panel: 'Panou lateral',
         history: 'Istoricul versiunilor',
         sync: 'Sincronizare',
-        chat: 'Chat',
         more: 'Și altele',
       },
       editorTitle: 'Un editor reproiectat',
@@ -459,11 +437,6 @@ const site: SiteMessages = {
       syncTitle: 'Sincronizare',
       syncBody:
         'Sincronizarea cu Google Drive este mai robustă. Modificările de pe calculatoare diferite sunt combinate, așa că nu se pierde nimic. Rulează singură la fiecare 30 de minute și imediat după ce faci o modificare.',
-      chatTitle: 'Chat',
-      chatBody:
-        'Nu ai un agent de programare? Descrie ce vrei sau alege un aspect sugerat, iar Stylebot scrie CSS-ul. Folosește propria cheie Claude, OpenAI sau Gemini.',
-      chatAlt:
-        'Fila Chat sugerând aspecte pentru pagină: Primitor, Liniștit și Doar linkurile colorate',
       moreTitle: 'Și altele',
       moreItems: [
         'Un nou stylebot.dev',

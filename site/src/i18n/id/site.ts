@@ -200,8 +200,8 @@ const site: SiteMessages = {
   manual: {
     title: 'Panduan',
     description:
-      'Cara memakai Stylebot: mengubah gaya situs, profil, baris perintah, Chat, sinkronisasi, aturan URL, dan pintasan.',
-    lede: 'Cara kerja Stylebot, dari gaya pertama Anda hingga profil, Chat, dan sinkronisasi.',
+      'Cara memakai Stylebot: mengubah gaya situs, profil, baris perintah, sinkronisasi, aturan URL, dan pintasan.',
+    lede: 'Cara kerja Stylebot, dari gaya pertama Anda hingga profil dan sinkronisasi.',
     sections: 'Bagian panduan',
     toc: {
       start: 'Memulai',
@@ -210,7 +210,6 @@ const site: SiteMessages = {
       sync: 'Sinkronisasi dan riwayat versi',
       urls: 'Aturan URL',
       cli: 'CLI',
-      chat: 'Chat',
       shortcuts: 'Pintasan keyboard',
       help: 'Bantuan dan dukungan',
     },
@@ -248,20 +247,6 @@ const site: SiteMessages = {
       privacy: 'Privasi',
       privacyBody:
         'Akses CLI nonaktif sampai Anda mengaktifkannya. Stylebot dan CLI hanya berkomunikasi satu sama lain, di komputer ini; agen mengirim apa yang dibacanya ke penyedianya sendiri.',
-    },
-    chat: {
-      intro:
-        'Chat nonaktif secara default. Untuk menambahkan tabnya ke editor, aktifkan <strong>Chat</strong> di opsi Stylebot, di bagian Dasar, lalu hubungkan kunci API. Chat cocok untuk perbaikan cepat: jelaskan perubahan yang Anda inginkan dan Stylebot yang menulis CSS-nya. Anda bisa memilih elemen untuk menunjuk bagian tertentu, atau melampirkan screenshot untuk memperlihatkan maksud Anda. Untuk perubahan yang lebih besar, seperti tema yang benar-benar baru, gunakan <a href="#cli">CLI</a>.',
-      shot: 'Tab Chat setelah meminta tema hutan dengan font serif yang mudah dibaca di Hacker News',
-      key: 'Gunakan kunci Anda sendiri',
-      keyBody:
-        'Hubungkan kunci API Claude, OpenAI, atau Gemini. Kunci hanya disimpan di komputer ini dan tidak pernah disinkronkan. Pesan dikirim langsung dari browser Anda ke penyedia.',
-      changes: 'Ke mana perubahan disimpan',
-      changesBody:
-        'Setiap perubahan langsung diterapkan dan ditambahkan ke stylesheet profil saat ini. Klik <strong>Ditambahkan N baris</strong> untuk melihatnya di Kode, atau urungkan dari chat.',
-      cost: 'Biaya',
-      costBody:
-        'Jumlah token di bawah kotak pesan menunjukkan pemakaian percakapan sejauh ini, beserta perkiraan biayanya.',
     },
     presets: {
       intro:
@@ -335,7 +320,7 @@ const site: SiteMessages = {
     browser: {
       title: 'Di browser Anda',
       body: [
-        'Gaya, setelan, riwayat, percakapan chat, dan kunci API Anda disimpan di browser, dan menghapus instalan Stylebot akan menghapusnya. Google Fonts dan stylesheet yang Anda <code>@import</code> diunduh dari server tempatnya di-hosting, yang dapat melihat alamat IP Anda.',
+        'Gaya, setelan, dan riwayat Anda disimpan di browser, dan menghapus instalan Stylebot akan menghapusnya. Google Fonts dan stylesheet yang Anda <code>@import</code> diunduh dari server tempatnya di-hosting, yang dapat melihat alamat IP Anda.',
       ],
     },
     sync: {
@@ -343,12 +328,6 @@ const site: SiteMessages = {
       body: [
         'Menghubungkan Google Drive di Opsi akan menyimpan gaya Anda ke sebuah file di Drive Anda sendiri. Stylebot hanya dapat melihat file yang dibuatnya, dan token aksesnya tetap di browser Anda. Putuskan sambungan di Opsi atau di <a href="https://myaccount.google.com/connections">Akun Google</a> Anda.',
         'Penggunaan informasi yang diterima Stylebot dari Google API mematuhi <a href="https://developers.google.com/terms/api-services-user-data-policy">Kebijakan Data Pengguna Layanan Google API</a>, termasuk persyaratan Penggunaan Terbatas.',
-      ],
-    },
-    chat: {
-      title: 'Chat',
-      body: [
-        'Chat nonaktif sampai Anda menambahkan kunci API, dan tidak ada yang dikirim sebelum itu. Pesan Anda dikirim langsung ke penyedia yang kunci API-nya Anda tambahkan, beserta screenshot yang Anda lampirkan, alamat dan judul halaman, kerangka dari konten yang terlihat, CSS halaman, dan gaya Anda. Ini bisa mencakup informasi pribadi di halaman. Kebijakan penyedia berlaku: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {
@@ -414,7 +393,7 @@ const site: SiteMessages = {
     },
     r40: {
       description:
-        'Stylebot 4.0 menghadirkan editor yang didesain ulang, baris perintah untuk agen coding, profil, panel samping, Chat, riwayat versi, dan sinkronisasi.',
+        'Stylebot 4.0 menghadirkan editor yang didesain ulang, baris perintah untuk agen coding, profil, panel samping, riwayat versi, dan sinkronisasi.',
       lede: 'Editor yang didesain ulang, baris perintah untuk agen coding, profil, dan panel samping.',
       toc: {
         editor: 'Editor baru',
@@ -423,7 +402,6 @@ const site: SiteMessages = {
         panel: 'Panel samping',
         history: 'Riwayat versi',
         sync: 'Sinkronisasi',
-        chat: 'Chat',
         more: 'Dan lainnya',
       },
       editorTitle: 'Editor yang didesain ulang',
@@ -453,11 +431,6 @@ const site: SiteMessages = {
       syncTitle: 'Sinkronisasi',
       syncBody:
         'Sinkronisasi Google Drive kini lebih andal. Editan dari komputer yang berbeda digabungkan, jadi tidak ada yang hilang. Sinkronisasi berjalan otomatis setiap 30 menit dan tepat setelah Anda mengedit.',
-      chatTitle: 'Chat',
-      chatBody:
-        'Tidak memakai agen coding? Jelaskan apa yang Anda inginkan, atau pilih tampilan yang disarankan, dan Stylebot yang menulis CSS-nya. Gunakan kunci Claude, OpenAI, atau Gemini Anda sendiri.',
-      chatAlt:
-        'Tab Chat menyarankan tampilan untuk halaman: Nyaman, Tenang, dan Hanya tautan berwarna',
       moreTitle: 'Dan lainnya',
       moreItems: [
         'stylebot.dev yang baru',

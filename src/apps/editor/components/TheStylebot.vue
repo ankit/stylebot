@@ -16,7 +16,6 @@
         >
           <the-basic-editor v-if="mode === 'basic'" />
           <the-presets-editor v-else-if="mode === 'magic'" />
-          <the-chat v-else-if="mode === 'chat'" />
 
           <!-- Stays mounted (just hidden) once opened — Monaco is too expensive to reload on every mode switch. -->
           <the-code-editor
@@ -37,7 +36,6 @@ import TheHeader from './TheHeader.vue';
 import TheCodeEditor from './TheCodeEditor.vue';
 import TheBasicEditor from './TheBasicEditor.vue';
 import ThePresetsEditor from './ThePresetsEditor.vue';
-import TheChat from './chat/TheChat.vue';
 import TheStylebotResizer from './TheStylebotResizer.vue';
 import TheWindowStatus from './TheWindowStatus.vue';
 import TheKeyboardShortcutsView from './shortcuts/TheKeyboardShortcutsView.vue';
@@ -53,7 +51,6 @@ export default Vue.extend({
     TheHeader,
     TheBasicEditor,
     ThePresetsEditor,
-    TheChat,
     TheCodeEditor,
     TheStylebotResizer,
     TheWindowStatus,

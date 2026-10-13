@@ -50,14 +50,7 @@ import {
   GetIsEditorWindowOpen,
   OpenEditorSidePanel,
   CloseEditorSidePanel,
-  ChatGetStatus,
-  ChatConnect,
-  ChatRemoveKey,
-  ChatSetModel,
-  ChatGetThread,
-  ChatSetThread,
 } from './messages';
-import { initChatPort } from './chat';
 
 import { refreshAllBadges, refreshBadgeForTab } from './styles';
 import { get as getOption, pruneRetired } from './options';
@@ -356,32 +349,11 @@ export const initListeners = (): void => {
         case 'EditorSidePanelOpened':
           onEditorSidePanelOpened(message.tabId);
           break;
-
-        case 'ChatGetStatus':
-          ChatGetStatus(sendResponse);
-          break;
-        case 'ChatConnect':
-          ChatConnect(message, sendResponse);
-          break;
-        case 'ChatRemoveKey':
-          ChatRemoveKey(message, sendResponse);
-          break;
-        case 'ChatSetModel':
-          ChatSetModel(message, sendResponse);
-          break;
-        case 'ChatGetThread':
-          ChatGetThread(message, sendResponse);
-          break;
-        case 'ChatSetThread':
-          ChatSetThread(message);
-          break;
       }
 
       return true;
     }
   );
-
-  initChatPort();
 
   chrome.contextMenus.onClicked.addListener(handleContextMenuClick);
 };

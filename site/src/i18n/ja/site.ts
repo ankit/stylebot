@@ -199,8 +199,8 @@ const site: SiteMessages = {
   manual: {
     title: 'マニュアル',
     description:
-      'Stylebot の使い方：サイトのスタイル変更、プロファイル、コマンドライン、チャット、同期、URL ルール、ショートカット。',
-    lede: '最初のスタイルからプロファイル、チャット、同期まで、Stylebot の使い方を紹介します。',
+      'Stylebot の使い方：サイトのスタイル変更、プロファイル、コマンドライン、同期、URL ルール、ショートカット。',
+    lede: '最初のスタイルからプロファイル、同期まで、Stylebot の使い方を紹介します。',
     sections: 'マニュアルの目次',
     toc: {
       start: 'はじめに',
@@ -209,7 +209,6 @@ const site: SiteMessages = {
       sync: '同期とバージョン履歴',
       urls: 'URL ルール',
       cli: 'CLI',
-      chat: 'チャット',
       shortcuts: 'キーボードショートカット',
       help: 'ヘルプとサポート',
     },
@@ -247,20 +246,6 @@ const site: SiteMessages = {
       privacy: 'プライバシー',
       privacyBody:
         'CLI からのアクセスは、オンにするまでオフです。Stylebot と CLI はこのパソコン上で互いにやり取りするだけです。エージェントは読み取った内容を自身のプロバイダーに送信します。',
-    },
-    chat: {
-      intro:
-        'チャットは初期設定ではオフです。エディタにタブを追加するには、Stylebot のオプションの基本設定で<strong>チャット</strong>をオンにしてから、API キーを接続します。ちょっとした修正に最適で、望む変更を伝えると Stylebot が CSS を書きます。要素を選んで対象を示したり、スクリーンショットを添付して意図を伝えたりもできます。テーマを丸ごと作るような大きな変更には、<a href="#cli">CLI</a> を使いましょう。',
-      shot: 'Hacker News で、読みやすいセリフ体の森のテーマを頼んだあとのチャットタブ',
-      key: '自分の API キーを使う',
-      keyBody:
-        'Claude、OpenAI、Gemini の API キーを接続します。キーはこのパソコンにのみ保存され、同期されません。メッセージはブラウザからプロバイダーに直接送信されます。',
-      changes: '変更の保存先',
-      changesBody:
-        '変更はすぐに適用され、現在のプロファイルのスタイルシートに追加されます。<strong>N 行を追加</strong>をクリックするとコードで確認でき、チャットから元に戻すこともできます。',
-      cost: '料金',
-      costBody:
-        'メッセージ欄の下のトークン数に、この会話での使用量と料金の目安が表示されます。',
     },
     presets: {
       intro:
@@ -333,7 +318,7 @@ const site: SiteMessages = {
     browser: {
       title: 'ブラウザ内',
       body: [
-        'スタイル、設定、履歴、チャットの会話、API キーはブラウザに保存され、Stylebot をアンインストールすると削除されます。Google Fonts と <code>@import</code> したスタイルシートはそれぞれのホストからダウンロードされ、ホストには IP アドレスが伝わります。',
+        'スタイル、設定、履歴はブラウザに保存され、Stylebot をアンインストールすると削除されます。Google Fonts と <code>@import</code> したスタイルシートはそれぞれのホストからダウンロードされ、ホストには IP アドレスが伝わります。',
       ],
     },
     sync: {
@@ -341,12 +326,6 @@ const site: SiteMessages = {
       body: [
         'オプションで Google Drive に接続すると、スタイルがご自身の Drive 内のファイルに保存されます。Stylebot が見られるのは自身が作成したファイルだけで、アクセストークンはブラウザに保存されます。接続の解除は、オプションか <a href="https://myaccount.google.com/connections">Google アカウント</a>で行えます。',
         'Stylebot による Google API から受け取った情報の使用は、限定使用の要件を含め、<a href="https://developers.google.com/terms/api-services-user-data-policy">Google API サービスのユーザーデータに関するポリシー</a>に準拠しています。',
-      ],
-    },
-    chat: {
-      title: 'チャット',
-      body: [
-        'チャットは API キーを追加するまでオフで、それまでは何も送信されません。メッセージは、API キーを追加したプロバイダーに直接送信されます。あわせて、添付したスクリーンショット、ページのアドレスとタイトル、表示されている内容の概要、ページの CSS とスタイルも送信されます。ページ上の個人情報が含まれることがあります。プロバイダーのポリシーが適用されます（<a href="https://www.anthropic.com/legal/privacy">Anthropic</a>、<a href="https://openai.com/policies/privacy-policy/">OpenAI</a>、<a href="https://ai.google.dev/gemini-api/terms">Google</a>）。',
       ],
     },
     cli: {
@@ -412,7 +391,7 @@ const site: SiteMessages = {
     },
     r40: {
       description:
-        'Stylebot 4.0 では、エディタを一新し、コーディングエージェント向けのコマンドライン、プロファイル、サイドパネル、チャット、バージョン履歴、同期を追加しました。',
+        'Stylebot 4.0 では、エディタを一新し、コーディングエージェント向けのコマンドライン、プロファイル、サイドパネル、バージョン履歴、同期を追加しました。',
       lede: 'エディタを一新し、コーディングエージェント向けのコマンドライン、プロファイル、サイドパネルを追加しました。',
       toc: {
         editor: 'エディタを一新',
@@ -421,7 +400,6 @@ const site: SiteMessages = {
         panel: 'サイドパネル',
         history: 'バージョン履歴',
         sync: '同期',
-        chat: 'チャット',
         more: 'その他',
       },
       editorTitle: 'エディタを一新',
@@ -451,11 +429,6 @@ const site: SiteMessages = {
       syncTitle: '同期',
       syncBody:
         'Google Drive 同期がより安定しました。別のパソコンでの編集はマージされるので、失われることはありません。同期は 30 分ごとと、編集した直後に自動で行われます。',
-      chatTitle: 'チャット',
-      chatBody:
-        'コーディングエージェントがなくても大丈夫。望む見た目を伝えるか、提案から選ぶと、Stylebot が CSS を書きます。Claude、OpenAI、Gemini のキーは自分のものを使います。',
-      chatAlt:
-        'ページに合わせて「ほっこり」「落ち着き」「リンクだけカラー」を提案するチャットタブ',
       moreTitle: 'その他',
       moreItems: [
         '新しい stylebot.dev',

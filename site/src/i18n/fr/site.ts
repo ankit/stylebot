@@ -200,8 +200,8 @@ const site: SiteMessages = {
   manual: {
     title: 'Manuel',
     description:
-      'Comment utiliser Stylebot : styliser un site, les profils, la ligne de commande, le Chat, la synchronisation, les règles d’URL et les raccourcis.',
-    lede: 'Le fonctionnement de Stylebot, de votre premier style aux profils, au Chat et à la synchronisation.',
+      'Comment utiliser Stylebot : styliser un site, les profils, la ligne de commande, la synchronisation, les règles d’URL et les raccourcis.',
+    lede: 'Le fonctionnement de Stylebot, de votre premier style aux profils et à la synchronisation.',
     sections: 'Sections du manuel',
     toc: {
       start: 'Premiers pas',
@@ -210,7 +210,6 @@ const site: SiteMessages = {
       sync: 'Synchronisation et historique des versions',
       urls: 'Règles d’URL',
       cli: 'CLI',
-      chat: 'Chat',
       shortcuts: 'Raccourcis clavier',
       help: 'Aide et assistance',
     },
@@ -248,20 +247,6 @@ const site: SiteMessages = {
       privacy: 'Confidentialité',
       privacyBody:
         'L’accès à la CLI reste désactivé tant que vous ne l’activez pas. Stylebot et la CLI ne communiquent qu’entre eux, sur cet ordinateur ; un agent envoie ce qu’il lit à son propre fournisseur.',
-    },
-    chat: {
-      intro:
-        'Le Chat est désactivé par défaut. Pour ajouter son onglet à l’éditeur, activez <strong>Chat</strong> dans les options de Stylebot, sous Général, puis connectez une clé d’API. Il est idéal pour les retouches rapides : décrivez la modification souhaitée et Stylebot écrit le CSS. Vous pouvez choisir un élément pour cibler quelque chose de précis, ou joindre une capture d’écran pour montrer ce que vous voulez dire. Pour des changements plus importants, comme un thème entièrement nouveau, utilisez la <a href="#cli">CLI</a>.',
-      shot: 'L’onglet Chat après avoir demandé un thème forêt avec une police serif lisible sur Hacker News',
-      key: 'Utilisez votre propre clé',
-      keyBody:
-        'Connectez une clé d’API Claude, OpenAI ou Gemini. Les clés sont enregistrées uniquement sur cet ordinateur, jamais synchronisées. Les messages vont directement de votre navigateur au fournisseur.',
-      changes: 'Où vont les modifications',
-      changesBody:
-        'Chaque modification est appliquée immédiatement et ajoutée à la feuille de style du profil actuel. Cliquez sur <strong>N lignes ajoutées</strong> pour la voir dans Code, ou annulez-la depuis le chat.',
-      cost: 'Coût',
-      costBody:
-        'Le nombre de jetons sous la zone de message indique ce que la conversation a consommé, avec un coût estimé.',
     },
     presets: {
       intro:
@@ -337,7 +322,7 @@ const site: SiteMessages = {
     browser: {
       title: 'Dans votre navigateur',
       body: [
-        'Vos styles, paramètres, historique, conversations de chat et clés d’API sont enregistrés dans votre navigateur, et la désinstallation de Stylebot les supprime. Les polices Google Fonts et les feuilles de style que vous importez avec <code>@import</code> sont téléchargées depuis leur hébergeur, qui voit votre adresse IP.',
+        'Vos styles, paramètres et historique sont enregistrés dans votre navigateur, et la désinstallation de Stylebot les supprime. Les polices Google Fonts et les feuilles de style que vous importez avec <code>@import</code> sont téléchargées depuis leur hébergeur, qui voit votre adresse IP.',
       ],
     },
     sync: {
@@ -345,12 +330,6 @@ const site: SiteMessages = {
       body: [
         'Quand vous connectez Google Drive dans les options, vos styles sont enregistrés dans un fichier de votre propre Drive. Stylebot ne voit que les fichiers qu’il crée, et son jeton d’accès reste dans votre navigateur. Déconnectez-vous dans les options ou dans votre <a href="https://myaccount.google.com/connections">compte Google</a>.',
         'L’utilisation par Stylebot des informations reçues des API Google respecte le <a href="https://developers.google.com/terms/api-services-user-data-policy">Règlement sur les données utilisateur des services d’API Google</a>, y compris les exigences relatives à l’utilisation limitée.',
-      ],
-    },
-    chat: {
-      title: 'Chat',
-      body: [
-        'Le Chat reste désactivé tant que vous n’avez pas ajouté de clé d’API, et rien n’est envoyé avant. Votre message est envoyé directement au fournisseur dont vous avez ajouté la clé d’API, avec les captures d’écran que vous joignez, l’adresse et le titre de la page, un plan de son contenu visible, son CSS et vos styles. Cela peut inclure des informations personnelles présentes sur la page. La politique de confidentialité du fournisseur s’applique : <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {
@@ -417,7 +396,7 @@ const site: SiteMessages = {
     },
     r40: {
       description:
-        'Stylebot 4.0 apporte un éditeur repensé, une ligne de commande pour les agents de code, des profils, un panneau latéral, le Chat, l’historique des versions et la synchronisation.',
+        'Stylebot 4.0 apporte un éditeur repensé, une ligne de commande pour les agents de code, des profils, un panneau latéral, l’historique des versions et la synchronisation.',
       lede: 'Un éditeur repensé, une ligne de commande pour les agents de code, des profils et un panneau latéral.',
       toc: {
         editor: 'Éditeur repensé',
@@ -426,7 +405,6 @@ const site: SiteMessages = {
         panel: 'Panneau latéral',
         history: 'Historique des versions',
         sync: 'Synchronisation',
-        chat: 'Chat',
         more: 'Et plus encore',
       },
       editorTitle: 'Un éditeur repensé',
@@ -458,11 +436,6 @@ const site: SiteMessages = {
       syncTitle: 'Synchronisation',
       syncBody:
         'La synchronisation Google Drive est plus fiable. Les modifications faites sur différents ordinateurs sont fusionnées, pour que rien ne se perde. Elle s’exécute d’elle-même toutes les 30 minutes et juste après chaque modification.',
-      chatTitle: 'Chat',
-      chatBody:
-        'Pas d’agent de code ? Décrivez ce que vous voulez, ou choisissez une apparence suggérée, et Stylebot écrit le CSS. Utilisez votre propre clé Claude, OpenAI ou Gemini.',
-      chatAlt:
-        'L’onglet Chat, qui suggère des apparences pour la page : Douillet, Apaisant et Seuls les liens en couleur',
       moreTitle: 'Et plus encore',
       moreItems: [
         'Un nouveau stylebot.dev',

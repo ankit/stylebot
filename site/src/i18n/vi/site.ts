@@ -200,8 +200,8 @@ const site: SiteMessages = {
   manual: {
     title: 'Hướng dẫn',
     description:
-      'Cách dùng Stylebot: tạo kiểu cho trang web, hồ sơ, dòng lệnh, Trò chuyện, đồng bộ, quy tắc URL và phím tắt.',
-    lede: 'Cách Stylebot hoạt động, từ kiểu đầu tiên đến hồ sơ, Trò chuyện và đồng bộ.',
+      'Cách dùng Stylebot: tạo kiểu cho trang web, hồ sơ, dòng lệnh, đồng bộ, quy tắc URL và phím tắt.',
+    lede: 'Cách Stylebot hoạt động, từ kiểu đầu tiên đến hồ sơ và đồng bộ.',
     sections: 'Các mục hướng dẫn',
     toc: {
       start: 'Bắt đầu',
@@ -210,7 +210,6 @@ const site: SiteMessages = {
       sync: 'Đồng bộ và lịch sử phiên bản',
       urls: 'Quy tắc URL',
       cli: 'CLI',
-      chat: 'Trò chuyện',
       shortcuts: 'Phím tắt',
       help: 'Trợ giúp và hỗ trợ',
     },
@@ -248,20 +247,6 @@ const site: SiteMessages = {
       privacy: 'Quyền riêng tư',
       privacyBody:
         'Quyền truy cập CLI ở trạng thái tắt cho đến khi bạn bật. Stylebot và CLI chỉ giao tiếp với nhau, trên máy tính này; trợ lý lập trình gửi những gì đọc được đến nhà cung cấp của mình.',
-    },
-    chat: {
-      intro:
-        'Trò chuyện mặc định tắt. Để thêm thẻ này vào trình chỉnh sửa, hãy bật <strong>Trò chuyện</strong> trong tùy chọn của Stylebot, mục Cơ bản, rồi kết nối khóa API. Tính năng này rất hợp cho những chỉnh sửa nhanh: mô tả thay đổi bạn muốn và Stylebot sẽ viết CSS. Bạn có thể chọn phần tử để chỉ rõ chỗ cần sửa, hoặc đính kèm ảnh chụp màn hình để minh họa ý bạn. Với thay đổi lớn hơn, như cả giao diện mới, hãy dùng <a href="#cli">CLI</a>.',
-      shot: 'Thẻ Trò chuyện sau khi yêu cầu giao diện rừng xanh với phông serif dễ đọc trên Hacker News',
-      key: 'Dùng khóa của riêng bạn',
-      keyBody:
-        'Kết nối khóa API của Claude, OpenAI hoặc Gemini. Khóa chỉ được lưu trên máy tính này và không bao giờ được đồng bộ. Tin nhắn đi thẳng từ trình duyệt của bạn đến nhà cung cấp.',
-      changes: 'Thay đổi được lưu ở đâu',
-      changesBody:
-        'Mỗi thay đổi được áp dụng ngay và thêm vào bảng kiểu của hồ sơ hiện tại. Nhấp <strong>Đã thêm N dòng</strong> để xem trong thẻ Mã, hoặc hoàn tác ngay trong cuộc trò chuyện.',
-      cost: 'Chi phí',
-      costBody:
-        'Số token bên dưới ô tin nhắn cho biết cuộc trò chuyện đã dùng bao nhiêu, kèm chi phí ước tính.',
     },
     presets: {
       intro:
@@ -338,7 +323,7 @@ const site: SiteMessages = {
     browser: {
       title: 'Trong trình duyệt của bạn',
       body: [
-        'Kiểu, cài đặt, lịch sử, các cuộc trò chuyện và khóa API của bạn được lưu trong trình duyệt, và gỡ cài đặt Stylebot sẽ xóa tất cả. Google Fonts và các bảng kiểu bạn <code>@import</code> được tải từ nơi lưu trữ chúng, và nơi đó thấy được địa chỉ IP của bạn.',
+        'Kiểu, cài đặt và lịch sử của bạn được lưu trong trình duyệt, và gỡ cài đặt Stylebot sẽ xóa tất cả. Google Fonts và các bảng kiểu bạn <code>@import</code> được tải từ nơi lưu trữ chúng, và nơi đó thấy được địa chỉ IP của bạn.',
       ],
     },
     sync: {
@@ -346,12 +331,6 @@ const site: SiteMessages = {
       body: [
         'Khi bạn kết nối Google Drive trong Tùy chọn, các kiểu của bạn được lưu vào một tệp trong Drive của chính bạn. Stylebot chỉ thấy được các tệp do Stylebot tạo, và mã truy cập được giữ trong trình duyệt của bạn. Hãy ngắt kết nối trong Tùy chọn hoặc trong <a href="https://myaccount.google.com/connections">tài khoản Google</a> của bạn.',
         'Việc Stylebot sử dụng thông tin nhận được từ các API của Google tuân thủ <a href="https://developers.google.com/terms/api-services-user-data-policy">Chính sách về dữ liệu người dùng của Dịch vụ API của Google</a>, bao gồm các yêu cầu về Sử dụng có giới hạn.',
-      ],
-    },
-    chat: {
-      title: 'Trò chuyện',
-      body: [
-        'Trò chuyện luôn tắt cho đến khi bạn thêm khóa API, và trước đó không có gì được gửi đi. Tin nhắn của bạn được gửi thẳng đến nhà cung cấp có khóa API mà bạn đã thêm, kèm ảnh chụp màn hình bạn đính kèm (nếu có), địa chỉ và tiêu đề của trang, dàn ý nội dung hiển thị, CSS của trang và các kiểu của bạn. Những nội dung này có thể chứa thông tin cá nhân trên trang. Chính sách của nhà cung cấp sẽ được áp dụng: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {
@@ -418,7 +397,7 @@ const site: SiteMessages = {
     },
     r40: {
       description:
-        'Stylebot 4.0 mang đến trình chỉnh sửa được thiết kế lại, dòng lệnh cho trợ lý lập trình, hồ sơ, bảng bên, Trò chuyện, lịch sử phiên bản và đồng bộ.',
+        'Stylebot 4.0 mang đến trình chỉnh sửa được thiết kế lại, dòng lệnh cho trợ lý lập trình, hồ sơ, bảng bên, lịch sử phiên bản và đồng bộ.',
       lede: 'Trình chỉnh sửa được thiết kế lại, dòng lệnh cho trợ lý lập trình, hồ sơ và bảng bên.',
       toc: {
         editor: 'Trình chỉnh sửa mới',
@@ -427,7 +406,6 @@ const site: SiteMessages = {
         panel: 'Bảng bên',
         history: 'Lịch sử phiên bản',
         sync: 'Đồng bộ',
-        chat: 'Trò chuyện',
         more: 'Và hơn thế nữa',
       },
       editorTitle: 'Trình chỉnh sửa được thiết kế lại',
@@ -458,11 +436,6 @@ const site: SiteMessages = {
       syncTitle: 'Đồng bộ',
       syncBody:
         'Đồng bộ Google Drive ổn định hơn. Thay đổi từ các máy tính khác nhau được gộp lại, nên không mất gì cả. Stylebot tự đồng bộ 30 phút một lần và ngay sau khi bạn chỉnh sửa.',
-      chatTitle: 'Trò chuyện',
-      chatBody:
-        'Không dùng trợ lý lập trình? Mô tả điều bạn muốn, hoặc chọn giao diện được gợi ý, và Stylebot sẽ viết CSS. Dùng khóa Claude, OpenAI hoặc Gemini của riêng bạn.',
-      chatAlt:
-        'Thẻ Trò chuyện gợi ý giao diện cho trang: Ấm cúng, Tĩnh lặng và Chỉ liên kết có màu',
       moreTitle: 'Và hơn thế nữa',
       moreItems: [
         'stylebot.dev mới',

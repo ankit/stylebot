@@ -30,12 +30,6 @@ const sharp = createRequire(path.join(rootDir, 'site/package.json'))('sharp');
 
 const APPEARANCES = ['light', 'dark'];
 
-const CHAT_KEY = {
-  'chat-api-key-anthropic': 'sk-ant-manual-screenshot-placeholder',
-  'chat-provider': 'anthropic',
-  options: { chat: true },
-};
-
 const hackerNews = () =>
   profiles(
     { name: 'Newspaper', css: gallery('hn', 'newspaper') },
@@ -147,56 +141,6 @@ const history = () => {
   }));
 };
 
-// A finished exchange about the Night Shift theme already on the page.
-const chatThread = () => [
-  {
-    role: 'user',
-    id: 'u1',
-    text: 'make this easy on the eyes at night, like my code editor',
-  },
-  {
-    role: 'assistant',
-    id: 'a1',
-    text: 'Gave the page a Dracula palette: a deep purple-gray background with soft white text, a lavender header in place of the orange one, and JetBrains Mono throughout, so it reads like your editor.',
-    edits: [
-      {
-        selector: 'body',
-        declarations: [
-          { property: 'background-color', value: '#282a36' },
-          { property: 'color', value: '#f8f8f2' },
-        ],
-      },
-      {
-        selector: '#hnmain',
-        declarations: [{ property: 'font-family', value: 'JetBrains Mono' }],
-      },
-    ],
-    previous: [
-      { selector: 'body', property: 'background-color', value: null },
-      { selector: 'body', property: 'color', value: null },
-      { selector: '#hnmain', property: 'font-family', value: null },
-    ],
-    applied: true,
-    model: 'claude-sonnet-5-5',
-    usage: { inputTokens: 14200, outputTokens: 480, cacheReadTokens: 0 },
-  },
-  {
-    role: 'user',
-    id: 'u2',
-    text: "what's a good name for this theme?",
-  },
-  {
-    role: 'assistant',
-    id: 'a2',
-    text: 'A few ideas, depending on the mood you like:\n\n- **Night Shift**: says what it’s for.\n- **Terminal Hours**: a nod to the monospace type.\n- **Lavender Dusk**: after the header’s color.',
-    edits: [],
-    previous: [],
-    applied: true,
-    model: 'claude-sonnet-5-5',
-    usage: { inputTokens: 15100, outputTokens: 120, cacheReadTokens: 14200 },
-  },
-];
-
 const SHOTS = [
   {
     name: 'editor-panel',
@@ -217,27 +161,6 @@ const SHOTS = [
       return around(panel, [
         panel.locator('.header'),
         panel.getByRole('button', { name: 'Add property' }),
-      ]);
-    },
-  },
-  {
-    name: 'agent-chat',
-    about: "Chat's suggestions, before anything is asked",
-    run: async (browser, { appearance }) => {
-      await seed(browser, {
-        ...CHAT_KEY,
-        styles: { 'en.wikipedia.org': wikipedia(appearance) },
-      });
-      const page = await openSite(
-        browser.context,
-        'https://en.wikipedia.org/wiki/Ikigai'
-      );
-      const panel = await openPanel(browser, page);
-      await showTab(panel, 'Chat');
-      await panel.mouse.move(0, 0);
-      return around(panel, [
-        panel.locator('.chat-empty-title'),
-        panel.locator('.chat-composer'),
       ]);
     },
   },
@@ -351,31 +274,6 @@ const SHOTS = [
       await panel.evaluate(() => document.activeElement?.blur());
       await link.hover();
       await wait(900);
-      return capture(browser.context, null, page, panel, {
-        appearance,
-        scale: 'device',
-      });
-    },
-  },
-  {
-    name: 'chat',
-    about: 'A Chat conversation beside Hacker News in Night Shift',
-    format: 'webp',
-    run: async (browser, { appearance }) => {
-      await seed(browser, {
-        ...CHAT_KEY,
-        'chat-thread-news.ycombinator.com': chatThread(),
-        styles: {
-          'news.ycombinator.com': style(gallery('hn', 'night-shift')),
-        },
-      });
-      const page = await openSite(
-        browser.context,
-        'https://news.ycombinator.com/'
-      );
-      const panel = await openPanel(browser, page);
-      await showTab(panel, 'Chat');
-      await panel.mouse.move(0, 0);
       return capture(browser.context, null, page, panel, {
         appearance,
         scale: 'device',

@@ -4,12 +4,11 @@
 
     <basics-section :label="t('appearance')">
       <the-theme />
-      <the-position />
     </basics-section>
 
     <basics-section :label="t('editor')">
+      <the-position />
       <the-context-menu />
-      <the-chat-option />
     </basics-section>
 
     <the-cli-access v-if="showCliAccess" />
@@ -27,7 +26,6 @@ import BasicsSection from './basics/BasicsSection.vue';
 import TheTheme from './basics/TheTheme.vue';
 import ThePosition from './basics/ThePosition.vue';
 import TheContextMenu from './basics/TheContextMenu.vue';
-import TheChatOption from './basics/TheChatOption.vue';
 import TheCliAccess from './basics/TheCliAccess.vue';
 import TheKeyboardShortcuts from './basics/TheKeyboardShortcuts.vue';
 
@@ -40,7 +38,6 @@ export default Vue.extend({
     TheTheme,
     ThePosition,
     TheContextMenu,
-    TheChatOption,
     TheCliAccess,
     TheKeyboardShortcuts,
   },

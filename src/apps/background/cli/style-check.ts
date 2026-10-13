@@ -1,7 +1,7 @@
 import * as postcss from 'postcss';
 
 import { getStableSelector } from '@stylebot/css';
-import type { ChatCssEdit } from '@stylebot/types';
+import type { CssEdit } from '@stylebot/types';
 
 const KEYFRAMES = /keyframes$/i;
 const GOOGLE_FONT_FAMILY = /fonts\.googleapis\.com\/css2\?family=([^:&"')]+)/;
@@ -70,7 +70,7 @@ export const parseSavedCss = (css: string): postcss.Root => {
 export const changedDeclarations = (
   before: postcss.Root,
   after: postcss.Root
-): Array<ChatCssEdit> => {
+): Array<CssEdit> => {
   const previous = new Set<string>();
   const key = (
     context: string,
@@ -82,10 +82,10 @@ export const changedDeclarations = (
     rule.walkDecls(decl => previous.add(key(context, rule, decl)))
   );
 
-  const edits: Array<ChatCssEdit> = [];
+  const edits: Array<CssEdit> = [];
 
   walkStyleRules(after, (rule, context) => {
-    const declarations: ChatCssEdit['declarations'] = [];
+    const declarations: CssEdit['declarations'] = [];
 
     rule.walkDecls(decl => {
       if (!previous.has(key(context, rule, decl))) {
@@ -104,7 +104,7 @@ export const changedDeclarations = (
 /**
  * Every declaration in the css, as edits by selector.
  */
-export const allDeclarations = (root: postcss.Root): Array<ChatCssEdit> =>
+export const allDeclarations = (root: postcss.Root): Array<CssEdit> =>
   changedDeclarations(postcss.root(), root);
 
 /**
@@ -118,7 +118,8 @@ export const ruleSelectors = (root: postcss.Root): Array<string> => {
 
 /**
  * Swaps each partly hashed class in the css's style rules for its stable
- * matcher, as Chat does when it saves, and lists the selectors it changed.
+ * matcher, so its rules outlive a rebuild, and lists the selectors it
+ * changed.
  */
 export const useStableSelectors = (
   root: postcss.Root

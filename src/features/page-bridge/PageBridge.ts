@@ -1,10 +1,5 @@
 import type { RoleColorGroups } from '@stylebot/css';
-import type {
-  ChatCssEdit,
-  ChatPageSignals,
-  ChatStyleProblem,
-  CssDeclaration,
-} from '@stylebot/types';
+import type { CssDeclaration } from '@stylebot/types';
 import type { AppliedDeclaration } from './applied-declarations';
 
 /**
@@ -124,46 +119,10 @@ export type PageBridge = {
   ): Promise<Record<string, string>>;
 
   /**
-   * An indented outline of the page's visible elements, for describing the
-   * page to a language model.
-   */
-  getPageOutline(): Promise<string>;
-
-  /**
-   * Cheap facts about the page, for suggesting requests that suit it.
-   */
-  getPageSignals(): Promise<ChatPageSignals>;
-
-  /**
    * How many of the page's elements each selector matches, or null for a
    * selector the page can't parse.
    */
   countMatches(selectors: Array<string>): Promise<Array<number | null>>;
-
-  /**
-   * The selectors with each partly hashed class swapped for its stable
-   * matcher, checked against the page.
-   */
-  getStableSelectors(selectors: Array<string>): Promise<Array<string>>;
-
-  /**
-   * Notes what the page looks like before the edits are applied, for
-   * checkStyle to compare against.
-   */
-  startStyleCheck(edits: Array<ChatCssEdit>): Promise<void>;
-
-  /**
-   * Adds edits about to be applied to the check startStyleCheck started,
-   * for a reply whose edits stream in one by one.
-   */
-  extendStyleCheck(edits: Array<ChatCssEdit>): Promise<void>;
-
-  /**
-   * Once the edits noted by startStyleCheck and extendStyleCheck have applied: text they made
-   * hard to read, surfaces a theme change missed, and declarations that
-   * changed nothing.
-   */
-  checkStyle(): Promise<Array<ChatStyleProblem>>;
 
   /**
    * The user's Stylebot declarations in effect on the element the selector
@@ -182,12 +141,6 @@ export type PageBridge = {
    * selector's first match when that element no longer fits.
    */
   getSelectorAlternatives(selector: string): Promise<SelectorAlternatives>;
-
-  /**
-   * The page's CSS as context for restyling it: its variables, and its
-   * own rules for the elements matching the selector.
-   */
-  getPageCssContext(selector: string): Promise<string>;
 
   /**
    * Asks the page to show its own panel again, docked on the given side;

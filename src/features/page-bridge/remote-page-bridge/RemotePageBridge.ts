@@ -1,11 +1,6 @@
 import type { AppliedDeclaration } from '../applied-declarations';
 import type { RoleColorGroups } from '@stylebot/css';
-import type {
-  ChatCssEdit,
-  ChatPageSignals,
-  ChatStyleProblem,
-  CssDeclaration,
-} from '@stylebot/types';
+import type { CssDeclaration } from '@stylebot/types';
 
 import type {
   PageBridge,
@@ -283,32 +278,8 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
     return this.request('getComputedStyles', selector, properties);
   }
 
-  getPageOutline(): Promise<string> {
-    return this.request('getPageOutline');
-  }
-
-  getPageSignals(): Promise<ChatPageSignals> {
-    return this.request('getPageSignals');
-  }
-
   countMatches(selectors: Array<string>): Promise<Array<number | null>> {
     return this.request('countMatches', selectors);
-  }
-
-  getStableSelectors(selectors: Array<string>): Promise<Array<string>> {
-    return this.request('getStableSelectors', selectors);
-  }
-
-  startStyleCheck(edits: Array<ChatCssEdit>): Promise<void> {
-    return this.request('startStyleCheck', edits);
-  }
-
-  extendStyleCheck(edits: Array<ChatCssEdit>): Promise<void> {
-    return this.request('extendStyleCheck', edits);
-  }
-
-  checkStyle(): Promise<Array<ChatStyleProblem>> {
-    return this.request('checkStyle');
   }
 
   getSelectorAlternatives(selector: string): Promise<SelectorAlternatives> {
@@ -321,10 +292,6 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
 
   getPageDeclarations(selector: string): Promise<Array<CssDeclaration>> {
     return this.request('getPageDeclarations', selector);
-  }
-
-  getPageCssContext(selector: string): Promise<string> {
-    return this.request('getPageCssContext', selector);
   }
 
   openInPage(dockLocation: 'left' | 'right'): void {

@@ -200,8 +200,8 @@ const site: SiteMessages = {
   manual: {
     title: 'Manual',
     description:
-      'Como usar o Stylebot: estilizar um site, perfis, a linha de comando, o Chat, sincronização, regras de URL e atalhos.',
-    lede: 'Como o Stylebot funciona, do seu primeiro estilo aos perfis, ao Chat e à sincronização.',
+      'Como usar o Stylebot: estilizar um site, perfis, a linha de comando, sincronização, regras de URL e atalhos.',
+    lede: 'Como o Stylebot funciona, do seu primeiro estilo aos perfis e à sincronização.',
     sections: 'Seções do manual',
     toc: {
       start: 'Primeiros passos',
@@ -210,7 +210,6 @@ const site: SiteMessages = {
       sync: 'Sincronização e histórico de versões',
       urls: 'Regras de URL',
       cli: 'CLI',
-      chat: 'Chat',
       shortcuts: 'Atalhos de teclado',
       help: 'Ajuda e suporte',
     },
@@ -248,20 +247,6 @@ const site: SiteMessages = {
       privacy: 'Privacidade',
       privacyBody:
         'O acesso à CLI fica desativado até você ativá-lo. O Stylebot e a CLI só se comunicam entre si, neste computador; um agente envia o que lê ao próprio provedor.',
-    },
-    chat: {
-      intro:
-        'O Chat vem desativado por padrão. Para adicionar a aba dele ao editor, ative <strong>Chat</strong> nas opções do Stylebot, em Geral, e depois conecte uma chave de API. Ele é ideal para ajustes rápidos: descreva a mudança que você quer e o Stylebot escreve o CSS. Você pode escolher um elemento para indicar algo específico ou anexar uma captura de tela para mostrar o que quer dizer. Para mudanças maiores, como um tema totalmente novo, use a <a href="#cli">CLI</a>.',
-      shot: 'A aba Chat depois de pedir um tema de floresta com uma fonte serifada legível no Hacker News',
-      key: 'Use sua própria chave',
-      keyBody:
-        'Conecte uma chave de API do Claude, OpenAI ou Gemini. As chaves ficam salvas apenas neste computador e nunca são sincronizadas. As mensagens vão direto do seu navegador para o provedor.',
-      changes: 'Para onde vão as mudanças',
-      changesBody:
-        'Cada mudança é aplicada na hora e adicionada à folha de estilo do perfil atual. Clique em <strong>N linhas adicionadas</strong> para vê-la em Código, ou desfaça pelo chat.',
-      cost: 'Custo',
-      costBody:
-        'A contagem de tokens abaixo da caixa de mensagem mostra quanto a conversa já usou, com um custo estimado.',
     },
     presets: {
       intro:
@@ -337,7 +322,7 @@ const site: SiteMessages = {
     browser: {
       title: 'No seu navegador',
       body: [
-        'Seus estilos, configurações, histórico, conversas do chat e chaves de API ficam salvos no seu navegador, e desinstalar o Stylebot remove tudo isso. As fontes do Google Fonts e as folhas de estilo que você importa com <code>@import</code> são baixadas de onde estão hospedadas, e quem as hospeda vê seu endereço IP.',
+        'Seus estilos, configurações e histórico ficam salvos no seu navegador, e desinstalar o Stylebot remove tudo isso. As fontes do Google Fonts e as folhas de estilo que você importa com <code>@import</code> são baixadas de onde estão hospedadas, e quem as hospeda vê seu endereço IP.',
       ],
     },
     sync: {
@@ -345,12 +330,6 @@ const site: SiteMessages = {
       body: [
         'Ao conectar o Google Drive nas Opções, seus estilos são salvos em um arquivo no seu próprio Drive. O Stylebot só consegue ver os arquivos que ele cria, e o token de acesso fica no seu navegador. Desconecte nas Opções ou na sua <a href="https://myaccount.google.com/connections">Conta do Google</a>.',
         'O uso que o Stylebot faz das informações recebidas das APIs do Google segue a <a href="https://developers.google.com/terms/api-services-user-data-policy">Política de dados do usuário dos serviços de API do Google</a>, incluindo os requisitos de uso limitado.',
-      ],
-    },
-    chat: {
-      title: 'Chat',
-      body: [
-        'O Chat fica desativado até você adicionar uma chave de API, e nada é enviado antes disso. Sua mensagem vai direto para o provedor cuja chave de API você adicionou, junto com qualquer captura de tela que você anexar, o endereço e o título da página, uma estrutura do conteúdo visível dela, o CSS dela e seus estilos. Isso pode incluir informações pessoais da página. Vale a política do provedor: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {
@@ -417,7 +396,7 @@ const site: SiteMessages = {
     },
     r40: {
       description:
-        'O Stylebot 4.0 traz um editor redesenhado, uma linha de comando para agentes de programação, perfis, um painel lateral, o Chat, histórico de versões e sincronização.',
+        'O Stylebot 4.0 traz um editor redesenhado, uma linha de comando para agentes de programação, perfis, um painel lateral, histórico de versões e sincronização.',
       lede: 'Um editor redesenhado, uma linha de comando para agentes de programação, perfis e um painel lateral.',
       toc: {
         editor: 'Editor redesenhado',
@@ -426,7 +405,6 @@ const site: SiteMessages = {
         panel: 'Painel lateral',
         history: 'Histórico de versões',
         sync: 'Sincronização',
-        chat: 'Chat',
         more: 'E mais',
       },
       editorTitle: 'Um editor redesenhado',
@@ -456,11 +434,6 @@ const site: SiteMessages = {
       syncTitle: 'Sincronização',
       syncBody:
         'A sincronização com o Google Drive está mais robusta. As edições de computadores diferentes são mescladas, então nenhuma se perde. Ela roda sozinha a cada 30 minutos e logo depois que você edita.',
-      chatTitle: 'Chat',
-      chatBody:
-        'Não usa um agente de programação? Descreva o que você quer, ou escolha um visual sugerido, e o Stylebot escreve o CSS. Use sua própria chave do Claude, OpenAI ou Gemini.',
-      chatAlt:
-        'A aba Chat sugerindo visuais para a página: Aconchegante, Tranquilo e Só os links em cor',
       moreTitle: 'E mais',
       moreItems: [
         'Um novo stylebot.dev',

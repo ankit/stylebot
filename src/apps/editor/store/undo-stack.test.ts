@@ -1,9 +1,6 @@
 import {
   COALESCE_WINDOW_MS,
-  getChatSourceId,
-  getChatTurnId,
   UNDO_LIMIT,
-  discardChange,
   emptyUndoStack,
   undoKeyFor,
   undoShortcuts,
@@ -16,22 +13,6 @@ const key = (init: KeyboardEventInit): KeyboardEvent =>
   new KeyboardEvent('keydown', init);
 
 describe('undo stack', () => {
-  describe('discardChange', () => {
-    it('drops the latest step only when it came from the source', () => {
-      const stack = recordChange(
-        recordChange(emptyUndoStack(), 'a', 'edit', 1000),
-        'b',
-        'chat:r1',
-        5000
-      );
-
-      expect(discardChange(stack, 'chat:r1').past).toEqual([
-        { css: 'a', source: 'edit', at: 1000 },
-      ]);
-      expect(discardChange(stack, 'chat:r2')).toBe(stack);
-    });
-  });
-
   describe('recordChange', () => {
     it('pushes the css being replaced as a new step', () => {
       const stack = recordChange(emptyUndoStack(), 'a', 'edit', 1000);
@@ -40,13 +21,6 @@ describe('undo stack', () => {
         past: [{ css: 'a', source: 'edit', at: 1000 }],
         future: [],
       });
-    });
-
-    it('extends the latest step for a grouped change from the same source, however late', () => {
-      const first = recordChange(emptyUndoStack(), 'a', 'chat:r1', 1000);
-      const second = recordChange(first, 'b', 'chat:r1', 60000, 'always');
-
-      expect(second.past).toEqual([{ css: 'a', source: 'chat:r1', at: 60000 }]);
     });
 
     it('extends the latest step for a quick change from the same source', () => {
@@ -64,8 +38,8 @@ describe('undo stack', () => {
     });
 
     it('keeps a change that must never merge as its own step, however quick', () => {
-      const first = recordChange(emptyUndoStack(), 'a', 'chat:r1', 1000);
-      const second = recordChange(first, 'b', 'chat:r1', 1001, 'never');
+      const first = recordChange(emptyUndoStack(), 'a', 'swatch', 1000);
+      const second = recordChange(first, 'b', 'swatch', 1001, 'never');
 
       expect(second.past).toHaveLength(2);
     });
@@ -170,13 +144,6 @@ describe('undo stack', () => {
       const next = recordChange(redone!.undoStack, 'b', 'edit', Date.now());
 
       expect(next.past.map(entry => entry.css)).toEqual(['a', 'b']);
-    });
-  });
-
-  describe('getChatTurnId', () => {
-    it('reads the reply back from its source, and nothing from any other', () => {
-      expect(getChatTurnId(getChatSourceId('r1'))).toBe('r1');
-      expect(getChatTurnId('slider')).toBeNull();
     });
   });
 

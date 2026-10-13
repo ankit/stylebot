@@ -198,8 +198,8 @@ const site: SiteMessages = {
   manual: {
     title: '설명서',
     description:
-      'Stylebot 사용법: 사이트 스타일 지정, 프로필, 명령줄, 채팅, 동기화, URL 규칙, 단축키.',
-    lede: '첫 스타일부터 프로필, 채팅, 동기화까지 Stylebot 사용법을 알아보세요.',
+      'Stylebot 사용법: 사이트 스타일 지정, 프로필, 명령줄, 동기화, URL 규칙, 단축키.',
+    lede: '첫 스타일부터 프로필과 동기화까지 Stylebot 사용법을 알아보세요.',
     sections: '설명서 목차',
     toc: {
       start: '시작하기',
@@ -208,7 +208,6 @@ const site: SiteMessages = {
       sync: '동기화 및 버전 기록',
       urls: 'URL 규칙',
       cli: 'CLI',
-      chat: '채팅',
       shortcuts: '키보드 단축키',
       help: '도움말 및 지원',
     },
@@ -246,20 +245,6 @@ const site: SiteMessages = {
       privacy: '개인정보 보호',
       privacyBody:
         'CLI 액세스는 직접 켜기 전까지 꺼져 있습니다. Stylebot과 CLI는 이 컴퓨터 안에서 서로만 통신하며, 에이전트는 읽은 내용을 자신의 제공업체로 보냅니다.',
-    },
-    chat: {
-      intro:
-        '채팅은 기본적으로 꺼져 있습니다. 편집기에 탭을 추가하려면 Stylebot 옵션의 일반에서 <strong>채팅</strong>을 켠 뒤 API 키를 연결하세요. 간단한 수정에 알맞으며, 원하는 변경을 설명하면 Stylebot이 CSS를 작성합니다. 요소를 선택해 대상을 가리키거나, 스크린샷을 첨부해 원하는 모습을 보여 줄 수도 있습니다. 완전히 새로운 테마처럼 큰 변경에는 <a href="#cli">CLI</a>를 사용하세요.',
-      shot: 'Hacker News에서 읽기 쉬운 세리프 글꼴의 숲 테마를 요청한 뒤의 채팅 탭',
-      key: '내 API 키 사용',
-      keyBody:
-        'Claude, OpenAI, Gemini API 키를 연결하세요. 키는 이 컴퓨터에만 저장되며 동기화되지 않습니다. 메시지는 브라우저에서 제공업체로 바로 전송됩니다.',
-      changes: '변경 사항이 저장되는 곳',
-      changesBody:
-        '각 변경은 바로 적용되고 현재 프로필의 스타일시트에 추가됩니다. <strong>N줄 추가됨</strong>을 클릭하면 코드 탭에서 볼 수 있고, 채팅에서 실행 취소할 수도 있습니다.',
-      cost: '비용',
-      costBody:
-        '메시지 입력란 아래의 토큰 수는 대화에 사용된 양과 예상 비용을 보여 줍니다.',
     },
     presets: {
       intro:
@@ -332,7 +317,7 @@ const site: SiteMessages = {
     browser: {
       title: '브라우저 안',
       body: [
-        '스타일, 설정, 기록, 채팅 대화, API 키는 브라우저에 저장되며, Stylebot을 삭제하면 함께 삭제됩니다. Google Fonts 글꼴과 <code>@import</code>로 가져온 스타일시트는 호스팅된 곳에서 다운로드되며, 이때 그곳에 IP 주소가 전달됩니다.',
+        '스타일, 설정, 기록은 브라우저에 저장되며, Stylebot을 삭제하면 함께 삭제됩니다. Google Fonts 글꼴과 <code>@import</code>로 가져온 스타일시트는 호스팅된 곳에서 다운로드되며, 이때 그곳에 IP 주소가 전달됩니다.',
       ],
     },
     sync: {
@@ -340,12 +325,6 @@ const site: SiteMessages = {
       body: [
         '옵션에서 Google Drive를 연결하면 스타일이 본인의 Drive에 있는 파일에 저장됩니다. Stylebot은 자신이 만든 파일만 볼 수 있으며, 액세스 토큰은 브라우저에 보관됩니다. 연결은 옵션이나 <a href="https://myaccount.google.com/connections">Google 계정</a>에서 해제할 수 있습니다.',
         'Google API에서 받은 정보에 대한 Stylebot의 사용은 제한적 사용 요구사항을 포함한 <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API 서비스 사용자 데이터 정책</a>을 준수합니다.',
-      ],
-    },
-    chat: {
-      title: '채팅',
-      body: [
-        '채팅은 API 키를 추가하기 전까지 꺼져 있으며, 그 전에는 아무것도 전송되지 않습니다. 메시지는 API 키를 추가한 제공업체로 바로 전송되며, 첨부한 스크린샷, 페이지의 주소와 제목, 보이는 내용의 개요, 페이지의 CSS와 스타일도 함께 전송됩니다. 여기에는 페이지에 표시된 개인정보가 포함될 수 있습니다. 제공업체의 정책이 적용됩니다: <a href="https://www.anthropic.com/legal/privacy">Anthropic</a>, <a href="https://openai.com/policies/privacy-policy/">OpenAI</a>, <a href="https://ai.google.dev/gemini-api/terms">Google</a>.',
       ],
     },
     cli: {
@@ -411,7 +390,7 @@ const site: SiteMessages = {
     },
     r40: {
       description:
-        'Stylebot 4.0은 새롭게 디자인한 편집기, 코딩 에이전트를 위한 명령줄, 프로필, 측면 패널, 채팅, 버전 기록, 동기화를 제공합니다.',
+        'Stylebot 4.0은 새롭게 디자인한 편집기, 코딩 에이전트를 위한 명령줄, 프로필, 측면 패널, 버전 기록, 동기화를 제공합니다.',
       lede: '새롭게 디자인한 편집기, 코딩 에이전트를 위한 명령줄, 프로필, 측면 패널.',
       toc: {
         editor: '새 편집기',
@@ -420,7 +399,6 @@ const site: SiteMessages = {
         panel: '측면 패널',
         history: '버전 기록',
         sync: '동기화',
-        chat: '채팅',
         more: '그 밖의 기능',
       },
       editorTitle: '새롭게 디자인한 편집기',
@@ -450,11 +428,6 @@ const site: SiteMessages = {
       syncTitle: '동기화',
       syncBody:
         'Google Drive 동기화가 더 안정적입니다. 여러 컴퓨터의 변경 사항을 병합하므로 잃어버리는 내용이 없습니다. 30분마다, 그리고 편집 직후에 자동으로 실행됩니다.',
-      chatTitle: '채팅',
-      chatBody:
-        '코딩 에이전트가 없으신가요? 원하는 것을 설명하거나 제안된 스타일을 고르면 Stylebot이 CSS를 작성합니다. Claude, OpenAI, Gemini 키를 직접 연결해 사용하세요.',
-      chatAlt:
-        '페이지에 어울리는 스타일을 제안하는 채팅 탭: 아늑하게, 차분하게, 링크만 컬러로',
       moreTitle: '그 밖의 기능',
       moreItems: [
         '새로워진 stylebot.dev',

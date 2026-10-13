@@ -64,7 +64,6 @@ import {
   recordChange,
   undoChange,
   redoChange,
-  getChatTurnId,
 } from './undo-stack';
 import type { UndoMerge, UndoMove } from './undo-stack';
 
@@ -78,16 +77,12 @@ export type ApplyCssArgs = {
   record?: boolean;
   // Whether the change can join the latest step from the same source.
   merge?: UndoMerge;
-  // False to apply to the page without saving yet, as a chat reply does
-  // while its edits stream in; it saves once at the end.
-  save?: boolean;
 };
 
 const RECENT_FONTS_LIMIT = 10;
 
 /**
- * Applies an undo or redo move, flipping the chat reply it stepped over so
- * the reply's card reads undone or applied to match.
+ * Applies an undo or redo move.
  */
 const stepHistory = (
   { commit, dispatch }: { commit: Commit; dispatch: Dispatch },
@@ -99,12 +94,6 @@ const stepHistory = (
 
   commit('setUndoStack', move.undoStack);
   dispatch('applyCss', { css: move.css, record: false });
-
-  const turnId = getChatTurnId(move.source);
-
-  if (turnId) {
-    dispatch('chat/flipTurn', turnId);
-  }
 };
 
 // Bumped per apply/preview so that, after its awaits, a call superseded by a
@@ -377,13 +366,7 @@ export default {
 
   applyCss(
     { commit, state }: { commit: Commit; state: State },
-    {
-      css,
-      source = 'edit',
-      record = true,
-      merge = 'recent',
-      save = true,
-    }: ApplyCssArgs
+    { css, source = 'edit', record = true, merge = 'recent' }: ApplyCssArgs
   ): void {
     // Saving empty css deletes the style, and holding none may just mean the
     // stored one never reached the editor rather than that there is none.
@@ -400,15 +383,13 @@ export default {
         enabled: state.enabled,
         forceImportant: state.forceImportant,
       });
-      if (save) {
-        setStyle(
-          state.url,
-          removeEmptyRules(css),
-          state.readability,
-          state.forceImportant,
-          state.activeProfile
-        );
-      }
+      setStyle(
+        state.url,
+        removeEmptyRules(css),
+        state.readability,
+        state.forceImportant,
+        state.activeProfile
+      );
 
       if (record && css !== state.css) {
         commit(
@@ -785,7 +766,7 @@ export default {
     // is detached from the document, not just hidden. Switch the panel to
     // Magic locally without persisting over the user's global mode
     // preference (mirrors openStylebot's readabilityActive handling above).
-    if (value && ['basic', 'code', 'chat'].includes(state.options.mode)) {
+    if (value && ['basic', 'code'].includes(state.options.mode)) {
       commit('setOptions', { ...state.options, mode: 'magic' });
     }
 

@@ -193,8 +193,8 @@ const site: SiteMessages = {
   manual: {
     title: '手册',
     description:
-      'Stylebot 使用方法：设置网站样式、方案、命令行、聊天、同步、URL 规则和快捷键。',
-    lede: 'Stylebot 怎么用，从你的第一个样式到方案、聊天和同步。',
+      'Stylebot 使用方法：设置网站样式、方案、命令行、同步、URL 规则和快捷键。',
+    lede: 'Stylebot 怎么用，从你的第一个样式到方案和同步。',
     sections: '手册章节',
     toc: {
       start: '入门',
@@ -203,7 +203,6 @@ const site: SiteMessages = {
       sync: '同步和版本历史',
       urls: 'URL 规则',
       cli: 'CLI',
-      chat: '聊天',
       shortcuts: '快捷键',
       help: '帮助和支持',
     },
@@ -241,19 +240,6 @@ const site: SiteMessages = {
       privacy: '隐私',
       privacyBody:
         'CLI 访问默认关闭，需要你手动开启。Stylebot 和 CLI 只在这台电脑上相互通信；智能体会把它读取的内容发送给自己的服务商。',
-    },
-    chat: {
-      intro:
-        '聊天默认关闭。要在编辑器中添加它的标签页，请在 Stylebot 选项的“基本”中开启<strong>聊天</strong>，然后连接 API 密钥。它最适合快速修改：描述你想要的改动，Stylebot 就会编写 CSS。可以选取元素来指明要改的地方，也可以附加截图来说明你的意思。更大的改动，比如整套新主题，请使用 <a href="#cli">CLI</a>。',
-      shot: '“聊天”标签页：在 Hacker News 上要求换成森林主题和易读的衬线字体之后',
-      key: '使用你自己的密钥',
-      keyBody:
-        '连接 Claude、OpenAI 或 Gemini 的 API 密钥。密钥只保存在这台电脑上，从不同步。消息直接从你的浏览器发送到服务商。',
-      changes: '改动去了哪里',
-      changesBody:
-        '每处改动都会立即应用，并添加到当前方案的样式表中。点击<strong>添加了 N 行</strong>可在“代码”中查看，也可以在聊天中撤销。',
-      cost: '费用',
-      costBody: '消息框下方的 token 数显示这次对话已用的量，并附有预估费用。',
     },
     presets: {
       intro:
@@ -324,7 +310,7 @@ const site: SiteMessages = {
     browser: {
       title: '浏览器中的数据',
       body: [
-        '你的样式、设置、历史记录、聊天记录和 API 密钥都保存在浏览器中，卸载 Stylebot 会将它们删除。Google Fonts 字体和通过 <code>@import</code> 引入的样式表会从其托管位置下载，托管方会看到你的 IP 地址。',
+        '你的样式、设置和历史记录都保存在浏览器中，卸载 Stylebot 会将它们删除。Google Fonts 字体和通过 <code>@import</code> 引入的样式表会从其托管位置下载，托管方会看到你的 IP 地址。',
       ],
     },
     sync: {
@@ -332,12 +318,6 @@ const site: SiteMessages = {
       body: [
         '在设置中连接 Google Drive 后，你的样式会保存到你自己 Drive 中的一个文件。Stylebot 只能看到它自己创建的文件，它的访问令牌保存在你的浏览器中。可以在设置或你的 <a href="https://myaccount.google.com/connections">Google 账号</a>中断开连接。',
         'Stylebot 对从 Google API 获取的信息的使用遵守 <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API 服务用户数据政策</a>，包括其中的“有限使用”要求。',
-      ],
-    },
-    chat: {
-      title: '聊天',
-      body: [
-        '在你添加 API 密钥之前，聊天处于关闭状态，不会发送任何内容。你的消息会直接发送给你添加了 API 密钥的服务商，一同发送的还有你附加的截图、页面的地址和标题、页面可见内容的概要、页面的 CSS 和你的样式。其中可能包含页面上的个人信息。适用该服务商的政策：<a href="https://www.anthropic.com/legal/privacy">Anthropic</a>、<a href="https://openai.com/policies/privacy-policy/">OpenAI</a>、<a href="https://ai.google.dev/gemini-api/terms">Google</a>。',
       ],
     },
     cli: {
@@ -398,7 +378,7 @@ const site: SiteMessages = {
     },
     r40: {
       description:
-        'Stylebot 4.0 带来重新设计的编辑器、面向编程智能体的命令行、方案、侧边栏、聊天、版本历史和同步。',
+        'Stylebot 4.0 带来重新设计的编辑器、面向编程智能体的命令行、方案、侧边栏、版本历史和同步。',
       lede: '重新设计的编辑器、面向编程智能体的命令行、方案和侧边栏。',
       toc: {
         editor: '重新设计的编辑器',
@@ -407,7 +387,6 @@ const site: SiteMessages = {
         panel: '侧边栏',
         history: '版本历史',
         sync: '同步',
-        chat: '聊天',
         more: '更多',
       },
       editorTitle: '重新设计的编辑器',
@@ -435,10 +414,6 @@ const site: SiteMessages = {
       syncTitle: '同步',
       syncBody:
         'Google Drive 同步更加稳定，会合并来自不同电脑的改动，不会丢失任何内容。每 30 分钟自动同步一次，编辑后也会立即同步。',
-      chatTitle: '聊天',
-      chatBody:
-        '没有编程智能体？描述你想要的效果，或选一个推荐的风格，Stylebot 就会编写 CSS。使用你自己的 Claude、OpenAI 或 Gemini 密钥。',
-      chatAlt: '“聊天”标签页为页面推荐的风格：“温馨”“宁静”和“只有链接是彩色”',
       moreTitle: '更多',
       moreItems: [
         '全新的 stylebot.dev',

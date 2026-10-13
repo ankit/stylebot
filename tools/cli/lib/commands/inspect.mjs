@@ -2,8 +2,8 @@ import { addHelpSections } from '../help.mjs';
 import { createPrinter, request } from '../request.mjs';
 
 /**
- * Adds the commands that read the page as Chat does: its suggestions, its
- * css, computed values and selector matches.
+ * Adds the commands that read the page: its suggestions, its css, computed
+ * values and selector matches.
  */
 export const addInspectCommands = program => {
   const print = createPrinter(program);
@@ -12,7 +12,7 @@ export const addInspectCommands = program => {
 
   program
     .command('suggestions')
-    .description('Requests that suit the page, as Chat suggests them')
+    .description('Requests that suit the page, plus a creative look')
     .argument('[tab]', 'A tab id; the active tab if left out')
     .action(async tab =>
       print(await request('suggestions', { tab }), suggestions =>

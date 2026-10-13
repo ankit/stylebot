@@ -174,28 +174,14 @@ export const createEditorWindowHandler = (
                 return bridge.getPageColors();
               case 'getComputedStyles':
                 return bridge.getComputedStyles(...message.args);
-              case 'getPageOutline':
-                return bridge.getPageOutline();
-              case 'getPageSignals':
-                return bridge.getPageSignals();
               case 'countMatches':
                 return bridge.countMatches(...message.args);
-              case 'getStableSelectors':
-                return bridge.getStableSelectors(...message.args);
-              case 'startStyleCheck':
-                return bridge.startStyleCheck(...message.args);
-              case 'extendStyleCheck':
-                return bridge.extendStyleCheck(...message.args);
-              case 'checkStyle':
-                return bridge.checkStyle();
               case 'getAppliedDeclarations':
                 return bridge.getAppliedDeclarations(...message.args);
               case 'getPageDeclarations':
                 return bridge.getPageDeclarations(...message.args);
               case 'getSelectorAlternatives':
                 return bridge.getSelectorAlternatives(...message.args);
-              case 'getPageCssContext':
-                return bridge.getPageCssContext(...message.args);
             }
           });
           break;

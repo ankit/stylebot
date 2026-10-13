@@ -10,7 +10,6 @@ import actions from '@/apps/editor/store/actions';
 import getters from '@/apps/editor/store/getters';
 import mutations from '@/apps/editor/store/mutations';
 import type { State } from '@/apps/editor/store';
-import { createChatModule } from '@/apps/editor/store/chat';
 
 export type EditorStateOverrides = Partial<Omit<State, 'options'>> & {
   options?: Partial<StylebotOptions>;
@@ -40,9 +39,6 @@ export const createEditorStore = (
     state,
     getters,
     mutations,
-    modules: {
-      chat: createChatModule(),
-    },
     actions: {
       ...actions,
       initialize: noop,

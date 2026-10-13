@@ -13,7 +13,6 @@ jest.mock('./editor-window', () => ({
 }));
 jest.mock('./messages', () => ({}));
 jest.mock('./restore-tabs', () => ({ restoreOpenTabs: jest.fn() }));
-jest.mock('./chat', () => ({ initChatPort: jest.fn() }));
 jest.mock('./styles', () => ({
   refreshAllBadges: jest.fn(),
   refreshBadgeForTab: jest.fn(),

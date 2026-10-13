@@ -20,4 +20,3 @@
 - [Readability](readability.md) — the reader view and how it loads
 - [Profiles](profiles.md) — several named stylesheets per site, how they're stored, saved and synced
 - [Sync](sync.md) — Google Drive sync and its three-way merge
-- [Chat](chat.md) — bring-your-own-key chat that writes CSS, and its provider adapters
