@@ -248,9 +248,7 @@ const updateScreenshots = async localizationId => {
   const existing = await getAll(
     `/v1/appScreenshotSets/${set.id}/appScreenshots`
   );
-  const ids = [];
-
-  for (const file of files) {
+  const matches = files.map(file => {
     const buffer = readFileSync(path.join(screenshotsDir, file));
     const match = existing.find(
       item =>
@@ -258,14 +256,22 @@ const updateScreenshots = async localizationId => {
         item.attributes.sourceFileChecksum === md5(buffer) &&
         item.attributes.assetDeliveryState?.state !== 'FAILED'
     );
+    return { file, buffer, match };
+  });
 
-    ids.push(match ? match.id : await uploadScreenshot(set.id, file, buffer));
-    console.log(`✓ ${file}${match ? ' (unchanged)' : ''}`);
-  }
-
-  for (const item of existing.filter(({ id }) => !ids.includes(id))) {
+  // Removed first, since a set holds at most 10 screenshots.
+  for (const item of existing.filter(
+    item => !matches.some(({ match }) => match === item)
+  )) {
     await request('DELETE', `/v1/appScreenshots/${item.id}`);
     console.log(`✓ removed ${item.attributes.fileName}`);
+  }
+
+  const ids = [];
+
+  for (const { file, buffer, match } of matches) {
+    ids.push(match ? match.id : await uploadScreenshot(set.id, file, buffer));
+    console.log(`✓ ${file}${match ? ' (unchanged)' : ''}`);
   }
 
   await request(
