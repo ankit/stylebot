@@ -14,7 +14,7 @@ const PLUGIN = 'tools/claude-plugin';
 const SKILL = `${PLUGIN}/skills/stylebot/SKILL.md`;
 // Where a checkout keeps the page check, newest first.
 const STYLE_CHECKS = [
-  'src/features/page-bridge/style-check',
+  'src/features/page-bridge/page-reading/style-check',
   'src/features/page-bridge/chat/style-check',
 ];
 
