@@ -1,3 +1,9 @@
+## Version 4.0.2 (October 2026)
+
+- Remove Chat; to restyle pages with AI, use the `stylebot` command line with a coding agent like Claude Code (#1190)
+- Hide the inspect highlight when the pointer leaves the page, and stop inspecting when the editor's Options menu opens
+- Fix shortcut labels in the options page's Basics being too bright in dark mode
+
 ## Version 4.0.1 (October 2026)
 
 - Make Chat optional: it stays hidden until you turn it on in the options page's Basics, and stays on if you already use it (#1183)
