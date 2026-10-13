@@ -3,7 +3,6 @@
 //
 //   yarn capture:manual [<name>...] [--no-build]
 
-import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -17,16 +16,15 @@ import {
   openSite,
   profiles,
   seed,
+  sharp,
   showTab,
   style,
+  syncState,
   wait,
 } from './browser.mjs';
 import { gallery, theme } from './shots.mjs';
 
 const OUT_DIR = path.join(rootDir, 'site/src/assets/manual');
-
-// The site already depends on sharp, for Astro's images.
-const sharp = createRequire(path.join(rootDir, 'site/package.json'))('sharp');
 
 const APPEARANCES = ['light', 'dark'];
 
@@ -100,28 +98,6 @@ const openPopup = async browser => {
   await popup.waitForLoadState('load');
   await wait(1500);
   return popup;
-};
-
-/**
- * Seeded sync state that reads as connected and synced a few minutes ago.
- */
-const syncState = () => {
-  const syncedAt = new Date(Date.now() - 3 * 60 * 1000).toISOString();
-  return {
-    'google-drive-sync-enabled': true,
-    'google-drive-sync-state': {
-      remoteRevision: syncedAt,
-      localRevision: syncedAt,
-      lastSyncedAt: syncedAt,
-      account: { email: 'you@gmail.com' },
-      metadata: {
-        id: 'manual',
-        modifiedTime: syncedAt,
-        webViewLink: 'https://drive.google.com/',
-        webContentLink: 'https://drive.google.com/',
-      },
-    },
-  };
 };
 
 const history = () => {

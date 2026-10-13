@@ -102,6 +102,16 @@ const {
     display: none;
   }
 
+  @media (max-width: 639px) {
+    .quote {
+      min-height: 280px;
+    }
+
+    .quote:nth-child(n + 2) {
+      display: none;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .quote {
       transition: none;

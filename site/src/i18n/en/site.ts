@@ -47,7 +47,14 @@ export default {
     // Shown on phones in place of the store buttons.
     desktopOnly:
       'Stylebot runs on <strong>Chrome, Firefox and Edge</strong> on desktop.',
-    video: 'Stylebot demo video',
+    // Headlines of the swipeable feature cards on phones, each over a
+    // screenshot of the feature.
+    tour: {
+      label: 'Feature tour',
+      pick: 'Point at anything. Restyle it.',
+      code: 'Write CSS when you want to.',
+      profiles: 'Switch looks in a click.',
+    },
     installTitle: 'Install Stylebot',
     installBody:
       'Free and open source since 2011. No account and no tracking. Your styles live in your browser, and the code is on GitHub.',

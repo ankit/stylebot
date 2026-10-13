@@ -7,7 +7,7 @@ import CliCommand from '../../components/cli/CliCommand.astro';
 import CliSection from '../../components/cli/CliSection.astro';
 import Quotes from '../../components/Quotes.astro';
 import Footer from '../../components/Footer.astro';
-import VideoEmbed from '../../components/VideoEmbed.astro';
+import FeatureTour from '../../components/FeatureTour.astro';
 import StoreLink from '../../components/StoreLink.astro';
 import { CLI_PACKAGE, LINKS, STORES } from '../../lib/links';
 import {
@@ -398,8 +398,8 @@ const structuredData = {
       <div class="demo-full">
         <Demo client:visible messages={demo} />
       </div>
-      <div class="demo-video">
-        <VideoEmbed />
+      <div class="demo-tour">
+        <FeatureTour />
       </div>
     </div>
 
@@ -665,7 +665,7 @@ const structuredData = {
     width: 100%;
   }
 
-  .demo-video,
+  .demo-tour,
   .cta-desktop {
     display: none;
   }
@@ -676,7 +676,7 @@ const structuredData = {
       display: none;
     }
 
-    .demo-video {
+    .demo-tour {
       display: block;
     }
 

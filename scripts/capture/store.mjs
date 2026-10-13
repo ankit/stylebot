@@ -1,10 +1,11 @@
 // Takes the store listing's screenshots from the current build, on live sites,
 // into store/screenshots/:
 //
-//   yarn capture:store [--safari] [--only <name>...] [--no-build]
+//   yarn capture:store [--safari | --phone] [--only <name>...] [--no-build]
 //
 // With --safari, the Mac App Store's set goes into store/safari/ instead, at
-// 2560×1600 and without the CLI.
+// 2560×1600 and without the CLI. With --phone, the same screens are cut out,
+// without their headlines, for the tour on stylebot.dev's phone layout.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -13,10 +14,12 @@ import { bin, rootDir, runOrExit } from '../lib/cli.mjs';
 import { launch } from './browser.mjs';
 import { SHOTS } from './shots.mjs';
 
-const USAGE = `usage: yarn capture:store [--safari] [--only <name>...] [--no-build]
+const USAGE = `usage: yarn capture:store [--safari | --phone] [--only <name>...] [--no-build]
 
   --safari    take the Mac App Store's set, at 2560×1600, into store/safari/
-  --only      retake just these shots, by name or number (e.g. --only 5-readability 2)
+  --phone     cut the screens out for stylebot.dev's phone tour, into
+              site/src/assets/tour/
+  --only      retake just these shots, by name or number (e.g. --only 7-readability 2)
   --no-build  skip the rebuild (dist must already be current)
 
 Shots:
@@ -31,14 +34,19 @@ if (args.includes('--help') || args.includes('-h')) {
 }
 
 const safari = args.includes('--safari');
-const outDir = path.join(rootDir, 'store', safari ? 'safari' : 'screenshots');
+const phone = args.includes('--phone');
+const outDir = phone
+  ? path.join(rootDir, 'site/src/assets/tour')
+  : path.join(rootDir, 'store', safari ? 'safari' : 'screenshots');
 // Drawn at 2x either way; Safari keeps those pixels for the Mac App Store.
 const options = safari ? { scale: 'device' } : {};
 
 const only = args.includes('--only')
   ? args.slice(args.indexOf('--only') + 1).filter(arg => !arg.startsWith('--'))
   : [];
-const available = safari ? SHOTS.filter(shot => !shot.cli) : SHOTS;
+const available = SHOTS.filter(shot =>
+  safari ? !shot.cli : !phone || shot.phone
+);
 const shots = only.length
   ? available.filter(({ name }) =>
       only.some(wanted => name === wanted || name.startsWith(`${wanted}-`))
@@ -60,11 +68,18 @@ let failed = 0;
 
 // One at a time, each in a fresh browser, so no shot's state reaches another.
 for (const shot of shots) {
-  const file = path.join(outDir, `${shot.name}.png`);
+  const file = phone
+    ? path.join(outDir, `${shot.name.replace(/^\d+-/, '')}.webp`)
+    : path.join(outDir, `${shot.name}.png`);
   const browser = shot.standalone ? null : await launch(shot);
 
   try {
-    await (shot.standalone ? shot.run(file) : shot.run(browser, file, options));
+    const shotOptions = phone
+      ? { phone: shot.phone }
+      : { ...options, slide: shot.slide };
+    await (shot.standalone
+      ? shot.run(file, shotOptions)
+      : shot.run(browser, file, shotOptions));
     console.log(`✓ ${shot.name}`);
   } catch (error) {
     failed++;

@@ -40,7 +40,12 @@ const site: SiteMessages = {
     also: '也支援 {first} 和 {second}',
     desktopOnly:
       'Stylebot 支援電腦版 <strong>Chrome、Firefox 和 Edge</strong>。',
-    video: 'Stylebot 示範影片',
+    tour: {
+      label: '功能導覽',
+      pick: '指向任何元素，改變它的樣式。',
+      code: '想寫CSS時，隨時可寫。',
+      profiles: '一鍵切換外觀。',
+    },
     installTitle: '安裝 Stylebot',
     installBody:
       '自 2011 年起免費開放原始碼。不需帳戶，也不追蹤。你的樣式保存在瀏覽器中，程式碼公開在 GitHub 上。',

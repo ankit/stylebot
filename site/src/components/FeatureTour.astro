@@ -1,0 +1,85 @@
+---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import { messagesFor } from '../i18n';
+import { crisp } from '../lib/screenshots';
+import pick from '../assets/tour/pick-element.webp';
+import code from '../assets/tour/code.webp';
+import profiles from '../assets/tour/profiles.webp';
+
+const {
+  site: {
+    home: { tour: t },
+  },
+} = messagesFor(Astro.url);
+
+const CARDS: [string, ImageMetadata][] = [
+  [t.pick, pick],
+  [t.code, code],
+  [t.profiles, profiles],
+];
+---
+
+<div class="tour" role="region" aria-label={t.label} tabindex="0">
+  {CARDS.map(([title, src]) => (
+    <figure class="tour-card">
+      <figcaption>{title}</figcaption>
+      <Image
+        src={src}
+        alt=""
+        width={src.width / 2}
+        densities={[1, 2]}
+        {...crisp(src)}
+      />
+    </figure>
+  ))}
+</div>
+
+<style>
+  .tour {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: min(400px, calc(100% - 28px));
+    grid-template-rows: auto auto;
+    gap: 14px 12px;
+    margin: 0 calc(-1 * var(--gutter));
+    padding: 0 var(--gutter) 4px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+  }
+
+  .tour::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tour:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .tour-card {
+    grid-row: span 2;
+    display: grid;
+    grid-template-rows: subgrid;
+    align-items: end;
+    margin: 0;
+    scroll-snap-align: start;
+  }
+
+  .tour-card figcaption {
+    padding: 0 2px;
+    font: 600 20px/1.25 var(--display);
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+
+  .tour-card img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 14px;
+    border: 1px solid var(--border);
+  }
+</style>
