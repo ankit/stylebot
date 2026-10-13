@@ -2,8 +2,8 @@ import type { GetCanStylePage } from '@stylebot/types';
 
 /**
  * Whether Stylebot can style a tab: "supported", "unsupported" when its page
- * script runs there but the document isn't a web page (a PDF, JSON or XML
- * file), or "unreachable" when the script isn't running there at all.
+ * script runs there but the document is a file it can't style (a PDF, JSON or
+ * XML file), or "unreachable" when the script isn't running there at all.
  */
 export type PageSupport = 'supported' | 'unsupported' | 'unreachable';
 

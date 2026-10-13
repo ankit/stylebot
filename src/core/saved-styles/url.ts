@@ -131,8 +131,13 @@ export const matchesUrlPattern = (
 };
 
 /**
- * Whether a document is one Stylebot can style: a web page, as opposed to a
- * PDF, JSON or XML file, whatever its URL says.
+ * Whether a document is one Stylebot can style: a web page, or an image, video,
+ * audio or text file the browser shows in a page of its own, as opposed to a
+ * PDF, JSON, XML or SVG file, whatever its URL says.
  */
 export const isStylableDocument = (contentType: string): boolean =>
-  contentType === 'text/html' || contentType === 'application/xhtml+xml';
+  contentType === 'text/html' ||
+  contentType === 'application/xhtml+xml' ||
+  contentType === 'text/plain' ||
+  (/^(image|video|audio)\//.test(contentType) &&
+    contentType !== 'image/svg+xml');
