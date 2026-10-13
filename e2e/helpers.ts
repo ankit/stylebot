@@ -13,7 +13,9 @@ import { expect, closeServer, type Extension, type Popup } from './fixtures';
 // take a while after the page itself has finished loading.
 const EDITOR_LISTENER_TIMEOUT_MS = 20_000;
 
-type Route = string | { body: string; headers?: Record<string, string> };
+type Route =
+  | string
+  | { body: string | Buffer; headers?: Record<string, string> };
 
 // A real HTTP server for tests that need genuine navigation, several windows,
 // or response headers; `servePage` is enough for a single static page.
