@@ -44,8 +44,8 @@ const getTarget = (
 };
 
 /**
- * Sends the command to the page, once a tab an update left for later has
- * Stylebot back.
+ * Sends the command to the page. After an update, a background tab only gets
+ * Stylebot's scripts back when it's first used, so restore it first.
  */
 const runInPage = (tabId: number, command: StylebotCommandName): void => {
   const message: RunCommand = { name: 'RunCommand', command };

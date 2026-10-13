@@ -87,8 +87,10 @@ type ContentScript = NonNullable<
   chrome.runtime.Manifest['content_scripts']
 >[number];
 
-// Each tab's content scripts, by their index in the manifest.
-type TabScripts = Map<number, { tab: chrome.tabs.Tab; scripts: Array<number> }>;
+// A tab and its content scripts, by their index in the manifest.
+type TabEntry = { tab: chrome.tabs.Tab; scripts: Array<number> };
+
+type TabScripts = Map<number, TabEntry>;
 
 const getContentScripts = (): Array<ContentScript> =>
   chrome.runtime.getManifest().content_scripts ?? [];
@@ -146,6 +148,57 @@ const findTabScripts = async (): Promise<TabScripts> => {
 };
 
 /**
+ * Saves the tabs to restore once they're first shown.
+ */
+const savePendingTabs = async (pendingTabs: TabScripts): Promise<void> => {
+  if (!pendingTabs.size) {
+    return;
+  }
+
+  const pending: Record<string, Array<number>> = {};
+
+  pendingTabs.forEach(({ scripts }, tabId) => {
+    pending[getRestorePendingKey(tabId)] = scripts;
+  });
+
+  await chrome.storage.session.set(pending);
+};
+
+/**
+ * Restores the tabs left for later that were shown before they were saved,
+ * so their activation found nothing to restore.
+ */
+const restoreShownMeanwhile = async (
+  pendingTabs: TabScripts
+): Promise<void> => {
+  const shown = await chrome.tabs.query({ active: true });
+
+  await Promise.all(
+    shown
+      .filter(({ id }) => id !== undefined && pendingTabs.has(id))
+      .map(({ id }) => restoreTab(id as number))
+  );
+};
+
+/**
+ * Runs the scripts in a tab, if it has any to run, then reopens the editor
+ * there, if it was open.
+ */
+const restoreNow = async (
+  tabId: number,
+  entry?: TabEntry,
+  host?: EditorHost
+): Promise<void> => {
+  if (entry) {
+    await inject(entry.tab, entry.scripts);
+  }
+
+  if (host) {
+    await reopen(tabId, host);
+  }
+};
+
+/**
  * Puts Stylebot back right away where it's in view or was open: the active
  * tab of each window and the tabs with the editor. The rest wait until they
  * are first shown, so an update doesn't run the scripts in every tab at once.
@@ -156,63 +209,47 @@ const restore = async (
 ): Promise<void> => {
   const tabScripts = await found;
   const editors = open ?? (await findOpenEditors());
-  const now: TabScripts = new Map();
-  const later: TabScripts = new Map();
+  const tabsInView: TabScripts = new Map();
+  const pendingTabs: TabScripts = new Map();
 
-  tabScripts.forEach((entry, tabId) =>
-    (entry.tab.active || editors[tabId] ? now : later).set(tabId, entry)
-  );
+  tabScripts.forEach((entry, tabId) => {
+    const inView = entry.tab.active || !!editors[tabId];
 
-  if (later.size) {
-    await chrome.storage.session.set(
-      Object.fromEntries(
-        [...later].map(([tabId, { scripts }]) => [
-          getRestorePendingKey(tabId),
-          scripts,
-        ])
-      )
-    );
-  }
+    if (inView) {
+      tabsInView.set(tabId, entry);
+    } else {
+      pendingTabs.set(tabId, entry);
+    }
+  });
 
-  // A tab shown while the tabs were being sorted missed its activation.
-  const shown = await chrome.tabs.query({ active: true });
-  const tabIds = new Set([...now.keys(), ...Object.keys(editors).map(Number)]);
+  await savePendingTabs(pendingTabs);
+
+  const tabIds = new Set([
+    ...tabsInView.keys(),
+    ...Object.keys(editors).map(Number),
+  ]);
 
   await Promise.all([
-    ...shown
-      .filter(({ id }) => id !== undefined && later.has(id))
-      .map(({ id }) => restoreTab(id as number)),
-    ...[...tabIds].map(async tabId => {
-      const injecting = now.get(tabId);
-
-      if (injecting) {
-        await inject(injecting.tab, injecting.scripts);
-      }
-
-      if (editors[tabId]) {
-        await reopen(tabId, editors[tabId]);
-      }
-    }),
+    restoreShownMeanwhile(pendingTabs),
+    ...Array.from(tabIds, tabId =>
+      restoreNow(tabId, tabsInView.get(tabId), editors[tabId])
+    ),
   ]);
 };
 
 let restoring = Promise.resolve();
 
 /**
- * Runs the content scripts again in the tabs they match whose copies a reload
- * or update cut off, since Chrome only injects into new pages, then opens
- * Stylebot again where it was showing: in `open`, or else wherever a cut-off
- * panel is left on the page. Tabs out of view are left for `restoreTab`.
- * Needs scripting, so it does nothing without it.
+ * Puts Stylebot back into open tabs after an update or reload, and reopens
+ * the editor where it was open. Visible tabs are restored now, the rest later.
  */
 export const restoreOpenTabs = (open?: OpenEditors): Promise<void> => {
   if (!chrome.scripting) {
     return Promise.resolve();
   }
 
-  // Tabs are found right away, so one opened after this call, which gets the
-  // content scripts from Chrome, is left alone. Restores then run one at a
-  // time, so a tab two of them find is only injected once.
+  // Tabs are listed now, since tabs opened later get the scripts from Chrome.
+  // Restores run one after another so no tab is injected twice.
   const found = findTabScripts();
 
   restoring = restoring
@@ -222,10 +259,11 @@ export const restoreOpenTabs = (open?: OpenEditors): Promise<void> => {
 };
 
 /**
- * Restores a tab `restoreOpenTabs` left for later, once. A discarded tab
- * stays pending, since the page it loads again gets the scripts anyway.
+ * Runs the content scripts in the tab if it's on the list of tabs an update
+ * left for later, then takes it off the list. A discarded tab stays on it,
+ * since reloading gives it the scripts anyway.
  */
-const restorePending = async (tabId: number): Promise<void> => {
+const restoreIfPending = async (tabId: number): Promise<void> => {
   const key = getRestorePendingKey(tabId);
   const { [key]: scripts } = await chrome.storage.session.get(key);
 
@@ -262,7 +300,7 @@ export const restoreTab = (tabId: number): Promise<void> => {
   let restoringTab = restoringTabs.get(tabId);
 
   if (!restoringTab) {
-    restoringTab = restorePending(tabId)
+    restoringTab = restoreIfPending(tabId)
       .catch(e => console.error('Stylebot: could not restore tab', e))
       .finally(() => restoringTabs.delete(tabId));
     restoringTabs.set(tabId, restoringTab);
