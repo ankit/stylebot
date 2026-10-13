@@ -178,4 +178,4 @@ Claude, OpenAI and Gemini, each behind one small adapter: check that a key works
 
 ## Evaluating changes
 
-Unit tests show the plumbing works, not that replies got better. [Chat evals](chat-evals.md) covers `yarn eval:chat`, which measures that on recorded pages.
+Unit tests show the plumbing works, not that replies got better. [Styling evals](styling-evals.md) covers `yarn eval:styling`, which measures that for the CLI on recorded pages.

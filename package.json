@@ -55,7 +55,7 @@
     "capture:gallery": "node scripts/capture/gallery.mjs",
     "capture:manual": "node scripts/capture/manual.mjs",
     "storybook": "storybook dev -p 6006 --no-open",
-    "eval:chat": "node evals/chat/run.mjs",
+    "eval:styling": "node evals/styling/run.mjs",
     "build-storybook": "storybook build --quiet",
     "postinstall": "patch-package"
   },
