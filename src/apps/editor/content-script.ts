@@ -197,7 +197,7 @@ const removeDeadEditor = (): void => {
   );
 };
 
-// A PDF, JSON or XML file gets nothing; its viewer breaks under the editor.
+// A PDF, JSON, XML or SVG file gets nothing; its viewer breaks under the editor.
 if (isStylableDocument(document.contentType)) {
   removeDeadEditor();
   listen();
