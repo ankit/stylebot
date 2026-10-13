@@ -191,6 +191,21 @@ describe('shadow-roots', () => {
         jest.useRealTimers();
       }
     });
+
+    it("doesn't recheck custom elements already defined without a shadow root", async () => {
+      jest.useFakeTimers();
+
+      try {
+        customElements.define('defined-light', class extends HTMLElement {});
+        setShadowRootCSS('example', 'tr { color: red; }');
+        document.body.appendChild(document.createElement('defined-light'));
+        await Promise.resolve();
+
+        expect(jest.getTimerCount()).toBe(0);
+      } finally {
+        jest.useRealTimers();
+      }
+    });
   });
 
   describe('with constructable stylesheets', () => {

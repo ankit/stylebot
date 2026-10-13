@@ -88,6 +88,9 @@ const registerRoot = (registry: Registry, root: ShadowRoot): void => {
 
 const PENDING_CHECK_DELAYS_MS = [250, 500, 1000, 2000, 4000, 8000];
 
+// Custom elements not yet upgraded; built-in elements always count as defined.
+const UNDEFINED_SELECTOR = ':not(:defined)';
+
 /**
  * Rechecks custom elements that had no shadow root yet, since a content
  * script has no `customElements` to wait on for their upgrade.
@@ -147,46 +150,59 @@ const watchPendingElement = (registry: Registry, el: Element): void => {
   };
 };
 
-const visitElement = (registry: Registry, el: Element): void => {
-  if (isStylebotHost(el)) {
-    return;
-  }
+const visitHost = (registry: Registry, el: Element): void => {
+  const root = el.shadowRoot;
 
-  if (el.shadowRoot) {
-    registerRoot(registry, el.shadowRoot);
-  } else if (el.localName.includes('-')) {
-    watchPendingElement(registry, el);
+  if (root && !isStylebotHost(el)) {
+    registerRoot(registry, root);
   }
 };
 
-// querySelectorAll never crosses into shadow trees, so this covers one
-// tree; registerRoot scans each newly found root itself.
-const scanSubtree = (
-  registry: Registry,
-  scope: Scannable,
-  seen?: Set<Node>
-): void => {
+/**
+ * Finds the open roots in one tree and the custom elements still waiting
+ * for their definition. querySelectorAll never crosses into shadow trees;
+ * registerRoot scans each newly found root itself.
+ */
+const scanSubtree = (registry: Registry, scope: Scannable): void => {
   if (scope instanceof Element) {
-    visitElement(registry, scope);
+    visitHost(registry, scope);
+
+    if (scope.matches(UNDEFINED_SELECTOR) && !isStylebotHost(scope)) {
+      watchPendingElement(registry, scope);
+    }
   }
 
   const descendants = scope.querySelectorAll('*');
 
   for (let i = 0; i < descendants.length; i++) {
-    visitElement(registry, descendants[i]);
-    seen?.add(descendants[i]);
+    visitHost(registry, descendants[i]);
+  }
+
+  // Matched natively, so elements that can't upgrade are never touched
+  const undefinedElements = scope.querySelectorAll(UNDEFINED_SELECTOR);
+
+  for (let i = 0; i < undefinedElements.length; i++) {
+    if (!isStylebotHost(undefinedElements[i])) {
+      watchPendingElement(registry, undefinedElements[i]);
+    }
   }
 };
 
 const onMutations = (registry: Registry, records: Array<MutationRecord>) => {
-  // Parser-inserted nodes arrive parent-first; scanning a parent's subtree
-  // already covers the children that follow it in the same batch.
-  const seen = new Set<Node>();
+  const added = new Set<Node>();
+
+  records.forEach(record => record.addedNodes.forEach(node => added.add(node)));
 
   records.forEach(record => {
+    // A node added inside another node added in this batch is covered by
+    // that node's scan, as is every parser-inserted child after its parent.
+    if (added.has(record.target)) {
+      return;
+    }
+
     record.addedNodes.forEach(node => {
-      if (node instanceof Element && !seen.has(node)) {
-        scanSubtree(registry, node, seen);
+      if (node instanceof Element) {
+        scanSubtree(registry, node);
       }
     });
   });
