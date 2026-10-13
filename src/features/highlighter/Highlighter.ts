@@ -369,7 +369,8 @@ class Highlighter {
    * or pop-out window. The element stays current so keys typed there still work.
    */
   onPointerOut = (event: PointerEvent): void => {
-    if (event.relatedTarget) {
+    // Moving into an iframe's own document has no related target either.
+    if (event.relatedTarget || event.target instanceof HTMLIFrameElement) {
       return;
     }
 
