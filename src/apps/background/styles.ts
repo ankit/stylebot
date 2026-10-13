@@ -28,7 +28,6 @@ import type {
   Timestamp,
 } from '@stylebot/types';
 
-import { getIsReadabilityActive, updateIcon } from './badge';
 import { compileStyles } from './compiled-styles';
 import { recordStyleChange } from '@stylebot/history';
 import { scheduleSyncAfterEdit } from './sync-scheduler';
@@ -36,8 +35,7 @@ import { scheduleSyncAfterEdit } from './sync-scheduler';
 export { getStylesForPage } from '@stylebot/saved-styles';
 
 /**
- * Pushes the current styles to every open tab and refreshes the badge
- * for the active one.
+ * Pushes the current styles to every open tab.
  */
 export const applyStylesToAllTabs = async (): Promise<void> => {
   const allStyles = await getAll();
@@ -54,38 +52,8 @@ export const applyStylesToAllTabs = async (): Promise<void> => {
       };
 
       chrome.tabs.sendMessage(tab.id, message);
-
-      if (tab.active) {
-        const readabilityActive = await getIsReadabilityActive(tab.id);
-        updateIcon(tab, styles, readabilityActive);
-      }
     }
   });
-};
-
-/**
- * Refreshes the toolbar badge for a single tab based on its styles
- * and readability state.
- */
-export const refreshBadgeForTab = async (
-  tab: chrome.tabs.Tab
-): Promise<void> => {
-  if (!tab.url || tab.id === undefined) {
-    return;
-  }
-
-  const allStyles = await getAll();
-  const { styles } = getStylesForPage(tab.url, allStyles);
-  const readabilityActive = await getIsReadabilityActive(tab.id);
-  await updateIcon(tab, styles, readabilityActive);
-};
-
-/**
- * Refreshes every tab's badge, for changes that aren't about one page.
- */
-export const refreshAllBadges = async (): Promise<void> => {
-  const tabs = await chrome.tabs.query({});
-  await Promise.all(tabs.map(refreshBadgeForTab));
 };
 
 /**

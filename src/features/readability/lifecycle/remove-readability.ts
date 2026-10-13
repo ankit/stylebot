@@ -1,6 +1,5 @@
 import { hideLoader } from '../loading-screen/loader';
 import { revertToCachedDocument } from './document-cache';
-import { reportChanged } from './report-changed';
 import { nextGeneration, clearPendingRetry } from './state';
 
 // Kept in sync with the `.stylebot-reader.closing` transition duration.
@@ -21,7 +20,6 @@ export const removeReadability = (): void => {
 
   if (!panel) {
     host?.remove();
-    reportChanged();
     return;
   }
 
@@ -30,6 +28,5 @@ export const removeReadability = (): void => {
   panel.classList.add('closing');
   setTimeout(() => {
     host?.remove();
-    reportChanged();
   }, CLOSE_TRANSITION_MS);
 };

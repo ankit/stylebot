@@ -31,7 +31,6 @@ import {
   RenameProfile,
   DeleteProfile,
   SetReadability,
-  ReadabilityActiveChanged,
   GetReadabilitySettings,
   SetReadabilitySettings,
   GetImportCss,
@@ -52,7 +51,7 @@ import {
   CloseEditorSidePanel,
 } from './messages';
 
-import { refreshAllBadges, refreshBadgeForTab } from './styles';
+import { updateBadge } from './badge';
 import { get as getOption, pruneRetired } from './options';
 import {
   AWAY_SECONDS,
@@ -150,7 +149,7 @@ export const initListeners = (): void => {
     }
 
     if (SYNC_ISSUE_KEYS.some(key => changes[key])) {
-      refreshAllBadges();
+      updateBadge();
     }
   });
 
@@ -163,7 +162,7 @@ export const initListeners = (): void => {
     }
   });
 
-  // When an existing tab is updated, refresh the context-menu and badge.
+  // When an existing tab is updated, refresh the context-menu.
   // A closed tab takes its editor window with it; a closed window is forgotten.
   chrome.tabs.onRemoved.addListener(tabId => {
     editorWindow.close(tabId);
@@ -174,10 +173,6 @@ export const initListeners = (): void => {
   });
 
   chrome.tabs.onUpdated.addListener(async (tabId, _, tab) => {
-    if (tab.status === 'complete' && tab.url) {
-      await refreshBadgeForTab(tab);
-    }
-
     const option = await getOption('contextMenu');
 
     if (option && tab.status === 'complete') {
@@ -281,9 +276,6 @@ export const initListeners = (): void => {
 
         case 'SetReadability':
           SetReadability(message, sender);
-          break;
-        case 'ReadabilityActiveChanged':
-          ReadabilityActiveChanged(message, sender);
           break;
         case 'GetReadabilitySettings':
           GetReadabilitySettings(sendResponse);

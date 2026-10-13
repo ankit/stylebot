@@ -27,8 +27,6 @@ if (window === window.top) {
         sendResponse(canStyle);
       } else if (message.name === 'GetIsPageReaderable') {
         sendResponse(isReaderable());
-      } else if (message.name === 'GetIsReadabilityActive') {
-        sendResponse(!!document.getElementById('stylebot-reader'));
       }
     }
   );

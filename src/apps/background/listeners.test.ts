@@ -13,10 +13,7 @@ jest.mock('./editor-window', () => ({
 }));
 jest.mock('./messages', () => ({}));
 jest.mock('./restore-tabs', () => ({ restoreOpenTabs: jest.fn() }));
-jest.mock('./styles', () => ({
-  refreshAllBadges: jest.fn(),
-  refreshBadgeForTab: jest.fn(),
-}));
+jest.mock('./badge', () => ({ updateBadge: jest.fn() }));
 jest.mock('./options', () => ({ get: jest.fn(), pruneRetired: jest.fn() }));
 jest.mock('./sync-scheduler', () => ({
   AWAY_SECONDS: 60,

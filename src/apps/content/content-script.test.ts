@@ -260,24 +260,4 @@ describe('inject-css run()', () => {
       null
     );
   });
-
-  it('answers GetIsReadabilityActive based on whether #stylebot-reader is mounted', () => {
-    (stylesheets.readCache as jest.Mock).mockReturnValue(null);
-    matching([]);
-
-    load();
-
-    const sendResponse = jest.fn();
-    registeredListener({ name: 'GetIsReadabilityActive' }, {}, sendResponse);
-    expect(sendResponse).toHaveBeenLastCalledWith(false);
-
-    const host = document.createElement('div');
-    host.id = 'stylebot-reader';
-    document.body.appendChild(host);
-
-    registeredListener({ name: 'GetIsReadabilityActive' }, {}, sendResponse);
-    expect(sendResponse).toHaveBeenLastCalledWith(true);
-
-    host.remove();
-  });
 });

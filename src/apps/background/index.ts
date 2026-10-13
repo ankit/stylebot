@@ -1,6 +1,7 @@
 import { supportsCLI } from '@stylebot/settings';
 import { getSiteUrl } from '@stylebot/utils';
 
+import { updateBadge } from './badge';
 import { initCliBridge } from './cli';
 import { ContextMenu } from './contextmenu';
 import { initListeners } from './listeners';
@@ -16,9 +17,7 @@ holdWritesUntil(runMigrations());
 ensureCompiledStyles().then(updatePeriodicSync);
 
 chrome.runtime.setUninstallURL(getSiteUrl('/goodbye'));
-chrome.action.setBadgeBackgroundColor({
-  color: '#555',
-});
+updateBadge();
 
 ContextMenu.init();
 

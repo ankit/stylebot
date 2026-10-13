@@ -4,7 +4,6 @@ jest.mock('./editor-window');
 
 import {
   SetReadability,
-  ReadabilityActiveChanged,
   GetRecentColors,
   AddRecentColor,
   OpenOptionsPage,
@@ -21,19 +20,13 @@ describe('SetReadability', () => {
     } as unknown as typeof chrome;
   });
 
-  it('persists the value and refreshes the badge for the sending tab', async () => {
-    const tab = {
-      id: 1,
-      url: 'https://example.com/article',
-    } as chrome.tabs.Tab;
-
+  it('persists the value', async () => {
     await SetReadability(
       { name: 'SetReadability', url: 'example.com', value: true },
-      { tab }
+      {}
     );
 
     expect(stylesModule.setReadability).toBeCalledWith('example.com', true);
-    expect(stylesModule.refreshBadgeForTab).toBeCalledWith(tab);
   });
 
   it('relays the change to the sending tab so other content scripts stay in sync', async () => {
@@ -51,42 +44,6 @@ describe('SetReadability', () => {
       name: 'ReadabilityStateChanged',
       value: true,
     });
-  });
-
-  it('does not attempt to update the badge when there is no sending tab', async () => {
-    await SetReadability(
-      { name: 'SetReadability', url: 'example.com', value: true },
-      {}
-    );
-
-    expect(stylesModule.setReadability).toBeCalledWith('example.com', true);
-    expect(stylesModule.refreshBadgeForTab).not.toBeCalled();
-  });
-});
-
-describe('ReadabilityActiveChanged', () => {
-  beforeEach(() => {
-    jest.resetAllMocks();
-  });
-
-  it('refreshes the badge for the sending tab', async () => {
-    const tab = {
-      id: 1,
-      url: 'https://example.com/article',
-    } as chrome.tabs.Tab;
-
-    await ReadabilityActiveChanged(
-      { name: 'ReadabilityActiveChanged' },
-      { tab }
-    );
-
-    expect(stylesModule.refreshBadgeForTab).toBeCalledWith(tab);
-  });
-
-  it('does nothing when there is no sending tab', async () => {
-    await ReadabilityActiveChanged({ name: 'ReadabilityActiveChanged' }, {});
-
-    expect(stylesModule.refreshBadgeForTab).not.toBeCalled();
   });
 });
 

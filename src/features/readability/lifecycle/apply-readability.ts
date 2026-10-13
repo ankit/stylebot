@@ -7,7 +7,6 @@ import {
 import { showLoader } from '../loading-screen/loader';
 import { cacheUrl, didUrlChange } from './document-cache';
 import { removeReadability } from './remove-readability';
-import { reportChanged } from './report-changed';
 import { nextGeneration, isStaleGeneration, setPendingRetry } from './state';
 import {
   getEligibility,
@@ -60,7 +59,6 @@ const run = async (myGeneration: number, attempt = 0): Promise<void> => {
   try {
     await mountReader();
     markEligible(window.location.href);
-    reportChanged();
   } catch {
     if (isStaleGeneration(myGeneration)) {
       return;

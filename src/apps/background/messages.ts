@@ -7,7 +7,6 @@ import {
   move,
   getStylesForPage,
   setReadability,
-  refreshBadgeForTab,
   getImportCss,
   getGoogleWebFontExists,
   getGoogleFontFile,
@@ -20,8 +19,6 @@ import {
   deleteProfile,
 } from './styles';
 import * as styleStorage from './styles';
-
-import { getIsReadabilityActive, updateIcon } from './badge';
 
 import {
   get as getOption,
@@ -46,7 +43,6 @@ import type {
   SetAllStyles as SetAllStylesType,
   SetReadability as SetReadabilityType,
   ReadabilityStateChanged,
-  ReadabilityActiveChanged as ReadabilityActiveChangedType,
   SetReadabilitySettings as SetReadabilitySettingsType,
   GetImportCss as GetImportCssType,
   GetCompiledStylesResponse,
@@ -263,11 +259,6 @@ export const GetStylesForPage = async (
   const response = getStylesForPage(tab.url, styles);
 
   sendResponse(response);
-
-  if (tab.id !== undefined) {
-    const readabilityActive = await getIsReadabilityActive(tab.id);
-    updateIcon(tab, response.styles, readabilityActive);
-  }
 };
 
 export const MoveStyle = (message: MoveStyleType): void => {
@@ -357,25 +348,12 @@ export const SetReadability = async (
 ): Promise<void> => {
   await setReadability(message.url, message.value);
 
-  if (sender.tab) {
-    await refreshBadgeForTab(sender.tab);
-
-    if (sender.tab.id) {
-      const relay: ReadabilityStateChanged = {
-        name: 'ReadabilityStateChanged',
-        value: message.value,
-      };
-      chrome.tabs.sendMessage(sender.tab.id, relay);
-    }
-  }
-};
-
-export const ReadabilityActiveChanged = async (
-  _message: ReadabilityActiveChangedType,
-  sender: chrome.runtime.MessageSender
-): Promise<void> => {
-  if (sender.tab) {
-    await refreshBadgeForTab(sender.tab);
+  if (sender.tab?.id) {
+    const relay: ReadabilityStateChanged = {
+      name: 'ReadabilityStateChanged',
+      value: message.value,
+    };
+    chrome.tabs.sendMessage(sender.tab.id, relay);
   }
 };
 
