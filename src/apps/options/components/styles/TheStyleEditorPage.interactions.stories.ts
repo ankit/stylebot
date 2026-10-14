@@ -144,7 +144,6 @@ export const SaveShortcut: StoryObj = {
     });
 
     await step('Ctrl+S in the code editor saves the edit', async () => {
-      await openProfiledStyle(canvasElement);
       await editCss('body { max-width: 600px; }');
       window.postMessage({ type: 'stylebotSavePressed' }, '*');
 
