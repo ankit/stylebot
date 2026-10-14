@@ -131,7 +131,7 @@ export const initListeners = (): void => {
     }
   });
 
-  // Safari has no idle API; there the popup and the alarm still sync.
+  // Safari has no idle API; there the alarm and startup still sync.
   if (chrome.idle) {
     chrome.idle.setDetectionInterval(AWAY_SECONDS);
     chrome.idle.onStateChanged.addListener(async state => {

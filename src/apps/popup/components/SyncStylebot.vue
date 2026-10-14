@@ -111,15 +111,8 @@ export default Vue.extend({
     },
   },
 
-  async created() {
-    await this.readSyncState();
-
-    // Opening the popup is when stale styles would show, so pick up what
-    // other devices pushed. A sign-in can't happen here, so leave that be.
-    // With a last sync time to show, it runs without the spinner.
-    if (!this.needsAuth) {
-      this.sync(Boolean(this.syncTime));
-    }
+  created() {
+    this.readSyncState();
   },
 
   methods: {
@@ -143,15 +136,13 @@ export default Vue.extend({
      * Joins a run already in flight in the background rather than queueing.
      * An earlier failure stays on screen until this run's result replaces it.
      */
-    sync(quiet = false): void {
+    sync(): void {
       const message: RunGoogleDriveSync = {
         name: 'RunGoogleDriveSync',
         interactive: false,
       };
 
-      if (!quiet) {
-        this.syncInProgress = true;
-      }
+      this.syncInProgress = true;
 
       chrome.runtime.sendMessage(
         message,
