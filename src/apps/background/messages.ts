@@ -252,6 +252,7 @@ export const GetStylesForPage = async (
   const tab = sender.tab;
 
   if (!tab?.url) {
+    sendResponse({ styles: [] });
     return;
   }
 
