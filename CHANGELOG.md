@@ -1,3 +1,16 @@
+## Version 4.0.3 (October 2026)
+
+- Open the editor docked in the page on the right by default, instead of in the side panel
+- Style images, videos and text files opened in their own tab (#1202)
+- Fix the inspector not picking elements while editing in Code
+- Fix styles sometimes staying on in open tabs after being turned off
+- Fix the toolbar icon warning about sync when Google Drive was unreachable or rate-limited (#1199)
+- Keep Drive sign-in working longer on Chrome, Edge and Firefox
+- Sync when the popup opens without showing a spinner
+- Drop the style count and reader badges from the toolbar icon
+- Center the selector in the inspector's card
+- Make the browser faster after an update and on pages with many styles (#1200, #1203, #1204)
+
 ## Version 4.0.2 (October 2026)
 
 - Remove Chat; to restyle pages with AI, use the `stylebot` command line with a coding agent like Claude Code (#1190)
