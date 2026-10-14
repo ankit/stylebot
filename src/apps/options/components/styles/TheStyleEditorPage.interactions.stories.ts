@@ -113,6 +113,11 @@ export const EditInactiveProfile: StoryObj = {
         profiles: { night: { css: 'body { background: #000; }' } },
       });
     });
+
+    await step('the editor stays open with nothing left unsaved', async () => {
+      await expect(canvas.getByRole('tab', { name: /^Default/ })).toBeVisible();
+      await expect(canvas.queryByText('Unsaved changes')).toBeNull();
+    });
   },
 };
 

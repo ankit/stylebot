@@ -1,13 +1,17 @@
-import { isSidePanelIgnoringTabs } from '@stylebot/utils';
+import {
+  getChromiumVariant,
+  doesSidePanelWorkInChromiumVariant,
+} from '@stylebot/utils';
+import type { ChromiumVariant } from '@stylebot/utils';
 
-let ignoresTabs = false;
+let chromiumVariant: ChromiumVariant | undefined;
 
 /**
- * Reads whether this browser was found to ignore per-tab side panels, for
+ * Reads whether this is a browser that won't show the side panel, for
  * hasSidePanel. The store calls this as it initializes.
  */
 export const loadSidePanelSupport = async (): Promise<void> => {
-  ignoresTabs = await isSidePanelIgnoringTabs().catch(() => false);
+  chromiumVariant = await getChromiumVariant().catch(() => undefined);
 };
 
 /**
@@ -16,4 +20,5 @@ export const loadSidePanelSupport = async (): Promise<void> => {
  * and content scripts can't see chrome.sidePanel, so this goes by the browser.
  */
 export const hasSidePanel = (): boolean =>
-  /Chrome\//.test(navigator.userAgent) && !ignoresTabs;
+  /Chrome\//.test(navigator.userAgent) &&
+  doesSidePanelWorkInChromiumVariant(chromiumVariant);

@@ -1,7 +1,7 @@
 import type { Meta } from '@storybook/vue';
 
 import SyncStylebot from './SyncStylebot.vue';
-import { popup, syncSucceeds } from '@stylebot/storybook/fixtures/popup';
+import { popup } from '@stylebot/storybook/fixtures/popup';
 
 const meta: Meta = {
   title: 'Browser Action/Sync',
@@ -30,7 +30,6 @@ export const Synced = popup({
     'google-drive-sync-enabled': true,
     'google-drive-sync-state': synced,
   },
-  googleDriveSync: syncSucceeds,
 });
 
 export const NeedsSignIn = popup({

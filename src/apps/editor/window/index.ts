@@ -2,7 +2,13 @@ import { t } from '@stylebot/i18n';
 import { setPageBridge, RemotePageBridge } from '@stylebot/page-bridge';
 
 import { createStore, mountEditor } from '@stylebot/editor';
-import { getPageSupport, markSidePanelIgnoringTabs } from '@stylebot/utils';
+import type { EditorSidePanelOpened } from '@stylebot/types';
+import {
+  detectChromiumVariant,
+  detectVivaldiSidePanel,
+  getPageSupport,
+  doesSidePanelWorkInChromiumVariant,
+} from '@stylebot/utils';
 
 import { openEditorWindow } from '../utils/chrome';
 import { initWindowListeners, initTabInfo } from './listeners';
@@ -130,17 +136,31 @@ const init = async (): Promise<void> => {
     return;
   }
 
-  const [tab, hostTab] = await Promise.all([
+  const [tab, inVivaldi] = await Promise.all([
     chrome.tabs.get(tabId).catch(() => undefined),
-    host === 'sidepanel' ? chrome.tabs.getCurrent() : undefined,
+    host === 'sidepanel' && detectVivaldiSidePanel(),
   ]);
 
-  // Vivaldi hosts side panels as tabs and shares one panel across them all,
-  // which the editor can't work in; the background then docks it in the page.
-  if (hostTab) {
-    await markSidePanelIgnoringTabs();
+  // The background docks the editor in the page instead.
+  if (inVivaldi) {
     window.close();
     return;
+  }
+
+  // A browser this page can tell (Arc) loads the panel without showing it,
+  // so the background has to be told to dock the editor in the page.
+  if (host === 'sidepanel') {
+    detectChromiumVariant().then(variant => {
+      if (!doesSidePanelWorkInChromiumVariant(variant)) {
+        const message: EditorSidePanelOpened = {
+          name: 'EditorSidePanelOpened',
+          tabId,
+        };
+
+        chrome.runtime.sendMessage(message);
+        window.close();
+      }
+    });
   }
 
   const canStyle = await canStyleTab(tab);

@@ -1,7 +1,7 @@
 import type { Meta } from '@storybook/vue';
 
 import UnsupportedPage from './UnsupportedPage.vue';
-import { popup, syncSucceeds } from '@stylebot/storybook/fixtures/popup';
+import { popup } from '@stylebot/storybook/fixtures/popup';
 
 const meta: Meta = {
   title: 'Browser Action/Unsupported Page',
@@ -21,7 +21,6 @@ const syncOn = {
 export const NewTab = popup({
   tabUrl: 'chrome://newtab/',
   storage: syncOn,
-  googleDriveSync: syncSucceeds,
 });
 
 export const BrowserPage = popup({ tabUrl: 'chrome://flags' });
@@ -29,21 +28,18 @@ export const BrowserPage = popup({ tabUrl: 'chrome://flags' });
 export const ExtensionPage = popup({
   tabUrl: 'chrome-extension://abcdefghijklmnop/options.html',
   storage: syncOn,
-  googleDriveSync: syncSucceeds,
 });
 
 export const WebStore = popup({
   tabUrl: 'https://chromewebstore.google.com/detail/stylebot/abc',
   pageSupport: 'unreachable',
   storage: syncOn,
-  googleDriveSync: syncSucceeds,
 });
 
 export const LocalFile = popup({
   tabUrl: 'file:///Users/me/notes.html',
   pageSupport: 'unreachable',
   storage: syncOn,
-  googleDriveSync: syncSucceeds,
 });
 
 export const PdfFile = popup({
