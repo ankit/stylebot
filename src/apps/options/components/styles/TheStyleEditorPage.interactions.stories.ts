@@ -10,6 +10,7 @@ import {
   seededStyles,
 } from '@stylebot/storybook/fixtures/options';
 import { findOpenMenu, user } from '@stylebot/storybook/story-helpers';
+import { isMac } from '@stylebot/utils';
 
 const meta: Meta = {
   title: 'Tests/Options/Profiles',
@@ -111,6 +112,40 @@ export const EditInactiveProfile: StoryObj = {
         activeProfile: 'default',
         profiles: { night: { css: 'body { background: #000; }' } },
       });
+    });
+  },
+};
+
+export const SaveShortcut: StoryObj = {
+  ...profiledStyleEditor,
+  name: 'Ctrl+S saves like the Save button, from the page or the code editor',
+  play: async context => {
+    await profiledStyleEditor.play?.(context);
+    const { canvasElement, step } = context;
+
+    const canvas = within(canvasElement);
+    const store = optionsStore(canvasElement);
+
+    await step('Ctrl+S in the URL field saves the edit', async () => {
+      await editCss('body { max-width: 640px; }');
+      await user.click(canvas.getByPlaceholderText('example.com'));
+      await user.keyboard(
+        isMac() ? '{Meta>}s{/Meta}' : '{Control>}s{/Control}'
+      );
+
+      await waitFor(() =>
+        expect(store.state.styles[URL].css).toBe('body { max-width: 640px; }')
+      );
+    });
+
+    await step('Ctrl+S in the code editor saves the edit', async () => {
+      await openProfiledStyle(canvasElement);
+      await editCss('body { max-width: 600px; }');
+      window.postMessage({ type: 'stylebotSavePressed' }, '*');
+
+      await waitFor(() =>
+        expect(store.state.styles[URL].css).toBe('body { max-width: 600px; }')
+      );
     });
   },
 };

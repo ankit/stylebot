@@ -112,4 +112,35 @@ describe('MonacoEditorIframe', () => {
       { type: 'stylebotMonacoIframeCssUpdated', css: 'a { color: blue; }' },
     ]);
   });
+
+  describe('save shortcut', () => {
+    const pressSave = () => {
+      const event = new KeyboardEvent('keydown', {
+        key: 's',
+        ctrlKey: true,
+        cancelable: true,
+      });
+      jest.spyOn(navigator, 'platform', 'get').mockReturnValue('Win32');
+      window.dispatchEvent(event);
+      return event;
+    };
+
+    const saves = () =>
+      posted.filter(message => message.type === 'stylebotSavePressed');
+
+    it("leaves the in-page editor's Ctrl+S to the browser", () => {
+      const event = pressSave();
+
+      expect(saves()).toEqual([]);
+      expect(event.defaultPrevented).toBe(false);
+    });
+
+    it('asks the options page to save instead of the browser saving the page', () => {
+      new MonacoEditorIframe('options');
+      const event = pressSave();
+
+      expect(saves()).toEqual([{ type: 'stylebotSavePressed' }]);
+      expect(event.defaultPrevented).toBe(true);
+    });
+  });
 });

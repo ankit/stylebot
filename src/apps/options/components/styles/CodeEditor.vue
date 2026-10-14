@@ -58,6 +58,10 @@ export default Vue.extend({
         case 'stylebotMonacoIframeCssUpdated':
           this.handleIframeCssUpdate(message.data.css);
           break;
+
+        case 'stylebotSavePressed':
+          this.$emit('save');
+          break;
       }
     },
 

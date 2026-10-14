@@ -124,6 +124,7 @@
         :css="css"
         :autofocus="!!existingStyle"
         @update="css = $event"
+        @save="onSaveShortcut"
       />
     </div>
 
@@ -222,6 +223,7 @@ import { countRules } from '@stylebot/css';
 import { ChevronLeftIcon, PlusIcon } from '@stylebot/icons';
 import { DEFAULT_PROFILE_ID, expandProfiles } from '@stylebot/saved-styles';
 import type { ExpandedProfiles } from '@stylebot/saved-styles';
+import { isSaveShortcut } from '@stylebot/utils';
 
 import SiteIcon from '../site/SiteIcon.vue';
 import StyleRowMenu from './StyleRowMenu.vue';
@@ -409,7 +411,39 @@ export default Vue.extend({
     },
   },
 
+  created() {
+    window.addEventListener('keydown', this.onKeydown);
+  },
+
+  beforeDestroy() {
+    window.removeEventListener('keydown', this.onKeydown);
+  },
+
   methods: {
+    onKeydown(event: KeyboardEvent): void {
+      if (isSaveShortcut(event)) {
+        event.preventDefault();
+        this.onSaveShortcut();
+      }
+    },
+
+    /**
+     * Saves as the Save button would, unless it's disabled or a dialog is
+     * open on top of the editor.
+     */
+    onSaveShortcut(): void {
+      const dialogOpen =
+        !!this.dialog ||
+        this.showDeleteConfirm ||
+        this.showDeleteProfileConfirm ||
+        this.showLeaveConfirm ||
+        this.showReplaceConfirm;
+
+      if (this.valid && !dialogOpen) {
+        this.save();
+      }
+    },
+
     guardLeave(next: NavigationGuardNext): void {
       if (this.isDirty && !this.leaving) {
         this.pendingNext = next;
