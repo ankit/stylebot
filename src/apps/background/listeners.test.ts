@@ -18,6 +18,10 @@ jest.mock('./restore-tabs', () => ({
 }));
 jest.mock('./badge', () => ({ updateBadge: jest.fn() }));
 jest.mock('./options', () => ({ get: jest.fn(), pruneRetired: jest.fn() }));
+jest.mock('./side-panel-check', () => ({
+  initSidePanelCheck: jest.fn(),
+  onEditorSidePanelOpened: jest.fn(),
+}));
 jest.mock('./sync-scheduler', () => ({
   AWAY_SECONDS: 60,
   isSyncAlarm: jest.fn(),

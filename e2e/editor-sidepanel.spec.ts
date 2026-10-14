@@ -181,12 +181,9 @@ test('a side panel that shows the editor stays the chosen position', async ({
     await extension.evaluate(async () => {
       const items = await chrome.storage.local.get([
         'options',
-        'sidePanelIgnoresTabs',
+        'chromiumVariant',
       ]);
-      return [
-        items['sidePanelIgnoresTabs'],
-        items['options'].layout.dockLocation,
-      ];
+      return [items['chromiumVariant'], items['options'].layout.dockLocation];
     })
   ).toEqual([undefined, 'sidepanel']);
   expect(await isSidePanelOpen(extension)).toBe(true);

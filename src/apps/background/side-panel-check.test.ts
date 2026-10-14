@@ -1,15 +1,16 @@
-import {
-  isEditorSidePanelOpen,
-  isSidePanelIgnoringTabs,
-} from '@stylebot/utils';
+import { isEditorSidePanelOpen, getChromiumVariant } from '@stylebot/utils';
 
 import { get as getOption, set as setOption } from './options';
-import { onEditorSidePanelOpened } from './side-panel-check';
+import {
+  initSidePanelCheck,
+  onEditorSidePanelOpened,
+  opensEditorInSidePanel,
+} from './side-panel-check';
 
 jest.mock('@stylebot/utils', () => ({
   ...jest.requireActual('@stylebot/utils'),
   isEditorSidePanelOpen: jest.fn(),
-  isSidePanelIgnoringTabs: jest.fn(),
+  getChromiumVariant: jest.fn(),
   supportsEditorSidePanel: () => true,
 }));
 jest.mock('./options', () => ({
@@ -41,7 +42,7 @@ beforeEach(() => {
   jest.clearAllMocks();
   (getOption as jest.Mock).mockResolvedValue(layout);
   (isEditorSidePanelOpen as jest.Mock).mockResolvedValue(false);
-  (isSidePanelIgnoringTabs as jest.Mock).mockResolvedValue(false);
+  (getChromiumVariant as jest.Mock).mockResolvedValue(undefined);
   global.chrome = {
     tabs: { sendMessage: jest.fn() },
     runtime: {},
@@ -70,9 +71,9 @@ describe('onEditorSidePanelOpened', () => {
   });
 
   it('docks the editor in the page once the panel reports it is hosted as a tab', async () => {
-    (isSidePanelIgnoringTabs as jest.Mock)
-      .mockResolvedValueOnce(false)
-      .mockResolvedValue(true);
+    (getChromiumVariant as jest.Mock)
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValue('vivaldi');
 
     await check();
 
@@ -84,7 +85,7 @@ describe('onEditorSidePanelOpened', () => {
   });
 
   it('opens the editor in the page at once when the browser is already known', async () => {
-    (isSidePanelIgnoringTabs as jest.Mock).mockResolvedValue(true);
+    (getChromiumVariant as jest.Mock).mockResolvedValue('arc');
     (getOption as jest.Mock).mockResolvedValue({
       ...layout,
       dockLocation: 'right',
@@ -95,5 +96,54 @@ describe('onEditorSidePanelOpened', () => {
     expect(isEditorSidePanelOpen).not.toBeCalled();
     expect(setOption).not.toBeCalled();
     openStylebot();
+  });
+});
+
+describe('opensEditorInSidePanel', () => {
+  let onChanged: (
+    changes: Record<string, chrome.storage.StorageChange>,
+    area: string
+  ) => void;
+
+  beforeEach(() => {
+    global.chrome = {
+      sidePanel: { open: jest.fn() },
+      storage: {
+        onChanged: {
+          addListener: jest.fn(listener => {
+            onChanged = listener;
+          }),
+        },
+      },
+    } as unknown as typeof chrome;
+  });
+
+  it('tries the side panel until the dock is read', () => {
+    jest.isolateModules(() => {
+      const check = jest.requireActual('./side-panel-check');
+      expect(check.opensEditorInSidePanel()).toBe(true);
+    });
+  });
+
+  it('follows the dock as it changes', async () => {
+    initSidePanelCheck();
+    await jest.runAllTimersAsync();
+    expect(opensEditorInSidePanel()).toBe(true);
+
+    onChanged(
+      {
+        options: { newValue: { layout: { ...layout, dockLocation: 'right' } } },
+      },
+      'local'
+    );
+    expect(opensEditorInSidePanel()).toBe(false);
+  });
+
+  it('stays in the page once the browser is found not to show it', async () => {
+    initSidePanelCheck();
+    await jest.runAllTimersAsync();
+
+    onChanged({ chromiumVariant: { newValue: 'arc' } }, 'local');
+    expect(opensEditorInSidePanel()).toBe(false);
   });
 });

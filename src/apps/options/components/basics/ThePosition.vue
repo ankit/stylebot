@@ -39,7 +39,13 @@ import {
   UndockIcon,
 } from '@stylebot/icons';
 import type { StylebotDockLocation, StylebotLayout } from '@stylebot/types';
-import { supportsEditorSidePanel } from '@stylebot/utils';
+import {
+  detectChromiumVariant,
+  getChromiumVariant,
+  doesSidePanelWorkInChromiumVariant,
+  supportsEditorSidePanel,
+} from '@stylebot/utils';
+import type { ChromiumVariant } from '@stylebot/utils';
 
 type DockOption = {
   value: StylebotDockLocation;
@@ -60,9 +66,16 @@ export default Vue.extend({
     UndockIcon,
   },
 
+  data(): { chromiumVariant: ChromiumVariant | undefined } {
+    return { chromiumVariant: undefined };
+  },
+
   computed: {
     hasSidePanel(): boolean {
-      return supportsEditorSidePanel();
+      return (
+        supportsEditorSidePanel() &&
+        doesSidePanelWorkInChromiumVariant(this.chromiumVariant)
+      );
     },
 
     layout(): StylebotLayout {
@@ -112,6 +125,15 @@ export default Vue.extend({
         ...inPage,
       ];
     },
+  },
+
+  created() {
+    const setChromiumVariant = (variant: ChromiumVariant | undefined) => {
+      this.chromiumVariant = this.chromiumVariant ?? variant;
+    };
+
+    getChromiumVariant().then(setChromiumVariant, () => undefined);
+    detectChromiumVariant().then(setChromiumVariant, () => undefined);
   },
 });
 </script>

@@ -3,7 +3,7 @@ jest.mock('./restore-tabs', () => ({
   restoreTab: jest.fn(async () => undefined),
 }));
 jest.mock('./side-panel-check', () => ({
-  canUseEditorSidePanel: () => !!chrome.sidePanel,
+  opensEditorInSidePanel: () => !!chrome.sidePanel && mockDockedInSidePanel,
   onEditorSidePanelOpened: jest.fn(),
 }));
 jest.mock('./styles', () => ({
@@ -15,6 +15,8 @@ import * as editorWindow from './editor-window';
 import { restoreTab } from './restore-tabs';
 import { applyStylesToAllTabs, toggleForPage } from './styles';
 import { handleCommand } from './global-commands';
+
+let mockDockedInSidePanel = true;
 
 const PAGE = { id: 7, url: 'https://example.com/' } as chrome.tabs.Tab;
 
@@ -68,6 +70,7 @@ const flush = () => new Promise(resolve => setTimeout(resolve));
 describe('handleCommand', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockDockedInSidePanel = true;
   });
 
   it('asks the page to carry out a shortcut that acts on it', async () => {
@@ -106,12 +109,27 @@ describe('handleCommand', () => {
     expect(api.tabs.sendMessage).not.toBeCalled();
   });
 
-  it('leaves the editor to the page where the side panel isn’t the dock', async () => {
+  it('leaves the editor to the page where the side panel can’t open', async () => {
     const api = makeChrome({ panelSetUp: false });
 
     handleCommand('stylebot', PAGE);
     await flush();
 
+    expect(api.tabs.sendMessage).toBeCalledWith(
+      7,
+      { name: 'RunCommand', command: 'stylebot' },
+      expect.any(Function)
+    );
+  });
+
+  it('leaves the editor to the page where the side panel isn’t the dock', async () => {
+    mockDockedInSidePanel = false;
+    const api = makeChrome({ panelSetUp: true });
+
+    handleCommand('stylebot', PAGE);
+    await flush();
+
+    expect(api.sidePanel?.open).not.toBeCalled();
     expect(api.tabs.sendMessage).toBeCalledWith(
       7,
       { name: 'RunCommand', command: 'stylebot' },
