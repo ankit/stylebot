@@ -113,7 +113,7 @@ export const SHOTS = [
     slide: {
       title: 'Point at *anything*. Restyle it.',
       accent: 'pink',
-      pageWidth: 480,
+      pageWidth: 440,
     },
     phone: { pageWidth: 400 },
     run: async (browser, file, options) => {
@@ -149,7 +149,7 @@ export const SHOTS = [
     slide: {
       title: 'Write *CSS* when you want to.',
       accent: 'blue',
-      pageWidth: 600,
+      pageWidth: 380,
     },
     phone: { pageWidth: 400 },
     run: async (browser, file, options) => {
@@ -190,7 +190,7 @@ export const SHOTS = [
     slide: {
       title: 'Switch *looks* in a click.',
       accent: 'yellow',
-      pageWidth: 480,
+      pageWidth: 400,
     },
     phone: { pageWidth: 400 },
     run: async (browser, file, options) => {
@@ -213,7 +213,29 @@ export const SHOTS = [
     },
   },
   {
-    name: '4-cli',
+    name: '4-sync',
+    about: 'Sync in Options, connected to Google Drive',
+    appearance: 'dark',
+    slide: {
+      title: 'Your styles, on *every computer*.',
+      accent: 'yellow',
+      pageWidth: 740,
+    },
+    run: async (browser, file, options) => {
+      await seed(browser, {
+        styles: { 'news.ycombinator.com': hackerNews('Newspaper') },
+        ...syncState(),
+      });
+      const page = await openOptions(browser, 'sync', pageWidth(options));
+      await wait(600);
+      await capture(browser.context, file, page, null, {
+        appearance: 'dark',
+        ...options,
+      });
+    },
+  },
+  {
+    name: '5-cli',
     about: 'The CLI restyling Hacker News from a terminal',
     appearance: 'light',
     slide: {
@@ -228,13 +250,13 @@ export const SHOTS = [
       captureCli(file, gallery('hn', 'newspaper'), options),
   },
   {
-    name: '5-version-history',
+    name: '6-version-history',
     about: 'Version history in Options',
     appearance: 'dark',
     slide: {
       title: 'Go back to *any version*.',
       accent: 'blue',
-      pageWidth: 880,
+      pageWidth: 740,
     },
     run: async (browser, file, options) => {
       const sites = [
@@ -268,35 +290,13 @@ export const SHOTS = [
     },
   },
   {
-    name: '6-sync',
-    about: 'Sync in Options, connected to Google Drive',
-    appearance: 'dark',
-    slide: {
-      title: 'Your styles, on *every computer*.',
-      accent: 'yellow',
-      pageWidth: 880,
-    },
-    run: async (browser, file, options) => {
-      await seed(browser, {
-        styles: { 'news.ycombinator.com': hackerNews('Newspaper') },
-        ...syncState(),
-      });
-      const page = await openOptions(browser, 'sync', pageWidth(options));
-      await wait(600);
-      await capture(browser.context, file, page, null, {
-        appearance: 'dark',
-        ...options,
-      });
-    },
-  },
-  {
     name: '7-readability',
     about: 'Readability: Wikipedia with its settings open',
     appearance: 'light',
     slide: {
       title: 'Read without the *clutter*.',
       accent: 'pink',
-      pageWidth: 900,
+      pageWidth: 760,
     },
     run: async (browser, file, options) => {
       await seed(browser, {
