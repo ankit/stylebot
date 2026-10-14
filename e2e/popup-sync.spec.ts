@@ -61,7 +61,7 @@ test.describe('popup sync strip', () => {
     expect(await popup.locator('.sync-strip').isVisible()).toBe(false);
   });
 
-  test('syncs on open without an auth window, then asks for a sign-in when there is no token', async ({
+  test('opens without syncing, and Sync now runs without an auth window, then asks for a sign-in when there is no token', async ({
     context,
     extension,
     openPopup,
@@ -72,6 +72,19 @@ test.describe('popup sync strip', () => {
     });
 
     const popup = await openPopup();
+    const syncNow = popup.locator('.sync-button', { hasText: 'Sync now' });
+
+    await expect.poll(() => syncNow.isVisible()).toBe(true);
+    expect(
+      await extension.evaluate(
+        async () =>
+          (
+            await chrome.storage.local.get('google-drive-sync-needs-auth')
+          )['google-drive-sync-needs-auth']
+      )
+    ).toBeUndefined();
+
+    await syncNow.click();
 
     // Only a non-interactive run leaves this flag; an interactive one would
     // have opened a sign-in tab instead.

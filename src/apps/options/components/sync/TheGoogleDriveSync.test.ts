@@ -121,9 +121,7 @@ describe('TheGoogleDriveSync.vue', () => {
     };
 
     const synced = mountCard({ ...enabled, googleDriveSyncNeedsAuth: false });
-    expect(synced.text()).toContain(
-      'when_you_edit_a_style_or_open_the_popup_and_every_minutes'
-    );
+    expect(synced.text()).toContain('when_you_edit_a_style_and_every_minutes');
     expect(synced.text()).toContain('synced_at_time');
     expect(synced.text()).not.toContain('sync_needs_sign_in');
 

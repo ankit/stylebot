@@ -1,3 +1,5 @@
+import type Vue from 'vue';
+import type { Wrapper } from '@vue/test-utils';
 import { mount } from '@vue/test-utils';
 
 import SyncStylebot from './SyncStylebot.vue';
@@ -45,8 +47,7 @@ const syncState = (
 };
 
 /**
- * Opens the strip with the given sync state, which starts a sync unless it
- * needs a sign-in.
+ * Opens the strip with the given sync state.
  */
 const openStrip = async (
   lastSyncedAt?: string,
@@ -59,6 +60,13 @@ const openStrip = async (
   return wrapper;
 };
 
+/**
+ * Clicks the strip's button, which syncs unless a sign-in is needed.
+ */
+const clickSync = async (wrapper: Wrapper<Vue>) => {
+  await wrapper.find('.sync-button').trigger('click');
+};
+
 describe('SyncStylebot.vue', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -67,41 +75,37 @@ describe('SyncStylebot.vue', () => {
     } as unknown as typeof chrome;
   });
 
-  it('syncs without an auth window as soon as it opens', async () => {
-    await openStrip('earlier');
+  it('shows when it last synced without syncing on open', async () => {
+    const wrapper = await openStrip('earlier');
+
+    expect(sendMessage).not.toHaveBeenCalled();
+    expect(wrapper.text()).toContain('synced_at_time');
+    expect(wrapper.text()).toContain('sync_now');
+  });
+
+  it('syncs without an auth window when Sync now is clicked', async () => {
+    const wrapper = await openStrip('earlier');
+
+    await clickSync(wrapper);
 
     expect(sendMessage).toHaveBeenCalledWith(
       { name: 'RunGoogleDriveSync', interactive: false },
       expect.any(Function)
     );
-  });
-
-  it('syncs on open behind the last sync time, without a spinner', async () => {
-    const wrapper = await openStrip('earlier');
-
-    expect(wrapper.text()).toContain('synced_at_time');
-    expect(wrapper.find('.sync-button').attributes('disabled')).toBeUndefined();
+    expect(wrapper.find('.sync-button').attributes('disabled')).toBeDefined();
   });
 
   it('says it is syncing when it never has', async () => {
     const wrapper = await openStrip(undefined);
 
+    await clickSync(wrapper);
+
     expect(wrapper.text()).toContain('sync_in_progress');
-    expect(wrapper.find('.sync-button').attributes('disabled')).toBeDefined();
-  });
-
-  it('spins while a sync the user started runs', async () => {
-    const wrapper = await openStrip('earlier');
-
-    respond({ ok: true, metadata });
-    await flush();
-    await wrapper.find('.sync-button').trigger('click');
-
-    expect(wrapper.find('.sync-button').attributes('disabled')).toBeDefined();
   });
 
   it('reports success and tells the popup', async () => {
     const wrapper = await openStrip('earlier');
+    await clickSync(wrapper);
 
     syncState('now');
     respond({ ok: true, metadata });
@@ -113,6 +117,7 @@ describe('SyncStylebot.vue', () => {
 
   it('shows a failure and lets the user retry', async () => {
     const wrapper = await openStrip('earlier');
+    await clickSync(wrapper);
 
     syncState('earlier', false, 'sync_error_network');
     respond({ ok: false, errorKey: 'sync_error_network' });
@@ -122,13 +127,14 @@ describe('SyncStylebot.vue', () => {
     expect(wrapper.text()).toContain('retry');
     expect(wrapper.emitted('synced')).toBeUndefined();
 
-    await wrapper.find('.sync-button').trigger('click');
+    await clickSync(wrapper);
 
     expect(sendMessage).toHaveBeenCalledTimes(2);
   });
 
   it('treats a background that never answered as a failure', async () => {
     const wrapper = await openStrip('earlier');
+    await clickSync(wrapper);
 
     respond(undefined);
     await flush();
@@ -136,10 +142,12 @@ describe('SyncStylebot.vue', () => {
     expect(wrapper.text()).toContain('couldnt_sync');
   });
 
-  it('keeps showing a failure from a closed popup while it tries again', async () => {
+  it('keeps showing an earlier failure until a retry replaces it', async () => {
     const wrapper = await openStrip('earlier', false, 'sync_error_network');
 
-    expect(sendMessage).toHaveBeenCalledTimes(1);
+    expect(wrapper.text()).toContain('couldnt_reach_google_drive');
+
+    await clickSync(wrapper);
     expect(wrapper.text()).toContain('couldnt_reach_google_drive');
 
     syncState('now');
@@ -150,19 +158,20 @@ describe('SyncStylebot.vue', () => {
     expect(wrapper.text()).toContain('synced_at_time');
   });
 
-  it('points to the Sync tab when a sign-in is needed, without syncing', async () => {
+  it('points to the Sync tab when a sign-in is needed', async () => {
     const wrapper = await openStrip('earlier', true);
 
-    expect(sendMessage).not.toHaveBeenCalled();
     expect(wrapper.text()).toContain('sign_in_to_keep_syncing');
 
-    await wrapper.find('.sync-button').trigger('click');
+    await clickSync(wrapper);
 
+    expect(sendMessage).not.toHaveBeenCalled();
     expect(openSyncOptions).toHaveBeenCalled();
   });
 
   it('switches to the sign-in prompt when a sync finds it needs one', async () => {
     const wrapper = await openStrip('earlier');
+    await clickSync(wrapper);
 
     syncState('earlier', true);
     respond({ ok: false, errorKey: 'sync_error_auth' });
