@@ -2,6 +2,7 @@
 import CustomLight from './themes/CustomLight';
 import CustomDark from './themes/CustomDark';
 import type { IframeMessage, ParentMessage } from '@stylebot/monaco-editor';
+import { isSaveShortcut } from '@stylebot/utils';
 
 declare global {
   // Must stay an interface: augmenting Window relies on declaration merging.
@@ -291,6 +292,9 @@ class MonacEditorIframe {
     window.addEventListener('keydown', event => {
       if (event.key === 'Escape') {
         this.postMessage({ type: 'stylebotEscapePressed' });
+      } else if (this.variant === 'options' && isSaveShortcut(event)) {
+        event.preventDefault();
+        this.postMessage({ type: 'stylebotSavePressed' });
       }
     });
 

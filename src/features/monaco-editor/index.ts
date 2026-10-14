@@ -13,10 +13,15 @@ export type IframeEscapeMessage = {
   type: 'stylebotEscapePressed';
 };
 
+export type IframeSaveMessage = {
+  type: 'stylebotSavePressed';
+};
+
 export type IframeMessage =
   | IframeCssUpdatedMessage
   | IframeLoadedMessage
-  | IframeEscapeMessage;
+  | IframeEscapeMessage
+  | IframeSaveMessage;
 
 export type ParentUpdateCssMessage = {
   type: 'stylebotCssUpdate';
