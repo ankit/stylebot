@@ -53,6 +53,7 @@ describe('TheCodeEditor.vue', () => {
   afterEach(() => {
     wrapper?.destroy();
     wrapper = undefined;
+    jest.restoreAllMocks();
     jest.useRealTimers();
   });
 
@@ -86,6 +87,20 @@ describe('TheCodeEditor.vue', () => {
       'applyCss',
       { css: 'a { color: blue; }', source: 'code' },
     ]);
+  });
+
+  it('adds an empty rule for a picked selector it has no rule for', async () => {
+    // jsdom gives the editor's iframe no window to post the css to.
+    jest
+      .spyOn(HTMLIFrameElement.prototype, 'contentWindow', 'get')
+      .mockReturnValue(window);
+
+    store.state.activeSelector = '.parent .child';
+    await Vue.nextTick();
+
+    expect(store.state.css).toBe(
+      'a { color: red; }\n\n.parent .child {\n  \n}'
+    );
   });
 
   it('drops pending typing when the css is replaced from outside the editor', async () => {

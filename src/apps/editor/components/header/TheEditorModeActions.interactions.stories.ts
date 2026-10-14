@@ -49,19 +49,22 @@ export const TabsSwitchMode: StoryObj = {
 
 export const ShortcutsSwitchMode: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'b, c and p switch modes; i only inspects in Basic',
+  name: 'b, c and p switch modes; i inspects in Basic and Code',
   play: async ({ canvasElement }) => {
     const store = storeOf(canvasElement);
 
     await pressKey('c');
     await expect(store.state.options.mode).toBe('code');
 
-    // Inspecting is a basic-mode affair, so its shortcut is inert here.
     await pressKey('i');
-    await expect(store.state.inspecting).toBe(false);
+    await expect(store.state.inspecting).toBe(true);
 
     await pressKey('p');
     await expect(store.state.options.mode).toBe('magic');
+    await expect(store.state.inspecting).toBe(false);
+
+    await pressKey('i');
+    await expect(store.state.inspecting).toBe(false);
 
     await pressKey('b');
     await expect(store.state.options.mode).toBe('basic');

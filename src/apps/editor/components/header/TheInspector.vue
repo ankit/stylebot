@@ -67,7 +67,7 @@ export default Vue.extend({
     },
 
     disabled(): boolean {
-      return this.mode !== 'basic';
+      return this.mode !== 'basic' && this.mode !== 'code';
     },
   },
 
@@ -80,9 +80,8 @@ export default Vue.extend({
       }
     },
 
-    // Only Basic inspects, so inspecting left on stops on leaving it.
-    mode(newValue: StylebotEditingMode): void {
-      if (newValue !== 'basic' && this.active) {
+    mode(): void {
+      if (this.active) {
         this.$store.commit('setInspecting', false);
       }
     },

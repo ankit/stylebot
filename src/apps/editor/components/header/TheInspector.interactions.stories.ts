@@ -100,6 +100,28 @@ export const PickSetsSelector: StoryObj = {
   },
 };
 
+export const InspectsInCode: StoryObj = {
+  ...editor({ options: { mode: 'code' } }),
+  name: 'the inspector picks an element in Code too',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const button = inspector(canvasElement);
+
+    await expect(button).toBeEnabled();
+    await user.click(button);
+    await expect(store.state.inspecting).toBe(true);
+
+    await hoverPage(canvas.getByRole('heading', { level: 1 }));
+    await waitFor(() => expect(currentChip()).toMatch(/\bh1$/));
+    await pressKey('Enter');
+
+    await expect(store.state.inspecting).toBe(false);
+    await expect(store.state.activeSelector).toMatch(/\bh1$/);
+    await expect(store.state.options.mode).toBe('code');
+  },
+};
+
 export const HintsOtherMatches: StoryObj = {
   ...editor({ inspecting: true }),
   name: "hovering an element tints the selector's other matches on the page",
