@@ -118,7 +118,8 @@ const buildChromeManifest = (manifest, { nodeEnv, preview, store }) => {
 
 const SITE_BRIDGE_SCRIPT = 'site-bridge/index.js';
 
-// Where `yarn dev` in site/ serves stylebot.dev, on whichever port is free.
+// Where `yarn dev` in the stylebot-site repo serves stylebot.dev, on whichever
+// port is free.
 const SITE_DEV_SERVER = 'http://localhost/*';
 
 /**

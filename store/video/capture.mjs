@@ -21,10 +21,7 @@ const SITE_URL = 'https://en.wikipedia.org/wiki/Ikigai';
 const SITE_HTML = path.join(HERE, 'wiki-ikigai.html');
 const SITE = 'en.wikipedia.org';
 // What Claude's style is: the gallery's Slate theme, and the fonts it brings.
-const THEME_CSS = path.join(
-  ROOT,
-  'site/src/assets/gallery/wikipedia/slate.css'
-);
+const THEME_CSS = path.join(ROOT, 'scripts/capture/themes/wikipedia/slate.css');
 const THEME_FONTS = ['Playfair Display', 'Libre Baskerville'];
 const THEME_PROFILE = 'Slate';
 const PROMPT = '/stylebot give this article a calm dark reading look';

@@ -10,9 +10,9 @@ import path from 'node:path';
 const root = path.resolve(import.meta.dirname, '../..');
 const outDir = path.join(root, 'release');
 
-// Kept out of the source zip: the website, store art and the Safari app aren't
-// part of the Firefox build.
-const EXCLUDED_FROM_SOURCE = ['site', 'store', 'safari'];
+// Kept out of the source zip: store art and the Safari app aren't part of the
+// Firefox build.
+const EXCLUDED_FROM_SOURCE = ['store', 'safari'];
 
 /**
  * Runs a command in the repo root, printing its output.

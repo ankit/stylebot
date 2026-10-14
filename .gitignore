@@ -8,6 +8,7 @@ firefox-dist
 safari-dist
 preview-dist
 release
+captures
 node_modules
 .chrome-dev-profile*
 .edge-dev-profile*

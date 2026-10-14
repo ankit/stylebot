@@ -10,10 +10,7 @@ import { rootDir } from '../lib/cli.mjs';
 
 const require = createRequire(import.meta.url);
 const { chromium } = require('@playwright/test');
-// The site already depends on sharp, for Astro's images.
-export const sharp = createRequire(path.join(rootDir, 'site/package.json'))(
-  'sharp'
-);
+export const sharp = require('sharp');
 
 export const WIDTH = 1280;
 export const HEIGHT = 800;

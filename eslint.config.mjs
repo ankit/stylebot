@@ -27,9 +27,6 @@ export default tseslint.config(
       'evals/styling/pages',
       'evals/styling/results',
 
-      // Separate Gatsby project with its own toolchain.
-      'site',
-
       // Xcode project; its JS is Apple's generated wrapper-app boilerplate,
       // not part of the extension's own source.
       'safari',

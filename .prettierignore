@@ -11,9 +11,6 @@ patches
 yarn.lock
 CHANGELOG.md
 
-# Separate Gatsby project with its own toolchain.
-site
-
 # Prompt content — the manual line wrapping there is deliberate.
 .agents
 .claude

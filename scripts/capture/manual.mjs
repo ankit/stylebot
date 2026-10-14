@@ -1,12 +1,12 @@
 // Takes the stylebot.dev manual's and 4.0 release page's screenshots from the
-// current build, in light and dark, into site/src/assets/manual/:
+// current build, in light and dark, into captures/manual/:
 //
-//   yarn capture:manual [<name>...] [--no-build]
+//   yarn capture:manual [<name>...] [--out <dir>] [--no-build]
 
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { bin, rootDir, runOrExit } from '../lib/cli.mjs';
+import { bin, runOrExit } from '../lib/cli.mjs';
 import {
   HEIGHT,
   WIDTH,
@@ -23,8 +23,7 @@ import {
   wait,
 } from './browser.mjs';
 import { gallery, theme } from './shots.mjs';
-
-const OUT_DIR = path.join(rootDir, 'site/src/assets/manual');
+import { capturesDir, shownPath, takeOutput } from './output.mjs';
 
 const APPEARANCES = ['light', 'dark'];
 
@@ -295,8 +294,9 @@ const SHOTS = [
   },
 ];
 
-const USAGE = `usage: yarn capture:manual [<name>...] [--no-build]
+const USAGE = `usage: yarn capture:manual [<name>...] [--out <dir>] [--no-build]
 
+  --out       save into this directory instead of captures/manual/
   --no-build  skip the rebuild (dist must already be current)
 
 With no names, retakes every shot below, each in light and dark.
@@ -312,7 +312,8 @@ if (args.includes('--help') || args.includes('-h')) {
   process.exit(0);
 }
 
-const wanted = args.filter(arg => !arg.startsWith('--'));
+const { outDir, rest } = takeOutput(args, capturesDir('manual'));
+const wanted = rest.filter(arg => !arg.startsWith('--'));
 const shots = wanted.length
   ? SHOTS.filter(({ name }) => wanted.includes(name))
   : SHOTS;
@@ -332,7 +333,7 @@ for (const shot of shots) {
   for (const appearance of APPEARANCES) {
     const format = shot.format ?? 'png';
     const label = `${shot.name}${appearance === 'dark' ? '-dark' : ''}`;
-    const file = path.join(OUT_DIR, `${label}.${format}`);
+    const file = path.join(outDir, `${label}.${format}`);
     const browser = await launch({ appearance });
 
     try {
@@ -350,5 +351,5 @@ for (const shot of shots) {
   }
 }
 
-console.log(`\nSaved to ${path.relative(rootDir, OUT_DIR)}/`);
+console.log(`\nSaved to ${shownPath(outDir)}/`);
 process.exit(failed ? 1 : 0);

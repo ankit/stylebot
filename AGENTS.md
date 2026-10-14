@@ -18,7 +18,7 @@ Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of
 - `jest/` — Jest setup and the stylesheet stub
 - `dist/` — Chrome/Edge build output; `firefox-dist/` — Firefox build output; `preview-dist/` — `yarn build:preview` output
 - `store/` — store listing art (promo tiles, screenshots) per store; not part of the build. `yarn capture:store` retakes the screenshots; `store/video/` makes the demo video (see its README)
-- `site/` — stylebot.dev static site
+- `captures/` — git-ignored output of the `capture:*` scripts that shoot screenshots for stylebot.dev, whose source is its own repo, [stylebot-site](https://github.com/ankit/stylebot-site); copy them into that repo by hand
 - `docs/` — developer docs: setup, releases, translation, e2e, architecture (editor, selectors, CSS, readability, profiles, sync)
 - `patches/` — patch-package patches applied to dependencies on install
 
@@ -42,8 +42,8 @@ session is already inside a worktree.
 - `yarn e2e` — builds the extension then runs the Playwright e2e suite headless on Chrome, as CI does. `--edge` / `--firefox` switch browser, `--headed` / `--ui` / `--debug` switch mode, `--no-build` skips the rebuild; see `docs/e2e.md`.
 - `yarn test:storybook` — builds Storybook and runs every story headless with `@storybook/test-runner`, asserting the `play` functions. `--no-build` reuses `storybook-static`; `--dev --watch <path>` runs against a `yarn storybook` already on :6006.
 - `yarn capture:store` — builds the extension and retakes the store screenshots in `store/screenshots/` on live sites, headless; `--only <name>` retakes some. Use the `capture-store` skill, which checks each image.
-- `yarn capture:gallery` — builds the extension and retakes the stylebot.dev gallery's theme screenshots in `site/src/assets/gallery/`, headless; `hn/newspaper` or `hn` retakes some. Use the `capture-gallery` skill, which checks each image.
-- `yarn capture:manual` — builds the extension and retakes the stylebot.dev manual's and 4.0 release page's screenshots in `site/src/assets/manual/`, light and dark, headless; `sync history` retakes some. Check each image before committing.
+- `yarn capture:gallery` — builds the extension and retakes the stylebot.dev gallery's theme screenshots into `captures/gallery/` (or `--out <dir>`), headless, from the themes in `scripts/capture/themes/`; `hn/newspaper` or `hn` retakes some. Use the `capture-gallery` skill, which checks each image.
+- `yarn capture:manual` — builds the extension and retakes the stylebot.dev manual's and 4.0 release page's screenshots into `captures/manual/` (or `--out <dir>`), light and dark, headless; `sync history` retakes some. Check each image before committing.
 - `yarn storybook` — Storybook 7.6 (last line with Vue 2 support) for the shared primitives and popup/options/editor composites, with a light/dark toolbar
 
 ## Validation

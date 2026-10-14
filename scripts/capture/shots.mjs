@@ -5,7 +5,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { rootDir } from '../lib/cli.mjs';
 import {
   WIDTH,
   HEIGHT,
@@ -31,10 +30,7 @@ export const theme = name =>
   fs.readFileSync(path.join(THEMES_DIR, `${name}.css`), 'utf8');
 
 export const gallery = (site, name) =>
-  fs.readFileSync(
-    path.join(rootDir, 'site/src/assets/gallery', site, `${name}.css`),
-    'utf8'
-  );
+  fs.readFileSync(path.join(THEMES_DIR, site, `${name}.css`), 'utf8');
 
 // GitHub wraps the repo's last-commit row at the panel's width, so it's laid
 // out a little wider and scaled into the space.

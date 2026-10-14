@@ -189,6 +189,7 @@
     "progress-bar-webpack-plugin": "^2.1.0",
     "sass": "^1.26.9",
     "sass-loader": "^8.0.2",
+    "sharp": "^0.35.4",
     "storybook": "~7.6.20",
     "terser-webpack-plugin": "^3.0.7",
     "ts-jest": "^29",

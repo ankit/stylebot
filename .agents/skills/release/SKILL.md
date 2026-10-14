@@ -103,5 +103,5 @@ build steps for reviewers. Upload by hand; there is no automated store upload.
 
 ## Optional follow-up
 
-Minor releases (X.Y.0) usually get a marketing page under
-`site/src/pages/releases/X.Y.js`. Patch releases don't.
+Minor releases (X.Y.0) usually get a release page on stylebot.dev, in the stylebot-site
+repo's `src/pages/[...lang]/releases/X.Y.astro`. Patch releases don't.

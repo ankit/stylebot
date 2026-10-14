@@ -1,15 +1,16 @@
 // Takes the stylebot.dev gallery's screenshots from the current build, on live
-// sites, next to each theme's CSS in site/src/assets/gallery/:
+// sites, applying each theme in themes/<site>/, into captures/gallery/<site>/:
 //
-//   yarn capture:gallery [<site>[/<theme>]...] [--no-build]
+//   yarn capture:gallery [<site>[/<theme>]...] [--out <dir>] [--no-build]
 
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { bin, rootDir, runOrExit } from '../lib/cli.mjs';
+import { bin, runOrExit } from '../lib/cli.mjs';
 import { launch, seed, style, wait } from './browser.mjs';
+import { capturesDir, shownPath, takeOutput } from './output.mjs';
 
-const GALLERY_DIR = path.join(rootDir, 'site/src/assets/gallery');
+const THEMES_DIR = path.join(import.meta.dirname, 'themes');
 
 // The page each site's themes are shown on. NYTimes blocks headless Chrome and
 // Gmail needs a sign-in, so their shots are still taken by hand.
@@ -22,17 +23,18 @@ const PAGES = {
 const VIEWPORT = { width: 1440, height: 900 };
 
 const themes = fs
-  .readdirSync(GALLERY_DIR)
+  .readdirSync(THEMES_DIR)
   .filter(site => PAGES[site])
   .flatMap(site =>
     fs
-      .readdirSync(path.join(GALLERY_DIR, site))
+      .readdirSync(path.join(THEMES_DIR, site))
       .filter(file => file.endsWith('.css'))
       .map(file => `${site}/${path.basename(file, '.css')}`)
   );
 
-const USAGE = `usage: yarn capture:gallery [<site>[/<theme>]...] [--no-build]
+const USAGE = `usage: yarn capture:gallery [<site>[/<theme>]...] [--out <dir>] [--no-build]
 
+  --out       save into this directory instead of captures/gallery/
   --no-build  skip the rebuild (dist must already be current)
 
 With no names, retakes every theme below.
@@ -48,7 +50,8 @@ if (args.includes('--help') || args.includes('-h')) {
   process.exit(0);
 }
 
-const wanted = args.filter(arg => !arg.startsWith('--'));
+const { outDir, rest } = takeOutput(args, capturesDir('gallery'));
+const wanted = rest.filter(arg => !arg.startsWith('--'));
 const shots = wanted.length
   ? themes.filter(theme =>
       wanted.some(name => theme === name || theme.startsWith(`${name}/`))
@@ -69,7 +72,7 @@ let failed = 0;
 for (const theme of shots) {
   const [site] = theme.split('/');
   const url = PAGES[site];
-  const css = fs.readFileSync(path.join(GALLERY_DIR, `${theme}.css`), 'utf8');
+  const css = fs.readFileSync(path.join(THEMES_DIR, `${theme}.css`), 'utf8');
   const browser = await launch({ appearance: 'light' });
 
   try {
@@ -79,7 +82,8 @@ for (const theme of shots) {
     await page.goto(url, { waitUntil: 'load' });
     await page.mouse.move(0, 0);
     await wait(2500);
-    await page.screenshot({ path: path.join(GALLERY_DIR, `${theme}.png`) });
+    fs.mkdirSync(path.join(outDir, site), { recursive: true });
+    await page.screenshot({ path: path.join(outDir, `${theme}.png`) });
     console.log(`✓ ${theme}`);
   } catch (error) {
     failed++;
@@ -89,5 +93,5 @@ for (const theme of shots) {
   }
 }
 
-console.log(`\nSaved to ${path.relative(rootDir, GALLERY_DIR)}/`);
+console.log(`\nSaved to ${shownPath(outDir)}/`);
 process.exit(failed ? 1 : 0);
