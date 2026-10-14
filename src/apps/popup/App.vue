@@ -134,6 +134,7 @@ import type {
   StylebotLayout,
   StylebotDockLocation,
 } from '@stylebot/types';
+import { markSidePanelUnusableInArc } from '@stylebot/utils';
 import type { PageSupport } from '@stylebot/utils';
 
 export default Vue.extend({
@@ -261,6 +262,8 @@ export default Vue.extend({
   },
 
   created() {
+    markSidePanelUnusableInArc();
+
     getCurrentTab(async tab => {
       this.tab = tab;
       this.pageSupport = await getRestoredPageSupport(tab);

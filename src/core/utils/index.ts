@@ -44,6 +44,8 @@ export {
   SIDE_PANEL_IGNORED_KEY,
   isSidePanelIgnoringTabs,
   markSidePanelIgnoringTabs,
+  hasArcPalette,
+  markSidePanelUnusableInArc,
   configureEditorSidePanel,
   openEditorSidePanel,
   closeEditorSidePanel,

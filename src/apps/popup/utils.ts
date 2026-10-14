@@ -21,6 +21,7 @@ import {
   openDonatePage,
   supportsEditorSidePanel,
   openEditorSidePanel,
+  hasArcPalette,
   getBrowserCommands,
   getPageSupport,
   getRestorePendingKey,
@@ -156,10 +157,11 @@ export const toggleStylebot = (tab: chrome.tabs.Tab): void => {
 
 /**
  * Opens the editor in the tab's side panel straight from the popup's click,
- * as the page couldn't once its gesture is gone; falls back to the page.
+ * as the page couldn't once its gesture is gone; falls back to the page, as
+ * in Arc, whose side panel never shows.
  */
 export const openStylebotSidePanel = (tab: chrome.tabs.Tab): void => {
-  if (!tab.id || !supportsEditorSidePanel()) {
+  if (!tab.id || !supportsEditorSidePanel() || hasArcPalette()) {
     toggleStylebot(tab);
     return;
   }

@@ -39,7 +39,11 @@ import {
   UndockIcon,
 } from '@stylebot/icons';
 import type { StylebotDockLocation, StylebotLayout } from '@stylebot/types';
-import { supportsEditorSidePanel } from '@stylebot/utils';
+import {
+  isSidePanelIgnoringTabs,
+  markSidePanelUnusableInArc,
+  supportsEditorSidePanel,
+} from '@stylebot/utils';
 
 type DockOption = {
   value: StylebotDockLocation;
@@ -60,9 +64,13 @@ export default Vue.extend({
     UndockIcon,
   },
 
+  data(): { sidePanelUnusable: boolean } {
+    return { sidePanelUnusable: false };
+  },
+
   computed: {
     hasSidePanel(): boolean {
-      return supportsEditorSidePanel();
+      return supportsEditorSidePanel() && !this.sidePanelUnusable;
     },
 
     layout(): StylebotLayout {
@@ -112,6 +120,15 @@ export default Vue.extend({
         ...inPage,
       ];
     },
+  },
+
+  created() {
+    const mark = (unusable: boolean) => {
+      this.sidePanelUnusable = this.sidePanelUnusable || unusable;
+    };
+
+    isSidePanelIgnoringTabs().then(mark, () => undefined);
+    markSidePanelUnusableInArc().then(mark, () => undefined);
   },
 });
 </script>

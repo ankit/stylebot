@@ -1,8 +1,8 @@
 export const SIDE_PANEL_IGNORED_KEY = 'sidePanelIgnoresTabs';
 
 /**
- * Whether this browser was found to ignore per-tab side panels (Vivaldi),
- * which the editor needs. Readable from content scripts too.
+ * Whether this browser was found unable to host the editor in its side
+ * panel (Vivaldi, Arc). Readable from content scripts too.
  */
 export const isSidePanelIgnoringTabs = async (): Promise<boolean> =>
   !!(await chrome.storage.local.get(SIDE_PANEL_IGNORED_KEY))[
@@ -15,6 +15,35 @@ export const isSidePanelIgnoringTabs = async (): Promise<boolean> =>
  */
 export const markSidePanelIgnoringTabs = (): Promise<void> =>
   chrome.storage.local.set({ [SIDE_PANEL_IGNORED_KEY]: true });
+
+const ARC_PALETTE_VARIABLE = '--arc-palette-title';
+const ARC_WAIT_MS = 2000;
+const ARC_POLL_MS = 100;
+
+/**
+ * Whether this page shows in Arc, by the palette variables Arc adds to every
+ * page; its user agent matches Chrome's.
+ */
+export const hasArcPalette = (): boolean =>
+  !!getComputedStyle(document.documentElement).getPropertyValue(
+    ARC_PALETTE_VARIABLE
+  );
+
+/**
+ * Remembers that the side panel can't host the editor when this page shows
+ * in Arc, which has the side panel API but never shows the panel. Arc adds
+ * its palette a moment after the page loads, so this waits for it a while.
+ */
+export const markSidePanelUnusableInArc = async (): Promise<boolean> => {
+  for (let waited = 0; waited <= ARC_WAIT_MS; waited += ARC_POLL_MS) {
+    if (hasArcPalette()) {
+      await markSidePanelIgnoringTabs();
+      return true;
+    }
+    await new Promise(resolve => setTimeout(resolve, ARC_POLL_MS));
+  }
+  return false;
+};
 
 /**
  * Whether this browser can host the editor in its side panel. Content

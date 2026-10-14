@@ -2,7 +2,12 @@ import { t } from '@stylebot/i18n';
 import { setPageBridge, RemotePageBridge } from '@stylebot/page-bridge';
 
 import { createStore, mountEditor } from '@stylebot/editor';
-import { getPageSupport, markSidePanelIgnoringTabs } from '@stylebot/utils';
+import type { EditorSidePanelOpened } from '@stylebot/types';
+import {
+  getPageSupport,
+  markSidePanelIgnoringTabs,
+  markSidePanelUnusableInArc,
+} from '@stylebot/utils';
 
 import { openEditorWindow } from '../utils/chrome';
 import { initWindowListeners, initTabInfo } from './listeners';
@@ -141,6 +146,21 @@ const init = async (): Promise<void> => {
     await markSidePanelIgnoringTabs();
     window.close();
     return;
+  }
+
+  // Arc loads the side panel but never shows it. Told so, the background
+  // docks the editor in the page and opens it there.
+  if (host === 'sidepanel') {
+    markSidePanelUnusableInArc().then(isArc => {
+      if (isArc) {
+        const message: EditorSidePanelOpened = {
+          name: 'EditorSidePanelOpened',
+          tabId,
+        };
+        chrome.runtime.sendMessage(message);
+        window.close();
+      }
+    });
   }
 
   const canStyle = await canStyleTab(tab);
