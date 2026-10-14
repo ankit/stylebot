@@ -5,6 +5,7 @@ import Vuex from 'vuex';
 import VueRouter from 'vue-router';
 
 import { defaultCommands, defaultOptions } from '@stylebot/settings';
+import type { StyleWithoutUrl } from '@stylebot/types';
 
 import App from './App.vue';
 import { createRouter } from './router';
@@ -36,13 +37,29 @@ const createStore = () =>
           readability: false,
           modifiedTime: '2026-01-10T09:30:00Z',
         },
-      },
+      } as Record<string, StyleWithoutUrl>,
       options: { ...defaultOptions, appearance: 'light' },
       commands: defaultCommands,
       googleDriveSyncEnabled: false,
       googleDriveSyncMetadata: undefined,
     },
-    actions: Object.fromEntries(ACTIONS.map(name => [name, jest.fn()])),
+    actions: {
+      ...Object.fromEntries(ACTIONS.map(name => [name, jest.fn()])),
+      saveStyle: (
+        { state },
+        {
+          initialUrl,
+          url,
+          drafts,
+        }: { initialUrl: string; url: string; drafts: Record<string, string> }
+      ) => {
+        const { [initialUrl]: style, ...rest } = state.styles;
+        state.styles = {
+          ...rest,
+          [url]: { ...style, css: drafts.default ?? style.css },
+        };
+      },
+    },
   });
 
 const flush = () => new Promise(resolve => setTimeout(resolve, 0));
@@ -160,18 +177,49 @@ describe('options App routing', () => {
     expect(router.currentRoute.name).toBe('styles');
   });
 
-  it('saves without prompting even though the edit made it dirty', async () => {
-    const { wrapper, router } = await mountApp('/styles/edit?url=example.com');
-
-    await wrapper.find('.url-input').setValue('renamed.com');
+  const clickSave = async (wrapper: Wrapper<Vue>) => {
     await wrapper
       .findAll('.editor-footer button')
       .filter(w => w.text() === 'save')
       .at(0)
       .trigger('click');
     await flush();
+  };
 
-    expect(router.currentRoute.name).toBe('styles');
+  it('stays in the editor after saving, still guarding later edits', async () => {
+    const { wrapper, router } = await mountApp('/styles/edit?url=example.com');
+    const editor = wrapper.findComponent({ name: 'TheStyleEditorPage' });
+
+    editor.vm.$data.drafts = { default: 'h1 { color: blue; }' };
+    await clickSave(wrapper);
+
+    expect(router.currentRoute.fullPath).toBe('/styles/edit?url=example.com');
+    expect(wrapper.text()).not.toContain('unsaved_changes');
+    expect(wrapper.findComponent({ name: 'SConfirmDialog' }).exists()).toBe(
+      false
+    );
+
+    await wrapper.find('.url-input').setValue('changed.com');
+    router.push('/basics').catch(() => undefined);
+    await flush();
+
+    expect(router.currentRoute.name).toBe('style-edit');
+    expect(wrapper.findComponent({ name: 'SConfirmDialog' }).exists()).toBe(
+      true
+    );
+  });
+
+  it('reopens the editor at the new url when saving a rename, without prompting', async () => {
+    const { wrapper, router } = await mountApp('/styles/edit?url=example.com');
+
+    await wrapper.find('.url-input').setValue('renamed.com');
+    await clickSave(wrapper);
+
+    expect(router.currentRoute.name).toBe('style-edit');
+    expect(router.currentRoute.query.url).toBe('renamed.com');
+    expect((wrapper.find('.url-input').element as HTMLInputElement).value).toBe(
+      'renamed.com'
+    );
     expect(wrapper.findComponent({ name: 'SConfirmDialog' }).exists()).toBe(
       false
     );

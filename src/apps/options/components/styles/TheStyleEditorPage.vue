@@ -551,8 +551,12 @@ export default Vue.extend({
       this.emitSave();
     },
 
+    /**
+     * Saves and stays open. A new url reopens the editor at it, so the page
+     * only lets that one navigation past the unsaved-changes prompt.
+     */
     emitSave(): void {
-      this.leaving = true;
+      this.leaving = this.url !== this.initialUrl;
       this.$emit('save', {
         initialUrl: this.initialUrl,
         url: this.url,

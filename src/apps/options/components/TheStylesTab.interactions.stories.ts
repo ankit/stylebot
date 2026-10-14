@@ -58,8 +58,14 @@ export const SavingANewUrlDoesNotAsk: StoryObj = {
     await user.click(canvas.getByRole('button', { name: 'Save' }));
 
     await expect(canvas.queryByText(/already exists/)).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(canvas.getByPlaceholderText('example.com')).toHaveValue(
+        'another.example.com'
+      )
+    );
+    await expect(canvas.getByRole('tab', { name: /^Default/ })).toBeVisible();
   }),
-  name: 'saving a style for a URL with no style saves without asking',
+  name: 'saving a style for a URL with no style saves without asking, and keeps it open',
 };
 
 export const LastRowMenuIsNotClipped: StoryObj = {
