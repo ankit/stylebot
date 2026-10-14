@@ -72,17 +72,8 @@ describe('getAll', () => {
     });
   });
 
-  it('docks to the side panel by default where the browser has one', async () => {
+  it('docks right by default, even where the browser has a side panel', async () => {
     store = {};
-    (chrome as unknown as { sidePanel: object }).sidePanel = {
-      open: jest.fn(),
-    };
-
-    expect((await getAll()).layout.dockLocation).toBe('sidepanel');
-  });
-
-  it('docks right where the browser ignores per-tab side panels', async () => {
-    store = { sidePanelIgnoresTabs: true };
     (chrome as unknown as { sidePanel: object }).sidePanel = {
       open: jest.fn(),
     };
@@ -90,8 +81,34 @@ describe('getAll', () => {
     expect((await getAll()).layout.dockLocation).toBe('right');
   });
 
-  it('docks right by default where the browser has no side panel', async () => {
-    store = {};
+  it('docks right where the browser ignores per-tab side panels', async () => {
+    store = {
+      sidePanelIgnoresTabs: true,
+      options: {
+        layout: {
+          width: 360,
+          adjustPageLayout: false,
+          dockLocation: 'sidepanel',
+        },
+      },
+    };
+    (chrome as unknown as { sidePanel: object }).sidePanel = {
+      open: jest.fn(),
+    };
+
+    expect((await getAll()).layout.dockLocation).toBe('right');
+  });
+
+  it('docks right where the browser has no side panel', async () => {
+    store = {
+      options: {
+        layout: {
+          width: 360,
+          adjustPageLayout: false,
+          dockLocation: 'sidepanel',
+        },
+      },
+    };
 
     expect((await getAll()).layout.dockLocation).toBe('right');
   });

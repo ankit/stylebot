@@ -27,8 +27,7 @@ export const defaultOptions: StylebotOptions = {
   layout: {
     width: 360,
     adjustPageLayout: false,
-    // Firefox has no side panel; the background reads this back as 'right' there.
-    dockLocation: 'sidepanel',
+    dockLocation: 'right',
   },
   appearance: 'system',
   lastColorSet: 'neutrals',
