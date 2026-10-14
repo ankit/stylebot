@@ -18,7 +18,7 @@ export const markSidePanelIgnoringTabs = (): Promise<void> =>
 
 const ARC_PALETTE_VARIABLE = '--arc-palette-title';
 const ARC_WAIT_MS = 2000;
-const ARC_POLL_MS = 100;
+const ARC_POLL_MS = 250;
 
 /**
  * Whether this page shows in Arc, by the palette variables Arc adds to every
@@ -30,19 +30,32 @@ export const hasArcPalette = (): boolean =>
   );
 
 /**
- * Remembers that the side panel can't host the editor when this page shows
- * in Arc, which has the side panel API but never shows the panel. Arc adds
- * its palette a moment after the page loads, so this waits for it a while.
+ * Whether this page shows in Arc. Arc adds its palette a moment after the
+ * page loads, so this waits for it a while.
  */
-export const markSidePanelUnusableInArc = async (): Promise<boolean> => {
+export const isArcBrowser = async (): Promise<boolean> => {
   for (let waited = 0; waited <= ARC_WAIT_MS; waited += ARC_POLL_MS) {
     if (hasArcPalette()) {
-      await markSidePanelIgnoringTabs();
       return true;
     }
     await new Promise(resolve => setTimeout(resolve, ARC_POLL_MS));
   }
   return false;
+};
+
+/**
+ * Remembers that the side panel can't host the editor when this page shows
+ * in Arc, which has the side panel API but never shows the panel. Answers
+ * whether it is Arc.
+ */
+export const markSidePanelUnusableInArc = async (): Promise<boolean> => {
+  if (!(await isArcBrowser())) {
+    return false;
+  }
+  if (!(await isSidePanelIgnoringTabs())) {
+    await markSidePanelIgnoringTabs();
+  }
+  return true;
 };
 
 /**

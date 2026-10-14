@@ -45,6 +45,7 @@ export {
   isSidePanelIgnoringTabs,
   markSidePanelIgnoringTabs,
   hasArcPalette,
+  isArcBrowser,
   markSidePanelUnusableInArc,
   configureEditorSidePanel,
   openEditorSidePanel,

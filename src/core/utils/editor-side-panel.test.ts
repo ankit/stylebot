@@ -7,7 +7,12 @@ beforeEach(() => {
   jest.useFakeTimers();
   document.documentElement.removeAttribute('style');
   global.chrome = {
-    storage: { local: { set: jest.fn(() => Promise.resolve()) } },
+    storage: {
+      local: {
+        get: jest.fn(() => Promise.resolve({})),
+        set: jest.fn(() => Promise.resolve()),
+      },
+    },
   } as unknown as typeof chrome;
 });
 
@@ -24,6 +29,16 @@ describe('markSidePanelUnusableInArc', () => {
     expect(chrome.storage.local.set).toBeCalledWith({
       [SIDE_PANEL_IGNORED_KEY]: true,
     });
+  });
+
+  it('leaves storage alone when Arc is already known', async () => {
+    (chrome.storage.local.get as jest.Mock).mockResolvedValue({
+      [SIDE_PANEL_IGNORED_KEY]: true,
+    });
+    document.documentElement.style.setProperty('--arc-palette-title', '#fff');
+
+    await expect(markSidePanelUnusableInArc()).resolves.toBe(true);
+    expect(chrome.storage.local.set).not.toBeCalled();
   });
 
   it('leaves the side panel alone in other browsers', async () => {

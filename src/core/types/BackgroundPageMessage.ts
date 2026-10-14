@@ -1,6 +1,7 @@
 import type { StyleMap } from './styles';
 import type { StylebotOptions } from './options';
 import type { ReadabilitySettings } from './readability';
+import type { StylebotCommandName } from './commands';
 
 export type SetStyle = {
   name: 'SetStyle';
@@ -225,6 +226,13 @@ export type EditorSidePanelOpened = {
   tabId: number;
 };
 
+// A global shortcut the page caught itself, where the browser doesn't pass
+// it on (Arc).
+export type RunPageCommand = {
+  name: 'RunPageCommand';
+  command: StylebotCommandName;
+};
+
 export type CloseEditorSidePanel = {
   name: 'CloseEditorSidePanel';
   tabId?: number;
@@ -282,6 +290,7 @@ type BackgroundPageMessage =
   | OpenEditorSidePanel
   | CloseEditorSidePanel
   | EditorSidePanelOpened
+  | RunPageCommand
   | RestoreTab;
 
 export default BackgroundPageMessage;

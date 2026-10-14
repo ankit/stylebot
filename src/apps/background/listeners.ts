@@ -365,6 +365,9 @@ export const initListeners = (): void => {
         case 'EditorSidePanelOpened':
           onEditorSidePanelOpened(message.tabId);
           break;
+        case 'RunPageCommand':
+          handleCommand(message.command, sender.tab);
+          break;
         case 'RestoreTab':
           restoreTab(message.tabId).then(() => sendResponse({ ok: true }));
           break;
