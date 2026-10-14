@@ -227,6 +227,8 @@ export const initListeners = (): void => {
     }
   });
 
+  // Only messages that get an answer keep their channel open: one left open
+  // rejects the sender's promise once the worker stops (#1211).
   chrome.runtime.onMessage.addListener(
     (
       message: BackgroundPageMessage,
@@ -236,17 +238,17 @@ export const initListeners = (): void => {
       switch (message.name) {
         case 'GetCommands':
           GetCommands(sendResponse);
-          break;
+          return true;
 
         case 'GetOption':
           GetOption(message, sendResponse);
-          break;
+          return true;
         case 'SetOption':
           SetOption(message);
           break;
         case 'GetAllOptions':
           GetAllOptions(sendResponse);
-          break;
+          return true;
 
         case 'OpenOptionsPage':
           OpenOptionsPage(message);
@@ -269,13 +271,13 @@ export const initListeners = (): void => {
           break;
         case 'GetAllStyles':
           GetAllStyles(sendResponse);
-          break;
+          return true;
         case 'SetAllStyles':
           SetAllStyles(message, sendResponse);
-          break;
+          return true;
         case 'GetStylesForPage':
           GetStylesForPage(sender, sendResponse);
-          break;
+          return true;
         case 'EnableStyle':
           EnableStyle(message);
           break;
@@ -287,10 +289,10 @@ export const initListeners = (): void => {
           break;
         case 'CreateProfile':
           CreateProfile(message, sendResponse);
-          break;
+          return true;
         case 'InstallStyle':
           InstallStyle(message, sender, sendResponse);
-          break;
+          return true;
         case 'RenameProfile':
           RenameProfile(message);
           break;
@@ -303,46 +305,46 @@ export const initListeners = (): void => {
           break;
         case 'GetReadabilitySettings':
           GetReadabilitySettings(sendResponse);
-          break;
+          return true;
         case 'SetReadabilitySettings':
           SetReadabilitySettings(message);
           break;
 
         case 'GetImportCss':
           GetImportCss(message, sendResponse);
-          break;
+          return true;
         case 'GetCompiledStyles':
           GetCompiledStyles(sendResponse);
-          break;
+          return true;
         case 'GetGoogleWebFontExists':
           GetGoogleWebFontExists(message, sendResponse);
-          break;
+          return true;
         case 'GetGoogleFontFile':
           GetGoogleFontFile(message, sendResponse);
-          break;
+          return true;
 
         case 'RunGoogleDriveSync':
           RunGoogleDriveSync(message, sendResponse);
-          break;
+          return true;
         case 'GoogleSignInRedirect':
           GoogleSignInRedirect(message, sender);
           break;
         case 'ScanVersionHistory':
           ScanVersionHistory(message, sendResponse);
-          break;
+          return true;
         case 'RestoreVersion':
           RestoreVersion(message, sendResponse);
-          break;
+          return true;
         case 'UndoRestore':
           UndoRestore(message, sendResponse);
-          break;
+          return true;
 
         case 'GetRecentColors':
           GetRecentColors(sendResponse);
-          break;
+          return true;
         case 'AddRecentColor':
           AddRecentColor(message, sendResponse);
-          break;
+          return true;
 
         case 'OpenEditorWindow':
           OpenEditorWindow(message, sender);
@@ -355,10 +357,10 @@ export const initListeners = (): void => {
           break;
         case 'GetIsEditorWindowOpen':
           GetIsEditorWindowOpen(message, sender, sendResponse);
-          break;
+          return true;
         case 'OpenEditorSidePanel':
           OpenEditorSidePanel(message, sender, sendResponse);
-          break;
+          return true;
         case 'CloseEditorSidePanel':
           CloseEditorSidePanel(message, sender);
           break;
@@ -367,10 +369,10 @@ export const initListeners = (): void => {
           break;
         case 'RestoreTab':
           restoreTab(message.tabId).then(() => sendResponse({ ok: true }));
-          break;
+          return true;
       }
 
-      return true;
+      return false;
     }
   );
 
