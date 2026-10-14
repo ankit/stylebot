@@ -1,4 +1,4 @@
-import { SIDE_PANEL_IGNORED_KEY } from '@stylebot/utils';
+import { CHROMIUM_VARIANT_KEY } from '@stylebot/utils';
 
 import { initPageShortcuts, toCombo } from './page-shortcuts';
 
@@ -105,7 +105,7 @@ describe('initPageShortcuts', () => {
       command: 'style',
     });
     expect(chrome.storage.local.set).toBeCalledWith({
-      [SIDE_PANEL_IGNORED_KEY]: true,
+      [CHROMIUM_VARIANT_KEY]: 'arc',
     });
   });
 

@@ -1,7 +1,8 @@
 import type { StylebotOptions } from '@stylebot/types';
 import { defaultOptions } from '@stylebot/settings';
 import {
-  isSidePanelIgnoringTabs,
+  getChromiumVariant,
+  doesSidePanelWorkInChromiumVariant,
   supportsEditorSidePanel,
 } from '@stylebot/utils';
 
@@ -13,15 +14,20 @@ export const getAll = async (): Promise<StylebotOptions> => {
   const items = await chrome.storage.local.get('options');
   const options: StylebotOptions = { ...defaultOptions, ...items['options'] };
 
-  // Without a side panel the editor docks in the page, where it used to.
-  if (
-    options.layout.dockLocation === 'sidepanel' &&
-    (!supportsEditorSidePanel() || (await isSidePanelIgnoringTabs()))
-  ) {
-    return { ...options, layout: { ...options.layout, dockLocation: 'right' } };
+  if (options.layout.dockLocation !== 'sidepanel') {
+    return options;
   }
 
-  return options;
+  const variant = await getChromiumVariant();
+  const hasSidePanel =
+    supportsEditorSidePanel() && doesSidePanelWorkInChromiumVariant(variant);
+
+  if (hasSidePanel) {
+    return options;
+  }
+
+  // Without a side panel the editor docks in the page, where it used to.
+  return { ...options, layout: { ...options.layout, dockLocation: 'right' } };
 };
 
 export const get = async (

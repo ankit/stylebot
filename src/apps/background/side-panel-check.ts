@@ -1,27 +1,30 @@
 import type { OpenStylebot, StylebotLayout } from '@stylebot/types';
 import {
-  SIDE_PANEL_IGNORED_KEY,
+  CHROMIUM_VARIANT_KEY,
+  getChromiumVariant,
   isEditorSidePanelOpen,
-  isSidePanelIgnoringTabs,
   openEditorSidePanel,
+  doesSidePanelWorkInChromiumVariant,
   supportsEditorSidePanel,
 } from '@stylebot/utils';
+import type { ChromiumVariant } from '@stylebot/utils';
 
 import { get as getOption, set as setOption } from './options';
 
 const LOAD_TIMEOUT_MS = 2000;
 const POLL_MS = 250;
 
-let ignoresTabs = false;
+let chromiumVariant: ChromiumVariant | undefined;
 let isDock: boolean | undefined;
 
 /**
  * Whether the editor can open in the browser's side panel: it has one, and
- * hasn't been found to ignore per-tab panels. Answers at once, so callers
- * can still open the panel during the user's gesture.
+ * shows it. Answers at once, so callers can still open the panel during the
+ * user's gesture.
  */
 export const canUseEditorSidePanel = (): boolean =>
-  supportsEditorSidePanel() && !ignoresTabs;
+  supportsEditorSidePanel() &&
+  doesSidePanelWorkInChromiumVariant(chromiumVariant);
 
 /**
  * Whether the editor opens in the side panel. Says yes until the dock is
@@ -35,9 +38,10 @@ export const opensEditorInSidePanel = (): boolean =>
  * with storage.
  */
 export const initSidePanelCheck = (): void => {
-  isSidePanelIgnoringTabs().then(value => {
-    ignoresTabs = value;
+  getChromiumVariant().then(variant => {
+    chromiumVariant = variant;
   });
+
   getOption('layout').then(layout => {
     isDock = (layout as StylebotLayout).dockLocation === 'sidepanel';
   });
@@ -46,9 +50,11 @@ export const initSidePanelCheck = (): void => {
     if (area !== 'local') {
       return;
     }
-    if (changes[SIDE_PANEL_IGNORED_KEY]) {
-      ignoresTabs = !!changes[SIDE_PANEL_IGNORED_KEY].newValue;
+
+    if (changes[CHROMIUM_VARIANT_KEY]) {
+      chromiumVariant = changes[CHROMIUM_VARIANT_KEY].newValue;
     }
+
     if (changes['options']) {
       isDock =
         changes['options'].newValue?.layout?.dockLocation === 'sidepanel';
@@ -57,12 +63,12 @@ export const initSidePanelCheck = (): void => {
 };
 
 /**
- * Waits for the side panel to report that the browser hosts it as a tab,
- * which it does as it loads (Vivaldi), or for the editor to show up in it.
+ * Waits for the side panel to find, as it loads, that the browser won't show
+ * it (Vivaldi, Arc), or for the editor to show up in it.
  */
-const waitForPanelHostedAsTab = async (tabId: number): Promise<boolean> => {
+const waitForHiddenPanel = async (tabId: number): Promise<boolean> => {
   for (let waited = 0; waited < LOAD_TIMEOUT_MS; waited += POLL_MS) {
-    if (await isSidePanelIgnoringTabs()) {
+    if (!doesSidePanelWorkInChromiumVariant(await getChromiumVariant())) {
       return true;
     }
     if (await isEditorSidePanelOpen(tabId)) {
@@ -74,12 +80,12 @@ const waitForPanelHostedAsTab = async (tabId: number): Promise<boolean> => {
 };
 
 /**
- * Follows up a side panel just opened on the tab. In a browser that ignores
- * per-tab panels (Vivaldi) the panel closes itself, so the editor docks in
- * the page from now on, and opens there.
+ * Follows up a side panel just opened on the tab. In a browser that won't
+ * show it (Vivaldi, Arc) the panel closes itself, so the editor docks in the
+ * page from now on, and opens there.
  */
 export const onEditorSidePanelOpened = async (tabId: number): Promise<void> => {
-  if (!(await waitForPanelHostedAsTab(tabId))) {
+  if (!(await waitForHiddenPanel(tabId))) {
     return;
   }
 

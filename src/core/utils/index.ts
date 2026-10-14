@@ -41,17 +41,22 @@ export {
 } from './open-page';
 export {
   supportsEditorSidePanel,
-  SIDE_PANEL_IGNORED_KEY,
-  isSidePanelIgnoringTabs,
-  markSidePanelIgnoringTabs,
-  hasArcPalette,
-  isArcBrowser,
-  markSidePanelUnusableInArc,
   configureEditorSidePanel,
   openEditorSidePanel,
   closeEditorSidePanel,
   isEditorSidePanelOpen,
 } from './editor-side-panel';
+export {
+  CHROMIUM_VARIANT_KEY,
+  doesSidePanelWorkInChromiumVariant,
+  doShortcutsWorkInChromiumVariant,
+  getChromiumVariant,
+  rememberChromiumVariant,
+  detectChromiumVariantSync,
+  detectChromiumVariant,
+  detectVivaldiSidePanel,
+} from './chromium-variants';
+export type { ChromiumVariant } from './chromium-variants';
 export { fromBrowserShortcut, toBrowserShortcut } from './browser-shortcut';
 export {
   COMMAND_NAMES,

@@ -40,10 +40,12 @@ import {
 } from '@stylebot/icons';
 import type { StylebotDockLocation, StylebotLayout } from '@stylebot/types';
 import {
-  isSidePanelIgnoringTabs,
-  markSidePanelUnusableInArc,
+  detectChromiumVariant,
+  getChromiumVariant,
+  doesSidePanelWorkInChromiumVariant,
   supportsEditorSidePanel,
 } from '@stylebot/utils';
+import type { ChromiumVariant } from '@stylebot/utils';
 
 type DockOption = {
   value: StylebotDockLocation;
@@ -64,13 +66,16 @@ export default Vue.extend({
     UndockIcon,
   },
 
-  data(): { sidePanelUnusable: boolean } {
-    return { sidePanelUnusable: false };
+  data(): { chromiumVariant: ChromiumVariant | undefined } {
+    return { chromiumVariant: undefined };
   },
 
   computed: {
     hasSidePanel(): boolean {
-      return supportsEditorSidePanel() && !this.sidePanelUnusable;
+      return (
+        supportsEditorSidePanel() &&
+        doesSidePanelWorkInChromiumVariant(this.chromiumVariant)
+      );
     },
 
     layout(): StylebotLayout {
@@ -123,12 +128,12 @@ export default Vue.extend({
   },
 
   created() {
-    const mark = (unusable: boolean) => {
-      this.sidePanelUnusable = this.sidePanelUnusable || unusable;
+    const setChromiumVariant = (variant: ChromiumVariant | undefined) => {
+      this.chromiumVariant = this.chromiumVariant ?? variant;
     };
 
-    isSidePanelIgnoringTabs().then(mark, () => undefined);
-    markSidePanelUnusableInArc().then(mark, () => undefined);
+    getChromiumVariant().then(setChromiumVariant, () => undefined);
+    detectChromiumVariant().then(setChromiumVariant, () => undefined);
   },
 });
 </script>

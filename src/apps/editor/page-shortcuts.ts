@@ -3,7 +3,11 @@ import type {
   RunPageCommand,
   StylebotCommands,
 } from '@stylebot/types';
-import { COMMAND_NAMES, markSidePanelUnusableInArc } from '@stylebot/utils';
+import {
+  COMMAND_NAMES,
+  detectChromiumVariant,
+  doShortcutsWorkInChromiumVariant,
+} from '@stylebot/utils';
 
 import { whenDomReady } from './utils/dom-ready';
 
@@ -67,19 +71,13 @@ export const toCombo = (event: KeyboardEvent): string => {
 };
 
 /**
- * Whether the browser registers Stylebot's shortcuts but never passes them
- * on. Only Arc does so far, which also can't show the side panel.
- */
-const dropsBrowserCommands = async (): Promise<boolean> =>
-  /Chrome\//.test(navigator.userAgent) && markSidePanelUnusableInArc();
-
-/**
- * Catches Stylebot's global shortcuts in the page where the browser drops
- * them, and has the background carry them out as it would a browser's.
+ * Catches Stylebot's global shortcuts in the page where the browser doesn't
+ * pass them on, and has the background carry them out as it would a
+ * browser's.
  */
 export const initPageShortcuts = (): void => {
   whenDomReady(async () => {
-    if (!(await dropsBrowserCommands())) {
+    if (doShortcutsWorkInChromiumVariant(await detectChromiumVariant())) {
       return;
     }
 
