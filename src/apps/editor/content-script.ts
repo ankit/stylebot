@@ -10,6 +10,7 @@ import type { TabMessage } from '@stylebot/types';
 
 import { REMOTE_PAGE_BRIDGE_PORT } from '@stylebot/page-bridge';
 
+import { initPageShortcuts } from './page-shortcuts';
 import type { EditorApp } from './load-editor';
 import { isEditorLoading, loadEditor } from './load-editor';
 import { loadInspector } from './load-inspector';
@@ -201,4 +202,5 @@ const removeDeadEditor = (): void => {
 if (isStylableDocument(document.contentType)) {
   removeDeadEditor();
   listen();
+  initPageShortcuts();
 }

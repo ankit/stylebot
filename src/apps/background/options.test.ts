@@ -18,11 +18,21 @@ beforeEach(() => {
     storage: {
       local: {
         get: jest.fn(
-          (key: string) =>
+          (keys: string | Array<string>) =>
             new Promise(resolve => {
               // Simulate the read taking a tick, so a second set() call can
               // start before the first one's read-modify-write finishes.
-              setTimeout(() => resolve({ [key]: store[key] }), 10);
+              setTimeout(
+                () =>
+                  resolve(
+                    Object.fromEntries(
+                      ([] as Array<string>)
+                        .concat(keys)
+                        .map(key => [key, store[key]])
+                    )
+                  ),
+                10
+              );
             })
         ),
         set: jest.fn(
@@ -81,7 +91,25 @@ describe('getAll', () => {
     expect((await getAll()).layout.dockLocation).toBe('right');
   });
 
-  it('docks right where the browser ignores per-tab side panels', async () => {
+  it('docks right where the browser won’t show the side panel', async () => {
+    store = {
+      chromiumVariant: 'arc',
+      options: {
+        layout: {
+          width: 360,
+          adjustPageLayout: false,
+          dockLocation: 'sidepanel',
+        },
+      },
+    };
+    (chrome as unknown as { sidePanel: object }).sidePanel = {
+      open: jest.fn(),
+    };
+
+    expect((await getAll()).layout.dockLocation).toBe('right');
+  });
+
+  it('docks right in Vivaldi, as 4.0 recorded it', async () => {
     store = {
       sidePanelIgnoresTabs: true,
       options: {

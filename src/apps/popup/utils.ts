@@ -21,6 +21,8 @@ import {
   openDonatePage,
   supportsEditorSidePanel,
   openEditorSidePanel,
+  detectChromiumVariantSync,
+  doesSidePanelWorkInChromiumVariant,
   getBrowserCommands,
   getPageSupport,
   getRestorePendingKey,
@@ -156,10 +158,15 @@ export const toggleStylebot = (tab: chrome.tabs.Tab): void => {
 
 /**
  * Opens the editor in the tab's side panel straight from the popup's click,
- * as the page couldn't once its gesture is gone; falls back to the page.
+ * as the page couldn't once its gesture is gone; falls back to the page,
+ * as where the browser won't show the panel.
  */
 export const openStylebotSidePanel = (tab: chrome.tabs.Tab): void => {
-  if (!tab.id || !supportsEditorSidePanel()) {
+  if (
+    !tab.id ||
+    !supportsEditorSidePanel() ||
+    !doesSidePanelWorkInChromiumVariant(detectChromiumVariantSync())
+  ) {
     toggleStylebot(tab);
     return;
   }
