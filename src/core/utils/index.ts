@@ -54,7 +54,6 @@ export {
   rememberChromiumVariant,
   detectChromiumVariantSync,
   detectChromiumVariant,
-  detectVivaldiSidePanel,
 } from './chromium-variants';
 export type { ChromiumVariant } from './chromium-variants';
 export { fromBrowserShortcut, toBrowserShortcut } from './browser-shortcut';

@@ -1,7 +1,7 @@
 /*
  * Chromium variants that have Chrome's extension APIs but don't honour them,
- * and the only place Stylebot names them. Each is found once, from a page,
- * and remembered for every other context.
+ * and the only place Stylebot names them. Each is found once and remembered
+ * for every other context.
  */
 
 export type ChromiumVariant = 'vivaldi' | 'arc';
@@ -84,13 +84,23 @@ export const detectChromiumVariantSync = (): ChromiumVariant | undefined => {
 };
 
 /**
- * Finds the Chromium variant showing this page and remembers it, waiting a
- * while for Arc to add its palette.
+ * Vivaldi, by the data it adds to every window the windows API returns,
+ * where there is a windows API.
  */
-export const detectChromiumVariant = async (): Promise<
-  ChromiumVariant | undefined
-> => {
-  if (!/Chrome\//.test(navigator.userAgent)) {
+const detectVivaldi = async (): Promise<ChromiumVariant | undefined> => {
+  if (!chrome.windows) {
+    return undefined;
+  }
+
+  const [win] = await chrome.windows.getAll();
+  return win && 'vivExtData' in win ? 'vivaldi' : undefined;
+};
+
+/**
+ * Arc, waiting a while for it to add its palette, where there is a page.
+ */
+const detectArc = async (): Promise<ChromiumVariant | undefined> => {
+  if (typeof document === 'undefined') {
     return undefined;
   }
 
@@ -100,7 +110,6 @@ export const detectChromiumVariant = async (): Promise<
   for (let waited = 0; waited <= waitMs; waited += pollMs) {
     const variant = detectChromiumVariantSync();
     if (variant) {
-      await rememberChromiumVariant(variant);
       return variant;
     }
 
@@ -111,14 +120,26 @@ export const detectChromiumVariant = async (): Promise<
 };
 
 /**
- * Finds whether the side panel page was opened as a tab, which is how
- * Vivaldi hosts side panels, and remembers it.
+ * Finds the Chromium variant Stylebot runs in and remembers it. A content
+ * script has no windows API, so it only knows Vivaldi once the background or
+ * another extension page has found it.
  */
-export const detectVivaldiSidePanel = async (): Promise<boolean> => {
-  if (!(await chrome.tabs.getCurrent())) {
-    return false;
+export const detectChromiumVariant = async (): Promise<
+  ChromiumVariant | undefined
+> => {
+  if (!/Chrome\//.test(navigator.userAgent)) {
+    return undefined;
   }
 
-  await rememberChromiumVariant('vivaldi');
-  return true;
+  const known = await getChromiumVariant();
+  if (known) {
+    return known;
+  }
+
+  const variant = (await detectVivaldi()) ?? (await detectArc());
+  if (variant) {
+    await rememberChromiumVariant(variant);
+  }
+
+  return variant;
 };
