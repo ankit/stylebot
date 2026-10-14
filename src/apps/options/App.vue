@@ -122,7 +122,11 @@ export default Vue.extend({
 
       if (url !== initialUrl && this.$store.state.styles[url]) {
         this.$router
-          .replace({ name: 'style-edit', query: { url } })
+          .replace({
+            name: 'style-edit',
+            query: { url },
+            params: { justSaved: 'true' },
+          })
           .catch(() => undefined);
       }
     },

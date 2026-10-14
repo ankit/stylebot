@@ -117,6 +117,11 @@ export const EditInactiveProfile: StoryObj = {
     await step('the editor stays open with nothing left unsaved', async () => {
       await expect(canvas.getByRole('tab', { name: /^Default/ })).toBeVisible();
       await expect(canvas.queryByText('Unsaved changes')).toBeNull();
+      await expect(canvas.getByText('Saved')).toBeVisible();
+      await expect(canvas.getByRole('button', { name: 'Save' })).toBeDisabled();
+      await waitFor(() => expect(canvas.queryByText('Saved')).toBeNull(), {
+        timeout: 3000,
+      });
     });
   },
 };

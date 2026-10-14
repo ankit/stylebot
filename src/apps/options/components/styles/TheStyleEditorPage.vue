@@ -131,23 +131,27 @@
     <div class="editor-footer">
       <s-text as="div" variant="muted" class="stats">
         <template v-if="isDirty">
-          <span class="dirty-dot" />
+          <span class="status-dot" />
           <s-text as="span" size="label" class="dirty-text">
             {{ t('unsaved_changes') }}
           </s-text>
           <span>·</span>
         </template>
-        <span class="counts">
-          {{ lineCountLabel }} · {{ ruleCountLabel }}
-          <template v-if="savedLabel">· {{ savedLabel }}</template>
-        </span>
+        <template v-else-if="savedStatusVisible">
+          <span class="status-dot saved" />
+          <s-text as="span" size="label" class="saved-text">
+            {{ t('saved') }}
+          </s-text>
+          <span>·</span>
+        </template>
+        <span class="counts">{{ lineCountLabel }} · {{ ruleCountLabel }}</span>
       </s-text>
 
       <s-button :disabled="!isDirty" @click="discard">
         {{ t('discard') }}
       </s-button>
 
-      <s-button variant="primary" :disabled="!valid" @click="save">
+      <s-button variant="primary" :disabled="!isDirty || !valid" @click="save">
         {{ t('save') }}
       </s-button>
     </div>
@@ -206,7 +210,6 @@
 <script lang="ts">
 import Vue from 'vue';
 import type { NavigationGuardNext, Route } from 'vue-router';
-import { formatDistanceToNow } from 'date-fns';
 
 import type { StyleWithoutUrl } from '@stylebot/types';
 import {
@@ -231,6 +234,8 @@ import CodeEditor from './CodeEditor.vue';
 import IconMenuTrigger from '../IconMenuTrigger.vue';
 
 type ProfileDialog = 'new' | 'rename';
+
+const SAVED_DURATION = 1500;
 
 export default Vue.extend({
   name: 'TheStyleEditorPage',
@@ -266,6 +271,11 @@ export default Vue.extend({
       type: String,
       default: '',
     },
+    // Set when a save reopened the editor at a new url.
+    justSaved: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   data(): {
@@ -280,6 +290,7 @@ export default Vue.extend({
     showReplaceConfirm: boolean;
     leaving: boolean;
     pendingNext: NavigationGuardNext | null;
+    savedTimer: ReturnType<typeof setTimeout> | null;
   } {
     const existing = this.$store.state.styles[this.initialUrl];
 
@@ -296,6 +307,7 @@ export default Vue.extend({
       showReplaceConfirm: false,
       leaving: false,
       pendingNext: null,
+      savedTimer: null,
     };
   },
 
@@ -383,16 +395,8 @@ export default Vue.extend({
         : `${this.ruleCount} rule${this.ruleCount === 1 ? '' : 's'}`;
     },
 
-    savedLabel(): string {
-      if (!this.existingStyle) {
-        return '';
-      }
-
-      return this.t('saved_time', [
-        formatDistanceToNow(new Date(this.existingStyle.modifiedTime), {
-          addSuffix: true,
-        }),
-      ]);
+    savedStatusVisible(): boolean {
+      return this.savedTimer !== null && !this.isDirty;
     },
 
     valid(): boolean {
@@ -411,12 +415,20 @@ export default Vue.extend({
     },
   },
 
-  created() {
+  created(): void {
     window.addEventListener('keydown', this.onKeydown);
+
+    if (this.justSaved) {
+      this.showSavedStatus();
+    }
   },
 
-  beforeDestroy() {
+  beforeDestroy(): void {
     window.removeEventListener('keydown', this.onKeydown);
+
+    if (this.savedTimer) {
+      clearTimeout(this.savedTimer);
+    }
   },
 
   methods: {
@@ -439,9 +451,19 @@ export default Vue.extend({
         this.showLeaveConfirm ||
         this.showReplaceConfirm;
 
-      if (this.valid && !dialogOpen) {
+      if (this.isDirty && this.valid && !dialogOpen) {
         this.save();
       }
+    },
+
+    showSavedStatus(): void {
+      if (this.savedTimer) {
+        clearTimeout(this.savedTimer);
+      }
+
+      this.savedTimer = setTimeout(() => {
+        this.savedTimer = null;
+      }, SAVED_DURATION);
     },
 
     guardLeave(next: NavigationGuardNext): void {
@@ -598,6 +620,10 @@ export default Vue.extend({
           ? this.changedDrafts
           : { [DEFAULT_PROFILE_ID]: this.css },
       });
+
+      if (!this.leaving) {
+        this.showSavedStatus();
+      }
     },
   },
 });
@@ -780,20 +806,25 @@ export default Vue.extend({
   margin-right: 8px;
 }
 
-.dirty-dot {
+.status-dot {
   flex: none;
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: var(--warning-icon);
   transform: translateY(-1px);
+
+  &.saved {
+    background: var(--success);
+  }
 }
 
 .counts {
   @include truncate;
 }
 
-.dirty-text {
+.dirty-text,
+.saved-text {
   flex: none;
 }
 </style>

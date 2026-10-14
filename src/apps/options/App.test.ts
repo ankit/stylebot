@@ -186,14 +186,32 @@ describe('options App routing', () => {
     await flush();
   };
 
+  const saveButton = (wrapper: Wrapper<Vue>) =>
+    wrapper.findAll('.editor-footer button').at(1);
+
+  it('only enables Save when there are changes', async () => {
+    const { wrapper } = await mountApp('/styles/edit?url=example.com');
+    const editor = wrapper.findComponent({ name: 'TheStyleEditorPage' });
+
+    expect(saveButton(wrapper).attributes('disabled')).toBeDefined();
+
+    editor.vm.$data.drafts = { default: 'h1 { color: blue; }' };
+    await flush();
+
+    expect(saveButton(wrapper).attributes('disabled')).toBeUndefined();
+  });
+
   it('stays in the editor after saving, still guarding later edits', async () => {
     const { wrapper, router } = await mountApp('/styles/edit?url=example.com');
     const editor = wrapper.findComponent({ name: 'TheStyleEditorPage' });
 
     editor.vm.$data.drafts = { default: 'h1 { color: blue; }' };
+    await flush();
     await clickSave(wrapper);
 
     expect(router.currentRoute.fullPath).toBe('/styles/edit?url=example.com');
+    expect(wrapper.find('.saved-text').text()).toBe('saved');
+    expect(saveButton(wrapper).attributes('disabled')).toBeDefined();
     expect(wrapper.text()).not.toContain('unsaved_changes');
     expect(wrapper.findComponent({ name: 'SConfirmDialog' }).exists()).toBe(
       false
@@ -220,6 +238,7 @@ describe('options App routing', () => {
     expect((wrapper.find('.url-input').element as HTMLInputElement).value).toBe(
       'renamed.com'
     );
+    expect(wrapper.find('.saved-text').text()).toBe('saved');
     expect(wrapper.findComponent({ name: 'SConfirmDialog' }).exists()).toBe(
       false
     );
