@@ -4,7 +4,11 @@ import {
 } from '@stylebot/utils';
 
 import { get as getOption, set as setOption } from './options';
-import { onEditorSidePanelOpened } from './side-panel-check';
+import {
+  initSidePanelCheck,
+  onEditorSidePanelOpened,
+  opensEditorInSidePanel,
+} from './side-panel-check';
 
 jest.mock('@stylebot/utils', () => ({
   ...jest.requireActual('@stylebot/utils'),
@@ -95,5 +99,54 @@ describe('onEditorSidePanelOpened', () => {
     expect(isEditorSidePanelOpen).not.toBeCalled();
     expect(setOption).not.toBeCalled();
     openStylebot();
+  });
+});
+
+describe('opensEditorInSidePanel', () => {
+  let onChanged: (
+    changes: Record<string, chrome.storage.StorageChange>,
+    area: string
+  ) => void;
+
+  beforeEach(() => {
+    global.chrome = {
+      sidePanel: { open: jest.fn() },
+      storage: {
+        onChanged: {
+          addListener: jest.fn(listener => {
+            onChanged = listener;
+          }),
+        },
+      },
+    } as unknown as typeof chrome;
+  });
+
+  it('tries the side panel until the dock is read', () => {
+    jest.isolateModules(() => {
+      const check = jest.requireActual('./side-panel-check');
+      expect(check.opensEditorInSidePanel()).toBe(true);
+    });
+  });
+
+  it('follows the dock as it changes', async () => {
+    initSidePanelCheck();
+    await jest.runAllTimersAsync();
+    expect(opensEditorInSidePanel()).toBe(true);
+
+    onChanged(
+      {
+        options: { newValue: { layout: { ...layout, dockLocation: 'right' } } },
+      },
+      'local'
+    );
+    expect(opensEditorInSidePanel()).toBe(false);
+  });
+
+  it('stays in the page once the browser is found unable to host it', async () => {
+    initSidePanelCheck();
+    await jest.runAllTimersAsync();
+
+    onChanged({ sidePanelIgnoresTabs: { newValue: true } }, 'local');
+    expect(opensEditorInSidePanel()).toBe(false);
   });
 });

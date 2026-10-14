@@ -13,6 +13,7 @@ const LOAD_TIMEOUT_MS = 2000;
 const POLL_MS = 250;
 
 let ignoresTabs = false;
+let isDock: boolean | undefined;
 
 /**
  * Whether the editor can open in the browser's side panel: it has one, and
@@ -23,16 +24,34 @@ export const canUseEditorSidePanel = (): boolean =>
   supportsEditorSidePanel() && !ignoresTabs;
 
 /**
- * Keeps canUseEditorSidePanel's answer in step with storage.
+ * Whether the editor opens in the side panel. Says yes until the dock is
+ * read after the worker wakes; callers fall back to the page.
+ */
+export const opensEditorInSidePanel = (): boolean =>
+  isDock !== false && canUseEditorSidePanel();
+
+/**
+ * Keeps canUseEditorSidePanel's and opensEditorInSidePanel's answers in step
+ * with storage.
  */
 export const initSidePanelCheck = (): void => {
   isSidePanelIgnoringTabs().then(value => {
     ignoresTabs = value;
   });
+  getOption('layout').then(layout => {
+    isDock = (layout as StylebotLayout).dockLocation === 'sidepanel';
+  });
 
   chrome.storage.onChanged.addListener((changes, area) => {
-    if (area === 'local' && changes[SIDE_PANEL_IGNORED_KEY]) {
+    if (area !== 'local') {
+      return;
+    }
+    if (changes[SIDE_PANEL_IGNORED_KEY]) {
       ignoresTabs = !!changes[SIDE_PANEL_IGNORED_KEY].newValue;
+    }
+    if (changes['options']) {
+      isDock =
+        changes['options'].newValue?.layout?.dockLocation === 'sidepanel';
     }
   });
 };

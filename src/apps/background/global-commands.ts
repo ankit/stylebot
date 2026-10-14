@@ -10,8 +10,8 @@ import * as editorWindow from './editor-window';
 import { restoreTab } from './restore-tabs';
 import { applyStylesToAllTabs, toggleForPage } from './styles';
 import {
-  canUseEditorSidePanel,
   onEditorSidePanelOpened,
+  opensEditorInSidePanel,
 } from './side-panel-check';
 
 const isCommandName = (command: string): command is StylebotCommandName =>
@@ -59,7 +59,7 @@ const runInPage = (tabId: number, command: StylebotCommandName): void => {
 /**
  * Toggles the editor where the side panel is the dock. The panel is set up
  * on every tab ahead of time then, so it opens here, before anything is
- * awaited and the shortcut's gesture lapses; elsewhere the open fails and
+ * awaited and the shortcut's gesture lapses. Where the open fails anyway,
  * the page toggles its own editor.
  */
 const toggleEditorWithSidePanel = (tabId: number): void => {
@@ -109,7 +109,7 @@ export const handleCommand = (
   if (command === 'stylebot') {
     if (target.fromEditorWindow) {
       editorWindow.close(target.tabId);
-    } else if (canUseEditorSidePanel()) {
+    } else if (opensEditorInSidePanel()) {
       toggleEditorWithSidePanel(target.tabId);
     } else {
       runInPage(target.tabId, command);
