@@ -9,7 +9,10 @@ import {
   RULE_CSS,
   WITH_RULE,
 } from '@stylebot/storybook/fixtures/editor';
-import type { GalleryShimOptions } from '@stylebot/storybook/mocks/chrome';
+import {
+  GALLERY_PUBLISHED_SCREENSHOT,
+  type GalleryShimOptions,
+} from '@stylebot/storybook/mocks/chrome';
 import {
   openEditorMenu,
   storeOf,
@@ -159,12 +162,46 @@ export const UpdatesWhatWasPublished: StoryObj = {
       await expect(publishButton(canvas, 'Publish update')).toBeDisabled();
     });
 
+    await step("the Gallery's screenshot is kept", async () => {
+      await waitFor(() =>
+        expect(canvas.getByRole('img', { name: 'Screenshot' })).toHaveAttribute(
+          'src',
+          GALLERY_PUBLISHED_SCREENSHOT
+        )
+      );
+    });
+
     await step('a new screenshot is enough to publish', async () => {
-      await takeScreenshot(canvas);
+      await user.click(
+        canvas.getByRole('button', {
+          name: 'Take a new screenshot of this tab',
+        })
+      );
+      await waitFor(() =>
+        expect(
+          canvas.getByRole('img', { name: 'Screenshot' })
+        ).not.toHaveAttribute('src', GALLERY_PUBLISHED_SCREENSHOT)
+      );
+      await waitFor(() =>
+        expect(publishButton(canvas, 'Publish update')).toBeEnabled()
+      );
       await user.click(publishButton(canvas, 'Publish update'));
 
       await canvas.findByText('Installed copies update within a day.');
     });
+  },
+};
+
+export const WaitsForTheCompressedScreenshot: StoryObj = {
+  ...publishView({ account, compress: 'pending' }),
+  name: 'A capture shows as taken, and publishing waits until it fits the Gallery',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await takeScreenshot(canvas);
+    await user.type(canvas.getByLabelText('Name'), 'Night reading');
+
+    await expect(publishButton(canvas)).toBeDisabled();
   },
 };
 

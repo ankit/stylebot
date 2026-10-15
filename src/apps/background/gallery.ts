@@ -3,6 +3,7 @@ import {
   dataUrlToBlob,
   compressScreenshot,
   forgetPublishedStyle,
+  getGalleryUrl,
   getMyStyles,
   getPublishedStyleForProfile,
   getPublishedStyleIdForProfile,
@@ -28,6 +29,7 @@ import type {
   CompressGalleryScreenshot as CompressGalleryScreenshotType,
   GetMyGalleryStyles as GetMyGalleryStylesType,
   GetMyGalleryStylesResponse,
+  GetGalleryScreenshot as GetGalleryScreenshotType,
   GetPublishedGalleryStyle as GetPublishedGalleryStyleType,
   GetPublishedGalleryStyleResponse,
   PublishToGallery as PublishToGalleryType,
@@ -152,6 +154,29 @@ export const CompressGalleryScreenshot = async (
         ? failure
         : { ...failure, errorKey: 'gallery_error_screenshot' }
     );
+  }
+};
+
+/**
+ * Fetches a screenshot the gallery shows, so an update can keep it.
+ */
+export const GetGalleryScreenshot = async (
+  { path }: GetGalleryScreenshotType,
+  sendResponse: (response: GalleryScreenshotResponse) => void
+): Promise<void> => {
+  try {
+    const response = await fetch(getGalleryUrl(path));
+
+    if (!response.ok) {
+      throw new Error(`Screenshot request failed (${response.status})`);
+    }
+
+    sendResponse({
+      ok: true,
+      screenshot: await blobToDataUrl(await response.blob()),
+    });
+  } catch (e) {
+    sendResponse({ ...fail(e), errorKey: 'gallery_error_screenshot' });
   }
 };
 

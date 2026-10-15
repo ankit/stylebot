@@ -10,6 +10,7 @@ import {
 import { captureTab } from './capture-tab';
 import {
   CaptureGalleryScreenshot,
+  GetGalleryScreenshot,
   GetMyGalleryStyles,
   GetPublishedGalleryStyle,
   PublishToGallery,
@@ -200,6 +201,48 @@ describe('gallery messages', () => {
     );
 
     expect(captureTab).toHaveBeenCalledWith(tab);
+    expect(response).toMatchObject({
+      ok: false,
+      errorKey: 'gallery_error_screenshot',
+    });
+  });
+
+  it('fetches the screenshot the gallery shows', async () => {
+    // jsdom's FileReader only reads its own Blobs, not node-fetch's.
+    fetchMock.mockImplementationOnce(
+      async () =>
+        ({
+          ok: true,
+          blob: async () => new Blob(['webp'], { type: 'image/webp' }),
+        } as Response)
+    );
+
+    const response = await respond(send =>
+      GetGalleryScreenshot(
+        { name: 'GetGalleryScreenshot', path: style.screenshot },
+        send
+      )
+    );
+
+    expect(fetchMock.mock.calls[0][0]).toBe(
+      new URL(style.screenshot, GALLERY_API_URL).href
+    );
+    expect(response).toEqual({
+      ok: true,
+      screenshot: 'data:image/webp;base64,d2VicA==',
+    });
+  });
+
+  it("fails as a screenshot error when the gallery's is gone", async () => {
+    fetchMock.mockResponseOnce('', { status: 404 });
+
+    const response = await respond(send =>
+      GetGalleryScreenshot(
+        { name: 'GetGalleryScreenshot', path: style.screenshot },
+        send
+      )
+    );
+
     expect(response).toMatchObject({
       ok: false,
       errorKey: 'gallery_error_screenshot',
