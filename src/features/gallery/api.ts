@@ -75,3 +75,49 @@ export const publishVersion = (
 
 export const unpublishStyle = (session: string, id: string): Promise<void> =>
   request(`/styles/${encodeURIComponent(id)}`, { method: 'DELETE', session });
+
+/**
+ * A page of styles; nextOffset is null on the last one.
+ */
+export type GalleryStylesPage = {
+  styles: Array<GalleryStyle>;
+  nextOffset: number | null;
+};
+
+export type GalleryStyleWithCss = GalleryStyle & { css: string };
+
+/**
+ * What an install answers with: enough to save the style as a profile.
+ */
+export type GalleryInstall = Pick<
+  GalleryStyle,
+  'id' | 'site' | 'name' | 'version'
+> & { css: string };
+
+/**
+ * A site's live styles, most installed first.
+ */
+export const getSiteStyles = (
+  site: string,
+  limit: number
+): Promise<GalleryStylesPage> =>
+  request(`/styles?${new URLSearchParams({ site, limit: String(limit) })}`);
+
+/**
+ * A live style with the CSS of its latest version.
+ */
+export const getStyle = (id: string): Promise<GalleryStyleWithCss> =>
+  request(`/styles/${encodeURIComponent(id)}`);
+
+/**
+ * Counts an install of a style, once per install id however often it's
+ * sent, and answers with its latest CSS.
+ */
+export const recordInstall = (
+  id: string,
+  installId: string
+): Promise<GalleryInstall> =>
+  request(`/styles/${encodeURIComponent(id)}/installs`, {
+    method: 'POST',
+    json: { installId },
+  });

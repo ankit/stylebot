@@ -53,6 +53,14 @@ export const getPublishedStyleIdForProfile = async (
   null;
 
 /**
+ * The ids of every gallery style published from here, by any account.
+ */
+export const getPublishedStyleIds = async (): Promise<Set<string>> =>
+  new Set(
+    Object.values(await getPublishedStylesByProfile()).map(each => each.styleId)
+  );
+
+/**
  * Remembers what a profile was published as, replacing what it was before.
  */
 export const rememberPublishedStyle = async (

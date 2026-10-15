@@ -13,6 +13,12 @@ import type {
   OpenEditorSidePanel,
   OpenEditorSidePanelResponse,
   RestoreTab,
+  GetGallerySuggestions,
+  GetGallerySuggestionsResponse,
+  GetGalleryStyleCss,
+  GetGalleryStyleCssResponse,
+  InstallGalleryStyle,
+  InstallGalleryStyleResponse,
 } from '@stylebot/types';
 import { STYLES_KEY, getStylesForPage } from '@stylebot/saved-styles';
 import { defaultOptions } from '@stylebot/settings';
@@ -290,3 +296,27 @@ export const forwardClickToInput = (
   const input = container.querySelector('input') as HTMLInputElement | null;
   input?.click();
 };
+
+export const getGallerySuggestions = (
+  pageUrl: string
+): Promise<GetGallerySuggestionsResponse> =>
+  chrome.runtime.sendMessage<
+    GetGallerySuggestions,
+    GetGallerySuggestionsResponse
+  >({ name: 'GetGallerySuggestions', pageUrl });
+
+export const getGalleryStyleCss = (
+  id: string
+): Promise<GetGalleryStyleCssResponse> =>
+  chrome.runtime.sendMessage<GetGalleryStyleCss, GetGalleryStyleCssResponse>({
+    name: 'GetGalleryStyleCss',
+    id,
+  });
+
+export const installGalleryStyle = (
+  message: Omit<InstallGalleryStyle, 'name'>
+): Promise<InstallGalleryStyleResponse> =>
+  chrome.runtime.sendMessage<InstallGalleryStyle, InstallGalleryStyleResponse>({
+    name: 'InstallGalleryStyle',
+    ...message,
+  });

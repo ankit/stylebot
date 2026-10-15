@@ -472,13 +472,15 @@ export const createProfile = async (
 /**
  * Adds css as a new, active profile of a url's style, under the name or the
  * first free variant of it, and turns the style on. Installing the same css
- * under the same name again switches back to that profile instead.
+ * under the same name again switches back to that profile instead. Resolves
+ * with the profile's name and id.
  */
 export const installProfile = async (
   url: string,
   { name, css }: { name: string; css: string }
-): Promise<string> => {
+): Promise<{ name: string; id: string }> => {
   let installedName = name;
+  let installedId = '';
 
   await update(styles => {
     const existing = styles[url] ?? {
@@ -495,6 +497,7 @@ export const installProfile = async (
     );
 
     if (installed) {
+      installedId = installed.id;
       const style = activateProfile(existing, installed.id);
 
       if (style === existing && existing.enabled) {
@@ -509,10 +512,11 @@ export const installProfile = async (
       name,
       profiles.map(profile => profile.name)
     );
+    installedId = crypto.randomUUID();
 
     styles[url] = editStyle(
       addProfile(existing, {
-        id: crypto.randomUUID(),
+        id: installedId,
         name: installedName,
         css,
         activate: true,
@@ -523,7 +527,7 @@ export const installProfile = async (
     return styles;
   });
 
-  return installedName;
+  return { name: installedName, id: installedId };
 };
 
 /**

@@ -77,6 +77,9 @@ import {
   UnpublishFromGallery,
   SetGalleryDisplayName,
   GetPublishedGalleryStyle,
+  GetGallerySuggestions,
+  GetGalleryStyleCss,
+  InstallGalleryStyle,
 } from './gallery';
 
 import type {
@@ -419,6 +422,15 @@ export const initListeners = (): void => {
           return true;
         case 'GetPublishedGalleryStyle':
           GetPublishedGalleryStyle(message, sendResponse);
+          return true;
+        case 'GetGallerySuggestions':
+          GetGallerySuggestions(message, sendResponse);
+          return true;
+        case 'GetGalleryStyleCss':
+          GetGalleryStyleCss(message, sendResponse);
+          return true;
+        case 'InstallGalleryStyle':
+          InstallGalleryStyle(message, sendResponse);
           return true;
       }
 
