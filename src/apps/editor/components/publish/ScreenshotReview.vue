@@ -6,7 +6,7 @@
     aria-modal="true"
     :aria-label="t('review_screenshot')"
     tabindex="-1"
-    @keydown.esc.stop.prevent="$emit('close')"
+    @keydown.esc.stop.prevent="$emit('cancel')"
   >
     <s-theme-provider mode="dark">
       <div class="review-bar">
@@ -18,7 +18,7 @@
         </div>
 
         <s-button v-if="boxes.length" @click="undo">{{ t('undo') }}</s-button>
-        <s-button @click="$emit('close')">{{ t('cancel') }}</s-button>
+        <s-button @click="$emit('cancel')">{{ t('cancel') }}</s-button>
         <s-button variant="primary" :disabled="applying" @click="done">
           {{ t('done') }}
         </s-button>
@@ -83,7 +83,8 @@ const clamp = (value: number): number => Math.min(Math.max(value, 0), 1);
 /**
  * Shows a screenshot at nearly the window's size for the user to check, and
  * to blur anything private by dragging boxes over it. On Done the blur goes
- * into the pixels and `done` has the result; `close` means nothing changed.
+ * into the pixels and `done` has the result, as is without blurs; `cancel`
+ * means the user doesn't want it.
  */
 export default Vue.extend({
   name: 'ScreenshotReview',
@@ -198,12 +199,12 @@ export default Vue.extend({
     },
 
     /**
-     * Blurs the boxes into the image and hands back the result, or closes
-     * without boxes, keeping the screenshot as it is.
+     * Blurs the boxes into the image and hands back the result, or the
+     * screenshot as it is without boxes.
      */
     async done(): Promise<void> {
       if (!this.boxes.length) {
-        this.$emit('close');
+        this.$emit('done', this.screenshot);
         return;
       }
 

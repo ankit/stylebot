@@ -144,7 +144,8 @@ export type PageBridge = {
 
   /**
    * Shows a screenshot over the page for the user to check and blur, and
-   * resolves with the edited image, or null when they cancel.
+   * resolves with the one to keep, blurred or as it was, or null when they
+   * cancel.
    */
   reviewScreenshot(screenshot: string): Promise<string | null>;
 
