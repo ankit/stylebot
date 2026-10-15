@@ -31,6 +31,14 @@ const isCLISupported = supportsCLI(process.env.BROWSER);
 const cliDefinitions = {
   'process.env.STYLEBOT_CLI': JSON.stringify(String(isCLISupported)),
 };
+// A development build can point the styles gallery at another API, such as a local Worker.
+const galleryDefinitions = {
+  'process.env.STYLEBOT_GALLERY_API_URL': JSON.stringify(
+    process.env.NODE_ENV === 'production'
+      ? ''
+      : process.env.STYLEBOT_GALLERY_API_URL ?? ''
+  ),
+};
 
 // Drive sign-in can't exchange codes or refresh tokens without it, so a
 // release built without it would ship with sign-in broken. CI builds only test.
@@ -349,6 +357,7 @@ const backgroundPageConfig = {
     new webpack.DefinePlugin({
       global: 'this',
       ...cliDefinitions,
+      ...galleryDefinitions,
       // Google sign-in's Desktop client secret, kept out of the repo.
       'process.env.STYLEBOT_GOOGLE_CLIENT_SECRET': JSON.stringify(
         process.env.STYLEBOT_GOOGLE_CLIENT_SECRET ?? ''
@@ -385,6 +394,7 @@ const clientConfig = {
     new webpack.DefinePlugin({
       global: 'globalThis',
       ...cliDefinitions,
+      ...galleryDefinitions,
     }),
   ],
 };
