@@ -45,6 +45,19 @@ export type GalleryPublishedStyle = GalleryStyle & {
 };
 
 /**
+ * What was published from a Stylebot style's profile: the gallery style, a
+ * hash of the CSS its latest version has, and where its gallery page is.
+ */
+export type GalleryPublished = {
+  styleId: string;
+  version: number;
+  // Compared with hashCss of the profile's CSS to tell if it has changed.
+  cssHash: string;
+  group: string;
+  slug: string;
+};
+
+/**
  * i18n keys for what went wrong, so the editor shows it in the user's
  * language. The server's own message is passed along where it's specific.
  */

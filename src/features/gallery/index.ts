@@ -37,3 +37,12 @@ export {
 } from './session';
 
 export { toGalleryFailure } from './to-gallery-failure';
+export { compressScreenshot } from './compress-screenshot';
+export { blobToDataUrl, dataUrlToBlob, hashCss, toGallerySite } from './utils';
+export {
+  getPublishedStyleForProfile,
+  getPublishedStyleIdForProfile,
+  rememberPublishedStyle,
+  forgetPublishedStyle,
+  type PublishedStyleRecord,
+} from './published-styles';
