@@ -108,6 +108,22 @@ export const OpensFromTheMoreMenu: StoryObj = {
   },
 };
 
+export const TitleGoesBack: StoryObj = {
+  ...publishView({ account }),
+  name: 'Clicking the title goes back to the editor, like the back arrow',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await user.click(
+      await canvas.findByRole('heading', { name: 'Publish to Gallery' })
+    );
+
+    await waitFor(() =>
+      expect(storeOf(canvasElement).state.publishing).toBe(false)
+    );
+  },
+};
+
 export const SignsInThenPublishes: StoryObj = {
   ...publishView({
     publish: {
