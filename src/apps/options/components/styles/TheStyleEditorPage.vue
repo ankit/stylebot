@@ -131,14 +131,14 @@
     <div class="editor-footer">
       <s-text as="div" variant="muted" class="stats">
         <template v-if="isDirty">
-          <span class="status-dot" />
+          <s-status-dot tone="warning" :size="8" class="status-dot" />
           <s-text as="span" size="label" class="dirty-text">
             {{ t('unsaved_changes') }}
           </s-text>
           <span>·</span>
         </template>
         <template v-else-if="savedStatusVisible">
-          <span class="status-dot saved" />
+          <s-status-dot tone="success" :size="8" class="status-dot" />
           <s-text as="span" size="label" class="saved-text">
             {{ t('saved') }}
           </s-text>
@@ -213,14 +213,15 @@ import type { NavigationGuardNext, Route } from 'vue-router';
 
 import type { StyleWithoutUrl } from '@stylebot/types';
 import {
-  SToggleSwitch,
-  SText,
-  SButton,
   SAnchoredMenu,
+  SButton,
+  SConfirmDialog,
   SMenu,
   SMenuItem,
-  SConfirmDialog,
   SPromptDialog,
+  SStatusDot,
+  SText,
+  SToggleSwitch,
 } from '@stylebot/components';
 import { countRules } from '@stylebot/css';
 import { ChevronLeftIcon, PlusIcon } from '@stylebot/icons';
@@ -241,6 +242,7 @@ export default Vue.extend({
   name: 'TheStyleEditorPage',
 
   components: {
+    SStatusDot,
     SToggleSwitch,
     ChevronLeftIcon,
     PlusIcon,
@@ -806,17 +808,8 @@ export default Vue.extend({
   margin-right: 8px;
 }
 
-.status-dot {
-  flex: none;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--warning-icon);
+.stats .status-dot {
   transform: translateY(-1px);
-
-  &.saved {
-    background: var(--success);
-  }
 }
 
 .counts {

@@ -7,7 +7,7 @@
     @click="open"
     @keydown="onKeydown"
   >
-    <span class="release-dot" />
+    <s-status-dot tone="accent" />
 
     <s-text class="release-text">
       {{ t('new_in_version', [version]) }}
@@ -37,12 +37,13 @@ import {
 
 import { onEnterOrSpace } from '../../utils';
 import { XIcon } from '@stylebot/icons';
-import { SIconButton, SText } from '@stylebot/components';
+import { SIconButton, SStatusDot, SText } from '@stylebot/components';
 
 export default Vue.extend({
   name: 'ReleaseNotification',
 
   components: {
+    SStatusDot,
     XIcon,
     SIconButton,
     SText,
@@ -102,14 +103,6 @@ export default Vue.extend({
   cursor: pointer;
 
   @include focus-ring;
-}
-
-.release-dot {
-  flex: none;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent);
 }
 
 .release-text {

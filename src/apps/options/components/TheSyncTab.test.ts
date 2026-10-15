@@ -36,7 +36,7 @@ describe('TheSyncTab.vue', () => {
     });
 
     const banner = wrapper.find('.banner');
-    expect(banner.classes()).toContain('error');
+    expect(banner.classes()).toContain('danger');
     expect(banner.text()).toContain('sync_error_auth');
   });
 

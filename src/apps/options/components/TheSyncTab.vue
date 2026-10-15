@@ -1,39 +1,47 @@
 <template>
   <div class="sync-tab">
-    <sync-status-banner
+    <s-callout
       v-if="showRestoreSuccess"
+      class="banner"
       @dismiss="showRestoreSuccess = false"
     >
       {{ t('restore_success') }}
-    </sync-status-banner>
+    </s-callout>
 
-    <sync-status-banner
+    <s-callout
       v-if="importedCount !== null"
+      class="banner"
       @dismiss="importedCount = null"
     >
       {{ importedMessage }}
-    </sync-status-banner>
+    </s-callout>
 
-    <sync-status-banner v-if="showUpToDate" @dismiss="showUpToDate = false">
+    <s-callout
+      v-if="showUpToDate"
+      class="banner"
+      @dismiss="showUpToDate = false"
+    >
       {{ t('import_up_to_date') }}
-    </sync-status-banner>
+    </s-callout>
 
-    <sync-status-banner
+    <s-callout
       v-if="importErrorKey"
-      variant="error"
+      class="banner"
+      tone="danger"
       @dismiss="importErrorKey = null"
     >
       {{ t('import_error', [t(importErrorKey)]) }}
-    </sync-status-banner>
+    </s-callout>
 
-    <sync-status-banner
+    <s-callout
       v-if="syncStatus"
-      :variant="syncStatus.type"
+      class="banner"
+      :tone="syncStatus.type === 'error' ? 'danger' : 'info'"
       :title="syncStatus.detail"
       @dismiss="$store.dispatch('dismissSyncStatus')"
     >
       {{ t(syncStatus.messageKey, [syncStatus.detail || '']) }}
-    </sync-status-banner>
+    </s-callout>
 
     <div>
       <s-heading as="h1" size="xl">{{ t('sync_options') }}</s-heading>
@@ -74,7 +82,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { SHeading, SText, SButton } from '@stylebot/components';
+import { SButton, SCallout, SHeading, SText } from '@stylebot/components';
 import type { ImportPreview } from '@stylebot/saved-styles';
 import {
   mergeBackup,
@@ -83,7 +91,6 @@ import {
 } from '@stylebot/saved-styles';
 import type { StyleMap } from '@stylebot/types';
 import TheGoogleDriveSync from './sync/TheGoogleDriveSync.vue';
-import SyncStatusBanner from './sync/SyncStatusBanner.vue';
 import ImportBackupDialog from './sync/ImportBackupDialog.vue';
 
 import { downloadBackup, pickBackupFile } from '../backup';
@@ -98,11 +105,11 @@ export default Vue.extend({
   name: 'TheSyncTab',
 
   components: {
+    SCallout,
     SHeading,
     SText,
     SButton,
     TheGoogleDriveSync,
-    SyncStatusBanner,
     ImportBackupDialog,
   },
 
@@ -224,6 +231,10 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+.sync-tab .banner {
+  margin-bottom: 16px;
+}
+
 .sync-tab {
   max-width: 760px;
   padding: 20px 22px 26px;
