@@ -302,14 +302,15 @@ export default {
   },
 
   /**
-   * Shows a screenshot over the page for review, resolving with the blurred
-   * image, or null when nothing was blurred or another review replaced it.
+   * Shows a screenshot over the page for review, resolving with the one to
+   * keep, blurred or as it was, or null when the user cancels. A review that
+   * another replaces keeps its screenshot as it was.
    */
   reviewScreenshot(
-    { commit }: { commit: Commit },
+    { state, commit }: { state: State; commit: Commit },
     screenshot: string
   ): Promise<string | null> {
-    finishReview?.(null);
+    finishReview?.(state.screenshotReview);
     commit('setScreenshotReview', screenshot);
 
     return new Promise(resolve => {
