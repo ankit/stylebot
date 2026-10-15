@@ -1,9 +1,6 @@
 <template>
-  <section class="sign-in">
-    <s-text>{{ t('share_this_style_in_the_gallery') }}</s-text>
-    <s-text size="caption" variant="muted">
-      {{ t('the_gallery_never_sees_your_email') }}
-    </s-text>
+  <div class="sign-in">
+    <s-callout v-if="error" tone="danger">{{ error }}</s-callout>
 
     <s-button
       variant="primary"
@@ -11,23 +8,21 @@
       :disabled="signingIn"
       @click="signIn"
     >
-      {{ signingIn ? t('signing_in') : t('sign_in_with_google') }}
+      {{ signingIn ? t('signing_in') : t('sign_in_with_google_to_publish') }}
     </s-button>
-
-    <s-callout v-if="error" tone="danger">{{ error }}</s-callout>
-  </section>
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { SButton, SCallout, SText } from '@stylebot/components';
+import { SButton, SCallout } from '@stylebot/components';
 
 import { signInToGallery } from '../../utils/gallery';
 import { galleryErrorText } from '@stylebot/gallery';
 
 /**
- * Asks to sign in to the Gallery with Google, and emits `signed-in` with the
- * account once that's done.
+ * The publish view's footer while signed out: signs in to the Gallery with
+ * Google, and emits `signed-in` with the account once that's done.
  */
 export default Vue.extend({
   name: 'GallerySignIn',
@@ -35,7 +30,6 @@ export default Vue.extend({
   components: {
     SButton,
     SCallout,
-    SText,
   },
 
   data(): { signingIn: boolean; error: string } {
@@ -65,14 +59,16 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .sign-in {
+  flex: none;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin: 0;
+  gap: 10px;
+  padding: 12px 14px 14px;
+  border-top: 1px solid var(--panel-border);
 }
 
 .sign-in .sign-in-button {
-  align-self: flex-start;
-  margin-top: 6px;
+  padding: 11px 16px;
+  font-size: 14px;
 }
 </style>

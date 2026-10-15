@@ -156,4 +156,13 @@ export default {
   hasUnpublishedChanges: (state: State): boolean =>
     state.publishedGalleryStyle !== null &&
     hashCss(state.css) !== state.publishedGalleryStyle.cssHash,
+
+  // The name of the profile being edited; empty for an unnamed one.
+  activeProfileName: (state: State): string => {
+    const profile = state.profiles.find(
+      each => each.id === state.activeProfile
+    );
+
+    return profile?.name ?? '';
+  },
 };

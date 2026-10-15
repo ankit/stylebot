@@ -1,5 +1,6 @@
 export {
   GALLERY_API_URL,
+  GALLERY_SITE_URL,
   getGalleryUrl,
   getGalleryStyleUrl,
   getGallerySiteUrl,
