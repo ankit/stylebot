@@ -4,7 +4,14 @@ import {
   compressScreenshot,
   forgetPublishedStyle,
   getGalleryUrl,
+  getInstallId,
+  getInstalledStyleIds,
   getMyStyles,
+  getPublishedStyleIds,
+  getSiteStyles,
+  getStyle,
+  recordInstall,
+  rememberInstalledStyle,
   getPublishedStyleForProfile,
   getPublishedStyleIdForProfile,
   getSignedInAccount,
@@ -30,6 +37,12 @@ import type {
   GetMyGalleryStyles as GetMyGalleryStylesType,
   GetMyGalleryStylesResponse,
   GetGalleryScreenshot as GetGalleryScreenshotType,
+  GetGallerySuggestions as GetGallerySuggestionsType,
+  GetGallerySuggestionsResponse,
+  GetGalleryStyleCss as GetGalleryStyleCssType,
+  GetGalleryStyleCssResponse,
+  InstallGalleryStyle as InstallGalleryStyleType,
+  InstallGalleryStyleResponse,
   GetPublishedGalleryStyle as GetPublishedGalleryStyleType,
   GetPublishedGalleryStyleResponse,
   PublishToGallery as PublishToGalleryType,
@@ -39,8 +52,10 @@ import type {
   UnpublishFromGallery as UnpublishFromGalleryType,
   UnpublishFromGalleryResponse,
 } from '@stylebot/types';
+import { compileStyle } from '@stylebot/css';
 
 import { captureTab } from './capture-tab';
+import { applyStylesToAllTabs, installProfile } from './styles';
 
 // Gallery sign-in reuses Drive sync's Google sign-in.
 const google: GoogleTokenSource = {
@@ -272,4 +287,84 @@ export const GetPublishedGalleryStyle = async (
       slug: published.slug,
     },
   });
+};
+
+// Enough of a site's styles to still have a couple to suggest after leaving
+// out the ones installed or published here.
+const SUGGESTIONS_FETCHED = 12;
+
+/**
+ * The page's site's most installed gallery styles, leaving out the ones
+ * installed or published here.
+ */
+export const GetGallerySuggestions = async (
+  { pageUrl }: GetGallerySuggestionsType,
+  sendResponse: (response: GetGallerySuggestionsResponse) => void
+): Promise<void> => {
+  try {
+    const site = toGallerySite(new URL(pageUrl).hostname);
+    const [{ styles }, installed, published] = await Promise.all([
+      getSiteStyles(site, SUGGESTIONS_FETCHED),
+      getInstalledStyleIds(),
+      getPublishedStyleIds(),
+    ]);
+
+    sendResponse({
+      ok: true,
+      styles: styles.filter(
+        style => !installed.has(style.id) && !published.has(style.id)
+      ),
+      group: styles[0]?.group ?? null,
+    });
+  } catch (e) {
+    sendResponse(fail(e));
+  }
+};
+
+/**
+ * A gallery style's CSS, compiled the way a saved style is applied.
+ */
+export const GetGalleryStyleCss = async (
+  { id }: GetGalleryStyleCssType,
+  sendResponse: (response: GetGalleryStyleCssResponse) => void
+): Promise<void> => {
+  try {
+    const { css, importUrls } = compileStyle((await getStyle(id)).css, {
+      forceImportant: true,
+    });
+
+    sendResponse({ ok: true, css, importUrls });
+  } catch (e) {
+    sendResponse(fail(e));
+  }
+};
+
+/**
+ * Installs a gallery style as a new profile of a Stylebot style, counting
+ * the install and remembering it.
+ */
+export const InstallGalleryStyle = async (
+  { id, url, group, slug }: InstallGalleryStyleType,
+  sendResponse: (response: InstallGalleryStyleResponse) => void
+): Promise<void> => {
+  try {
+    const style = await recordInstall(id, await getInstallId());
+    const profile = await installProfile(url, {
+      name: style.name,
+      css: style.css,
+    });
+
+    await rememberInstalledStyle(id, {
+      url,
+      profileId: profile.id,
+      version: style.version,
+      group,
+      slug,
+    });
+
+    sendResponse({ ok: true, profileName: profile.name });
+    await applyStylesToAllTabs();
+  } catch (e) {
+    sendResponse(fail(e));
+  }
 };

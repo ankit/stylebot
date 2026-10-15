@@ -23,7 +23,7 @@ import Vue from 'vue';
 import { SButton, SCallout, SText } from '@stylebot/components';
 
 import { signInToGallery } from '../../utils/gallery';
-import { galleryErrorText } from './gallery-error';
+import { galleryErrorText } from '@stylebot/gallery';
 
 /**
  * Asks to sign in to the Gallery with Google, and emits `signed-in` with the

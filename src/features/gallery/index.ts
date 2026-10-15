@@ -2,6 +2,7 @@ export {
   GALLERY_API_URL,
   getGalleryUrl,
   getGalleryStyleUrl,
+  getGallerySiteUrl,
   NAME_MAX_LENGTH,
   DESCRIPTION_MAX_LENGTH,
   NOTES_MAX_LENGTH,
@@ -24,7 +25,13 @@ export {
   publishStyle,
   publishVersion,
   unpublishStyle,
+  getSiteStyles,
+  getStyle,
+  recordInstall,
   type GallerySession,
+  type GalleryStylesPage,
+  type GalleryStyleWithCss,
+  type GalleryInstall,
 } from './api';
 
 export {
@@ -43,7 +50,19 @@ export { blobToDataUrl, dataUrlToBlob, hashCss, toGallerySite } from './utils';
 export {
   getPublishedStyleForProfile,
   getPublishedStyleIdForProfile,
+  getPublishedStyleIds,
   rememberPublishedStyle,
   forgetPublishedStyle,
   type PublishedStyleRecord,
 } from './published-styles';
+export {
+  getInstallId,
+  getInstalledStyleIds,
+  rememberInstalledStyle,
+  type InstalledStyleRecord,
+} from './installed-styles';
+export {
+  GALLERY_PREVIEW_PORT,
+  type GalleryPreviewMessage,
+} from './preview-port';
+export { galleryErrorText } from './gallery-error-text';

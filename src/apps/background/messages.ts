@@ -200,12 +200,12 @@ export const InstallStyle = async (
     return;
   }
 
-  const profileName = await installProfile(message.url.trim(), {
+  const profile = await installProfile(message.url.trim(), {
     name: message.profileName.trim(),
     css: message.css,
   });
 
-  sendResponse({ profileName });
+  sendResponse({ profileName: profile.name });
   return applyStylesToAllTabs();
 };
 

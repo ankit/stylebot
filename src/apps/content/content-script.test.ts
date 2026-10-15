@@ -63,6 +63,7 @@ describe('inject-css run()', () => {
             registeredListener = fn;
           },
         },
+        onConnect: { addListener: jest.fn() },
       },
     };
   });

@@ -27,6 +27,12 @@ export const getGalleryStyleUrl = ({
     slug
   )}`;
 
+/**
+ * A site group's page on the gallery site, listing its styles.
+ */
+export const getGallerySiteUrl = (group: string): string =>
+  `${GALLERY_SITE_URL}/s/${encodeURIComponent(group)}`;
+
 export const NAME_MAX_LENGTH = 60;
 export const DESCRIPTION_MAX_LENGTH = 200;
 export const NOTES_MAX_LENGTH = 200;

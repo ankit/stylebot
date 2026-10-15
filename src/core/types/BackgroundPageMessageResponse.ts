@@ -88,6 +88,18 @@ export type UnpublishFromGalleryResponse = GalleryResult;
 export type GetPublishedGalleryStyleResponse = {
   published: GalleryPublished | null;
 };
+// The site's group, to browse the rest of its styles in the gallery.
+export type GetGallerySuggestionsResponse = GalleryResult<{
+  styles: Array<GalleryStyle>;
+  group: string | null;
+}>;
+export type GetGalleryStyleCssResponse = GalleryResult<{
+  css: string;
+  importUrls: Array<string>;
+}>;
+export type InstallGalleryStyleResponse = GalleryResult<{
+  profileName: string;
+}>;
 
 type BackgroundPageMessageResponse =
   | GetAllOptionsResponse
@@ -117,6 +129,9 @@ type BackgroundPageMessageResponse =
   | GalleryScreenshotResponse
   | PublishToGalleryResponse
   | UnpublishFromGalleryResponse
-  | GetPublishedGalleryStyleResponse;
+  | GetPublishedGalleryStyleResponse
+  | GetGallerySuggestionsResponse
+  | GetGalleryStyleCssResponse
+  | InstallGalleryStyleResponse;
 
 export default BackgroundPageMessageResponse;

@@ -96,7 +96,7 @@ import {
   unpublishFromGallery,
 } from '../../utils/gallery';
 
-import { galleryErrorText } from './gallery-error';
+import { galleryErrorText } from '@stylebot/gallery';
 import GallerySignIn from './GallerySignIn.vue';
 import PublishedStyle from './PublishedStyle.vue';
 import PublishedStyleMenu from './PublishedStyleMenu.vue';
