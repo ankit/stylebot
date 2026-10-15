@@ -2,7 +2,7 @@
   <div class="publish-view">
     <subview-header :title="title" @back="back">
       <published-style-menu
-        v-if="step === 'form' && target"
+        v-if="editing && target"
         :style-data="target"
         :disabled="publishing"
         @unpublish="confirmingUnpublish = true"
@@ -10,36 +10,40 @@
     </subview-header>
 
     <div class="view-body" :class="{ busy: publishing }">
-      <gallery-sign-in v-if="step === 'signed-out'" @signed-in="showForm" />
+      <template v-if="formVisible">
+        <gallery-intro v-if="signedOut" />
 
-      <template v-else-if="step === 'form'">
-        <screenshot-field
-          :screenshot="screenshot"
-          :capturing="capturing"
-          @capture="capture"
-          @review="review"
-        />
+        <div class="form" :class="{ locked: signedOut }" :inert="signedOut">
+          <screenshot-field
+            :screenshot="screenshot"
+            :capturing="capturing"
+            @capture="capture"
+            @review="review"
+          />
 
-        <style-details-fields
-          :name.sync="name"
-          :description.sync="description"
-          :notes.sync="notes"
-          :display-name.sync="displayName"
-          :update="Boolean(target)"
-          @author-change="saveDisplayName"
-        />
+          <style-details-fields
+            :name.sync="name"
+            :description.sync="description"
+            :notes.sync="notes"
+            :display-name.sync="displayName"
+            :update="Boolean(target)"
+            @author-change="saveDisplayName"
+          />
+        </div>
 
         <s-callout v-if="error" tone="danger">{{ error }}</s-callout>
       </template>
 
       <published-style
-        v-else-if="step === 'published' && published"
-        :style-data="published"
+        v-else-if="publishedResult"
+        :style-data="publishedResult"
       />
     </div>
 
+    <gallery-sign-in v-if="signedOut" @signed-in="showForm" />
+
     <publish-footer
-      v-if="step === 'form'"
+      v-else-if="editing"
       :target="target"
       :publishing="publishing"
       :can-publish="canPublish"
@@ -47,8 +51,8 @@
       @publish="publish"
     />
 
-    <div v-else-if="step === 'published' && published" class="view-footer">
-      <s-link-button class="view-link" @click="viewInGallery(published)">
+    <div v-else-if="publishedResult" class="view-footer">
+      <s-link-button class="view-link" @click="viewInGallery(publishedResult)">
         {{ t('view_in_gallery') }}
       </s-link-button>
       <s-button @click="back">{{ t('done') }}</s-button>
@@ -97,6 +101,7 @@ import {
 } from '../../utils/gallery';
 
 import { galleryErrorText } from '@stylebot/gallery';
+import GalleryIntro from './GalleryIntro.vue';
 import GallerySignIn from './GallerySignIn.vue';
 import PublishedStyle from './PublishedStyle.vue';
 import PublishedStyleMenu from './PublishedStyleMenu.vue';
@@ -137,6 +142,7 @@ export default Vue.extend({
     SConfirmDialog,
     SLinkButton,
     SubviewHeader,
+    GalleryIntro,
     GallerySignIn,
     PublishedStyle,
     PublishedStyleMenu,
@@ -167,12 +173,29 @@ export default Vue.extend({
   },
 
   computed: {
+    signedOut(): boolean {
+      return this.step === 'signed-out';
+    },
+
+    editing(): boolean {
+      return this.step === 'form';
+    },
+
+    // Signed out too, locked until sign-in.
+    formVisible(): boolean {
+      return this.signedOut || this.editing;
+    },
+
+    publishedResult(): GalleryPublishedStyle | null {
+      return this.step === 'published' ? this.published : null;
+    },
+
     title(): string {
-      if (this.step === 'published' && this.published) {
-        return this.published.name;
+      if (this.publishedResult) {
+        return this.publishedResult.name;
       }
 
-      if (this.step === 'form' && this.target) {
+      if (this.editing && this.target) {
         return this.t('update_name', [this.target.name]);
       }
 
@@ -208,6 +231,7 @@ export default Vue.extend({
 
   async mounted() {
     this.$store.commit('setInspecting', false);
+    this.name = this.$store.getters.activeProfileName;
 
     const response = await getGalleryAccount();
 
@@ -228,13 +252,8 @@ export default Vue.extend({
     },
 
     showForm(account: GalleryAuthor): void {
-      const { profiles, activeProfile } = this.$store.state;
-
       this.account = account;
       this.displayName = account.name ?? '';
-      this.name =
-        profiles.find((each: { id: string }) => each.id === activeProfile)
-          ?.name ?? '';
       this.step = 'form';
 
       this.loadTarget();
@@ -457,6 +476,17 @@ export default Vue.extend({
   }
 
   @include thin-scrollbar;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  transition: opacity 0.15s;
+
+  &.locked {
+    opacity: 0.45;
+  }
 }
 
 .view-footer {

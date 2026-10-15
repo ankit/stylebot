@@ -5,7 +5,7 @@
         <chevron-left-icon :size="12" />
       </s-icon-button>
 
-      <s-heading as="h1" size="sm" class="title">{{ title }}</s-heading>
+      <s-heading as="h1" size="md" class="title">{{ title }}</s-heading>
     </div>
 
     <slot />
