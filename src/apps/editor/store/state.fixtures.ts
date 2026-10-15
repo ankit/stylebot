@@ -32,6 +32,9 @@ const mockState: State = {
   contextMenuSelector: '',
 
   help: false,
+  publishing: false,
+  capturing: false,
+  publishedGalleryStyle: null,
   visible: false,
   inspecting: false,
   previewSelector: '',

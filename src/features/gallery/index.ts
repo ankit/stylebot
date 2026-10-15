@@ -1,6 +1,7 @@
 export {
   GALLERY_API_URL,
   getGalleryUrl,
+  getGalleryStyleUrl,
   NAME_MAX_LENGTH,
   DESCRIPTION_MAX_LENGTH,
   NOTES_MAX_LENGTH,
