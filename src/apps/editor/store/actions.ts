@@ -35,9 +35,9 @@ import type {
 
 import {
   captureGalleryScreenshot,
-  compressGalleryScreenshot,
   getPublishedGalleryStyle,
 } from '../utils/gallery';
+import { waitForPanelToSlideAway } from '../utils/panel-slide';
 
 import {
   getAllOptions,
@@ -272,9 +272,9 @@ export default {
   },
 
   /**
-   * Captures the styled page for the gallery and compresses it to upload. In
-   * the page itself, the panel steps aside so the page is captured at its
-   * full width.
+   * Captures the styled page for the gallery, as taken. In the page itself,
+   * the panel slides away so the page is captured at its full width, then
+   * comes back.
    */
   async captureGalleryScreenshot({
     state,
@@ -283,28 +283,19 @@ export default {
     state: State;
     commit: Commit;
   }): Promise<GalleryScreenshotResponse> {
-    let captured: GalleryScreenshotResponse;
-
-    if (state.host === 'page') {
-      commit('setCapturing', true);
-
-      try {
-        await new Promise(resolve =>
-          requestAnimationFrame(() => requestAnimationFrame(resolve))
-        );
-        captured = await captureGalleryScreenshot();
-      } finally {
-        commit('setCapturing', false);
-      }
-    } else {
-      captured = await captureGalleryScreenshot(state.tabId ?? undefined);
+    if (state.host !== 'page') {
+      return captureGalleryScreenshot(state.tabId ?? undefined);
     }
 
-    if (!captured.ok) {
-      return captured;
-    }
+    commit('setCapturing', true);
 
-    return compressGalleryScreenshot(captured.screenshot);
+    try {
+      await waitForPanelToSlideAway();
+
+      return await captureGalleryScreenshot();
+    } finally {
+      commit('setCapturing', false);
+    }
   },
 
   async loadPublishedGalleryStyle({

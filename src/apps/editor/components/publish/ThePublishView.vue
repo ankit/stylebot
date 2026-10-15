@@ -84,7 +84,9 @@ import type {
 } from '@stylebot/types';
 
 import {
+  compressGalleryScreenshot,
   getGalleryAccount,
+  getGalleryScreenshot,
   getMyGalleryStyles,
   getPublishedGalleryStyle,
   publishToGallery,
@@ -116,6 +118,8 @@ type Data = {
   displayName: string;
   screenshot: string;
   capturing: boolean;
+  // Shrinking a capture to fit the gallery's limit, after showing it as taken.
+  compressing: boolean;
   publishing: boolean;
   confirmingUnpublish: boolean;
   error: string;
@@ -152,6 +156,7 @@ export default Vue.extend({
       displayName: '',
       screenshot: '',
       capturing: false,
+      compressing: false,
       publishing: false,
       confirmingUnpublish: false,
       error: '',
@@ -191,6 +196,7 @@ export default Vue.extend({
         this.hasChanges &&
         !this.publishing &&
         !this.capturing &&
+        !this.compressing &&
         Boolean(this.screenshot) &&
         Boolean(this.name.trim()) &&
         Boolean(this.$store.state.css.trim())
@@ -257,6 +263,19 @@ export default Vue.extend({
         this.name = target.name;
         this.description = target.description ?? '';
         this.publishedCssHash = published?.cssHash ?? '';
+        this.loadScreenshot(target.screenshot);
+      }
+    },
+
+    /**
+     * Starts an update from the screenshot the gallery shows now, unless one
+     * was taken in the meantime.
+     */
+    async loadScreenshot(path: string): Promise<void> {
+      const response = await getGalleryScreenshot(path);
+
+      if (response.ok && !this.screenshot) {
+        this.screenshot = response.screenshot;
       }
     },
 
@@ -277,6 +296,29 @@ export default Vue.extend({
 
       this.screenshot = response.screenshot;
       this.tookScreenshot = true;
+      this.compress(response.screenshot);
+    },
+
+    /**
+     * Shrinks a capture to fit the gallery's limit while it's on show, unless
+     * another capture replaces it meanwhile.
+     */
+    async compress(screenshot: string): Promise<void> {
+      this.compressing = true;
+
+      const response = await compressGalleryScreenshot(screenshot);
+
+      if (this.screenshot !== screenshot) {
+        return;
+      }
+
+      this.compressing = false;
+
+      if (response.ok) {
+        this.screenshot = response.screenshot;
+      } else {
+        this.showError(response);
+      }
     },
 
     async saveDisplayName(): Promise<void> {

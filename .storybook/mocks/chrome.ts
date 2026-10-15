@@ -21,6 +21,7 @@ import type {
   GalleryAuthor,
   GalleryAccountResponse,
   GalleryPublished,
+  GalleryScreenshotResponse,
   GalleryStyle,
   PublishToGalleryResponse,
 } from '@stylebot/types';
@@ -60,12 +61,21 @@ export type GalleryShimOptions = {
   // What the profile published, and which of the account's styles that is.
   published?: GalleryPublished;
   publish?: PublishToGalleryResponse;
+  // Fitting a capture to the gallery's limit; pending keeps it compressing.
+  compress?: Pending<GalleryScreenshotResponse>;
 };
 
 const GALLERY_SCREENSHOT =
   'data:image/svg+xml,' +
   encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 10"><rect width="16" height="10" fill="#dfe6f3"/><rect x="2" y="2" width="9" height="1.5" fill="#2a5fd6"/></svg>'
+  );
+
+// What the gallery shows for a published style, unlike a fresh capture.
+export const GALLERY_PUBLISHED_SCREENSHOT =
+  'data:image/svg+xml,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 10"><rect width="16" height="10" fill="#1a1b26"/><rect x="2" y="2" width="9" height="1.5" fill="#7aa2f7"/></svg>'
   );
 
 type Callback = (response?: unknown) => void;
@@ -234,9 +244,16 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
       ok: true,
       screenshot: GALLERY_SCREENSHOT,
     }),
-    CompressGalleryScreenshot: () => ({
+    CompressGalleryScreenshot: () => {
+      if (gallery.compress === 'pending') {
+        return new Promise(() => undefined);
+      }
+
+      return gallery.compress ?? { ok: true, screenshot: GALLERY_SCREENSHOT };
+    },
+    GetGalleryScreenshot: () => ({
       ok: true,
-      screenshot: GALLERY_SCREENSHOT,
+      screenshot: GALLERY_PUBLISHED_SCREENSHOT,
     }),
     PublishToGallery: message => {
       if (gallery.publish) {

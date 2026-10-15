@@ -245,6 +245,7 @@ export default Vue.extend({
     border: 1px solid var(--panel-border);
     border-radius: 14px;
     box-shadow: 0 14px 40px var(--panel-shadow);
+    transition: transform 0.22s ease;
 
     &.left {
       left: 12px;
@@ -256,7 +257,13 @@ export default Vue.extend({
   }
 
   &.stylebot-capturing {
-    visibility: hidden;
+    &.right {
+      transform: translateX(calc(100% + 64px));
+    }
+
+    &.left {
+      transform: translateX(calc(-100% - 64px));
+    }
   }
 
   &.stylebot-resizing {

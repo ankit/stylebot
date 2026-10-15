@@ -281,6 +281,12 @@ export type CompressGalleryScreenshot = {
   screenshot: string;
 };
 
+// A screenshot the gallery already shows, by its path, to publish again.
+export type GetGalleryScreenshot = {
+  name: 'GetGalleryScreenshot';
+  path: string;
+};
+
 export type PublishToGallery = {
   name: 'PublishToGallery';
   // Set to publish a new version of this gallery style.
@@ -364,6 +370,7 @@ type BackgroundPageMessage =
   | GetMyGalleryStyles
   | CaptureGalleryScreenshot
   | CompressGalleryScreenshot
+  | GetGalleryScreenshot
   | PublishToGallery
   | UnpublishFromGallery
   | SetGalleryDisplayName
