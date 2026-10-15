@@ -119,7 +119,16 @@ export default Vue.extend({
       drafts: Record<string, string>;
     }): void {
       this.$store.dispatch('saveStyle', { initialUrl, url, drafts });
-      this.navigate({ name: 'styles' });
+
+      if (url !== initialUrl && this.$store.state.styles[url]) {
+        this.$router
+          .replace({
+            name: 'style-edit',
+            query: { url },
+            params: { justSaved: 'true' },
+          })
+          .catch(() => undefined);
+      }
     },
   },
 });

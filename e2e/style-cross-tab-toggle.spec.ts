@@ -32,8 +32,6 @@ test('disabling/enabling a style propagates live to every open tab on that host'
   // The popup's toggle can't be clicked: this harness's popup is a real tab, so
   // sender.tab breaks GetStylesForPage. Send the same message its toggle sends.
   const popup = await openPopup();
-  // Not awaited: the background listener always returns true without ever
-  // calling sendResponse for these, so awaiting would hang until GC.
   await popup.evaluate(() => {
     chrome.runtime.sendMessage({ name: 'DisableStyle', url: 'localhost' });
   });

@@ -34,7 +34,10 @@ export const routes: Array<RouteConfig> = [
     name: 'style-edit',
     component: TheStyleEditorPage,
     meta: { tab: 'styles' },
-    props: route => ({ initialUrl: queryString(route.query.url) }),
+    props: route => ({
+      initialUrl: queryString(route.query.url),
+      justSaved: !!route.params.justSaved,
+    }),
   },
   {
     path: '/history',
