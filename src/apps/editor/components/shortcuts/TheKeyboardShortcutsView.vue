@@ -1,16 +1,10 @@
 <template>
   <div class="keyboard-shortcuts-view">
-    <div class="view-header">
-      <s-icon-button :size="26" :tooltip="t('back')" @click="back">
-        <chevron-left-icon :size="15" />
-      </s-icon-button>
-
-      <s-heading as="h1" size="sm" class="title">
-        {{ t('keyboard_shortcuts') }}
-      </s-heading>
-
-      <s-text size="caption" variant="muted">{{ t('esc_to_close') }}</s-text>
-    </div>
+    <subview-header :title="t('keyboard_shortcuts')" @back="back">
+      <s-text size="caption" variant="muted" class="esc-hint">
+        {{ t('esc_to_close') }}
+      </s-text>
+    </subview-header>
 
     <div class="view-body">
       <section v-for="group in groups" :key="group.label" class="group">
@@ -61,18 +55,13 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import {
-  SHeading,
-  SIconButton,
-  SShortcutChip,
-  SText,
-} from '@stylebot/components';
-import { ChevronLeftIcon } from '@stylebot/icons';
+import { SShortcutChip, SText } from '@stylebot/components';
 import type { StylebotCommands, StylebotEditorCommands } from '@stylebot/types';
 import { isMac, isSafari, openShortcutsPage } from '@stylebot/utils';
 
 import { undoShortcuts } from '../../store/undo-stack';
 import { hasSidePanel } from '../../utils/side-panel';
+import SubviewHeader from '../SubviewHeader.vue';
 
 type ShortcutRow = { label: string; key: string };
 type ShortcutGroup = {
@@ -86,11 +75,9 @@ export default Vue.extend({
   name: 'TheKeyboardShortcutsView',
 
   components: {
-    SHeading,
-    SIconButton,
     SShortcutChip,
     SText,
-    ChevronLeftIcon,
+    SubviewHeader,
   },
 
   props: {
@@ -206,19 +193,8 @@ export default Vue.extend({
   background: var(--tab-surface);
 }
 
-.view-header {
-  flex: none;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px var(--panel-gutter) 12px calc(var(--panel-gutter) - 9px);
-  background: var(--panel-surface);
-  border-bottom: 1px solid var(--panel-border);
-}
-
-.title {
-  flex: 1;
-  min-width: 0;
+.esc-hint {
+  margin-right: 4px;
 }
 
 .view-body {

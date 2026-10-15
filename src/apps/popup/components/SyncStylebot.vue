@@ -7,12 +7,12 @@
       class="sync-status-tooltip"
     >
       <s-text as="span" class="sync-status">
-        <span class="dot dot--danger" />
+        <s-status-dot tone="danger" />
         {{ issueText }}
       </s-text>
     </component>
     <s-text v-else-if="syncTime" as="span" variant="muted" class="sync-status">
-      <span class="dot" />
+      <s-status-dot tone="success" />
       {{ t('synced_at_time', [syncTime]) }}
     </s-text>
     <s-text
@@ -52,7 +52,7 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { SText, STooltip } from '@stylebot/components';
+import { SStatusDot, SText, STooltip } from '@stylebot/components';
 import { ArrowRepeatIcon } from '@stylebot/icons';
 import {
   formatSyncTime,
@@ -72,6 +72,7 @@ export default Vue.extend({
   name: 'SyncStylebot',
 
   components: {
+    SStatusDot,
     SText,
     STooltip,
     ArrowRepeatIcon,
@@ -196,18 +197,6 @@ export default Vue.extend({
   gap: 8px;
   flex: 1;
   min-width: 0;
-}
-
-.dot {
-  flex: none;
-  width: 6px;
-  height: 6px;
-  border-radius: 3px;
-  background: var(--success);
-}
-
-.dot--danger {
-  background: var(--danger);
 }
 
 .sync-button {
