@@ -17,6 +17,7 @@ const aliasedPackages = [
   'inject-css',
   'i18n',
   'sync',
+  'gallery',
   'history',
   'types',
   'utils',
@@ -60,7 +61,10 @@ const config: StorybookConfig = {
          2.6 that webpack's vue-loader uses; @vitejs/plugin-vue2 needs Vue 2.7. */
       plugins: [createVuePlugin(), localePlugin()],
       // Stories show the Chrome and Edge build, which carries the CLI.
-      define: { 'process.env.STYLEBOT_CLI': JSON.stringify('true') },
+      define: {
+        'process.env.STYLEBOT_CLI': JSON.stringify('true'),
+        'process.env.STYLEBOT_GALLERY_API_URL': JSON.stringify(''),
+      },
       resolve: {
         alias: [
           { find: '@stylebot/storybook', replacement: __dirname },
