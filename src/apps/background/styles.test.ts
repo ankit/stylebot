@@ -308,12 +308,15 @@ describe('style edits', () => {
   it('installs css as a new active profile, keeping the existing css and turning the style on', async () => {
     store.styles['example.com'].enabled = false;
 
-    const name = await installProfile('example.com', {
+    const profile = await installProfile('example.com', {
       name: 'Dracula',
       css: 'a { color: purple; }',
     });
 
-    expect(name).toBe('Dracula');
+    expect(profile.name).toBe('Dracula');
+    expect(stored('example.com').profiles?.[profile.id]).toMatchObject({
+      name: 'Dracula',
+    });
     expect(writes()).toBe(1);
     expect(stored('example.com')).toMatchObject({
       css: 'a { color: purple; }',
@@ -324,12 +327,12 @@ describe('style edits', () => {
 
   it('switches back to an installed profile rather than adding the same one twice', async () => {
     const css = 'a { color: purple; }';
-    await installProfile('example.com', { name: 'Dracula', css });
+    const first = await installProfile('example.com', { name: 'Dracula', css });
     await setActiveProfile('example.com', 'default');
 
-    expect(await installProfile('example.com', { name: 'Dracula', css })).toBe(
-      'Dracula'
-    );
+    expect(
+      await installProfile('example.com', { name: 'Dracula', css })
+    ).toEqual(first);
     expect(stored('example.com')).toMatchObject({ css });
     expect(Object.keys(stored('example.com').profiles ?? {})).toHaveLength(2);
 
@@ -342,7 +345,8 @@ describe('style edits', () => {
     await installProfile('example.com', { name: 'Dracula', css: 'a {}' });
 
     expect(
-      await installProfile('example.com', { name: 'Dracula', css: 'b {}' })
+      (await installProfile('example.com', { name: 'Dracula', css: 'b {}' }))
+        .name
     ).toBe('Dracula 2');
   });
 

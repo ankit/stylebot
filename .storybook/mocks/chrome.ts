@@ -23,6 +23,7 @@ import type {
   GalleryPublished,
   GalleryScreenshotResponse,
   GalleryStyle,
+  InstallGalleryStyleResponse,
   PublishToGalleryResponse,
 } from '@stylebot/types';
 
@@ -63,6 +64,9 @@ export type GalleryShimOptions = {
   publish?: PublishToGalleryResponse;
   // Fitting a capture to the gallery's limit; pending keeps it compressing.
   compress?: Pending<GalleryScreenshotResponse>;
+  // The popup's suggestions for the site, and what installing one answers.
+  suggestions?: Array<GalleryStyle>;
+  install?: InstallGalleryStyleResponse;
 };
 
 const GALLERY_SCREENSHOT =
@@ -251,6 +255,24 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
 
       return gallery.compress ?? { ok: true, screenshot: GALLERY_SCREENSHOT };
     },
+    GetGallerySuggestions: () => ({
+      ok: true,
+      styles: gallery.suggestions ?? [],
+      group: gallery.suggestions?.[0]?.group ?? null,
+    }),
+    GetGalleryStyleCss: () => ({
+      ok: true,
+      css: 'body { background: #1a1b26 !important; }',
+      importUrls: [],
+    }),
+    InstallGalleryStyle: message => {
+      const { id } = message as unknown as { id: string };
+      const installed = gallery.suggestions?.find(each => each.id === id);
+
+      return (
+        gallery.install ?? { ok: true, profileName: installed?.name ?? '' }
+      );
+    },
     GetGalleryScreenshot: () => ({
       ok: true,
       screenshot: GALLERY_PUBLISHED_SCREENSHOT,
@@ -340,6 +362,11 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
         callback?: Callback
       ) => respond(callback, tabResponses[message.name]?.()),
       create: () => respond(undefined, undefined),
+      // The popup's gallery preview port; the stand-in page has no listener.
+      connect: () => ({
+        postMessage: () => undefined,
+        disconnect: () => undefined,
+      }),
       query: (_info: unknown, callback?: Callback) => respond(callback, [tab]),
     },
 

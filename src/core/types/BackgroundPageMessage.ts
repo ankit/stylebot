@@ -320,6 +320,28 @@ export type GetPublishedGalleryStyle = {
   profileId: string;
 };
 
+export type GetGallerySuggestions = {
+  name: 'GetGallerySuggestions';
+  // The page's url; suggestions are the gallery's styles for its site.
+  pageUrl: string;
+};
+
+// A gallery style's CSS, compiled to preview on a page.
+export type GetGalleryStyleCss = {
+  name: 'GetGalleryStyleCss';
+  id: string;
+};
+
+export type InstallGalleryStyle = {
+  name: 'InstallGalleryStyle';
+  id: string;
+  // The Stylebot style it's added to as a profile.
+  url: string;
+  // Where its gallery page is.
+  group: string;
+  slug: string;
+};
+
 type BackgroundPageMessage =
   | SetStyle
   | EnableStyle
@@ -374,6 +396,9 @@ type BackgroundPageMessage =
   | PublishToGallery
   | UnpublishFromGallery
   | SetGalleryDisplayName
-  | GetPublishedGalleryStyle;
+  | GetPublishedGalleryStyle
+  | GetGallerySuggestions
+  | GetGalleryStyleCss
+  | InstallGalleryStyle;
 
 export default BackgroundPageMessage;

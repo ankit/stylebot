@@ -9,7 +9,7 @@
 
     <div
       class="profile-list"
-      :class="{ 'profile-list--joined': joined }"
+      :class="{ 'profile-list--joined': joined, previewing }"
       role="radiogroup"
       :aria-label="url"
     >
@@ -101,6 +101,12 @@ export default Vue.extend({
       default: false,
     },
 
+    // A gallery preview is on the page, so the saved pick's check greys out.
+    previewing: {
+      type: Boolean,
+      default: false,
+    },
+
     // While the editor is open it keeps the style on, so turning it off waits.
     disableOff: {
       type: Boolean,
@@ -170,6 +176,10 @@ export default Vue.extend({
   flex: none;
   width: 16px;
   color: var(--accent-text);
+
+  .previewing & {
+    color: var(--text-muted);
+  }
 }
 
 .profile-name {

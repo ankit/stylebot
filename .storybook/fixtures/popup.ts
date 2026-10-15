@@ -1,7 +1,10 @@
 import type { StoryObj } from '@storybook/vue';
 
 import App from '@/apps/popup/App.vue';
+import type { GalleryStyle } from '@stylebot/types';
+
 import type { ChromeShimOptions } from '../mocks/chrome';
+import { GALLERY_PUBLISHED_SCREENSHOT } from '../mocks/chrome';
 
 export const style = (url: string, enabled = true) => ({
   url,
@@ -48,3 +51,30 @@ export const ratingEligible = (
     ...storage,
   },
 });
+
+const galleryStyle = (
+  id: string,
+  name: string,
+  installs: number,
+  author: string | null
+): GalleryStyle => ({
+  id,
+  site: 'example.com',
+  group: 'example.com',
+  slug: id,
+  name,
+  description: null,
+  author: { id: `author-${id}`, name: author },
+  version: 1,
+  installs,
+  createdAt: 0,
+  updatedAt: 0,
+  screenshot: GALLERY_PUBLISHED_SCREENSHOT,
+  status: 'live',
+});
+
+// The site's most installed gallery styles, as the popup suggests them.
+export const gallerySuggestions: Array<GalleryStyle> = [
+  galleryStyle('tokyo-night', 'Tokyo Night', 1240, 'maya'),
+  galleryStyle('paper', 'Paper', 1, null),
+];

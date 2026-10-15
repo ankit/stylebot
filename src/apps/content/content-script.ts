@@ -8,6 +8,7 @@ import { isStylableDocument } from '@stylebot/saved-styles';
 import { readCache } from '@stylebot/stylesheets';
 import type { TabMessage } from '@stylebot/types';
 
+import { listenForGalleryPreview } from './gallery-preview';
 import { hidePage, revealPage } from './hide-page';
 import { applyPageState, getPageState, savePageState } from './page-state';
 import { getCompiledStyles } from './saved-styles';
@@ -30,6 +31,10 @@ if (window === window.top) {
       }
     }
   );
+
+  if (canStyle) {
+    listenForGalleryPreview();
+  }
 }
 
 // Fallback if the storage read (or an @import fetch) stalls — real

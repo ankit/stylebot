@@ -11,17 +11,25 @@ import { captureTab } from './capture-tab';
 import {
   CaptureGalleryScreenshot,
   GetGalleryScreenshot,
+  GetGalleryStyleCss,
+  GetGallerySuggestions,
   GetMyGalleryStyles,
   GetPublishedGalleryStyle,
+  InstallGalleryStyle,
   PublishToGallery,
   UnpublishFromGallery,
 } from './gallery';
+import { installProfile } from './styles';
 
 jest.mock('@stylebot/sync', () => ({
   getGoogleAccessToken: jest.fn(async () => 'ya29.token'),
   clearGoogleAccessToken: jest.fn(async () => undefined),
 }));
 jest.mock('./capture-tab', () => ({ captureTab: jest.fn() }));
+jest.mock('./styles', () => ({
+  installProfile: jest.fn(async () => ({ name: 'Tokyo Night', id: 'p1' })),
+  applyStylesToAllTabs: jest.fn(async () => undefined),
+}));
 
 const SCREENSHOT = 'data:image/png;base64,iVBORw0KGgo=';
 
@@ -246,6 +254,117 @@ describe('gallery messages', () => {
     expect(response).toMatchObject({
       ok: false,
       errorKey: 'gallery_error_screenshot',
+    });
+  });
+
+  it("suggests the site's styles that are neither installed nor published here", async () => {
+    const other = { ...style, id: 'other', slug: 'other' };
+    const installed = { ...style, id: 'installed', slug: 'installed' };
+    mockStorage({
+      'gallery-installed': {
+        installed: {
+          url: 'github.com',
+          profileId: 'p1',
+          version: 1,
+          group: 'github.com',
+          slug: 'installed',
+        },
+      },
+      'gallery-published': {
+        [JSON.stringify(['github.com', 'default'])]: {
+          styleId: style.id,
+          accountId: 'me',
+          cssHash: 'abc',
+          version: 1,
+          group: 'github.com',
+          slug: style.slug,
+        },
+      },
+    });
+    fetchMock.mockResponseOnce(
+      JSON.stringify({ styles: [style, installed, other], nextOffset: null })
+    );
+
+    const response = await respond(send =>
+      GetGallerySuggestions(
+        {
+          name: 'GetGallerySuggestions',
+          pageUrl: 'https://www.github.com/ankit',
+        },
+        send
+      )
+    );
+
+    expect(fetchMock.mock.calls[0][0]).toBe(
+      `${GALLERY_API_URL}/styles?site=github.com&limit=12`
+    );
+    expect(response).toEqual({
+      ok: true,
+      styles: [other],
+      group: 'github.com',
+    });
+  });
+
+  it('compiles a gallery style the way a saved style is applied', async () => {
+    fetchMock.mockResponseOnce(
+      JSON.stringify({
+        ...style,
+        css: '@import url(https://example.com/a.css);\na { color: red; }',
+      })
+    );
+
+    const response = await respond(send =>
+      GetGalleryStyleCss({ name: 'GetGalleryStyleCss', id: style.id }, send)
+    );
+
+    expect(response).toEqual({
+      ok: true,
+      css: 'a { color: red !important; }',
+      importUrls: ['https://example.com/a.css'],
+    });
+  });
+
+  it('installs a gallery style as a profile and remembers it', async () => {
+    const store = mockStorage({ 'gallery-install-id': 'install-1' });
+    fetchMock.mockResponseOnce(
+      JSON.stringify({
+        id: style.id,
+        site: 'github.com',
+        name: 'Tokyo Night',
+        version: 2,
+        css: 'a { color: red; }',
+      })
+    );
+
+    const response = await respond(send =>
+      InstallGalleryStyle(
+        {
+          name: 'InstallGalleryStyle',
+          id: style.id,
+          url: 'github.com',
+          group: 'github.com',
+          slug: 'tokyo-night',
+        },
+        send
+      )
+    );
+
+    expect(JSON.parse(fetchMock.mock.calls[0][1]?.body as string)).toEqual({
+      installId: 'install-1',
+    });
+    expect(installProfile).toHaveBeenCalledWith('github.com', {
+      name: 'Tokyo Night',
+      css: 'a { color: red; }',
+    });
+    expect(response).toEqual({ ok: true, profileName: 'Tokyo Night' });
+    expect(store['gallery-installed']).toEqual({
+      [style.id]: {
+        url: 'github.com',
+        profileId: 'p1',
+        version: 2,
+        group: 'github.com',
+        slug: 'tokyo-night',
+      },
     });
   });
 });

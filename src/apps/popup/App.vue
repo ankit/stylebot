@@ -18,6 +18,7 @@
         :enabled="siteEnabled"
         :disable-off="isOpen"
         :joined="hasToggleRows"
+        :previewing="galleryPreviewing"
         @pick="pickSiteProfile"
       />
       <template v-else>
@@ -67,6 +68,15 @@
         />
       </div>
 
+      <the-gallery-suggestions
+        ref="gallery"
+        :tab="tab"
+        :style-url="styles.length ? styles[0].url : domain"
+        :profile-names="siteProfiles.map(profile => profile.name)"
+        @preview="galleryPreviewing = $event"
+        @installed="loadStyles"
+      />
+
       <div class="popup-divider" />
 
       <div
@@ -106,6 +116,7 @@ import ToggleStylebot from './components/ToggleStylebot.vue';
 import UnsupportedPage from './components/UnsupportedPage.vue';
 import ReleaseNotification from './components/notifications/ReleaseNotification.vue';
 import RatingPrompt from './components/notifications/RatingPrompt.vue';
+import TheGallerySuggestions from './components/TheGallerySuggestions.vue';
 
 import {
   getStyles,
@@ -152,6 +163,7 @@ export default Vue.extend({
     UnsupportedPage,
     ReleaseNotification,
     RatingPrompt,
+    TheGallerySuggestions,
   },
 
   data(): {
@@ -169,6 +181,8 @@ export default Vue.extend({
     commands?: GetCommandsResponse;
     appearance: StylebotAppearance;
     dockLocation: StylebotDockLocation | '';
+    // A gallery style is shown on the page in place of the site's own.
+    galleryPreviewing: boolean;
   } {
     return {
       styles: [],
@@ -183,6 +197,7 @@ export default Vue.extend({
       commands: undefined,
       appearance: 'system',
       dockLocation: '',
+      galleryPreviewing: false,
     };
   },
 
@@ -340,6 +355,11 @@ export default Vue.extend({
      */
     pickSiteProfile(id: string | null): void {
       const { url } = this.styles[0];
+
+      // Picking a profile ends a gallery preview, so the pick shows.
+      (
+        this.$refs.gallery as InstanceType<typeof TheGallerySuggestions>
+      )?.cancel();
 
       if (id === null) {
         if (this.siteEnabled) {
