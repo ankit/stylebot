@@ -236,6 +236,14 @@ const config = {
           to: 'editor-window/appearance-init.js',
         },
         {
+          from: 'apps/side-panel-default/index.html',
+          to: 'side-panel-default/index.html',
+        },
+        {
+          from: 'apps/side-panel-default/index.js',
+          to: 'side-panel-default/index.js',
+        },
+        {
           from: 'apps/monaco-iframe/index.html',
           to: 'monaco-editor/iframe/index.html',
           transform: transformHtml,

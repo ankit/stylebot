@@ -137,6 +137,21 @@ test('the side panel is set up on every tab while it is the chosen position', as
   await expect.poll(panelOptions).toMatchObject({ enabled: false });
 });
 
+test('the manifest’s default side panel, there for Vivaldi, stays off', async ({
+  extension,
+}) => {
+  const defaultOptions = () =>
+    extension.evaluate(() =>
+      (
+        chrome.sidePanel as unknown as {
+          getOptions: (options: object) => Promise<{ enabled?: boolean }>;
+        }
+      ).getOptions({})
+    );
+
+  await expect.poll(defaultOptions).toMatchObject({ enabled: false });
+});
+
 test('the side panel opens with the inspector on', async ({
   context,
   extension,

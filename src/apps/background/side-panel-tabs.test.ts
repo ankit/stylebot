@@ -83,6 +83,14 @@ describe('configureSidePanelTabs', () => {
     });
   });
 
+  it('switches off the manifest’s default panel, which only Vivaldi needs', async () => {
+    const { api } = makeChrome('right');
+
+    await configureSidePanelTabs();
+
+    expect(api.sidePanel?.setOptions).toBeCalledWith({ enabled: false });
+  });
+
   it('leaves the panel alone in Vivaldi, which opens it for any change', async () => {
     const { api } = makeChrome('right');
     (detectChromiumVariant as jest.Mock).mockResolvedValueOnce('vivaldi');
@@ -108,7 +116,7 @@ describe('initSidePanelTabs', () => {
 
     listeners.created?.({ id: 9 } as chrome.tabs.Tab);
     await flush();
-    expect(api.sidePanel?.setOptions).toBeCalledTimes(1);
+    expect(api.sidePanel?.setOptions).toBeCalledTimes(2);
     expect(api.sidePanel?.setOptions).toBeCalledWith(
       expect.objectContaining({ tabId: 9, enabled: true })
     );

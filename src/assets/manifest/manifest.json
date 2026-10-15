@@ -33,6 +33,9 @@
       "run_at": "document_start"
     }
   ],
+  "side_panel": {
+    "default_path": "side-panel-default/index.html"
+  },
   "action": {
     "default_icon": {
       "16": "img/icon16.png",

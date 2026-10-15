@@ -24,6 +24,10 @@ export const configureSidePanelTabs = async (
     return;
   }
 
+  // The manifest's default panel is only there for Vivaldi, so switch it off
+  // everywhere else; the tabs' own panels override it.
+  chrome.sidePanel.setOptions({ enabled: false }).catch(() => undefined);
+
   const layout = (await getOption('layout')) as StylebotLayout;
   const enabled = layout.dockLocation === 'sidepanel';
 
