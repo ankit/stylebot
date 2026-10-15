@@ -5,7 +5,6 @@ import { createStore, mountEditor } from '@stylebot/editor';
 import type { EditorSidePanelOpened } from '@stylebot/types';
 import {
   detectChromiumVariant,
-  detectVivaldiSidePanel,
   getPageSupport,
   doesSidePanelWorkInChromiumVariant,
 } from '@stylebot/utils';
@@ -136,19 +135,9 @@ const init = async (): Promise<void> => {
     return;
   }
 
-  const [tab, inVivaldi] = await Promise.all([
-    chrome.tabs.get(tabId).catch(() => undefined),
-    host === 'sidepanel' && detectVivaldiSidePanel(),
-  ]);
+  const tab = await chrome.tabs.get(tabId).catch(() => undefined);
 
-  // The background docks the editor in the page instead.
-  if (inVivaldi) {
-    window.close();
-    return;
-  }
-
-  // A browser this page can tell (Arc) loads the panel without showing it,
-  // so the background has to be told to dock the editor in the page.
+  // Where the panel won't show (Vivaldi, Arc), dock the editor in the page.
   if (host === 'sidepanel') {
     detectChromiumVariant().then(variant => {
       if (!doesSidePanelWorkInChromiumVariant(variant)) {

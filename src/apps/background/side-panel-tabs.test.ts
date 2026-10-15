@@ -1,4 +1,11 @@
+import { detectChromiumVariant } from '@stylebot/utils';
+
 import { configureSidePanelTabs, initSidePanelTabs } from './side-panel-tabs';
+
+jest.mock('@stylebot/utils', () => ({
+  ...jest.requireActual('@stylebot/utils'),
+  detectChromiumVariant: jest.fn(async () => undefined),
+}));
 
 const makeChrome = (dockLocation: string, { sidePanel = true } = {}) => {
   const listeners: {
@@ -74,6 +81,15 @@ describe('configureSidePanelTabs', () => {
       tabId: 2,
       enabled: false,
     });
+  });
+
+  it('leaves the panel alone in Vivaldi, which opens it for any change', async () => {
+    const { api } = makeChrome('right');
+    (detectChromiumVariant as jest.Mock).mockResolvedValueOnce('vivaldi');
+
+    await configureSidePanelTabs();
+
+    expect(api.sidePanel?.setOptions).not.toBeCalled();
   });
 
   it('does nothing in a browser without a side panel', async () => {

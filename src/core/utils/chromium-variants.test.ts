@@ -74,6 +74,21 @@ describe('detectChromiumVariant', () => {
     expect(chrome.storage.local.set).not.toBeCalled();
   });
 
+  it('finds and remembers Vivaldi by the data it adds to windows', async () => {
+    (chrome as unknown as { windows: unknown }).windows = {
+      getAll: jest.fn(async () => [{ id: 1, vivExtData: '{}' }]),
+    };
+
+    await expect(detectChromiumVariant()).resolves.toBe('vivaldi');
+    expect(store[CHROMIUM_VARIANT_KEY]).toBe('vivaldi');
+  });
+
+  it('answers with Vivaldi in a page once the background has found it', async () => {
+    store = { [CHROMIUM_VARIANT_KEY]: 'vivaldi' };
+
+    await expect(detectChromiumVariant()).resolves.toBe('vivaldi');
+  });
+
   it('finds nothing in other browsers', async () => {
     const found = detectChromiumVariant();
     await jest.advanceTimersByTimeAsync(3000);

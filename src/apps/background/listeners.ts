@@ -73,6 +73,7 @@ import type {
 } from '@stylebot/types';
 
 import {
+  detectChromiumVariant,
   setNotification,
   getExtensionVersion,
   getReleaseNotificationId,
@@ -87,12 +88,11 @@ import {
  * synchronously when the service worker starts, for Chrome to wake it for them.
  */
 export const initListeners = (): void => {
-  // Set up side panels and open the welcome page on install; on update, clean
-  // up retired options, put Stylebot back into open tabs, and show what's new
-  // after a major update.
+  // Runs on install and on every update.
   chrome.runtime.onInstalled.addListener(
     async ({ reason, previousVersion }) => {
       configureSidePanelTabs();
+      detectChromiumVariant().catch(() => undefined);
 
       if (reason === 'install' || reason === 'update') {
         recordInstallTime();
