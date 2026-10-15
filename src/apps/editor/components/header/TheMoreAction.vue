@@ -1,5 +1,5 @@
 <template>
-  <s-anchored-menu class="more-action-anchor" @open="stopInspecting">
+  <s-anchored-menu class="more-action-anchor" @open="onOpen">
     <template #trigger="{ toggle }">
       <s-icon-button :size="24" :tooltip="t('view_options')" @click="toggle">
         <more-icon :size="16" />
@@ -42,6 +42,8 @@
         </div>
 
         <s-menu-divider class="more-menu-divider" />
+
+        <the-gallery-menu-item v-if="hasCss" @click="close()" />
 
         <s-menu-item
           @click="
@@ -104,6 +106,7 @@ import type {
 import { openOptionsPage } from '@stylebot/utils';
 
 import { hasSidePanel } from '../../utils/side-panel';
+import TheGalleryMenuItem from './TheGalleryMenuItem.vue';
 
 type DockOption = {
   value: StylebotDockLocation;
@@ -132,9 +135,14 @@ export default Vue.extend({
     SunIcon,
     MoonIcon,
     MonitorIcon,
+    TheGalleryMenuItem,
   },
 
   computed: {
+    hasCss(): boolean {
+      return Boolean(this.$store.state.css.trim());
+    },
+
     layout(): StylebotLayout {
       return this.$store.state.options.layout;
     },
@@ -212,8 +220,9 @@ export default Vue.extend({
   },
 
   methods: {
-    stopInspecting(): void {
+    onOpen(): void {
       this.$store.commit('setInspecting', false);
+      this.$store.dispatch('loadPublishedGalleryStyle');
     },
 
     dock(dockLocation: StylebotDockLocation): void {

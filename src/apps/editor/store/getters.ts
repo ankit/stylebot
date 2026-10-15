@@ -3,6 +3,7 @@ import type * as postcss from 'postcss';
 import type { State } from './';
 import type { CssDeclaration } from '@stylebot/types';
 import type { RoleColorGroups } from '@stylebot/css';
+import { hashCss } from '@stylebot/gallery';
 import {
   getRule,
   getRuleForSelector,
@@ -150,4 +151,9 @@ export default {
   readabilityActive: (state: State): boolean => {
     return state.readability && state.page.readerable;
   },
+
+  // Whether the CSS differs from what was last published to the gallery.
+  hasUnpublishedChanges: (state: State): boolean =>
+    state.publishedGalleryStyle !== null &&
+    hashCss(state.css) !== state.publishedGalleryStyle.cssHash,
 };

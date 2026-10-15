@@ -5,6 +5,8 @@
 
       <the-keyboard-shortcuts-view v-if="help" />
 
+      <the-publish-view v-else-if="publishing" />
+
       <template v-else>
         <the-header ref="header" />
 
@@ -24,6 +26,8 @@
             @leave="onCodeEditorLeave"
           />
         </div>
+
+        <the-gallery-status />
       </template>
     </div>
   </the-stylebot-resizer>
@@ -39,6 +43,8 @@ import ThePresetsEditor from './ThePresetsEditor.vue';
 import TheStylebotResizer from './TheStylebotResizer.vue';
 import TheWindowStatus from './TheWindowStatus.vue';
 import TheKeyboardShortcutsView from './shortcuts/TheKeyboardShortcutsView.vue';
+import ThePublishView from './publish/ThePublishView.vue';
+import TheGalleryStatus from './publish/TheGalleryStatus.vue';
 
 import type { StylebotEditingMode } from '@stylebot/types';
 
@@ -55,6 +61,8 @@ export default Vue.extend({
     TheStylebotResizer,
     TheWindowStatus,
     TheKeyboardShortcutsView,
+    ThePublishView,
+    TheGalleryStatus,
   },
 
   data(): { codeEditorMounted: boolean } {
@@ -83,9 +91,27 @@ export default Vue.extend({
     help(): boolean {
       return this.$store.state.help;
     },
+
+    publishing(): boolean {
+      return this.$store.state.publishing;
+    },
+
+    galleryKey(): string {
+      const { url, activeProfile, publishing } = this.$store.state;
+
+      return JSON.stringify([url, activeProfile, publishing]);
+    },
   },
 
   watch: {
+    // Reloads what was published as the profile changes or a publish ends.
+    galleryKey: {
+      immediate: true,
+      handler(): void {
+        this.$store.dispatch('loadPublishedGalleryStyle');
+      },
+    },
+
     mode: {
       immediate: true,
       handler(mode: StylebotEditingMode): void {

@@ -30,7 +30,14 @@ import type {
   StylebotLayout,
   StylebotDockLocation,
   StylebotAppearance,
+  GalleryScreenshotResponse,
 } from '@stylebot/types';
+
+import {
+  captureGalleryScreenshot,
+  compressGalleryScreenshot,
+  getPublishedGalleryStyle,
+} from '../utils/gallery';
 
 import {
   getAllOptions,
@@ -248,6 +255,11 @@ export default {
       return;
     }
 
+    if (state.publishing) {
+      commit('setPublishing', false);
+      return;
+    }
+
     // A separate window closes with Cmd/Ctrl+W, and a side panel with its own button, so Escape only backs out.
     if (state.host !== 'page') {
       if (state.inspecting) {
@@ -257,6 +269,57 @@ export default {
     }
 
     dispatch('closeStylebot');
+  },
+
+  /**
+   * Captures the styled page for the gallery and compresses it to upload. In
+   * the page itself, the panel steps aside so the page is captured at its
+   * full width.
+   */
+  async captureGalleryScreenshot({
+    state,
+    commit,
+  }: {
+    state: State;
+    commit: Commit;
+  }): Promise<GalleryScreenshotResponse> {
+    let captured: GalleryScreenshotResponse;
+
+    if (state.host === 'page') {
+      commit('setCapturing', true);
+
+      try {
+        await new Promise(resolve =>
+          requestAnimationFrame(() => requestAnimationFrame(resolve))
+        );
+        captured = await captureGalleryScreenshot();
+      } finally {
+        commit('setCapturing', false);
+      }
+    } else {
+      captured = await captureGalleryScreenshot(state.tabId ?? undefined);
+    }
+
+    if (!captured.ok) {
+      return captured;
+    }
+
+    return compressGalleryScreenshot(captured.screenshot);
+  },
+
+  async loadPublishedGalleryStyle({
+    state,
+    commit,
+  }: {
+    state: State;
+    commit: Commit;
+  }): Promise<void> {
+    const { published } = await getPublishedGalleryStyle(
+      state.url,
+      state.activeProfile
+    );
+
+    commit('setPublishedGalleryStyle', published);
   },
 
   setMode(

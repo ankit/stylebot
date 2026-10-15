@@ -18,6 +18,11 @@ import type {
   ReadabilitySettings,
   RunGoogleDriveSyncResponse,
   VersionHistory,
+  GalleryAuthor,
+  GalleryAccountResponse,
+  GalleryPublished,
+  GalleryStyle,
+  PublishToGalleryResponse,
 } from '@stylebot/types';
 
 import { isMac, toBrowserShortcut } from '@stylebot/utils';
@@ -44,7 +49,24 @@ export type ChromeShimOptions = {
   versionHistory?: Pending<VersionHistory>;
   // Optional permissions already granted, and how the prompt answers a request.
   permissions?: { granted?: boolean; allowRequest?: boolean };
+  gallery?: GalleryShimOptions;
 };
+
+export type GalleryShimOptions = {
+  // Signed in already; left out, the editor starts signed out.
+  account?: GalleryAuthor;
+  signIn?: GalleryAccountResponse;
+  styles?: Array<GalleryStyle>;
+  // What the profile published, and which of the account's styles that is.
+  published?: GalleryPublished;
+  publish?: PublishToGalleryResponse;
+};
+
+const GALLERY_SCREENSHOT =
+  'data:image/svg+xml,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 10"><rect width="16" height="10" fill="#dfe6f3"/><rect x="2" y="2" width="9" height="1.5" fill="#2a5fd6"/></svg>'
+  );
 
 type Callback = (response?: unknown) => void;
 
@@ -104,6 +126,8 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     active: true,
     url: overrides.tabUrl ?? 'https://example.com/article',
   };
+
+  const gallery = { ...overrides.gallery };
 
   const permissions = {
     granted: false,
@@ -179,6 +203,71 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     UndoRestore: () => ({ ok: true }),
 
     OpenEditorSidePanel: () => true,
+
+    GetGalleryAccount: () => ({ ok: true, account: gallery.account ?? null }),
+    SignInToGallery: () => {
+      const response = gallery.signIn ?? {
+        ok: true,
+        account: { id: 'me', name: null },
+      };
+
+      if (response.ok) {
+        gallery.account = response.account ?? undefined;
+      }
+
+      return response;
+    },
+    SetGalleryDisplayName: message => ({
+      ok: true,
+      account: {
+        id: gallery.account?.id ?? 'me',
+        name: (message as unknown as { displayName: string }).displayName,
+      },
+    }),
+    GetMyGalleryStyles: () => ({
+      ok: true,
+      styles: gallery.styles ?? [],
+      publishedId: gallery.published?.styleId ?? null,
+    }),
+    GetPublishedGalleryStyle: () => ({ published: gallery.published ?? null }),
+    CaptureGalleryScreenshot: () => ({
+      ok: true,
+      screenshot: GALLERY_SCREENSHOT,
+    }),
+    CompressGalleryScreenshot: () => ({
+      ok: true,
+      screenshot: GALLERY_SCREENSHOT,
+    }),
+    PublishToGallery: message => {
+      if (gallery.publish) {
+        return gallery.publish;
+      }
+
+      const { title, styleId } = message as unknown as {
+        title: string;
+        styleId?: string;
+      };
+
+      return {
+        ok: true,
+        style: {
+          id: styleId ?? 'new-style',
+          site: 'example.com',
+          group: 'example.com',
+          slug: 'new-style',
+          name: title,
+          description: null,
+          author: gallery.account ?? { id: 'me', name: null },
+          version: styleId ? 2 : 1,
+          installs: 0,
+          createdAt: 0,
+          updatedAt: 0,
+          screenshot: GALLERY_SCREENSHOT,
+          removed: [],
+        },
+      };
+    },
+    UnpublishFromGallery: () => ({ ok: true }),
   };
 
   const tabResponses: Record<string, () => unknown> = {
