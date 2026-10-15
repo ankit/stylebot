@@ -8,6 +8,7 @@ import type {
   StylebotCommands,
   ReadabilitySettings,
   StylebotEditorCommands,
+  GalleryPublished,
 } from '@stylebot/types';
 
 import {
@@ -89,6 +90,12 @@ export type State = {
   selectors: Array<CssSelectorMetadata>;
 
   help: boolean;
+  // Whether the gallery's publish view replaces the editor.
+  publishing: boolean;
+  // Page host: hides the panel while the page is captured for the gallery.
+  capturing: boolean;
+  // What this style's profile last published to the gallery, if anything.
+  publishedGalleryStyle: GalleryPublished | null;
   visible: boolean;
   inspecting: boolean;
   // The element under the inspector while picking, previewed in the panel.
@@ -132,6 +139,9 @@ export const createStore = (host: EditorHost): Store<State> => {
       contextMenuSelector: '',
 
       help: false,
+      publishing: false,
+      capturing: false,
+      publishedGalleryStyle: null,
       visible: false,
       inspecting: false,
       previewSelector: '',

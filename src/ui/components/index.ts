@@ -25,6 +25,8 @@ export { default as SNumberField } from './SNumberField.vue';
 export { default as SBadge } from './SBadge.vue';
 export { default as SStatusDot } from './SStatusDot.vue';
 export { default as SCallout } from './SCallout.vue';
+export { default as SSpinner } from './SSpinner.vue';
+export { default as STextInput } from './STextInput.vue';
 export { default as SCard } from './SCard.vue';
 export { default as SList } from './SList.vue';
 export { default as SListItem } from './SListItem.vue';

@@ -11,6 +11,22 @@ export const GALLERY_API_URL =
 export const getGalleryUrl = (path: string): string =>
   new URL(path, GALLERY_API_URL).href;
 
+const GALLERY_SITE_URL = 'https://gallery.stylebot.dev';
+
+/**
+ * A style's page on the gallery site.
+ */
+export const getGalleryStyleUrl = ({
+  group,
+  slug,
+}: {
+  group: string;
+  slug: string;
+}): string =>
+  `${GALLERY_SITE_URL}/s/${encodeURIComponent(group)}/${encodeURIComponent(
+    slug
+  )}`;
+
 export const NAME_MAX_LENGTH = 60;
 export const DESCRIPTION_MAX_LENGTH = 200;
 export const NOTES_MAX_LENGTH = 200;
