@@ -21,7 +21,6 @@ const SITE_URL = 'https://en.wikipedia.org/wiki/Ikigai';
 const SITE_HTML = path.join(HERE, 'wiki-ikigai.html');
 const SITE = 'en.wikipedia.org';
 // What Claude's style is: the gallery's Slate theme, and the fonts it brings.
-const THEME_CSS = path.join(ROOT, 'scripts/capture/themes/wikipedia/slate.css');
 const THEME_FONTS = ['Playfair Display', 'Libre Baskerville'];
 const THEME_PROFILE = 'Slate';
 const PROMPT = '/stylebot give this article a calm dark reading look';
@@ -31,6 +30,7 @@ const { chromium } = require('@playwright/test');
 const { launchOptions, loadExtension, closeWelcomeTabs } = await import(
   path.join(ROOT, 'scripts/capture/browser.mjs')
 );
+const { gallery } = await import(path.join(ROOT, 'scripts/capture/themes.mjs'));
 
 // Content area of the browser window, in CSS px. The video draws Chrome's
 // frame around it; the side panel takes the right PANEL_W when open.
@@ -759,7 +759,7 @@ await wait(1300);
 
 const WORK = '~/.stylebot/work';
 const cssFile = path.join(home, `${SITE}.css`);
-fs.copyFileSync(THEME_CSS, cssFile);
+fs.writeFileSync(cssFile, gallery('wikipedia', 'slate'));
 const cssLines = fs.readFileSync(cssFile, 'utf8').trimEnd().split('\n').length;
 
 /**

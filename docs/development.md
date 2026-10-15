@@ -47,7 +47,7 @@ Run `yarn storybook` to browse the popup, options page, editor and shared compon
 
 ## The website
 
-The [stylebot.dev](https://stylebot.dev) site has its own repo, [stylebot-site](https://github.com/ankit/stylebot-site). Some of its screenshots are taken from this repo's build: `yarn capture:gallery`, `yarn capture:manual` and `yarn capture:store --phone` save them in `captures/` (or the directory after `--out`), to copy into the site's repo. Development builds also run the site bridge on `localhost`, so gallery installs work against the site's dev server.
+The [stylebot.dev](https://stylebot.dev) site has its own repo, [stylebot-site](https://github.com/ankit/stylebot-site). Some of its screenshots are taken from this repo's build: `yarn capture:gallery`, `yarn capture:manual` and `yarn capture:store --phone` save them in `captures/` (or the directory after `--out`), to copy into the site's repo. The gallery's themes are the site's: `yarn capture:gallery` reads them from a stylebot-site checkout beside this repo, or the directory after `--themes`. Development builds also run the site bridge on `localhost`, so gallery installs work against the site's dev server.
 
 ## Sync
 

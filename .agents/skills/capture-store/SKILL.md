@@ -48,10 +48,10 @@ Send the user the images in order, then commit them once they're happy.
 Each shot is an entry in `scripts/capture/shots.mjs`: the site, the theme it's seeded
 with, what's opened or hovered, and its `slide` — the headline (`*word*` is highlighted),
 accent, and either a narrower `pageWidth` to lay the page out at or a `crop`.
-Keep the copy free of product names other than Stylebot's. Gallery themes come from `scripts/capture/themes/<site>/`, copies of the site's gallery,
-including the Hacker News profiles the gallery also lists; Modern, which it doesn't, is kept
-in `scripts/capture/themes/`. When the user updates one in their browser, refresh its
-copy with `yarn stylebot css get news.ycombinator.com --profile "<name>"`, keeping the
+Keep the copy free of product names other than Stylebot's. Gallery themes are read from the site repo's gallery, `src/assets/gallery/<site>/` in a
+stylebot-site checkout beside this one, including the Hacker News profiles the gallery also
+lists; Modern, which it doesn't, is kept in `scripts/capture/hn-modern.css`. When the user
+updates one in their browser, refresh its file with `yarn stylebot css get news.ycombinator.com --profile "<name>"`, keeping the
 gallery file's `/* Site: Name */` first line, then retake the shots and, with the `capture-gallery` skill, the gallery image.
 
 Choosing what to show:

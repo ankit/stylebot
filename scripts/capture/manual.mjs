@@ -22,7 +22,8 @@ import {
   syncState,
   wait,
 } from './browser.mjs';
-import { gallery, theme } from './shots.mjs';
+import { hnModern } from './shots.mjs';
+import { gallery } from './themes.mjs';
 import { capturesDir, shownPath, takeOutput } from './output.mjs';
 
 const APPEARANCES = ['light', 'dark'];
@@ -31,7 +32,7 @@ const hackerNews = () =>
   profiles(
     { name: 'Newspaper', css: gallery('hn', 'newspaper') },
     { name: 'Night Shift', css: gallery('hn', 'night-shift') },
-    { name: 'Modern', css: theme('hn-modern') },
+    { name: 'Modern', css: hnModern() },
     { name: 'Newspaper Dark', css: gallery('hn', 'newspaper-dark') }
   );
 

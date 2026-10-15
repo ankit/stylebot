@@ -5,13 +5,15 @@ description: Retake the stylebot.dev gallery's theme screenshots with `yarn capt
 
 # Capture the gallery screenshots
 
-`yarn capture:gallery` builds the extension, then applies each theme in
-`scripts/capture/themes/<site>/<theme>.css` on its live site in a fresh headless Chrome and
-saves the page, without the panel, as `captures/gallery/<site>/<theme>.png` (1440×900 at
-2x); `--out <dir>` saves elsewhere.
+`yarn capture:gallery` builds the extension, then applies each theme in the site's
+gallery, `<site>/<theme>.css`, on its live site in a fresh headless Chrome and saves the
+page, without the panel, as `captures/gallery/<site>/<theme>.png` (1440×900 at 2x);
+`--out <dir>` saves elsewhere.
 
-The site is its own repo, github.com/ankit/stylebot-site, with the same themes and their
-images in `src/assets/gallery/`. The two copies of each theme's CSS are kept in step by hand.
+The site is its own repo, github.com/ankit/stylebot-site, and the only copy of the themes:
+they're read from `src/assets/gallery/` in a checkout of it beside this repo, or the
+directory after `--themes`. `--out` pointing at that same directory saves each image beside
+its CSS, ready to commit there.
 
 ## 1. Run it
 
@@ -34,13 +36,12 @@ Open each PNG and check, before saying they're done:
 - **Nothing reads as broken**: a clipped header, overlapping text, an unstyled block.
 
 Send the user the images. Once they're happy, they go into the site's
-`src/assets/gallery/<site>/`, committed there.
+`src/assets/gallery/<site>/`, committed there; save them there directly with `--out`.
 
 ## Adding a theme
 
-- Save its CSS as `scripts/capture/themes/<site>/<theme>.css` here and
-  `src/assets/gallery/<site>/<theme>.css` in the site's repo, starting with a
-  `/* Site: Name */` line.
+- Save its CSS as `src/assets/gallery/<site>/<theme>.css` in the site's repo, starting
+  with a `/* Site: Name */` line.
 - Add an entry to the site's `src/lib/gallery.ts`: its name, the image and CSS imports, and two
   swatch colors, the background and its accent.
 - A site that isn't in `PAGES` yet needs a page there that loads headless, with no images or

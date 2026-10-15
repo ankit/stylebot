@@ -20,17 +20,14 @@ import {
   wait,
 } from './browser.mjs';
 import { captureCli } from './cli-shot.mjs';
+import { gallery } from './themes.mjs';
 
-const THEMES_DIR = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  'themes'
-);
-
-export const theme = name =>
-  fs.readFileSync(path.join(THEMES_DIR, `${name}.css`), 'utf8');
-
-export const gallery = (site, name) =>
-  fs.readFileSync(path.join(THEMES_DIR, site, `${name}.css`), 'utf8');
+// Hacker News' Modern profile, which the site's gallery doesn't list.
+export const hnModern = () =>
+  fs.readFileSync(
+    path.join(path.dirname(fileURLToPath(import.meta.url)), 'hn-modern.css'),
+    'utf8'
+  );
 
 // GitHub wraps the repo's last-commit row at the panel's width, so it's laid
 // out a little wider and scaled into the space.
@@ -50,7 +47,7 @@ const openPanelFor = (browser, page, options) =>
 const hackerNews = active => {
   const list = [
     { name: 'Night Shift', css: gallery('hn', 'night-shift') },
-    { name: 'Modern', css: theme('hn-modern') },
+    { name: 'Modern', css: hnModern() },
     { name: 'Newspaper', css: gallery('hn', 'newspaper') },
     { name: 'Newspaper Dark', css: gallery('hn', 'newspaper-dark') },
   ];
