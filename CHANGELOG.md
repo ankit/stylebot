@@ -1,7 +1,7 @@
 ## Version 4.0.4 (October 2026)
 
 - Make Stylebot usable in Arc (#1212)
-- Recognise Vivaldi on install and hide the Side panel option there from the start (#1215)
+- Vivaldi: no longer open the side panel after installing or updating, and hide the Side panel option (#1215)
 - Keep the options page's style editor open after saving, save it with Ctrl+S / ⌘S, and only enable Save when there are changes (#1207, #1209)
 - Stop syncing every time the popup opens; Stylebot still syncs in the background, and Sync now syncs on demand (#1213)
 - Fix "A listener indicated an asynchronous response…" errors showing up in page consoles (#1214)
