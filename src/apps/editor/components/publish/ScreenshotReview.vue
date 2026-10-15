@@ -12,7 +12,7 @@
       <div class="review-bar">
         <div class="review-heading">
           <s-heading as="h2" size="md">{{ t('review_screenshot') }}</s-heading>
-          <s-text size="caption" variant="muted">
+          <s-text size="large" variant="muted">
             {{ t('drag_over_anything_private_to_blur_it') }}
           </s-text>
         </div>
