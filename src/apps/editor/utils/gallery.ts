@@ -6,6 +6,7 @@ import type {
   GetGalleryAccount,
   GetMyGalleryStyles,
   GetMyGalleryStylesResponse,
+  GetGalleryScreenshot,
   GetPublishedGalleryStyle,
   GetPublishedGalleryStyleResponse,
   PublishToGallery,
@@ -15,6 +16,8 @@ import type {
   UnpublishFromGallery,
   UnpublishFromGalleryResponse,
 } from '@stylebot/types';
+
+import { flashPage, playShutterSound } from './shutter';
 
 export const getGalleryAccount = (): Promise<GalleryAccountResponse> =>
   chrome.runtime.sendMessage<GetGalleryAccount, GalleryAccountResponse>({
@@ -51,13 +54,28 @@ export const getPublishedGalleryStyle = (
     GetPublishedGalleryStyleResponse
   >({ name: 'GetPublishedGalleryStyle', url, profileId });
 
-export const captureGalleryScreenshot = (
+/**
+ * Captures a tab for the gallery with a shutter sound. Without tabId it's the
+ * tab the editor is in, which also flashes like a camera.
+ */
+export const captureGalleryScreenshot = async (
   tabId?: number
-): Promise<GalleryScreenshotResponse> =>
-  chrome.runtime.sendMessage<
+): Promise<GalleryScreenshotResponse> => {
+  const response = await chrome.runtime.sendMessage<
     CaptureGalleryScreenshot,
     GalleryScreenshotResponse
   >({ name: 'CaptureGalleryScreenshot', tabId });
+
+  if (response.ok) {
+    playShutterSound();
+
+    if (tabId === undefined) {
+      flashPage();
+    }
+  }
+
+  return response;
+};
 
 export const compressGalleryScreenshot = (
   screenshot: string
@@ -66,6 +84,14 @@ export const compressGalleryScreenshot = (
     CompressGalleryScreenshot,
     GalleryScreenshotResponse
   >({ name: 'CompressGalleryScreenshot', screenshot });
+
+export const getGalleryScreenshot = (
+  path: string
+): Promise<GalleryScreenshotResponse> =>
+  chrome.runtime.sendMessage<GetGalleryScreenshot, GalleryScreenshotResponse>({
+    name: 'GetGalleryScreenshot',
+    path,
+  });
 
 export const publishToGallery = (
   message: Omit<PublishToGallery, 'name'>

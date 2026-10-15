@@ -72,6 +72,7 @@ import {
   GetMyGalleryStyles,
   CaptureGalleryScreenshot,
   CompressGalleryScreenshot,
+  GetGalleryScreenshot,
   PublishToGallery,
   UnpublishFromGallery,
   SetGalleryDisplayName,
@@ -403,6 +404,9 @@ export const initListeners = (): void => {
           return true;
         case 'CompressGalleryScreenshot':
           CompressGalleryScreenshot(message, sendResponse);
+          return true;
+        case 'GetGalleryScreenshot':
+          GetGalleryScreenshot(message, sendResponse);
           return true;
         case 'PublishToGallery':
           PublishToGallery(message, sendResponse);
