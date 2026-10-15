@@ -68,14 +68,14 @@ export type GalleryShimOptions = {
 const GALLERY_SCREENSHOT =
   'data:image/svg+xml,' +
   encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 10"><rect width="16" height="10" fill="#dfe6f3"/><rect x="2" y="2" width="9" height="1.5" fill="#2a5fd6"/></svg>'
+    '<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 16 10"><rect width="16" height="10" fill="#dfe6f3"/><rect x="2" y="2" width="9" height="1.5" fill="#2a5fd6"/></svg>'
   );
 
 // What the gallery shows for a published style, unlike a fresh capture.
 export const GALLERY_PUBLISHED_SCREENSHOT =
   'data:image/svg+xml,' +
   encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 10"><rect width="16" height="10" fill="#1a1b26"/><rect x="2" y="2" width="9" height="1.5" fill="#7aa2f7"/></svg>'
+    '<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 16 10"><rect width="16" height="10" fill="#1a1b26"/><rect x="2" y="2" width="9" height="1.5" fill="#7aa2f7"/></svg>'
   );
 
 type Callback = (response?: unknown) => void;

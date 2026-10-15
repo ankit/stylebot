@@ -4,6 +4,9 @@
       <s-text as="span" size="label" variant="muted">
         {{ t('screenshot') }}
       </s-text>
+      <s-link-button v-if="screenshot" class="review" @click="$emit('review')">
+        {{ t('review') }}
+      </s-link-button>
       <s-icon-button
         v-if="screenshot"
         class="retake"
@@ -16,9 +19,15 @@
       </s-icon-button>
     </div>
 
-    <div v-if="screenshot" class="screenshot">
+    <button
+      v-if="screenshot"
+      type="button"
+      class="screenshot reviewable"
+      :aria-label="t('review_screenshot')"
+      @click="$emit('review')"
+    >
       <img :src="screenshot" :alt="t('screenshot')" />
-    </div>
+    </button>
 
     <div v-else class="screenshot empty">
       <s-text as="span" variant="muted" class="empty-text">
@@ -34,12 +43,12 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SButton, SIconButton, SText } from '@stylebot/components';
+import { SButton, SIconButton, SLinkButton, SText } from '@stylebot/components';
 import { CameraIcon } from '@stylebot/icons';
 
 /**
  * The style's screenshot for the Gallery, or a way to take one. Emits
- * `capture` to take it, or take it again.
+ * `capture` to take it, or take it again, and `review` to check and blur it.
  */
 export default Vue.extend({
   name: 'ScreenshotField',
@@ -47,6 +56,7 @@ export default Vue.extend({
   components: {
     SButton,
     SIconButton,
+    SLinkButton,
     SText,
     CameraIcon,
   },
@@ -80,6 +90,12 @@ export default Vue.extend({
   justify-content: space-between;
 }
 
+.field-heading .review {
+  margin-left: auto;
+  margin-right: 10px;
+  font-size: 13px;
+}
+
 .field-heading .retake {
   margin: -8px -6px -8px 0;
   color: var(--text-muted);
@@ -102,6 +118,15 @@ export default Vue.extend({
     object-fit: cover;
     object-position: top center;
   }
+}
+
+.reviewable {
+  @include button-reset;
+
+  border: 1px solid var(--panel-border);
+  cursor: zoom-in;
+
+  @include focus-ring(2px);
 }
 
 .screenshot.empty {

@@ -143,6 +143,12 @@ export type PageBridge = {
   getSelectorAlternatives(selector: string): Promise<SelectorAlternatives>;
 
   /**
+   * Shows a screenshot over the page for the user to check and blur, and
+   * resolves with the edited image, or null when they cancel.
+   */
+  reviewScreenshot(screenshot: string): Promise<string | null>;
+
+  /**
    * Asks the page to show its own panel again, docked on the given side;
    * a no-op for the in-page host.
    */
