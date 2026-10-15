@@ -11,7 +11,7 @@ export const GALLERY_API_URL =
 export const getGalleryUrl = (path: string): string =>
   new URL(path, GALLERY_API_URL).href;
 
-const GALLERY_SITE_URL = 'https://gallery.stylebot.dev';
+export const GALLERY_SITE_URL = 'https://gallery.stylebot.dev';
 
 /**
  * A style's page on the gallery site.

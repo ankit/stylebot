@@ -9,6 +9,7 @@ export { default as SIconButton } from './SIconButton.vue';
 export { default as SCopyButton } from './SCopyButton.vue';
 export { default as SButton } from './SButton.vue';
 export { default as SLinkButton } from './SLinkButton.vue';
+export { default as SExternalLink } from './SExternalLink.vue';
 export { default as SAnchoredMenu } from './SAnchoredMenu.vue';
 export { default as SMenuItem } from './SMenuItem.vue';
 export { default as SMenuDivider } from './SMenuDivider.vue';

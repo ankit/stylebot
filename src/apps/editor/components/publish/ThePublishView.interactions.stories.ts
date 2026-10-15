@@ -138,15 +138,31 @@ export const SignsInThenPublishes: StoryObj = {
       },
     },
   }),
-  name: 'Signing in shows the form, and publishing lists what the Gallery took out',
+  name: 'Signing in unlocks the form behind it, and publishing lists what the Gallery took out',
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
 
-    await step('sign in with Google', async () => {
-      await user.click(
-        await canvas.findByRole('button', { name: 'Sign in with Google' })
+    await step('signed out, the form waits behind sign-in', async () => {
+      const signIn = await canvas.findByRole('button', {
+        name: 'Sign in with Google to publish',
+      });
+
+      await expect(
+        canvasElement.querySelector('.publish-view .form')
+      ).toHaveAttribute('inert');
+
+      await user.click(signIn);
+    });
+
+    await step('signed in, the form unlocks in place', async () => {
+      await waitFor(() =>
+        expect(
+          canvasElement.querySelector('.publish-view .form')
+        ).not.toHaveAttribute('inert')
       );
-      await canvas.findByLabelText('Name');
+      await expect(
+        canvas.queryByRole('button', { name: 'Sign in with Google to publish' })
+      ).toBeNull();
     });
 
     await step('publish waits for a screenshot and a name', async () => {
