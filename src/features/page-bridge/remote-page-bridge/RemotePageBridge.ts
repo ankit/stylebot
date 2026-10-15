@@ -294,6 +294,14 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
     return this.request('getPageDeclarations', selector);
   }
 
+  /**
+   * Shows the review in the page, bringing its tab forward first.
+   */
+  reviewScreenshot(screenshot: string): Promise<string | null> {
+    this.focusPage();
+    return this.request('reviewScreenshot', screenshot);
+  }
+
   openInPage(dockLocation: 'left' | 'right'): void {
     this.send({ type: 'openInPage', dockLocation });
   }

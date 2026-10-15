@@ -74,6 +74,9 @@ import {
 } from './undo-stack';
 import type { UndoMerge, UndoMove } from './undo-stack';
 
+// Settles the screenshot review open over the page.
+let finishReview: ((screenshot: string | null) => void) | null = null;
+
 export type ApplyCssArgs = {
   css: string;
   // Groups rapid changes into one undo step: a drag or a burst of
@@ -296,6 +299,31 @@ export default {
     } finally {
       commit('setCapturing', false);
     }
+  },
+
+  /**
+   * Shows a screenshot over the page for review, resolving with the blurred
+   * image, or null when nothing was blurred or another review replaced it.
+   */
+  reviewScreenshot(
+    { commit }: { commit: Commit },
+    screenshot: string
+  ): Promise<string | null> {
+    finishReview?.(null);
+    commit('setScreenshotReview', screenshot);
+
+    return new Promise(resolve => {
+      finishReview = resolve;
+    });
+  },
+
+  finishScreenshotReview(
+    { commit }: { commit: Commit },
+    screenshot: string | null
+  ): void {
+    commit('setScreenshotReview', null);
+    finishReview?.(screenshot);
+    finishReview = null;
   },
 
   async loadPublishedGalleryStyle({
