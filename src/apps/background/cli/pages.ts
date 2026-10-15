@@ -6,11 +6,9 @@ import {
   serializeTab,
   waitForLoad,
 } from './cli-window';
+import { captureTab } from '../capture-tab';
 import { inspectTab, requireNamed, resolveTab } from './targets';
 import type { CliCommands } from './types';
-
-// Chrome rate-limits captureVisibleTab, and a freshly activated tab needs a frame to paint.
-const PAINT_DELAY_MS = 300;
 
 export const pageCommands: CliCommands = {
   async open({ url, forceNew }) {
@@ -60,26 +58,9 @@ export const pageCommands: CliCommands = {
 
   async screenshot({ tab }) {
     requireNamed(tab, 'tab');
-    const { id, windowId, active } = await resolveTab(tab);
+    const target = await resolveTab(tab);
 
-    if (active) {
-      return chrome.tabs.captureVisibleTab(windowId, { format: 'png' });
-    }
-
-    // Chrome only captures a window's shown tab: show it just for the capture.
-    const [shown] = await chrome.tabs.query({ active: true, windowId });
-    await chrome.tabs.update(id as number, { active: true });
-
-    try {
-      await new Promise(resolve => setTimeout(resolve, PAINT_DELAY_MS));
-      return await chrome.tabs.captureVisibleTab(windowId, { format: 'png' });
-    } finally {
-      if (shown?.id !== undefined) {
-        await chrome.tabs
-          .update(shown.id, { active: true })
-          .catch(() => undefined);
-      }
-    }
+    return captureTab(target);
   },
 
   async done() {

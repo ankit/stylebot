@@ -4,6 +4,13 @@ import type { StylebotCommands } from './commands';
 import type { ReadabilitySettings } from './readability';
 import type { GoogleDriveSyncMetadata } from './sync';
 import type { RestoreResult, VersionHistory } from './history';
+import type {
+  GalleryAuthor,
+  GalleryPublished,
+  GalleryPublishedStyle,
+  GalleryResult,
+  GalleryStyle,
+} from './gallery';
 
 export type GetAllOptionsResponse = StylebotOptions;
 export type GetOptionResponse = StylebotOptions[keyof StylebotOptions];
@@ -63,6 +70,25 @@ export type GetIsEditorWindowOpenResponse = boolean;
 export type OpenEditorSidePanelResponse = boolean;
 export type RestoreTabResponse = { ok: true };
 
+// The account is null while signed out, which only getting it reports.
+export type GalleryAccountResponse = GalleryResult<{
+  account: GalleryAuthor | null;
+}>;
+export type GetMyGalleryStylesResponse = GalleryResult<{
+  styles: Array<GalleryStyle>;
+  // The style published from this Stylebot style and profile, if still listed.
+  publishedId: string | null;
+}>;
+// The screenshot is a data URL.
+export type GalleryScreenshotResponse = GalleryResult<{ screenshot: string }>;
+export type PublishToGalleryResponse = GalleryResult<{
+  style: GalleryPublishedStyle;
+}>;
+export type UnpublishFromGalleryResponse = GalleryResult;
+export type GetPublishedGalleryStyleResponse = {
+  published: GalleryPublished | null;
+};
+
 type BackgroundPageMessageResponse =
   | GetAllOptionsResponse
   | GetOptionResponse
@@ -85,6 +111,12 @@ type BackgroundPageMessageResponse =
   | AddRecentColorResponse
   | GetIsEditorWindowOpenResponse
   | OpenEditorSidePanelResponse
-  | RestoreTabResponse;
+  | RestoreTabResponse
+  | GalleryAccountResponse
+  | GetMyGalleryStylesResponse
+  | GalleryScreenshotResponse
+  | PublishToGalleryResponse
+  | UnpublishFromGalleryResponse
+  | GetPublishedGalleryStyleResponse;
 
 export default BackgroundPageMessageResponse;
