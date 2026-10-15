@@ -17,6 +17,7 @@
           :screenshot="screenshot"
           :capturing="capturing"
           @capture="capture"
+          @review="review"
         />
 
         <style-details-fields
@@ -76,6 +77,7 @@ import {
   SLinkButton,
 } from '@stylebot/components';
 import { getGalleryStyleUrl, hashCss } from '@stylebot/gallery';
+import { getPageBridge } from '@stylebot/page-bridge';
 import type {
   GalleryAuthor,
   GalleryFailure,
@@ -297,11 +299,36 @@ export default Vue.extend({
       this.screenshot = response.screenshot;
       this.tookScreenshot = true;
       this.compress(response.screenshot);
+      this.review();
     },
 
     /**
-     * Shrinks a capture to fit the gallery's limit while it's on show, unless
-     * another capture replaces it meanwhile.
+     * Opens the screenshot over the page, where there's room to check it and
+     * blur anything private, and keeps what the user blurred.
+     */
+    async review(): Promise<void> {
+      const blurred = await getPageBridge()
+        .reviewScreenshot(this.screenshot)
+        .catch(() => null);
+
+      // The review took the window's user to the page; bring them back.
+      if (this.$store.state.host === 'window') {
+        chrome.windows
+          .getCurrent()
+          .then(({ id }) => id && chrome.windows.update(id, { focused: true }))
+          .catch(() => undefined);
+      }
+
+      if (blurred) {
+        this.screenshot = blurred;
+        this.tookScreenshot = true;
+        this.compress(blurred);
+      }
+    },
+
+    /**
+     * Shrinks a screenshot to fit the gallery's limit while it's on show,
+     * unless another capture or a blur replaces it meanwhile.
      */
     async compress(screenshot: string): Promise<void> {
       this.compressing = true;

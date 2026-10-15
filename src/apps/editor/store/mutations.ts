@@ -161,6 +161,10 @@ export default {
     state.capturing = value;
   },
 
+  setScreenshotReview(state: State, value: string | null): void {
+    state.screenshotReview = value;
+  },
+
   setPublishedGalleryStyle(state: State, value: GalleryPublished | null): void {
     state.publishedGalleryStyle = value;
   },

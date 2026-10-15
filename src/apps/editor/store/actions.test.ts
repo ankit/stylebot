@@ -38,6 +38,7 @@ const mockBridge = {
   getAppliedDeclarations: jest.fn(),
   getPageDeclarations: jest.fn(),
   getSelectorAlternatives: jest.fn(),
+  reviewScreenshot: jest.fn(),
   countMatches: jest.fn(),
   openInPage: jest.fn(),
   focusPage: jest.fn(),
@@ -1041,6 +1042,38 @@ describe('actions', () => {
       expect(mockCommit).toBeCalledWith('setComputedStyles', {
         'font-size': '20px',
       });
+    });
+  });
+
+  describe('reviewScreenshot', () => {
+    it('resolves with what the review hands back', async () => {
+      const review = actions.reviewScreenshot(
+        { commit: mockCommit },
+        'data:image/png;base64,a'
+      );
+
+      expect(mockCommit).toHaveBeenCalledWith(
+        'setScreenshotReview',
+        'data:image/png;base64,a'
+      );
+
+      actions.finishScreenshotReview(
+        { commit: mockCommit },
+        'data:image/webp;base64,b'
+      );
+
+      await expect(review).resolves.toBe('data:image/webp;base64,b');
+      expect(mockCommit).toHaveBeenLastCalledWith('setScreenshotReview', null);
+    });
+
+    it('settles an open review with null when another replaces it', async () => {
+      const first = actions.reviewScreenshot({ commit: mockCommit }, 'first');
+      const second = actions.reviewScreenshot({ commit: mockCommit }, 'second');
+
+      await expect(first).resolves.toBeNull();
+
+      actions.finishScreenshotReview({ commit: mockCommit }, null);
+      await expect(second).resolves.toBeNull();
     });
   });
 });

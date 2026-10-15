@@ -69,12 +69,27 @@ const publishButton = (
   name = 'Publish'
 ): HTMLElement => canvas.getByRole('button', { name });
 
+/**
+ * Closes the review a new screenshot opens over the page, keeping it as is.
+ */
+const closeReview = async (canvas: ReturnType<typeof within>) => {
+  const review = within(
+    await canvas.findByRole('dialog', { name: 'Review screenshot' })
+  );
+
+  await user.click(review.getByRole('button', { name: 'Cancel' }));
+  await waitFor(() => expect(canvas.queryByRole('dialog')).toBeNull());
+};
+
 const takeScreenshot = async (canvas: ReturnType<typeof within>) => {
   await user.click(
     await canvas.findByRole('button', { name: 'Take screenshot' })
   );
-  await canvas.findByRole('img', { name: 'Screenshot' });
+  await closeReview(canvas);
 };
+
+const screenshotSrc = (canvas: ReturnType<typeof within>) =>
+  canvas.getByRole('img', { name: 'Screenshot' }).getAttribute('src');
 
 export const OpensFromTheMoreMenu: StoryObj = {
   ...editor(WITH_RULE),
@@ -177,6 +192,7 @@ export const UpdatesWhatWasPublished: StoryObj = {
           name: 'Take a new screenshot of this tab',
         })
       );
+      await closeReview(canvas);
       await waitFor(() =>
         expect(
           canvas.getByRole('img', { name: 'Screenshot' })
@@ -202,6 +218,73 @@ export const WaitsForTheCompressedScreenshot: StoryObj = {
     await user.type(canvas.getByLabelText('Name'), 'Night reading');
 
     await expect(publishButton(canvas)).toBeDisabled();
+  },
+};
+
+export const BlursInTheReview: StoryObj = {
+  ...publishView({ account }),
+  name: 'A new screenshot opens for review, and what is blurred there is kept',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    let review: ReturnType<typeof within>;
+
+    await step('taking a screenshot opens the review', async () => {
+      await user.click(
+        await canvas.findByRole('button', { name: 'Take screenshot' })
+      );
+      review = within(
+        await canvas.findByRole('dialog', { name: 'Review screenshot' })
+      );
+    });
+
+    await step('drag over part of it to blur it', async () => {
+      const image = review.getByRole('img', {
+        name: 'Screenshot',
+      }) as HTMLImageElement;
+      await image.decode();
+      const { left, top, width, height } = image.getBoundingClientRect();
+
+      await user.pointer([
+        {
+          keys: '[MouseLeft>]',
+          target: image,
+          coords: { clientX: left + width * 0.1, clientY: top + height * 0.1 },
+        },
+        {
+          target: image,
+          coords: { clientX: left + width * 0.6, clientY: top + height * 0.4 },
+        },
+        { keys: '[/MouseLeft]', target: image },
+      ]);
+
+      await review.findByRole('button', { name: 'Remove blur' });
+    });
+
+    await step('Done keeps the blurred screenshot', async () => {
+      const before = review
+        .getByRole('img', { name: 'Screenshot' })
+        .getAttribute('src');
+
+      await user.click(review.getByRole('button', { name: 'Done' }));
+      await waitFor(() => expect(canvas.queryByRole('dialog')).toBeNull());
+      await waitFor(() => expect(screenshotSrc(canvas)).not.toBe(before));
+    });
+  },
+};
+
+export const ReviewsAgainFromTheField: StoryObj = {
+  ...publishView({ account }),
+  name: 'Review opens the screenshot again, and Cancel keeps it',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await takeScreenshot(canvas);
+    const before = screenshotSrc(canvas);
+
+    await user.click(canvas.getByRole('button', { name: 'Review' }));
+    await closeReview(canvas);
+
+    await expect(screenshotSrc(canvas)).toBe(before);
   },
 };
 

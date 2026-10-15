@@ -94,6 +94,8 @@ export type State = {
   publishing: boolean;
   // Page host: hides the panel while the page is captured for the gallery.
   capturing: boolean;
+  // The screenshot being reviewed over the page, whichever host asked.
+  screenshotReview: string | null;
   // What this style's profile last published to the gallery, if anything.
   publishedGalleryStyle: GalleryPublished | null;
   visible: boolean;
@@ -141,6 +143,7 @@ export const createStore = (host: EditorHost): Store<State> => {
       help: false,
       publishing: false,
       capturing: false,
+      screenshotReview: null,
       publishedGalleryStyle: null,
       visible: false,
       inspecting: false,

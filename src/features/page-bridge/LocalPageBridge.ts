@@ -76,16 +76,25 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
   private previewer: Highlighter;
   private unwatchHover: (() => void) | null = null;
   private getStylebotCss: () => string;
+  private showScreenshotReview: (screenshot: string) => Promise<string | null>;
   // The element behind the last pick, which a broad selector's first match
   // may not be.
   private pickedElement: HTMLElement | null = null;
   // The element under the inspector while picking.
   private hoveredElement: HTMLElement | null = null;
 
-  constructor({ getStylebotCss }: { getStylebotCss: () => string }) {
+  constructor({
+    getStylebotCss,
+    reviewScreenshot,
+  }: {
+    getStylebotCss: () => string;
+    // Shows the review over this page; the editor UI provides it.
+    reviewScreenshot: (screenshot: string) => Promise<string | null>;
+  }) {
     super();
 
     this.getStylebotCss = getStylebotCss;
+    this.showScreenshotReview = reviewScreenshot;
 
     this.inspector = new Highlighter({
       onSelect: selector => {
@@ -281,6 +290,10 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
     const el = this.elementFor(selector);
 
     return Promise.resolve(el ? getPageDeclarations(el) : []);
+  }
+
+  reviewScreenshot(screenshot: string): Promise<string | null> {
+    return this.showScreenshotReview(screenshot);
   }
 
   openInPage(): void {

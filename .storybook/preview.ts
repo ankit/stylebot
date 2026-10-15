@@ -24,15 +24,12 @@ Vue.use(Vuex);
 Vue.mixin({ methods: { t } });
 installChrome();
 
-// The canvas is the "page"; the bridge reads the mounted story's css like the
-// content script reads its store's.
-const mountedStoryCss = (): string => {
-  const app = document.querySelector<HTMLElement & { __vue__?: Vue }>(
+// The canvas is the "page"; the bridge uses the mounted story's store like
+// the content script uses its own.
+const mountedStoryStore = () =>
+  document.querySelector<HTMLElement & { __vue__?: Vue }>(
     '#storybook-root .stylebot-app'
-  );
-
-  return app?.__vue__?.$store?.state.css ?? '';
-};
+  )?.__vue__?.$store;
 
 // One bridge per story, or highlighter overlays and listeners outlive it.
 let pageBridge: LocalPageBridge | null = null;
@@ -42,7 +39,11 @@ let pageBridge: LocalPageBridge | null = null;
 const resetPageBridge = (overrides: Partial<PageBridge> = {}): void => {
   pageBridge?.stopInspecting();
   pageBridge?.unhighlight();
-  pageBridge = new LocalPageBridge({ getStylebotCss: mountedStoryCss });
+  pageBridge = new LocalPageBridge({
+    getStylebotCss: () => mountedStoryStore()?.state.css ?? '',
+    reviewScreenshot: async screenshot =>
+      mountedStoryStore()?.dispatch('reviewScreenshot', screenshot) ?? null,
+  });
   Object.assign(pageBridge, overrides);
   setPageBridge(pageBridge);
 };
