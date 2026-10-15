@@ -1,6 +1,8 @@
 import type { StylebotLayout } from '@stylebot/types';
 import {
   configureEditorSidePanel,
+  detectChromiumVariant,
+  doesSidePanelWorkInChromiumVariant,
   supportsEditorSidePanel,
 } from '@stylebot/utils';
 
@@ -10,11 +12,15 @@ import { get as getOption } from './options';
  * Sets up the editor's side panel on the given tabs, or every tab, while the
  * side panel is the dock, and takes it away otherwise. The toggle shortcut
  * relies on this: it has to open the panel before it could read the dock.
+ * Left alone where the panel won't show, as Vivaldi opens it for any change.
  */
 export const configureSidePanelTabs = async (
   tabs?: Array<chrome.tabs.Tab>
 ): Promise<void> => {
-  if (!supportsEditorSidePanel()) {
+  if (
+    !supportsEditorSidePanel() ||
+    !doesSidePanelWorkInChromiumVariant(await detectChromiumVariant())
+  ) {
     return;
   }
 
