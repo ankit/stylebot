@@ -49,7 +49,7 @@
 
         <div class="status" :class="{ connected }" role="status">
           <span class="status-badge" aria-hidden="true">
-            <span class="status-dot" />
+            <s-status-dot :tone="connected ? 'success' : 'warning'" :size="8" />
           </span>
           {{ connected ? t('connected') : t('waiting_for_connection') }}
         </div>
@@ -61,7 +61,12 @@
 <script lang="ts">
 import Vue from 'vue';
 
-import { SListItem, SToggleSwitch, SText } from '@stylebot/components';
+import {
+  SListItem,
+  SStatusDot,
+  SText,
+  SToggleSwitch,
+} from '@stylebot/components';
 import {
   getCliConnected,
   hasCliPermissions,
@@ -81,6 +86,7 @@ export default Vue.extend({
   name: 'TheCliAccess',
 
   components: {
+    SStatusDot,
     BasicsSection,
     CliCommand,
     SListItem,
@@ -268,17 +274,6 @@ export default Vue.extend({
 
   .connected & {
     background: var(--success-background);
-  }
-}
-
-.status-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--warning);
-
-  .connected & {
-    background: var(--success);
   }
 }
 </style>

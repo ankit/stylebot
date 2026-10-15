@@ -23,6 +23,8 @@ export { default as STabs } from './STabs.vue';
 export { default as SSelect } from './SSelect.vue';
 export { default as SNumberField } from './SNumberField.vue';
 export { default as SBadge } from './SBadge.vue';
+export { default as SStatusDot } from './SStatusDot.vue';
+export { default as SCallout } from './SCallout.vue';
 export { default as SCard } from './SCard.vue';
 export { default as SList } from './SList.vue';
 export { default as SListItem } from './SListItem.vue';

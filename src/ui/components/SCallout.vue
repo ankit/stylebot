@@ -1,5 +1,5 @@
 <template>
-  <div :class="['banner', variant]">
+  <div class="callout" :class="tone" :role="tone === 'danger' ? 'alert' : null">
     <div class="message">
       <slot />
     </div>
@@ -18,14 +18,18 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-
-import { SIconButton } from '@stylebot/components';
 import { XIcon } from '@stylebot/icons';
 
-export type BannerVariant = 'success' | 'error';
+import SIconButton from './SIconButton.vue';
 
+type Tone = 'info' | 'warning' | 'danger';
+
+/**
+ * A tinted box for a message that sits in the flow of a page, such as an
+ * error. Listening to `dismiss` adds a close button.
+ */
 export default Vue.extend({
-  name: 'SyncStatusBanner',
+  name: 'SCallout',
 
   components: {
     SIconButton,
@@ -33,23 +37,24 @@ export default Vue.extend({
   },
 
   props: {
-    variant: {
-      type: String as PropType<BannerVariant>,
-      default: 'success',
+    tone: {
+      type: String as PropType<Tone>,
+      default: 'info',
     },
   },
 });
 </script>
 
 <style lang="scss" scoped>
-.banner {
+.callout {
   display: flex;
   align-items: flex-start;
   gap: 8px;
   padding: 10px 14px;
+  border: 1px solid transparent;
   border-radius: 9px;
   font-size: 13px;
-  margin-bottom: 16px;
+  line-height: 1.45;
 }
 
 .message {
@@ -61,15 +66,21 @@ export default Vue.extend({
   margin: -1px -6px -1px 0;
 }
 
-.banner.success {
-  background: var(--info);
-  border: 1px solid var(--info-border);
+.info {
+  border-color: var(--info-border);
   color: var(--text-primary);
+  background: var(--info);
 }
 
-.banner.error {
-  background: var(--danger-background);
-  border: 1px solid var(--danger-border);
+.warning {
+  border-color: var(--warning-border);
+  color: var(--text-body);
+  background: var(--warning-background);
+}
+
+.danger {
+  border-color: var(--danger-border);
   color: var(--danger);
+  background: var(--danger-background);
 }
 </style>
