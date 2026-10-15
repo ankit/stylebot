@@ -13,6 +13,10 @@ export {
 
 export { runGoogleDriveSync } from './google-drive/sync';
 export {
+  default as getGoogleAccessToken,
+  clearCachedToken as clearGoogleAccessToken,
+} from './google-drive/get-access-token';
+export {
   handleSignInRedirect,
   isSignInRedirect,
 } from './google-drive/redirect-rule-sign-in';

@@ -253,6 +253,67 @@ export type RestoreTab = {
   tabId: number;
 };
 
+export type GetGalleryAccount = {
+  name: 'GetGalleryAccount';
+};
+
+export type SignInToGallery = {
+  name: 'SignInToGallery';
+};
+
+export type GetMyGalleryStyles = {
+  name: 'GetMyGalleryStyles';
+  site: string;
+  // The Stylebot style and profile, to find the one published from them.
+  url: string;
+  profileId: string;
+};
+
+// Leave out tabId to capture the tab the message came from. Returns the
+// capture as taken; CompressGalleryScreenshot makes it fit the gallery's limit.
+export type CaptureGalleryScreenshot = {
+  name: 'CaptureGalleryScreenshot';
+  tabId?: number;
+};
+
+export type CompressGalleryScreenshot = {
+  name: 'CompressGalleryScreenshot';
+  screenshot: string;
+};
+
+export type PublishToGallery = {
+  name: 'PublishToGallery';
+  // Set to publish a new version of this gallery style.
+  styleId?: string;
+  site: string;
+  url: string;
+  profileId: string;
+  title: string;
+  description: string;
+  // What changed; sent only with a new version.
+  notes: string;
+  css: string;
+  // A data URL, as CaptureGalleryScreenshot returns it.
+  screenshot: string;
+};
+
+export type UnpublishFromGallery = {
+  name: 'UnpublishFromGallery';
+  id: string;
+};
+
+export type SetGalleryDisplayName = {
+  name: 'SetGalleryDisplayName';
+  // The alias; empty for anonymous.
+  displayName: string;
+};
+
+export type GetPublishedGalleryStyle = {
+  name: 'GetPublishedGalleryStyle';
+  url: string;
+  profileId: string;
+};
+
 type BackgroundPageMessage =
   | SetStyle
   | EnableStyle
@@ -297,6 +358,15 @@ type BackgroundPageMessage =
   | EditorSidePanelOpened
   | ReloadForSidePanelGrant
   | RunPageCommand
-  | RestoreTab;
+  | RestoreTab
+  | GetGalleryAccount
+  | SignInToGallery
+  | GetMyGalleryStyles
+  | CaptureGalleryScreenshot
+  | CompressGalleryScreenshot
+  | PublishToGallery
+  | UnpublishFromGallery
+  | SetGalleryDisplayName
+  | GetPublishedGalleryStyle;
 
 export default BackgroundPageMessage;

@@ -66,6 +66,17 @@ import {
   SYNC_ISSUE_KEYS,
 } from '@stylebot/sync';
 import { syncStyles } from './sync';
+import {
+  GetGalleryAccount,
+  SignInToGallery,
+  GetMyGalleryStyles,
+  CaptureGalleryScreenshot,
+  CompressGalleryScreenshot,
+  PublishToGallery,
+  UnpublishFromGallery,
+  SetGalleryDisplayName,
+  GetPublishedGalleryStyle,
+} from './gallery';
 
 import type {
   TabUpdated,
@@ -376,6 +387,34 @@ export const initListeners = (): void => {
           break;
         case 'RestoreTab':
           restoreTab(message.tabId).then(() => sendResponse({ ok: true }));
+          return true;
+
+        case 'GetGalleryAccount':
+          GetGalleryAccount(sendResponse);
+          return true;
+        case 'SignInToGallery':
+          SignInToGallery(sendResponse);
+          return true;
+        case 'GetMyGalleryStyles':
+          GetMyGalleryStyles(message, sendResponse);
+          return true;
+        case 'CaptureGalleryScreenshot':
+          CaptureGalleryScreenshot(message, sender, sendResponse);
+          return true;
+        case 'CompressGalleryScreenshot':
+          CompressGalleryScreenshot(message, sendResponse);
+          return true;
+        case 'PublishToGallery':
+          PublishToGallery(message, sendResponse);
+          return true;
+        case 'UnpublishFromGallery':
+          UnpublishFromGallery(message, sendResponse);
+          return true;
+        case 'SetGalleryDisplayName':
+          SetGalleryDisplayName(message, sendResponse);
+          return true;
+        case 'GetPublishedGalleryStyle':
+          GetPublishedGalleryStyle(message, sendResponse);
           return true;
       }
 
