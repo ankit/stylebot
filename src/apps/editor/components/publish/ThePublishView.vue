@@ -305,6 +305,11 @@ export default Vue.extend({
     },
 
     async capture(): Promise<void> {
+      const previous = {
+        screenshot: this.screenshot,
+        tookScreenshot: this.tookScreenshot,
+      };
+
       this.capturing = true;
 
       const response = await this.$store.dispatch('captureGalleryScreenshot');
@@ -318,17 +323,25 @@ export default Vue.extend({
       this.screenshot = response.screenshot;
       this.tookScreenshot = true;
       this.compress(response.screenshot);
-      this.review();
+
+      // Cancelling the review of a new capture throws the capture away.
+      if (!(await this.review())) {
+        this.screenshot = previous.screenshot;
+        this.tookScreenshot = previous.tookScreenshot;
+        this.compressing = false;
+      }
     },
 
     /**
      * Opens the screenshot over the page, where there's room to check it and
-     * blur anything private, and keeps what the user blurred.
+     * blur anything private, and keeps what the user blurred. Resolves with
+     * whether they kept it rather than cancelling.
      */
-    async review(): Promise<void> {
-      const blurred = await getPageBridge()
-        .reviewScreenshot(this.screenshot)
-        .catch(() => null);
+    async review(): Promise<boolean> {
+      const shown = this.screenshot;
+      const reviewed = await getPageBridge()
+        .reviewScreenshot(shown)
+        .catch(() => shown);
 
       // The review took the window's user to the page; bring them back.
       if (this.$store.state.host === 'window') {
@@ -338,11 +351,17 @@ export default Vue.extend({
           .catch(() => undefined);
       }
 
-      if (blurred) {
-        this.screenshot = blurred;
-        this.tookScreenshot = true;
-        this.compress(blurred);
+      if (!reviewed) {
+        return false;
       }
+
+      if (reviewed !== shown) {
+        this.screenshot = reviewed;
+        this.tookScreenshot = true;
+        this.compress(reviewed);
+      }
+
+      return true;
     },
 
     /**

@@ -1048,7 +1048,7 @@ describe('actions', () => {
   describe('reviewScreenshot', () => {
     it('resolves with what the review hands back', async () => {
       const review = actions.reviewScreenshot(
-        { commit: mockCommit },
+        { state: mockState, commit: mockCommit },
         'data:image/png;base64,a'
       );
 
@@ -1066,11 +1066,20 @@ describe('actions', () => {
       expect(mockCommit).toHaveBeenLastCalledWith('setScreenshotReview', null);
     });
 
-    it('settles an open review with null when another replaces it', async () => {
-      const first = actions.reviewScreenshot({ commit: mockCommit }, 'first');
-      const second = actions.reviewScreenshot({ commit: mockCommit }, 'second');
+    it('keeps the screenshot of a review another replaces', async () => {
+      const first = actions.reviewScreenshot(
+        { state: mockState, commit: mockCommit },
+        'first'
+      );
+      const second = actions.reviewScreenshot(
+        {
+          state: { ...mockState, screenshotReview: 'first' },
+          commit: mockCommit,
+        },
+        'second'
+      );
 
-      await expect(first).resolves.toBeNull();
+      await expect(first).resolves.toBe('first');
 
       actions.finishScreenshotReview({ commit: mockCommit }, null);
       await expect(second).resolves.toBeNull();

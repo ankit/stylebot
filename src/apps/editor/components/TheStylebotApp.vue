@@ -5,7 +5,7 @@
     <screenshot-review
       v-if="screenshotReview"
       :screenshot="screenshotReview"
-      @close="$store.dispatch('finishScreenshotReview', null)"
+      @cancel="$store.dispatch('finishScreenshotReview', null)"
       @done="$store.dispatch('finishScreenshotReview', $event)"
     />
   </s-theme-provider>

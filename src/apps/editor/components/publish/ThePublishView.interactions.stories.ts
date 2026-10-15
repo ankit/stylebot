@@ -70,22 +70,28 @@ const publishButton = (
 ): HTMLElement => canvas.getByRole('button', { name });
 
 /**
- * Closes the review a new screenshot opens over the page, keeping it as is.
+ * Closes the review open over the page with Done or Cancel.
  */
-const closeReview = async (canvas: ReturnType<typeof within>) => {
+const closeReview = async (
+  canvas: ReturnType<typeof within>,
+  button: 'Done' | 'Cancel'
+) => {
   const review = within(
     await canvas.findByRole('dialog', { name: 'Review screenshot' })
   );
 
-  await user.click(review.getByRole('button', { name: 'Cancel' }));
+  await user.click(review.getByRole('button', { name: button }));
   await waitFor(() => expect(canvas.queryByRole('dialog')).toBeNull());
 };
 
+/**
+ * Takes a screenshot and keeps it as it is from the review that opens.
+ */
 const takeScreenshot = async (canvas: ReturnType<typeof within>) => {
   await user.click(
     await canvas.findByRole('button', { name: 'Take screenshot' })
   );
-  await closeReview(canvas);
+  await closeReview(canvas, 'Done');
 };
 
 const screenshotSrc = (canvas: ReturnType<typeof within>) =>
@@ -224,7 +230,7 @@ export const UpdatesWhatWasPublished: StoryObj = {
           name: 'Take a new screenshot of this tab',
         })
       );
-      await closeReview(canvas);
+      await closeReview(canvas, 'Done');
       await waitFor(() =>
         expect(
           canvas.getByRole('img', { name: 'Screenshot' })
@@ -314,9 +320,27 @@ export const ReviewsAgainFromTheField: StoryObj = {
     const before = screenshotSrc(canvas);
 
     await user.click(canvas.getByRole('button', { name: 'Review' }));
-    await closeReview(canvas);
+    await closeReview(canvas, 'Cancel');
 
     await expect(screenshotSrc(canvas)).toBe(before);
+  },
+};
+
+export const CancelDiscardsTheCapture: StoryObj = {
+  ...publishView({ account }),
+  name: 'Cancelling the review of a new screenshot throws it away',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await user.click(
+      await canvas.findByRole('button', { name: 'Take screenshot' })
+    );
+    await closeReview(canvas, 'Cancel');
+
+    await expect(
+      canvas.getByRole('button', { name: 'Take screenshot' })
+    ).toBeVisible();
+    await expect(canvas.queryByRole('img', { name: 'Screenshot' })).toBeNull();
   },
 };
 
