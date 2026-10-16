@@ -1,26 +1,25 @@
 <template>
   <section class="published">
     <div class="summary">
-      <span class="check"><check-icon :size="14" /></span>
-      <div class="summary-text">
-        <s-heading as="h2" size="md">
-          {{ t('version_number_is_live', [String(styleData.version)]) }}
-        </s-heading>
-        <s-text variant="muted">{{ detail }}</s-text>
-      </div>
+      <s-heading as="h2" size="md" class="status">
+        <s-status-dot tone="success" />
+        {{
+          t('version_number_is_live_in_the_gallery', [
+            String(styleData.version),
+          ])
+        }}
+      </s-heading>
+      <img class="screenshot" :src="screenshotUrl" :alt="t('screenshot')" />
     </div>
 
-    <img class="screenshot" :src="screenshotUrl" :alt="t('screenshot')" />
-
-    <div class="field">
-      <s-text as="span" size="label" variant="muted">{{ t('link') }}</s-text>
-      <div class="link-row">
+    <div class="link-field">
+      <s-tooltip :text="styleUrl" grow>
         <span class="link">
           <span class="link-base">{{ link.base }}</span>
           <span class="link-slug">{{ link.slug }}</span>
         </span>
-        <s-copy-button :text="styleUrl" />
-      </div>
+      </s-tooltip>
+      <s-copy-button :text="styleUrl" :label="t('copy')" />
     </div>
 
     <s-callout v-if="styleData.removed.length" tone="warning">
@@ -31,19 +30,32 @@
         </li>
       </ul>
     </s-callout>
+
+    <hr class="divider" />
+
+    <s-text variant="muted">
+      {{ t('edits_stay_on_your_device_until_you_publish_an_update') }}
+    </s-text>
   </section>
 </template>
 
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-import { SCallout, SCopyButton, SHeading, SText } from '@stylebot/components';
-import { CheckIcon } from '@stylebot/icons';
+import {
+  SCallout,
+  SCopyButton,
+  SHeading,
+  SStatusDot,
+  SText,
+  STooltip,
+} from '@stylebot/components';
 import { getGalleryStyleUrl, getGalleryUrl } from '@stylebot/gallery';
 import type { GalleryPublishedStyle } from '@stylebot/types';
 
 /**
- * What the gallery published, its link, and anything it took out of the CSS.
+ * What the gallery published, its link to copy, and anything it took out of
+ * the CSS.
  */
 export default Vue.extend({
   name: 'PublishedStyle',
@@ -52,8 +64,9 @@ export default Vue.extend({
     SCallout,
     SCopyButton,
     SHeading,
+    SStatusDot,
     SText,
-    CheckIcon,
+    STooltip,
   },
 
   props: {
@@ -64,15 +77,6 @@ export default Vue.extend({
   },
 
   computed: {
-    // An update reaches people who installed it; a new style is just out.
-    detail(): string {
-      if (this.styleData.version > 1) {
-        return this.t('installed_copies_update_within_a_day');
-      }
-
-      return this.t('anyone_can_install_it_from_the_gallery');
-    },
-
     screenshotUrl(): string {
       return getGalleryUrl(this.styleData.screenshot);
     },
@@ -81,7 +85,7 @@ export default Vue.extend({
       return getGalleryStyleUrl(this.styleData);
     },
 
-    // The link without its scheme, split so the style's own part stands out.
+    // The link without its scheme, split so the style's own part stays in view.
     link(): { base: string; slug: string } {
       const bare = this.styleUrl.replace(/^https?:\/\//, '');
       const slash = bare.lastIndexOf('/') + 1;
@@ -96,32 +100,20 @@ export default Vue.extend({
 .published {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
   margin: 0;
 }
 
 .summary {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 12px;
 }
 
-.check {
-  flex: none;
+.summary .status {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  border-radius: 15px;
-  color: var(--success);
-  background: var(--success-background);
-}
-
-.summary-text {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+  gap: 8px;
 }
 
 .screenshot {
@@ -131,39 +123,43 @@ export default Vue.extend({
   border: 1px solid var(--panel-border);
   border-radius: 8px;
   object-fit: cover;
-  object-position: top center;
+  object-position: top left;
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-}
+.link-field {
+  @include field-border(8px);
 
-.link-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 6px 6px 12px;
-  border-radius: 8px;
+  gap: 8px;
+  height: 36px;
+  box-sizing: border-box;
+  padding: 0 4px 0 10px;
   background: var(--field-surface);
 }
 
 .link {
-  flex: 1;
-  min-width: 0;
-  font-size: 14px;
-  line-height: 1.4;
-  overflow-wrap: anywhere;
+  display: flex;
+  font-size: 13px;
+  white-space: nowrap;
 }
 
 .link-base {
+  @include truncate;
+
+  min-width: 0;
   color: var(--text-muted);
 }
 
 .link-slug {
-  font-weight: 500;
+  flex: none;
   color: var(--text-primary);
+}
+
+.divider {
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--panel-border);
 }
 
 .removed-list {

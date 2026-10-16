@@ -1,40 +1,51 @@
 <template>
-  <popup-row
-    button
-    class="suggestion"
-    :disabled="disabled"
-    @click="$emit('preview')"
-  >
+  <div class="suggestion" :class="{ disabled }" @click="preview">
     <gallery-style-summary :style-data="styleData">
-      <s-text as="span" size="caption" variant="muted" class="meta">
-        {{ meta }}
+      <s-text
+        v-if="author || styleData.installs"
+        as="span"
+        size="caption"
+        variant="muted"
+        class="meta"
+      >
+        <span v-if="author" class="author">{{ author }}</span>
+        <span v-if="styleData.installs" class="installs" :title="installsTitle">
+          <download-icon :size="11" />
+          {{ installsCount }}
+        </span>
       </s-text>
     </gallery-style-summary>
-    <s-text as="span" size="caption" medium class="preview-hint">
+    <s-button
+      size="small"
+      class="preview-button"
+      :disabled="disabled"
+      @click.stop="preview"
+    >
       {{ t('preview') }}
-    </s-text>
-  </popup-row>
+    </s-button>
+  </div>
 </template>
 
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-import { SText } from '@stylebot/components';
+import { SButton, SText } from '@stylebot/components';
+import { DownloadIcon } from '@stylebot/icons';
 import type { GalleryStyle } from '@stylebot/types';
 
 import GalleryStyleSummary from './GalleryStyleSummary.vue';
-import PopupRow from './PopupRow.vue';
 
 /**
- * A suggested gallery style, with its author and installs. Emits `preview`
- * when clicked.
+ * A suggested gallery style, with its author and installs. Its Preview
+ * button, or a click anywhere on it, emits `preview`.
  */
 export default Vue.extend({
   name: 'GallerySuggestion',
 
   components: {
+    DownloadIcon,
     GalleryStyleSummary,
-    PopupRow,
+    SButton,
     SText,
   },
 
@@ -51,21 +62,31 @@ export default Vue.extend({
   },
 
   computed: {
-    meta(): string {
-      const { author, installs } = this.styleData;
-      const count = new Intl.NumberFormat(undefined, {
-        notation: 'compact',
-      }).format(installs);
-      const installsText = this.t(
-        installs === 1 ? 'installs_one' : 'installs_other',
-        [count]
+    author(): string {
+      return this.styleData.author.name ?? '';
+    },
+
+    // Short, as in 1.2K; the title has the whole number.
+    installsCount(): string {
+      return new Intl.NumberFormat(undefined, { notation: 'compact' }).format(
+        this.styleData.installs
       );
+    },
 
-      if (!author.name) {
-        return installsText;
+    installsTitle(): string {
+      const { installs } = this.styleData;
+
+      return this.t(installs === 1 ? 'installs_one' : 'installs_other', [
+        installs.toLocaleString(),
+      ]);
+    },
+  },
+
+  methods: {
+    preview(): void {
+      if (!this.disabled) {
+        this.$emit('preview');
       }
-
-      return `${author.name} · ${installsText}`;
     },
   },
 });
@@ -74,15 +95,52 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .meta {
   @include truncate;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
-.preview-hint {
-  flex: none;
-  visibility: hidden;
+.author {
+  @include truncate;
+}
 
-  .suggestion:hover &,
-  .suggestion:focus-visible & {
-    visibility: visible;
+.installs {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.suggestion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+
+  &:hover:not(.disabled) {
+    background: var(--hover-tint);
   }
+
+  &.disabled {
+    cursor: default;
+  }
+}
+
+.suggestion .preview-button {
+  flex: none;
+  opacity: 0;
+}
+
+.suggestion .preview-button.button.default:hover:not(:disabled) {
+  border-color: var(--text-faint);
+  background: var(--panel-surface);
+}
+
+.suggestion:hover .preview-button,
+.suggestion:focus-within .preview-button {
+  opacity: 1;
 }
 </style>

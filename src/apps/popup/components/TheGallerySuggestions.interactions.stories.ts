@@ -37,6 +37,22 @@ const previewPort = () => {
   return port.postMessage;
 };
 
+/**
+ * The suggestion row for a gallery style, found by its name.
+ */
+const suggestion = async (
+  canvas: ReturnType<typeof within>,
+  name: string
+): Promise<HTMLElement> =>
+  (await canvas.findByText(name)).closest('.suggestion') as HTMLElement;
+
+const preview = async (canvas: ReturnType<typeof within>, name: string) =>
+  user.click(
+    within(await suggestion(canvas, name)).getByRole('button', {
+      name: 'Preview',
+    })
+  );
+
 export const ListsSuggestions: StoryObj = {
   ...withSuggestions,
   name: "lists the site's popular Gallery styles with their author and installs",
@@ -44,12 +60,11 @@ export const ListsSuggestions: StoryObj = {
     const canvas = within(canvasElement);
 
     await canvas.findByText('Popular in Gallery');
-    await expect(
-      canvas.getByRole('button', { name: /Tokyo Night/ })
-    ).toHaveTextContent('maya · 1.2K installs');
-    await expect(
-      canvas.getByRole('button', { name: /Paper/ })
-    ).toHaveTextContent('1 install');
+    await expect(await suggestion(canvas, 'Tokyo Night')).toHaveTextContent(
+      /maya\s*1\.2K/
+    );
+    await expect(canvas.getByTitle('1,240 installs')).toBeVisible();
+    await expect(canvas.getByTitle('1 install')).toHaveTextContent('1');
   },
 };
 
@@ -62,9 +77,7 @@ export const PreviewsThenInstalls: StoryObj = {
     const install = spyOn(chrome.runtime, 'sendMessage');
 
     await step('preview', async () => {
-      await user.click(
-        await canvas.findByRole('button', { name: /Tokyo Night/ })
-      );
+      await preview(canvas, 'Tokyo Night');
 
       await canvas.findByText('Previewing on this page');
       await waitFor(() =>
@@ -101,7 +114,7 @@ export const CancelEndsThePreview: StoryObj = {
     const canvas = within(canvasElement);
     const sent = previewPort();
 
-    await user.click(await canvas.findByRole('button', { name: /Paper/ }));
+    await preview(canvas, 'Paper');
     await user.click(await canvas.findByRole('button', { name: 'Cancel' }));
 
     await expect(sent).toHaveBeenLastCalledWith({ preview: null });
@@ -124,7 +137,42 @@ export const LeavesOutInstalledProfiles: StoryObj = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    await canvas.findByRole('button', { name: /Paper/ });
-    await expect(canvas.queryByRole('button', { name: /^Dark/ })).toBeNull();
+    await suggestion(canvas, 'Paper');
+    await expect(
+      canvas.queryByText('Dark', { selector: '.suggestion *' })
+    ).toBeNull();
+  },
+};
+
+export const LeavesOutNoInstalls: StoryObj = {
+  ...popup({
+    styles: [style('example.com')],
+    defaultStyle: style('example.com'),
+    gallery: {
+      suggestions: [{ ...gallerySuggestions[0], installs: 0 }],
+    },
+  }),
+  name: 'a suggestion nobody has installed yet shows just its author',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const row = await suggestion(canvas, 'Tokyo Night');
+
+    await expect(row).toHaveTextContent('maya');
+    await expect(row.querySelector('.installs')).toBeNull();
+  },
+};
+
+export const BrowsesAll: StoryObj = {
+  ...withSuggestions,
+  name: "Browse all opens the site's styles in the Gallery",
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const link = await canvas.findByRole('link', { name: /Browse all/ });
+
+    await expect(link).toHaveAttribute(
+      'href',
+      'https://gallery.stylebot.dev/s/example.com'
+    );
+    await expect(link).toHaveAttribute('target', '_blank');
   },
 };

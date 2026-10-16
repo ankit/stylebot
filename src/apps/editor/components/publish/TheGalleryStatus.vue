@@ -1,35 +1,37 @@
 <template>
   <div v-if="published" class="gallery-status">
-    <span class="state">
-      <s-status-dot :tone="hasChanges ? 'warning' : 'success'" />
-      <a
-        v-if="!hasChanges && link"
-        class="published-link"
-        :href="link"
-        target="_blank"
-        rel="noopener"
-        :title="t('view_in_gallery')"
-      >
-        <s-text as="span" variant="muted">{{ t('published') }}</s-text>
+    <span v-if="!hasChanges" class="state">
+      <s-status-dot tone="success" />
+      {{ t('published') }}
+      <span class="separator">·</span>
+      <a class="version-link" :href="link" target="_blank" rel="noopener">
+        {{ t('version_number', [String(published.version)]) }}
+        <span class="arrow">↗</span>
       </a>
-      <s-text v-else as="span" variant="muted">{{ stateText }}</s-text>
     </span>
 
-    <s-button v-if="hasChanges" size="small" @click="openPublishing">
-      {{ t('publish') }}
-    </s-button>
+    <template v-else>
+      <span class="state">
+        <s-status-dot tone="warning" />
+        {{ t('unpublished_changes') }}
+      </span>
+      <s-button size="small" @click="openPublishing">
+        {{ t('publish_update') }}
+      </s-button>
+    </template>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { SButton, SStatusDot, SText } from '@stylebot/components';
+import { SButton, SStatusDot } from '@stylebot/components';
 import { getGalleryStyleUrl } from '@stylebot/gallery';
 import type { GalleryPublished } from '@stylebot/types';
 
 /**
- * A published style's gallery state under the editor: published, linking to
- * its gallery page, or with edits the gallery doesn't have yet.
+ * A published style's Gallery state under the editor: the live version,
+ * linking to its Gallery page, or edits the Gallery doesn't have yet with a
+ * way to publish them.
  */
 export default Vue.extend({
   name: 'TheGalleryStatus',
@@ -37,7 +39,6 @@ export default Vue.extend({
   components: {
     SButton,
     SStatusDot,
-    SText,
   },
 
   computed: {
@@ -47,14 +48,6 @@ export default Vue.extend({
 
     hasChanges(): boolean {
       return this.$store.getters.hasUnpublishedChanges;
-    },
-
-    stateText(): string {
-      if (this.hasChanges) {
-        return this.t('unpublished_changes');
-      }
-
-      return this.t('published');
     },
 
     link(): string {
@@ -77,27 +70,44 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  min-height: 52px;
-  padding: 10px 10px 10px 14px;
+  gap: 8px;
+  height: 40px;
+  padding: 0 6px 0 14px;
   border-top: 1px solid var(--panel-border);
-  background: var(--panel-surface);
 }
 
 .state {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 1;
+  color: var(--text-muted);
 }
 
-.published-link {
+.version-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: inherit;
   text-decoration: none;
 
-  &:hover .text {
+  &:hover {
     color: var(--text-primary);
-    text-decoration: underline;
   }
 
   @include focus-ring(2px);
+}
+
+.separator,
+.arrow {
+  color: var(--text-faint);
+}
+
+.gallery-status .button.size-small {
+  padding: 7px 10px;
+  font-size: 13px;
+  font-weight: 500;
 }
 </style>

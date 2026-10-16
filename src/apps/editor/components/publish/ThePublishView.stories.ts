@@ -20,3 +20,38 @@ export const SignedIn = {
   ...editor({ ...WITH_RULE, publishing: true }),
   parameters: { chrome: { gallery: { account: { id: 'me', name: 'maya' } } } },
 };
+
+const tokyoNight = {
+  id: 'Xk3p9QaL2m',
+  site: 'example.com',
+  group: 'example.com',
+  slug: 'tokyo-night',
+  name: 'Tokyo Night',
+  description: 'The Tokyo Night palette',
+  author: { id: 'me', name: 'maya' },
+  version: 1,
+  installs: 120,
+  createdAt: 0,
+  updatedAt: 0,
+  screenshot: '/screenshots/Xk3p9QaL2m/1',
+  status: 'live' as const,
+};
+
+export const Update = {
+  ...editor({ ...WITH_RULE, publishing: true }),
+  parameters: {
+    chrome: {
+      gallery: {
+        account: tokyoNight.author,
+        styles: [tokyoNight],
+        published: {
+          styleId: tokyoNight.id,
+          version: 1,
+          cssHash: '',
+          group: tokyoNight.group,
+          slug: tokyoNight.slug,
+        },
+      },
+    },
+  },
+};

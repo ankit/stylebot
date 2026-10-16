@@ -4,19 +4,15 @@
       <s-text as="span" size="label" variant="muted">
         {{ t('screenshot') }}
       </s-text>
-      <s-link-button v-if="screenshot" class="review" @click="$emit('review')">
-        {{ t('review') }}
-      </s-link-button>
-      <s-icon-button
+      <s-link-button
         v-if="screenshot"
         class="retake"
-        :size="30"
-        :tooltip="t('take_a_new_screenshot_of_this_tab')"
         :disabled="capturing"
         @click="$emit('capture')"
       >
-        <camera-icon :size="17" />
-      </s-icon-button>
+        <camera-icon :size="15" />
+        {{ t('retake') }}
+      </s-link-button>
     </div>
 
     <button
@@ -43,19 +39,19 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SButton, SIconButton, SLinkButton, SText } from '@stylebot/components';
+import { SButton, SLinkButton, SText } from '@stylebot/components';
 import { CameraIcon } from '@stylebot/icons';
 
 /**
  * The style's screenshot for the Gallery, or a way to take one. Emits
- * `capture` to take it, or take it again, and `review` to check and blur it.
+ * `capture` to take it, or take it again, and `review` when the image is
+ * clicked, to check and blur it.
  */
 export default Vue.extend({
   name: 'ScreenshotField',
 
   components: {
     SButton,
-    SIconButton,
     SLinkButton,
     SText,
     CameraIcon,
@@ -90,15 +86,11 @@ export default Vue.extend({
   justify-content: space-between;
 }
 
-.field-heading .review {
-  margin-left: auto;
-  margin-right: 10px;
-  font-size: 13px;
-}
-
 .field-heading .retake {
-  margin: -8px -6px -8px 0;
-  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
 }
 
 .screenshot {

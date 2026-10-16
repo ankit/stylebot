@@ -1,16 +1,11 @@
-<template>
-  <a class="external-link" :href="href" target="_blank" rel="noopener">
-    <slot />
-    ↗
-  </a>
-</template>
-
 <script lang="ts">
+import type { CreateElement, VNode } from 'vue';
 import Vue from 'vue';
 
 /**
  * A link that opens in a new tab, marked with an arrow, for use in running
- * text.
+ * text. A render function, since a template's line breaks would add spaces
+ * inside the link.
  */
 export default Vue.extend({
   name: 'SExternalLink',
@@ -20,6 +15,23 @@ export default Vue.extend({
       type: String,
       required: true,
     },
+
+    // Off where the link stands alone, such as beside a heading.
+    underline: {
+      type: Boolean,
+      default: true,
+    },
+  },
+
+  render(h: CreateElement): VNode {
+    return h(
+      'a',
+      {
+        class: ['external-link', { plain: !this.underline }],
+        attrs: { href: this.href, target: '_blank', rel: 'noopener' },
+      },
+      [...(this.$slots.default ?? []), ' ↗']
+    );
   },
 });
 </script>
@@ -37,6 +49,10 @@ export default Vue.extend({
 
   &:hover {
     text-decoration-color: currentColor;
+  }
+
+  &.plain {
+    text-decoration: none;
   }
 
   @include focus-ring(2px);
