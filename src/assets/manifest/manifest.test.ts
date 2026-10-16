@@ -1,12 +1,6 @@
 import crypto from 'crypto';
-import fs from 'fs';
-import path from 'path';
 
 import { buildManifest } from '../../../scripts/lib/build-manifest';
-
-const base = JSON.parse(
-  fs.readFileSync(path.join(__dirname, 'manifest.json'), 'utf8')
-);
 
 const GOOGLE_HOSTS = [
   'https://drive.google.com/*',
@@ -95,7 +89,7 @@ const normalize = (fields: Record<string, Array<unknown>>) =>
   );
 
 const releaseManifest = (browser: 'chrome' | 'firefox' | 'safari') =>
-  buildManifest(base, {
+  buildManifest({
     browser: browser === 'chrome' ? undefined : browser,
     nodeEnv: 'production',
     preview: false,
@@ -144,7 +138,7 @@ describe('optional permissions', () => {
   ])(
     'make the side panel optional in the %s Chrome manifest',
     (_, nodeEnv, preview) => {
-      const manifest = buildManifest(base, {
+      const manifest = buildManifest({
         browser: undefined,
         nodeEnv,
         preview,
@@ -163,7 +157,7 @@ describe('CLI permissions', () => {
     ['preview', 'production', true],
     ['development', 'development', false],
   ])('are only optional in the %s Chrome manifest', (_, nodeEnv, preview) => {
-    const manifest = buildManifest(base, {
+    const manifest = buildManifest({
       browser: undefined,
       nodeEnv,
       preview,
@@ -203,7 +197,7 @@ describe('store key', () => {
     ['Chrome', undefined, 'oiaejidbmkiecgbjeifoejpgmdaleoha'],
     ['Edge', 'edge', 'mjolbpfednnbebfapicajpifliopnnai'],
   ])('gives the %s preview build its store id', (_, store, id) => {
-    const manifest = buildManifest(base, {
+    const manifest = buildManifest({
       nodeEnv: 'production',
       preview: true,
       store,

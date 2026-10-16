@@ -292,9 +292,9 @@ const config = {
           from: 'assets/manifest/manifest.json',
           to: 'manifest.json',
 
-          transform: content =>
+          transform: () =>
             JSON.stringify(
-              buildManifest(JSON.parse(content), {
+              buildManifest({
                 browser: process.env.BROWSER,
                 nodeEnv: process.env.NODE_ENV,
                 preview: isPreview,

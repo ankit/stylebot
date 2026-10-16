@@ -170,7 +170,12 @@ export default tseslint.config(
   },
 
   {
-    files: ['*.js', 'jest/**/*.js', 'scripts/**/*.js'],
+    files: [
+      '*.js',
+      'jest/**/*.js',
+      'scripts/**/*.js',
+      'src/assets/manifest/*.js',
+    ],
     languageOptions: { sourceType: 'commonjs' },
     rules: { '@typescript-eslint/no-require-imports': 'off' },
   },

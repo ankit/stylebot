@@ -6,14 +6,11 @@ export type Manifest = {
   [field: string]: unknown;
 };
 
-export function buildManifest(
-  base: Manifest,
-  options: {
-    browser?: string;
-    nodeEnv?: string;
-    preview?: boolean;
-    store?: string;
-  }
-): Manifest;
+export function buildManifest(options: {
+  browser?: string;
+  nodeEnv?: string;
+  preview?: boolean;
+  store?: string;
+}): Manifest;
 
 export function supportsCLI(browser?: string): boolean;

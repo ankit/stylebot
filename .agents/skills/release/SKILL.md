@@ -46,9 +46,8 @@ Update `version` in both:
 - `package.json`
 - `src/assets/manifest/manifest.json`
 
-`src/assets/manifest/manifest-firefox.json` has **no** `version` field — it only overrides
-`background` and `browser_specific_settings`, and webpack shallow-merges it over the base
-manifest. Leave it alone.
+The per-browser modules (`chrome.js`, `firefox.js`, `safari.js`) have **no** `version`
+field — each spreads the base manifest and adds its own fields. Leave them alone.
 
 ## 4. Commit and open the PR
 

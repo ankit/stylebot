@@ -9,7 +9,7 @@ Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of
   - `src/features/` — capabilities shared by apps: `sync`, `history`, `page-bridge`, `highlighter`, `google-fonts`, `readability` (eligibility and reader lifecycle), `side-panel` (the editor's side panel and its optional permission), `monaco-editor`
   - `src/ui/` — `components`, `icons`, `scss`
   - `src/core/` — `css`, `stylesheets`, `saved-styles`, `types`, `settings`, `i18n`, `utils`
-  - `src/assets/` — `manifest` (base manifest plus dev and Firefox overrides), `icon` (the extension icon: SVG sources and the PNGs the build copies to `img/`), `fonts`, `_locales` (i18n strings per locale)
+  - `src/assets/` — `manifest` (base manifest, a module per browser that extends it, and the dev store keys), `icon` (the extension icon: SVG sources and the PNGs the build copies to `img/`), `fonts`, `_locales` (i18n strings per locale)
 - Imports only point down: apps → features, ui, core; features → ui, core; ui → ui, core; core → core. Nothing imports an app, and features don't import each other. The `stylebot/tier-imports` lint rule enforces this; the few imports that predate it are allowlisted in `eslint/rules/tier-imports.mjs` — remove entries, never add them.
 - `tools/cli/` — the `stylebot` command line (`yarn stylebot`), which drives the extension in a running browser through a native messaging host, once it's turned on in Stylebot's options; see `docs/cli.md`
 - `tools/claude-plugin/` — the Claude Code plugin: a `/stylebot` skill for restyling pages with the CLI, listed in the repo's `.claude-plugin/marketplace.json`
