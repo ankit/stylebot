@@ -17,7 +17,7 @@ import type { PropType } from 'vue';
 import Vue from 'vue';
 
 type Variant = 'default' | 'primary' | 'ghost' | 'danger';
-type Size = 'default' | 'small';
+type Size = 'default' | 'small' | 'large';
 
 export default Vue.extend({
   name: 'SButton',
@@ -75,6 +75,11 @@ export default Vue.extend({
   gap: 5px;
   padding: 7px 13px;
   font-size: 12px;
+}
+
+.button.size-large {
+  padding: 12px 16px;
+  font-size: 14px;
 }
 
 .button.default {
