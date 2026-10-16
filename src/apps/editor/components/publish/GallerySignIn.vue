@@ -4,7 +4,7 @@
 
     <s-button
       variant="primary"
-      class="sign-in-button"
+      size="large"
       :disabled="signingIn"
       @click="signIn"
     >
@@ -63,12 +63,7 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   gap: 10px;
-  padding: 12px 14px 14px;
+  padding: 14px;
   border-top: 1px solid var(--panel-border);
-}
-
-.sign-in .sign-in-button {
-  padding: 11px 16px;
-  font-size: 14px;
 }
 </style>

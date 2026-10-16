@@ -12,7 +12,7 @@ const meta: Meta = {
       control: 'radio',
       options: ['default', 'primary', 'ghost', 'danger'],
     },
-    size: { control: 'radio', options: ['default', 'small'] },
+    size: { control: 'radio', options: ['default', 'small', 'large'] },
     disabled: { control: 'boolean' },
     label: { control: 'text' },
     trailingIcon: { control: 'boolean' },
@@ -67,6 +67,10 @@ export const Variants = matrix({
     {
       label: 'Small',
       cell: attrs => `<s-button ${attrs} size="small">Save</s-button>`,
+    },
+    {
+      label: 'Large',
+      cell: attrs => `<s-button ${attrs} size="large">Save</s-button>`,
     },
   ],
 });

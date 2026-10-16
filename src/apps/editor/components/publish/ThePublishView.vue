@@ -52,10 +52,13 @@
     />
 
     <div v-else-if="publishedResult" class="view-footer">
-      <s-link-button class="view-link" @click="viewInGallery(publishedResult)">
-        {{ t('view_in_gallery') }}
-      </s-link-button>
-      <s-button @click="back">{{ t('done') }}</s-button>
+      <s-button
+        variant="primary"
+        size="large"
+        @click="viewInGallery(publishedResult)"
+      >
+        {{ t('view_in_gallery') }} ↗
+      </s-button>
     </div>
 
     <s-confirm-dialog
@@ -74,12 +77,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import {
-  SButton,
-  SCallout,
-  SConfirmDialog,
-  SLinkButton,
-} from '@stylebot/components';
+import { SButton, SCallout, SConfirmDialog } from '@stylebot/components';
 import { getGalleryStyleUrl, hashCss } from '@stylebot/gallery';
 import { getPageBridge } from '@stylebot/page-bridge';
 import type {
@@ -140,7 +138,6 @@ export default Vue.extend({
     SButton,
     SCallout,
     SConfirmDialog,
-    SLinkButton,
     SubviewHeader,
     GalleryIntro,
     GallerySignIn,
@@ -511,20 +508,11 @@ export default Vue.extend({
 .view-footer {
   flex: none;
   display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 12px 12px 16px;
+  padding: 14px;
   border-top: 1px solid var(--panel-border);
 }
 
 .view-footer .button {
-  padding: 10px 16px;
-  font-size: 14px;
-}
-
-.view-footer .view-link {
   flex: 1;
-  font-size: 14px;
-  text-align: left;
 }
 </style>

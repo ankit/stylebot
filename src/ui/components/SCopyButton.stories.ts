@@ -18,3 +18,8 @@ export const Focused: StoryObj = {
   ...fromTemplate({ SCopyButton }, template),
   play: ({ canvasElement }) => focusViaTab(canvasElement),
 };
+
+export const WithLabel = fromTemplate(
+  { SCopyButton },
+  `<s-copy-button text="https://gallery.stylebot.dev/s/github.com/tokyo-night" label="Copy" />`
+);

@@ -1,23 +1,5 @@
 <template>
   <div class="details">
-    <gallery-field :label="t('name')">
-      <s-text-input
-        :value="name"
-        :maxlength="nameMaxLength"
-        required
-        @input="$emit('update:name', $event)"
-      />
-    </gallery-field>
-
-    <gallery-field :label="t('description')" optional>
-      <s-text-input
-        multiline
-        :value="description"
-        :maxlength="descriptionMaxLength"
-        @input="$emit('update:description', $event)"
-      />
-    </gallery-field>
-
     <gallery-field v-if="update" :label="t('what_changed')" optional>
       <s-text-input
         :value="notes"
@@ -26,24 +8,49 @@
       />
     </gallery-field>
 
-    <gallery-field
-      :label="t('author')"
-      :hint="t('changes_the_name_on_all_your_published_styles')"
-    >
-      <s-text-input
-        :value="displayName"
-        :placeholder="t('anonymous')"
-        :maxlength="displayNameMaxLength"
-        @input="$emit('update:displayName', $event)"
-        @change="$emit('author-change')"
-      />
-    </gallery-field>
+    <section class="gallery-details" :class="{ update }">
+      <s-heading v-if="update" as="h3" size="sm">
+        {{ t('gallery_details') }}
+      </s-heading>
+
+      <gallery-field :label="t('name')">
+        <s-text-input
+          :value="name"
+          :maxlength="nameMaxLength"
+          required
+          @input="$emit('update:name', $event)"
+        />
+      </gallery-field>
+
+      <gallery-field :label="t('description')" optional>
+        <s-text-input
+          multiline
+          :value="description"
+          :maxlength="descriptionMaxLength"
+          @input="$emit('update:description', $event)"
+        />
+      </gallery-field>
+
+      <gallery-field
+        :label="t('author')"
+        :hint="update ? '' : authorHint"
+        :tooltip="update ? authorHint : ''"
+      >
+        <s-text-input
+          :value="displayName"
+          :placeholder="t('anonymous')"
+          :maxlength="displayNameMaxLength"
+          @input="$emit('update:displayName', $event)"
+          @change="$emit('author-change')"
+        />
+      </gallery-field>
+    </section>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { STextInput } from '@stylebot/components';
+import { SHeading, STextInput } from '@stylebot/components';
 import {
   DESCRIPTION_MAX_LENGTH,
   DISPLAY_NAME_MAX_LENGTH,
@@ -55,13 +62,15 @@ import GalleryField from './GalleryField.vue';
 
 /**
  * The style's details for the Gallery, each bound with `.sync`: its name,
- * description, what changed (for an update) and the author's alias, which
- * emits `author-change` once edited.
+ * description and the author's alias, which emits `author-change` once
+ * edited. An update asks what changed first, above the details it set last
+ * time.
  */
 export default Vue.extend({
   name: 'StyleDetailsFields',
 
   components: {
+    SHeading,
     STextInput,
     GalleryField,
   },
@@ -95,6 +104,10 @@ export default Vue.extend({
   },
 
   computed: {
+    authorHint(): string {
+      return this.t('changes_the_name_on_all_your_published_styles');
+    },
+
     nameMaxLength(): number {
       return NAME_MAX_LENGTH;
     },
@@ -115,9 +128,16 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.details {
+.details,
+.gallery-details {
   display: flex;
   flex-direction: column;
   gap: 18px;
+}
+
+.gallery-details.update {
+  gap: 14px;
+  padding-top: 18px;
+  border-top: 1px solid var(--panel-border);
 }
 </style>

@@ -7,9 +7,14 @@
         <s-text as="h2" size="caption" variant="muted" medium>
           {{ t('popular_in_gallery') }}
         </s-text>
-        <s-link-button v-if="group" class="browse" @click="browse">
+        <s-external-link
+          v-if="browseUrl"
+          class="browse"
+          :href="browseUrl"
+          :underline="false"
+        >
           {{ t('browse_all') }}
-        </s-link-button>
+        </s-external-link>
       </div>
 
       <template v-for="style in shownStyles">
@@ -38,7 +43,7 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-import { SCallout, SLinkButton, SText } from '@stylebot/components';
+import { SCallout, SExternalLink, SText } from '@stylebot/components';
 import {
   GALLERY_PREVIEW_PORT,
   galleryErrorText,
@@ -78,7 +83,7 @@ export default Vue.extend({
     GalleryPreviewCard,
     GallerySuggestion,
     SCallout,
-    SLinkButton,
+    SExternalLink,
     SText,
   },
 
@@ -114,6 +119,10 @@ export default Vue.extend({
   },
 
   computed: {
+    browseUrl(): string {
+      return this.group ? getGallerySiteUrl(this.group) : '';
+    },
+
     shownStyles(): Array<GalleryStyle> {
       const names = new Set(
         this.profileNames.map(name => name.trim().toLowerCase())
@@ -207,13 +216,6 @@ export default Vue.extend({
       this.cancel();
       this.styles = this.styles.filter(each => each.id !== style.id);
       this.$emit('installed');
-    },
-
-    browse(): void {
-      if (this.group) {
-        chrome.tabs.create({ url: getGallerySiteUrl(this.group) });
-        window.close();
-      }
     },
   },
 });

@@ -1,5 +1,14 @@
 <template>
+  <s-button v-if="label" size="small" class="labelled" @click="copy">
+    <check-icon v-if="copied" :size="13" />
+    <copy-icon v-else :size="13" />
+    <span class="labels">
+      <span :class="{ hidden: copied }">{{ label }}</span>
+      <span :class="{ hidden: !copied }">{{ t('copied') }}</span>
+    </span>
+  </s-button>
   <s-icon-button
+    v-else
     class="copy-button"
     :size="size"
     :tooltip="copied ? t('copied') : t('copy')"
@@ -15,13 +24,15 @@ import Vue from 'vue';
 
 import { CheckIcon, CopyIcon } from '@stylebot/icons';
 
+import SButton from './SButton.vue';
 import SIconButton from './SIconButton.vue';
 
 const COPIED_FOR_MS = 1600;
 
 /**
- * An icon button that copies text to the clipboard, showing a check for a
- * moment once it has.
+ * A button that copies text to the clipboard, showing a check for a moment
+ * once it has: an icon alone, or with a label that turns to Copied. Both
+ * labels take up room, so the button keeps its width.
  */
 export default Vue.extend({
   name: 'SCopyButton',
@@ -29,6 +40,7 @@ export default Vue.extend({
   components: {
     CheckIcon,
     CopyIcon,
+    SButton,
     SIconButton,
   },
 
@@ -41,6 +53,11 @@ export default Vue.extend({
     size: {
       type: Number,
       default: 28,
+    },
+
+    label: {
+      type: String,
+      default: '',
     },
   },
 
@@ -87,5 +104,22 @@ export default Vue.extend({
   &:hover {
     color: var(--text-primary);
   }
+}
+
+.labelled.button.size-small {
+  gap: 4px;
+  padding: 6px 7px;
+}
+
+.labels {
+  display: grid;
+
+  > span {
+    grid-area: 1 / 1;
+  }
+}
+
+.hidden {
+  visibility: hidden;
 }
 </style>
