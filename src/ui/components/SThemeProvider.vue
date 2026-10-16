@@ -34,6 +34,10 @@ export default Vue.extend({
   --card-surface: #1f2026;
   --tab-surface: #141519;
   --code-surface: #1a1b1e;
+  --inset-surface: #222429;
+  --inset-button-hover: #2b2e34;
+  --inset-button-hover-border: #4f545e;
+  --inset-button-hover-shadow: none;
   --panel-shadow: rgb(0 0 0 / 34%);
 
   // Text
@@ -126,6 +130,10 @@ export default Vue.extend({
   --card-surface: #fff;
   --tab-surface: #f7f8fa;
   --code-surface: #fcfcfd;
+  --inset-surface: #f6f7f9;
+  --inset-button-hover: #fff;
+  --inset-button-hover-border: #b9bec7;
+  --inset-button-hover-shadow: 0 1px 2px rgb(0 0 0 / 8%);
   --panel-shadow: rgb(0 0 0 / 16%);
 
   // Text

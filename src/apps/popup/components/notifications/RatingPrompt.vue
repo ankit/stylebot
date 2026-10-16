@@ -4,32 +4,35 @@
     class="rating-prompt"
     :aria-label="t('enjoying_stylebot')"
   >
-    <div class="rating-prompt-header">
-      <s-heading as="h2" size="md" class="rating-prompt-title">
-        {{ t('enjoying_stylebot') }}
-      </s-heading>
+    <div class="rating-prompt-card">
+      <div class="rating-prompt-text">
+        <s-heading as="h2" size="md">
+          {{ t('enjoying_stylebot') }}
+        </s-heading>
+
+        <s-text variant="muted">
+          {{
+            t(
+              'if_stylebot_has_made_the_web_nicer_for_you_a_quick_rating_helps_others_find_it'
+            )
+          }}
+        </s-text>
+      </div>
+
+      <div>
+        <s-button class="rating-prompt-rate" @click="rate">
+          {{ t('rate_stylebot') }}
+        </s-button>
+      </div>
 
       <s-icon-button
         class="rating-prompt-dismiss"
+        :size="28"
         :tooltip="t('dismiss')"
         @click="dismiss"
       >
-        <x-icon :size="16" />
+        <x-icon :size="14" />
       </s-icon-button>
-    </div>
-
-    <s-text variant="muted" class="rating-prompt-body">
-      {{
-        t(
-          'if_stylebot_has_made_the_web_nicer_for_you_a_quick_rating_helps_others_find_it'
-        )
-      }}
-    </s-text>
-
-    <div>
-      <s-button variant="primary" @click="rate">
-        {{ t('rate_stylebot') }}
-      </s-button>
     </div>
   </section>
 </template>
@@ -95,42 +98,47 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .rating-prompt {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 16px 12px 16px 16px;
-  background: var(--info);
-  border-top: 1px solid var(--info-border);
+  padding: 0 12px 12px;
 }
 
-.rating-prompt-header {
+.rating-prompt-card {
+  position: relative;
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  background: var(--inset-surface);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+}
 
-  .rating-prompt-title {
-    flex: 1;
-    min-width: 0;
-    font-weight: 500;
-  }
+.rating-prompt-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-right: 24px;
+}
+
+.rating-prompt-card .rating-prompt-rate.button:hover:not(:disabled) {
+  background: var(--inset-button-hover);
+  border-color: var(--inset-button-hover-border);
+  box-shadow: var(--inset-button-hover-shadow);
 }
 
 .rating-prompt-dismiss {
-  flex: none;
-  margin-top: -4px;
+  position: absolute;
+  top: 8px;
+  right: 8px;
 
   ::v-deep .icon-button {
-    padding: 5px;
+    padding: 0;
+    border-radius: 7px;
     color: var(--text-muted);
 
     &:hover {
-      background: var(--info-border);
+      color: var(--text-primary);
+      background: var(--panel-border);
     }
   }
-}
-
-.rating-prompt-body {
-  padding-right: 32px;
-  margin-bottom: 8px;
 }
 </style>
