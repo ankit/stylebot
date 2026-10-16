@@ -1,10 +1,10 @@
-import { OpenOptionsPage } from '../messages';
+import { openOptionsTab } from '../options-tab';
 import { get as getOption } from '../options';
 import { restoreOpenTabs } from '../restore-tabs';
 import { initCliBridge, updateCliBridge } from './index';
 import { pageCommands } from './pages';
 
-jest.mock('../messages', () => ({ OpenOptionsPage: jest.fn() }));
+jest.mock('../options-tab', () => ({ openOptionsTab: jest.fn() }));
 jest.mock('../options', () => ({ get: jest.fn() }));
 jest.mock('./inspect', () => ({ inspectCommands: {} }));
 jest.mock('./pages', () => ({
@@ -236,18 +236,24 @@ describe('initCliBridge', () => {
     await flush();
 
     expect(chrome.runtime.reload).toBeCalledTimes(1);
-    expect(storage['cli-reloaded-for-grant']).toEqual({ 7: 'window' });
+    expect(storage['cli-reloaded-for-grant']).toEqual({
+      editors: { 7: 'window' },
+      optionsRoute: '/basics',
+    });
   });
 
   it('connects, restores open tabs and reopens Options on Basics after that reload', async () => {
-    storage['cli-reloaded-for-grant'] = { 7: 'window' };
+    storage['cli-reloaded-for-grant'] = {
+      editors: { 7: 'window' },
+      optionsRoute: '/basics',
+    };
     setOption(true);
 
     await restart({ connectNative } as never);
 
     expect(connectNative).toBeCalledTimes(1);
     expect(restoreOpenTabs).toBeCalledWith({ 7: 'window' });
-    expect(OpenOptionsPage).toBeCalledWith({ route: '/basics' });
+    expect(openOptionsTab).toBeCalledWith('/basics');
     expect(storage).not.toHaveProperty('cli-reloaded-for-grant');
   });
 
@@ -261,7 +267,7 @@ describe('initCliBridge', () => {
 
   it("doesn't reload again when connectNative is still missing after it", async () => {
     jest.spyOn(console, 'error').mockImplementation(() => undefined);
-    storage['cli-reloaded-for-grant'] = true;
+    storage['cli-reloaded-for-grant'] = { editors: {} };
     setOption(true);
 
     await restart({ connectNative: undefined } as never);

@@ -21,7 +21,9 @@ import type {
   RestoreResult,
   UndoRestore,
   UndoRestoreResponse,
+  ReloadForSidePanelGrant,
 } from '@stylebot/types';
+import { requestSidePanelPermission } from '@stylebot/utils';
 
 export const getAllStyles = (): Promise<GetAllStylesResponse> => {
   const message: GetAllStyles = {
@@ -169,4 +171,21 @@ export const undoRestore = async (
   >(message);
 
   return Boolean(response?.ok);
+};
+
+/**
+ * Asks for the sidePanel permission during the click that picks the side
+ * panel, then has Stylebot reload for it and show Options again, so the
+ * editor opens in the side panel from the first time.
+ */
+export const grantSidePanel = (): void => {
+  requestSidePanelPermission().then(granted => {
+    if (granted) {
+      const message: ReloadForSidePanelGrant = {
+        name: 'ReloadForSidePanelGrant',
+      };
+
+      chrome.runtime.sendMessage(message);
+    }
+  });
 };

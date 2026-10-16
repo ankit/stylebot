@@ -1,6 +1,6 @@
 import type { RunGoogleDriveSyncResponse } from '@stylebot/types';
 
-import { runGoogleDriveSync, setAllStyles } from './utils';
+import { grantSidePanel, runGoogleDriveSync, setAllStyles } from './utils';
 
 const mockRuntime = (
   sendMessage: () => Promise<RunGoogleDriveSyncResponse | undefined>
@@ -82,5 +82,45 @@ describe('setAllStyles', () => {
     } as unknown as typeof chrome;
 
     await expect(setAllStyles({})).resolves.toBe(false);
+  });
+});
+
+describe('grantSidePanel', () => {
+  const mockPermissions = (granted: boolean) => {
+    const api = {
+      runtime: { sendMessage: jest.fn(), lastError: undefined },
+      permissions: {
+        request: jest.fn((_permissions, callback) => callback(granted)),
+      },
+    };
+
+    global.chrome = api as unknown as typeof chrome;
+    return api;
+  };
+
+  const flush = () => new Promise(resolve => setTimeout(resolve));
+
+  it('asks the background to reload once the permission is granted', async () => {
+    const api = mockPermissions(true);
+
+    grantSidePanel();
+    await flush();
+
+    expect(api.permissions.request).toBeCalledWith(
+      { permissions: ['sidePanel'] },
+      expect.any(Function)
+    );
+    expect(api.runtime.sendMessage).toBeCalledWith({
+      name: 'ReloadForSidePanelGrant',
+    });
+  });
+
+  it('leaves Stylebot running when the permission is refused', async () => {
+    const api = mockPermissions(false);
+
+    grantSidePanel();
+    await flush();
+
+    expect(api.runtime.sendMessage).not.toBeCalled();
   });
 });

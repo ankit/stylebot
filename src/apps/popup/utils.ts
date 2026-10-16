@@ -10,6 +10,8 @@ import type {
   SetActiveProfile,
   StylebotOptions,
   EditorSidePanelOpened,
+  OpenEditorSidePanel,
+  OpenEditorSidePanelResponse,
   RestoreTab,
 } from '@stylebot/types';
 import { STYLES_KEY, getStylesForPage } from '@stylebot/saved-styles';
@@ -20,6 +22,7 @@ import {
   openReportIssuePage,
   openDonatePage,
   supportsEditorSidePanel,
+  isSidePanelGranted,
   openEditorSidePanel,
   detectChromiumVariantSync,
   doesSidePanelWorkInChromiumVariant,
@@ -157,6 +160,21 @@ export const toggleStylebot = (tab: chrome.tabs.Tab): void => {
 };
 
 /**
+ * Has the background ask for the sidePanel permission during the click, and
+ * reload Stylebot for it, which opens the editor in the page this once.
+ */
+const grantStylebotSidePanel = (tab: chrome.tabs.Tab, tabId: number) => {
+  const message: OpenEditorSidePanel = { name: 'OpenEditorSidePanel', tabId };
+
+  chrome.runtime
+    .sendMessage<OpenEditorSidePanel, OpenEditorSidePanelResponse>(message)
+    .then(
+      granted => (granted ? window.close() : toggleStylebot(tab)),
+      () => toggleStylebot(tab)
+    );
+};
+
+/**
  * Opens the editor in the tab's side panel straight from the popup's click,
  * as the page couldn't once its gesture is gone; falls back to the page,
  * as where the browser won't show the panel.
@@ -168,6 +186,11 @@ export const openStylebotSidePanel = (tab: chrome.tabs.Tab): void => {
     !doesSidePanelWorkInChromiumVariant(detectChromiumVariantSync())
   ) {
     toggleStylebot(tab);
+    return;
+  }
+
+  if (!isSidePanelGranted()) {
+    grantStylebotSidePanel(tab, tab.id);
     return;
   }
 

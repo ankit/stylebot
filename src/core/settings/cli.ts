@@ -1,3 +1,5 @@
+import { tryPermissionsCall } from '@stylebot/utils';
+
 /**
  * What the CLI needs beyond the access to every site Stylebot already has:
  * its native host. Optional, so it's requested only when it's turned on.
@@ -11,45 +13,21 @@ export const CLI_PERMISSIONS: chrome.permissions.Permissions = {
  */
 export const supportsCLI = (): boolean => process.env.STYLEBOT_CLI === 'true';
 
-type PermissionsCall = (
-  permissions: chrome.permissions.Permissions,
-  callback: (result: boolean) => void
-) => void;
-
-/**
- * Runs a chrome.permissions call. A browser that doesn't declare the
- * permissions as optional fails the call, which counts as no.
- */
-const callPermissions = (
-  call: PermissionsCall,
-  permissions: chrome.permissions.Permissions
-): Promise<boolean> =>
-  new Promise(resolve => {
-    try {
-      call(permissions, result => {
-        void chrome.runtime.lastError;
-        resolve(!!result);
-      });
-    } catch {
-      resolve(false);
-    }
-  });
-
 export const hasCliPermissions = (): Promise<boolean> =>
-  callPermissions(chrome.permissions.contains, CLI_PERMISSIONS);
+  tryPermissionsCall(chrome.permissions.contains, CLI_PERMISSIONS);
 
 /**
  * Asks for the CLI's permissions. Call it straight from a click, before any
  * await, since the browser only prompts during a user gesture.
  */
 export const requestCliPermissions = (): Promise<boolean> =>
-  callPermissions(chrome.permissions.request, CLI_PERMISSIONS);
+  tryPermissionsCall(chrome.permissions.request, CLI_PERMISSIONS);
 
 /**
  * Gives back the native host, which cuts the CLI off.
  */
 export const removeCliPermissions = (): Promise<boolean> =>
-  callPermissions(chrome.permissions.remove, CLI_PERMISSIONS);
+  tryPermissionsCall(chrome.permissions.remove, CLI_PERMISSIONS);
 
 const CLI_CONNECTED_KEY = 'cli-connected';
 

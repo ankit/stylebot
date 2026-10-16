@@ -9,6 +9,14 @@ const readManifest = name =>
 const without = (list, ...removed) =>
   list.filter(item => !removed.includes(item));
 
+const addOptionalPermissions = (manifest, ...permissions) => ({
+  ...manifest,
+  optional_permissions: [
+    ...(manifest.optional_permissions ?? []),
+    ...permissions,
+  ],
+});
+
 const withoutSidePanel = manifest => {
   const { side_panel: _sidePanel, ...rest } = manifest;
   return rest;
@@ -85,8 +93,7 @@ const supportsCLI = browser => CLI_BROWSERS.includes(browser ?? CHROME);
  * and its page inspector.
  */
 const addCli = manifest => ({
-  ...manifest,
-  optional_permissions: ['nativeMessaging'],
+  ...addOptionalPermissions(manifest, 'nativeMessaging'),
   web_accessible_resources: [
     ...manifest.web_accessible_resources,
     { resources: ['cli-inspector/index.js'], matches: ['<all_urls>'] },
@@ -105,12 +112,22 @@ const addScripting = manifest => ({
 });
 
 /**
+ * Makes the side panel optional, as Chromium browsers support it unevenly.
+ * It's requested the first time the editor opens there.
+ */
+const makeSidePanelOptional = manifest =>
+  addOptionalPermissions(
+    { ...manifest, permissions: without(manifest.permissions, 'sidePanel') },
+    'sidePanel'
+  );
+
+/**
  * Adds the Chrome Web Store public key, or Edge Add-ons' for `store: 'edge'`,
  * for the store id that Drive sign-in's OAuth redirect needs. Release builds
  * leave it out: the stores reject an uploaded manifest with a `key`.
  */
 const buildChromeManifest = (manifest, { nodeEnv, preview, store }) => {
-  const scripting = addTabSignIn(addScripting(manifest));
+  const scripting = addTabSignIn(addScripting(makeSidePanelOptional(manifest)));
 
   if (nodeEnv === 'development' || preview) {
     const keyFile =

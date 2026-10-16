@@ -31,7 +31,6 @@ const RELEASE_INSTALL_WARNING_FIELDS = {
       'unlimitedStorage',
       'alarms',
       'idle',
-      'sidePanel',
       // Covered by the warning tabs already shows, so it adds none.
       'favicon',
       // No warning of its own, and <all_urls> below adds none either, since
@@ -137,6 +136,27 @@ describe('release manifest', () => {
   );
 });
 
+describe('optional permissions', () => {
+  it.each([
+    ['release', 'production', false],
+    ['preview', 'production', true],
+    ['development', 'development', false],
+  ])(
+    'make the side panel optional in the %s Chrome manifest',
+    (_, nodeEnv, preview) => {
+      const manifest = buildManifest(base, {
+        browser: undefined,
+        nodeEnv,
+        preview,
+      });
+
+      expect(manifest.permissions).not.toContain('sidePanel');
+      expect(manifest.optional_permissions).toContain('sidePanel');
+      expect(manifest).toHaveProperty('side_panel');
+    }
+  );
+});
+
 describe('CLI permissions', () => {
   it.each([
     ['release', 'production', false],
@@ -150,7 +170,7 @@ describe('CLI permissions', () => {
     });
 
     expect(manifest.permissions).not.toContain('nativeMessaging');
-    expect(manifest.optional_permissions).toEqual(['nativeMessaging']);
+    expect(manifest.optional_permissions).toContain('nativeMessaging');
   });
 
   it.each(['firefox', 'safari'] as const)(

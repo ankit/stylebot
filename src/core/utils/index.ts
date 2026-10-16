@@ -40,8 +40,15 @@ export {
   openReportIssuePage,
   openDonatePage,
 } from './open-page';
+export { tryPermissionsCall } from './permissions';
 export {
   supportsEditorSidePanel,
+  isSidePanelGranted,
+  isSidePanelAwaitingReload,
+  markSidePanelAwaitingReload,
+  requestSidePanelPermission,
+  hasSidePanelPermission,
+  removeSidePanelPermission,
   configureEditorSidePanel,
   openEditorSidePanel,
   closeEditorSidePanel,

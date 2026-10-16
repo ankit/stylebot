@@ -1,9 +1,89 @@
+import { tryPermissionsCall } from './permissions';
+
+const SIDE_PANEL_PERMISSIONS: chrome.permissions.Permissions = {
+  permissions: ['sidePanel'],
+};
+
+let grantedSinceStart = false;
+
 /**
- * Whether this browser can host the editor in its side panel. Content
- * scripts can't see chrome.sidePanel, so they can't use this.
+ * Whether this browser can host the editor in its side panel, once Stylebot
+ * has the optional sidePanel permission. Content scripts can't see
+ * chrome.sidePanel, so they can't use this.
  */
-export const supportsEditorSidePanel = (): boolean =>
-  typeof chrome !== 'undefined' && !!chrome.sidePanel?.open;
+export const supportsEditorSidePanel = (): boolean => {
+  if (typeof chrome === 'undefined') {
+    return false;
+  }
+
+  if (chrome.sidePanel) {
+    return !!chrome.sidePanel.open;
+  }
+
+  const optional: Array<string> =
+    chrome.runtime.getManifest().optional_permissions ?? [];
+
+  return optional.includes('sidePanel');
+};
+
+/**
+ * Whether chrome.sidePanel can be called here: this context started with the
+ * sidePanel permission. Using it after a grant at runtime, before Stylebot
+ * reloads, crashes Chrome (crbug.com/426412557).
+ */
+export const isSidePanelGranted = (): boolean =>
+  typeof chrome !== 'undefined' &&
+  !grantedSinceStart &&
+  !!chrome.sidePanel?.open;
+
+/**
+ * Whether the sidePanel permission came while this context was running, so
+ * chrome.sidePanel waits for Stylebot to reload.
+ */
+export const isSidePanelAwaitingReload = (): boolean => grantedSinceStart;
+
+/**
+ * Marks chrome.sidePanel as off limits until Stylebot reloads, when the
+ * permissions just granted include sidePanel.
+ */
+export const markSidePanelAwaitingReload = (
+  permissions: chrome.permissions.Permissions
+): void => {
+  if (permissions.permissions?.includes('sidePanel')) {
+    grantedSinceStart = true;
+  }
+};
+
+/**
+ * Asks for the sidePanel permission, which has no prompt. Must be called
+ * during a user gesture, before awaiting anything, and only without it.
+ */
+export const requestSidePanelPermission = async (): Promise<boolean> => {
+  const granted = await tryPermissionsCall(
+    chrome.permissions.request,
+    SIDE_PANEL_PERMISSIONS
+  );
+
+  if (granted) {
+    markSidePanelAwaitingReload(SIDE_PANEL_PERMISSIONS);
+  }
+
+  return granted;
+};
+
+/**
+ * Whether Stylebot holds the sidePanel permission, even one granted since
+ * this context started.
+ */
+export const hasSidePanelPermission = (): Promise<boolean> =>
+  tryPermissionsCall(chrome.permissions.contains, SIDE_PANEL_PERMISSIONS);
+
+/**
+ * Gives up the sidePanel permission, as browsers that force open the panel
+ * of any extension holding it need.
+ */
+export const removeSidePanelPermission = (): Promise<boolean> =>
+  tryPermissionsCall(chrome.permissions.remove, SIDE_PANEL_PERMISSIONS);
 
 /**
  * Sets up the tab's side panel to host the editor, or takes it away. The path
@@ -37,20 +117,30 @@ export const openEditorSidePanel = (tabId: number): Promise<void> => {
 /**
  * Closes the tab's panel the way Chrome's own close button does, animating
  * it away. Chrome before 141 has no sidePanel.close, so there disabling the
- * panel removes it at once instead.
+ * panel removes it at once instead. Without the permission there's none.
  */
-export const closeEditorSidePanel = (tabId: number): Promise<void> =>
-  chrome.sidePanel.close
+export const closeEditorSidePanel = (tabId: number): Promise<void> => {
+  if (!isSidePanelGranted()) {
+    return Promise.resolve();
+  }
+
+  return chrome.sidePanel.close
     ? chrome.sidePanel.close({ tabId })
     : chrome.sidePanel.setOptions({ tabId, enabled: false });
+};
 
 /**
  * Whether the tab's editor side panel is showing, from the extension
- * contexts Chrome reports rather than any state we keep.
+ * contexts Chrome reports rather than any state we keep. Never without
+ * the permission.
  */
 export const isEditorSidePanelOpen = async (
   tabId: number
 ): Promise<boolean> => {
+  if (!isSidePanelGranted()) {
+    return false;
+  }
+
   const contexts = await chrome.runtime.getContexts({
     contextTypes: ['SIDE_PANEL'],
   });

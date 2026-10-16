@@ -15,6 +15,7 @@ beforeEach(() => {
   };
 
   global.chrome = {
+    runtime: { getManifest: () => ({}) },
     storage: {
       local: {
         get: jest.fn(

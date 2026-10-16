@@ -8,7 +8,7 @@ jest.mock('@stylebot/utils', () => ({
   getPageSupport: jest.fn(),
   getRestorePendingKey: (tabId: number) => `restore-tab-${tabId}`,
   isEditorSidePanelOpen: jest.fn(),
-  supportsEditorSidePanel: () => true,
+  isSidePanelGranted: () => !!chrome.sidePanel,
 }));
 
 const sidePanelOpen = jest.fn();
@@ -30,6 +30,7 @@ beforeEach(() => {
   tabs = [{ id: 1, active: true }, { id: 2 }, {}] as Array<chrome.tabs.Tab>;
   executeScript.mockReset().mockResolvedValue([]);
   sendMessage.mockReset().mockResolvedValue(undefined);
+  sidePanelOpen.mockReset();
   (getPageSupport as jest.Mock).mockImplementation(
     async ({ id }: chrome.tabs.Tab) =>
       connected.includes(id ?? -1) ? 'supported' : 'unreachable'
@@ -137,6 +138,15 @@ describe('restoreOpenTabs', () => {
     expect(sendMessage).toBeCalledWith(1, { name: 'OpenStylebot' });
     expect(editorWindow.open).toBeCalledWith(2);
     expect(sidePanelOpen).toBeCalledWith({ tabId: 3 });
+  });
+
+  it('leaves the side panel shut without its permission', async () => {
+    delete (chrome as Partial<typeof chrome>).sidePanel;
+
+    await restoreOpenTabs({ 3: 'sidepanel' });
+
+    expect(isEditorSidePanelOpen).not.toBeCalled();
+    expect(sidePanelOpen).not.toBeCalled();
   });
 
   it('opens Stylebot again where a cut-off panel is left, when not told where', async () => {

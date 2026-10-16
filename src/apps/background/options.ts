@@ -43,6 +43,11 @@ export const get = async (
  */
 let pendingWrite = Promise.resolve();
 
+/**
+ * Resolves once the writes made so far have landed.
+ */
+export const waitForPendingWrites = (): Promise<void> => pendingWrite;
+
 export const set = (
   name: keyof StylebotOptions,
   value: StylebotOptions[keyof StylebotOptions]

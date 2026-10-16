@@ -1,8 +1,8 @@
 import {
   getPageSupport,
   getRestorePendingKey,
+  isSidePanelGranted,
   isEditorSidePanelOpen,
-  supportsEditorSidePanel,
 } from '@stylebot/utils';
 
 import * as editorWindow from './editor-window';
@@ -20,11 +20,13 @@ const isPanelShowing = (): boolean =>
   !!document.getElementById('stylebot')?.shadowRoot?.querySelector('.stylebot');
 
 const findHost = async (tabId: number): Promise<EditorHost | undefined> => {
-  if (await editorWindow.isOpen(tabId)) {
+  const isWindowOpen = await editorWindow.isOpen(tabId);
+  if (isWindowOpen) {
     return 'window';
   }
 
-  if (supportsEditorSidePanel() && (await isEditorSidePanelOpen(tabId))) {
+  const isSidePanelOpen = await isEditorSidePanelOpen(tabId);
+  if (isSidePanelOpen) {
     return 'sidepanel';
   }
 
@@ -73,7 +75,7 @@ const reopen = async (tabId: number, host: EditorHost): Promise<void> => {
       await chrome.tabs.sendMessage(tabId, { name: 'OpenStylebot' });
     } else if (host === 'window') {
       await editorWindow.open(tabId);
-    } else {
+    } else if (isSidePanelGranted()) {
       // Chrome only opens a side panel during a user gesture, which the
       // reload has ended, so this works only where the browser allows it.
       await chrome.sidePanel.open({ tabId });
@@ -103,7 +105,12 @@ const inject = async (
   tab: chrome.tabs.Tab,
   scripts: Array<number>
 ): Promise<void> => {
-  if (tab.id === undefined || (await getPageSupport(tab)) !== 'unreachable') {
+  if (tab.id === undefined) {
+    return;
+  }
+
+  const support = await getPageSupport(tab);
+  if (support !== 'unreachable') {
     return;
   }
 

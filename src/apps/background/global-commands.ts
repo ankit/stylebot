@@ -2,6 +2,7 @@ import type { RunCommand, StylebotCommandName } from '@stylebot/types';
 import {
   COMMAND_NAMES,
   closeEditorSidePanel,
+  isSidePanelGranted,
   isEditorSidePanelOpen,
   isWebPageUrl,
 } from '@stylebot/utils';
@@ -11,8 +12,9 @@ import { restoreTab } from './restore-tabs';
 import { applyStylesToAllTabs, toggleForPage } from './styles';
 import {
   onEditorSidePanelOpened,
+  openEditorSidePanelWithFallback,
   opensEditorInSidePanel,
-} from './side-panel-check';
+} from './side-panel';
 
 const isCommandName = (command: string): command is StylebotCommandName =>
   COMMAND_NAMES.includes(command as StylebotCommandName);
@@ -57,12 +59,17 @@ const runInPage = (tabId: number, command: StylebotCommandName): void => {
 };
 
 /**
- * Toggles the editor where the side panel is the dock. The panel is set up
- * on every tab ahead of time then, so it opens here, before anything is
- * awaited and the shortcut's gesture lapses. Where the open fails anyway,
- * the page toggles its own editor.
+ * Toggles the editor where the side panel is the dock, opening it before the
+ * shortcut's gesture lapses. Falls back to the page's own editor.
  */
 const toggleEditorWithSidePanel = (tabId: number): void => {
+  if (!isSidePanelGranted()) {
+    openEditorSidePanelWithFallback(tabId).catch(() =>
+      runInPage(tabId, 'stylebot')
+    );
+    return;
+  }
+
   const wasOpen = isEditorSidePanelOpen(tabId);
   const opened = chrome.sidePanel.open({ tabId }).then(
     () => true,

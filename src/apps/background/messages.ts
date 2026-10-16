@@ -101,15 +101,12 @@ import {
 } from './color-history';
 
 import * as editorWindow from './editor-window';
+import { openOptionsTab } from './options-tab';
 import {
   canUseEditorSidePanel,
   openEditorSidePanelWithFallback,
-} from './side-panel-check';
-import {
-  supportsEditorSidePanel,
-  closeEditorSidePanel,
-  isEditorSidePanelOpen,
-} from '@stylebot/utils';
+} from './side-panel';
+import { closeEditorSidePanel, isEditorSidePanelOpen } from '@stylebot/utils';
 
 export const DisableStyle = async (
   message: DisableStyleType
@@ -281,34 +278,8 @@ export const GetAllOptions = async (
   sendResponse(options);
 };
 
-/**
- * Not chrome.runtime.openOptionsPage: it drops the hash on Chrome and
- * won't reuse a tab on a different route on Firefox.
- */
-export const OpenOptionsPage = async (message?: {
-  route?: string;
-}): Promise<void> => {
-  const base = chrome.runtime.getURL('options.html');
-  const url = message?.route ? `${base}#${message.route}` : base;
-
-  const tabs = await chrome.tabs.query({});
-  const existing = tabs.find(tab => tab.url?.startsWith(base));
-
-  if (existing?.id !== undefined) {
-    await chrome.tabs.update(existing.id, {
-      active: true,
-      ...(message?.route ? { url } : {}),
-    });
-
-    if (existing.windowId !== undefined) {
-      await chrome.windows.update(existing.windowId, { focused: true });
-    }
-
-    return;
-  }
-
-  await chrome.tabs.create({ url, active: true });
-};
+export const OpenOptionsPage = (message?: { route?: string }): Promise<void> =>
+  openOptionsTab(message?.route);
 
 /**
  * Opens the browser's own page for extension shortcuts, where they're
@@ -412,7 +383,8 @@ export const syncAfterSignInRedirect = async (
   url: string,
   tabId?: number
 ): Promise<void> => {
-  if (await handleSignInRedirect(url, tabId)) {
+  const signedIn = await handleSignInRedirect(url, tabId);
+  if (signedIn) {
     syncStyles({ interactive: false });
   }
 };
@@ -513,7 +485,8 @@ export const ToggleEditorWindow = async (
   }
 
   // The page also counts a connected side panel as its editor window.
-  if (supportsEditorSidePanel() && (await isEditorSidePanelOpen(tabId))) {
+  const isSidePanelOpen = await isEditorSidePanelOpen(tabId);
+  if (isSidePanelOpen) {
     await closeEditorSidePanel(tabId);
   } else {
     await editorWindow.toggle(tabId);
@@ -557,7 +530,7 @@ export const CloseEditorSidePanel = async (
   sender: chrome.runtime.MessageSender
 ): Promise<void> => {
   const tabId = message.tabId ?? sender.tab?.id;
-  if (tabId !== undefined && supportsEditorSidePanel()) {
+  if (tabId !== undefined) {
     await closeEditorSidePanel(tabId);
   }
 };
@@ -568,9 +541,13 @@ export const GetIsEditorWindowOpen = async (
   sendResponse: (response: GetIsEditorWindowOpenResponse) => void
 ): Promise<void> => {
   const tabId = message.tabId ?? sender.tab?.id;
-  sendResponse(
-    tabId !== undefined &&
-      ((await editorWindow.isOpen(tabId)) ||
-        (supportsEditorSidePanel() && (await isEditorSidePanelOpen(tabId))))
-  );
+  if (tabId === undefined) {
+    sendResponse(false);
+    return;
+  }
+
+  const isWindowOpen = await editorWindow.isOpen(tabId);
+  const isSidePanelOpen = await isEditorSidePanelOpen(tabId);
+
+  sendResponse(isWindowOpen || isSidePanelOpen);
 };

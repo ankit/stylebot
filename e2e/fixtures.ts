@@ -62,6 +62,56 @@ export async function closeServer(server: http.Server): Promise<void> {
   await closed;
 }
 
+/*
+ * Optional permissions the suite's extension holds from the start, as users
+ * of releases that required them keep them. editor-sidepanel.spec.ts covers
+ * a fresh install granting the side panel.
+ */
+const HELD_OPTIONAL_PERMISSIONS = ['sidePanel'];
+
+/**
+ * Loads a copy of the build that requires the held optional permissions,
+ * then the build's own manifest over it as an update, which keeps them.
+ */
+async function loadExtensionHoldingPermissions(
+  context: BrowserContext,
+  userDataDir: string
+): Promise<Extension> {
+  const manifest = JSON.parse(
+    fs.readFileSync(path.join(DIST_PATH, 'manifest.json'), 'utf8')
+  );
+  const optional: Array<string> = manifest.optional_permissions ?? [];
+  const held = optional.filter(name =>
+    HELD_OPTIONAL_PERMISSIONS.includes(name)
+  );
+
+  if (!held.length) {
+    return engine.loadExtension(context, DIST_PATH);
+  }
+
+  const dir = path.join(userDataDir, 'extension');
+  const manifestFile = path.join(dir, 'manifest.json');
+  fs.cpSync(DIST_PATH, dir, { recursive: true });
+  fs.writeFileSync(
+    manifestFile,
+    JSON.stringify({
+      ...manifest,
+      permissions: [...manifest.permissions, ...held],
+      optional_permissions: optional.filter(name => !held.includes(name)),
+    })
+  );
+  const holding = await engine.loadExtension(context, dir);
+  await holding.evaluate(() => undefined);
+
+  fs.writeFileSync(manifestFile, JSON.stringify(manifest));
+  // Only Chromium builds hold optional permissions. The first copy's worker
+  // may still be listed for a while, so this waits for the new one.
+  const started = context.waitForEvent('serviceworker');
+  const extension = await engine.loadExtension(context, dir);
+  await started;
+  return extension;
+}
+
 type Instance = {
   context: BrowserContext;
   userDataDir: string;
@@ -146,7 +196,10 @@ class BrowserPool {
       );
     }
 
-    const extension = await engine.loadExtension(context, DIST_PATH);
+    const extension = await loadExtensionHoldingPermissions(
+      context,
+      userDataDir
+    );
 
     // onInstalled fires once the background first spins up, which under
     // parallel-worker load can be after the first test has already opened its

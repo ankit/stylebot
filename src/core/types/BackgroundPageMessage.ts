@@ -221,6 +221,11 @@ export type OpenEditorSidePanel = {
   tabId?: number;
 };
 
+// Options got the sidePanel permission, which takes a reload to use.
+export type ReloadForSidePanelGrant = {
+  name: 'ReloadForSidePanelGrant';
+};
+
 export type EditorSidePanelOpened = {
   name: 'EditorSidePanelOpened';
   tabId: number;
@@ -290,6 +295,7 @@ type BackgroundPageMessage =
   | OpenEditorSidePanel
   | CloseEditorSidePanel
   | EditorSidePanelOpened
+  | ReloadForSidePanelGrant
   | RunPageCommand
   | RestoreTab;
 

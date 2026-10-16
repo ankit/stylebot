@@ -11,8 +11,9 @@ export class ChromiumExtension implements Extension {
   }
 
   async evaluate<A, R>(fn: ExtensionFunction<A, R>, arg?: A): Promise<R> {
+    // The newest, as a reloaded extension's old worker may still be listed.
     const worker =
-      this.context.serviceWorkers()[0] ??
+      this.context.serviceWorkers().at(-1) ??
       (await this.context.waitForEvent('serviceworker'));
     return worker.evaluate(fn as PageFunction<A, R>, arg as A);
   }

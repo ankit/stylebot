@@ -57,6 +57,12 @@ Extension-privileged code runs in the MV3 service worker, and the popup is opene
 real page through CDP. A shortcut is fired through the dispatch Chrome's own event
 bindings use.
 
+The suite's extension starts out holding the optional side panel permission, as users of
+releases that required it do: a worker loads a copy of the build that requires it, then
+the build's own manifest over it as an update, which keeps the grant. The side panel spec
+covers a fresh install asking for it with its own browser, standing in for
+`chrome.runtime.reload()` and reloading through CDP instead.
+
 **Firefox** — Playwright can't load extensions into Firefox, so it starts Firefox with
 `--start-debugger-server` and talks Firefox's Remote Debugging Protocol (the same thing
 `web-ext run` and about:debugging use): it installs `firefox-dist/` as a temporary add-on

@@ -1,9 +1,8 @@
 import { hasCliPermissions, setCliConnected } from '@stylebot/settings';
 import type { StylebotOptions } from '@stylebot/types';
 
-import { OpenOptionsPage } from '../messages';
 import { get as getOption } from '../options';
-import { findOpenEditors, restoreOpenTabs } from '../restore-tabs';
+import { reloadForGrant, resumeAfterGrantReload } from '../grant-reload';
 import { inspectCommands } from './inspect';
 import { pageCommands } from './pages';
 import { pointerCommands } from './pointer';
@@ -16,7 +15,7 @@ const HOST_NAME = 'dev.stylebot.cli';
 
 // A missing host disconnects at once, so a port that outlives this has one.
 const CONNECTED_AFTER_MS = 500;
-const RELOADED_FOR_GRANT_KEY = 'cli-reloaded-for-grant';
+const RELOADED_FOR_CLI_KEY = 'cli-reloaded-for-grant';
 
 const commands: CliCommands = {
   ...pageCommands,
@@ -98,36 +97,7 @@ const disconnect = (): void => {
 };
 
 let pendingUpdate = Promise.resolve();
-let reloadedForGrant = Promise.resolve(false);
-
-/**
- * Chrome adds connectNative only to contexts started with nativeMessaging, so
- * a grant to a running worker needs a reload. Options reopens after it.
- */
-const reloadForGrant = async (): Promise<void> => {
-  await chrome.storage.local.set({
-    [RELOADED_FOR_GRANT_KEY]: await findOpenEditors(),
-  });
-  chrome.runtime.reload();
-};
-
-/**
- * Restores open tabs and reopens Options after a reload for a grant, and
- * reports whether this start followed one, so a browser that still lacks
- * connectNative isn't reloaded again.
- */
-const resumeAfterGrantReload = async (): Promise<boolean> => {
-  const items = await chrome.storage.local.get(RELOADED_FOR_GRANT_KEY);
-
-  if (!items[RELOADED_FOR_GRANT_KEY]) {
-    return false;
-  }
-
-  await chrome.storage.local.remove(RELOADED_FOR_GRANT_KEY);
-  await restoreOpenTabs(items[RELOADED_FOR_GRANT_KEY]);
-  OpenOptionsPage({ route: '/basics' });
-  return true;
-};
+let startedAfterGrantReload = Promise.resolve(false);
 
 /**
  * Connects while the CLI setting is on and its permissions are granted, and
@@ -142,11 +112,17 @@ export const updateCliBridge = (): Promise<void> => {
       if (allowed && !port) {
         if (typeof chrome.runtime.connectNative === 'function') {
           connect();
-          reloadedForGrant = Promise.resolve(false);
-        } else if (!(await reloadedForGrant)) {
-          await reloadForGrant();
+          startedAfterGrantReload = Promise.resolve(false);
         } else {
-          console.error('Stylebot CLI: connectNative is unavailable.');
+          const reloaded = await startedAfterGrantReload;
+
+          if (!reloaded) {
+            await reloadForGrant(RELOADED_FOR_CLI_KEY, {
+              optionsRoute: '/basics',
+            });
+          } else {
+            console.error('Stylebot CLI: connectNative is unavailable.');
+          }
         }
       } else if (!allowed && port) {
         disconnect();
@@ -176,6 +152,6 @@ export const initCliBridge = (): void => {
   });
 
   setCliConnected(false);
-  reloadedForGrant = resumeAfterGrantReload();
+  startedAfterGrantReload = resumeAfterGrantReload(RELOADED_FOR_CLI_KEY);
   updateCliBridge();
 };

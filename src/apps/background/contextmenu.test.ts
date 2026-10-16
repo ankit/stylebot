@@ -3,11 +3,11 @@ import type { StylebotOptions } from '@stylebot/types';
 
 import { ContextMenu, handleContextMenuClick } from './contextmenu';
 import { getAll as getAllOptions } from './options';
-import { openEditorSidePanelWithFallback } from './side-panel-check';
+import { openEditorSidePanelWithFallback } from './side-panel';
 
 jest.mock('./messages', () => ({ OpenOptionsPage: jest.fn() }));
 jest.mock('./options', () => ({ getAll: jest.fn() }));
-jest.mock('./side-panel-check', () => ({
+jest.mock('./side-panel', () => ({
   openEditorSidePanelWithFallback: jest.fn(() => Promise.resolve()),
 }));
 

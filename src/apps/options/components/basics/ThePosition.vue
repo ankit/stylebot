@@ -43,9 +43,12 @@ import {
   detectChromiumVariant,
   getChromiumVariant,
   doesSidePanelWorkInChromiumVariant,
+  isSidePanelGranted,
   supportsEditorSidePanel,
 } from '@stylebot/utils';
 import type { ChromiumVariant } from '@stylebot/utils';
+
+import { grantSidePanel } from '../../utils';
 
 type DockOption = {
   value: StylebotDockLocation;
@@ -96,6 +99,10 @@ export default Vue.extend({
           name: 'layout',
           value: { ...this.layout, dockLocation },
         });
+
+        if (dockLocation === 'sidepanel' && !isSidePanelGranted()) {
+          grantSidePanel();
+        }
       },
     },
 

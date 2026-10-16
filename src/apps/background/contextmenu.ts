@@ -6,7 +6,7 @@ import type { StylebotDockLocation } from '@stylebot/types';
 
 import { OpenOptionsPage } from './messages';
 import { getAll as getAllOptions } from './options';
-import { openEditorSidePanelWithFallback } from './side-panel-check';
+import { openEditorSidePanelWithFallback } from './side-panel';
 
 const CONTEXT_MENU_ID = 'stylebot-contextmenu';
 

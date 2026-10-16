@@ -1,4 +1,8 @@
-import type { BrowserContext, Page } from '@playwright/test';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import type { BrowserContext, Page, TestInfo } from '@playwright/test';
+import type { Engine } from './engine';
 import { test, expect, type Extension, type Popup } from './fixtures';
 import {
   startTestServer,
@@ -346,4 +350,167 @@ test('the inspector hides its overlay while the pointer is off the page', async 
     `document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowUp', bubbles: true, cancelable: true }))`
   );
   await expect(overlay).not.toHaveCount(0);
+});
+
+type FreshInstall = {
+  context: BrowserContext;
+  extension: Extension;
+  // How often Stylebot asked to reload itself.
+  reloads: () => Promise<number>;
+  // Reloads it through CDP, as it asked to, and waits for the new worker.
+  reload: () => Promise<Extension>;
+  close: () => Promise<void>;
+};
+
+/**
+ * Launches a browser with a fresh install, which, unlike the suite's
+ * extension, doesn't hold the optional sidePanel permission. CDP blocks an
+ * extension that reloads itself, so its own reload only gets counted.
+ */
+const installFresh = async (
+  engine: Engine,
+  testInfo: TestInfo
+): Promise<FreshInstall> => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'stylebot-e2e-grant-'));
+  const extensionDir = path.join(root, 'extension');
+  fs.cpSync(path.resolve(__dirname, '..', engine.distDir), extensionDir, {
+    recursive: true,
+  });
+
+  const context = await engine.launch(path.join(root, 'profile'), {
+    headless: testInfo.project.use.headless ?? true,
+    viewport: null,
+    colorScheme: null,
+  });
+  await context.route('https://stylebot.dev/**', route =>
+    route.fulfill({ contentType: 'text/html', body: '' })
+  );
+
+  const extension = await engine.loadExtension(context, extensionDir);
+  expect(await extension.evaluate(() => !!chrome.sidePanel)).toBe(false);
+
+  await extension.evaluate(() => {
+    const self = globalThis as typeof globalThis & { reloads: number };
+    self.reloads = 0;
+    Object.defineProperty(chrome.runtime, 'reload', {
+      value: () => self.reloads++,
+    });
+  });
+
+  return {
+    context,
+    extension,
+    reloads: () =>
+      extension.evaluate(
+        () => (globalThis as typeof globalThis & { reloads: number }).reloads
+      ),
+    reload: async () => {
+      const reloaded = await engine.loadExtension(context, extensionDir);
+      await expect
+        .poll(() =>
+          reloaded.evaluate(() => !!chrome.sidePanel).catch(() => false)
+        )
+        .toBe(true);
+      return reloaded;
+    },
+    close: async () => {
+      await context.close();
+      fs.rmSync(root, { recursive: true, force: true });
+    },
+  };
+};
+
+test('a fresh install asks for the side panel, reloads, then opens it', async ({
+  engine,
+}, testInfo) => {
+  test.setTimeout(90_000);
+  const fresh = await installFresh(engine, testInfo);
+  const { context } = fresh;
+
+  try {
+    await dockToSidePanel(fresh.extension);
+
+    const page = await context.newPage();
+    await page.goto(`${baseUrl}/`);
+    await page.bringToFront();
+
+    const popup = await engine.openPopup(context, fresh.extension);
+    await waitForEditorListener(popup);
+    await popup.locator('button', { hasText: 'Style this page' }).click();
+
+    await expect.poll(fresh.reloads).toBe(1);
+    expect(
+      await fresh.extension.evaluate(() =>
+        chrome.permissions.contains({ permissions: ['sidePanel'] })
+      )
+    ).toBe(true);
+    expect(await isSidePanelOpen(fresh.extension)).toBe(false);
+
+    const extension = await fresh.reload();
+
+    // The reload ended the gesture, so the editor opens in the page. Checked
+    // from the extension, as page.evaluate would hand the page a gesture.
+    await expect
+      .poll(() =>
+        extension.evaluate(async url => {
+          const [tab] = await chrome.tabs.query({ url: `${url}/` });
+          const [result] = await chrome.scripting.executeScript({
+            target: { tabId: tab.id! },
+            func: () =>
+              !!document
+                .getElementById('stylebot')
+                ?.shadowRoot?.querySelector('.stylebot'),
+          });
+          return result?.result;
+        }, baseUrl)
+      )
+      .toBe(true);
+    expect(await isSidePanelOpen(extension)).toBe(false);
+
+    const next = await context.newPage();
+    await next.goto(`${baseUrl}/`);
+    await openSidePanel(next, context, extension, () =>
+      engine.openPopup(context, extension)
+    );
+    expect(await isSidePanelOpen(extension)).toBe(true);
+  } finally {
+    await fresh.close();
+  }
+});
+
+test('picking the side panel in Options gets its permission, so the first open uses it', async ({
+  engine,
+}, testInfo) => {
+  test.setTimeout(90_000);
+  const fresh = await installFresh(engine, testInfo);
+  const { context } = fresh;
+  const optionsUrl = `chrome-extension://${fresh.extension.id}/options.html#/basics`;
+
+  try {
+    const options = await context.newPage();
+    await options.goto(optionsUrl);
+    await options.getByRole('button', { name: 'Side panel' }).click();
+
+    await expect.poll(fresh.reloads).toBe(1);
+    expect(
+      await fresh.extension.evaluate(() => chrome.storage.local.get('options'))
+    ).toMatchObject({ options: { layout: { dockLocation: 'sidepanel' } } });
+
+    await options.close();
+    const extension = await fresh.reload();
+
+    await expect
+      .poll(() => context.pages().some(page => page.url() === optionsUrl))
+      .toBe(true);
+
+    const page = await context.newPage();
+    await page.goto(`${baseUrl}/`);
+    await openSidePanel(page, context, extension, () =>
+      engine.openPopup(context, extension)
+    );
+    expect(await isSidePanelOpen(extension)).toBe(true);
+    expect(await page.locator('#stylebot .stylebot').count()).toBe(0);
+  } finally {
+    await fresh.close();
+  }
 });

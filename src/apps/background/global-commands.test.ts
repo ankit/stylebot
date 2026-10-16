@@ -2,9 +2,11 @@ jest.mock('./editor-window', () => ({ close: jest.fn() }));
 jest.mock('./restore-tabs', () => ({
   restoreTab: jest.fn(async () => undefined),
 }));
-jest.mock('./side-panel-check', () => ({
-  opensEditorInSidePanel: () => !!chrome.sidePanel && mockDockedInSidePanel,
+jest.mock('./side-panel', () => ({
+  opensEditorInSidePanel: () =>
+    (!!chrome.sidePanel || mockCanGrant) && mockDockedInSidePanel,
   onEditorSidePanelOpened: jest.fn(),
+  openEditorSidePanelWithFallback: jest.fn(() => mockGrant),
 }));
 jest.mock('./styles', () => ({
   toggleForPage: jest.fn(async () => undefined),
@@ -15,8 +17,11 @@ import * as editorWindow from './editor-window';
 import { restoreTab } from './restore-tabs';
 import { applyStylesToAllTabs, toggleForPage } from './styles';
 import { handleCommand } from './global-commands';
+import { openEditorSidePanelWithFallback } from './side-panel';
 
 let mockDockedInSidePanel = true;
+let mockCanGrant = false;
+let mockGrant: Promise<void> = Promise.resolve();
 
 const PAGE = { id: 7, url: 'https://example.com/' } as chrome.tabs.Tab;
 
@@ -71,6 +76,8 @@ describe('handleCommand', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockDockedInSidePanel = true;
+    mockCanGrant = false;
+    mockGrant = Promise.resolve();
   });
 
   it('asks the page to carry out a shortcut that acts on it', async () => {
@@ -130,6 +137,32 @@ describe('handleCommand', () => {
     await flush();
 
     expect(api.sidePanel?.open).not.toBeCalled();
+    expect(api.tabs.sendMessage).toBeCalledWith(
+      7,
+      { name: 'RunCommand', command: 'stylebot' },
+      expect.any(Function)
+    );
+  });
+
+  it('asks for the side panel without its permission, leaving the page alone', async () => {
+    mockCanGrant = true;
+    const api = makeChrome({ sidePanel: false });
+
+    handleCommand('stylebot', PAGE);
+    await flush();
+
+    expect(openEditorSidePanelWithFallback).toBeCalledWith(7);
+    expect(api.tabs.sendMessage).not.toBeCalled();
+  });
+
+  it('leaves the editor to the page when the side panel permission is refused', async () => {
+    mockCanGrant = true;
+    mockGrant = Promise.reject(new Error('Refused'));
+    const api = makeChrome({ sidePanel: false });
+
+    handleCommand('stylebot', PAGE);
+    await flush();
+
     expect(api.tabs.sendMessage).toBeCalledWith(
       7,
       { name: 'RunCommand', command: 'stylebot' },

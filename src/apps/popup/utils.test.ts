@@ -6,6 +6,7 @@ import {
   getRestoredPageSupport,
   getStyles,
   onEnterOrSpace,
+  openStylebotSidePanel,
 } from './utils';
 
 jest.mock('@stylebot/utils', () => ({
@@ -198,5 +199,69 @@ describe('getRestoredPageSupport', () => {
       } as chrome.tabs.Tab)
     ).toBe('unreachable');
     expect(sendMessage).not.toBeCalled();
+  });
+});
+
+describe('openStylebotSidePanel', () => {
+  const tab = { id: 7 } as chrome.tabs.Tab;
+
+  const makeChrome = ({ sidePanel = false, granted = true } = {}) => {
+    const api = {
+      runtime: {
+        getManifest: () => ({ optional_permissions: ['sidePanel'] }),
+        sendMessage: jest.fn(async () => granted),
+      },
+      tabs: { sendMessage: jest.fn() },
+      sidePanel: sidePanel
+        ? { open: jest.fn(async () => undefined), setOptions: jest.fn() }
+        : undefined,
+    };
+
+    global.chrome = api as unknown as typeof chrome;
+    return api;
+  };
+
+  const flush = () => new Promise(resolve => setTimeout(resolve));
+
+  beforeEach(() => {
+    jest.spyOn(window, 'close').mockImplementation(() => undefined);
+  });
+
+  it('opens the side panel from the click with the permission', async () => {
+    const api = makeChrome({ sidePanel: true });
+
+    openStylebotSidePanel(tab);
+    await flush();
+
+    expect(api.sidePanel?.open).toBeCalledWith({ tabId: 7 });
+    expect(api.runtime.sendMessage).toBeCalledWith({
+      name: 'EditorSidePanelOpened',
+      tabId: 7,
+    });
+  });
+
+  it('has the background ask for the permission without it', async () => {
+    const api = makeChrome();
+
+    openStylebotSidePanel(tab);
+    await flush();
+
+    expect(api.runtime.sendMessage).toBeCalledWith({
+      name: 'OpenEditorSidePanel',
+      tabId: 7,
+    });
+    expect(api.tabs.sendMessage).not.toBeCalled();
+    expect(window.close).toBeCalled();
+  });
+
+  it('opens the editor in the page when the permission is refused', async () => {
+    const api = makeChrome({ granted: false });
+
+    openStylebotSidePanel(tab);
+    await flush();
+
+    expect(api.tabs.sendMessage).toBeCalledWith(7, {
+      name: 'ToggleStylebot',
+    });
   });
 });
