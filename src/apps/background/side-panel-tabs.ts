@@ -1,10 +1,12 @@
 import type { StylebotLayout } from '@stylebot/types';
 import {
-  configureEditorSidePanel,
   detectChromiumVariant,
   doesSidePanelWorkInChromiumVariant,
-  isSidePanelGranted,
 } from '@stylebot/utils';
+import {
+  configureEditorSidePanel,
+  isSidePanelGranted,
+} from '@stylebot/side-panel';
 
 import { get as getOption } from './options';
 

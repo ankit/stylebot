@@ -1,9 +1,8 @@
+import { getPageSupport, getRestorePendingKey } from '@stylebot/utils';
 import {
-  getPageSupport,
-  getRestorePendingKey,
   isSidePanelGranted,
   isEditorSidePanelOpen,
-} from '@stylebot/utils';
+} from '@stylebot/side-panel';
 
 import * as editorWindow from './editor-window';
 

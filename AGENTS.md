@@ -6,7 +6,7 @@ Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of
 
 - `src/` — extension source, grouped into tiers. Each folder directly inside a tier is a package, imported as `@stylebot/<folder>` (resolved by `scripts/lib/src-packages.js`; `@stylebot/inject-css` keeps its old name for `apps/content`):
   - `src/apps/` — webpack entries and HTML pages: `background`, `popup`, `options`, `editor` (with the pop-out window in `editor/window`), `content` (the content script), `reader` (the readability UI bundle), `cli-inspector` (what the CLI reads and does on a page, loaded on its first request), `side-panel-default` (the manifest's default side panel, which closes itself; only Vivaldi shows it), `monaco-iframe`
-  - `src/features/` — capabilities shared by apps: `sync`, `history`, `page-bridge`, `highlighter`, `google-fonts`, `readability` (eligibility and reader lifecycle), `monaco-editor`
+  - `src/features/` — capabilities shared by apps: `sync`, `history`, `page-bridge`, `highlighter`, `google-fonts`, `readability` (eligibility and reader lifecycle), `side-panel` (the editor's side panel and its optional permission), `monaco-editor`
   - `src/ui/` — `components`, `icons`, `scss`
   - `src/core/` — `css`, `stylesheets`, `saved-styles`, `types`, `settings`, `i18n`, `utils`
   - `src/assets/` — `manifest` (base manifest plus dev and Firefox overrides), `icon` (the extension icon: SVG sources and the PNGs the build copies to `img/`), `fonts`, `_locales` (i18n strings per locale)
@@ -19,7 +19,7 @@ Browser extension (Chrome/Edge/Firefox) that lets users change the appearance of
 - `dist/` — Chrome/Edge build output; `firefox-dist/` — Firefox build output; `preview-dist/` — `yarn build:preview` output
 - `store/` — store listing art (promo tiles, screenshots) per store; not part of the build. `yarn capture:store` retakes the screenshots; `store/video/` makes the demo video (see its README)
 - `captures/` — git-ignored output of the `capture:*` scripts that shoot screenshots for stylebot.dev, whose source is its own repo, [stylebot-site](https://github.com/ankit/stylebot-site); copy them into that repo by hand
-- `docs/` — developer docs: setup, releases, translation, e2e, architecture (editor, selectors, CSS, readability, profiles, sync)
+- `docs/` — developer docs: setup, releases, translation, e2e, architecture (editor, side panel, selectors, CSS, readability, profiles, sync)
 - `patches/` — patch-package patches applied to dependencies on install
 
 ## Workflow

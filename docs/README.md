@@ -15,6 +15,7 @@
 ## Architecture
 
 - [Editor](editor.md) — the in-page and windowed editor, and the page bridge between them
+- [Side panel](side-panel.md) — docking the editor in Chrome's side panel, its optional permission, and the browsers that won't show it
 - [Selectors](selectors.md) — how the inspector picks a selector for an element
 - [CSS](css.md) — how edits land in the user's CSS, and how it's prepared and injected
 - [Readability](readability.md) — the reader view and how it loads

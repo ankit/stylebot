@@ -21,9 +21,6 @@ import {
   openOptionsPage,
   openReportIssuePage,
   openDonatePage,
-  supportsEditorSidePanel,
-  isSidePanelGranted,
-  openEditorSidePanel,
   detectChromiumVariantSync,
   doesSidePanelWorkInChromiumVariant,
   getBrowserCommands,
@@ -31,6 +28,11 @@ import {
   getRestorePendingKey,
   isWebPageUrl,
 } from '@stylebot/utils';
+import {
+  supportsEditorSidePanel,
+  isSidePanelGranted,
+  openEditorSidePanel,
+} from '@stylebot/side-panel';
 import type { PageSupport } from '@stylebot/utils';
 
 export const getCurrentTab = (

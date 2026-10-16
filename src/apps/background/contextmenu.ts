@@ -1,6 +1,7 @@
 import { t } from '@stylebot/i18n';
 import type { OpenStylebotFromContextMenu } from '@stylebot/types';
-import { getPageSupport, supportsEditorSidePanel } from '@stylebot/utils';
+import { getPageSupport } from '@stylebot/utils';
+import { supportsEditorSidePanel } from '@stylebot/side-panel';
 
 import type { StylebotDockLocation } from '@stylebot/types';
 

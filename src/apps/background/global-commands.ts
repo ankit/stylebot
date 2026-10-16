@@ -1,11 +1,10 @@
 import type { RunCommand, StylebotCommandName } from '@stylebot/types';
+import { COMMAND_NAMES, isWebPageUrl } from '@stylebot/utils';
 import {
-  COMMAND_NAMES,
   closeEditorSidePanel,
   isSidePanelGranted,
   isEditorSidePanelOpen,
-  isWebPageUrl,
-} from '@stylebot/utils';
+} from '@stylebot/side-panel';
 
 import * as editorWindow from './editor-window';
 import { restoreTab } from './restore-tabs';

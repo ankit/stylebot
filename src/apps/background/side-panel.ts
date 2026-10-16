@@ -3,17 +3,19 @@ import {
   CHROMIUM_VARIANT_KEY,
   detectChromiumVariant,
   getChromiumVariant,
+  doesSidePanelWorkInChromiumVariant,
+} from '@stylebot/utils';
+import {
   isSidePanelAwaitingReload,
   isSidePanelGranted,
   isEditorSidePanelOpen,
   markSidePanelAwaitingReload,
   openEditorSidePanel,
-  doesSidePanelWorkInChromiumVariant,
   hasSidePanelPermission,
   removeSidePanelPermission,
   requestSidePanelPermission,
   supportsEditorSidePanel,
-} from '@stylebot/utils';
+} from '@stylebot/side-panel';
 import type { ChromiumVariant } from '@stylebot/utils';
 
 import { reloadForGrant, resumeAfterGrantReload } from './grant-reload';

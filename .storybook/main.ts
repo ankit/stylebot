@@ -26,6 +26,7 @@ const aliasedPackages = [
   'google-fonts',
   'highlighter',
   'page-bridge',
+  'side-panel',
 ];
 
 const config: StorybookConfig = {

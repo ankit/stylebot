@@ -42,19 +42,6 @@ export {
 } from './open-page';
 export { tryPermissionsCall } from './permissions';
 export {
-  supportsEditorSidePanel,
-  isSidePanelGranted,
-  isSidePanelAwaitingReload,
-  markSidePanelAwaitingReload,
-  requestSidePanelPermission,
-  hasSidePanelPermission,
-  removeSidePanelPermission,
-  configureEditorSidePanel,
-  openEditorSidePanel,
-  closeEditorSidePanel,
-  isEditorSidePanelOpen,
-} from './editor-side-panel';
-export {
   CHROMIUM_VARIANT_KEY,
   doesSidePanelWorkInChromiumVariant,
   doShortcutsWorkInChromiumVariant,

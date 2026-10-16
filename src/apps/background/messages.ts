@@ -106,7 +106,10 @@ import {
   canUseEditorSidePanel,
   openEditorSidePanelWithFallback,
 } from './side-panel';
-import { closeEditorSidePanel, isEditorSidePanelOpen } from '@stylebot/utils';
+import {
+  closeEditorSidePanel,
+  isEditorSidePanelOpen,
+} from '@stylebot/side-panel';
 
 export const DisableStyle = async (
   message: DisableStyleType

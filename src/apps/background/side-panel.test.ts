@@ -1,14 +1,13 @@
+import { getChromiumVariant, detectChromiumVariant } from '@stylebot/utils';
 import {
   isEditorSidePanelOpen,
-  getChromiumVariant,
-  detectChromiumVariant,
   hasSidePanelPermission,
   isSidePanelAwaitingReload,
   isSidePanelGranted,
   openEditorSidePanel,
   removeSidePanelPermission,
   requestSidePanelPermission,
-} from '@stylebot/utils';
+} from '@stylebot/side-panel';
 
 import { reloadForGrant, resumeAfterGrantReload } from './grant-reload';
 import { get as getOption, set as setOption } from './options';
@@ -22,9 +21,12 @@ import {
 
 jest.mock('@stylebot/utils', () => ({
   ...jest.requireActual('@stylebot/utils'),
-  isEditorSidePanelOpen: jest.fn(),
   getChromiumVariant: jest.fn(),
   detectChromiumVariant: jest.fn(),
+}));
+jest.mock('@stylebot/side-panel', () => ({
+  ...jest.requireActual('@stylebot/side-panel'),
+  isEditorSidePanelOpen: jest.fn(),
   supportsEditorSidePanel: () => true,
   isSidePanelGranted: jest.fn(),
   isSidePanelAwaitingReload: jest.fn(),

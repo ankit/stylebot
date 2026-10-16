@@ -1,6 +1,6 @@
 # Editor
 
-The editor is one Vue app that runs in two hosts: docked inside the page, or in its own browser window. Everything it does to the page goes through a page bridge, which is what lets the same components run in either place.
+The editor is one Vue app that runs in two hosts: docked inside the page, or in its own browser window. Everything it does to the page goes through a page bridge, which is what lets the same components run in either place. The browser's side panel hosts it the same way as its own window; see [Side panel](side-panel.md).
 
 ## In the page
 

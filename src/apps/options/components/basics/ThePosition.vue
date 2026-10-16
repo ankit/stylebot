@@ -43,9 +43,11 @@ import {
   detectChromiumVariant,
   getChromiumVariant,
   doesSidePanelWorkInChromiumVariant,
+} from '@stylebot/utils';
+import {
   isSidePanelGranted,
   supportsEditorSidePanel,
-} from '@stylebot/utils';
+} from '@stylebot/side-panel';
 import type { ChromiumVariant } from '@stylebot/utils';
 
 import { grantSidePanel } from '../../utils';

@@ -3,8 +3,8 @@ import { defaultOptions } from '@stylebot/settings';
 import {
   getChromiumVariant,
   doesSidePanelWorkInChromiumVariant,
-  supportsEditorSidePanel,
 } from '@stylebot/utils';
+import { supportsEditorSidePanel } from '@stylebot/side-panel';
 
 /**
  * Layers stored options over the defaults so keys added in later releases

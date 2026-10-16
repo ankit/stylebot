@@ -1,13 +1,13 @@
-import type * as EditorSidePanel from './editor-side-panel';
+import type * as Permission from './permission';
 
 /**
  * Loads a fresh copy, as a new extension context starts with.
  */
-const loadModule = (): typeof EditorSidePanel => {
-  let loaded: typeof EditorSidePanel | undefined;
+const loadModule = (): typeof Permission => {
+  let loaded: typeof Permission | undefined;
 
   jest.isolateModules(() => {
-    loaded = jest.requireActual<typeof EditorSidePanel>('./editor-side-panel');
+    loaded = jest.requireActual<typeof Permission>('./permission');
   });
 
   return loaded!;
@@ -33,26 +33,6 @@ const makeChrome = ({
   global.chrome = api as unknown as typeof chrome;
   return api;
 };
-
-describe('supportsEditorSidePanel', () => {
-  it('says yes before the permission is granted, when it can be', () => {
-    makeChrome();
-
-    expect(loadModule().supportsEditorSidePanel()).toBe(true);
-  });
-
-  it('says yes with the permission', () => {
-    makeChrome({ sidePanel: true, optional: [] });
-
-    expect(loadModule().supportsEditorSidePanel()).toBe(true);
-  });
-
-  it('says no in a build that can’t ask for it', () => {
-    makeChrome({ optional: [] });
-
-    expect(loadModule().supportsEditorSidePanel()).toBe(false);
-  });
-});
 
 describe('isSidePanelGranted', () => {
   it('says yes where the side panel came with the start', () => {

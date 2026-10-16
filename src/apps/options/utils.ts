@@ -23,7 +23,7 @@ import type {
   UndoRestoreResponse,
   ReloadForSidePanelGrant,
 } from '@stylebot/types';
-import { requestSidePanelPermission } from '@stylebot/utils';
+import { requestSidePanelPermission } from '@stylebot/side-panel';
 
 export const getAllStyles = (): Promise<GetAllStylesResponse> => {
   const message: GetAllStyles = {

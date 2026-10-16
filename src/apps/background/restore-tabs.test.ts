@@ -1,4 +1,5 @@
-import { getPageSupport, isEditorSidePanelOpen } from '@stylebot/utils';
+import { getPageSupport } from '@stylebot/utils';
+import { isEditorSidePanelOpen } from '@stylebot/side-panel';
 
 import * as editorWindow from './editor-window';
 import { findOpenEditors, restoreOpenTabs, restoreTab } from './restore-tabs';
@@ -7,6 +8,8 @@ jest.mock('./editor-window', () => ({ isOpen: jest.fn(), open: jest.fn() }));
 jest.mock('@stylebot/utils', () => ({
   getPageSupport: jest.fn(),
   getRestorePendingKey: (tabId: number) => `restore-tab-${tabId}`,
+}));
+jest.mock('@stylebot/side-panel', () => ({
   isEditorSidePanelOpen: jest.fn(),
   isSidePanelGranted: () => !!chrome.sidePanel,
 }));
