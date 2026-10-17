@@ -112,8 +112,13 @@ export const InspectsInCode: StoryObj = {
     await user.click(button);
     await expect(store.state.inspecting).toBe(true);
 
-    await hoverPage(canvas.getByRole('heading', { level: 1 }));
-    await waitFor(() => expect(currentChip()).toMatch(/\bh1$/));
+    // Inspecting starts mid-play, so headless Chromium can re-hover its real
+    // cursor at the origin after our hover; hover again until the h1 holds.
+    const heading = canvas.getByRole('heading', { level: 1 });
+    await waitFor(async () => {
+      await hoverPage(heading);
+      await expect(currentChip()).toMatch(/\bh1$/);
+    });
     await pressKey('Enter');
 
     await expect(store.state.inspecting).toBe(false);
