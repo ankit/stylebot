@@ -13,6 +13,8 @@ import {
 } from 'node:fs';
 import path from 'node:path';
 
+import { requireReleaseTag } from '../stores/shared.mjs';
+
 const root = path.resolve(import.meta.dirname, '../..');
 const outDir = path.join(root, 'release');
 
@@ -102,6 +104,13 @@ if (!clientSecret) {
 const { version } = JSON.parse(
   readFileSync(path.join(root, 'package.json'), 'utf8')
 );
+try {
+  requireReleaseTag(version);
+} catch (error) {
+  console.error(error.message);
+  process.exit(1);
+}
+
 const extensionZip = path.join(outDir, `stylebot-${version}-firefox.zip`);
 const sourceZip = path.join(outDir, `stylebot-${version}-source.zip`);
 

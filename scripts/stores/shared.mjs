@@ -63,8 +63,23 @@ const git = args =>
   execFileSync('git', args, { cwd: rootDir, encoding: 'utf8' }).trim();
 
 /**
- * Checks what's uploaded can match a commit, along with the build secret and
- * the store's credentials, and returns the version being released.
+ * Throws unless HEAD is the release's vX.Y.Z tag, which the release workflow
+ * puts on the merged release commit, so a store only gets released code.
+ */
+export const requireReleaseTag = version => {
+  const tag = `v${version}`;
+
+  if (!git(['tag', '--points-at', 'HEAD']).split('\n').includes(tag)) {
+    throw new Error(
+      `HEAD isn't ${tag}. Run \`git fetch origin --tags && git checkout ${tag}\` ` +
+        'first, so the store gets the merged release commit.'
+    );
+  }
+};
+
+/**
+ * Checks what's uploaded is the release's tagged commit, along with the build
+ * secret and the store's credentials, and returns the version being released.
  */
 export const prepareUpload = envNames => {
   if (git(['status', '--porcelain'])) {
@@ -75,8 +90,13 @@ export const prepareUpload = envNames => {
 
   requireEnv(['STYLEBOT_GOOGLE_CLIENT_SECRET', ...envNames]);
 
-  return JSON.parse(readFileSync(path.join(rootDir, 'package.json'), 'utf8'))
-    .version;
+  const { version } = JSON.parse(
+    readFileSync(path.join(rootDir, 'package.json'), 'utf8')
+  );
+
+  requireReleaseTag(version);
+
+  return version;
 };
 
 /**
