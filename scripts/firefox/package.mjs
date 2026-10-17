@@ -4,8 +4,16 @@
 //   yarn package:firefox
 
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, readFileSync, rmSync } from 'node:fs';
+import {
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  statSync,
+} from 'node:fs';
 import path from 'node:path';
+
+import { requireReleaseTag } from '../stores/shared.mjs';
 
 const root = path.resolve(import.meta.dirname, '../..');
 const outDir = path.join(root, 'release');
@@ -13,6 +21,20 @@ const outDir = path.join(root, 'release');
 // Kept out of the source zip: store art and the Safari app aren't part of the
 // Firefox build.
 const EXCLUDED_FROM_SOURCE = ['store', 'safari'];
+
+const AMO_MAX_JS_MB = 4;
+
+/**
+ * The JavaScript files in dir that are too large for AMO's linter to parse,
+ * relative to dir.
+ */
+function findFilesTooLargeForAMO(dir) {
+  return readdirSync(dir, { recursive: true })
+    .filter(file => file.endsWith('.js'))
+    .filter(
+      file => statSync(path.join(dir, file)).size > AMO_MAX_JS_MB * 2 ** 20
+    );
+}
 
 /**
  * Runs a command in the repo root, printing its output.
@@ -82,6 +104,13 @@ if (!clientSecret) {
 const { version } = JSON.parse(
   readFileSync(path.join(root, 'package.json'), 'utf8')
 );
+try {
+  requireReleaseTag(version);
+} catch (error) {
+  console.error(error.message);
+  process.exit(1);
+}
+
 const extensionZip = path.join(outDir, `stylebot-${version}-firefox.zip`);
 const sourceZip = path.join(outDir, `stylebot-${version}-source.zip`);
 
@@ -90,6 +119,17 @@ rmSync(extensionZip, { force: true });
 rmSync(sourceZip, { force: true });
 
 run('yarn', ['build:firefox']);
+
+const tooLarge = findFilesTooLargeForAMO(path.join(root, 'firefox-dist'));
+
+if (tooLarge.length) {
+  console.error(
+    `AMO's linter can't parse JavaScript files over ${AMO_MAX_JS_MB} MB, so ` +
+      `it would reject the upload:\n  ${tooLarge.join('\n  ')}`
+  );
+  process.exit(1);
+}
+
 run('zip', ['-r', '-X', '-q', extensionZip, '.', '-x', '.build-complete'], {
   cwd: path.join(root, 'firefox-dist'),
 });
