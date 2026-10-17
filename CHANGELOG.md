@@ -1,3 +1,8 @@
+## Version 4.0.5 (October 2026)
+
+- Ask for permission to use the side panel the first time you pick it for the editor, so Vivaldi no longer opens the panel on its own
+- Show the rating prompt as a quieter card under Edit style in the popup
+
 ## Version 4.0.4 (October 2026)
 
 - Make Stylebot usable in Arc (#1212)
