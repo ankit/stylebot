@@ -736,6 +736,7 @@ export default Vue.extend({
   gap: 4px;
   flex: 1;
   min-width: 0;
+  margin-bottom: -1px;
   overflow-x: auto;
 }
 
@@ -748,7 +749,6 @@ export default Vue.extend({
   flex: none;
   height: 44px;
   padding: 0 8px;
-  margin-bottom: -1px;
   border-bottom: 3px solid transparent;
   font-size: 14px;
   font-weight: 500;
