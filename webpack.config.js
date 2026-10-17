@@ -60,6 +60,12 @@ const getOutputPath = () => {
     : `${__dirname}/dist`;
 };
 
+// Webpack 4 never empties the output folder, so files an older build wrote
+// would end up in a store zip.
+if (process.env.NODE_ENV === 'production') {
+  fs.rmSync(getOutputPath(), { recursive: true, force: true });
+}
+
 // Writes a marker once every compiler has built successfully, so tools like
 // scripts/launch-chrome.mjs never see it before manifest.json exists.
 const compilersDone = {};
