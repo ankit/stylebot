@@ -91,6 +91,7 @@ missing.
 ## 7. Build the store packages
 
 ```
+git fetch origin --tags && git checkout vX.Y.Z
 yarn build             # -> dist/     Chrome Web Store + Edge Add-ons
 yarn package:firefox   # -> release/  AMO extension zip + source zip
 ```
@@ -98,7 +99,8 @@ yarn package:firefox   # -> release/  AMO extension zip + source zip
 Both need `STYLEBOT_GOOGLE_CLIENT_SECRET` set to the Desktop OAuth client's secret; Drive
 sign-in fails without it, so the build refuses to run. Zip `dist/` by hand. `yarn package:firefox` needs a clean working tree: it builds Firefox
 and writes both zips AMO asks for, the extension and the source it was built from, with
-build steps for reviewers. Upload by hand; there is no automated store upload.
+build steps for reviewers, and refuses to run anywhere but the `vX.Y.Z` tag. Upload by hand,
+or with `yarn upload:chrome` / `upload:edge` / `upload:firefox` from the tag (see `docs/releases.md`).
 
 ## Optional follow-up
 

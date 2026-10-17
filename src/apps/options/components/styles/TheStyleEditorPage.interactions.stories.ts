@@ -78,6 +78,27 @@ export const CountInList: StoryObj = {
   },
 };
 
+export const TabsDoNotScrollVertically: StoryObj = {
+  ...profiledStyleEditor,
+  name: 'the profile tabs fit their bar, with no vertical scrollbar, and the selected one underlines its edge',
+  play: async context => {
+    await profiledStyleEditor.play?.(context);
+    const { canvasElement } = context;
+
+    const bar = canvasElement.querySelector('.profile-bar') as HTMLElement;
+    const tabs = canvasElement.querySelector('.profile-tabs') as HTMLElement;
+    const selected = canvasElement.querySelector(
+      '.profile-tab.selected'
+    ) as HTMLElement;
+
+    await expect(tabs.scrollHeight).toBeLessThanOrEqual(tabs.clientHeight);
+    await expect(tabs.offsetWidth).toBe(tabs.clientWidth);
+    await expect(
+      selected.getBoundingClientRect().bottom
+    ).toBeGreaterThanOrEqual(bar.getBoundingClientRect().bottom);
+  },
+};
+
 export const EditInactiveProfile: StoryObj = {
   ...profiledStyleEditor,
   name: 'a profile tab edits that profile without making it active, and Save keeps every edit',
