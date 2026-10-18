@@ -8,6 +8,7 @@ import {
   style,
 } from '../../features/gallery/gallery.fixtures';
 import { captureTab } from './capture-tab';
+import { getAll } from './styles';
 import {
   CaptureGalleryScreenshot,
   GetGalleryScreenshot,
@@ -24,6 +25,7 @@ jest.mock('@stylebot/sync', () => ({
 }));
 jest.mock('./capture-tab', () => ({ captureTab: jest.fn() }));
 jest.mock('./gallery-preview', () => ({}));
+jest.mock('./styles', () => ({ getAll: jest.fn(async () => ({})) }));
 
 const SCREENSHOT = 'data:image/png;base64,iVBORw0KGgo=';
 
@@ -156,6 +158,7 @@ describe('gallery messages', () => {
         group: style.group,
         slug: style.slug,
       },
+      installed: null,
     });
   });
 
@@ -275,6 +278,9 @@ describe('gallery messages', () => {
         },
       },
     });
+    (getAll as jest.Mock).mockResolvedValue({
+      'github.com': { css: '', profiles: { p1: { name: 'Installed' } } },
+    });
     fetchMock.mockResponseOnce(
       JSON.stringify({ styles: [style, installed, other], nextOffset: null })
     );
@@ -297,5 +303,38 @@ describe('gallery messages', () => {
       styles: [other],
       group: 'github.com',
     });
+  });
+
+  it('suggests an installed style again once its profile is removed', async () => {
+    const installed = { ...style, id: 'installed', slug: 'installed' };
+    mockStorage({
+      'gallery-installed': {
+        installed: {
+          url: 'github.com',
+          profileId: 'p1',
+          version: 1,
+          group: 'github.com',
+          slug: 'installed',
+        },
+      },
+    });
+    (getAll as jest.Mock).mockResolvedValue({
+      'github.com': { css: '', profiles: { default: { name: '' } } },
+    });
+    fetchMock.mockResponseOnce(
+      JSON.stringify({ styles: [installed], nextOffset: null })
+    );
+
+    const response = await respond(send =>
+      GetGallerySuggestions(
+        {
+          name: 'GetGallerySuggestions',
+          pageUrl: 'https://github.com/',
+        },
+        send
+      )
+    );
+
+    expect(response).toMatchObject({ ok: true, styles: [installed] });
   });
 });

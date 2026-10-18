@@ -10,12 +10,14 @@
 <script lang="ts">
 import Vue from 'vue';
 import { SMenuItem, SStatusDot } from '@stylebot/components';
+import { getGalleryStyleUrl } from '@stylebot/gallery';
 
 type Item = { label: string; changed: boolean };
 
 /**
  * The ⋯ menu's way into publishing to the Gallery, with an amber dot when a
- * published style has changes to publish.
+ * published style has changes to publish. A profile installed from the
+ * Gallery links to its page there instead.
  */
 export default Vue.extend({
   name: 'TheGalleryMenuItem',
@@ -27,7 +29,14 @@ export default Vue.extend({
 
   computed: {
     item(): Item {
-      if (!this.$store.state.publishedGalleryStyle) {
+      const { publishedGalleryStyle, installedGalleryStyle } =
+        this.$store.state;
+
+      if (!publishedGalleryStyle && installedGalleryStyle) {
+        return { label: this.t('view_in_gallery'), changed: false };
+      }
+
+      if (!publishedGalleryStyle) {
         return { label: this.t('publish_to_gallery'), changed: false };
       }
 
@@ -41,7 +50,19 @@ export default Vue.extend({
 
   methods: {
     openPublishing(): void {
-      this.$store.commit('setPublishing', true);
+      const { publishedGalleryStyle, installedGalleryStyle } =
+        this.$store.state;
+
+      if (!publishedGalleryStyle && installedGalleryStyle) {
+        window.open(
+          getGalleryStyleUrl(installedGalleryStyle),
+          '_blank',
+          'noopener'
+        );
+      } else {
+        this.$store.commit('setPublishing', true);
+      }
+
       this.$emit('click');
     },
   },

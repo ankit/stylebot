@@ -169,6 +169,13 @@ export default {
     state.publishedGalleryStyle = value;
   },
 
+  setInstalledGalleryStyle(
+    state: State,
+    value: State['installedGalleryStyle']
+  ): void {
+    state.installedGalleryStyle = value;
+  },
+
   setReadability(state: State, value: boolean): void {
     state.readability = value;
   },

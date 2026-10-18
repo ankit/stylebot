@@ -36,6 +36,7 @@ const mockState: State = {
   capturing: false,
   screenshotReview: null,
   publishedGalleryStyle: null,
+  installedGalleryStyle: null,
   visible: false,
   inspecting: false,
   previewSelector: '',

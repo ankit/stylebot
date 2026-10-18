@@ -1,6 +1,7 @@
 import { mockStorage } from './gallery.fixtures';
 import {
   getInstallId,
+  getInstalledStyleForProfile,
   getInstalledStyleIds,
   rememberInstalledStyle,
 } from './installed-styles';
@@ -26,6 +27,41 @@ describe('installed styles', () => {
       slug: 'night',
     });
 
-    expect(await getInstalledStyleIds()).toEqual(new Set(['abc']));
+    expect(
+      await getInstalledStyleIds({
+        'github.com': {
+          css: '',
+          enabled: true,
+          readability: false,
+          modifiedTime: '',
+          profiles: { p1: { name: 'Night' } },
+        },
+      })
+    ).toEqual(new Set(['abc']));
+    expect(await getInstalledStyleForProfile('github.com', 'p1')).toEqual(
+      expect.objectContaining({ group: 'github.com', slug: 'night' })
+    );
+  });
+
+  it('forgets an install once its profile is removed', async () => {
+    await rememberInstalledStyle('abc', {
+      url: 'github.com',
+      profileId: 'p1',
+      version: 1,
+      group: 'github.com',
+      slug: 'night',
+    });
+
+    expect(
+      await getInstalledStyleIds({
+        'github.com': {
+          css: '',
+          enabled: true,
+          readability: false,
+          modifiedTime: '',
+          profiles: { default: { name: '' } },
+        },
+      })
+    ).toEqual(new Set());
   });
 });

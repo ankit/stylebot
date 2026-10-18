@@ -1,3 +1,5 @@
+import type { StyleMap } from '@stylebot/types';
+
 // Remembers which gallery styles are installed and as which Stylebot
 // profile, so the popup doesn't suggest them again.
 const INSTALL_ID_KEY = 'gallery-install-id';
@@ -42,8 +44,32 @@ export const getInstallId = async (): Promise<string> => {
   return installId;
 };
 
-export const getInstalledStyleIds = async (): Promise<Set<string>> =>
-  new Set(Object.keys(await getInstalledStyles()));
+/**
+ * The gallery styles still installed: their profiles may since have been
+ * removed, here or by sync, which leaves them free to suggest again.
+ */
+export const getInstalledStyleIds = async (
+  styles: StyleMap
+): Promise<Set<string>> => {
+  const installed = Object.entries(await getInstalledStyles());
+
+  return new Set(
+    installed
+      .filter(([, { url, profileId }]) => styles[url]?.profiles?.[profileId])
+      .map(([styleId]) => styleId)
+  );
+};
+
+/**
+ * The gallery style a profile was installed from, if any.
+ */
+export const getInstalledStyleForProfile = async (
+  url: string,
+  profileId: string
+): Promise<InstalledStyleRecord | null> =>
+  Object.values(await getInstalledStyles()).find(
+    installed => installed.url === url && installed.profileId === profileId
+  ) ?? null;
 
 export const rememberInstalledStyle = async (
   styleId: string,
