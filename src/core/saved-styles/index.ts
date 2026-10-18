@@ -26,6 +26,10 @@ export {
   renameProfile,
   removeProfile,
   setProfileCss,
+  setProfileGalleryListing,
+  removeProfileGalleryListing,
+  removeGalleryListings,
+  isSameGalleryListing,
   isProfileNameTaken,
   freeProfileName,
 } from './profiles';

@@ -1,4 +1,5 @@
 import 'jest-fetch-mock';
+import type { StyleProfiles } from '@stylebot/types';
 
 jest.mock('./sync-scheduler', () => ({
   scheduleSyncAfterEdit: jest.fn().mockResolvedValue(undefined),
@@ -16,6 +17,9 @@ import {
   createProfile,
   installProfile,
   reinstallProfile,
+  setGalleryListing,
+  removeGalleryListing,
+  removePublishedGalleryListing,
   renameProfile,
   deleteProfile,
   getGoogleWebFontExists,
@@ -127,7 +131,7 @@ describe('style edits', () => {
     enabled: boolean;
     readability: boolean;
     modifiedTime: string;
-    profiles?: Record<string, { name: string; css?: string }>;
+    profiles?: StyleProfiles;
   };
 
   let store: { styles: Record<string, StoredStyle> };
@@ -359,7 +363,9 @@ describe('style edits', () => {
     await setActiveProfile('example.com', 'default');
     await disable('example.com');
 
-    expect(await reinstallProfile('example.com', id, 'b {}')).toBe('Dracula');
+    expect(await reinstallProfile('example.com', id, { css: 'b {}' })).toBe(
+      'Dracula'
+    );
     expect(stored('example.com')).toMatchObject({
       css: 'b {}',
       activeProfile: id,
@@ -374,8 +380,90 @@ describe('style edits', () => {
   it('reinstalls nothing when the profile is gone', async () => {
     const before = writes();
 
-    expect(await reinstallProfile('example.com', 'missing', 'b {}')).toBeNull();
+    expect(
+      await reinstallProfile('example.com', 'missing', { css: 'b {}' })
+    ).toBeNull();
     expect(writes()).toBe(before);
+  });
+
+  describe('gallery listings', () => {
+    const listing = (publishedBy?: string) => ({
+      styleId: 'night',
+      group: 'example.com',
+      slug: 'night',
+      version: 1,
+      cssHash: 'abc',
+      ...(publishedBy ? { publishedBy } : {}),
+    });
+
+    it('keeps the listing of a profile installed from the gallery, even when its name and css match another', async () => {
+      const css = 'a { color: purple; }';
+      const first = await installProfile('example.com', { name: 'Night', css });
+      const listed = await installProfile('example.com', {
+        name: 'Night',
+        css,
+        galleryListing: listing(),
+      });
+
+      expect(listed).toMatchObject({ name: 'Night 2' });
+      expect(listed.id).not.toBe(first.id);
+      expect(stored('example.com').profiles?.[listed.id]).toEqual({
+        name: 'Night 2',
+        galleryListing: listing(),
+      });
+    });
+
+    it('updates the listing of a profile it reinstalls', async () => {
+      const { id } = await installProfile('example.com', {
+        name: 'Night',
+        css: 'a {}',
+        galleryListing: listing(),
+      });
+      const newer = { ...listing(), version: 2 };
+
+      await reinstallProfile('example.com', id, {
+        css: 'b {}',
+        galleryListing: newer,
+      });
+
+      expect(stored('example.com')).toMatchObject({
+        css: 'b {}',
+        profiles: { [id]: { name: 'Night', galleryListing: newer } },
+      });
+    });
+
+    it('sets and removes the listing a profile was published as', async () => {
+      await setGalleryListing('example.com', 'default', listing('me'));
+      expect(stored('example.com').profiles?.default).toEqual({
+        name: '',
+        galleryListing: listing('me'),
+      });
+
+      const before = writes();
+      await setGalleryListing('example.com', 'default', listing('me'));
+      expect(writes()).toBe(before);
+
+      await removeGalleryListing('example.com', 'default');
+      expect(stored('example.com').profiles?.default).toEqual({ name: '' });
+    });
+
+    it('drops the listing only from the profiles published as an unpublished style', async () => {
+      const { id } = await installProfile('example.com', {
+        name: 'Night',
+        css: 'a {}',
+        galleryListing: listing(),
+      });
+      await setGalleryListing('example.com', 'default', listing('me'));
+
+      await removePublishedGalleryListing('night');
+
+      expect(
+        stored('example.com').profiles?.default?.galleryListing
+      ).toBeUndefined();
+      expect(stored('example.com').profiles?.[id]?.galleryListing).toEqual(
+        listing()
+      );
+    });
   });
 
   it('creates the style when installing for a url with none', async () => {

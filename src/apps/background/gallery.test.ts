@@ -1,5 +1,6 @@
 import fetchMock from 'jest-fetch-mock';
 import { GALLERY_API_URL, hashCss } from '@stylebot/gallery';
+import type { GalleryListing, StyleMap } from '@stylebot/types';
 
 import {
   mockStorage,
@@ -8,7 +9,6 @@ import {
   style,
 } from '../../features/gallery/gallery.fixtures';
 import { captureTab } from './capture-tab';
-import { getAll } from './styles';
 import {
   CaptureGalleryScreenshot,
   GetGalleryScreenshot,
@@ -26,7 +26,65 @@ jest.mock('@stylebot/sync', () => ({
 }));
 jest.mock('./capture-tab', () => ({ captureTab: jest.fn() }));
 jest.mock('./gallery-preview', () => ({}));
-jest.mock('./styles', () => ({ getAll: jest.fn(async () => ({})) }));
+let mockStyles: StyleMap;
+
+jest.mock('./styles', () => {
+  const {
+    expandProfiles,
+    removeProfileGalleryListing,
+    setProfileGalleryListing,
+  } = jest.requireActual<typeof import('@stylebot/saved-styles')>(
+    '@stylebot/saved-styles'
+  );
+
+  return {
+    getAll: jest.fn(async () => mockStyles),
+    setGalleryListing: jest.fn(
+      async (url: string, id: string, galleryListing: GalleryListing) => {
+        mockStyles[url] = setProfileGalleryListing(
+          mockStyles[url],
+          id,
+          galleryListing
+        );
+      }
+    ),
+    removePublishedGalleryListing: jest.fn(async (styleId: string) => {
+      for (const [url, saved] of Object.entries(mockStyles)) {
+        const { sheets } = expandProfiles(saved);
+
+        for (const [id, { galleryListing }] of Object.entries(sheets)) {
+          if (
+            galleryListing?.styleId === styleId &&
+            galleryListing.publishedBy
+          ) {
+            mockStyles[url] = removeProfileGalleryListing(mockStyles[url], id);
+          }
+        }
+      }
+    }),
+  };
+});
+
+const savedStyle = (profiles: StyleMap[string]['profiles'] = undefined) => ({
+  css: '',
+  enabled: true,
+  readability: false,
+  modifiedTime: '',
+  ...(profiles ? { profiles, activeProfile: Object.keys(profiles)[0] } : {}),
+});
+
+const listing = (
+  styleId: string,
+  slug: string,
+  publishedBy?: string
+): GalleryListing => ({
+  styleId,
+  group: 'github.com',
+  slug,
+  version: 1,
+  cssHash: 'abc',
+  ...(publishedBy ? { publishedBy } : {}),
+});
 
 const SCREENSHOT = 'data:image/png;base64,iVBORw0KGgo=';
 
@@ -54,6 +112,7 @@ beforeEach(() => {
   jest.spyOn(console, 'error').mockImplementation(() => undefined);
   fetchMock.resetMocks();
   mockStorage({ 'gallery-session': session });
+  mockStyles = { 'github.com': savedStyle() };
 });
 
 describe('gallery messages', () => {
@@ -163,6 +222,36 @@ describe('gallery messages', () => {
     });
   });
 
+  it('names the gallery style a profile was installed from, and hides one another account published', async () => {
+    const published = (profileId: string) =>
+      respond(send =>
+        GetPublishedGalleryStyle(
+          { name: 'GetPublishedGalleryStyle', url: 'github.com', profileId },
+          send
+        )
+      );
+    mockStyles = {
+      'github.com': savedStyle({
+        p1: { name: 'Night', galleryListing: listing('night', 'night') },
+        p2: {
+          name: 'Theirs',
+          css: 'a {}',
+          galleryListing: listing('theirs', 'theirs', 'someone'),
+        },
+      }),
+    };
+
+    expect(await published('p1')).toEqual({
+      published: null,
+      installed: { group: 'github.com', slug: 'night' },
+    });
+    expect(await published('p2')).toEqual({ published: null, installed: null });
+    expect(await published('missing')).toEqual({
+      published: null,
+      installed: null,
+    });
+  });
+
   it('forgets an unpublished style', async () => {
     fetchMock
       .mockResponseOnce(JSON.stringify(publishedStyle), { status: 201 })
@@ -258,30 +347,18 @@ describe('gallery messages', () => {
   it("suggests the site's styles that are neither installed nor published here", async () => {
     const other = { ...style, id: 'other', slug: 'other' };
     const installed = { ...style, id: 'installed', slug: 'installed' };
-    mockStorage({
-      'gallery-installed': {
-        installed: {
-          url: 'github.com',
-          profileId: 'p1',
-          version: 1,
-          group: 'github.com',
-          slug: 'installed',
+    mockStyles = {
+      'github.com': savedStyle({
+        default: {
+          name: '',
+          galleryListing: listing(style.id, style.slug, 'me'),
         },
-      },
-      'gallery-published': {
-        [JSON.stringify(['github.com', 'default'])]: {
-          styleId: style.id,
-          accountId: 'me',
-          cssHash: 'abc',
-          version: 1,
-          group: 'github.com',
-          slug: style.slug,
+        p1: {
+          name: 'Installed',
+          galleryListing: listing('installed', 'installed'),
         },
-      },
-    });
-    (getAll as jest.Mock).mockResolvedValue({
-      'github.com': { css: '', profiles: { p1: { name: 'Installed' } } },
-    });
+      }),
+    };
     fetchMock.mockResponseOnce(
       JSON.stringify({ styles: [style, installed, other], nextOffset: null })
     );
@@ -308,20 +385,9 @@ describe('gallery messages', () => {
 
   it('suggests an installed style again once its profile is removed', async () => {
     const installed = { ...style, id: 'installed', slug: 'installed' };
-    mockStorage({
-      'gallery-installed': {
-        installed: {
-          url: 'github.com',
-          profileId: 'p1',
-          version: 1,
-          group: 'github.com',
-          slug: 'installed',
-        },
-      },
-    });
-    (getAll as jest.Mock).mockResolvedValue({
-      'github.com': { css: '', profiles: { default: { name: '' } } },
-    });
+    mockStyles = {
+      'github.com': savedStyle({ default: { name: '' } }),
+    };
     fetchMock.mockResponseOnce(
       JSON.stringify({ styles: [installed], nextOffset: null })
     );
@@ -341,21 +407,12 @@ describe('gallery messages', () => {
 
   describe('install status', () => {
     const installedStyles = () => {
-      mockStorage({
-        'gallery-installed': {
-          night: {
-            url: 'github.com',
-            profileId: 'p1',
-            version: 1,
-            group: 'github.com',
-            slug: 'night',
-          },
-        },
-      });
       (global.chrome as { runtime?: unknown }).runtime = { id: 'stylebot' };
-      (getAll as jest.Mock).mockResolvedValue({
-        'github.com': { css: '', profiles: { p1: { name: 'Night' } } },
-      });
+      mockStyles = {
+        'github.com': savedStyle({
+          p1: { name: 'Night', galleryListing: listing('night', 'night') },
+        }),
+      };
     };
 
     const status = (styleIds: unknown, url: string) =>

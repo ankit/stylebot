@@ -11,6 +11,9 @@ import {
   removeProfile,
   renameProfile,
   setProfileCss,
+  setProfileGalleryListing,
+  removeProfileGalleryListing,
+  removeGalleryListings,
   isProfileNameTaken,
   freeProfileName,
 } from './profiles';
@@ -24,6 +27,14 @@ const style = (rest: Partial<StyleWithoutUrl> = {}): StyleWithoutUrl => ({
   modifiedTime: '2024-01-01T00:00:00.000Z',
   ...rest,
 });
+
+const GALLERY_LISTING = {
+  styleId: 'night',
+  group: 'github.com',
+  slug: 'night',
+  version: 1,
+  cssHash: 'abc',
+};
 
 const withTwo = () =>
   addProfile(style(), {
@@ -138,6 +149,79 @@ describe('getProfileSheet', () => {
   it('finds nothing for a missing style or profile', () => {
     expect(getProfileSheet(undefined, 'default')).toBeUndefined();
     expect(getProfileSheet(withTwo(), 'missing')).toBeUndefined();
+  });
+});
+
+describe('gallery listings', () => {
+  it('keeps a profile’s listing through switching, and drops an invalid one', () => {
+    const listed = addProfile(style(), {
+      id: 'night',
+      name: 'Night',
+      css: 'a { color: navy; }',
+      galleryListing: GALLERY_LISTING,
+      activate: false,
+    });
+
+    expect(activateProfile(listed, 'night').profiles).toEqual({
+      default: { name: '', css: 'a { color: red; }' },
+      night: { name: 'Night', galleryListing: GALLERY_LISTING },
+    });
+
+    const broken = style({
+      profiles: { a: { name: 'A', galleryListing: { styleId: 5 } as never } },
+      activeProfile: 'a',
+    });
+
+    expect(normalizeProfiles(broken).profiles).toEqual({ a: { name: 'A' } });
+
+    const padded = style({
+      profiles: {
+        a: {
+          name: 'A',
+          galleryListing: { ...GALLERY_LISTING, extra: 1 } as never,
+        },
+      },
+      activeProfile: 'a',
+    });
+
+    expect(normalizeProfiles(padded).profiles).toEqual({
+      a: { name: 'A', galleryListing: GALLERY_LISTING },
+    });
+  });
+
+  it('removes only the listings that match, returning the style itself when none do', () => {
+    const listed = setProfileGalleryListing(
+      setProfileGalleryListing(withTwo(), 'default', GALLERY_LISTING),
+      'dark',
+      { ...GALLERY_LISTING, styleId: 'other' }
+    );
+    const isNight = ({ styleId }: { styleId: string }) => styleId === 'night';
+
+    const removed = removeGalleryListings(listed, isNight);
+
+    expect(removed.profiles?.default?.galleryListing).toBeUndefined();
+    expect(removed.profiles?.dark?.galleryListing).toMatchObject({
+      styleId: 'other',
+    });
+    expect(removeGalleryListings(removed, isNight)).toBe(removed);
+  });
+
+  it('sets and removes a profile’s listing, returning the style itself when nothing changes', () => {
+    const two = withTwo();
+    const withListing = setProfileGalleryListing(two, 'dark', GALLERY_LISTING);
+
+    expect(withListing.profiles?.dark).toEqual({
+      name: 'Dark',
+      css: 'a { color: white; }',
+      galleryListing: GALLERY_LISTING,
+    });
+    expect(
+      setProfileGalleryListing(withListing, 'dark', { ...GALLERY_LISTING })
+    ).toBe(withListing);
+    expect(
+      removeProfileGalleryListing(withListing, 'dark').profiles?.dark
+    ).toEqual({ name: 'Dark', css: 'a { color: white; }' });
+    expect(setProfileGalleryListing(two, 'missing', GALLERY_LISTING)).toBe(two);
   });
 });
 

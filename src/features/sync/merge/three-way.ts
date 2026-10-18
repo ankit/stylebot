@@ -5,6 +5,7 @@ import {
   expandProfiles,
   isEquivalentCss,
   isEquivalentStyle,
+  isSameGalleryListing,
 } from '@stylebot/saved-styles';
 import type { ExpandedProfiles, ProfileSheet } from '@stylebot/saved-styles';
 
@@ -25,8 +26,38 @@ const parseTime = (timestamp?: string) => {
   return Number.isNaN(time) ? 0 : time;
 };
 
-const isSameSheet = (a?: ProfileSheet, b?: ProfileSheet) =>
-  !a || !b ? !a && !b : a.name === b.name && isEquivalentCss(a.css, b.css);
+const isSameSheet = (a?: ProfileSheet, b?: ProfileSheet) => {
+  if (!a || !b) {
+    return !a && !b;
+  }
+
+  return (
+    a.name === b.name &&
+    isEquivalentCss(a.css, b.css) &&
+    isSameGalleryListing(a.galleryListing, b.galleryListing)
+  );
+};
+
+/**
+ * The gallery listing a profile ends up with when both sides changed it: a
+ * change made on one side only, or the newer side's.
+ */
+const mergeGalleryListing = (
+  base: ProfileSheet | undefined,
+  local: ProfileSheet,
+  remote: ProfileSheet,
+  localWins: boolean
+) => {
+  if (isSameGalleryListing(remote.galleryListing, base?.galleryListing)) {
+    return local.galleryListing;
+  }
+
+  if (isSameGalleryListing(local.galleryListing, base?.galleryListing)) {
+    return remote.galleryListing;
+  }
+
+  return localWins ? local.galleryListing : remote.galleryListing;
+};
 
 /**
  * The name a profile ends up with when both sides changed it: a rename made
@@ -98,7 +129,11 @@ const mergeStyle = (
     } else {
       const merged = mergeCss(bs?.css ?? '', ls.css, rs.css, localWins, at);
 
-      sheet = { name: mergeName(bs, ls, rs, localWins), css: merged.css };
+      sheet = {
+        name: mergeName(bs, ls, rs, localWins),
+        css: merged.css,
+        galleryListing: mergeGalleryListing(bs, ls, rs, localWins),
+      };
       conflicted = conflicted || merged.conflicted;
     }
 

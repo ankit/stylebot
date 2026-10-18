@@ -87,12 +87,13 @@ export type GalleryStylesPage = {
 export type GalleryStyleWithCss = GalleryStyle & { css: string };
 
 /**
- * What an install answers with: enough to save the style as a profile.
+ * A gallery style with the CSS of its latest version, trimmed to what saving
+ * it as a profile needs.
  */
-export type GalleryInstall = Pick<
-  GalleryStyle,
-  'id' | 'site' | 'name' | 'version'
-> & { css: string };
+export type GalleryStyleToInstall = Pick<
+  GalleryStyleWithCss,
+  'id' | 'site' | 'name' | 'version' | 'css'
+>;
 
 /**
  * A site's live styles, most installed first.
@@ -116,7 +117,7 @@ export const getStyle = (id: string): Promise<GalleryStyleWithCss> =>
 export const recordInstall = (
   id: string,
   installId: string
-): Promise<GalleryInstall> =>
+): Promise<GalleryStyleToInstall> =>
   request(`/styles/${encodeURIComponent(id)}/installs`, {
     method: 'POST',
     json: { installId },

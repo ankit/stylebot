@@ -32,7 +32,7 @@ export {
   type GallerySession,
   type GalleryStylesPage,
   type GalleryStyleWithCss,
-  type GalleryInstall,
+  type GalleryStyleToInstall,
 } from './api';
 
 export {
@@ -48,24 +48,15 @@ export {
 export { toGalleryFailure } from './to-gallery-failure';
 export { compressScreenshot } from './compress-screenshot';
 export { blobToDataUrl, dataUrlToBlob, hashCss, toGallerySite } from './utils';
+export { getInstallId } from './install-id';
 export {
-  getPublishedStyleForProfile,
-  getPublishedStyleIdForProfile,
-  getPublishedStyleIds,
+  getInstalledProfile,
   getPublishedProfile,
-  rememberPublishedStyle,
-  forgetPublishedStyle,
-  type PublishedStyleRecord,
-} from './published-styles';
-export {
-  getInstallId,
-  getInstalledStyle,
-  getInstalledStyleIds,
-  getInstalledStyleForProfile,
-  getInstalledProfileNames,
-  rememberInstalledStyle,
-  type InstalledStyleRecord,
-} from './installed-styles';
+  getListedStyleIds,
+  getListedProfileNames,
+  getProfileGalleryListing,
+  type ListedProfile,
+} from './profile-listings';
 export {
   GALLERY_PREVIEW_SITES_KEY,
   type GalleryPreviewHandlers,
