@@ -17,6 +17,7 @@ export {
   DEFAULT_PROFILE_ID,
   normalizeProfiles,
   expandProfiles,
+  getProfileSheet,
   collapseProfiles,
   listProfiles,
   hasAnyCss,

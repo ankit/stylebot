@@ -145,6 +145,16 @@ export const collapseProfiles = <T extends WithProfiles>(
 };
 
 /**
+ * One of a style's profiles with its css, or undefined when the style or the
+ * profile doesn't exist.
+ */
+export const getProfileSheet = (
+  style: WithProfiles | undefined,
+  profileId: string
+): ProfileSheet | undefined =>
+  style ? expandProfiles(style).sheets[profileId] : undefined;
+
+/**
  * The style's profiles in display order, with which one is active.
  */
 export const listProfiles = (style: WithProfiles): Array<ProfileSummary> => {

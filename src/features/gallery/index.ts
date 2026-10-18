@@ -52,12 +52,14 @@ export {
   getPublishedStyleForProfile,
   getPublishedStyleIdForProfile,
   getPublishedStyleIds,
+  getPublishedProfile,
   rememberPublishedStyle,
   forgetPublishedStyle,
   type PublishedStyleRecord,
 } from './published-styles';
 export {
   getInstallId,
+  getInstalledStyle,
   getInstalledStyleIds,
   getInstalledStyleForProfile,
   getInstalledProfileNames,
