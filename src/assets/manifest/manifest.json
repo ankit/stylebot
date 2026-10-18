@@ -29,7 +29,7 @@
     },
     {
       "js": ["site-bridge/index.js"],
-      "matches": ["https://stylebot.dev/*"],
+      "matches": ["https://stylebot.dev/*", "https://gallery.stylebot.dev/*"],
       "run_at": "document_start"
     }
   ],

@@ -153,9 +153,16 @@ export const CreateProfile = async (
   return applyStylesToAllTabs();
 };
 
+// The sites whose pages may install styles.
+const INSTALL_ORIGINS = [
+  'https://stylebot.dev',
+  'https://gallery.stylebot.dev',
+];
+
 /**
- * Whether a page may install styles: stylebot.dev, or in development builds
- * the site's dev server on any localhost port, to try installs locally.
+ * Whether a page may install styles: stylebot.dev or its gallery, or in
+ * development builds the site's dev server on any localhost port, to try
+ * installs locally.
  */
 const canInstallFrom = (url: string | undefined): boolean => {
   if (!url) {
@@ -165,7 +172,7 @@ const canInstallFrom = (url: string | undefined): boolean => {
   const { origin, protocol, hostname } = new URL(url);
 
   return (
-    origin === 'https://stylebot.dev' ||
+    INSTALL_ORIGINS.includes(origin) ||
     (process.env.NODE_ENV === 'development' &&
       protocol === 'http:' &&
       hostname === 'localhost')
@@ -181,8 +188,8 @@ const isNonEmptyString = (value: unknown, maxLength: number) =>
   value.length <= maxLength;
 
 /**
- * Installs a gallery style from stylebot.dev as a new profile of its site's
- * style. Anything not sent from the site's bridge is refused.
+ * Installs a gallery style from stylebot.dev or its gallery as a new profile
+ * of its site's style. Anything not sent from the site's bridge is refused.
  */
 export const InstallStyle = async (
   message: InstallStyleType,
