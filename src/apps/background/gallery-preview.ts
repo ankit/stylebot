@@ -74,6 +74,30 @@ export const getGalleryPreview = async (
   tabId: number
 ): Promise<GalleryPreview | null> => (await readPreviews())[tabId] ?? null;
 
+/**
+ * Tells a tab on a web page to show its preview, with the saved style that
+ * installing it would replace there.
+ */
+const showOnTab = async (
+  tabId: number,
+  preview: GalleryPreview
+): Promise<void> => {
+  const tab = await chrome.tabs.get(tabId).catch(() => null);
+
+  if (!tab?.url || !/^https?:/.test(tab.url)) {
+    return;
+  }
+
+  const replacedUrl = await getReplacedStyleUrl(preview.style, tab.url);
+  const message: ShowGalleryPreview = {
+    name: 'ShowGalleryPreview',
+    preview,
+    replacedUrl,
+  };
+
+  sendToTab(tabId, message);
+};
+
 // The latest preview asked for in each tab, so a slower earlier one is dropped.
 const latestRequests = new Map<number, number>();
 
@@ -101,8 +125,7 @@ export const startGalleryPreview = async (
 
   await writePreviews({ ...previews, [tabId]: preview });
 
-  const message: ShowGalleryPreview = { name: 'ShowGalleryPreview', preview };
-  sendToTab(tabId, message);
+  await showOnTab(tabId, preview);
 
   return preview;
 };
@@ -181,29 +204,41 @@ const getLatestVersionListing = (
 });
 
 /**
+ * Whether installing a version switches back to the profile it was installed
+ * as: it's at that version, or older and unedited so it's updated in place.
+ */
+const canReuseInstall = (
+  { css, galleryListing }: ListedProfile,
+  version: number
+): boolean =>
+  galleryListing.version >= version || hashCss(css) === galleryListing.cssHash;
+
+/**
  * The installed profile to switch back to, updated to the latest version
  * when it's out of date and unedited. Null when the user edited a profile
  * that's out of date, so the latest goes beside it.
  */
 const reuseInstalledProfile = (
-  { url, profileId, css, galleryListing }: ListedProfile,
+  installed: ListedProfile,
   style: GalleryStyle,
   latest: GalleryStyleToInstall
 ): ReusableProfile | null => {
+  const { url, profileId, galleryListing } = installed;
+
+  if (!canReuseInstall(installed, latest.version)) {
+    return null;
+  }
+
   if (galleryListing.version >= latest.version) {
     return { url, profileId };
   }
 
-  if (hashCss(css) === galleryListing.cssHash) {
-    return {
-      url,
-      profileId,
-      css: latest.css,
-      galleryListing: getLatestVersionListing(style, latest),
-    };
-  }
-
-  return null;
+  return {
+    url,
+    profileId,
+    css: latest.css,
+    galleryListing: getLatestVersionListing(style, latest),
+  };
 };
 
 /**
@@ -274,6 +309,34 @@ const installLatestVersion = async (
 };
 
 /**
+ * The saved style a new profile for a page goes in: the first that matches
+ * it, or else one for its host.
+ */
+const getPageStyleUrl = (pageUrl: string, styles: StyleMap): string =>
+  getStylesForPage(pageUrl, styles).styles[0]?.url ?? new URL(pageUrl).hostname;
+
+/**
+ * The saved style that installing a gallery style from a page goes in, which
+ * a preview there replaces while the page's other styles stay.
+ */
+export const getReplacedStyleUrl = async (
+  style: GalleryStyle,
+  pageUrl: string
+): Promise<string> => {
+  const styles = await getAll();
+  const installed = getInstalledProfile(styles, style.id);
+
+  if (installed && canReuseInstall(installed, style.version)) {
+    return installed.url;
+  }
+
+  return (
+    getPublishedProfile(styles, style.id)?.url ??
+    getPageStyleUrl(pageUrl, styles)
+  );
+};
+
+/**
  * Installs a tab's preview the way the popup would, then ends the preview
  * and tells the gallery page.
  */
@@ -285,8 +348,7 @@ export const installGalleryPreview = async (tabId: number): Promise<string> => {
   }
 
   const tab = await chrome.tabs.get(tabId);
-  const { styles } = getStylesForPage(tab.url ?? '', await getAll());
-  const pageUrl = styles[0]?.url ?? new URL(tab.url ?? '').hostname;
+  const pageUrl = getPageStyleUrl(tab.url ?? '', await getAll());
 
   const latest = await recordInstall(preview.style.id, await getInstallId());
   const profileName = await installLatestVersion(

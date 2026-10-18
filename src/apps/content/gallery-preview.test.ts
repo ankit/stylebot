@@ -19,6 +19,7 @@ jest.mock('./page-state', () => ({
   applyPageState: jest.fn(),
   getPageState: () => ({
     styles: [
+      { url: '*', css: 'p {}', importUrls: [], enabled: true },
       { url: 'example.com', css: 'a {}', importUrls: [], enabled: true },
     ],
     readability: false,
@@ -43,7 +44,12 @@ beforeEach(async () => {
     window as { stylebotGalleryPreviewApp?: unknown }
   ).stylebotGalleryPreviewApp = { mount };
   global.chrome = {
-    runtime: { sendMessage: jest.fn(async () => ({ preview })) },
+    runtime: {
+      sendMessage: jest.fn(async () => ({
+        preview,
+        replacedUrl: 'example.com',
+      })),
+    },
     storage: {
       local: { get: jest.fn(async () => ({ galleryPreviewSites: [] })) },
     },
@@ -54,10 +60,11 @@ beforeEach(async () => {
 });
 
 describe('gallery preview on the page', () => {
-  it("shows a gallery style in place of the page's own, with its controls", async () => {
-    await showGalleryPreview(preview);
+  it('shows a gallery style in place of the style it would replace, with its controls', async () => {
+    await showGalleryPreview(preview, 'example.com');
 
     expect(removeStylesheet).toHaveBeenCalledWith('example.com');
+    expect(removeStylesheet).not.toHaveBeenCalledWith('*');
     expect(injectStylesheet).toHaveBeenCalledWith(
       'stylebot:gallery-preview',
       'b {}',
@@ -68,7 +75,7 @@ describe('gallery preview on the page', () => {
   });
 
   it("puts the page's own styles back when it's hidden", async () => {
-    await showGalleryPreview(preview);
+    await showGalleryPreview(preview, 'example.com');
     await hideGalleryPreview();
 
     expect(unmount).toHaveBeenCalled();
@@ -95,5 +102,6 @@ describe('gallery preview on the page', () => {
       name: 'GetGalleryPreview',
     });
     expect(mount).toHaveBeenCalledWith(preview.style, expect.any(Object));
+    expect(removeStylesheet).toHaveBeenCalledWith('example.com');
   });
 });
