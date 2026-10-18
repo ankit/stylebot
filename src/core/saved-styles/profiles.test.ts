@@ -4,6 +4,7 @@ import {
   activateProfile,
   addProfile,
   expandProfiles,
+  getProfileSheet,
   hasAnyCss,
   listProfiles,
   normalizeProfiles,
@@ -117,6 +118,26 @@ describe('getStylesForPage', () => {
     expect(
       getStylesForPage('https://a.com/', { 'a.com': blankActive }).styles
     ).toHaveLength(1);
+  });
+});
+
+describe('getProfileSheet', () => {
+  it('finds a profile with its css, active or not', () => {
+    const two = withTwo();
+
+    expect(getProfileSheet(two, 'default')).toEqual({
+      name: '',
+      css: 'a { color: red; }',
+    });
+    expect(getProfileSheet(two, 'dark')).toEqual({
+      name: 'Dark',
+      css: 'a { color: white; }',
+    });
+  });
+
+  it('finds nothing for a missing style or profile', () => {
+    expect(getProfileSheet(undefined, 'default')).toBeUndefined();
+    expect(getProfileSheet(withTwo(), 'missing')).toBeUndefined();
   });
 });
 

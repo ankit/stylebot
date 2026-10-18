@@ -15,6 +15,8 @@ export type InstalledStyleRecord = {
   version: number;
   group: string;
   slug: string;
+  // hashCss of the installed CSS, to tell if the profile was edited since.
+  cssHash: string;
 };
 
 // Keyed by gallery style id.
@@ -91,6 +93,17 @@ export const getInstalledStyleForProfile = async (
   Object.values(await getInstalledStyles()).find(
     installed => installed.url === url && installed.profileId === profileId
   ) ?? null;
+
+/**
+ * Where a gallery style was installed, if it was.
+ */
+export const getInstalledStyle = async (
+  styleId: string
+): Promise<InstalledStyleRecord | null> => {
+  const installed = await getInstalledStyles();
+
+  return installed[styleId] ?? null;
+};
 
 export const rememberInstalledStyle = async (
   styleId: string,

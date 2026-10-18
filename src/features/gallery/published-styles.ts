@@ -61,6 +61,24 @@ export const getPublishedStyleIds = async (): Promise<Set<string>> =>
   );
 
 /**
+ * The profile a gallery style was published from here, by any account.
+ */
+export const getPublishedProfile = async (
+  styleId: string
+): Promise<{ url: string; profileId: string } | null> => {
+  const published = Object.entries(await getPublishedStylesByProfile()).find(
+    ([, each]) => each.styleId === styleId
+  );
+
+  if (!published) {
+    return null;
+  }
+
+  const [url, profileId]: [string, string] = JSON.parse(published[0]);
+  return { url, profileId };
+};
+
+/**
  * Remembers what a profile was published as, replacing what it was before.
  */
 export const rememberPublishedStyle = async (

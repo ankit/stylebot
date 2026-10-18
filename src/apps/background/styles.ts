@@ -17,6 +17,7 @@ import {
   renameProfile as renameStyleProfile,
   removeProfile,
   expandProfiles,
+  getProfileSheet,
   freeProfileName,
 } from '@stylebot/saved-styles';
 
@@ -528,6 +529,43 @@ export const installProfile = async (
   });
 
   return { name: installedName, id: installedId };
+};
+
+/**
+ * Switches a url's style back to a profile installed before, replacing its
+ * css when given, and turns the style on. Resolves with the profile's name,
+ * or null when the profile is gone.
+ */
+export const reinstallProfile = async (
+  url: string,
+  profileId: string,
+  css?: string
+): Promise<string | null> => {
+  let name: string | null = null;
+
+  await update(styles => {
+    const existing = styles[url];
+    const sheet = getProfileSheet(existing, profileId);
+
+    if (!existing || !sheet) {
+      return undefined;
+    }
+
+    name = sheet.name;
+
+    const updated =
+      css === undefined ? existing : setProfileCss(existing, profileId, css);
+    const style = activateProfile(updated, profileId);
+
+    if (style === existing && existing.enabled) {
+      return undefined;
+    }
+
+    styles[url] = editStyle(style, { enabled: true });
+    return styles;
+  });
+
+  return name;
 };
 
 /**

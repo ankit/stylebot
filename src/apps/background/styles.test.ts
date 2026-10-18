@@ -15,6 +15,7 @@ import {
   setActiveProfile,
   createProfile,
   installProfile,
+  reinstallProfile,
   renameProfile,
   deleteProfile,
   getGoogleWebFontExists,
@@ -348,6 +349,33 @@ describe('style edits', () => {
       (await installProfile('example.com', { name: 'Dracula', css: 'b {}' }))
         .name
     ).toBe('Dracula 2');
+  });
+
+  it('switches back to an installed profile, replacing its css when given, and turns the style on', async () => {
+    const { id } = await installProfile('example.com', {
+      name: 'Dracula',
+      css: 'a {}',
+    });
+    await setActiveProfile('example.com', 'default');
+    await disable('example.com');
+
+    expect(await reinstallProfile('example.com', id, 'b {}')).toBe('Dracula');
+    expect(stored('example.com')).toMatchObject({
+      css: 'b {}',
+      activeProfile: id,
+      enabled: true,
+    });
+
+    const before = writes();
+    expect(await reinstallProfile('example.com', id)).toBe('Dracula');
+    expect(writes()).toBe(before);
+  });
+
+  it('reinstalls nothing when the profile is gone', async () => {
+    const before = writes();
+
+    expect(await reinstallProfile('example.com', 'missing', 'b {}')).toBeNull();
+    expect(writes()).toBe(before);
   });
 
   it('creates the style when installing for a url with none', async () => {

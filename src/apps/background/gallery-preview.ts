@@ -1,22 +1,33 @@
 import {
   GALLERY_PREVIEW_SITES_KEY,
   getInstallId,
+  getInstalledStyle,
+  getPublishedProfile,
   getStyle,
+  hashCss,
   recordInstall,
   rememberInstalledStyle,
   toGallerySite,
+  type GalleryInstall,
 } from '@stylebot/gallery';
 import { compileStyle } from '@stylebot/css';
-import { getStylesForPage } from '@stylebot/saved-styles';
+import { getProfileSheet, getStylesForPage } from '@stylebot/saved-styles';
 import type {
   GalleryPreview,
+  GalleryStyle,
   GalleryStyleInstalled,
   HideGalleryPreview,
   ShowGalleryPreview,
+  StyleMap,
   TabMessage,
 } from '@stylebot/types';
 
-import { applyStylesToAllTabs, getAll, installProfile } from './styles';
+import {
+  applyStylesToAllTabs,
+  getAll,
+  installProfile,
+  reinstallProfile,
+} from './styles';
 
 // Each tab's preview, by tab id.
 const PREVIEWS_KEY = 'galleryPreviews';
@@ -142,9 +153,120 @@ export const endGalleryPreview = async (
   }
 };
 
+type ProfileRef = { url: string; profileId: string };
+
+// A profile to switch back to, and the css to update it to, if any.
+type ReusableProfile = ProfileRef & { css?: string };
+
 /**
- * Installs a tab's preview as a new profile of the style for its page, the
- * way the popup would, then ends the preview and tells the gallery page.
+ * The profile this gallery style was installed as, with the latest css when
+ * it's out of date and unedited. Null when there's no install, its profile
+ * is gone, or the user edited a profile that's out of date.
+ */
+const findInstalledProfile = async (
+  styleId: string,
+  latest: GalleryInstall,
+  styles: StyleMap
+): Promise<ReusableProfile | null> => {
+  const installed = await getInstalledStyle(styleId);
+
+  if (!installed) {
+    return null;
+  }
+
+  const { url, profileId } = installed;
+  const css = getProfileSheet(styles[url], profileId)?.css;
+
+  if (css === undefined) {
+    return null;
+  }
+
+  if (installed.version >= latest.version) {
+    return { url, profileId };
+  }
+
+  if (hashCss(css) === installed.cssHash) {
+    return { url, profileId, css: latest.css };
+  }
+
+  return null;
+};
+
+/**
+ * The profile the style was published from here. It's the user's own, so
+ * it's switched back to as it is.
+ */
+const findPublishedProfile = async (
+  styleId: string,
+  styles: StyleMap
+): Promise<ReusableProfile | null> => {
+  const published = await getPublishedProfile(styleId);
+
+  if (!published) {
+    return null;
+  }
+
+  const sheet = getProfileSheet(styles[published.url], published.profileId);
+  return sheet ? published : null;
+};
+
+/**
+ * Remembers the profile a gallery style is installed as, at its latest version.
+ */
+const rememberInstall = (
+  { id, group, slug }: GalleryStyle,
+  latest: GalleryInstall,
+  { url, profileId }: ProfileRef
+) =>
+  rememberInstalledStyle(id, {
+    url,
+    profileId,
+    version: latest.version,
+    group,
+    slug,
+    cssHash: hashCss(latest.css),
+  });
+
+/**
+ * Installs a gallery style's latest version: into the profile it was
+ * installed or published as here, or else as a new profile of pageUrl's
+ * style. Resolves with the profile's name.
+ */
+const installLatestVersion = async (
+  style: GalleryStyle,
+  latest: GalleryInstall,
+  pageUrl: string
+): Promise<string> => {
+  const styles = await getAll();
+  const reusable =
+    (await findInstalledProfile(style.id, latest, styles)) ??
+    (await findPublishedProfile(style.id, styles));
+
+  if (reusable) {
+    const { url, profileId, css } = reusable;
+    const name = await reinstallProfile(url, profileId, css);
+
+    if (name !== null) {
+      if (css !== undefined) {
+        await rememberInstall(style, latest, reusable);
+      }
+
+      return name;
+    }
+  }
+
+  const profile = await installProfile(pageUrl, {
+    name: latest.name,
+    css: latest.css,
+  });
+  await rememberInstall(style, latest, { url: pageUrl, profileId: profile.id });
+
+  return profile.name;
+};
+
+/**
+ * Installs a tab's preview the way the popup would, then ends the preview
+ * and tells the gallery page.
  */
 export const installGalleryPreview = async (tabId: number): Promise<string> => {
   const preview = await getGalleryPreview(tabId);
@@ -153,24 +275,16 @@ export const installGalleryPreview = async (tabId: number): Promise<string> => {
     throw new Error('No preview to install');
   }
 
-  const { id, group, slug } = preview.style;
   const tab = await chrome.tabs.get(tabId);
   const { styles } = getStylesForPage(tab.url ?? '', await getAll());
-  const url = styles[0]?.url ?? new URL(tab.url ?? '').hostname;
+  const pageUrl = styles[0]?.url ?? new URL(tab.url ?? '').hostname;
 
-  const installed = await recordInstall(id, await getInstallId());
-  const profile = await installProfile(url, {
-    name: installed.name,
-    css: installed.css,
-  });
-
-  await rememberInstalledStyle(id, {
-    url,
-    profileId: profile.id,
-    version: installed.version,
-    group,
-    slug,
-  });
+  const latest = await recordInstall(preview.style.id, await getInstallId());
+  const profileName = await installLatestVersion(
+    preview.style,
+    latest,
+    pageUrl
+  );
 
   await endGalleryPreview(tabId);
   await applyStylesToAllTabs();
@@ -178,14 +292,14 @@ export const installGalleryPreview = async (tabId: number): Promise<string> => {
   if (preview.galleryTabId !== undefined) {
     const message: GalleryStyleInstalled = {
       name: 'GalleryStyleInstalled',
-      id,
-      profileName: profile.name,
+      id: preview.style.id,
+      profileName,
     };
 
     sendToTab(preview.galleryTabId, message);
   }
 
-  return profile.name;
+  return profileName;
 };
 
 /**

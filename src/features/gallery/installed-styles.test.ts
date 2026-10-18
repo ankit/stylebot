@@ -2,6 +2,7 @@ import { mockStorage } from './gallery.fixtures';
 import {
   getInstallId,
   getInstalledProfileNames,
+  getInstalledStyle,
   getInstalledStyleForProfile,
   getInstalledStyleIds,
   rememberInstalledStyle,
@@ -26,6 +27,7 @@ describe('installed styles', () => {
       version: 1,
       group: 'github.com',
       slug: 'night',
+      cssHash: 'abc123',
     });
 
     expect(
@@ -42,6 +44,8 @@ describe('installed styles', () => {
     expect(await getInstalledStyleForProfile('github.com', 'p1')).toEqual(
       expect.objectContaining({ group: 'github.com', slug: 'night' })
     );
+    expect(await getInstalledStyle('abc')).toMatchObject({ profileId: 'p1' });
+    expect(await getInstalledStyle('other')).toBeNull();
   });
 
   it('forgets an install once its profile is removed', async () => {
@@ -51,6 +55,7 @@ describe('installed styles', () => {
       version: 1,
       group: 'github.com',
       slug: 'night',
+      cssHash: 'abc123',
     });
 
     expect(
@@ -73,6 +78,7 @@ describe('installed styles', () => {
       version: 1,
       group: 'github.com',
       slug: 'night',
+      cssHash: 'abc123',
     });
     await rememberInstalledStyle('gone', {
       url: 'github.com',
@@ -80,6 +86,7 @@ describe('installed styles', () => {
       version: 1,
       group: 'github.com',
       slug: 'gone',
+      cssHash: 'abc123',
     });
 
     expect(
