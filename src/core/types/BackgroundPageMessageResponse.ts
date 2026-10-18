@@ -86,8 +86,11 @@ export type PublishToGalleryResponse = GalleryResult<{
   style: GalleryPublishedStyle;
 }>;
 export type UnpublishFromGalleryResponse = GalleryResult;
+// What the account published from a profile, or the gallery style the
+// profile was installed from.
 export type GetPublishedGalleryStyleResponse = {
   published: GalleryPublished | null;
+  installed: { group: string; slug: string } | null;
 };
 // The site's group, to browse the rest of its styles in the gallery.
 export type GetGallerySuggestionsResponse = GalleryResult<{

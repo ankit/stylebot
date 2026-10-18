@@ -334,12 +334,13 @@ export default {
     state: State;
     commit: Commit;
   }): Promise<void> {
-    const { published } = await getPublishedGalleryStyle(
+    const { published, installed } = await getPublishedGalleryStyle(
       state.url,
       state.activeProfile
     );
 
     commit('setPublishedGalleryStyle', published);
+    commit('setInstalledGalleryStyle', installed);
   },
 
   setMode(

@@ -5,6 +5,7 @@ import {
   forgetPublishedStyle,
   getGalleryUrl,
   getInstalledStyleIds,
+  getInstalledStyleForProfile,
   getMyStyles,
   getPublishedStyleIds,
   getSiteStyles,
@@ -54,6 +55,7 @@ import type {
 } from '@stylebot/types';
 
 import { captureTab } from './capture-tab';
+import { getAll } from './styles';
 import {
   endGalleryPreview,
   getGalleryPreview,
@@ -272,8 +274,8 @@ export const SetGalleryDisplayName = async (
 };
 
 /**
- * What the signed-in account published from a profile, without asking the
- * gallery.
+ * What the signed-in account published from a profile, or the gallery style
+ * it was installed from, without asking the gallery.
  */
 export const GetPublishedGalleryStyle = async (
   { url, profileId }: GetPublishedGalleryStyleType,
@@ -283,6 +285,7 @@ export const GetPublishedGalleryStyle = async (
   const published = account
     ? await getPublishedStyleForProfile(url, profileId, account.id)
     : null;
+  const installed = await getInstalledStyleForProfile(url, profileId);
 
   sendResponse({
     published: published && {
@@ -292,6 +295,7 @@ export const GetPublishedGalleryStyle = async (
       group: published.group,
       slug: published.slug,
     },
+    installed: installed && { group: installed.group, slug: installed.slug },
   });
 };
 
@@ -311,7 +315,7 @@ export const GetGallerySuggestions = async (
     const site = toGallerySite(new URL(pageUrl).hostname);
     const [{ styles }, installed, published] = await Promise.all([
       getSiteStyles(site, SUGGESTIONS_FETCHED),
-      getInstalledStyleIds(),
+      getAll().then(getInstalledStyleIds),
       getPublishedStyleIds(),
     ]);
 

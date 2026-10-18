@@ -69,6 +69,8 @@ export type GalleryShimOptions = {
   suggestions?: Array<GalleryStyle>;
   previewing?: GalleryStyle;
   install?: InstallGalleryPreviewResponse;
+  // The gallery style the profile was installed from.
+  installed?: { group: string; slug: string };
 };
 
 const GALLERY_SCREENSHOT =
@@ -246,7 +248,10 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
       styles: gallery.styles ?? [],
       publishedId: gallery.published?.styleId ?? null,
     }),
-    GetPublishedGalleryStyle: () => ({ published: gallery.published ?? null }),
+    GetPublishedGalleryStyle: () => ({
+      published: gallery.published ?? null,
+      installed: gallery.installed ?? null,
+    }),
     CaptureGalleryScreenshot: () => ({
       ok: true,
       screenshot: GALLERY_SCREENSHOT,

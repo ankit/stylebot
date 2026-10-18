@@ -59,6 +59,7 @@ export {
 export {
   getInstallId,
   getInstalledStyleIds,
+  getInstalledStyleForProfile,
   rememberInstalledStyle,
   type InstalledStyleRecord,
 } from './installed-styles';

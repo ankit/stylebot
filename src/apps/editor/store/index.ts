@@ -98,6 +98,8 @@ export type State = {
   screenshotReview: string | null;
   // What this style's profile last published to the gallery, if anything.
   publishedGalleryStyle: GalleryPublished | null;
+  // The gallery style this profile was installed from, if any.
+  installedGalleryStyle: { group: string; slug: string } | null;
   visible: boolean;
   inspecting: boolean;
   // The element under the inspector while picking, previewed in the panel.
@@ -145,6 +147,7 @@ export const createStore = (host: EditorHost): Store<State> => {
       capturing: false,
       screenshotReview: null,
       publishedGalleryStyle: null,
+      installedGalleryStyle: null,
       visible: false,
       inspecting: false,
       previewSelector: '',
