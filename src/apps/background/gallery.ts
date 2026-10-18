@@ -61,6 +61,7 @@ import {
 import {
   endGalleryPreview,
   getGalleryPreview,
+  getReplacedStyleUrl,
   installGalleryPreview,
   openGalleryPreview,
   startGalleryPreview,
@@ -398,10 +399,16 @@ export const GetGalleryPreview = async (
   sendResponse: (response: GetGalleryPreviewResponse) => void
 ): Promise<void> => {
   const target = tabId ?? sender.tab?.id;
+  const preview = target === undefined ? null : await getGalleryPreview(target);
+  const pageUrl = tabId === undefined ? sender.tab?.url : undefined;
 
-  sendResponse({
-    preview: target === undefined ? null : await getGalleryPreview(target),
-  });
+  if (!preview || !pageUrl) {
+    sendResponse({ preview });
+    return;
+  }
+
+  const replacedUrl = await getReplacedStyleUrl(preview.style, pageUrl);
+  sendResponse({ preview, replacedUrl });
 };
 
 /**

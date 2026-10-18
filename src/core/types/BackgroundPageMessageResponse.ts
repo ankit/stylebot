@@ -98,7 +98,11 @@ export type GetGallerySuggestionsResponse = GalleryResult<{
   group: string | null;
 }>;
 export type PreviewGalleryStyleResponse = GalleryResult;
-export type GetGalleryPreviewResponse = { preview: GalleryPreview | null };
+// replacedUrl is only for the tab's own page, as in ShowGalleryPreview.
+export type GetGalleryPreviewResponse = {
+  preview: GalleryPreview | null;
+  replacedUrl?: string;
+};
 // The profile name each requested gallery style is installed as.
 export type GetGalleryInstallStatusResponse = {
   installed: Record<string, string>;

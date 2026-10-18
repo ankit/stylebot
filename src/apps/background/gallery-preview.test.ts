@@ -76,9 +76,55 @@ describe('gallery preview', () => {
     expect(store.galleryPreviewSites).toEqual(['github.com']);
     expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(
       TAB_ID,
-      { name: 'ShowGalleryPreview', preview },
+      { name: 'ShowGalleryPreview', preview, replacedUrl: 'github.com' },
       expect.any(Function)
     );
+  });
+
+  it('tells the tab to replace the style it was installed in before', async () => {
+    (getAll as jest.Mock).mockResolvedValue({
+      'github.com': { css: 'p {}', enabled: true },
+      'github.com/*': {
+        css: 'a {}',
+        enabled: true,
+        readability: false,
+        modifiedTime: '',
+        activeProfile: 'p0',
+        profiles: {
+          p0: {
+            name: 'Tokyo Night',
+            galleryListing: {
+              styleId: style.id,
+              group: 'github.com',
+              slug: 'tokyo-night',
+              version: 2,
+              cssHash: hashCss('a {}'),
+            },
+          },
+        },
+      },
+    });
+    styleResponse('a {}');
+
+    await startGalleryPreview(TAB_ID, style.id);
+
+    expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(
+      TAB_ID,
+      expect.objectContaining({ replacedUrl: 'github.com/*' }),
+      expect.any(Function)
+    );
+  });
+
+  it("doesn't tell a tab that isn't on a web page yet", async () => {
+    (chrome.tabs.get as jest.Mock).mockResolvedValue({
+      id: TAB_ID,
+      url: 'about:blank',
+    });
+    styleResponse('a {}');
+
+    await startGalleryPreview(TAB_ID, style.id);
+
+    expect(chrome.tabs.sendMessage).not.toHaveBeenCalled();
   });
 
   it('opens the style’s site only once its preview is saved', async () => {
