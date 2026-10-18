@@ -2,6 +2,7 @@ import type { Style } from './styles';
 import type { ReadabilitySettings } from './readability';
 import type { StylebotCommandName } from './commands';
 import type { CssEdit, StyleProblem } from './page-reading';
+import type { GalleryPreview } from './gallery';
 
 export type ToggleStylebot = {
   name: 'ToggleStylebot';
@@ -140,6 +141,23 @@ export type InspectPage = {
   inspection: PageInspection;
 };
 
+export type ShowGalleryPreview = {
+  name: 'ShowGalleryPreview';
+  preview: GalleryPreview;
+};
+
+// The tab's gallery preview ended: cancelled, or installed as a profile.
+export type HideGalleryPreview = {
+  name: 'HideGalleryPreview';
+};
+
+// For the site bridge, on the gallery page a preview was opened from.
+export type GalleryStyleInstalled = {
+  name: 'GalleryStyleInstalled';
+  id: string;
+  profileName: string;
+};
+
 type TabMessage =
   | ToggleStylebot
   | RunCommand
@@ -153,6 +171,9 @@ type TabMessage =
   | GetIsPageReaderable
   | UpdateReader
   | ReadabilityStateChanged
-  | InspectPage;
+  | InspectPage
+  | ShowGalleryPreview
+  | HideGalleryPreview
+  | GalleryStyleInstalled;
 
 export default TabMessage;

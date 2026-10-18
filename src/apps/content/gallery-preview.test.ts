@@ -1,6 +1,13 @@
 import { injectStylesheet, removeStylesheet } from '@stylebot/stylesheets';
+import type { GalleryPreview } from '@stylebot/types';
 
-import { listenForGalleryPreview } from './gallery-preview';
+import { style } from '../../features/gallery/gallery.fixtures';
+import {
+  hideGalleryPreview,
+  isPreviewingGalleryStyle,
+  resumeGalleryPreview,
+  showGalleryPreview,
+} from './gallery-preview';
 import { applyPageState } from './page-state';
 import { getCompiledStyles } from './saved-styles';
 
@@ -19,51 +26,36 @@ jest.mock('./page-state', () => ({
 }));
 jest.mock('./saved-styles', () => ({ getCompiledStyles: jest.fn() }));
 
-type Listener<T> = (value: T) => void;
-
-/**
- * A port the popup would open, with ways to send it messages and close it.
- */
-const connect = (name = 'gallery-preview') => {
-  const onMessage: Array<Listener<unknown>> = [];
-  const onDisconnect: Array<Listener<void>> = [];
-  const port = {
-    name,
-    onMessage: { addListener: (fn: Listener<unknown>) => onMessage.push(fn) },
-    onDisconnect: {
-      addListener: (fn: Listener<void>) => onDisconnect.push(fn),
-    },
-  };
-
-  onConnect.forEach(fn => fn(port));
-
-  return {
-    send: (message: unknown) => onMessage.forEach(fn => fn(message)),
-    close: () => onDisconnect.forEach(fn => fn()),
-  };
+const preview: GalleryPreview = {
+  style: { ...style, site: 'localhost' },
+  css: 'b {}',
+  importUrls: [],
 };
 
-let onConnect: Array<Listener<unknown>>;
+const unmount = jest.fn();
+const mount = jest.fn(() => unmount);
 
-const settle = () => new Promise(resolve => setTimeout(resolve));
-
-beforeEach(() => {
+beforeEach(async () => {
   jest.clearAllMocks();
-  onConnect = [];
   (getCompiledStyles as jest.Mock).mockResolvedValue({});
+  window.matchMedia = jest.fn(() => ({ matches: false })) as never;
+  (
+    window as { stylebotGalleryPreviewApp?: unknown }
+  ).stylebotGalleryPreviewApp = { mount };
   global.chrome = {
-    runtime: {
-      onConnect: { addListener: (fn: Listener<unknown>) => onConnect.push(fn) },
+    runtime: { sendMessage: jest.fn(async () => ({ preview })) },
+    storage: {
+      local: { get: jest.fn(async () => ({ galleryPreviewSites: [] })) },
     },
   } as unknown as typeof chrome;
 
-  listenForGalleryPreview();
+  await hideGalleryPreview();
+  jest.clearAllMocks();
 });
 
-describe('gallery preview', () => {
-  it("shows a gallery style in place of the page's own", async () => {
-    connect().send({ preview: { css: 'b {}', importUrls: [] } });
-    await settle();
+describe('gallery preview on the page', () => {
+  it("shows a gallery style in place of the page's own, with its controls", async () => {
+    await showGalleryPreview(preview);
 
     expect(removeStylesheet).toHaveBeenCalledWith('example.com');
     expect(injectStylesheet).toHaveBeenCalledWith(
@@ -71,33 +63,37 @@ describe('gallery preview', () => {
       'b {}',
       []
     );
+    expect(mount).toHaveBeenCalledWith(preview.style, expect.any(Object));
+    expect(isPreviewingGalleryStyle()).toBe(true);
   });
 
-  it('puts the page back when the popup closes', async () => {
-    const port = connect();
-    port.send({ preview: { css: 'b {}', importUrls: [] } });
-    await settle();
+  it("puts the page's own styles back when it's hidden", async () => {
+    await showGalleryPreview(preview);
+    await hideGalleryPreview();
 
-    port.close();
-    await settle();
-
-    expect(removeStylesheet).toHaveBeenLastCalledWith(
-      'stylebot:gallery-preview'
-    );
+    expect(unmount).toHaveBeenCalled();
+    expect(removeStylesheet).toHaveBeenCalledWith('stylebot:gallery-preview');
     expect(applyPageState).toHaveBeenCalled();
+    expect(isPreviewingGalleryStyle()).toBe(false);
   });
 
-  it('leaves the page alone when the popup closes without previewing', async () => {
-    connect().close();
-    await settle();
+  it("doesn't ask the background on sites no tab previews", async () => {
+    await resumeGalleryPreview();
 
-    expect(applyPageState).not.toHaveBeenCalled();
+    expect(chrome.runtime.sendMessage).not.toHaveBeenCalled();
+    expect(mount).not.toHaveBeenCalled();
   });
 
-  it('ignores other ports', async () => {
-    connect('other').send({ preview: { css: 'b {}', importUrls: [] } });
-    await settle();
+  it("shows the tab's preview again on its site's next page", async () => {
+    (chrome.storage.local.get as jest.Mock).mockResolvedValue({
+      galleryPreviewSites: ['localhost'],
+    });
 
-    expect(injectStylesheet).not.toHaveBeenCalled();
+    await resumeGalleryPreview();
+
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+      name: 'GetGalleryPreview',
+    });
+    expect(mount).toHaveBeenCalledWith(preview.style, expect.any(Object));
   });
 });

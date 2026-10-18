@@ -10,6 +10,7 @@ import type {
   GetCompiledStylesResponse,
 } from '@stylebot/types';
 
+import { isPreviewingGalleryStyle } from './gallery-preview';
 import { applyPageState, getPageState, savePageState } from './page-state';
 
 /**
@@ -45,6 +46,9 @@ export const reapplySavedStyles = async (): Promise<void> => {
   const previous = readCache();
   const state = getPageState(await getCompiledStyles());
 
-  applyPageState(state, previous);
+  if (!isPreviewingGalleryStyle()) {
+    applyPageState(state, previous);
+  }
+
   savePageState(state);
 };

@@ -7,14 +7,15 @@
         <s-text as="h2" size="caption" variant="muted" medium>
           {{ t('popular_in_gallery') }}
         </s-text>
-        <s-external-link
+        <a
           v-if="browseUrl"
           class="browse"
           :href="browseUrl"
-          :underline="false"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           {{ t('browse_all') }}
-        </s-external-link>
+        </a>
       </div>
 
       <template v-for="style in shownStyles">
@@ -43,21 +44,18 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-import { SCallout, SExternalLink, SText } from '@stylebot/components';
-import {
-  GALLERY_PREVIEW_PORT,
-  galleryErrorText,
-  getGallerySiteUrl,
-  type GalleryPreviewMessage,
-} from '@stylebot/gallery';
+import { SCallout, SText } from '@stylebot/components';
+import { galleryErrorText, getGallerySiteUrl } from '@stylebot/gallery';
 import type { GalleryStyle } from '@stylebot/types';
 
 import GalleryPreviewCard from './GalleryPreviewCard.vue';
 import GallerySuggestion from './GallerySuggestion.vue';
 import {
-  getGalleryStyleCss,
+  endGalleryPreview,
+  getGalleryPreview,
   getGallerySuggestions,
-  installGalleryStyle,
+  installGalleryPreview,
+  previewGalleryStyle,
 } from '../utils';
 
 const SHOWN = 2;
@@ -68,13 +66,12 @@ type Data = {
   previewId: string | null;
   installing: boolean;
   error: string;
-  port: chrome.runtime.Port | null;
 };
 
 /**
  * The site's most installed gallery styles. Clicking one previews it on the
- * page in place of the site's own style, until it's installed as a new
- * profile, cancelled, or the popup closes.
+ * tab in place of the site's own style, as the tab moves around the site,
+ * until it's installed as a new profile or cancelled, here or on the page.
  */
 export default Vue.extend({
   name: 'TheGallerySuggestions',
@@ -83,19 +80,12 @@ export default Vue.extend({
     GalleryPreviewCard,
     GallerySuggestion,
     SCallout,
-    SExternalLink,
     SText,
   },
 
   props: {
     tab: {
       type: Object as PropType<chrome.tabs.Tab>,
-      required: true,
-    },
-
-    // The Stylebot style an install adds a profile to.
-    styleUrl: {
-      type: String,
       required: true,
     },
 
@@ -114,7 +104,6 @@ export default Vue.extend({
       previewId: null,
       installing: false,
       error: '',
-      port: null,
     };
   },
 
@@ -128,54 +117,60 @@ export default Vue.extend({
         this.profileNames.map(name => name.trim().toLowerCase())
       );
 
-      return this.styles
+      const shown = this.styles
         .filter(style => !names.has(style.name.trim().toLowerCase()))
         .slice(0, SHOWN);
+      const previewed = this.styles.find(style => style.id === this.previewId);
+
+      return previewed && !shown.includes(previewed)
+        ? [previewed, ...shown.slice(0, SHOWN - 1)]
+        : shown;
     },
   },
 
   async mounted() {
-    const response = await getGallerySuggestions(this.tab.url ?? '');
+    const tabId = this.tab.id;
+    const [response, current] = await Promise.all([
+      getGallerySuggestions(this.tab.url ?? ''),
+      tabId === undefined ? null : getGalleryPreview(tabId),
+    ]);
 
     // A gallery that can't be reached leaves the popup as it always was.
     if (response?.ok) {
       this.styles = response.styles;
       this.group = response.group;
     }
-  },
 
-  beforeDestroy() {
-    this.port?.disconnect();
+    const preview = current?.preview;
+
+    if (preview) {
+      if (!this.styles.some(style => style.id === preview.style.id)) {
+        this.styles = [preview.style, ...this.styles];
+      }
+
+      this.previewId = preview.style.id;
+      this.$emit('preview', true);
+    }
   },
 
   methods: {
-    send(message: GalleryPreviewMessage): void {
-      if (!this.port && this.tab.id !== undefined) {
-        this.port = chrome.tabs.connect(this.tab.id, {
-          name: GALLERY_PREVIEW_PORT,
-        });
+    async preview(style: GalleryStyle): Promise<void> {
+      if (this.tab.id === undefined) {
+        return;
       }
 
-      this.port?.postMessage(message);
-    },
-
-    async preview(style: GalleryStyle): Promise<void> {
       this.error = '';
       this.previewId = style.id;
       this.$emit('preview', true);
 
-      const response = await getGalleryStyleCss(style.id);
+      const response = await previewGalleryStyle(this.tab.id, style.id);
 
       // Another style may have been picked while this one loaded.
       if (this.previewId !== style.id) {
         return;
       }
 
-      if (response.ok) {
-        this.send({
-          preview: { css: response.css, importUrls: response.importUrls },
-        });
-      } else {
+      if (!response.ok) {
         this.error = galleryErrorText(response);
         this.cancel();
       }
@@ -186,8 +181,8 @@ export default Vue.extend({
      * is picked.
      */
     cancel(): void {
-      if (this.previewId) {
-        this.send({ preview: null });
+      if (this.previewId && this.tab.id !== undefined) {
+        endGalleryPreview(this.tab.id);
       }
 
       this.previewId = null;
@@ -195,15 +190,14 @@ export default Vue.extend({
     },
 
     async install(style: GalleryStyle): Promise<void> {
+      if (this.tab.id === undefined) {
+        return;
+      }
+
       this.installing = true;
       this.error = '';
 
-      const response = await installGalleryStyle({
-        id: style.id,
-        url: this.styleUrl,
-        group: style.group,
-        slug: style.slug,
-      });
+      const response = await installGalleryPreview(this.tab.id);
 
       this.installing = false;
 
@@ -212,8 +206,9 @@ export default Vue.extend({
         return;
       }
 
-      // The installed profile is applied now; the preview just steps aside.
-      this.cancel();
+      // Installing ended the preview, and the new profile is applied.
+      this.previewId = null;
+      this.$emit('preview', false);
       this.styles = this.styles.filter(each => each.id !== style.id);
       this.$emit('installed');
     },
@@ -237,6 +232,15 @@ export default Vue.extend({
 }
 
 .gallery-heading .browse {
+  color: var(--text-muted);
   font-size: 12px;
+  font-weight: 500;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--accent-text);
+  }
+
+  @include focus-ring(2px);
 }
 </style>

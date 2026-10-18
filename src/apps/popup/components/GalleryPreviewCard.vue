@@ -1,21 +1,26 @@
 <template>
   <div class="preview-card">
     <gallery-style-summary :style-data="styleData">
-      <s-text as="span" size="caption" variant="primary">
-        {{ t('previewing_on_this_page') }}
+      <s-text as="span" size="caption" variant="muted">
+        {{ t('preview_not_installed') }}
       </s-text>
     </gallery-style-summary>
 
     <div class="actions">
       <s-button
-        variant="primary"
+        variant="ghost"
+        class="cancel"
+        :disabled="installing"
+        @click="$emit('cancel')"
+      >
+        {{ t('cancel') }}
+      </s-button>
+      <s-button
+        class="install"
         :disabled="installing"
         @click="$emit('install')"
       >
-        {{ t('install') }}
-      </s-button>
-      <s-button :disabled="installing" @click="$emit('cancel')">
-        {{ t('cancel') }}
+        {{ installing ? t('installing') : t('install') }}
       </s-button>
     </div>
   </div>
@@ -59,20 +64,26 @@ export default Vue.extend({
 .preview-card {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 8px 10px 10px;
+  gap: 12px;
+  padding: 7px 9px 9px;
+  background: var(--inset-surface);
+  border: 1px solid var(--panel-border);
   border-radius: 8px;
-  background: color-mix(in srgb, var(--accent) 8%, var(--panel-surface));
-  box-shadow: inset 0 0 0 1px
-    color-mix(in srgb, var(--accent) 28%, var(--panel-surface));
 }
 
 .actions {
   display: flex;
+  justify-content: flex-end;
   gap: 6px;
+}
 
-  .button {
-    flex: 1;
-  }
+.preview-card .cancel.button:hover:not(:disabled) {
+  background: var(--panel-border);
+}
+
+.preview-card .install.button:hover:not(:disabled) {
+  background: var(--inset-button-hover);
+  border-color: var(--inset-button-hover-border);
+  box-shadow: var(--inset-button-hover-shadow);
 }
 </style>

@@ -63,7 +63,8 @@ export {
   type InstalledStyleRecord,
 } from './installed-styles';
 export {
-  GALLERY_PREVIEW_PORT,
-  type GalleryPreviewMessage,
-} from './preview-port';
+  GALLERY_PREVIEW_SITES_KEY,
+  type GalleryPreviewHandlers,
+  type GalleryPreviewAppWindow,
+} from './preview';
 export { galleryErrorText } from './gallery-error-text';

@@ -15,10 +15,13 @@ import type {
   RestoreTab,
   GetGallerySuggestions,
   GetGallerySuggestionsResponse,
-  GetGalleryStyleCss,
-  GetGalleryStyleCssResponse,
-  InstallGalleryStyle,
-  InstallGalleryStyleResponse,
+  PreviewGalleryStyle,
+  PreviewGalleryStyleResponse,
+  GetGalleryPreview,
+  GetGalleryPreviewResponse,
+  InstallGalleryPreview,
+  InstallGalleryPreviewResponse,
+  EndGalleryPreview,
 } from '@stylebot/types';
 import { STYLES_KEY, getStylesForPage } from '@stylebot/saved-styles';
 import { defaultOptions } from '@stylebot/settings';
@@ -305,18 +308,34 @@ export const getGallerySuggestions = (
     GetGallerySuggestionsResponse
   >({ name: 'GetGallerySuggestions', pageUrl });
 
-export const getGalleryStyleCss = (
+export const previewGalleryStyle = (
+  tabId: number,
   id: string
-): Promise<GetGalleryStyleCssResponse> =>
-  chrome.runtime.sendMessage<GetGalleryStyleCss, GetGalleryStyleCssResponse>({
-    name: 'GetGalleryStyleCss',
+): Promise<PreviewGalleryStyleResponse> =>
+  chrome.runtime.sendMessage<PreviewGalleryStyle, PreviewGalleryStyleResponse>({
+    name: 'PreviewGalleryStyle',
+    tabId,
     id,
   });
 
-export const installGalleryStyle = (
-  message: Omit<InstallGalleryStyle, 'name'>
-): Promise<InstallGalleryStyleResponse> =>
-  chrome.runtime.sendMessage<InstallGalleryStyle, InstallGalleryStyleResponse>({
-    name: 'InstallGalleryStyle',
-    ...message,
+export const getGalleryPreview = (
+  tabId: number
+): Promise<GetGalleryPreviewResponse> =>
+  chrome.runtime.sendMessage<GetGalleryPreview, GetGalleryPreviewResponse>({
+    name: 'GetGalleryPreview',
+    tabId,
+  });
+
+export const installGalleryPreview = (
+  tabId: number
+): Promise<InstallGalleryPreviewResponse> =>
+  chrome.runtime.sendMessage<
+    InstallGalleryPreview,
+    InstallGalleryPreviewResponse
+  >({ name: 'InstallGalleryPreview', tabId });
+
+export const endGalleryPreview = (tabId: number): Promise<void> =>
+  chrome.runtime.sendMessage<EndGalleryPreview>({
+    name: 'EndGalleryPreview',
+    tabId,
   });

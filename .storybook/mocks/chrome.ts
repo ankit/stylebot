@@ -23,7 +23,7 @@ import type {
   GalleryPublished,
   GalleryScreenshotResponse,
   GalleryStyle,
-  InstallGalleryStyleResponse,
+  InstallGalleryPreviewResponse,
   PublishToGalleryResponse,
 } from '@stylebot/types';
 
@@ -64,9 +64,11 @@ export type GalleryShimOptions = {
   publish?: PublishToGalleryResponse;
   // Fitting a capture to the gallery's limit; pending keeps it compressing.
   compress?: Pending<GalleryScreenshotResponse>;
-  // The popup's suggestions for the site, and what installing one answers.
+  // The popup's suggestions for the site, the one the tab previews already,
+  // and what installing a preview answers.
   suggestions?: Array<GalleryStyle>;
-  install?: InstallGalleryStyleResponse;
+  previewing?: GalleryStyle;
+  install?: InstallGalleryPreviewResponse;
 };
 
 const GALLERY_SCREENSHOT =
@@ -142,6 +144,7 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
   };
 
   const gallery = { ...overrides.gallery };
+  let previewing = gallery.previewing;
 
   const permissions = {
     granted: false,
@@ -260,18 +263,21 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
       styles: gallery.suggestions ?? [],
       group: gallery.suggestions?.[0]?.group ?? null,
     }),
-    GetGalleryStyleCss: () => ({
-      ok: true,
-      css: 'body { background: #1a1b26 !important; }',
-      importUrls: [],
-    }),
-    InstallGalleryStyle: message => {
+    PreviewGalleryStyle: message => {
       const { id } = message as unknown as { id: string };
-      const installed = gallery.suggestions?.find(each => each.id === id);
+      previewing = gallery.suggestions?.find(each => each.id === id);
 
-      return (
-        gallery.install ?? { ok: true, profileName: installed?.name ?? '' }
-      );
+      return { ok: true };
+    },
+    GetGalleryPreview: () => ({
+      preview: previewing
+        ? { style: previewing, css: '', importUrls: [] }
+        : null,
+    }),
+    InstallGalleryPreview: () =>
+      gallery.install ?? { ok: true, profileName: previewing?.name ?? '' },
+    EndGalleryPreview: () => {
+      previewing = undefined;
     },
     GetGalleryScreenshot: () => ({
       ok: true,

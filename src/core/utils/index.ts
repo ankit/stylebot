@@ -58,3 +58,4 @@ export {
   canSetBrowserCommands,
   setBrowserCommand,
 } from './browser-commands';
+export { injectFontFaces } from './inject-font-faces';

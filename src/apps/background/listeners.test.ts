@@ -12,6 +12,11 @@ jest.mock('./editor-window', () => ({
   forgetWindow: jest.fn(),
 }));
 jest.mock('./messages', () => ({}));
+jest.mock('./gallery-preview', () => ({
+  endGalleryPreview: jest.fn(),
+  endGalleryPreviewOffSite: jest.fn(),
+  syncGalleryPreviewSites: jest.fn(),
+}));
 jest.mock('./restore-tabs', () => ({
   restoreOpenTabs: jest.fn(),
   restoreTab: jest.fn(async () => undefined),

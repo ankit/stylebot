@@ -326,20 +326,33 @@ export type GetGallerySuggestions = {
   pageUrl: string;
 };
 
-// A gallery style's CSS, compiled to preview on a page.
-export type GetGalleryStyleCss = {
-  name: 'GetGalleryStyleCss';
+// Previews a gallery style on a tab: the popup's tab, or the page's own.
+export type PreviewGalleryStyle = {
+  name: 'PreviewGalleryStyle';
+  id: string;
+  tabId?: number;
+};
+
+// Sent by the site bridge: opens the style's site in a new tab, previewing it.
+export type OpenGalleryPreview = {
+  name: 'OpenGalleryPreview';
   id: string;
 };
 
-export type InstallGalleryStyle = {
-  name: 'InstallGalleryStyle';
-  id: string;
-  // The Stylebot style it's added to as a profile.
-  url: string;
-  // Where its gallery page is.
-  group: string;
-  slug: string;
+// A tab's gallery preview: the popup's tab, or the page's own.
+export type GetGalleryPreview = {
+  name: 'GetGalleryPreview';
+  tabId?: number;
+};
+
+export type InstallGalleryPreview = {
+  name: 'InstallGalleryPreview';
+  tabId?: number;
+};
+
+export type EndGalleryPreview = {
+  name: 'EndGalleryPreview';
+  tabId?: number;
 };
 
 type BackgroundPageMessage =
@@ -398,7 +411,10 @@ type BackgroundPageMessage =
   | SetGalleryDisplayName
   | GetPublishedGalleryStyle
   | GetGallerySuggestions
-  | GetGalleryStyleCss
-  | InstallGalleryStyle;
+  | PreviewGalleryStyle
+  | OpenGalleryPreview
+  | GetGalleryPreview
+  | InstallGalleryPreview
+  | EndGalleryPreview;
 
 export default BackgroundPageMessage;

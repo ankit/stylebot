@@ -1,8 +1,14 @@
 /**
- * Lets stylebot.dev and gallery.stylebot.dev install styles via postMessage,
- * and marks <html> with `data-stylebot-bridge` so they can detect Stylebot.
+ * Lets stylebot.dev and gallery.stylebot.dev install and preview styles via
+ * postMessage, and marks <html> with `data-stylebot-bridge` to detect Stylebot.
  */
-import type { InstallStyle, InstallStyleResponse } from '@stylebot/types';
+import type {
+  InstallStyle,
+  InstallStyleResponse,
+  OpenGalleryPreview,
+  PreviewGalleryStyleResponse,
+  TabMessage,
+} from '@stylebot/types';
 
 type SiteMessage =
   | { type: 'stylebot:ping' }
@@ -12,7 +18,8 @@ type SiteMessage =
       url: string;
       name: string;
       css: string;
-    };
+    }
+  | { type: 'stylebot:preview'; id: string };
 
 // The bridge's protocol version, which a page can read off <html>.
 const BRIDGE_VERSION = '1';
@@ -46,6 +53,20 @@ const handlers: { [T in SiteMessage['type']]: Handler<T> } = {
       profileName: response?.profileName ?? null,
     };
   },
+
+  'stylebot:preview': async ({ id }) => {
+    // It opens a tab, so only right after the user clicked, like a popup.
+    if (!navigator.userActivation?.isActive) {
+      return { type: 'stylebot:previewing', id, ok: false };
+    }
+
+    const message: OpenGalleryPreview = { name: 'OpenGalleryPreview', id };
+    const response = await chrome.runtime
+      .sendMessage<OpenGalleryPreview, PreviewGalleryStyleResponse>(message)
+      .catch((): null => null);
+
+    return { type: 'stylebot:previewing', id, ok: Boolean(response?.ok) };
+  },
 };
 
 window.addEventListener('message', async (event: MessageEvent<SiteMessage>) => {
@@ -63,4 +84,18 @@ window.addEventListener('message', async (event: MessageEvent<SiteMessage>) => {
   const reply = await handler(data);
 
   window.postMessage(reply, window.location.origin);
+});
+
+// A style previewed from this page was installed from its preview's tab.
+chrome.runtime.onMessage.addListener((message: TabMessage) => {
+  if (message.name === 'GalleryStyleInstalled') {
+    window.postMessage(
+      {
+        type: 'stylebot:installed',
+        id: message.id,
+        profileName: message.profileName,
+      },
+      window.location.origin
+    );
+  }
 });

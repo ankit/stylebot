@@ -12,7 +12,6 @@
       </s-text>
     </component>
     <s-text v-else-if="syncTime" as="span" variant="muted" class="sync-status">
-      <s-status-dot tone="success" />
       {{ t('synced_at_time', [syncTime]) }}
     </s-text>
     <s-text

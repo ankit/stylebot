@@ -37,6 +37,18 @@ export type GalleryStyle = {
 };
 
 /**
+ * A gallery style a tab is previewing, compiled to apply in place of the
+ * page's own styles while the tab stays on its site.
+ */
+export type GalleryPreview = {
+  style: GalleryStyle;
+  css: string;
+  importUrls: Array<string>;
+  // The gallery page it was opened from, told when it's installed.
+  galleryTabId?: number;
+};
+
+/**
  * A style as publishing returns it, with what the server took out of the CSS
  * so the author can see it.
  */

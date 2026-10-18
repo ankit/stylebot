@@ -4,14 +4,10 @@ import {
   compressScreenshot,
   forgetPublishedStyle,
   getGalleryUrl,
-  getInstallId,
   getInstalledStyleIds,
   getMyStyles,
   getPublishedStyleIds,
   getSiteStyles,
-  getStyle,
-  recordInstall,
-  rememberInstalledStyle,
   getPublishedStyleForProfile,
   getPublishedStyleIdForProfile,
   getSignedInAccount,
@@ -39,10 +35,14 @@ import type {
   GetGalleryScreenshot as GetGalleryScreenshotType,
   GetGallerySuggestions as GetGallerySuggestionsType,
   GetGallerySuggestionsResponse,
-  GetGalleryStyleCss as GetGalleryStyleCssType,
-  GetGalleryStyleCssResponse,
-  InstallGalleryStyle as InstallGalleryStyleType,
-  InstallGalleryStyleResponse,
+  PreviewGalleryStyle as PreviewGalleryStyleType,
+  PreviewGalleryStyleResponse,
+  OpenGalleryPreview as OpenGalleryPreviewType,
+  GetGalleryPreview as GetGalleryPreviewType,
+  GetGalleryPreviewResponse,
+  InstallGalleryPreview as InstallGalleryPreviewType,
+  InstallGalleryPreviewResponse,
+  EndGalleryPreview as EndGalleryPreviewType,
   GetPublishedGalleryStyle as GetPublishedGalleryStyleType,
   GetPublishedGalleryStyleResponse,
   PublishToGallery as PublishToGalleryType,
@@ -52,10 +52,16 @@ import type {
   UnpublishFromGallery as UnpublishFromGalleryType,
   UnpublishFromGalleryResponse,
 } from '@stylebot/types';
-import { compileStyle } from '@stylebot/css';
 
 import { captureTab } from './capture-tab';
-import { applyStylesToAllTabs, installProfile } from './styles';
+import {
+  endGalleryPreview,
+  getGalleryPreview,
+  installGalleryPreview,
+  openGalleryPreview,
+  startGalleryPreview,
+} from './gallery-preview';
+import { isStylebotSite } from './is-stylebot-site';
 
 // Gallery sign-in reuses Drive sync's Google sign-in.
 const google: GoogleTokenSource = {
@@ -322,49 +328,100 @@ export const GetGallerySuggestions = async (
 };
 
 /**
- * A gallery style's CSS, compiled the way a saved style is applied.
+ * The tab a preview message is about: the page's own, or the popup's tab.
  */
-export const GetGalleryStyleCss = async (
-  { id }: GetGalleryStyleCssType,
-  sendResponse: (response: GetGalleryStyleCssResponse) => void
+const getPreviewTabId = (
+  sender: chrome.runtime.MessageSender,
+  tabId: number | undefined
+): number => {
+  const id = sender.tab?.id ?? tabId;
+
+  if (id === undefined) {
+    throw new Error('No tab for the preview');
+  }
+
+  return id;
+};
+
+/**
+ * Previews a gallery style on the popup's tab, or the page's own.
+ */
+export const PreviewGalleryStyle = async (
+  { id, tabId }: PreviewGalleryStyleType,
+  sender: chrome.runtime.MessageSender,
+  sendResponse: (response: PreviewGalleryStyleResponse) => void
 ): Promise<void> => {
   try {
-    const { css, importUrls } = compileStyle((await getStyle(id)).css, {
-      forceImportant: true,
-    });
-
-    sendResponse({ ok: true, css, importUrls });
+    await startGalleryPreview(getPreviewTabId(sender, tabId), id);
+    sendResponse({ ok: true });
   } catch (e) {
     sendResponse(fail(e));
   }
 };
 
 /**
- * Installs a gallery style as a new profile of a Stylebot style, counting
- * the install and remembering it.
+ * Opens a gallery style's site to preview it, for the gallery's site bridge.
  */
-export const InstallGalleryStyle = async (
-  { id, url, group, slug }: InstallGalleryStyleType,
-  sendResponse: (response: InstallGalleryStyleResponse) => void
+export const OpenGalleryPreview = async (
+  { id }: OpenGalleryPreviewType,
+  sender: chrome.runtime.MessageSender,
+  sendResponse: (response: PreviewGalleryStyleResponse) => void
 ): Promise<void> => {
+  const fromSiteBridge =
+    sender.id === chrome.runtime.id && isStylebotSite(sender.url);
+  const isValidId = typeof id === 'string' && id.length <= 64;
+
   try {
-    const style = await recordInstall(id, await getInstallId());
-    const profile = await installProfile(url, {
-      name: style.name,
-      css: style.css,
-    });
+    if (!fromSiteBridge || !isValidId || !sender.tab) {
+      throw new Error('Preview refused');
+    }
 
-    await rememberInstalledStyle(id, {
-      url,
-      profileId: profile.id,
-      version: style.version,
-      group,
-      slug,
-    });
-
-    sendResponse({ ok: true, profileName: profile.name });
-    await applyStylesToAllTabs();
+    await openGalleryPreview(id, sender.tab);
+    sendResponse({ ok: true });
   } catch (e) {
     sendResponse(fail(e));
+  }
+};
+
+export const GetGalleryPreview = async (
+  { tabId }: GetGalleryPreviewType,
+  sender: chrome.runtime.MessageSender,
+  sendResponse: (response: GetGalleryPreviewResponse) => void
+): Promise<void> => {
+  const target = sender.tab?.id ?? tabId;
+
+  sendResponse({
+    preview: target === undefined ? null : await getGalleryPreview(target),
+  });
+};
+
+/**
+ * Installs a tab's gallery preview as a new profile, counting the install
+ * and remembering it.
+ */
+export const InstallGalleryPreview = async (
+  { tabId }: InstallGalleryPreviewType,
+  sender: chrome.runtime.MessageSender,
+  sendResponse: (response: InstallGalleryPreviewResponse) => void
+): Promise<void> => {
+  try {
+    const profileName = await installGalleryPreview(
+      getPreviewTabId(sender, tabId)
+    );
+
+    sendResponse({ ok: true, profileName });
+  } catch (e) {
+    sendResponse(fail(e));
+  }
+};
+
+export const EndGalleryPreview = async (
+  { tabId }: EndGalleryPreviewType,
+  sender: chrome.runtime.MessageSender
+): Promise<void> => {
+  const target = sender.tab?.id ?? tabId;
+
+  if (target !== undefined) {
+    await endGalleryPreview(target);
   }
 };
