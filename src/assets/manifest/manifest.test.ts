@@ -12,7 +12,7 @@ const GOOGLE_HOSTS = [
 const CONTENT_SCRIPT_MATCHES = [
   ['<all_urls>'],
   ['<all_urls>'],
-  ['https://stylebot.dev/*'],
+  ['https://stylebot.dev/*', 'https://gallery.stylebot.dev/*'],
 ];
 
 const RELEASE_INSTALL_WARNING_FIELDS = {

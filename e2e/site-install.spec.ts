@@ -4,13 +4,14 @@ import { test, expect } from './fixtures';
 import { PAGE_URL, seedStyles, servePage } from './helpers';
 
 const SITE_URL = 'https://stylebot.dev/';
+const GALLERY_URL = 'https://gallery.stylebot.dev/';
 const OTHER_SITE_URL = 'https://example.com/';
 const PURPLE = 'rgb(128, 0, 128)';
 const PINK = 'rgb(255, 0, 128)';
 
 const serveSites = (context: BrowserContext) =>
   Promise.all(
-    [SITE_URL, OTHER_SITE_URL].map(url =>
+    [SITE_URL, GALLERY_URL, OTHER_SITE_URL].map(url =>
       context.route(`${url}**`, route =>
         route.fulfill({
           contentType: 'text/html',
@@ -92,12 +93,41 @@ test('stylebot.dev installs a gallery style as a new, active profile', async ({
   });
 });
 
+test('the gallery finds the bridge on <html> and installs through it', async ({
+  context,
+  extension,
+}) => {
+  await serveSites(context);
+
+  const gallery = await context.newPage();
+  await gallery.goto(GALLERY_URL);
+
+  await expect(gallery.locator('html')).toHaveAttribute(
+    'data-stylebot-bridge',
+    '1'
+  );
+  expect(await install(gallery, 'Nord')).toMatchObject({
+    profileName: 'Nord',
+  });
+
+  const stored = await extension.evaluate(async () => {
+    const { styles } = await chrome.storage.local.get('styles');
+    return styles.localhost;
+  });
+  expect(Object.values(stored.profiles)).toContainEqual(
+    expect.objectContaining({ name: 'Nord' })
+  );
+});
+
 test('other sites get no bridge to install through', async ({ context }) => {
   await serveSites(context);
 
   const other = await context.newPage();
   await other.goto(OTHER_SITE_URL);
 
+  await expect(other.locator('html')).not.toHaveAttribute(
+    'data-stylebot-bridge'
+  );
   expect(
     await postToBridge(other, { type: 'stylebot:ping' }, 'stylebot:pong')
   ).toBeNull();

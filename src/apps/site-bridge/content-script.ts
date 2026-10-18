@@ -1,7 +1,6 @@
 /**
- * Lets stylebot.dev install gallery styles. The page posts `stylebot:ping`
- * to find out Stylebot is here, and `stylebot:install` with the style's url,
- * name and css; each gets an answer posted back to the page.
+ * Lets stylebot.dev and gallery.stylebot.dev install styles via postMessage,
+ * and marks <html> with `data-stylebot-bridge` so they can detect Stylebot.
  */
 import type { InstallStyle, InstallStyleResponse } from '@stylebot/types';
 
@@ -15,8 +14,39 @@ type SiteMessage =
       css: string;
     };
 
-const reply = (data: Record<string, unknown>) =>
-  window.postMessage(data, window.location.origin);
+// The bridge's protocol version, which a page can read off <html>.
+const BRIDGE_VERSION = '1';
+
+document.documentElement.dataset.stylebotBridge = BRIDGE_VERSION;
+
+type Reply = Record<string, unknown>;
+
+type Handler<T extends SiteMessage['type']> = (
+  message: Extract<SiteMessage, { type: T }>
+) => Reply | Promise<Reply>;
+
+const handlers: { [T in SiteMessage['type']]: Handler<T> } = {
+  'stylebot:ping': () => ({ type: 'stylebot:pong' }),
+
+  'stylebot:install': async ({ id, url, name, css }) => {
+    const message: InstallStyle = {
+      name: 'InstallStyle',
+      url,
+      profileName: name,
+      css,
+    };
+
+    const response = await chrome.runtime
+      .sendMessage<InstallStyle, InstallStyleResponse>(message)
+      .catch((): InstallStyleResponse => ({}));
+
+    return {
+      type: 'stylebot:installed',
+      id,
+      profileName: response?.profileName ?? null,
+    };
+  },
+};
 
 window.addEventListener('message', async (event: MessageEvent<SiteMessage>) => {
   if (event.source !== window || event.origin !== window.location.origin) {
@@ -25,24 +55,12 @@ window.addEventListener('message', async (event: MessageEvent<SiteMessage>) => {
 
   const data = event.data;
 
-  if (data?.type === 'stylebot:ping') {
-    reply({ type: 'stylebot:pong' });
-  } else if (data?.type === 'stylebot:install') {
-    const message: InstallStyle = {
-      name: 'InstallStyle',
-      url: data.url,
-      profileName: data.name,
-      css: data.css,
-    };
-
-    const response = await chrome.runtime
-      .sendMessage<InstallStyle, InstallStyleResponse>(message)
-      .catch((): InstallStyleResponse => ({}));
-
-    reply({
-      type: 'stylebot:installed',
-      id: data.id,
-      profileName: response?.profileName ?? null,
-    });
+  if (!data || !Object.hasOwn(handlers, data.type)) {
+    return;
   }
+
+  const handler = handlers[data.type] as Handler<SiteMessage['type']>;
+  const reply = await handler(data);
+
+  window.postMessage(reply, window.location.origin);
 });
