@@ -1,8 +1,10 @@
 <template>
-  <s-pill-button @click="toggle">
+  <s-pill-button :title="label" @click="toggle">
     {{ label }}
     <template v-if="shortcut" #trailing>
-      <s-shortcut-chip muted :value="shortcut" class="shortcut-hint" />
+      <span class="shortcut-hint">
+        <s-shortcut-chip muted :value="shortcut" />
+      </span>
     </template>
   </s-pill-button>
 </template>
@@ -68,8 +70,26 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+.pill-btn {
+  --pill-current: var(--pill-surface);
+
+  position: relative;
+
+  &:hover {
+    --pill-current: var(--pill-hover);
+  }
+}
+
 .shortcut-hint {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  display: flex;
+  border-radius: 6px;
+  background: var(--pill-current);
+  box-shadow: -10px 0 8px var(--pill-current);
   opacity: 0;
+  transform: translateY(-50%);
   transition: opacity 0.12s ease;
 }
 
