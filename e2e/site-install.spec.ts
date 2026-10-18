@@ -132,3 +132,136 @@ test('other sites get no bridge to install through', async ({ context }) => {
     await postToBridge(other, { type: 'stylebot:ping' }, 'stylebot:pong')
   ).toBeNull();
 });
+
+const GALLERY_API = 'https://stylebot-styles.ahuja-ankit.workers.dev/api/v1';
+
+const night = {
+  id: 'night',
+  site: 'example.com',
+  group: 'example.com',
+  slug: 'night',
+  name: 'Night',
+  description: null,
+  author: { id: 'author', name: null },
+  version: 1,
+  installs: 0,
+  createdAt: 0,
+  updatedAt: 0,
+  screenshot: '/screenshots/night/1',
+  css: `h1 { color: ${PURPLE}; }`,
+};
+
+/**
+ * Asks the bridge which of the gallery styles are installed, the way the
+ * gallery's browse grid does, and resolves with its answer.
+ */
+const installStatus = (page: Page, styleIds: Array<string>) =>
+  page.evaluate(
+    styleIds =>
+      new Promise<Record<string, string> | null>(resolve => {
+        const id = crypto.randomUUID();
+        const timer = setTimeout(() => resolve(null), 2000);
+
+        window.addEventListener('message', e => {
+          if (
+            e.source === window &&
+            e.data?.type === 'stylebot:status:result' &&
+            e.data.id === id
+          ) {
+            clearTimeout(timer);
+            resolve(e.data.installed);
+          }
+        });
+        window.postMessage(
+          { type: 'stylebot:status', id, styleIds },
+          location.origin
+        );
+      }),
+    styleIds
+  );
+
+test.describe('install status', () => {
+  test.skip(
+    ({ engine }) =>
+      !engine.opensExtensionPages || !engine.routesExtensionRequests,
+    "Serves the Gallery's API to the background and installs from an extension page"
+  );
+
+  test('the gallery sees a style installed from its preview, until its profile is removed', async ({
+    context,
+    extension,
+  }) => {
+    await serveSites(context);
+    await context.route(`${GALLERY_API}/**`, route =>
+      route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify(night),
+      })
+    );
+
+    const gallery = await context.newPage();
+    await gallery.goto(GALLERY_URL);
+    expect(await installStatus(gallery, ['night', 'unknown'])).toEqual({});
+
+    await test.step('preview it from the gallery and install it', async () => {
+      await gallery.evaluate(() => {
+        const button = document.createElement('button');
+
+        button.textContent = 'Try on site';
+        button.onclick = () =>
+          window.postMessage(
+            { type: 'stylebot:preview', id: 'night' },
+            location.origin
+          );
+        document.body.append(button);
+      });
+
+      const previewTab = context.waitForEvent('page');
+      await gallery.click('text=Try on site');
+      await (await previewTab).waitForURL(OTHER_SITE_URL);
+
+      const extensionPage = await context.newPage();
+      await extensionPage.goto(
+        `chrome-extension://${extension.id}/options.html`
+      );
+
+      expect(
+        await extensionPage.evaluate(async url => {
+          const [tab] = await chrome.tabs.query({ url: `${url}*` });
+
+          return chrome.runtime.sendMessage({
+            name: 'InstallGalleryPreview',
+            tabId: tab.id,
+          });
+        }, OTHER_SITE_URL)
+      ).toEqual({ ok: true, profileName: 'Night' });
+      await extensionPage.close();
+    });
+
+    expect(await installStatus(gallery, ['night', 'unknown'])).toEqual({
+      night: 'Night',
+    });
+
+    await extension.evaluate(async () => {
+      const { styles } = await chrome.storage.local.get('styles');
+      const style = styles['example.com'];
+      const [id] = Object.entries(style.profiles).find(
+        ([, profile]) => (profile as { name: string }).name === 'Night'
+      ) as [string, unknown];
+
+      delete style.profiles[id];
+      await chrome.storage.local.set({ styles });
+    });
+
+    expect(await installStatus(gallery, ['night', 'unknown'])).toEqual({});
+  });
+
+  test('other sites get no install status', async ({ context }) => {
+    await serveSites(context);
+
+    const other = await context.newPage();
+    await other.goto(OTHER_SITE_URL);
+
+    expect(await installStatus(other, ['night'])).toBeNull();
+  });
+});

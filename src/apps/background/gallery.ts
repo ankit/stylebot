@@ -6,6 +6,7 @@ import {
   getGalleryUrl,
   getInstalledStyleIds,
   getInstalledStyleForProfile,
+  getInstalledProfileNames,
   getMyStyles,
   getPublishedStyleIds,
   getSiteStyles,
@@ -44,6 +45,8 @@ import type {
   InstallGalleryPreview as InstallGalleryPreviewType,
   InstallGalleryPreviewResponse,
   EndGalleryPreview as EndGalleryPreviewType,
+  GetGalleryInstallStatus as GetGalleryInstallStatusType,
+  GetGalleryInstallStatusResponse,
   GetPublishedGalleryStyle as GetPublishedGalleryStyleType,
   GetPublishedGalleryStyleResponse,
   PublishToGallery as PublishToGalleryType,
@@ -332,13 +335,14 @@ export const GetGallerySuggestions = async (
 };
 
 /**
- * The tab a preview message is about: the page's own, or the popup's tab.
+ * The tab a preview message is about: the one it names, as the popup does,
+ * or else the page's own.
  */
 const getPreviewTabId = (
   sender: chrome.runtime.MessageSender,
   tabId: number | undefined
 ): number => {
-  const id = sender.tab?.id ?? tabId;
+  const id = tabId ?? sender.tab?.id;
 
   if (id === undefined) {
     throw new Error('No tab for the preview');
@@ -392,7 +396,7 @@ export const GetGalleryPreview = async (
   sender: chrome.runtime.MessageSender,
   sendResponse: (response: GetGalleryPreviewResponse) => void
 ): Promise<void> => {
-  const target = sender.tab?.id ?? tabId;
+  const target = tabId ?? sender.tab?.id;
 
   sendResponse({
     preview: target === undefined ? null : await getGalleryPreview(target),
@@ -423,9 +427,39 @@ export const EndGalleryPreview = async (
   { tabId }: EndGalleryPreviewType,
   sender: chrome.runtime.MessageSender
 ): Promise<void> => {
-  const target = sender.tab?.id ?? tabId;
+  const target = tabId ?? sender.tab?.id;
 
   if (target !== undefined) {
     await endGalleryPreview(target);
   }
+};
+
+/**
+ * Which of the requested gallery styles are installed, and as which profile,
+ * for the site bridge on Stylebot's own sites.
+ */
+export const GetGalleryInstallStatus = async (
+  { styleIds }: GetGalleryInstallStatusType,
+  sender: chrome.runtime.MessageSender,
+  sendResponse: (response: GetGalleryInstallStatusResponse) => void
+): Promise<void> => {
+  const fromSiteBridge =
+    sender.id === chrome.runtime.id && isStylebotSite(sender.url);
+
+  if (!fromSiteBridge || !Array.isArray(styleIds)) {
+    sendResponse({ installed: {} });
+    return;
+  }
+
+  const maxStyles = 100;
+  const maxIdLength = 64;
+  const ids = styleIds
+    .filter(
+      (id): id is string => typeof id === 'string' && id.length <= maxIdLength
+    )
+    .slice(0, maxStyles);
+
+  sendResponse({
+    installed: await getInstalledProfileNames(await getAll(), ids),
+  });
 };
