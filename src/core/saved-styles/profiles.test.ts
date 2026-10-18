@@ -225,6 +225,72 @@ describe('gallery listings', () => {
   });
 });
 
+describe('fields a newer version adds', () => {
+  const tint = { color: 'navy', strength: [1, 2] };
+  const future = (rest: object = {}) =>
+    style({
+      css: 'a { color: navy; }',
+      profiles: {
+        default: { name: '', css: 'a { color: red; }' },
+        night: { name: 'Night', tint, ...rest } as never,
+      },
+      activeProfile: 'night',
+    });
+
+  it('keeps them through repair, while still dropping what is invalid', () => {
+    const repaired = normalizeProfiles(
+      future({ css: 'stale {}', galleryListing: { styleId: 5 } })
+    );
+
+    expect(repaired.profiles?.night).toEqual({ name: 'Night', tint });
+    expect(
+      normalizeProfiles(
+        style({
+          profiles: {
+            a: { name: 'A' },
+            b: { name: 'B', css: 5, tint } as never,
+          },
+          activeProfile: 'a',
+        })
+      ).profiles
+    ).toEqual({ a: { name: 'A' } });
+    expect(sanitizeStyleMap({ 'a.com': future() })['a.com']).toEqual(future());
+  });
+
+  it('keeps them through switching profiles, either way', () => {
+    const away = activateProfile(future(), 'default');
+
+    expect(away.profiles?.night).toEqual({
+      name: 'Night',
+      css: 'a { color: navy; }',
+      tint,
+    });
+    expect(activateProfile(away, 'night')).toEqual(future());
+  });
+
+  it('keeps them when the profile is edited', () => {
+    const edited = removeProfileGalleryListing(
+      setProfileCss(
+        renameProfile(
+          activateProfile(future(), 'default'),
+          'night',
+          'Midnight'
+        ),
+        'night',
+        'b {}'
+      ),
+      'night'
+    );
+
+    expect(edited.profiles?.night).toEqual({
+      name: 'Midnight',
+      css: 'b {}',
+      tint,
+    });
+    expect(expandProfiles(edited).sheets.night).toMatchObject({ tint });
+  });
+});
+
 describe('normalizeProfiles', () => {
   it('leaves a well-formed style as it is', () => {
     const two = withTwo();

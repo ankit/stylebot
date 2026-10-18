@@ -2,7 +2,8 @@ import type { Timestamp } from './shared';
 
 /**
  * One of a style's alternative stylesheets. The active profile's css lives
- * in the style's own css, so its entry here holds only the name.
+ * in the style's own css, so its entry here holds only the name. Fields a
+ * newer Stylebot adds are kept as they are, so they survive this version.
  */
 export type StyleProfile = {
   name: string;

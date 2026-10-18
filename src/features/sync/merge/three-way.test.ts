@@ -466,4 +466,63 @@ describe('mergeThreeWay with profiles', () => {
       );
     });
   });
+
+  describe('fields a newer version adds', () => {
+    const withTint = (tint: unknown, time: string, css = WHITE) =>
+      style(RED, time, {
+        profiles: {
+          default: { name: '' },
+          dark: { name: 'Dark', css, ...(tint ? { tint } : {}) } as never,
+        },
+        activeProfile: 'default',
+      });
+
+    it('takes one added on one side only', () => {
+      const { styles } = merge(
+        { 'a.com': base },
+        { 'a.com': base },
+        { 'a.com': withTint('navy', T2) }
+      );
+
+      expect(styles['a.com'].profiles?.dark).toEqual({
+        name: 'Dark',
+        css: WHITE,
+        tint: 'navy',
+      });
+    });
+
+    it('keeps one when the other side edits the profile', () => {
+      const { styles } = merge(
+        { 'a.com': base },
+        { 'a.com': withTint('navy', T2) },
+        { 'a.com': withTint(undefined, T3, 'a { color: snow; }') }
+      );
+
+      expect(styles['a.com'].profiles?.dark).toEqual({
+        name: 'Dark',
+        css: 'a { color: snow; }',
+        tint: 'navy',
+      });
+    });
+
+    it('takes the newer value when both sides changed it', () => {
+      const { styles } = merge(
+        { 'a.com': withTint('navy', T1) },
+        { 'a.com': withTint('teal', T2) },
+        { 'a.com': withTint('plum', T3) }
+      );
+
+      expect(styles['a.com'].profiles?.dark).toMatchObject({ tint: 'plum' });
+    });
+
+    it('carries one through a first sync with no base', () => {
+      const { styles } = merge(
+        undefined,
+        { 'a.com': base },
+        { 'a.com': withTint('navy', T2) }
+      );
+
+      expect(styles['a.com'].profiles?.dark).toMatchObject({ tint: 'navy' });
+    });
+  });
 });

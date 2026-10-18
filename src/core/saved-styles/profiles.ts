@@ -89,17 +89,40 @@ export const isSameGalleryListing = (
 };
 
 /**
- * A profile entry as stored: css only when it isn't the active profile's,
- * and a gallery listing only when it has one.
+ * The fields of a profile this version doesn't know, which a newer Stylebot
+ * may have added.
+ */
+const getUnknownFields = (profile: StyleProfile): Record<string, unknown> => {
+  const fields: Record<string, unknown> = { ...profile };
+
+  delete fields.name;
+  delete fields.css;
+  delete fields.galleryListing;
+
+  return fields;
+};
+
+/**
+ * Whether two profiles have the same fields this version doesn't know.
+ */
+export const hasSameUnknownFields = (
+  a: StyleProfile,
+  b: StyleProfile
+): boolean =>
+  JSON.stringify(getUnknownFields(a)) === JSON.stringify(getUnknownFields(b));
+
+/**
+ * A profile entry as stored: css only when it isn't the active profile's, a
+ * gallery listing only when it has one, and any field this version doesn't
+ * know kept as it is, so it survives until a newer version reads it again.
  */
 const getStoredProfile = (
-  name: string,
-  css: string | undefined,
-  galleryListing: GalleryListing | undefined
+  { css, galleryListing, ...fields }: StyleProfile,
+  isActive: boolean
 ): StyleProfile => {
-  const profile: StyleProfile = { name };
+  const profile: StyleProfile = fields;
 
-  if (css !== undefined) {
+  if (!isActive && css !== undefined) {
     profile.css = css;
   }
 
@@ -117,9 +140,9 @@ const getStoredProfiles = (
   entries: Array<[string, StyleProfile]>,
   active: string
 ): StyleProfiles => {
-  const stored = entries.map(([id, { name, css, galleryListing }]) => [
+  const stored = entries.map(([id, profile]) => [
     id,
-    getStoredProfile(name, id === active ? undefined : css, galleryListing),
+    getStoredProfile(profile, id === active),
   ]);
 
   return Object.fromEntries(stored);
@@ -128,8 +151,8 @@ const getStoredProfiles = (
 /**
  * Repairs a style's profiles into the stored shape: invalid entries and
  * gallery listings dropped, the active id one of the profiles, and its css
- * only in the style's own css. A style left without profiles loses both
- * fields.
+ * only in the style's own css. Fields it doesn't know are kept. A style left
+ * without profiles loses both fields.
  */
 export const normalizeProfiles = <T extends WithProfiles>(style: T): T => {
   const { profiles, activeProfile, ...rest } = style;
@@ -204,9 +227,8 @@ export const expandProfiles = (style: WithProfiles): ExpandedProfiles => {
   for (const id of ids) {
     const profile = profiles[id];
     sheets[id] = {
-      name: profile.name,
+      ...profile,
       css: id === activeProfile ? css : profile.css ?? '',
-      galleryListing: profile.galleryListing,
     };
   }
 

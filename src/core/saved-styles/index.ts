@@ -30,6 +30,7 @@ export {
   removeProfileGalleryListing,
   removeGalleryListings,
   isSameGalleryListing,
+  hasSameUnknownFields,
   isProfileNameTaken,
   freeProfileName,
 } from './profiles';
