@@ -62,6 +62,33 @@ describe('isEquivalentStyleMap with profiles', () => {
     activeProfile: 'default',
   });
 
+  it('tells styles apart when only a field a newer version adds differs', () => {
+    const tinted = (tint: object) =>
+      style('a { color: red; }', T1, {
+        profiles: {
+          default: { name: '' },
+          dark: { name: 'Dark', css: 'b {}', tint } as never,
+        },
+        activeProfile: 'default',
+      });
+
+    expect(
+      isEquivalentStyleMap(
+        { 'a.com': tinted({ a: 1 }) },
+        { 'a.com': tinted({ a: 1 }) }
+      )
+    ).toBe(true);
+    expect(
+      isEquivalentStyleMap(
+        { 'a.com': tinted({ a: 1 }) },
+        { 'a.com': tinted({ a: 2 }) }
+      )
+    ).toBe(false);
+    expect(
+      isEquivalentStyleMap({ 'a.com': two }, { 'a.com': tinted({ a: 1 }) })
+    ).toBe(false);
+  });
+
   it('tells styles apart when only a profile’s gallery listing differs', () => {
     const listed = style('a { color: red; }', T1, {
       profiles: {

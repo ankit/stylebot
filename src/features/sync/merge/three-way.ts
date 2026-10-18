@@ -5,6 +5,7 @@ import {
   expandProfiles,
   isEquivalentCss,
   isEquivalentStyle,
+  hasSameUnknownFields,
   isSameGalleryListing,
 } from '@stylebot/saved-styles';
 import type { ExpandedProfiles, ProfileSheet } from '@stylebot/saved-styles';
@@ -34,7 +35,8 @@ const isSameSheet = (a?: ProfileSheet, b?: ProfileSheet) => {
   return (
     a.name === b.name &&
     isEquivalentCss(a.css, b.css) &&
-    isSameGalleryListing(a.galleryListing, b.galleryListing)
+    isSameGalleryListing(a.galleryListing, b.galleryListing) &&
+    hasSameUnknownFields(a, b)
   );
 };
 
@@ -129,7 +131,10 @@ const mergeStyle = (
     } else {
       const merged = mergeCss(bs?.css ?? '', ls.css, rs.css, localWins, at);
 
+      // Fields this version doesn't know come from both, the newer winning.
       sheet = {
+        ...(localWins ? rs : ls),
+        ...(localWins ? ls : rs),
         name: mergeName(bs, ls, rs, localWins),
         css: merged.css,
         galleryListing: mergeGalleryListing(bs, ls, rs, localWins),
