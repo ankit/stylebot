@@ -18,7 +18,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .pill-btn {
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: 1fr minmax(0, auto) 1fr;
   align-items: center;
   column-gap: 8px;
   flex: 1;
@@ -39,6 +39,8 @@ export default Vue.extend({
 }
 
 .pill-btn-label {
+  @include truncate;
+
   grid-column: 2;
   text-align: center;
 }

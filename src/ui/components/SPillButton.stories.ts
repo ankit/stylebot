@@ -42,3 +42,15 @@ export const Variants = fromTemplate(
   </div>
 `
 );
+
+export const LongLabel = fromTemplate(
+  components,
+  `
+  <div class="sb-row" style="width: 300px">
+    <s-pill-button>
+      Edit An Extremely Long Style Name That Tests Truncation, Anywhere
+      <template #trailing><s-shortcut-kbd small value="alt+shift+m" /></template>
+    </s-pill-button>
+  </div>
+`
+);
