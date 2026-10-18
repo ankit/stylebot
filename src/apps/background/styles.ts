@@ -12,6 +12,9 @@ import {
   hasAnyCss,
   listProfiles,
   setProfileCss,
+  setProfileGalleryListing,
+  removeProfileGalleryListing,
+  removeGalleryListings,
   addProfile,
   activateProfile,
   renameProfile as renameStyleProfile,
@@ -23,6 +26,7 @@ import {
 
 import type {
   CompiledStyles,
+  GalleryListing,
   StyleMap,
   StyleWithoutUrl,
   ApplyStylesToTab,
@@ -282,6 +286,25 @@ const update = (
 };
 
 /**
+ * Applies a change to a url's style, skipping the write when it has none or
+ * the change returns it as it is.
+ */
+const updateStyle = (
+  url: string,
+  change: (style: StyleWithoutUrl) => StyleWithoutUrl
+) =>
+  update(styles => {
+    const style = styles[url] && change(styles[url]);
+
+    if (!style || style === styles[url]) {
+      return undefined;
+    }
+
+    styles[url] = editStyle(style, {});
+    return styles;
+  });
+
+/**
  * Saves a profile's css for a url, the active one unless profileId names
  * another, and removes the style once no profile has css left. Skips the
  * write when profileId no longer exists. An undefined forceImportant keeps
@@ -472,13 +495,17 @@ export const createProfile = async (
 
 /**
  * Adds css as a new, active profile of a url's style, under the name or the
- * first free variant of it, and turns the style on. Installing the same css
- * under the same name again switches back to that profile instead. Resolves
- * with the profile's name and id.
+ * first free variant of it, and turns the style on. Without a gallery listing,
+ * installing the same css under the same name again switches back to that
+ * profile instead. Resolves with the profile's name and id.
  */
 export const installProfile = async (
   url: string,
-  { name, css }: { name: string; css: string }
+  {
+    name,
+    css,
+    galleryListing,
+  }: { name: string; css: string; galleryListing?: GalleryListing }
 ): Promise<{ name: string; id: string }> => {
   let installedName = name;
   let installedId = '';
@@ -493,9 +520,10 @@ export const installProfile = async (
 
     const profiles = listProfiles(existing);
     const { sheets } = expandProfiles(existing);
-    const installed = profiles.find(
-      profile => profile.name === name && sheets[profile.id].css === css
-    );
+    const isSameInstall = (profile: { id: string; name: string }) =>
+      profile.name === name && sheets[profile.id].css === css;
+    // A gallery install gets its own profile, never one that only looks the same.
+    const installed = galleryListing ? undefined : profiles.find(isSameInstall);
 
     if (installed) {
       installedId = installed.id;
@@ -520,6 +548,7 @@ export const installProfile = async (
         id: installedId,
         name: installedName,
         css,
+        galleryListing,
         activate: true,
       }),
       { enabled: true }
@@ -533,13 +562,16 @@ export const installProfile = async (
 
 /**
  * Switches a url's style back to a profile installed before, replacing its
- * css when given, and turns the style on. Resolves with the profile's name,
- * or null when the profile is gone.
+ * css and gallery listing when given, and turns the style on. Resolves with the
+ * profile's name, or null when the profile is gone.
  */
 export const reinstallProfile = async (
   url: string,
   profileId: string,
-  css?: string
+  {
+    css,
+    galleryListing,
+  }: { css?: string; galleryListing?: GalleryListing } = {}
 ): Promise<string | null> => {
   let name: string | null = null;
 
@@ -553,9 +585,15 @@ export const reinstallProfile = async (
 
     name = sheet.name;
 
-    const updated =
-      css === undefined ? existing : setProfileCss(existing, profileId, css);
-    const style = activateProfile(updated, profileId);
+    let style = activateProfile(existing, profileId);
+
+    if (css !== undefined) {
+      style = setProfileCss(style, profileId, css);
+    }
+
+    if (galleryListing) {
+      style = setProfileGalleryListing(style, profileId, galleryListing);
+    }
 
     if (style === existing && existing.enabled) {
       return undefined;
@@ -569,36 +607,57 @@ export const reinstallProfile = async (
 };
 
 /**
+ * Sets the gallery listing one of a url's profiles was published as.
+ */
+export const setGalleryListing = (
+  url: string,
+  profileId: string,
+  galleryListing: GalleryListing
+) =>
+  updateStyle(url, style =>
+    setProfileGalleryListing(style, profileId, galleryListing)
+  );
+
+/**
+ * Removes the gallery listing from one of a url's profiles.
+ */
+export const removeGalleryListing = (url: string, profileId: string) =>
+  updateStyle(url, style => removeProfileGalleryListing(style, profileId));
+
+/**
+ * Drops the listing from every profile published as it, once it's unpublished.
+ */
+export const removePublishedGalleryListing = (styleId: string) =>
+  update(styles => {
+    const isUnpublished = (galleryListing: GalleryListing) =>
+      galleryListing.styleId === styleId &&
+      galleryListing.publishedBy !== undefined;
+    let changed = false;
+
+    for (const [url, style] of Object.entries(styles)) {
+      const updated = removeGalleryListings(style, isUnpublished);
+
+      if (updated !== style) {
+        styles[url] = editStyle(updated, {});
+        changed = true;
+      }
+    }
+
+    return changed ? styles : undefined;
+  });
+
+/**
  * Renames one of a url's profiles. No-op if it does not exist or already
  * has that name.
  */
 export const renameProfile = (url: string, profileId: string, name: string) =>
-  update(styles => {
-    const style =
-      styles[url] && renameStyleProfile(styles[url], profileId, name);
-
-    if (!style || style === styles[url]) {
-      return undefined;
-    }
-
-    styles[url] = editStyle(style, {});
-    return styles;
-  });
+  updateStyle(url, style => renameStyleProfile(style, profileId, name));
 
 /**
  * Deletes one of a url's profiles, never its last one.
  */
 export const deleteProfile = (url: string, profileId: string) =>
-  update(styles => {
-    const style = styles[url] && removeProfile(styles[url], profileId);
-
-    if (!style || style === styles[url]) {
-      return undefined;
-    }
-
-    styles[url] = editStyle(style, {});
-    return styles;
-  });
+  updateStyle(url, style => removeProfile(style, profileId));
 
 /**
  * Checks whether a Google Web Fonts stylesheet url resolves to a real font.

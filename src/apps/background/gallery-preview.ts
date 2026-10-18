@@ -1,22 +1,23 @@
 import {
   GALLERY_PREVIEW_SITES_KEY,
   getInstallId,
-  getInstalledStyle,
+  getInstalledProfile,
   getPublishedProfile,
   getStyle,
   hashCss,
   recordInstall,
-  rememberInstalledStyle,
   toGallerySite,
-  type GalleryInstall,
+  type GalleryStyleToInstall,
+  type ListedProfile,
 } from '@stylebot/gallery';
 import { compileStyle } from '@stylebot/css';
-import { getProfileSheet, getStylesForPage } from '@stylebot/saved-styles';
+import { getStylesForPage } from '@stylebot/saved-styles';
 import type {
   GalleryPreview,
   GalleryStyle,
   GalleryStyleInstalled,
   HideGalleryPreview,
+  GalleryListing,
   ShowGalleryPreview,
   StyleMap,
   TabMessage,
@@ -27,6 +28,7 @@ import {
   getAll,
   installProfile,
   reinstallProfile,
+  removeGalleryListing,
 } from './styles';
 
 // Each tab's preview, by tab id.
@@ -153,79 +155,82 @@ export const endGalleryPreview = async (
   }
 };
 
-type ProfileRef = { url: string; profileId: string };
-
-// A profile to switch back to, and the css to update it to, if any.
-type ReusableProfile = ProfileRef & { css?: string };
+/**
+ * A profile to switch back to, with the css and listing to update it to when
+ * it's out of date.
+ */
+type ReusableProfile = {
+  url: string;
+  profileId: string;
+  css?: string;
+  galleryListing?: GalleryListing;
+};
 
 /**
- * The profile this gallery style was installed as, with the latest css when
- * it's out of date and unedited. Null when there's no install, its profile
- * is gone, or the user edited a profile that's out of date.
+ * The gallery listing for a profile installed at the style's latest version.
  */
-const findInstalledProfile = async (
-  styleId: string,
-  latest: GalleryInstall,
-  styles: StyleMap
-): Promise<ReusableProfile | null> => {
-  const installed = await getInstalledStyle(styleId);
+const getLatestVersionListing = (
+  { id, group, slug }: GalleryStyle,
+  { version, css }: GalleryStyleToInstall
+): GalleryListing => ({
+  styleId: id,
+  group,
+  slug,
+  version,
+  cssHash: hashCss(css),
+});
 
-  if (!installed) {
-    return null;
-  }
-
-  const { url, profileId } = installed;
-  const css = getProfileSheet(styles[url], profileId)?.css;
-
-  if (css === undefined) {
-    return null;
-  }
-
-  if (installed.version >= latest.version) {
+/**
+ * The installed profile to switch back to, updated to the latest version
+ * when it's out of date and unedited. Null when the user edited a profile
+ * that's out of date, so the latest goes beside it.
+ */
+const reuseInstalledProfile = (
+  { url, profileId, css, galleryListing }: ListedProfile,
+  style: GalleryStyle,
+  latest: GalleryStyleToInstall
+): ReusableProfile | null => {
+  if (galleryListing.version >= latest.version) {
     return { url, profileId };
   }
 
-  if (hashCss(css) === installed.cssHash) {
-    return { url, profileId, css: latest.css };
+  if (hashCss(css) === galleryListing.cssHash) {
+    return {
+      url,
+      profileId,
+      css: latest.css,
+      galleryListing: getLatestVersionListing(style, latest),
+    };
   }
 
   return null;
 };
 
 /**
- * The profile the style was published from here. It's the user's own, so
- * it's switched back to as it is.
+ * The profile to switch back to for a gallery style: the one it was installed
+ * as, or else the one it was published from, which is the user's own and
+ * kept as it is.
  */
-const findPublishedProfile = async (
-  styleId: string,
-  styles: StyleMap
-): Promise<ReusableProfile | null> => {
-  const published = await getPublishedProfile(styleId);
+const findReusableProfile = (
+  styles: StyleMap,
+  style: GalleryStyle,
+  latest: GalleryStyleToInstall
+): ReusableProfile | null => {
+  const installed = getInstalledProfile(styles, style.id);
+  const reusable = installed && reuseInstalledProfile(installed, style, latest);
 
-  if (!published) {
-    return null;
+  if (reusable) {
+    return reusable;
   }
 
-  const sheet = getProfileSheet(styles[published.url], published.profileId);
-  return sheet ? published : null;
-};
+  const published = getPublishedProfile(styles, style.id);
 
-/**
- * Remembers the profile a gallery style is installed as, at its latest version.
- */
-const rememberInstall = (
-  { id, group, slug }: GalleryStyle,
-  latest: GalleryInstall,
-  { url, profileId }: ProfileRef
-) =>
-  rememberInstalledStyle(id, {
-    url,
-    profileId,
-    version: latest.version,
-    group,
-    slug,
-    cssHash: hashCss(latest.css),
-  });
+  if (published) {
+    return { url: published.url, profileId: published.profileId };
+  }
+
+  return null;
+};
 
 /**
  * Installs a gallery style's latest version: into the profile it was
@@ -234,32 +239,36 @@ const rememberInstall = (
  */
 const installLatestVersion = async (
   style: GalleryStyle,
-  latest: GalleryInstall,
+  latest: GalleryStyleToInstall,
   pageUrl: string
 ): Promise<string> => {
   const styles = await getAll();
-  const reusable =
-    (await findInstalledProfile(style.id, latest, styles)) ??
-    (await findPublishedProfile(style.id, styles));
+  const reusable = findReusableProfile(styles, style, latest);
 
   if (reusable) {
-    const { url, profileId, css } = reusable;
-    const name = await reinstallProfile(url, profileId, css);
+    const { url, profileId, css, galleryListing } = reusable;
+    const name = await reinstallProfile(url, profileId, {
+      css,
+      galleryListing,
+    });
 
     if (name !== null) {
-      if (css !== undefined) {
-        await rememberInstall(style, latest, reusable);
-      }
-
       return name;
     }
+  }
+
+  // The edited install stays the user's, so only the new profile keeps the listing.
+  const installed = getInstalledProfile(styles, style.id);
+
+  if (installed) {
+    await removeGalleryListing(installed.url, installed.profileId);
   }
 
   const profile = await installProfile(pageUrl, {
     name: latest.name,
     css: latest.css,
+    galleryListing: getLatestVersionListing(style, latest),
   });
-  await rememberInstall(style, latest, { url: pageUrl, profileId: profile.id });
 
   return profile.name;
 };

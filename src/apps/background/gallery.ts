@@ -2,23 +2,18 @@ import {
   blobToDataUrl,
   dataUrlToBlob,
   compressScreenshot,
-  forgetPublishedStyle,
   getGalleryUrl,
-  getInstalledStyleIds,
-  getInstalledStyleForProfile,
-  getInstalledProfileNames,
+  getListedProfileNames,
+  getListedStyleIds,
   getMyStyles,
-  getPublishedStyleIds,
   getSiteStyles,
-  getPublishedStyleForProfile,
-  getPublishedStyleIdForProfile,
+  getProfileGalleryListing,
   getSignedInAccount,
   hashCss,
   publishStyle,
   publishVersion,
   SCREENSHOT_MAX_BYTES,
   setDisplayName,
-  rememberPublishedStyle,
   signIn,
   storeAccount,
   toGalleryFailure,
@@ -58,7 +53,11 @@ import type {
 } from '@stylebot/types';
 
 import { captureTab } from './capture-tab';
-import { getAll } from './styles';
+import {
+  getAll,
+  setGalleryListing,
+  removePublishedGalleryListing,
+} from './styles';
 import {
   endGalleryPreview,
   getGalleryPreview,
@@ -122,9 +121,10 @@ export const GetMyGalleryStyles = async (
     const all = await withSession(google, getMyStyles);
     const styles = all.filter(style => style.site === toGallerySite(site));
     const account = await getSignedInAccount();
+    const savedStyles = await getAll();
+    const listing = getProfileGalleryListing(savedStyles, url, profileId);
     const publishedId =
-      account &&
-      (await getPublishedStyleIdForProfile(url, profileId, account.id));
+      account && listing?.publishedBy === account.id ? listing.styleId : null;
 
     sendResponse({
       ok: true,
@@ -229,13 +229,13 @@ export const PublishToGallery = async (
         : publishStyle(session, message.site, form)
     );
 
-    await rememberPublishedStyle(message.url, message.profileId, {
+    await setGalleryListing(message.url, message.profileId, {
       styleId: style.id,
-      version: style.version,
-      accountId: style.author.id,
-      cssHash: hashCss(message.css),
       group: style.group,
       slug: style.slug,
+      version: style.version,
+      cssHash: hashCss(message.css),
+      publishedBy: style.author.id,
     });
 
     sendResponse({ ok: true, style });
@@ -250,7 +250,7 @@ export const UnpublishFromGallery = async (
 ): Promise<void> => {
   try {
     await withSession(google, session => unpublishStyle(session, id));
-    await forgetPublishedStyle(id);
+    await removePublishedGalleryListing(id);
     sendResponse({ ok: true });
   } catch (e) {
     sendResponse(fail(e));
@@ -285,21 +285,25 @@ export const GetPublishedGalleryStyle = async (
   sendResponse: (response: GetPublishedGalleryStyleResponse) => void
 ): Promise<void> => {
   const account = await getSignedInAccount();
-  const published = account
-    ? await getPublishedStyleForProfile(url, profileId, account.id)
-    : null;
-  const installed = await getInstalledStyleForProfile(url, profileId);
+  const savedStyles = await getAll();
+  const listing = getProfileGalleryListing(savedStyles, url, profileId);
 
-  sendResponse({
-    published: published && {
-      styleId: published.styleId,
-      version: published.version,
-      cssHash: published.cssHash,
-      group: published.group,
-      slug: published.slug,
-    },
-    installed: installed && { group: installed.group, slug: installed.slug },
-  });
+  if (!listing) {
+    sendResponse({ published: null, installed: null });
+    return;
+  }
+
+  const { publishedBy, ...published } = listing;
+
+  if (!publishedBy) {
+    const { group, slug } = listing;
+    sendResponse({ published: null, installed: { group, slug } });
+    return;
+  }
+
+  // Another account's style can't be updated from here, so it isn't shown.
+  const isMine = publishedBy === account?.id;
+  sendResponse({ published: isMine ? published : null, installed: null });
 };
 
 // Enough of a site's styles to still have a couple to suggest after leaving
@@ -316,17 +320,14 @@ export const GetGallerySuggestions = async (
 ): Promise<void> => {
   try {
     const site = toGallerySite(new URL(pageUrl).hostname);
-    const [{ styles }, installed, published] = await Promise.all([
+    const [{ styles }, listed] = await Promise.all([
       getSiteStyles(site, SUGGESTIONS_FETCHED),
-      getAll().then(getInstalledStyleIds),
-      getPublishedStyleIds(),
+      getAll().then(getListedStyleIds),
     ]);
 
     sendResponse({
       ok: true,
-      styles: styles.filter(
-        style => !installed.has(style.id) && !published.has(style.id)
-      ),
+      styles: styles.filter(style => !listed.has(style.id)),
       group: styles[0]?.group ?? null,
     });
   } catch (e) {
@@ -458,8 +459,7 @@ export const GetGalleryInstallStatus = async (
       (id): id is string => typeof id === 'string' && id.length <= maxIdLength
     )
     .slice(0, maxStyles);
+  const savedStyles = await getAll();
 
-  sendResponse({
-    installed: await getInstalledProfileNames(await getAll(), ids),
-  });
+  sendResponse({ installed: getListedProfileNames(savedStyles, ids) });
 };

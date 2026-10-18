@@ -9,13 +9,20 @@ import {
   startGalleryPreview,
 } from './gallery-preview';
 import { hashCss } from '@stylebot/gallery';
+import type { GalleryListing } from '@stylebot/types';
 
-import { getAll, installProfile, reinstallProfile } from './styles';
+import {
+  getAll,
+  installProfile,
+  reinstallProfile,
+  removeGalleryListing,
+} from './styles';
 
 jest.mock('./styles', () => ({
   getAll: jest.fn(async () => ({})),
   installProfile: jest.fn(async () => ({ name: 'Tokyo Night', id: 'p1' })),
   reinstallProfile: jest.fn(async () => 'Mine'),
+  removeGalleryListing: jest.fn(async () => undefined),
   applyStylesToAllTabs: jest.fn(async () => undefined),
 }));
 
@@ -123,14 +130,11 @@ describe('gallery preview', () => {
     expect(installProfile).toHaveBeenCalledWith('github.com', {
       name: 'Tokyo Night',
       css: 'a { color: red; }',
-    });
-    expect(store['gallery-installed']).toEqual({
-      [style.id]: {
-        url: 'github.com',
-        profileId: 'p1',
-        version: 2,
+      galleryListing: {
+        styleId: style.id,
         group: 'github.com',
         slug: 'tokyo-night',
+        version: 2,
         cssHash: hashCss('a { color: red; }'),
       },
     });
@@ -153,12 +157,20 @@ describe('gallery preview', () => {
 
   describe('installing a style installed or published here before', () => {
     const LATEST_CSS = 'a { color: blue; }';
+    const LATEST_LISTING: GalleryListing = {
+      styleId: style.id,
+      group: 'github.com',
+      slug: 'tokyo-night',
+      version: 2,
+      cssHash: hashCss(LATEST_CSS),
+    };
 
     /**
-     * Seeds github.com with one profile holding css, previews the style and
-     * queues the gallery's answer to the install with its latest css.
+     * Seeds github.com with one profile holding css and a gallery listing,
+     * galleryListing, previews the style and queues the gallery's answer to the
+     * install with its latest css.
      */
-    const seed = async (css: string) => {
+    const seed = async (css: string, galleryListing?: GalleryListing) => {
       store['gallery-install-id'] = 'install-1';
       (getAll as jest.Mock).mockResolvedValue({
         'github.com': {
@@ -167,7 +179,7 @@ describe('gallery preview', () => {
           readability: false,
           modifiedTime: '',
           activeProfile: 'p0',
-          profiles: { p0: { name: 'Mine' } },
+          profiles: { p0: { name: 'Mine', galleryListing } },
         },
       });
       styleResponse('a {}');
@@ -177,101 +189,69 @@ describe('gallery preview', () => {
       );
     };
 
-    const installedAt = (version: number, css: string) => {
-      store['gallery-installed'] = {
-        [style.id]: {
-          url: 'github.com',
-          profileId: 'p0',
-          version,
-          group: 'github.com',
-          slug: 'tokyo-night',
-          cssHash: hashCss(css),
-        },
-      };
-    };
+    const installedAt = (version: number, css: string): GalleryListing => ({
+      ...LATEST_LISTING,
+      version,
+      cssHash: hashCss(css),
+    });
 
     it('switches back to an install of the latest version, keeping its edits', async () => {
-      await seed('a { color: pink; }');
-      installedAt(2, 'a { color: red; }');
+      await seed('a { color: pink; }', installedAt(2, 'a { color: red; }'));
 
       expect(await installGalleryPreview(TAB_ID)).toBe('Mine');
-      expect(reinstallProfile).toHaveBeenCalledWith(
-        'github.com',
-        'p0',
-        undefined
-      );
+      expect(reinstallProfile).toHaveBeenCalledWith('github.com', 'p0', {
+        css: undefined,
+        galleryListing: undefined,
+      });
       expect(installProfile).not.toHaveBeenCalled();
     });
 
     it('updates an untouched install of an older version in place', async () => {
-      await seed('a { color: red; }');
-      installedAt(1, 'a { color: red; }');
+      await seed('a { color: red; }', installedAt(1, 'a { color: red; }'));
 
       await installGalleryPreview(TAB_ID);
 
-      expect(reinstallProfile).toHaveBeenCalledWith(
-        'github.com',
-        'p0',
-        LATEST_CSS
-      );
-      expect(store['gallery-installed']).toMatchObject({
-        [style.id]: {
-          profileId: 'p0',
-          version: 2,
-          cssHash: hashCss(LATEST_CSS),
-        },
+      expect(reinstallProfile).toHaveBeenCalledWith('github.com', 'p0', {
+        css: LATEST_CSS,
+        galleryListing: LATEST_LISTING,
       });
     });
 
-    it('adds a newer version beside an edited install and follows it', async () => {
-      await seed('a { color: pink; }');
-      installedAt(1, 'a { color: red; }');
+    it('adds a newer version beside an edited install, which keeps the edits but loses the listing', async () => {
+      await seed('a { color: pink; }', installedAt(1, 'a { color: red; }'));
 
       await installGalleryPreview(TAB_ID);
 
       expect(reinstallProfile).not.toHaveBeenCalled();
+      expect(removeGalleryListing).toHaveBeenCalledWith('github.com', 'p0');
       expect(installProfile).toHaveBeenCalledWith('github.com', {
         name: 'Tokyo Night',
         css: LATEST_CSS,
-      });
-      expect(store['gallery-installed']).toMatchObject({
-        [style.id]: { profileId: 'p1', version: 2 },
+        galleryListing: LATEST_LISTING,
       });
     });
 
     it('switches to the profile it was published from rather than adding a copy', async () => {
-      await seed('a { color: pink; }');
-      store['gallery-published'] = {
-        [JSON.stringify(['github.com', 'p0'])]: {
-          styleId: style.id,
-          version: 1,
-          cssHash: hashCss('a { color: pink; }'),
-          group: 'github.com',
-          slug: 'tokyo-night',
-          accountId: 'someone',
-        },
-      };
+      await seed('a { color: pink; }', {
+        ...installedAt(1, 'a { color: pink; }'),
+        publishedBy: 'someone',
+      });
 
       expect(await installGalleryPreview(TAB_ID)).toBe('Mine');
-      expect(reinstallProfile).toHaveBeenCalledWith(
-        'github.com',
-        'p0',
-        undefined
-      );
+      expect(reinstallProfile).toHaveBeenCalledWith('github.com', 'p0', {
+        css: undefined,
+        galleryListing: undefined,
+      });
       expect(installProfile).not.toHaveBeenCalled();
-      expect(store['gallery-installed']).toBeUndefined();
     });
 
-    it('installs anew once the profile it was installed as is gone', async () => {
+    it("installs anew when no profile has the style's listing", async () => {
       await seed('a { color: pink; }');
-      installedAt(2, 'a { color: red; }');
-      (store['gallery-installed'] as Record<string, { profileId: string }>)[
-        style.id
-      ].profileId = 'removed';
 
       await installGalleryPreview(TAB_ID);
 
       expect(reinstallProfile).not.toHaveBeenCalled();
+      expect(removeGalleryListing).not.toHaveBeenCalled();
       expect(installProfile).toHaveBeenCalled();
     });
   });

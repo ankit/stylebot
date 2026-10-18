@@ -7,6 +7,23 @@ import type { Timestamp } from './shared';
 export type StyleProfile = {
   name: string;
   css?: string;
+  galleryListing?: GalleryListing;
+};
+
+/**
+ * The gallery listing a profile was installed from or published as. It
+ * lives on the profile, so it syncs with it and goes when it does.
+ */
+export type GalleryListing = {
+  styleId: string;
+  group: string;
+  slug: string;
+  version: number;
+  // A hash of that version's CSS, to tell if the profile was edited since.
+  cssHash: string;
+  // The gallery account that published it from this profile. Missing when it
+  // was installed from the gallery.
+  publishedBy?: string;
 };
 
 export type StyleProfiles = {

@@ -397,4 +397,73 @@ describe('mergeThreeWay with profiles', () => {
       css: 'p {}',
     });
   });
+
+  describe('gallery listings', () => {
+    const listing = (version: number) => ({
+      styleId: 'night',
+      group: 'a.com',
+      slug: 'night',
+      version,
+      cssHash: 'abc',
+    });
+
+    const withListing = (version: number | undefined, time: string) =>
+      style(RED, time, {
+        profiles: {
+          default: { name: '' },
+          dark: {
+            name: 'Dark',
+            css: WHITE,
+            ...(version ? { galleryListing: listing(version) } : {}),
+          },
+        },
+        activeProfile: 'default',
+      });
+
+    it('takes a listing added on one side only', () => {
+      const { styles } = merge(
+        { 'a.com': base },
+        { 'a.com': base },
+        { 'a.com': withListing(1, T2) }
+      );
+
+      expect(styles['a.com'].profiles?.dark?.galleryListing).toEqual(
+        listing(1)
+      );
+    });
+
+    it('keeps a listing when the other side edits the profile', () => {
+      const edited = style(RED, T3, {
+        profiles: {
+          default: { name: '' },
+          dark: { name: 'Dark', css: 'a { color: snow; }' },
+        },
+        activeProfile: 'default',
+      });
+
+      const { styles } = merge(
+        { 'a.com': base },
+        { 'a.com': withListing(1, T2) },
+        { 'a.com': edited }
+      );
+
+      expect(styles['a.com'].profiles?.dark).toEqual({
+        name: 'Dark',
+        css: 'a { color: snow; }',
+        galleryListing: listing(1),
+      });
+    });
+
+    it('takes the newer listing when both sides changed it', () => {
+      const { styles } = merge(
+        { 'a.com': withListing(1, T1) },
+        { 'a.com': withListing(2, T2) },
+        { 'a.com': withListing(3, T3) }
+      );
+
+      expect(styles['a.com'].profiles?.dark?.galleryListing).toEqual(
+        listing(3)
+      );
+    });
+  });
 });
