@@ -7,6 +7,7 @@ import type { RestoreResult, VersionHistory } from './history';
 import type {
   GalleryAuthor,
   GalleryPublished,
+  GalleryPreview,
   GalleryPublishedStyle,
   GalleryResult,
   GalleryStyle,
@@ -93,11 +94,9 @@ export type GetGallerySuggestionsResponse = GalleryResult<{
   styles: Array<GalleryStyle>;
   group: string | null;
 }>;
-export type GetGalleryStyleCssResponse = GalleryResult<{
-  css: string;
-  importUrls: Array<string>;
-}>;
-export type InstallGalleryStyleResponse = GalleryResult<{
+export type PreviewGalleryStyleResponse = GalleryResult;
+export type GetGalleryPreviewResponse = { preview: GalleryPreview | null };
+export type InstallGalleryPreviewResponse = GalleryResult<{
   profileName: string;
 }>;
 
@@ -131,7 +130,8 @@ type BackgroundPageMessageResponse =
   | UnpublishFromGalleryResponse
   | GetPublishedGalleryStyleResponse
   | GetGallerySuggestionsResponse
-  | GetGalleryStyleCssResponse
-  | InstallGalleryStyleResponse;
+  | PreviewGalleryStyleResponse
+  | GetGalleryPreviewResponse
+  | InstallGalleryPreviewResponse;
 
 export default BackgroundPageMessageResponse;

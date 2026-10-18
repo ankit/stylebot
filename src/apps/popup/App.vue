@@ -71,7 +71,6 @@
       <the-gallery-suggestions
         ref="gallery"
         :tab="tab"
-        :style-url="styles.length ? styles[0].url : domain"
         :profile-names="siteProfiles.map(profile => profile.name)"
         @preview="galleryPreviewing = $event"
         @installed="loadStyles"
@@ -444,7 +443,7 @@ body {
 .popup-footer {
   display: flex;
   gap: 8px;
-  padding: 10px 12px 12px;
+  padding: 10px 16px 12px;
 }
 
 .popup-footer.popup-footer--above-sync {

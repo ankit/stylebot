@@ -78,9 +78,17 @@ import {
   SetGalleryDisplayName,
   GetPublishedGalleryStyle,
   GetGallerySuggestions,
-  GetGalleryStyleCss,
-  InstallGalleryStyle,
+  PreviewGalleryStyle,
+  OpenGalleryPreview,
+  GetGalleryPreview,
+  InstallGalleryPreview,
+  EndGalleryPreview,
 } from './gallery';
+import {
+  endGalleryPreview,
+  endGalleryPreviewOffSite,
+  syncGalleryPreviewSites,
+} from './gallery-preview';
 
 import type {
   TabUpdated,
@@ -108,6 +116,7 @@ export const initListeners = (): void => {
   chrome.runtime.onInstalled.addListener(
     async ({ reason, previousVersion }) => {
       configureSidePanelTabs();
+      syncGalleryPreviewSites();
       detectChromiumVariant().catch(() => undefined);
 
       if (reason === 'install' || reason === 'update') {
@@ -177,6 +186,7 @@ export const initListeners = (): void => {
   // Pick up what other devices pushed while the browser was closed.
   chrome.runtime.onStartup.addListener(async () => {
     configureSidePanelTabs();
+    syncGalleryPreviewSites();
 
     if (await getGoogleDriveSyncEnabled()) {
       syncStyles({ interactive: false });
@@ -187,6 +197,7 @@ export const initListeners = (): void => {
   // A closed tab takes its editor window with it; a closed window is forgotten.
   chrome.tabs.onRemoved.addListener(tabId => {
     editorWindow.close(tabId);
+    endGalleryPreview(tabId, { notifyTab: false });
   });
 
   chrome.windows.onRemoved.addListener(windowId => {
@@ -196,6 +207,10 @@ export const initListeners = (): void => {
   chrome.tabs.onUpdated.addListener((tabId, { url }) => {
     if (url && isSignInRedirect(url)) {
       syncAfterSignInRedirect(url, tabId);
+    }
+
+    if (url) {
+      endGalleryPreviewOffSite(tabId, url);
     }
   });
 
@@ -426,12 +441,21 @@ export const initListeners = (): void => {
         case 'GetGallerySuggestions':
           GetGallerySuggestions(message, sendResponse);
           return true;
-        case 'GetGalleryStyleCss':
-          GetGalleryStyleCss(message, sendResponse);
+        case 'PreviewGalleryStyle':
+          PreviewGalleryStyle(message, sender, sendResponse);
           return true;
-        case 'InstallGalleryStyle':
-          InstallGalleryStyle(message, sendResponse);
+        case 'OpenGalleryPreview':
+          OpenGalleryPreview(message, sender, sendResponse);
           return true;
+        case 'GetGalleryPreview':
+          GetGalleryPreview(message, sender, sendResponse);
+          return true;
+        case 'InstallGalleryPreview':
+          InstallGalleryPreview(message, sender, sendResponse);
+          return true;
+        case 'EndGalleryPreview':
+          EndGalleryPreview(message, sender);
+          break;
       }
 
       return false;

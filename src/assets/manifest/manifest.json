@@ -82,6 +82,8 @@
         "monaco-editor/*",
         "editor/app.js",
         "editor/app.css",
+        "gallery-preview/index.js",
+        "gallery-preview/index.css",
         "fonts/*",
         "readability/reader.js",
         "readability/reader.css",

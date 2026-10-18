@@ -1,8 +1,8 @@
 <template>
   <span class="summary">
-    <img class="thumbnail" :src="thumbnail" alt="" />
+    <s-thumbnail class="thumbnail" :src="thumbnail" :width="52" :height="32" />
     <span class="summary-text">
-      <s-text as="span" size="large" medium class="truncated">
+      <s-text as="span" size="large" class="name">
         {{ styleData.name }}
       </s-text>
       <slot />
@@ -13,7 +13,7 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-import { SText } from '@stylebot/components';
+import { SText, SThumbnail } from '@stylebot/components';
 import { getGalleryUrl } from '@stylebot/gallery';
 import type { GalleryStyle } from '@stylebot/types';
 
@@ -25,6 +25,7 @@ export default Vue.extend({
 
   components: {
     SText,
+    SThumbnail,
   },
 
   props: {
@@ -46,19 +47,13 @@ export default Vue.extend({
 .summary {
   display: flex;
   flex: 1;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   min-width: 0;
 }
 
-.thumbnail {
-  flex: none;
-  width: 52px;
-  height: 32px;
-  border: 1px solid var(--panel-border);
-  border-radius: 5px;
-  object-fit: cover;
-  object-position: top left;
+.summary .thumbnail {
+  margin-top: 4px;
 }
 
 .summary-text {
@@ -69,7 +64,11 @@ export default Vue.extend({
   min-width: 0;
 }
 
-.truncated {
-  @include truncate;
+.name {
+  display: -webkit-box;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 </style>

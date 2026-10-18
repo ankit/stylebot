@@ -19,6 +19,7 @@ import {
   deleteProfile,
 } from './styles';
 import * as styleStorage from './styles';
+import { isStylebotSite } from './is-stylebot-site';
 
 import {
   get as getOption,
@@ -153,32 +154,6 @@ export const CreateProfile = async (
   return applyStylesToAllTabs();
 };
 
-// The sites whose pages may install styles.
-const INSTALL_ORIGINS = [
-  'https://stylebot.dev',
-  'https://gallery.stylebot.dev',
-];
-
-/**
- * Whether a page may install styles: stylebot.dev or its gallery, or in
- * development builds the site's dev server on any localhost port, to try
- * installs locally.
- */
-const canInstallFrom = (url: string | undefined): boolean => {
-  if (!url) {
-    return false;
-  }
-
-  const { origin, protocol, hostname } = new URL(url);
-
-  return (
-    INSTALL_ORIGINS.includes(origin) ||
-    (process.env.NODE_ENV === 'development' &&
-      protocol === 'http:' &&
-      hostname === 'localhost')
-  );
-};
-
 const MAX_INSTALL_CSS_LENGTH = 100_000;
 const MAX_INSTALL_NAME_LENGTH = 60;
 
@@ -198,7 +173,7 @@ export const InstallStyle = async (
 ): Promise<void> => {
   if (
     sender.id !== chrome.runtime.id ||
-    !canInstallFrom(sender.url) ||
+    !isStylebotSite(sender.url) ||
     !isNonEmptyString(message.url, 2048) ||
     !isNonEmptyString(message.profileName, MAX_INSTALL_NAME_LENGTH) ||
     !isNonEmptyString(message.css, MAX_INSTALL_CSS_LENGTH)

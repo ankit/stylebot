@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import type { Store } from 'vuex';
 import { t } from '@stylebot/i18n';
-import { isFieldTarget } from '@stylebot/utils';
+import { injectFontFaces, isFieldTarget } from '@stylebot/utils';
 
 import type { State } from '../store';
 import TheStylebotApp from '../components/TheStylebotApp.vue';
@@ -37,30 +37,6 @@ const mountEditor = (store: Store<State>, el: Element): Vue => {
     el,
     render: h => h(TheStylebotApp),
   });
-};
-
-/**
- * Registers the editor's fonts on the page's document, since browsers
- * ignore font-face rules inside a shadow root. Reads the same fonts.css the
- * extension pages use, pointing its files at the extension.
- */
-const injectFontFaces = async (): Promise<void> => {
-  if (document.getElementById('stylebot-editor-fonts')) {
-    return;
-  }
-
-  const styleEl = document.createElement('style');
-  styleEl.setAttribute('id', 'stylebot-editor-fonts');
-  (document.head || document.documentElement).appendChild(styleEl);
-
-  const css = await fetch(chrome.runtime.getURL('fonts/fonts.css')).then(
-    response => response.text()
-  );
-
-  styleEl.textContent = css.replace(
-    /url\('([^']+)'\)/g,
-    (_, file: string) => `url('${chrome.runtime.getURL(`fonts/${file}`)}')`
-  );
 };
 
 let editorCss: Promise<string> | null = null;

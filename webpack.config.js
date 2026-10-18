@@ -387,6 +387,7 @@ const clientConfig = {
     'editor-window/index': './apps/editor/window/index.ts',
     'inject-css/index': './apps/content/content-script.ts',
     'site-bridge/index': './apps/site-bridge/content-script.ts',
+    'gallery-preview/index': './apps/gallery-preview/index.ts',
     'monaco-editor/iframe/index': './apps/monaco-iframe/index.ts',
     'monaco-editor/iframe/options-index':
       './apps/monaco-iframe/options-index.ts',

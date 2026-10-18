@@ -8,7 +8,11 @@ import { isStylableDocument } from '@stylebot/saved-styles';
 import { readCache } from '@stylebot/stylesheets';
 import type { TabMessage } from '@stylebot/types';
 
-import { listenForGalleryPreview } from './gallery-preview';
+import {
+  hideGalleryPreview,
+  resumeGalleryPreview,
+  showGalleryPreview,
+} from './gallery-preview';
 import { hidePage, revealPage } from './hide-page';
 import { applyPageState, getPageState, savePageState } from './page-state';
 import { getCompiledStyles } from './saved-styles';
@@ -28,13 +32,13 @@ if (window === window.top) {
         sendResponse(canStyle);
       } else if (message.name === 'GetIsPageReaderable') {
         sendResponse(isReaderable());
+      } else if (message.name === 'ShowGalleryPreview' && canStyle) {
+        showGalleryPreview(message.preview);
+      } else if (message.name === 'HideGalleryPreview') {
+        hideGalleryPreview();
       }
     }
   );
-
-  if (canStyle) {
-    listenForGalleryPreview();
-  }
 }
 
 // Fallback if the storage read (or an @import fetch) stalls — real
@@ -63,6 +67,10 @@ const run = () => {
     clearTimeout(revealTimeout);
     revealPage();
     savePageState(freshState);
+
+    if (window === window.top) {
+      resumeGalleryPreview();
+    }
   });
 };
 

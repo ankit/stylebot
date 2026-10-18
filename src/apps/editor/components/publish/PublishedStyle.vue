@@ -9,7 +9,7 @@
           ])
         }}
       </s-heading>
-      <img class="screenshot" :src="screenshotUrl" :alt="t('screenshot')" />
+      <s-thumbnail :src="screenshotUrl" :alt="t('screenshot')" />
     </div>
 
     <div class="link-field">
@@ -48,6 +48,7 @@ import {
   SHeading,
   SStatusDot,
   SText,
+  SThumbnail,
   STooltip,
 } from '@stylebot/components';
 import { getGalleryStyleUrl, getGalleryUrl } from '@stylebot/gallery';
@@ -66,6 +67,7 @@ export default Vue.extend({
     SHeading,
     SStatusDot,
     SText,
+    SThumbnail,
     STooltip,
   },
 
@@ -114,16 +116,6 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-.screenshot {
-  display: block;
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  border: 1px solid var(--panel-border);
-  border-radius: 8px;
-  object-fit: cover;
-  object-position: top left;
 }
 
 .link-field {
