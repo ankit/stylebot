@@ -99,6 +99,10 @@ export type GetGallerySuggestionsResponse = GalleryResult<{
 }>;
 export type PreviewGalleryStyleResponse = GalleryResult;
 export type GetGalleryPreviewResponse = { preview: GalleryPreview | null };
+// The profile name each requested gallery style is installed as.
+export type GetGalleryInstallStatusResponse = {
+  installed: Record<string, string>;
+};
 export type InstallGalleryPreviewResponse = GalleryResult<{
   profileName: string;
 }>;
@@ -135,6 +139,7 @@ type BackgroundPageMessageResponse =
   | GetGallerySuggestionsResponse
   | PreviewGalleryStyleResponse
   | GetGalleryPreviewResponse
-  | InstallGalleryPreviewResponse;
+  | InstallGalleryPreviewResponse
+  | GetGalleryInstallStatusResponse;
 
 export default BackgroundPageMessageResponse;

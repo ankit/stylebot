@@ -12,6 +12,7 @@ import { getAll } from './styles';
 import {
   CaptureGalleryScreenshot,
   GetGalleryScreenshot,
+  GetGalleryInstallStatus,
   GetGallerySuggestions,
   GetMyGalleryStyles,
   GetPublishedGalleryStyle,
@@ -336,5 +337,62 @@ describe('gallery messages', () => {
     );
 
     expect(response).toMatchObject({ ok: true, styles: [installed] });
+  });
+
+  describe('install status', () => {
+    const installedStyles = () => {
+      mockStorage({
+        'gallery-installed': {
+          night: {
+            url: 'github.com',
+            profileId: 'p1',
+            version: 1,
+            group: 'github.com',
+            slug: 'night',
+          },
+        },
+      });
+      (global.chrome as { runtime?: unknown }).runtime = { id: 'stylebot' };
+      (getAll as jest.Mock).mockResolvedValue({
+        'github.com': { css: '', profiles: { p1: { name: 'Night' } } },
+      });
+    };
+
+    const status = (styleIds: unknown, url: string) =>
+      respond(send =>
+        GetGalleryInstallStatus(
+          {
+            name: 'GetGalleryInstallStatus',
+            styleIds: styleIds as Array<string>,
+          },
+          { id: 'stylebot', url },
+          send
+        )
+      );
+
+    it('names the requested styles that are installed', async () => {
+      installedStyles();
+
+      expect(
+        await status(['night', 'other', 42], 'https://gallery.stylebot.dev/s')
+      ).toEqual({ installed: { night: 'Night' } });
+    });
+
+    it('tells other sites nothing', async () => {
+      installedStyles();
+
+      expect(await status(['night'], 'https://example.com/')).toEqual({
+        installed: {},
+      });
+    });
+
+    it('only looks up the first 100 ids', async () => {
+      installedStyles();
+      const ids = [...Array.from({ length: 100 }, (_, i) => `x${i}`), 'night'];
+
+      expect(await status(ids, 'https://stylebot.dev/')).toEqual({
+        installed: {},
+      });
+    });
   });
 });

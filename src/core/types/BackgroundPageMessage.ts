@@ -350,6 +350,12 @@ export type InstallGalleryPreview = {
   tabId?: number;
 };
 
+// Sent by the site bridge: which of these gallery styles are installed.
+export type GetGalleryInstallStatus = {
+  name: 'GetGalleryInstallStatus';
+  styleIds: Array<string>;
+};
+
 export type EndGalleryPreview = {
   name: 'EndGalleryPreview';
   tabId?: number;
@@ -415,6 +421,7 @@ type BackgroundPageMessage =
   | OpenGalleryPreview
   | GetGalleryPreview
   | InstallGalleryPreview
-  | EndGalleryPreview;
+  | EndGalleryPreview
+  | GetGalleryInstallStatus;
 
 export default BackgroundPageMessage;

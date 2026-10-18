@@ -61,6 +61,27 @@ export const getInstalledStyleIds = async (
 };
 
 /**
+ * The profile name each of the given gallery styles is installed as, leaving
+ * out the ones not installed, or whose profile has since been removed.
+ */
+export const getInstalledProfileNames = async (
+  styles: StyleMap,
+  styleIds: Array<string>
+): Promise<Record<string, string>> => {
+  const installed = await getInstalledStyles();
+
+  return Object.fromEntries(
+    styleIds.flatMap(styleId => {
+      const record = installed[styleId];
+      const profile =
+        record && styles[record.url]?.profiles?.[record.profileId];
+
+      return profile ? [[styleId, profile.name]] : [];
+    })
+  );
+};
+
+/**
  * The gallery style a profile was installed from, if any.
  */
 export const getInstalledStyleForProfile = async (

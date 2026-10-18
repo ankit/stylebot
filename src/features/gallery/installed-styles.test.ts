@@ -1,6 +1,7 @@
 import { mockStorage } from './gallery.fixtures';
 import {
   getInstallId,
+  getInstalledProfileNames,
   getInstalledStyleForProfile,
   getInstalledStyleIds,
   rememberInstalledStyle,
@@ -63,5 +64,37 @@ describe('installed styles', () => {
         },
       })
     ).toEqual(new Set());
+  });
+
+  it('names the profiles requested styles are installed as', async () => {
+    await rememberInstalledStyle('abc', {
+      url: 'github.com',
+      profileId: 'p1',
+      version: 1,
+      group: 'github.com',
+      slug: 'night',
+    });
+    await rememberInstalledStyle('gone', {
+      url: 'github.com',
+      profileId: 'p2',
+      version: 1,
+      group: 'github.com',
+      slug: 'gone',
+    });
+
+    expect(
+      await getInstalledProfileNames(
+        {
+          'github.com': {
+            css: '',
+            enabled: true,
+            readability: false,
+            modifiedTime: '',
+            profiles: { p1: { name: 'Night' } },
+          },
+        },
+        ['abc', 'gone', 'unknown']
+      )
+    ).toEqual({ abc: 'Night' });
   });
 });
