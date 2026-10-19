@@ -8,6 +8,8 @@ import type {
   EnableStyle,
   DisableStyle,
   SetActiveProfile,
+  RenameProfile,
+  DeleteProfile,
   StylebotOptions,
   EditorSidePanelOpened,
   OpenEditorSidePanel,
@@ -110,6 +112,27 @@ export const setActiveProfile = (url: string, profileId: string): void => {
     url,
     profileId,
   };
+
+  chrome.runtime.sendMessage(message);
+};
+
+export const renameProfile = (
+  url: string,
+  profileId: string,
+  profileName: string
+): void => {
+  const message: RenameProfile = {
+    name: 'RenameProfile',
+    url,
+    profileId,
+    profileName,
+  };
+
+  chrome.runtime.sendMessage(message);
+};
+
+export const deleteProfile = (url: string, profileId: string): void => {
+  const message: DeleteProfile = { name: 'DeleteProfile', url, profileId };
 
   chrome.runtime.sendMessage(message);
 };

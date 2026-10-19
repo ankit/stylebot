@@ -20,6 +20,9 @@
         :joined="hasToggleRows"
         :previewing="galleryPreviewing"
         @pick="pickSiteProfile"
+        @edit="editSiteProfile"
+        @rename="renameSiteProfile"
+        @delete="deleteSiteProfile"
       />
       <template v-else>
         <div class="popup-header">
@@ -83,6 +86,7 @@
         :class="{ 'popup-footer--above-sync': syncEnabled }"
       >
         <toggle-stylebot
+          ref="toggle"
           :is-open="isOpen"
           :tab="tab"
           :shortcut="stylebotShortcut"
@@ -127,6 +131,8 @@ import {
   enableStyle,
   disableStyle,
   setActiveProfile,
+  renameProfile,
+  deleteProfile,
   getRestoredPageSupport,
 } from './utils';
 
@@ -135,6 +141,8 @@ import {
   expandProfiles,
   hasAnyCss,
   listProfiles,
+  removeProfile,
+  renameProfile as renameStyleProfile,
 } from '@stylebot/saved-styles';
 import type { ProfileSummary } from '@stylebot/saved-styles';
 import type {
@@ -377,6 +385,46 @@ export default Vue.extend({
 
       this.siteActiveProfile = id;
       this.siteEnabled = true;
+    },
+
+    /**
+     * Switches the site to a profile and opens the editor on it.
+     */
+    editSiteProfile(id: string): void {
+      this.pickSiteProfile(id);
+
+      if (!this.isOpen) {
+        (this.$refs.toggle as InstanceType<typeof ToggleStylebot>).toggle();
+      }
+    },
+
+    renameSiteProfile(id: string, name: string): void {
+      const [site, ...rest] = this.styles;
+
+      renameProfile(site.url, id, name);
+      this.styles = [renameStyleProfile(site, id, name), ...rest];
+    },
+
+    /**
+     * Deletes a profile. Deleting the one that's on turns the site's style
+     * off, unless the open editor is keeping it on.
+     */
+    deleteSiteProfile(id: string): void {
+      const [site, ...rest] = this.styles;
+      const turnOff =
+        this.siteEnabled && id === this.siteActiveProfile && !this.isOpen;
+
+      deleteProfile(site.url, id);
+
+      if (turnOff) {
+        disableStyle(site.url);
+        this.siteEnabled = false;
+      }
+
+      const updated = { ...removeProfile(site, id), enabled: this.siteEnabled };
+
+      this.styles = [updated, ...rest];
+      this.siteActiveProfile = expandProfiles(updated).active;
     },
   },
 });

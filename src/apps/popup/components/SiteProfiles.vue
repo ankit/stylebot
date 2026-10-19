@@ -13,45 +13,32 @@
       role="radiogroup"
       :aria-label="url"
     >
-      <button
-        type="button"
-        role="radio"
-        class="profile-option"
-        :class="{ checked: !enabled }"
-        :aria-checked="enabled ? 'false' : 'true'"
+      <profile-row
+        :name="t('no_style')"
+        :checked="!enabled"
         :disabled="disableOff"
-        @click="$emit('pick', null)"
-      >
-        <s-text as="span" size="large" class="profile-name">
-          {{ t('no_style') }}
-        </s-text>
-        <span class="check-slot" aria-hidden="true">
-          <check-icon v-if="!enabled" :size="16" />
-        </span>
-      </button>
+        :actions="false"
+        @pick="$emit('pick', null)"
+      />
 
-      <button
+      <profile-row
         v-for="profile in profiles"
         :key="profile.id"
-        type="button"
-        role="radio"
-        class="profile-option"
-        :class="{ checked: enabled && profile.id === activeProfile }"
-        :aria-checked="
-          enabled && profile.id === activeProfile ? 'true' : 'false'
-        "
-        @click="$emit('pick', profile.id)"
-      >
-        <s-text as="span" size="large" class="profile-name">
-          {{ displayName(profile) }}
-        </s-text>
-        <span class="check-slot" aria-hidden="true">
-          <check-icon
-            v-if="enabled && profile.id === activeProfile"
-            :size="16"
-          />
-        </span>
-      </button>
+        v-model="draft"
+        :name="displayName(profile)"
+        :checked="enabled && profile.id === activeProfile"
+        :menu-open="menuFor === profile.id"
+        :renaming="renaming === profile.id"
+        :error="nameError"
+        @pick="$emit('pick', profile.id)"
+        @more="toggleMenu(profile.id)"
+        @close-menu="menuFor = null"
+        @edit="edit(profile.id)"
+        @rename="startRename(profile)"
+        @delete="remove(profile.id)"
+        @submit="submitRename"
+        @cancel="renaming = null"
+      />
     </div>
   </div>
 </template>
@@ -59,19 +46,20 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-import { SHeading, SText } from '@stylebot/components';
-import { CheckIcon } from '@stylebot/icons';
-import OptionsButton from './OptionsButton.vue';
+import { SHeading } from '@stylebot/components';
+import { isProfileNameTaken } from '@stylebot/saved-styles';
 import type { ProfileSummary } from '@stylebot/saved-styles';
+
+import OptionsButton from './OptionsButton.vue';
+import ProfileRow from './ProfileRow.vue';
 
 export default Vue.extend({
   name: 'SiteProfiles',
 
   components: {
     SHeading,
-    SText,
-    CheckIcon,
     OptionsButton,
+    ProfileRow,
   },
 
   props: {
@@ -114,9 +102,92 @@ export default Vue.extend({
     },
   },
 
+  data(): {
+    // The profile whose ••• menu is open, or null.
+    menuFor: string | null;
+    // The profile being renamed, or null.
+    renaming: string | null;
+    draft: string;
+  } {
+    return {
+      menuFor: null,
+      renaming: null,
+      draft: '',
+    };
+  },
+
+  computed: {
+    nameError(): string {
+      const others = this.profiles
+        .filter(profile => profile.id !== this.renaming)
+        .map(this.displayName);
+
+      return isProfileNameTaken(this.draft, others)
+        ? this.t('profile_name_taken')
+        : '';
+    },
+  },
+
+  watch: {
+    menuFor(id: string | null): void {
+      if (id) {
+        document.addEventListener('mousedown', this.onDocumentMousedown);
+      } else {
+        document.removeEventListener('mousedown', this.onDocumentMousedown);
+      }
+    },
+  },
+
+  beforeDestroy() {
+    document.removeEventListener('mousedown', this.onDocumentMousedown);
+  },
+
   methods: {
     displayName(profile: ProfileSummary): string {
       return profile.name || this.t('profile_default_name');
+    },
+
+    toggleMenu(id: string): void {
+      this.menuFor = this.menuFor === id ? null : id;
+    },
+
+    onDocumentMousedown(event: MouseEvent): void {
+      const target = event.target as HTMLElement;
+
+      if (!target.closest('.row-menu, .row-more')) {
+        this.menuFor = null;
+      }
+    },
+
+    edit(id: string): void {
+      this.menuFor = null;
+      this.$emit('edit', id);
+    },
+
+    startRename(profile: ProfileSummary): void {
+      this.menuFor = null;
+      this.renaming = profile.id;
+      this.draft = this.displayName(profile);
+    },
+
+    submitRename(): void {
+      const profile = this.profiles.find(({ id }) => id === this.renaming);
+      const name = this.draft.trim();
+
+      if (!profile) {
+        return;
+      }
+
+      this.renaming = null;
+
+      if (name && !this.nameError && name !== this.displayName(profile)) {
+        this.$emit('rename', profile.id, name);
+      }
+    },
+
+    remove(id: string): void {
+      this.menuFor = null;
+      this.$emit('delete', id);
     },
   },
 });
@@ -144,52 +215,6 @@ export default Vue.extend({
 
   &.profile-list--joined {
     padding-bottom: 0;
-  }
-}
-
-.profile-option {
-  @include button-reset;
-
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  height: 34px;
-  padding: 0 10px;
-  border-radius: 7px;
-  cursor: pointer;
-
-  &:hover:not(:disabled) {
-    background: var(--hover-tint);
-  }
-
-  &:disabled {
-    cursor: default;
-    opacity: 0.5;
-  }
-
-  @include focus-ring;
-}
-
-.check-slot {
-  display: flex;
-  justify-content: center;
-  flex: none;
-  width: 16px;
-  color: var(--accent-text);
-
-  .previewing & {
-    color: var(--text-muted);
-  }
-}
-
-.profile-name {
-  @include truncate;
-
-  flex: 1;
-  min-width: 0;
-
-  .checked & {
-    font-weight: 600;
   }
 }
 </style>
