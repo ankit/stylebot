@@ -1,6 +1,7 @@
 import type {
   GalleryStyle,
   InstallGalleryPreviewResponse,
+  UndoGalleryInstallResponse,
 } from '@stylebot/types';
 
 /**
@@ -14,6 +15,7 @@ export const GALLERY_PREVIEW_SITES_KEY = 'galleryPreviewSites';
  */
 export type GalleryPreviewHandlers = {
   install: () => Promise<InstallGalleryPreviewResponse>;
+  undo: () => Promise<UndoGalleryInstallResponse>;
   cancel: () => void;
   compare: (on: boolean) => void;
 };
@@ -26,6 +28,6 @@ export type GalleryPreviewAppWindow = Window & {
     mount: (
       style: GalleryStyle,
       handlers: GalleryPreviewHandlers
-    ) => () => void;
+    ) => (installed?: boolean) => void;
   };
 };

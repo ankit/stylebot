@@ -83,11 +83,13 @@ import {
   GetGalleryPreview,
   InstallGalleryPreview,
   EndGalleryPreview,
+  UndoGalleryInstall,
   GetGalleryInstallStatus,
 } from './gallery';
 import {
   endGalleryPreview,
   endGalleryPreviewOffSite,
+  forgetGalleryInstall,
   syncGalleryPreviewSites,
 } from './gallery-preview';
 
@@ -199,6 +201,7 @@ export const initListeners = (): void => {
   chrome.tabs.onRemoved.addListener(tabId => {
     editorWindow.close(tabId);
     endGalleryPreview(tabId, { notifyTab: false });
+    forgetGalleryInstall(tabId);
   });
 
   chrome.windows.onRemoved.addListener(windowId => {
@@ -457,6 +460,9 @@ export const initListeners = (): void => {
         case 'EndGalleryPreview':
           EndGalleryPreview(message, sender);
           break;
+        case 'UndoGalleryInstall':
+          UndoGalleryInstall(message, sender, sendResponse);
+          return true;
         case 'GetGalleryInstallStatus':
           GetGalleryInstallStatus(message, sender, sendResponse);
           return true;

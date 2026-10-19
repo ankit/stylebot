@@ -20,6 +20,7 @@ import type {
   GalleryListing,
   ShowGalleryPreview,
   StyleMap,
+  StyleWithoutUrl,
   TabMessage,
 } from '@stylebot/types';
 
@@ -29,12 +30,31 @@ import {
   installProfile,
   reinstallProfile,
   removeGalleryListing,
+  restoreStyles,
 } from './styles';
 
 // Each tab's preview, by tab id.
 const PREVIEWS_KEY = 'galleryPreviews';
 
+// Each tab's latest install, with the styles it changed as they were before.
+const INSTALL_UNDOS_KEY = 'galleryInstallUndos';
+
 type Previews = Record<string, GalleryPreview>;
+
+type InstallUndo = {
+  preview: GalleryPreview;
+  styles: Record<string, StyleWithoutUrl | null>;
+};
+
+type InstallUndos = Record<string, InstallUndo>;
+
+const readInstallUndos = async (): Promise<InstallUndos> => {
+  const items = await chrome.storage.session.get(INSTALL_UNDOS_KEY);
+  return items[INSTALL_UNDOS_KEY] ?? {};
+};
+
+const writeInstallUndos = (undos: InstallUndos): Promise<void> =>
+  chrome.storage.session.set({ [INSTALL_UNDOS_KEY]: undos });
 
 const readPreviews = async (): Promise<Previews> => {
   const items = await chrome.storage.session.get(PREVIEWS_KEY);
@@ -98,6 +118,19 @@ const showOnTab = async (
   sendToTab(tabId, message);
 };
 
+/**
+ * Saves a tab's preview and shows it there.
+ */
+const showPreview = async (
+  tabId: number,
+  preview: GalleryPreview
+): Promise<void> => {
+  const previews = await readPreviews();
+
+  await writePreviews({ ...previews, [tabId]: preview });
+  await showOnTab(tabId, preview);
+};
+
 // The latest preview asked for in each tab, so a slower earlier one is dropped.
 const latestRequests = new Map<number, number>();
 
@@ -121,12 +154,8 @@ export const startGalleryPreview = async (
   }
 
   const preview: GalleryPreview = { style, css, importUrls, galleryTabId };
-  const previews = await readPreviews();
 
-  await writePreviews({ ...previews, [tabId]: preview });
-
-  await showOnTab(tabId, preview);
-
+  await showPreview(tabId, preview);
   return preview;
 };
 
@@ -162,7 +191,7 @@ export const openGalleryPreview = async (
  */
 export const endGalleryPreview = async (
   tabId: number,
-  { notifyTab = true } = {}
+  { notifyTab = true, installed = false } = {}
 ): Promise<void> => {
   const { [tabId]: preview, ...rest } = await readPreviews();
 
@@ -173,7 +202,11 @@ export const endGalleryPreview = async (
   await writePreviews(rest);
 
   if (notifyTab) {
-    const message: HideGalleryPreview = { name: 'HideGalleryPreview' };
+    const message: HideGalleryPreview = {
+      name: 'HideGalleryPreview',
+      installed,
+    };
+
     sendToTab(tabId, message);
   }
 };
@@ -337,6 +370,59 @@ export const getReplacedStyleUrl = async (
 };
 
 /**
+ * Remembers the styles a tab's install changed, as they were, so it can be
+ * undone.
+ */
+const rememberInstall = async (
+  tabId: number,
+  preview: GalleryPreview,
+  before: StyleMap,
+  after: StyleMap
+): Promise<void> => {
+  const urls = new Set([...Object.keys(before), ...Object.keys(after)]);
+  const styles: InstallUndo['styles'] = {};
+
+  urls.forEach(url => {
+    if (JSON.stringify(before[url]) !== JSON.stringify(after[url])) {
+      styles[url] = before[url] ?? null;
+    }
+  });
+
+  const undos = await readInstallUndos();
+  await writeInstallUndos({ ...undos, [tabId]: { preview, styles } });
+};
+
+/**
+ * Forgets a tab's install, once it's closed.
+ */
+export const forgetGalleryInstall = async (tabId: number): Promise<void> => {
+  const { [tabId]: undo, ...rest } = await readInstallUndos();
+
+  if (undo) {
+    await writeInstallUndos(rest);
+  }
+};
+
+/**
+ * Puts back the styles a tab's latest install changed, and previews the
+ * style there again.
+ */
+export const undoGalleryInstall = async (tabId: number): Promise<void> => {
+  const { [tabId]: undo, ...rest } = await readInstallUndos();
+
+  if (!undo) {
+    throw new Error('No install to undo');
+  }
+
+  await writeInstallUndos(rest);
+
+  // Previewing first keeps the tab from showing the restored styles meanwhile.
+  await showPreview(tabId, undo.preview);
+  await restoreStyles(undo.styles);
+  await applyStylesToAllTabs();
+};
+
+/**
  * Installs a tab's preview the way the popup would, then ends the preview
  * and tells the gallery page.
  */
@@ -351,13 +437,16 @@ export const installGalleryPreview = async (tabId: number): Promise<string> => {
   const pageUrl = getPageStyleUrl(tab.url ?? '', await getAll());
 
   const latest = await recordInstall(preview.style.id, await getInstallId());
+  const before = await getAll();
   const profileName = await installLatestVersion(
     preview.style,
     latest,
     pageUrl
   );
 
-  await endGalleryPreview(tabId);
+  await rememberInstall(tabId, preview, before, await getAll());
+
+  await endGalleryPreview(tabId, { installed: true });
   await applyStylesToAllTabs();
 
   if (preview.galleryTabId !== undefined) {

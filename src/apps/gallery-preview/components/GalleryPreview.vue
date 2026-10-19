@@ -1,60 +1,32 @@
 <template>
   <s-theme-provider class="root" :mode="appearance">
-    <div class="preview" role="region" :aria-label="t('preview')">
-      <span class="summary">
-        <s-thumbnail :src="thumbnail" :width="69" :height="43" />
-        <span class="details">
-          <s-text
-            as="a"
-            size="large"
-            class="name"
-            :href="styleUrl"
-            :title="styleData.name"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {{ styleData.name }}
-          </s-text>
-          <s-text as="span" variant="muted" class="status">
-            {{
-              held
-                ? t('showing_the_page_as_it_was')
-                : t('preview_not_installed')
-            }}
-          </s-text>
-        </span>
-      </span>
+    <div
+      ref="bar"
+      class="preview"
+      :class="{ leaving }"
+      role="region"
+      :aria-label="t('preview')"
+      @mouseenter="pause"
+      @mouseleave="onMouseLeave"
+      @animationend.self="onAnimationEnd"
+    >
+      <install-confirmation
+        v-if="phase === 'done'"
+        :style-data="styleData"
+        :undoing="undoing"
+        @undo="undo"
+        @dismiss="dismiss"
+      />
 
-      <span class="divider" />
-
-      <s-button
-        class="compare"
-        :class="{ held }"
-        :disabled="installing"
-        @pointerdown.native="hold($event)"
-        @pointerup.native="release"
-        @pointercancel.native="release"
-        @lostpointercapture.native="release"
-        @blur.native="release"
-        @keydown.native.space.prevent="setHeld(true)"
-        @keydown.native.enter.prevent="setHeld(true)"
-        @keyup.native="release"
-      >
-        {{ t('hold_to_compare') }}
-      </s-button>
-      <s-button variant="primary" :disabled="installing" @click="install">
-        {{ installing ? t('installing') : t('install') }}
-      </s-button>
-      <s-icon-button
-        class="close"
-        :size="33"
-        :title="t('cancel_preview_esc')"
-        :aria-label="t('cancel_preview_esc')"
-        :disabled="installing"
-        @click="cancel"
-      >
-        <x-icon :size="14" />
-      </s-icon-button>
+      <preview-controls
+        v-else
+        :style-data="styleData"
+        :installing="installing"
+        @compare="handlers.compare"
+        @install="install"
+        @filled="filled = true"
+        @cancel="cancel"
+      />
 
       <s-text v-if="error" as="p" size="caption" class="error" role="alert">
         {{ error }}
@@ -66,21 +38,23 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-import {
-  SButton,
-  SIconButton,
-  SText,
-  SThemeProvider,
-  SThumbnail,
-} from '@stylebot/components';
-import { XIcon } from '@stylebot/icons';
+import { SText, SThemeProvider } from '@stylebot/components';
 import {
   galleryErrorText,
-  getGalleryStyleUrl,
-  getGalleryUrl,
   type GalleryPreviewHandlers,
 } from '@stylebot/gallery';
 import type { GalleryStyle, StylebotAppearance } from '@stylebot/types';
+
+import InstallConfirmation from './InstallConfirmation.vue';
+import PreviewControls from './PreviewControls.vue';
+
+type Phase = 'preview' | 'installing' | 'done';
+
+const CONFIRM_MS = 4000;
+const CONFIRM_AFTER_HOVER_MS = 2000;
+
+const reducesMotion = (): boolean =>
+  window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /**
  * Whether a key press belongs to something the user is typing in.
@@ -93,17 +67,16 @@ const isTyping = (target: EventTarget | null): boolean =>
 /**
  * The controls a page shows while it previews a gallery style, to install it,
  * cancel (or press Esc), or hold to compare with the page's own styles.
+ * Once installed they confirm it, with an undo, then emit `done`.
  */
 export default Vue.extend({
   name: 'GalleryPreview',
 
   components: {
-    SButton,
-    SIconButton,
+    InstallConfirmation,
+    PreviewControls,
     SText,
     SThemeProvider,
-    SThumbnail,
-    XIcon,
   },
 
   props: {
@@ -121,23 +94,57 @@ export default Vue.extend({
       type: String as PropType<StylebotAppearance>,
       default: 'system',
     },
+
+    installed: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   data() {
     return {
-      held: false,
-      installing: false,
+      phase: 'preview' as Phase,
+      filled: false,
+      undoing: false,
+      leaving: false,
       error: '',
+      timer: 0,
     };
   },
 
   computed: {
-    thumbnail(): string {
-      return getGalleryUrl(this.styleData.screenshot);
+    installing(): boolean {
+      return this.phase === 'installing';
     },
 
-    styleUrl(): string {
-      return getGalleryStyleUrl(this.styleData);
+    // Installed from the bar, once its button has filled; from the popup, at once.
+    confirmable(): boolean {
+      return this.installed && (this.filled || !this.installing);
+    },
+  },
+
+  watch: {
+    // Runs before the bar re-renders, so it can read the width it had.
+    async phase(): Promise<void> {
+      const bar = this.$refs.bar as HTMLElement;
+      const from = bar.offsetWidth;
+
+      await this.$nextTick();
+
+      const to = bar.offsetWidth;
+
+      if (from !== to && !reducesMotion()) {
+        bar.animate([{ width: `${from}px` }, { width: `${to}px` }], {
+          duration: 380,
+          easing: 'cubic-bezier(0.3, 0.8, 0.2, 1)',
+        });
+      }
+    },
+
+    confirmable(confirmable: boolean): void {
+      if (confirmable) {
+        this.confirm();
+      }
     },
   },
 
@@ -147,35 +154,26 @@ export default Vue.extend({
 
   beforeDestroy() {
     window.removeEventListener('keydown', this.onKeydown);
+    clearTimeout(this.timer);
   },
 
   methods: {
     onKeydown(event: KeyboardEvent): void {
-      if (
+      const isEscape =
         event.key === 'Escape' &&
         event.isTrusted &&
         !event.defaultPrevented &&
-        !this.installing &&
-        !isTyping(event.target)
-      ) {
+        !isTyping(event.target);
+
+      if (!isEscape) {
+        return;
+      }
+
+      if (this.phase === 'done') {
+        this.dismiss();
+      } else if (!this.installing) {
         this.cancel();
       }
-    },
-
-    setHeld(held: boolean): void {
-      if (this.held !== held) {
-        this.held = held;
-        this.handlers.compare(held);
-      }
-    },
-
-    hold(event: PointerEvent): void {
-      (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
-      this.setHeld(true);
-    },
-
-    release(): void {
-      this.setHeld(false);
     },
 
     cancel(): void {
@@ -183,15 +181,63 @@ export default Vue.extend({
     },
 
     async install(): Promise<void> {
-      this.installing = true;
       this.error = '';
+      this.filled = false;
+      this.phase = 'installing';
 
       const response = await this.handlers.install();
 
-      // A successful install ends the preview, unmounting this.
+      // A successful install ends the preview, which sets `installed`.
       if (!response.ok) {
-        this.installing = false;
+        this.phase = 'preview';
         this.error = galleryErrorText(response);
+      }
+    },
+
+    confirm(): void {
+      this.phase = 'done';
+      this.resume(CONFIRM_MS);
+    },
+
+    pause(): void {
+      clearTimeout(this.timer);
+    },
+
+    onMouseLeave(): void {
+      this.resume(CONFIRM_AFTER_HOVER_MS);
+    },
+
+    resume(ms: number): void {
+      clearTimeout(this.timer);
+
+      if (this.phase === 'done' && !this.undoing) {
+        this.timer = window.setTimeout(this.dismiss, ms);
+      }
+    },
+
+    async undo(): Promise<void> {
+      this.pause();
+      this.undoing = true;
+      this.error = '';
+
+      const response = await this.handlers.undo();
+
+      // An undone install previews the style again, replacing this.
+      if (!response.ok) {
+        this.undoing = false;
+        this.error = galleryErrorText(response);
+        this.resume(CONFIRM_MS);
+      }
+    },
+
+    dismiss(): void {
+      this.pause();
+      this.leaving = true;
+    },
+
+    onAnimationEnd(): void {
+      if (this.leaving) {
+        this.$emit('done');
       }
     },
   },
@@ -212,6 +258,7 @@ export default Vue.extend({
   gap: 8px;
   box-sizing: border-box;
   padding: 10px;
+  overflow: hidden;
   border: 1px solid var(--field-border);
   border-radius: 14px;
   background: var(--panel-surface);
@@ -224,65 +271,31 @@ export default Vue.extend({
   }
 }
 
-.summary {
-  display: flex;
-  flex: 1;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-  padding-left: 2px;
-}
+.preview.leaving {
+  animation: leave 260ms ease-in forwards;
 
-.details {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-  max-width: 300px;
-}
-
-.name {
-  @include truncate;
-
-  align-self: flex-start;
-  max-width: 100%;
-  text-decoration: none;
-
-  @include focus-ring;
-}
-
-.status {
-  @include truncate;
-}
-
-.divider {
-  flex: none;
-  align-self: stretch;
-  width: 1px;
-  margin: 4px;
-  background: var(--panel-border);
-}
-
-.compare {
-  touch-action: none;
-  user-select: none;
-}
-
-.preview .compare.held,
-.preview .compare.held:hover:not(:disabled) {
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 16%, transparent);
-  color: var(--accent);
-}
-
-.close {
-  color: var(--icon-color);
+  @media (prefers-reduced-motion: reduce) {
+    animation-name: fade;
+  }
 }
 
 .error {
   flex-basis: 100%;
   padding: 0 2px;
   color: var(--danger);
+}
+
+@keyframes leave {
+  to {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@keyframes fade {
+  to {
+    opacity: 0;
+  }
 }
 
 @keyframes rise {

@@ -361,6 +361,11 @@ export type EndGalleryPreview = {
   tabId?: number;
 };
 
+// Sent by the page's preview bar, just after an install.
+export type UndoGalleryInstall = {
+  name: 'UndoGalleryInstall';
+};
+
 type BackgroundPageMessage =
   | SetStyle
   | EnableStyle
@@ -422,6 +427,7 @@ type BackgroundPageMessage =
   | GetGalleryPreview
   | InstallGalleryPreview
   | EndGalleryPreview
+  | UndoGalleryInstall
   | GetGalleryInstallStatus;
 
 export default BackgroundPageMessage;
