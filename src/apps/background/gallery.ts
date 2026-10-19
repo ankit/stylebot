@@ -10,6 +10,7 @@ import {
   getProfileGalleryListing,
   getSignedInAccount,
   hashCss,
+  isGalleryApiError,
   publishStyle,
   publishVersion,
   SCREENSHOT_MAX_BYTES,
@@ -82,6 +83,19 @@ const google: GoogleTokenSource = {
 const fail = (e: unknown) => {
   console.error('Stylebot gallery request failed:', e);
   return toGalleryFailure(e);
+};
+
+/**
+ * Removes a style's published listing when the gallery can't find it, since
+ * the website can unpublish or delete it.
+ */
+const removeListingIfNotFound = async (
+  e: unknown,
+  styleId: string
+): Promise<void> => {
+  if (isGalleryApiError(e) && e.status === 404) {
+    await removePublishedGalleryListing(styleId);
+  }
 };
 
 /**
@@ -243,6 +257,10 @@ export const PublishToGallery = async (
 
     sendResponse({ ok: true, style });
   } catch (e) {
+    if (message.styleId) {
+      await removeListingIfNotFound(e, message.styleId);
+    }
+
     sendResponse(fail(e));
   }
 };
@@ -256,6 +274,7 @@ export const UnpublishFromGallery = async (
     await removePublishedGalleryListing(id);
     sendResponse({ ok: true });
   } catch (e) {
+    await removeListingIfNotFound(e, id);
     sendResponse(fail(e));
   }
 };

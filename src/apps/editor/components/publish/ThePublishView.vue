@@ -439,6 +439,7 @@ export default Vue.extend({
           this.step = 'published';
         } else {
           this.showError(response);
+          this.clearTargetIfNotFound(response);
         }
       } finally {
         this.publishing = false;
@@ -460,6 +461,18 @@ export default Vue.extend({
         this.target = null;
       } else {
         this.showError(response);
+        this.clearTargetIfNotFound(response);
+      }
+    },
+
+    /**
+     * Goes back to a first publish when the style was unpublished or deleted
+     * on the website, which the background has forgotten too.
+     */
+    clearTargetIfNotFound({ errorKey }: GalleryFailure): void {
+      if (errorKey === 'gallery_error_not_found') {
+        this.target = null;
+        this.$store.commit('setPublishedGalleryStyle', null);
       }
     },
   },

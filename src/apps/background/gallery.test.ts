@@ -1,5 +1,5 @@
 import fetchMock from 'jest-fetch-mock';
-import { GALLERY_API_URL, hashCss } from '@stylebot/gallery';
+import { GALLERY_API_URL, getListedStyleIds, hashCss } from '@stylebot/gallery';
 import type { GalleryListing, StyleMap } from '@stylebot/types';
 
 import {
@@ -281,6 +281,69 @@ describe('gallery messages', () => {
     );
 
     expect(mine).toMatchObject({ publishedId: null });
+  });
+
+  it('forgets a style the gallery no longer has when updating it', async () => {
+    fetchMock
+      .mockResponseOnce(JSON.stringify(publishedStyle), { status: 201 })
+      .mockResponseOnce(JSON.stringify({ error: 'Style not found' }), {
+        status: 404,
+      });
+
+    await respond(send => PublishToGallery(publishMessage, send));
+
+    expect(
+      await respond(send =>
+        PublishToGallery({ ...publishMessage, styleId: style.id }, send)
+      )
+    ).toMatchObject({ ok: false, errorKey: 'gallery_error_not_found' });
+    expect(
+      await respond(send =>
+        GetPublishedGalleryStyle(
+          {
+            name: 'GetPublishedGalleryStyle',
+            url: 'github.com',
+            profileId: 'default',
+          },
+          send
+        )
+      )
+    ).toEqual({ published: null, installed: null });
+  });
+
+  it('forgets a style the gallery no longer has when unpublishing it', async () => {
+    fetchMock
+      .mockResponseOnce(JSON.stringify(publishedStyle), { status: 201 })
+      .mockResponseOnce(JSON.stringify({ error: 'Style not found' }), {
+        status: 404,
+      });
+
+    await respond(send => PublishToGallery(publishMessage, send));
+
+    expect(
+      await respond(send =>
+        UnpublishFromGallery(
+          { name: 'UnpublishFromGallery', id: style.id },
+          send
+        )
+      )
+    ).toMatchObject({ ok: false, errorKey: 'gallery_error_not_found' });
+    expect(getListedStyleIds(mockStyles).size).toBe(0);
+  });
+
+  it('keeps a published style when an update fails for another reason', async () => {
+    fetchMock
+      .mockResponseOnce(JSON.stringify(publishedStyle), { status: 201 })
+      .mockResponseOnce(JSON.stringify({ error: 'Conflict' }), {
+        status: 409,
+      });
+
+    await respond(send => PublishToGallery(publishMessage, send));
+    await respond(send =>
+      PublishToGallery({ ...publishMessage, styleId: style.id }, send)
+    );
+
+    expect(getListedStyleIds(mockStyles)).toEqual(new Set([style.id]));
   });
 
   it('captures the tab the message came from', async () => {

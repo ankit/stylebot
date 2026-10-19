@@ -123,7 +123,11 @@ describe('gallery API', () => {
     fetchMock.mockResponseOnce('', { status: 204 });
 
     await expect(unpublishStyle('abc', 'Xk3p9QaL2m')).resolves.toBeUndefined();
-    expect(lastRequest().init.method).toBe('DELETE');
+
+    const { url, init } = lastRequest();
+
+    expect(url).toBe(`${GALLERY_API_URL}/styles/Xk3p9QaL2m/unpublish`);
+    expect(init.method).toBe('POST');
   });
 
   it("rejects with the server's message and status", async () => {

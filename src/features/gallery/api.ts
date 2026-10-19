@@ -73,8 +73,15 @@ export const publishVersion = (
     form: toFormData(form),
   });
 
+/**
+ * Takes one of the account's styles out of the gallery; the website can
+ * publish it again or delete it for good.
+ */
 export const unpublishStyle = (session: string, id: string): Promise<void> =>
-  request(`/styles/${encodeURIComponent(id)}`, { method: 'DELETE', session });
+  request(`/styles/${encodeURIComponent(id)}/unpublish`, {
+    method: 'POST',
+    session,
+  });
 
 /**
  * A page of styles; nextOffset is null on the last one.
