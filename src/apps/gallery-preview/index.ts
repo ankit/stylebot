@@ -36,6 +36,9 @@ const HOST_CSS = `
 
 let css: Promise<string> | null = null;
 
+// Controls still confirming an install, taken away if another preview starts.
+let leaving: (() => void) | null = null;
+
 /**
  * The stylesheet, fetched once; a failed fetch is tried again next time.
  */
@@ -59,16 +62,29 @@ const getAppearance = async (): Promise<StylebotAppearance> => {
 
 /**
  * Mounts the preview's controls in a closed shadow root at the bottom of the
- * page, and returns a function that takes them away.
+ * page, and returns a function that takes them away, or, once the style is
+ * installed, leaves them to confirm it and go by themselves.
  */
 const mount = (
   style: GalleryStyle,
   handlers: GalleryPreviewHandlers
-): (() => void) => {
+): ((installed?: boolean) => void) => {
   const host = document.createElement('stylebot-gallery-preview');
   const root = host.attachShadow({ mode: 'closed' });
+  const state = Vue.observable({ installed: false });
   let app: Vue | null = null;
   let removed = false;
+
+  const remove = () => {
+    if (leaving === remove) {
+      leaving = null;
+    }
+
+    app?.$destroy();
+    host.remove();
+  };
+
+  leaving?.();
 
   host.style.cssText = HOST_CSS;
   host.lang = t('language_code');
@@ -90,15 +106,26 @@ const mount = (
       el,
       render: h =>
         h(GalleryPreview, {
-          props: { styleData: style, handlers, appearance },
+          props: {
+            styleData: style,
+            handlers,
+            appearance,
+            installed: state.installed,
+          },
+          on: { done: remove },
         }),
     });
   });
 
-  return () => {
+  return installed => {
     removed = true;
-    app?.$destroy();
-    host.remove();
+
+    if (installed && app) {
+      leaving = remove;
+      state.installed = true;
+    } else {
+      remove();
+    }
   };
 };
 

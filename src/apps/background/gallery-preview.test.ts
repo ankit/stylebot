@@ -7,15 +7,17 @@ import {
   installGalleryPreview,
   openGalleryPreview,
   startGalleryPreview,
+  undoGalleryInstall,
 } from './gallery-preview';
 import { hashCss } from '@stylebot/gallery';
-import type { GalleryListing } from '@stylebot/types';
+import type { GalleryListing, StyleMap } from '@stylebot/types';
 
 import {
   getAll,
   installProfile,
   reinstallProfile,
   removeGalleryListing,
+  restoreStyles,
 } from './styles';
 
 jest.mock('./styles', () => ({
@@ -24,6 +26,7 @@ jest.mock('./styles', () => ({
   reinstallProfile: jest.fn(async () => 'Mine'),
   removeGalleryListing: jest.fn(async () => undefined),
   applyStylesToAllTabs: jest.fn(async () => undefined),
+  restoreStyles: jest.fn(async () => undefined),
 }));
 
 const TAB_ID = 7;
@@ -187,7 +190,7 @@ describe('gallery preview', () => {
     expect(await getGalleryPreview(TAB_ID)).toBeNull();
     expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(
       TAB_ID,
-      { name: 'HideGalleryPreview' },
+      { name: 'HideGalleryPreview', installed: true },
       expect.any(Function)
     );
     expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(
@@ -300,5 +303,43 @@ describe('gallery preview', () => {
       expect(removeGalleryListing).not.toHaveBeenCalled();
       expect(installProfile).toHaveBeenCalled();
     });
+  });
+
+  it('undoes an install, putting back only the styles it changed, and previews again', async () => {
+    const before = {
+      css: 'b {}',
+      enabled: true,
+      readability: false,
+      modifiedTime: '1',
+    };
+    const untouched = { ...before, css: 'c {}' };
+
+    store['gallery-install-id'] = 'install-1';
+    let current: StyleMap = { 'github.com': before, 'x.com': untouched };
+
+    (getAll as jest.Mock).mockImplementation(async () => current);
+    (installProfile as jest.Mock).mockImplementationOnce(async () => {
+      current = {
+        'github.com': { ...before, css: 'a {}' },
+        'gist.github.com': { ...before, css: 'a {}' },
+        'x.com': untouched,
+      };
+
+      return { name: 'Hacker Hearth', id: 'p2' };
+    });
+    styleResponse('a {}');
+    await startGalleryPreview(TAB_ID, style.id);
+    const preview = await getGalleryPreview(TAB_ID);
+    fetchMock.mockResponseOnce(JSON.stringify({ ...style, css: 'a {}' }));
+
+    await installGalleryPreview(TAB_ID);
+    await undoGalleryInstall(TAB_ID);
+
+    expect(restoreStyles).toHaveBeenCalledWith({
+      'github.com': before,
+      'gist.github.com': null,
+    });
+    expect(await getGalleryPreview(TAB_ID)).toEqual(preview);
+    await expect(undoGalleryInstall(TAB_ID)).rejects.toThrow();
   });
 });

@@ -625,6 +625,24 @@ export const removeGalleryListing = (url: string, profileId: string) =>
   updateStyle(url, style => removeProfileGalleryListing(style, profileId));
 
 /**
+ * Puts urls' styles back as they were, removing those that had none.
+ */
+export const restoreStyles = (
+  previous: Record<string, StyleWithoutUrl | null>
+): Promise<void> =>
+  update(styles => {
+    for (const [url, style] of Object.entries(previous)) {
+      if (style) {
+        styles[url] = editStyle(style, {});
+      } else {
+        delete styles[url];
+      }
+    }
+
+    return styles;
+  });
+
+/**
  * Drops the listing from every profile published as it, once it's unpublished.
  */
 export const removePublishedGalleryListing = (styleId: string) =>

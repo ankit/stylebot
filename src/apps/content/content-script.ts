@@ -35,7 +35,7 @@ if (window === window.top) {
       } else if (message.name === 'ShowGalleryPreview' && canStyle) {
         showGalleryPreview(message.preview, message.replacedUrl);
       } else if (message.name === 'HideGalleryPreview') {
-        hideGalleryPreview();
+        hideGalleryPreview(message.installed);
       }
     }
   );

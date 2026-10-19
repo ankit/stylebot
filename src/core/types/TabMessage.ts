@@ -151,6 +151,7 @@ export type ShowGalleryPreview = {
 // The tab's gallery preview ended: cancelled, or installed as a profile.
 export type HideGalleryPreview = {
   name: 'HideGalleryPreview';
+  installed?: boolean;
 };
 
 // For the site bridge, on the gallery page a preview was opened from.

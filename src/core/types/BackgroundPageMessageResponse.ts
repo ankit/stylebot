@@ -110,6 +110,7 @@ export type GetGalleryInstallStatusResponse = {
 export type InstallGalleryPreviewResponse = GalleryResult<{
   profileName: string;
 }>;
+export type UndoGalleryInstallResponse = GalleryResult;
 
 type BackgroundPageMessageResponse =
   | GetAllOptionsResponse
@@ -144,6 +145,7 @@ type BackgroundPageMessageResponse =
   | PreviewGalleryStyleResponse
   | GetGalleryPreviewResponse
   | InstallGalleryPreviewResponse
+  | UndoGalleryInstallResponse
   | GetGalleryInstallStatusResponse;
 
 export default BackgroundPageMessageResponse;

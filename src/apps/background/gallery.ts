@@ -40,6 +40,7 @@ import type {
   InstallGalleryPreview as InstallGalleryPreviewType,
   InstallGalleryPreviewResponse,
   EndGalleryPreview as EndGalleryPreviewType,
+  UndoGalleryInstallResponse,
   GetGalleryInstallStatus as GetGalleryInstallStatusType,
   GetGalleryInstallStatusResponse,
   GetPublishedGalleryStyle as GetPublishedGalleryStyleType,
@@ -65,6 +66,7 @@ import {
   installGalleryPreview,
   openGalleryPreview,
   startGalleryPreview,
+  undoGalleryInstall,
 } from './gallery-preview';
 import { isStylebotSite } from './is-stylebot-site';
 
@@ -439,6 +441,22 @@ export const EndGalleryPreview = async (
 
   if (target !== undefined) {
     await endGalleryPreview(target);
+  }
+};
+
+/**
+ * Undoes the install the sending tab's preview bar just confirmed.
+ */
+export const UndoGalleryInstall = async (
+  _message: unknown,
+  sender: chrome.runtime.MessageSender,
+  sendResponse: (response: UndoGalleryInstallResponse) => void
+): Promise<void> => {
+  try {
+    await undoGalleryInstall(getPreviewTabId(sender, undefined));
+    sendResponse({ ok: true });
+  } catch (e) {
+    sendResponse(fail(e));
   }
 };
 

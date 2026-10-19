@@ -11,6 +11,8 @@ import type {
   GetGalleryPreviewResponse,
   InstallGalleryPreview,
   InstallGalleryPreviewResponse,
+  UndoGalleryInstall,
+  UndoGalleryInstallResponse,
 } from '@stylebot/types';
 
 import { applyPageState, getPageState } from './page-state';
@@ -24,7 +26,7 @@ type PreviewWindow = GalleryPreviewAppWindow & {
   stylebotGalleryPreview?: {
     preview: GalleryPreview;
     replacedUrl: string;
-    unmount?: () => void;
+    unmount?: (installed?: boolean) => void;
   };
 };
 
@@ -115,6 +117,15 @@ const install = (): Promise<InstallGalleryPreviewResponse> => {
   >(message);
 };
 
+const undo = (): Promise<UndoGalleryInstallResponse> => {
+  const message: UndoGalleryInstall = { name: 'UndoGalleryInstall' };
+
+  return chrome.runtime.sendMessage<
+    UndoGalleryInstall,
+    UndoGalleryInstallResponse
+  >(message);
+};
+
 const cancel = (): void => {
   const message: EndGalleryPreview = { name: 'EndGalleryPreview' };
   chrome.runtime.sendMessage(message);
@@ -176,6 +187,7 @@ export const showGalleryPreview = async (
 
   shared.stylebotGalleryPreview.unmount = app?.mount(preview.style, {
     install,
+    undo,
     cancel,
     compare,
   });
@@ -183,8 +195,9 @@ export const showGalleryPreview = async (
 
 /**
  * Takes the preview and its controls off and puts the page's own styles back.
+ * Once installed, the controls confirm it, with an undo, before they go.
  */
-export const hideGalleryPreview = async (): Promise<void> => {
+export const hideGalleryPreview = async (installed = false): Promise<void> => {
   const current = shared.stylebotGalleryPreview;
 
   if (!current) {
@@ -192,7 +205,7 @@ export const hideGalleryPreview = async (): Promise<void> => {
   }
 
   shared.stylebotGalleryPreview = undefined;
-  current.unmount?.();
+  current.unmount?.(installed);
 
   await crossfade(async () => {
     removeStylesheet(PREVIEW_KEY);
