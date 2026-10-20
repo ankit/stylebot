@@ -12,16 +12,6 @@ export {
 } from './google-drive/sync-metadata';
 
 export { runGoogleDriveSync } from './google-drive/sync';
-export {
-  default as getGoogleAccessToken,
-  clearCachedToken as clearGoogleAccessToken,
-  getIdentityAccessToken as getGoogleIdentityToken,
-  clearCachedIdentityToken as clearGoogleIdentityToken,
-} from './google-drive/get-access-token';
-export {
-  handleSignInRedirect,
-  isSignInRedirect,
-} from './google-drive/redirect-rule-sign-in';
 
 export { formatSyncTime } from './format-sync-time';
 

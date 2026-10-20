@@ -1,66 +1,26 @@
-// Code from https://github.com/mdn/webextensions-examples/tree/master/google-userinfo
-import { syncError } from '../errors';
-import { isUnavailable } from './http';
 import {
-  DESKTOP_CLIENT_ID,
-  REFRESH_TOKEN_KEY,
-  refreshAccessToken,
-  type IssuedToken,
-} from './desktop-client';
-import { signInWithIdentityAPI, usesIdentitySignIn } from './identity-sign-in';
-import { signInWithRedirectRule } from './redirect-rule-sign-in';
+  cacheGoogleToken,
+  clearGoogleToken,
+  getStoredGoogleToken,
+  signInToGoogle,
+  validateGoogleToken,
+  type AccessToken,
+  type GoogleAccess,
+} from '@stylebot/google-auth';
 
-export type AccessToken = string;
+import { syncError } from '../errors';
 
-const CLIENT_ID =
+const DRIVE_ACCESS: GoogleAccess = {
+  scopes: ['https://www.googleapis.com/auth/drive.file'],
+  cacheKey: 'google-drive-access-token',
+  refreshTokenKey: 'google-drive-refresh-token',
+};
+
+const WEB_CLIENT_ID =
   '662998053209-s49tq55ic3td87m08gi8vpjqm5t7r9st.apps.googleusercontent.com';
 
-const CACHE_KEY = 'google-drive-access-token';
-
-const SCOPES = ['https://www.googleapis.com/auth/drive.file'];
-
-// The gallery's sign-in only needs to know who the user is, not their Drive;
-// the profile scope lets a new account's username come from their name.
-const IDENTITY_SCOPES = [
-  'openid',
-  'https://www.googleapis.com/auth/userinfo.profile',
-];
-const IDENTITY_CACHE_KEY = 'google-identity-access-token';
-const IDENTITY_REFRESH_TOKEN_KEY = 'google-identity-refresh-token';
-
-// Retire the token a minute early so a sync started just under the wire does
-// not fail halfway through with a 401.
-const EXPIRY_SKEW_MS = 60 * 1000;
-
-type CachedToken = { token: AccessToken; expiresAt: number };
-
-const getCachedToken = async (
-  cacheKey = CACHE_KEY
-): Promise<AccessToken | null> => {
-  const items = await chrome.storage.local.get(cacheKey);
-  const cached: CachedToken | undefined = items[cacheKey];
-
-  if (!cached || cached.expiresAt <= Date.now()) {
-    return null;
-  }
-
-  return cached.token;
-};
-
-const setCachedToken = (
-  token: AccessToken,
-  expiresIn: number,
-  cacheKey = CACHE_KEY
-): Promise<void> => {
-  const expiresAt = Date.now() + expiresIn * 1000 - EXPIRY_SKEW_MS;
-  return chrome.storage.local.set({ [cacheKey]: { token, expiresAt } });
-};
-
 export const clearCachedToken = (): Promise<void> =>
-  chrome.storage.local.remove(CACHE_KEY);
-
-export const clearCachedIdentityToken = (): Promise<void> =>
-  chrome.storage.local.remove(IDENTITY_CACHE_KEY);
+  clearGoogleToken(DRIVE_ACCESS);
 
 const extractTokenParams = (redirectUri: string) => {
   const m = redirectUri.match(/[#?](.*)/);
@@ -86,44 +46,6 @@ const extractTokenParams = (redirectUri: string) => {
 };
 
 /**
- * Validate the token contained in redirectURL.
- * This follows essentially the process here:
- * https://developers.google.com/identity/protocols/OAuth2UserAgent#tokeninfo-validation
- * - make a GET request to the validation URL, including the access token
- * - if the response is 200, and contains an "aud" property, and that property
- * matches the clientID, then the response is valid
- * - otherwise it is not valid
- * Note that the Google page talks about an "audience" property, but in fact
- * it seems to be "aud".
- */
-const validate = async (
-  token: AccessToken,
-  clientId: string
-): Promise<void> => {
-  const validationBaseURL = 'https://www.googleapis.com/oauth2/v3/tokeninfo';
-  const response = await fetch(`${validationBaseURL}?access_token=${token}`, {
-    method: 'GET',
-  });
-
-  if (isUnavailable(response.status)) {
-    throw syncError(
-      `Token validation unavailable (${response.status})`,
-      'network'
-    );
-  }
-
-  if (response.status !== 200) {
-    throw syncError('Token validation error', 'sign-in');
-  }
-
-  const json: { aud?: string } = await response.json();
-
-  if (json.aud !== clientId) {
-    throw syncError('Token validation error', 'sign-in');
-  }
-};
-
-/**
  * Wraps the callback API: @types/chrome has no promise overload for
  * launchWebAuthFlow, unlike the storage calls elsewhere in sync.
  */
@@ -132,10 +54,10 @@ const authorizeSilently = (): Promise<string | undefined> => {
     const redirectURL = chrome.identity.getRedirectURL();
 
     let authURL = 'https://accounts.google.com/o/oauth2/auth';
-    authURL += `?client_id=${CLIENT_ID}`;
+    authURL += `?client_id=${WEB_CLIENT_ID}`;
     authURL += `&response_type=token`;
     authURL += `&redirect_uri=${encodeURIComponent(redirectURL)}`;
-    authURL += `&scope=${encodeURIComponent(SCOPES.join(' '))}`;
+    authURL += `&scope=${encodeURIComponent(DRIVE_ACCESS.scopes.join(' '))}`;
 
     chrome.identity.launchWebAuthFlow(
       { interactive: false, url: authURL },
@@ -170,23 +92,11 @@ const renewWebClientToken = async (): Promise<AccessToken> => {
     throw syncError('Authorization failure', 'sign-in');
   }
 
-  await validate(params.token, CLIENT_ID);
-  await setCachedToken(params.token, params.expiresIn);
+  await validateGoogleToken(params.token, WEB_CLIENT_ID);
+  await cacheGoogleToken(DRIVE_ACCESS.cacheKey, params.token, params.expiresIn);
 
   return params.token;
 };
-
-/**
- * Signs in with the browser's auth window where it can finish one, else in a
- * tab, keeping the refresh token under `refreshTokenKey`.
- */
-const signIn = (
-  scopes = SCOPES,
-  refreshTokenKey = REFRESH_TOKEN_KEY
-): Promise<IssuedToken> =>
-  usesIdentitySignIn()
-    ? signInWithIdentityAPI(scopes, refreshTokenKey)
-    : signInWithRedirectRule(scopes, refreshTokenKey);
 
 /**
  * Resolves a usable token: the cached one, else one from the stored refresh
@@ -196,49 +106,20 @@ const signIn = (
 export default async (
   { interactive }: { interactive: boolean } = { interactive: true }
 ): Promise<AccessToken> => {
-  const cached = await getCachedToken();
+  const stored = await getStoredGoogleToken(DRIVE_ACCESS);
 
-  if (cached) {
-    return cached;
+  if (stored) {
+    return stored;
   }
 
-  const issued = await refreshAccessToken();
-
-  if (!issued && !interactive) {
-    // Safari has no identity API.
-    if (typeof chrome.identity?.launchWebAuthFlow === 'function') {
-      return renewWebClientToken();
-    }
-
-    throw syncError('Sign-in needed', 'sign-in');
+  if (interactive) {
+    return signInToGoogle(DRIVE_ACCESS);
   }
 
-  const token = issued ?? (await signIn());
-
-  await validate(token.token, DESKTOP_CLIENT_ID);
-  await setCachedToken(token.token, token.expiresIn);
-
-  return token.token;
-};
-
-/**
- * Resolves a token that only identifies the user, for the gallery: the
- * cached one, else one from its own refresh token, else a sign-in. It's kept
- * apart from Drive's, so neither sign-in nor sign-out touches the other.
- */
-export const getIdentityAccessToken = async (): Promise<AccessToken> => {
-  const cached = await getCachedToken(IDENTITY_CACHE_KEY);
-
-  if (cached) {
-    return cached;
+  // Safari has no identity API.
+  if (typeof chrome.identity?.launchWebAuthFlow === 'function') {
+    return renewWebClientToken();
   }
 
-  const refreshed = await refreshAccessToken(IDENTITY_REFRESH_TOKEN_KEY);
-  const issued =
-    refreshed ?? (await signIn(IDENTITY_SCOPES, IDENTITY_REFRESH_TOKEN_KEY));
-
-  await validate(issued.token, DESKTOP_CLIENT_ID);
-  await setCachedToken(issued.token, issued.expiresIn, IDENTITY_CACHE_KEY);
-
-  return issued.token;
+  throw syncError('Sign-in needed', 'sign-in');
 };

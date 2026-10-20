@@ -1,14 +1,25 @@
 import fetchMock from 'jest-fetch-mock';
 
-import getAccessToken, { getIdentityAccessToken } from './get-access-token';
-import { DESKTOP_CLIENT_ID, REFRESH_TOKEN_KEY } from './desktop-client';
+import { getGoogleToken, getStoredGoogleToken } from './token';
+import { DESKTOP_CLIENT_ID } from './desktop-client';
 import {
   CLOSE_GRACE_MS,
   handleSignInRedirect,
   isSignInRedirect,
 } from './redirect-rule-sign-in';
 
-const CACHE_KEY = 'google-drive-access-token';
+const CACHE_KEY = 'drive-access-token';
+const REFRESH_TOKEN_KEY = 'drive-refresh-token';
+const DRIVE = {
+  scopes: ['https://www.googleapis.com/auth/drive.file'],
+  cacheKey: CACHE_KEY,
+  refreshTokenKey: REFRESH_TOKEN_KEY,
+};
+const IDENTITY = {
+  scopes: ['openid', 'https://www.googleapis.com/auth/userinfo.profile'],
+  cacheKey: 'identity-access-token',
+  refreshTokenKey: 'identity-refresh-token',
+};
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const EXTENSION_PAGE = 'safari-web-extension://abc/google-sign-in/index.html';
 
@@ -124,12 +135,12 @@ beforeEach(() => {
   mockGoogle();
 });
 
-describe('getAccessToken without an identity API', () => {
+describe('Google sign-in without an identity API', () => {
   it('refreshes silently with a stored refresh token, opening no tab', async () => {
     store[REFRESH_TOKEN_KEY] = 'refresh-1';
     tokenResponses = [{ access_token: 'fresh', expires_in: 3600 }];
 
-    await expect(getAccessToken({ interactive: false })).resolves.toBe('fresh');
+    await expect(getStoredGoogleToken(DRIVE)).resolves.toBe('fresh');
 
     expect(tokenRequests[0].get('grant_type')).toBe('refresh_token');
     expect(tokenRequests[0].get('refresh_token')).toBe('refresh-1');
@@ -137,10 +148,8 @@ describe('getAccessToken without an identity API', () => {
     expect((store[CACHE_KEY] as { token: string }).token).toBe('fresh');
   });
 
-  it('asks for a sign-in rather than opening a tab when not interactive', async () => {
-    await expect(getAccessToken({ interactive: false })).rejects.toMatchObject({
-      code: 'sign-in',
-    });
+  it('resolves no stored token rather than opening a tab', async () => {
+    await expect(getStoredGoogleToken(DRIVE)).resolves.toBeNull();
 
     expect(chrome.tabs.create).not.toBeCalled();
   });
@@ -149,7 +158,7 @@ describe('getAccessToken without an identity API', () => {
     store[REFRESH_TOKEN_KEY] = 'refresh-1';
     fetchMock.mockResponseOnce('{}', { status: 503 });
 
-    await expect(getAccessToken({ interactive: false })).rejects.toMatchObject({
+    await expect(getStoredGoogleToken(DRIVE)).rejects.toMatchObject({
       code: 'network',
     });
 
@@ -160,9 +169,7 @@ describe('getAccessToken without an identity API', () => {
     store[REFRESH_TOKEN_KEY] = 'revoked';
     tokenResponses = [{ error: 'invalid_grant' }];
 
-    await expect(getAccessToken({ interactive: false })).rejects.toMatchObject({
-      code: 'sign-in',
-    });
+    await expect(getStoredGoogleToken(DRIVE)).resolves.toBeNull();
 
     expect(store[REFRESH_TOKEN_KEY]).toBeUndefined();
   });
@@ -173,7 +180,7 @@ describe('getAccessToken without an identity API', () => {
       { access_token: 'signed-in', expires_in: 3600 },
     ];
 
-    const result = getAccessToken({ interactive: true });
+    const result = getGoogleToken(DRIVE);
     await signInTabOpened();
     const auth = openedAuthURL();
 
@@ -206,7 +213,7 @@ describe('getAccessToken without an identity API', () => {
   it('finishes a sign-in whose opener went away with the background', async () => {
     tokenResponses = [{ access_token: 'a', refresh_token: 'r-3' }];
 
-    getAccessToken({ interactive: true }).catch(() => undefined);
+    getGoogleToken(DRIVE).catch(() => undefined);
     await signInTabOpened();
     const state = openedAuthURL().searchParams.get('state');
 
@@ -222,7 +229,7 @@ describe('getAccessToken without an identity API', () => {
   it('finishes a sign-in from the loopback address the redirect rule missed', async () => {
     tokenResponses = [{ access_token: 'a', refresh_token: 'r-4' }];
 
-    getAccessToken({ interactive: true }).catch(() => undefined);
+    getGoogleToken(DRIVE).catch(() => undefined);
     await signInTabOpened();
     const state = openedAuthURL().searchParams.get('state');
     const loopback = `http://127.0.0.1/stylebot-auth?code=c-1&state=${state}`;
@@ -235,11 +242,23 @@ describe('getAccessToken without an identity API', () => {
     expect(chrome.tabs.remove).toBeCalledWith(9);
   });
 
+  it("keeps the refresh token of a sign-in started before each kept its key as Drive's", async () => {
+    tokenResponses = [{ access_token: 'a', refresh_token: 'r-5' }];
+    store['google-drive-sign-in'] = [
+      { state: 'older', verifier: 'v', tabId: 5, status: 'pending' },
+    ];
+
+    await expect(handleSignInRedirect(redirectFor('older'))).resolves.toBe(
+      true
+    );
+    expect(store['google-drive-refresh-token']).toBe('r-5');
+  });
+
   it('brings back the open sign-in tab instead of opening another', async () => {
-    getAccessToken({ interactive: true }).catch(() => undefined);
+    getGoogleToken(DRIVE).catch(() => undefined);
     await signInTabOpened();
 
-    getAccessToken({ interactive: true }).catch(() => undefined);
+    getGoogleToken(DRIVE).catch(() => undefined);
     for (let i = 0; i < 10; i++) {
       await settle();
     }
@@ -248,15 +267,15 @@ describe('getAccessToken without an identity API', () => {
     expect(chrome.tabs.update).toBeCalledWith(7, { active: true });
   });
 
-  it('keeps a Drive sign-in and a gallery sign-in apart', async () => {
+  it('keeps sign-ins with their own refresh tokens apart', async () => {
     tokenResponses = [
       { access_token: 'a', refresh_token: 'identity-refresh' },
       { access_token: 'identity', expires_in: 3600 },
     ];
 
-    getAccessToken({ interactive: true }).catch(() => undefined);
+    getGoogleToken(DRIVE).catch(() => undefined);
     await signInTabOpened();
-    const identity = getIdentityAccessToken();
+    const identity = getGoogleToken(IDENTITY);
     for (let i = 0; i < 10; i++) {
       await settle();
     }
@@ -274,7 +293,7 @@ describe('getAccessToken without an identity API', () => {
     ).resolves.toBe(true);
     await expect(identity).resolves.toBe('identity');
 
-    expect(store['google-identity-refresh-token']).toBe('identity-refresh');
+    expect(store[IDENTITY.refreshTokenKey]).toBe('identity-refresh');
     expect(store[REFRESH_TOKEN_KEY]).toBeUndefined();
     expect(chrome.tabs.remove).toBeCalledWith(8);
     expect(chrome.tabs.remove).not.toBeCalledWith(7);
@@ -284,7 +303,7 @@ describe('getAccessToken without an identity API', () => {
   });
 
   it('ignores a redirect whose state does not match the sign-in it started', async () => {
-    getAccessToken({ interactive: true }).catch(() => undefined);
+    getGoogleToken(DRIVE).catch(() => undefined);
     await signInTabOpened();
 
     await expect(handleSignInRedirect(redirectFor('forged'))).resolves.toBe(
@@ -294,7 +313,7 @@ describe('getAccessToken without an identity API', () => {
   });
 
   it('fails the sign-in when Google sends back no code', async () => {
-    const result = getAccessToken({ interactive: true });
+    const result = getGoogleToken(DRIVE);
     await signInTabOpened();
     const state = openedAuthURL().searchParams.get('state');
 
@@ -310,7 +329,7 @@ describe('getAccessToken without an identity API', () => {
     tokenResponses = [
       { error: 'invalid_client', error_description: 'Unauthorized' },
     ];
-    const result = getAccessToken({ interactive: true });
+    const result = getGoogleToken(DRIVE);
     await signInTabOpened();
     const state = openedAuthURL().searchParams.get('state');
 
@@ -328,7 +347,7 @@ describe('getAccessToken without an identity API', () => {
       { access_token: 'signed-in' },
     ];
 
-    const result = getAccessToken({ interactive: true });
+    const result = getGoogleToken(DRIVE);
     await signInTabOpened();
     const state = openedAuthURL().searchParams.get('state');
 
@@ -344,7 +363,7 @@ describe('getAccessToken without an identity API', () => {
   });
 
   it('rejects when the user closes the sign-in tab', async () => {
-    const result = getAccessToken({ interactive: true }).catch(e => e);
+    const result = getGoogleToken(DRIVE).catch(e => e);
     await signInTabOpened();
 
     jest.useFakeTimers();

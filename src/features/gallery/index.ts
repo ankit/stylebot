@@ -44,7 +44,6 @@ export {
   clearSession,
   signIn,
   withSession,
-  type GoogleTokenSource,
 } from './session';
 
 export { toGalleryFailure } from './to-gallery-failure';

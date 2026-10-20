@@ -23,9 +23,9 @@ import {
   UnpublishFromGallery,
 } from './gallery';
 
-jest.mock('@stylebot/sync', () => ({
-  getGoogleIdentityToken: jest.fn(async () => 'ya29.token'),
-  clearGoogleIdentityToken: jest.fn(async () => undefined),
+jest.mock('@stylebot/google-auth', () => ({
+  getGoogleToken: jest.fn(async () => 'ya29.token'),
+  clearGoogleToken: jest.fn(async () => undefined),
 }));
 jest.mock('./capture-tab', () => ({ captureTab: jest.fn() }));
 jest.mock('./gallery-preview', () => ({}));

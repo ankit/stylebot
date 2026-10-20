@@ -44,6 +44,8 @@ Scheduled runs are non-interactive: the token comes from the cache, then the ref
 
 Every browser signs in against a **Desktop app** OAuth client, with PKCE and offline access, and keeps the refresh token it gets. Scheduled runs trade it for access tokens with a plain request, so they never depend on the browser's Google session, its cookies, or which of several accounts is signed in. When Google stops honouring it, the next interactive sync signs in again.
 
+The gallery signs in the same way, but asks only for who the user is, not their Drive, and keeps its own tokens, so signing in or out of one leaves the other alone.
+
 A Desktop client only accepts a loopback redirect, so the browser has to catch Google's redirect to `127.0.0.1` before anything loads:
 
 - **Chrome, Edge and Safari** sign in in an ordinary tab. A redirect rule the extension adds for the sign-in sends the loopback address to an extension page, which hands the code to the background; it closes the tab and returns to the one the user started from. Where the rule can't run, such as with the extension's site access limited, the background reads the code off the tab's loopback address instead. The sign-in in progress is kept in storage rather than memory, since the background may unload while the user is on Google's page; whichever background receives the code finishes it, and a second sync brings the open sign-in tab forward instead of opening another.

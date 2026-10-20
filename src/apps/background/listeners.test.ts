@@ -35,8 +35,10 @@ jest.mock('./sync-scheduler', () => ({
 jest.mock('@stylebot/sync', () => ({
   runGoogleDriveSync: jest.fn(),
   getGoogleDriveSyncEnabled: jest.fn(),
-  isSignInRedirect: () => false,
   SYNC_ISSUE_KEYS: [],
+}));
+jest.mock('@stylebot/google-auth', () => ({
+  isSignInRedirect: () => false,
 }));
 
 import { ContextMenu } from './contextmenu';

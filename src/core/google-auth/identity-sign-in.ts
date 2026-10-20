@@ -1,6 +1,5 @@
-import { syncError } from '../errors';
+import { googleAuthError } from './errors';
 import {
-  REFRESH_TOKEN_KEY,
   getAuthURL,
   getRandomString,
   requestToken,
@@ -41,7 +40,10 @@ const launchWebAuthFlow = (url: string): Promise<string> =>
 
         if (lastError || !responseURL) {
           reject(
-            syncError(lastError?.message ?? 'Authorization failure', 'sign-in')
+            googleAuthError(
+              lastError?.message ?? 'Authorization failure',
+              'sign-in'
+            )
           );
           return;
         }
@@ -58,7 +60,7 @@ const launchWebAuthFlow = (url: string): Promise<string> =>
  */
 export const signInWithIdentityAPI = async (
   scopes: Array<string>,
-  refreshTokenKey = REFRESH_TOKEN_KEY
+  refreshTokenKey: string
 ): Promise<IssuedToken> => {
   const verifier = getRandomString();
   const state = getRandomString();
@@ -72,7 +74,7 @@ export const signInWithIdentityAPI = async (
   const code = redirect.searchParams.get('code');
 
   if (redirect.searchParams.get('state') !== state || !code) {
-    throw syncError(
+    throw googleAuthError(
       `Authorization failure: ${
         redirect.searchParams.get('error') ?? 'no code'
       }`,
@@ -89,7 +91,7 @@ export const signInWithIdentityAPI = async (
   const issued = getIssuedToken(json);
 
   if (!json.refresh_token || !issued) {
-    throw syncError(
+    throw googleAuthError(
       `Authorization failure: ${json.error ?? 'no refresh token'}`,
       'sign-in'
     );
