@@ -75,7 +75,8 @@ import {
   GetGalleryScreenshot,
   PublishToGallery,
   UnpublishFromGallery,
-  SetGalleryDisplayName,
+  SetGalleryUsername,
+  CheckGalleryUsername,
   GetPublishedGalleryStyle,
   GetGallerySuggestions,
   PreviewGalleryStyle,
@@ -436,8 +437,11 @@ export const initListeners = (): void => {
         case 'UnpublishFromGallery':
           UnpublishFromGallery(message, sendResponse);
           return true;
-        case 'SetGalleryDisplayName':
-          SetGalleryDisplayName(message, sendResponse);
+        case 'SetGalleryUsername':
+          SetGalleryUsername(message, sendResponse);
+          return true;
+        case 'CheckGalleryUsername':
+          CheckGalleryUsername(message, sendResponse);
           return true;
         case 'GetPublishedGalleryStyle':
           GetPublishedGalleryStyle(message, sendResponse);

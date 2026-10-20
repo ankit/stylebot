@@ -5,7 +5,8 @@ import type { ReadabilitySettings } from './readability';
 import type { GoogleDriveSyncMetadata } from './sync';
 import type { RestoreResult, VersionHistory } from './history';
 import type {
-  GalleryAuthor,
+  GalleryAccount,
+  GalleryUsernameCheck,
   GalleryPublished,
   GalleryPreview,
   GalleryPublishedStyle,
@@ -73,8 +74,9 @@ export type RestoreTabResponse = { ok: true };
 
 // The account is null while signed out, which only getting it reports.
 export type GalleryAccountResponse = GalleryResult<{
-  account: GalleryAuthor | null;
+  account: GalleryAccount | null;
 }>;
+export type CheckGalleryUsernameResponse = GalleryResult<GalleryUsernameCheck>;
 export type GetMyGalleryStylesResponse = GalleryResult<{
   styles: Array<GalleryStyle>;
   // The style published from this Stylebot style and profile, if still listed.

@@ -1,10 +1,28 @@
 /**
- * Who publishes styles to the gallery, by an anonymous id and an optional
- * alias. Both a signed-in account and a style's author have this shape.
+ * Who publishes styles to the gallery, by an id and a unique username, as a
+ * style's author shows them.
  */
 export type GalleryAuthor = {
   id: string;
-  name: string | null;
+  username: string;
+};
+
+/**
+ * The signed-in account: an author whose username the gallery made up until
+ * they confirm it, by publishing with it or picking another.
+ */
+export type GalleryAccount = GalleryAuthor & {
+  usernameConfirmed: boolean;
+};
+
+/**
+ * Whether a username can be the account's, and if not, why and what the
+ * gallery suggests instead.
+ */
+export type GalleryUsernameCheck = {
+  available: boolean;
+  reason?: 'invalid' | 'reserved' | 'taken';
+  suggestion?: string;
 };
 
 /**
@@ -80,6 +98,8 @@ export type GalleryErrorKey =
   | 'gallery_error_not_yours'
   | 'gallery_error_not_found'
   | 'gallery_error_conflict'
+  | 'that_username_is_taken'
+  | 'that_username_is_reserved'
   | 'gallery_error_screenshot_too_large'
   | 'gallery_error_screenshot'
   | 'gallery_error_unknown';

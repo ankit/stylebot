@@ -53,10 +53,12 @@ const launchWebAuthFlow = (url: string): Promise<string> =>
 
 /**
  * Signs in to Google in the browser's auth window and keeps the refresh
- * token, so later runs get access tokens without the user.
+ * token under `refreshTokenKey`, so later runs get access tokens without the
+ * user.
  */
 export const signInWithIdentityAPI = async (
-  scopes: Array<string>
+  scopes: Array<string>,
+  refreshTokenKey = REFRESH_TOKEN_KEY
 ): Promise<IssuedToken> => {
   const verifier = getRandomString();
   const state = getRandomString();
@@ -93,6 +95,6 @@ export const signInWithIdentityAPI = async (
     );
   }
 
-  await chrome.storage.local.set({ [REFRESH_TOKEN_KEY]: json.refresh_token });
+  await chrome.storage.local.set({ [refreshTokenKey]: json.refresh_token });
   return issued;
 };

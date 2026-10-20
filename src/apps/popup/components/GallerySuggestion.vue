@@ -56,9 +56,8 @@ export default Vue.extend({
   },
 
   computed: {
-    // Authors without an alias are anonymous, as the publish form puts it.
     author(): string {
-      return this.styleData.author.name || this.t('anonymous');
+      return this.styleData.author.username;
     },
 
     // Short, as in 1.2K; the title has the whole number.

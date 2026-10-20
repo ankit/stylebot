@@ -12,18 +12,20 @@ import {
 import { captureTab } from './capture-tab';
 import {
   CaptureGalleryScreenshot,
+  CheckGalleryUsername,
   GetGalleryScreenshot,
   GetGalleryInstallStatus,
   GetGallerySuggestions,
   GetMyGalleryStyles,
   GetPublishedGalleryStyle,
   PublishToGallery,
+  SetGalleryUsername,
   UnpublishFromGallery,
 } from './gallery';
 
 jest.mock('@stylebot/sync', () => ({
-  getGoogleAccessToken: jest.fn(async () => 'ya29.token'),
-  clearGoogleAccessToken: jest.fn(async () => undefined),
+  getGoogleIdentityToken: jest.fn(async () => 'ya29.token'),
+  clearGoogleIdentityToken: jest.fn(async () => undefined),
 }));
 jest.mock('./capture-tab', () => ({ captureTab: jest.fn() }));
 jest.mock('./gallery-preview', () => ({}));
@@ -173,6 +175,77 @@ describe('gallery messages', () => {
     );
 
     expect(mine).toEqual({ ok: true, styles: [style], publishedId: null });
+  });
+
+  it('sets the username and keeps the stored account in step', async () => {
+    const renamed = { ...account, username: 'maya-k' };
+    fetchMock.mockResponseOnce(JSON.stringify(renamed));
+
+    expect(
+      await respond(send =>
+        SetGalleryUsername(
+          { name: 'SetGalleryUsername', username: 'maya-k' },
+          send
+        )
+      )
+    ).toEqual({ ok: true, account: renamed });
+
+    const stored = await chrome.storage.local.get('gallery-session');
+    expect(stored['gallery-session'].account).toEqual(renamed);
+  });
+
+  it('says why a username was turned down, not that a version clashed', async () => {
+    fetchMock
+      .mockResponseOnce(JSON.stringify({ error: 'That username is taken' }), {
+        status: 409,
+      })
+      .mockResponseOnce(
+        JSON.stringify({ error: 'That username is reserved' }),
+        {
+          status: 409,
+        }
+      );
+
+    const set = (username: string) =>
+      respond(send =>
+        SetGalleryUsername({ name: 'SetGalleryUsername', username }, send)
+      );
+
+    await expect(set('maya')).resolves.toMatchObject({
+      ok: false,
+      errorKey: 'that_username_is_taken',
+    });
+    await expect(set('admin')).resolves.toMatchObject({
+      ok: false,
+      errorKey: 'that_username_is_reserved',
+    });
+  });
+
+  it('checks whether a username is free', async () => {
+    fetchMock.mockResponseOnce(
+      JSON.stringify({
+        available: false,
+        reason: 'taken',
+        suggestion: 'maya-2',
+      })
+    );
+
+    expect(
+      await respond(send =>
+        CheckGalleryUsername(
+          { name: 'CheckGalleryUsername', username: 'maya' },
+          send
+        )
+      )
+    ).toEqual({
+      ok: true,
+      available: false,
+      reason: 'taken',
+      suggestion: 'maya-2',
+    });
+    expect(fetchMock.mock.calls[0][0]).toBe(
+      `${GALLERY_API_URL}/usernames/maya`
+    );
   });
 
   it("passes on the gallery's reason for turning a style down", async () => {

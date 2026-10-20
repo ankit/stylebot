@@ -36,5 +36,15 @@ export const getGallerySiteUrl = (group: string): string =>
 export const NAME_MAX_LENGTH = 60;
 export const DESCRIPTION_MAX_LENGTH = 200;
 export const NOTES_MAX_LENGTH = 200;
-export const DISPLAY_NAME_MAX_LENGTH = 40;
+export const USERNAME_MIN_LENGTH = 3;
+export const USERNAME_MAX_LENGTH = 30;
+
+/**
+ * Whether a username follows the gallery's rule: lowercase letters and
+ * numbers, with single hyphens between them.
+ */
+export const isValidUsername = (username: string): boolean =>
+  username.length >= USERNAME_MIN_LENGTH &&
+  username.length <= USERNAME_MAX_LENGTH &&
+  /^[a-z0-9]+(-[a-z0-9]+)*$/.test(username);
 export const SCREENSHOT_MAX_BYTES = 1024 * 1024;

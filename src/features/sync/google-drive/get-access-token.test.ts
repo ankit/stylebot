@@ -1,6 +1,9 @@
 import fetchMock from 'jest-fetch-mock';
 
-import getAccessToken, { clearCachedToken } from './get-access-token';
+import getAccessToken, {
+  clearCachedToken,
+  getIdentityAccessToken,
+} from './get-access-token';
 import { DESKTOP_CLIENT_ID, REFRESH_TOKEN_KEY } from './desktop-client';
 import { signInWithIdentityAPI } from './identity-sign-in';
 import { signInWithRedirectRule } from './redirect-rule-sign-in';
@@ -230,6 +233,64 @@ describe('getAccessToken', () => {
     await expect(getAccessToken({ interactive: false })).rejects.toMatchObject({
       code: 'sign-in',
     });
+  });
+});
+
+describe('getIdentityAccessToken', () => {
+  const IDENTITY_CACHE_KEY = 'google-identity-access-token';
+  const IDENTITY_REFRESH_TOKEN_KEY = 'google-identity-refresh-token';
+  const IDENTITY_SCOPES = [
+    'openid',
+    'https://www.googleapis.com/auth/userinfo.profile',
+  ];
+
+  it('refreshes from its own refresh token, leaving Drive sign-in alone', async () => {
+    store[REFRESH_TOKEN_KEY] = 'drive-refresh';
+    store[CACHE_KEY] = { token: 'drive', expiresAt: Date.now() + 60_000 };
+    store[IDENTITY_REFRESH_TOKEN_KEY] = 'identity-refresh';
+    fetchMock.mockResponse(async request =>
+      request.url === TOKEN_URL
+        ? JSON.stringify({ access_token: 'identity', expires_in: 3600 })
+        : JSON.stringify({ aud: DESKTOP_CLIENT_ID })
+    );
+
+    await expect(getIdentityAccessToken()).resolves.toBe('identity');
+
+    const refresh = new URLSearchParams(
+      fetchMock.mock.calls[0][1]?.body as string
+    );
+    expect(refresh.get('refresh_token')).toBe('identity-refresh');
+    expect((store[IDENTITY_CACHE_KEY] as { token: string }).token).toBe(
+      'identity'
+    );
+    expect((store[CACHE_KEY] as { token: string }).token).toBe('drive');
+  });
+
+  it('signs in asking only for openid and profile, keeping its refresh token apart', async () => {
+    jest
+      .mocked(signInWithRedirectRule)
+      .mockResolvedValue({ token: 'signed-in', expiresIn: 3600 });
+    mockGoogle({ aud: DESKTOP_CLIENT_ID });
+
+    await expect(getIdentityAccessToken()).resolves.toBe('signed-in');
+    expect(signInWithRedirectRule).toBeCalledWith(
+      IDENTITY_SCOPES,
+      IDENTITY_REFRESH_TOKEN_KEY
+    );
+  });
+
+  it('signs in through the auth window on Firefox', async () => {
+    mockChrome({ extensionURL: 'moz-extension://abc/' });
+    jest
+      .mocked(signInWithIdentityAPI)
+      .mockResolvedValue({ token: 'signed-in', expiresIn: 3600 });
+    mockGoogle({ aud: DESKTOP_CLIENT_ID });
+
+    await expect(getIdentityAccessToken()).resolves.toBe('signed-in');
+    expect(signInWithIdentityAPI).toBeCalledWith(
+      IDENTITY_SCOPES,
+      IDENTITY_REFRESH_TOKEN_KEY
+    );
   });
 });
 

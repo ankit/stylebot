@@ -4,6 +4,7 @@ import { galleryApiError } from './request';
 import { account, mockStorage, session } from './gallery.fixtures';
 import {
   getSignedInAccount,
+  getStoredSession,
   signIn,
   storeAccount,
   withSession,
@@ -111,11 +112,19 @@ describe('gallery session', () => {
   it('updates the stored account', async () => {
     const store = mockStorage({ [SESSION_KEY]: session });
 
-    await storeAccount({ ...account, name: 'Maya' });
+    await storeAccount({ ...account, username: 'maya-k' });
 
     expect(store[SESSION_KEY]).toEqual({
       ...session,
-      account: { ...account, name: 'Maya' },
+      account: { ...account, username: 'maya-k' },
     });
+  });
+
+  it('drops a stored session from before usernames', async () => {
+    mockStorage({
+      [SESSION_KEY]: { ...session, account: { id: account.id, name: null } },
+    });
+
+    await expect(getStoredSession()).resolves.toBeNull();
   });
 });

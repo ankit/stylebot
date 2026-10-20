@@ -15,6 +15,8 @@ export { runGoogleDriveSync } from './google-drive/sync';
 export {
   default as getGoogleAccessToken,
   clearCachedToken as clearGoogleAccessToken,
+  getIdentityAccessToken as getGoogleIdentityToken,
+  clearCachedIdentityToken as clearGoogleIdentityToken,
 } from './google-drive/get-access-token';
 export {
   handleSignInRedirect,

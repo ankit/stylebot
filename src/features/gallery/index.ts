@@ -7,7 +7,8 @@ export {
   NAME_MAX_LENGTH,
   DESCRIPTION_MAX_LENGTH,
   NOTES_MAX_LENGTH,
-  DISPLAY_NAME_MAX_LENGTH,
+  USERNAME_MAX_LENGTH,
+  isValidUsername,
   SCREENSHOT_MAX_BYTES,
 } from './config';
 
@@ -21,7 +22,8 @@ export { type StyleForm } from './to-form-data';
 
 export {
   createSession,
-  setDisplayName,
+  setUsername,
+  checkUsername,
   getMyStyles,
   publishStyle,
   publishVersion,

@@ -65,9 +65,19 @@ type SignIn = {
   verifier: string;
   tabId: number;
   openerTabId?: number;
+  refreshTokenKey?: string;
   status: 'pending' | 'done' | 'failed';
   error?: string;
 };
+
+const getRefreshTokenKey = (signIn: SignIn): string =>
+  signIn.refreshTokenKey ?? REFRESH_TOKEN_KEY;
+
+const isPendingForRefreshToken = (
+  signIn: SignIn,
+  refreshTokenKey: string
+): boolean =>
+  signIn.status === 'pending' && getRefreshTokenKey(signIn) === refreshTokenKey;
 
 const getSignIns = async (): Promise<Array<SignIn>> => {
   const stored = (await chrome.storage.local.get(SIGN_INS_KEY))[SIGN_INS_KEY];
@@ -157,13 +167,22 @@ const waitForSignIn = (tabId: number): Promise<void> =>
 
 /**
  * Opens Google's consent page in a tab, with PKCE, or brings back one
- * already open so a second sync doesn't start a second sign-in.
+ * already open for the same refresh token so a second sync doesn't start a
+ * second sign-in.
  */
-const startSignIn = async (scopes: Array<string>): Promise<number> => {
+const startSignIn = async (
+  scopes: Array<string>,
+  refreshTokenKey: string
+): Promise<number> => {
   const signIns = await getSignIns();
+  const pending = signIns.filter(each =>
+    isPendingForRefreshToken(each, refreshTokenKey)
+  );
 
-  for (const signIn of signIns) {
-    if (signIn.status === 'pending' && (await isTabOpen(signIn.tabId))) {
+  for (const signIn of pending) {
+    const open = await isTabOpen(signIn.tabId);
+
+    if (open) {
       chrome.tabs.update(signIn.tabId, { active: true });
       return signIn.tabId;
     }
@@ -190,45 +209,56 @@ const startSignIn = async (scopes: Array<string>): Promise<number> => {
 
   await setSignIns([
     ...signIns.filter(each => each.status === 'pending'),
-    { state, verifier, tabId, openerTabId: opener?.id, status: 'pending' },
+    {
+      state,
+      verifier,
+      tabId,
+      openerTabId: opener?.id,
+      refreshTokenKey,
+      status: 'pending',
+    },
   ]);
 
   return tabId;
 };
 
-let opening: Promise<number> | null = null;
+const opening = new Map<string, Promise<number>>();
 
 /**
- * Overlapping calls in one background share a single tab.
+ * Overlapping calls in one background for the same refresh token share a
+ * single tab.
  */
-const openSignInTab = (scopes: Array<string>): Promise<number> => {
-  opening =
-    opening ??
-    startSignIn(scopes).then(
-      tabId => {
-        opening = null;
-        return tabId;
-      },
-      e => {
-        opening = null;
-        throw e;
-      }
-    );
+const openSignInTab = (
+  scopes: Array<string>,
+  refreshTokenKey: string
+): Promise<number> => {
+  const pending = opening.get(refreshTokenKey);
 
-  return opening;
+  if (pending) {
+    return pending;
+  }
+
+  const tab = startSignIn(scopes, refreshTokenKey).finally(() =>
+    opening.delete(refreshTokenKey)
+  );
+
+  opening.set(refreshTokenKey, tab);
+  return tab;
 };
 
 /**
  * Signs in to Google in a tab and resolves with a fresh access token once
- * the background has stored the refresh token the sign-in returned.
+ * the background has stored, under `refreshTokenKey`, the refresh token the
+ * sign-in returned.
  */
 export const signInWithRedirectRule = async (
-  scopes: Array<string>
+  scopes: Array<string>,
+  refreshTokenKey = REFRESH_TOKEN_KEY
 ): Promise<IssuedToken> => {
-  const tabId = await openSignInTab(scopes);
+  const tabId = await openSignInTab(scopes, refreshTokenKey);
   await waitForSignIn(tabId);
 
-  const issued = await refreshAccessToken();
+  const issued = await refreshAccessToken(refreshTokenKey);
   if (!issued) {
     throw syncError('Token refresh failure', 'sign-in');
   }
@@ -275,22 +305,24 @@ export const handleSignInRedirect = async (
         error = [json.error ?? 'no refresh token', json.error_description]
           .filter(Boolean)
           .join(': ');
-        console.error('Google Drive sign-in failed:', error);
+        console.error('Google sign-in failed:', error);
       }
     }
   } catch (e) {
     error = e instanceof Error ? e.message : String(e);
     throw e;
   } finally {
+    const refreshTokenKey = getRefreshTokenKey(signIn);
+
     if (refreshToken) {
-      await chrome.storage.local.set({ [REFRESH_TOKEN_KEY]: refreshToken });
+      await chrome.storage.local.set({ [refreshTokenKey]: refreshToken });
     }
 
-    // One sign-in is enough: the others' tabs close with it, and their
-    // waiting runs retry with the refresh token this one stored.
+    // One sign-in is enough: the others for the same refresh token close with
+    // it, and their waiting runs retry with the refresh token this one stored.
     const status = refreshToken ? 'done' : 'failed';
     const closing = refreshToken
-      ? signIns.filter(each => each.status === 'pending')
+      ? signIns.filter(each => isPendingForRefreshToken(each, refreshTokenKey))
       : [signIn];
 
     await setSignIns(
@@ -298,7 +330,14 @@ export const handleSignInRedirect = async (
         closing.includes(each) ? { ...each, status, error } : each
       )
     );
-    await removeRedirectRule();
+
+    const othersPending = signIns.some(
+      each => each.status === 'pending' && !closing.includes(each)
+    );
+
+    if (!othersPending) {
+      await removeRedirectRule();
+    }
 
     // The tab Google sent back may have a new id from the one we opened.
     closing.forEach(each => closeTab(each.tabId));

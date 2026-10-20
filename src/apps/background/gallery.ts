@@ -14,7 +14,8 @@ import {
   publishStyle,
   publishVersion,
   SCREENSHOT_MAX_BYTES,
-  setDisplayName,
+  setUsername,
+  checkUsername,
   signIn,
   storeAccount,
   toGalleryFailure,
@@ -23,7 +24,10 @@ import {
   withSession,
   type GoogleTokenSource,
 } from '@stylebot/gallery';
-import { clearGoogleAccessToken, getGoogleAccessToken } from '@stylebot/sync';
+import {
+  clearGoogleIdentityToken,
+  getGoogleIdentityToken,
+} from '@stylebot/sync';
 import type {
   GalleryAccountResponse,
   CaptureGalleryScreenshot as CaptureGalleryScreenshotType,
@@ -49,7 +53,9 @@ import type {
   PublishToGallery as PublishToGalleryType,
   PublishToGalleryResponse,
   GalleryScreenshotResponse,
-  SetGalleryDisplayName as SetGalleryDisplayNameType,
+  SetGalleryUsername as SetGalleryUsernameType,
+  CheckGalleryUsername as CheckGalleryUsernameType,
+  CheckGalleryUsernameResponse,
   UnpublishFromGallery as UnpublishFromGalleryType,
   UnpublishFromGalleryResponse,
 } from '@stylebot/types';
@@ -71,10 +77,9 @@ import {
 } from './gallery-preview';
 import { isStylebotSite } from './is-stylebot-site';
 
-// Gallery sign-in reuses Drive sync's Google sign-in.
 const google: GoogleTokenSource = {
-  getToken: () => getGoogleAccessToken({ interactive: true }),
-  clearToken: clearGoogleAccessToken,
+  getToken: getGoogleIdentityToken,
+  clearToken: clearGoogleIdentityToken,
 };
 
 /**
@@ -280,19 +285,56 @@ export const UnpublishFromGallery = async (
 };
 
 /**
- * Sets the alias shown on all the account's styles.
+ * Sets the username shown on all the account's styles, or confirms the one
+ * it has.
  */
-export const SetGalleryDisplayName = async (
-  { displayName }: SetGalleryDisplayNameType,
+export const SetGalleryUsername = async (
+  { username }: SetGalleryUsernameType,
   sendResponse: (response: GalleryAccountResponse) => void
 ): Promise<void> => {
   try {
     const account = await withSession(google, session =>
-      setDisplayName(session, displayName.trim())
+      setUsername(session, username)
     );
 
     await storeAccount(account);
     sendResponse({ ok: true, account });
+  } catch (e) {
+    sendResponse(usernameFailure(e));
+  }
+};
+
+/**
+ * A username the gallery turned down, with its reason: it answers a 409
+ * for one that's taken or reserved, unlike a version published meanwhile.
+ */
+const usernameFailure = (e: unknown) => {
+  if (!isGalleryApiError(e) || e.status !== 409) {
+    return fail(e);
+  }
+
+  return {
+    ok: false as const,
+    errorKey: /reserved/i.test(e.message)
+      ? ('that_username_is_reserved' as const)
+      : ('that_username_is_taken' as const),
+    errorDetail: e.message,
+  };
+};
+
+/**
+ * Whether the account can take a username, as it's typed.
+ */
+export const CheckGalleryUsername = async (
+  { username }: CheckGalleryUsernameType,
+  sendResponse: (response: CheckGalleryUsernameResponse) => void
+): Promise<void> => {
+  try {
+    const check = await withSession(google, session =>
+      checkUsername(session, username)
+    );
+
+    sendResponse({ ok: true, ...check });
   } catch (e) {
     sendResponse(fail(e));
   }

@@ -5,7 +5,8 @@ import {
   getMyStyles,
   publishStyle,
   publishVersion,
-  setDisplayName,
+  setUsername,
+  checkUsername,
   unpublishStyle,
 } from './api';
 import { GALLERY_API_URL } from './config';
@@ -73,14 +74,34 @@ describe('gallery API', () => {
     expect(new Headers(init.headers).get('Authorization')).toBe('Bearer abc');
   });
 
-  it('clears the display name with null when it is empty', async () => {
-    fetchMock.mockResponseOnce(JSON.stringify({ id: 'a', name: null }));
+  it('sets the username on the account', async () => {
+    fetchMock.mockResponseOnce(
+      JSON.stringify({ id: 'a', username: 'maya', usernameConfirmed: true })
+    );
 
-    await setDisplayName('abc', '');
+    await setUsername('abc', 'maya');
 
-    const { init } = lastRequest();
+    const { url, init } = lastRequest();
+    expect(url).toBe(`${GALLERY_API_URL}/me`);
     expect(init.method).toBe('PATCH');
-    expect(JSON.parse(init.body as string)).toEqual({ name: null });
+    expect(JSON.parse(init.body as string)).toEqual({ username: 'maya' });
+  });
+
+  it('checks a username, escaping it into the path', async () => {
+    fetchMock.mockResponseOnce(
+      JSON.stringify({
+        available: false,
+        reason: 'taken',
+        suggestion: 'maya-2',
+      })
+    );
+
+    expect(await checkUsername('abc', 'maya/x')).toEqual({
+      available: false,
+      reason: 'taken',
+      suggestion: 'maya-2',
+    });
+    expect(lastRequest().url).toBe(`${GALLERY_API_URL}/usernames/maya%2Fx`);
   });
 
   it('publishes a style as a multipart form with its site', async () => {

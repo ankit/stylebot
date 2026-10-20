@@ -308,10 +308,15 @@ export type UnpublishFromGallery = {
   id: string;
 };
 
-export type SetGalleryDisplayName = {
-  name: 'SetGalleryDisplayName';
-  // The alias; empty for anonymous.
-  displayName: string;
+export type SetGalleryUsername = {
+  name: 'SetGalleryUsername';
+  // The account's current one confirms it.
+  username: string;
+};
+
+export type CheckGalleryUsername = {
+  name: 'CheckGalleryUsername';
+  username: string;
 };
 
 export type GetPublishedGalleryStyle = {
@@ -419,7 +424,8 @@ type BackgroundPageMessage =
   | GetGalleryScreenshot
   | PublishToGallery
   | UnpublishFromGallery
-  | SetGalleryDisplayName
+  | SetGalleryUsername
+  | CheckGalleryUsername
   | GetPublishedGalleryStyle
   | GetGallerySuggestions
   | PreviewGalleryStyle

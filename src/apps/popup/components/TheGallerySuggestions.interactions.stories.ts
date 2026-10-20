@@ -123,29 +123,6 @@ export const ShowsTheTabsPreview: StoryObj = {
   },
 };
 
-export const ShowsAnonymousAuthors: StoryObj = {
-  ...popup({
-    styles: [style('example.com')],
-    defaultStyle: style('example.com'),
-    gallery: {
-      suggestions: [
-        {
-          ...gallerySuggestions[0],
-          author: { ...gallerySuggestions[0].author, name: null },
-        },
-      ],
-    },
-  }),
-  name: 'a suggestion whose author has no alias says anonymous',
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await expect(await suggestion(canvas, 'Tokyo Night')).toHaveTextContent(
-      'anonymous'
-    );
-  },
-};
-
 export const LeavesOutInstalledProfiles: StoryObj = {
   ...popup({
     styles: [profiledStyle('example.com')],

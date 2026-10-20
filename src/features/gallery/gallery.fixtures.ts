@@ -1,8 +1,16 @@
-import type { GalleryPublishedStyle, GalleryStyle } from '@stylebot/types';
+import type {
+  GalleryAccount,
+  GalleryPublishedStyle,
+  GalleryStyle,
+} from '@stylebot/types';
 
 import type { GallerySession } from './api';
 
-export const account = { id: 'b7Rr2KdQ0z', name: null };
+export const account: GalleryAccount = {
+  id: 'b7Rr2KdQ0z',
+  username: 'maya',
+  usernameConfirmed: true,
+};
 
 export const session: GallerySession = {
   session: 'b7Rr2KdQ0z.1794614400000.secret',
@@ -17,7 +25,7 @@ export const style: GalleryStyle = {
   slug: 'tokyo-night',
   name: 'Tokyo Night',
   description: 'The Tokyo Night palette',
-  author: account,
+  author: { id: account.id, username: account.username },
   version: 2,
   installs: 120,
   createdAt: 1791849600000,
