@@ -3,6 +3,7 @@
     class="compare"
     :class="{ held }"
     :disabled="disabled"
+    aria-keyshortcuts="C"
     @pointerdown.native="hold($event)"
     @pointerup.native="release"
     @pointercancel.native="release"
@@ -13,22 +14,46 @@
     @keyup.native="release"
   >
     {{ t('hold_to_compare') }}
+    <s-shortcut-chip small value="c" class="key" aria-hidden="true" />
   </s-button>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { SButton } from '@stylebot/components';
+import { SButton, SShortcutChip } from '@stylebot/components';
+
+const KEY = 'KeyC';
 
 /**
- * A button held down by pointer, Space or Enter, emitting `change` as it's
- * held and let go.
+ * Whether a key press belongs to something the user is typing in.
+ */
+const isTyping = (target: EventTarget | null): boolean =>
+  target instanceof HTMLElement &&
+  (target.isContentEditable ||
+    ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName));
+
+/**
+ * Whether a key press is the bare compare key, outside anything typed in.
+ */
+const isCompareKey = (event: KeyboardEvent): boolean =>
+  event.code === KEY &&
+  event.isTrusted &&
+  !event.altKey &&
+  !event.ctrlKey &&
+  !event.metaKey &&
+  !event.shiftKey &&
+  !isTyping(event.target);
+
+/**
+ * A button held down by pointer, Space or Enter, or C anywhere on the page,
+ * emitting `change` as it's held and let go.
  */
 export default Vue.extend({
   name: 'HoldToCompareButton',
 
   components: {
     SButton,
+    SShortcutChip,
   },
 
   props: {
@@ -44,7 +69,17 @@ export default Vue.extend({
     };
   },
 
+  mounted() {
+    // Captured, so the page's own shortcut for C doesn't run as well.
+    window.addEventListener('keydown', this.onKeydown, true);
+    window.addEventListener('keyup', this.onKeyup, true);
+    window.addEventListener('blur', this.release);
+  },
+
   beforeDestroy() {
+    window.removeEventListener('keydown', this.onKeydown, true);
+    window.removeEventListener('keyup', this.onKeyup, true);
+    window.removeEventListener('blur', this.release);
     this.setHeld(false);
   },
 
@@ -64,6 +99,23 @@ export default Vue.extend({
     release(): void {
       this.setHeld(false);
     },
+
+    onKeydown(event: KeyboardEvent): void {
+      if (this.disabled || !isCompareKey(event)) {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      this.setHeld(true);
+    },
+
+    onKeyup(event: KeyboardEvent): void {
+      if (event.code === KEY && this.held) {
+        event.stopImmediatePropagation();
+        this.release();
+      }
+    },
   },
 });
 </script>
@@ -72,6 +124,13 @@ export default Vue.extend({
 .compare {
   touch-action: none;
   user-select: none;
+}
+
+// No keyboard to press it on.
+@media (pointer: coarse) {
+  .key {
+    display: none;
+  }
 }
 
 .button.compare.held,

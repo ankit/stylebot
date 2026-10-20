@@ -66,7 +66,8 @@ const isTyping = (target: EventTarget | null): boolean =>
 
 /**
  * The controls a page shows while it previews a gallery style, to install it,
- * cancel (or press Esc), or hold to compare with the page's own styles.
+ * cancel (or press Esc), or hold to compare (or hold C) with the page's own
+ * styles.
  * Once installed they confirm it, with an undo, then emit `done`.
  */
 export default Vue.extend({
