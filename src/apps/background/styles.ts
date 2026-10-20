@@ -643,13 +643,12 @@ export const restoreStyles = (
   });
 
 /**
- * Drops the listing from every profile published as it, once it's unpublished.
+ * Drops a gallery style's listing from every profile, once it's unpublished.
  */
-export const removePublishedGalleryListing = (styleId: string) =>
+export const removeStyleGalleryListings = (styleId: string) =>
   update(styles => {
     const isUnpublished = (galleryListing: GalleryListing) =>
-      galleryListing.styleId === styleId &&
-      galleryListing.publishedBy !== undefined;
+      galleryListing.styleId === styleId;
     let changed = false;
 
     for (const [url, style] of Object.entries(styles)) {

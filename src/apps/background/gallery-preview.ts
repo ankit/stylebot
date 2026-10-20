@@ -1,8 +1,8 @@
 import {
   GALLERY_PREVIEW_SITES_KEY,
   getInstallId,
-  getInstalledProfile,
-  getPublishedProfile,
+  getListedProfiles,
+  getSignedInAccount,
   getStyle,
   hashCss,
   recordInstall,
@@ -108,7 +108,7 @@ const showOnTab = async (
     return;
   }
 
-  const replacedUrl = await getReplacedStyleUrl(preview.style, tab.url);
+  const replacedUrl = await getInstallTargetUrl(preview.style, tab.url);
   const message: ShowGalleryPreview = {
     name: 'ShowGalleryPreview',
     preview,
@@ -212,21 +212,19 @@ export const endGalleryPreview = async (
 };
 
 /**
- * A profile to switch back to, with the css and listing to update it to when
- * it's out of date.
+ * Whether a gallery style is the signed-in account's own.
  */
-type ReusableProfile = {
-  url: string;
-  profileId: string;
-  css?: string;
-  galleryListing?: GalleryListing;
+const isOwnStyle = async ({ author }: GalleryStyle): Promise<boolean> => {
+  const account = await getSignedInAccount();
+
+  return account?.id === author.id;
 };
 
 /**
  * The gallery listing for a profile installed at the style's latest version.
  */
 const getLatestVersionListing = (
-  { id, group, slug }: GalleryStyle,
+  { id, group, slug, author }: GalleryStyle,
   { version, css }: GalleryStyleToInstall
 ): GalleryListing => ({
   styleId: id,
@@ -234,102 +232,74 @@ const getLatestVersionListing = (
   slug,
   version,
   cssHash: hashCss(css),
+  authorId: author.id,
 });
 
 /**
- * Whether installing a version switches back to the profile it was installed
- * as: it's at that version, or older and unedited so it's updated in place.
+ * Whether a profile hasn't been edited since it was installed or published.
  */
-const canReuseInstall = (
-  { css, galleryListing }: ListedProfile,
-  version: number
-): boolean =>
-  galleryListing.version >= version || hashCss(css) === galleryListing.cssHash;
+const isUnedited = ({ css, galleryListing }: ListedProfile): boolean =>
+  hashCss(css) === galleryListing.cssHash;
 
 /**
- * The installed profile to switch back to, updated to the latest version
- * when it's out of date and unedited. Null when the user edited a profile
- * that's out of date, so the latest goes beside it.
+ * What installing a version of a gallery style does with the profiles it's
+ * already listed as here.
  */
-const reuseInstalledProfile = (
-  installed: ListedProfile,
-  style: GalleryStyle,
-  latest: GalleryStyleToInstall
-): ReusableProfile | null => {
-  const { url, profileId, galleryListing } = installed;
-
-  if (!canReuseInstall(installed, latest.version)) {
-    return null;
-  }
-
-  if (galleryListing.version >= latest.version) {
-    return { url, profileId };
-  }
-
-  return {
-    url,
-    profileId,
-    css: latest.css,
-    galleryListing: getLatestVersionListing(style, latest),
-  };
-};
+type InstallPlan =
+  // Switch to a profile as it is.
+  | { kind: 'switch'; profile: ListedProfile }
+  // Update an older, unedited profile to the version in place.
+  | { kind: 'update'; profile: ListedProfile }
+  // Add a new profile, taking the listing off the edited ones.
+  | { kind: 'add'; edited: Array<ListedProfile> };
 
 /**
- * The profile to switch back to for a gallery style: the one it was installed
- * as, or else the one it was published from, which is the user's own and
- * kept as it is.
+ * Plans installing a version of a gallery style: switch to a profile already
+ * at that version, else update an unedited older one, else add a new one. The
+ * account's own style switches to its edited profile instead of adding one.
  */
-const findReusableProfile = (
+const planInstall = (
   styles: StyleMap,
-  style: GalleryStyle,
-  latest: GalleryStyleToInstall
-): ReusableProfile | null => {
-  const installed = getInstalledProfile(styles, style.id);
-  const reusable = installed && reuseInstalledProfile(installed, style, latest);
+  styleId: string,
+  version: number,
+  isOwn: boolean
+): InstallPlan => {
+  const listed = getListedProfiles(styles, styleId);
+  const current = listed.find(
+    profile => profile.galleryListing.version >= version
+  );
 
-  if (reusable) {
-    return reusable;
+  if (current) {
+    return { kind: 'switch', profile: current };
   }
 
-  const published = getPublishedProfile(styles, style.id);
+  const unedited = listed.find(isUnedited);
 
-  if (published) {
-    return { url: published.url, profileId: published.profileId };
+  if (unedited) {
+    return { kind: 'update', profile: unedited };
   }
 
-  return null;
+  // Edits to the account's own style are its unpublished changes.
+  if (isOwn && listed.length > 0) {
+    return { kind: 'switch', profile: listed[0] };
+  }
+
+  return { kind: 'add', edited: listed };
 };
 
 /**
- * Installs a gallery style's latest version: into the profile it was
- * installed or published as here, or else as a new profile of pageUrl's
- * style. Resolves with the profile's name.
+ * Adds a gallery style's latest version as a new profile of pageUrl's style,
+ * taking the listing off its edited profiles, which keep their css. Resolves
+ * with the new profile's name.
  */
-const installLatestVersion = async (
+const addGalleryProfile = async (
+  pageUrl: string,
   style: GalleryStyle,
   latest: GalleryStyleToInstall,
-  pageUrl: string
+  edited: Array<ListedProfile>
 ): Promise<string> => {
-  const styles = await getAll();
-  const reusable = findReusableProfile(styles, style, latest);
-
-  if (reusable) {
-    const { url, profileId, css, galleryListing } = reusable;
-    const name = await reinstallProfile(url, profileId, {
-      css,
-      galleryListing,
-    });
-
-    if (name !== null) {
-      return name;
-    }
-  }
-
-  // The edited install stays the user's, so only the new profile keeps the listing.
-  const installed = getInstalledProfile(styles, style.id);
-
-  if (installed) {
-    await removeGalleryListing(installed.url, installed.profileId);
+  for (const { url, profileId } of edited) {
+    await removeGalleryListing(url, profileId);
   }
 
   const profile = await installProfile(pageUrl, {
@@ -339,6 +309,37 @@ const installLatestVersion = async (
   });
 
   return profile.name;
+};
+
+/**
+ * Installs a gallery style's latest version as its plan says. Resolves with
+ * the profile's name.
+ */
+const installLatestVersion = async (
+  style: GalleryStyle,
+  latest: GalleryStyleToInstall,
+  pageUrl: string
+): Promise<string> => {
+  const styles = await getAll();
+  const isOwn = await isOwnStyle(style);
+  const plan = planInstall(styles, style.id, latest.version, isOwn);
+
+  if (plan.kind === 'add') {
+    return addGalleryProfile(pageUrl, style, latest, plan.edited);
+  }
+
+  const { url, profileId } = plan.profile;
+  const update: { css?: string; galleryListing?: GalleryListing } = {};
+
+  if (plan.kind === 'update') {
+    update.css = latest.css;
+    update.galleryListing = getLatestVersionListing(style, latest);
+  }
+
+  const name = await reinstallProfile(url, profileId, update);
+
+  // The profile was deleted meanwhile, so the style goes in a new one.
+  return name ?? addGalleryProfile(pageUrl, style, latest, []);
 };
 
 /**
@@ -352,21 +353,19 @@ const getPageStyleUrl = (pageUrl: string, styles: StyleMap): string =>
  * The saved style that installing a gallery style from a page goes in, which
  * a preview there replaces while the page's other styles stay.
  */
-export const getReplacedStyleUrl = async (
+export const getInstallTargetUrl = async (
   style: GalleryStyle,
   pageUrl: string
 ): Promise<string> => {
   const styles = await getAll();
-  const installed = getInstalledProfile(styles, style.id);
+  const isOwn = await isOwnStyle(style);
+  const plan = planInstall(styles, style.id, style.version, isOwn);
 
-  if (installed && canReuseInstall(installed, style.version)) {
-    return installed.url;
+  if (plan.kind === 'add') {
+    return getPageStyleUrl(pageUrl, styles);
   }
 
-  return (
-    getPublishedProfile(styles, style.id)?.url ??
-    getPageStyleUrl(pageUrl, styles)
-  );
+  return plan.profile.url;
 };
 
 /**

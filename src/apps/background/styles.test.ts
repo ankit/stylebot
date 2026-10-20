@@ -19,7 +19,7 @@ import {
   reinstallProfile,
   setGalleryListing,
   removeGalleryListing,
-  removePublishedGalleryListing,
+  removeStyleGalleryListings,
   renameProfile,
   deleteProfile,
   getGoogleWebFontExists,
@@ -387,13 +387,13 @@ describe('style edits', () => {
   });
 
   describe('gallery listings', () => {
-    const listing = (publishedBy?: string) => ({
-      styleId: 'night',
+    const listing = (styleId = 'night') => ({
+      styleId,
       group: 'example.com',
-      slug: 'night',
+      slug: styleId,
       version: 1,
       cssHash: 'abc',
-      ...(publishedBy ? { publishedBy } : {}),
+      authorId: 'someone',
     });
 
     it('keeps the listing of a profile installed from the gallery, even when its name and css match another', async () => {
@@ -433,29 +433,29 @@ describe('style edits', () => {
     });
 
     it('sets and removes the listing a profile was published as', async () => {
-      await setGalleryListing('example.com', 'default', listing('me'));
+      await setGalleryListing('example.com', 'default', listing('mine'));
       expect(stored('example.com').profiles?.default).toEqual({
         name: '',
-        galleryListing: listing('me'),
+        galleryListing: listing('mine'),
       });
 
       const before = writes();
-      await setGalleryListing('example.com', 'default', listing('me'));
+      await setGalleryListing('example.com', 'default', listing('mine'));
       expect(writes()).toBe(before);
 
       await removeGalleryListing('example.com', 'default');
       expect(stored('example.com').profiles?.default).toEqual({ name: '' });
     });
 
-    it('drops the listing only from the profiles published as an unpublished style', async () => {
+    it('drops an unpublished style’s listing from every profile, keeping other styles’', async () => {
       const { id } = await installProfile('example.com', {
         name: 'Night',
         css: 'a {}',
         galleryListing: listing(),
       });
-      await setGalleryListing('example.com', 'default', listing('me'));
+      await setGalleryListing('example.com', 'default', listing('mine'));
 
-      await removePublishedGalleryListing('night');
+      await removeStyleGalleryListings('mine');
 
       expect(
         stored('example.com').profiles?.default?.galleryListing

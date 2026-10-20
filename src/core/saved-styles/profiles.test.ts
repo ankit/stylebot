@@ -34,6 +34,7 @@ const GALLERY_LISTING = {
   slug: 'night',
   version: 1,
   cssHash: 'abc',
+  authorId: 'someone',
 };
 
 const withTwo = () =>

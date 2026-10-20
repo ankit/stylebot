@@ -58,12 +58,12 @@ import { captureTab } from './capture-tab';
 import {
   getAll,
   setGalleryListing,
-  removePublishedGalleryListing,
+  removeStyleGalleryListings,
 } from './styles';
 import {
   endGalleryPreview,
   getGalleryPreview,
-  getReplacedStyleUrl,
+  getInstallTargetUrl,
   installGalleryPreview,
   openGalleryPreview,
   startGalleryPreview,
@@ -86,7 +86,7 @@ const fail = (e: unknown) => {
 };
 
 /**
- * Removes a style's published listing when the gallery can't find it, since
+ * Removes a style's listings when the gallery can't find it, since
  * the website can unpublish or delete it.
  */
 const removeListingIfNotFound = async (
@@ -94,7 +94,7 @@ const removeListingIfNotFound = async (
   styleId: string
 ): Promise<void> => {
   if (isGalleryApiError(e) && e.status === 404) {
-    await removePublishedGalleryListing(styleId);
+    await removeStyleGalleryListings(styleId);
   }
 };
 
@@ -141,7 +141,7 @@ export const GetMyGalleryStyles = async (
     const savedStyles = await getAll();
     const listing = getProfileGalleryListing(savedStyles, url, profileId);
     const publishedId =
-      account && listing?.publishedBy === account.id ? listing.styleId : null;
+      account && listing?.authorId === account.id ? listing.styleId : null;
 
     sendResponse({
       ok: true,
@@ -252,7 +252,7 @@ export const PublishToGallery = async (
       slug: style.slug,
       version: style.version,
       cssHash: hashCss(message.css),
-      publishedBy: style.author.id,
+      authorId: style.author.id,
     });
 
     sendResponse({ ok: true, style });
@@ -271,7 +271,7 @@ export const UnpublishFromGallery = async (
 ): Promise<void> => {
   try {
     await withSession(google, session => unpublishStyle(session, id));
-    await removePublishedGalleryListing(id);
+    await removeStyleGalleryListings(id);
     sendResponse({ ok: true });
   } catch (e) {
     await removeListingIfNotFound(e, id);
@@ -299,8 +299,8 @@ export const SetGalleryDisplayName = async (
 };
 
 /**
- * What the signed-in account published from a profile, or the gallery style
- * it was installed from, without asking the gallery.
+ * The signed-in account's own gallery style a profile is listed as, or else
+ * the gallery style it was installed from, without asking the gallery.
  */
 export const GetPublishedGalleryStyle = async (
   { url, profileId }: GetPublishedGalleryStyleType,
@@ -315,17 +315,15 @@ export const GetPublishedGalleryStyle = async (
     return;
   }
 
-  const { publishedBy, ...published } = listing;
+  const { authorId, ...published } = listing;
 
-  if (!publishedBy) {
+  if (authorId !== account?.id) {
     const { group, slug } = listing;
     sendResponse({ published: null, installed: { group, slug } });
     return;
   }
 
-  // Another account's style can't be updated from here, so it isn't shown.
-  const isMine = publishedBy === account?.id;
-  sendResponse({ published: isMine ? published : null, installed: null });
+  sendResponse({ published, installed: null });
 };
 
 // Enough of a site's styles to still have a couple to suggest after leaving
@@ -428,7 +426,7 @@ export const GetGalleryPreview = async (
     return;
   }
 
-  const replacedUrl = await getReplacedStyleUrl(preview.style, pageUrl);
+  const replacedUrl = await getInstallTargetUrl(preview.style, pageUrl);
   sendResponse({ preview, replacedUrl });
 };
 

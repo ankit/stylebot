@@ -50,8 +50,7 @@ export { compressScreenshot } from './compress-screenshot';
 export { blobToDataUrl, dataUrlToBlob, hashCss, toGallerySite } from './utils';
 export { getInstallId } from './install-id';
 export {
-  getInstalledProfile,
-  getPublishedProfile,
+  getListedProfiles,
   getListedStyleIds,
   getListedProfileNames,
   getProfileGalleryListing,

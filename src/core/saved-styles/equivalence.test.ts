@@ -102,6 +102,7 @@ describe('isEquivalentStyleMap with profiles', () => {
             slug: 'night',
             version: 1,
             cssHash: 'abc',
+            authorId: 'someone',
           },
         },
       },
