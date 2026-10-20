@@ -36,6 +36,10 @@
     <s-text variant="muted">
       {{ t('edits_stay_on_your_device_until_you_publish_an_update') }}
     </s-text>
+
+    <s-button variant="primary" size="large" @click="viewInGallery">
+      {{ t('view_in_gallery') }} ↗
+    </s-button>
   </section>
 </template>
 
@@ -43,6 +47,7 @@
 import type { PropType } from 'vue';
 import Vue from 'vue';
 import {
+  SButton,
   SCallout,
   SCopyButton,
   SHeading,
@@ -55,13 +60,14 @@ import { getGalleryStyleUrl, getGalleryUrl } from '@stylebot/gallery';
 import type { GalleryPublishedStyle } from '@stylebot/types';
 
 /**
- * What the gallery published, its link to copy, and anything it took out of
- * the CSS.
+ * What the gallery published, its link to copy, anything it took out of the
+ * CSS, and a button to see it there.
  */
 export default Vue.extend({
   name: 'PublishedStyle',
 
   components: {
+    SButton,
     SCallout,
     SCopyButton,
     SHeading,
@@ -87,12 +93,18 @@ export default Vue.extend({
       return getGalleryStyleUrl(this.styleData);
     },
 
-    // The link without its scheme, split so the style's own part stays in view.
+    // The site and slug, which tell styles apart; the site gives way when long.
     link(): { base: string; slug: string } {
-      const bare = this.styleUrl.replace(/^https?:\/\//, '');
-      const slash = bare.lastIndexOf('/') + 1;
+      return {
+        base: `${this.styleData.site.replace(/^www\./, '')}/`,
+        slug: this.styleData.slug,
+      };
+    },
+  },
 
-      return { base: bare.slice(0, slash), slug: bare.slice(slash) };
+  methods: {
+    viewInGallery(): void {
+      window.open(this.styleUrl, '_blank', 'noopener');
     },
   },
 });

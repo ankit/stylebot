@@ -247,6 +247,46 @@ export const UpdatesWhatWasPublished: StoryObj = {
   },
 };
 
+export const PublishedShowsTheShortLink: StoryObj = {
+  ...publishView({
+    account,
+    publish: {
+      ok: true,
+      style: {
+        ...tokyoNight,
+        site: 'www.wikipedia.org',
+        group: 'wikipedia',
+        version: 1,
+        removed: [],
+      },
+    },
+  }),
+  name: 'Once published, the link shows the site and slug, and the close button closes Stylebot',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step('publish', async () => {
+      await takeScreenshot(canvas);
+      await user.clear(canvas.getByLabelText('Name'));
+      await user.type(canvas.getByLabelText('Name'), 'Tokyo Night');
+      await user.click(publishButton(canvas));
+
+      await canvas.findByText('Version 1 is live in the Gallery');
+    });
+
+    await step('the link leaves out the Gallery address', async () => {
+      await expect(
+        canvasElement.querySelector('.published .link')
+      ).toHaveTextContent(/^wikipedia\.org\/\s*tokyo-night$/);
+    });
+
+    await step('the close button closes Stylebot', async () => {
+      await user.click(canvas.getByRole('button', { name: 'Close' }));
+      await expect(storeOf(canvasElement).state.visible).toBe(false);
+    });
+  },
+};
+
 export const BlursThePublishedScreenshot: StoryObj = {
   ...publishView(publishedTokyoNight),
   name: "The Gallery's screenshot can be blurred, which is enough to publish",
