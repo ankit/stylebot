@@ -208,7 +208,7 @@ export const CompressGalleryScreenshot = async (
 };
 
 /**
- * Fetches a screenshot the gallery shows, so an update can keep it.
+ * Fetches a screenshot the gallery shows, to review or publish it again.
  */
 export const GetGalleryScreenshot = async (
   { path }: GetGalleryScreenshotType,
@@ -244,7 +244,9 @@ export const PublishToGallery = async (
       description: message.description,
       notes: message.styleId ? message.notes : undefined,
       css: message.css,
-      screenshot: await compressUnderLimit(message.screenshot),
+      screenshot: message.screenshot
+        ? await compressUnderLimit(message.screenshot)
+        : undefined,
     };
 
     const style = await withSession(session =>

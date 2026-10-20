@@ -155,6 +155,20 @@ describe('gallery messages', () => {
     );
   });
 
+  it("leaves the screenshot out of a new version that doesn't change it", async () => {
+    fetchMock.mockResponseOnce(JSON.stringify(publishedStyle));
+
+    await respond(send =>
+      PublishToGallery(
+        { ...publishMessage, styleId: style.id, screenshot: undefined },
+        send
+      )
+    );
+
+    const body = fetchMock.mock.calls[0][1]?.body as FormData;
+    expect(body.has('screenshot')).toBe(false);
+  });
+
   it('lists only styles for this site', async () => {
     fetchMock.mockResponseOnce(
       JSON.stringify({

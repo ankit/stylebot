@@ -285,7 +285,8 @@ export type CompressGalleryScreenshot = {
   screenshot: string;
 };
 
-// A screenshot the gallery already shows, by its path, to publish again.
+// A screenshot the gallery already shows, by its path or URL, to review or
+// publish again.
 export type GetGalleryScreenshot = {
   name: 'GetGalleryScreenshot';
   path: string;
@@ -303,8 +304,9 @@ export type PublishToGallery = {
   // What changed; sent only with a new version.
   notes: string;
   css: string;
-  // A data URL, as CaptureGalleryScreenshot returns it.
-  screenshot: string;
+  // A data URL, as CaptureGalleryScreenshot returns it. Required for a new
+  // style; a new version without one keeps the style's.
+  screenshot?: string;
 };
 
 export type UnpublishFromGallery = {

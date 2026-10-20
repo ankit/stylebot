@@ -80,7 +80,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { SButton, SCallout, SConfirmDialog } from '@stylebot/components';
-import { getGalleryStyleUrl, hashCss } from '@stylebot/gallery';
+import { getGalleryStyleUrl, getGalleryUrl, hashCss } from '@stylebot/gallery';
 import { getPageBridge } from '@stylebot/page-bridge';
 import type {
   GalleryAccount,
@@ -119,6 +119,8 @@ type Data = {
   target: GalleryStyle | null;
   // The CSS hash of the version in the gallery, to tell if there's news.
   publishedCssHash: string;
+  // Taken or blurred here, so it's a data URL to upload; otherwise it's the
+  // gallery's, by URL.
   tookScreenshot: boolean;
   name: string;
   description: string;
@@ -292,20 +294,30 @@ export default Vue.extend({
         this.name = target.name;
         this.description = target.description ?? '';
         this.publishedCssHash = published?.cssHash ?? '';
-        this.loadScreenshot(target.screenshot);
+
+        if (!this.tookScreenshot) {
+          this.screenshot = getGalleryUrl(target.screenshot);
+        }
       }
     },
 
     /**
-     * Starts an update from the screenshot the gallery shows now, unless one
-     * was taken in the meantime.
+     * The screenshot as a data URL, fetching the gallery's when it's still
+     * the one shown, since the page can't blur or upload it by URL.
      */
-    async loadScreenshot(path: string): Promise<void> {
-      const response = await getGalleryScreenshot(path);
-
-      if (response.ok && !this.screenshot) {
-        this.screenshot = response.screenshot;
+    async screenshotDataUrl(): Promise<string | null> {
+      if (this.tookScreenshot) {
+        return this.screenshot;
       }
+
+      const response = await getGalleryScreenshot(this.screenshot);
+
+      if (!response.ok) {
+        this.showError(response);
+        return null;
+      }
+
+      return response.screenshot;
     },
 
     viewInGallery(style: GalleryStyle): void {
@@ -346,7 +358,12 @@ export default Vue.extend({
      * whether they kept it rather than cancelling.
      */
     async review(): Promise<boolean> {
-      const shown = this.screenshot;
+      const shown = await this.screenshotDataUrl();
+
+      if (!shown) {
+        return false;
+      }
+
       const reviewed = await getPageBridge()
         .reviewScreenshot(shown)
         .catch(() => shown);
@@ -418,6 +435,19 @@ export default Vue.extend({
           this.account = named.account;
         }
 
+        // A first publish uploads one, even the gallery's after an unpublish.
+        let screenshot: string | undefined;
+
+        if (!this.target || this.tookScreenshot) {
+          const dataUrl = await this.screenshotDataUrl();
+
+          if (!dataUrl) {
+            return;
+          }
+
+          screenshot = dataUrl;
+        }
+
         const { url, activeProfile, css } = this.$store.state;
         const response = await publishToGallery({
           styleId: this.target?.id,
@@ -428,7 +458,7 @@ export default Vue.extend({
           description: this.description.trim(),
           notes: this.notes.trim(),
           css,
-          screenshot: this.screenshot,
+          screenshot,
         });
 
         if (response.ok) {
