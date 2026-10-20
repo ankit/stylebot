@@ -43,38 +43,17 @@ const listProfilesWithListings = (styles: StyleMap): Array<ListedProfile> =>
     listStyleProfilesWithListings(url, style)
   );
 
-const isPublished = ({ galleryListing }: ListedProfile) =>
-  galleryListing.publishedBy !== undefined;
-
 /**
- * The profile a gallery style was installed as, if any.
+ * The profiles a gallery style was installed or published as, latest
+ * version first.
  */
-export const getInstalledProfile = (
+export const getListedProfiles = (
   styles: StyleMap,
   styleId: string
-): ListedProfile | null => {
-  const installed = listProfilesWithListings(styles).find(
-    profile =>
-      profile.galleryListing.styleId === styleId && !isPublished(profile)
-  );
-
-  return installed ?? null;
-};
-
-/**
- * The profile a gallery style was published from, by any account, if any.
- */
-export const getPublishedProfile = (
-  styles: StyleMap,
-  styleId: string
-): ListedProfile | null => {
-  const published = listProfilesWithListings(styles).find(
-    profile =>
-      profile.galleryListing.styleId === styleId && isPublished(profile)
-  );
-
-  return published ?? null;
-};
+): Array<ListedProfile> =>
+  listProfilesWithListings(styles)
+    .filter(({ galleryListing }) => galleryListing.styleId === styleId)
+    .sort((a, b) => b.galleryListing.version - a.galleryListing.version);
 
 /**
  * The gallery styles installed or published here.

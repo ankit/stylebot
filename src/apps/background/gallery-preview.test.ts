@@ -1,6 +1,6 @@
 import fetchMock from 'jest-fetch-mock';
 
-import { style } from '../../features/gallery/gallery.fixtures';
+import { session, style } from '../../features/gallery/gallery.fixtures';
 import {
   endGalleryPreviewOffSite,
   getGalleryPreview,
@@ -102,6 +102,7 @@ describe('gallery preview', () => {
               slug: 'tokyo-night',
               version: 2,
               cssHash: hashCss('a {}'),
+              authorId: style.author.id,
             },
           },
         },
@@ -185,6 +186,7 @@ describe('gallery preview', () => {
         slug: 'tokyo-night',
         version: 2,
         cssHash: hashCss('a { color: red; }'),
+        authorId: style.author.id,
       },
     });
     expect(await getGalleryPreview(TAB_ID)).toBeNull();
@@ -212,6 +214,7 @@ describe('gallery preview', () => {
       slug: 'tokyo-night',
       version: 2,
       cssHash: hashCss(LATEST_CSS),
+      authorId: style.author.id,
     };
 
     /**
@@ -248,10 +251,7 @@ describe('gallery preview', () => {
       await seed('a { color: pink; }', installedAt(2, 'a { color: red; }'));
 
       expect(await installGalleryPreview(TAB_ID)).toBe('Mine');
-      expect(reinstallProfile).toHaveBeenCalledWith('github.com', 'p0', {
-        css: undefined,
-        galleryListing: undefined,
-      });
+      expect(reinstallProfile).toHaveBeenCalledWith('github.com', 'p0', {});
       expect(installProfile).not.toHaveBeenCalled();
     });
 
@@ -280,17 +280,13 @@ describe('gallery preview', () => {
       });
     });
 
-    it('switches to the profile it was published from rather than adding a copy', async () => {
-      await seed('a { color: pink; }', {
-        ...installedAt(1, 'a { color: pink; }'),
-        publishedBy: 'someone',
-      });
+    it('switches back to an edited, older copy of the signed-in account’s own style, keeping it as it is', async () => {
+      await seed('a { color: pink; }', installedAt(1, 'a { color: red; }'));
+      store['gallery-session'] = session;
 
       expect(await installGalleryPreview(TAB_ID)).toBe('Mine');
-      expect(reinstallProfile).toHaveBeenCalledWith('github.com', 'p0', {
-        css: undefined,
-        galleryListing: undefined,
-      });
+      expect(reinstallProfile).toHaveBeenCalledWith('github.com', 'p0', {});
+      expect(removeGalleryListing).not.toHaveBeenCalled();
       expect(installProfile).not.toHaveBeenCalled();
     });
 

@@ -3,6 +3,7 @@ import { GALLERY_API_URL, getListedStyleIds, hashCss } from '@stylebot/gallery';
 import type { GalleryListing, StyleMap } from '@stylebot/types';
 
 import {
+  account,
   mockStorage,
   publishedStyle,
   session,
@@ -48,15 +49,12 @@ jest.mock('./styles', () => {
         );
       }
     ),
-    removePublishedGalleryListing: jest.fn(async (styleId: string) => {
+    removeStyleGalleryListings: jest.fn(async (styleId: string) => {
       for (const [url, saved] of Object.entries(mockStyles)) {
         const { sheets } = expandProfiles(saved);
 
         for (const [id, { galleryListing }] of Object.entries(sheets)) {
-          if (
-            galleryListing?.styleId === styleId &&
-            galleryListing.publishedBy
-          ) {
+          if (galleryListing?.styleId === styleId) {
             mockStyles[url] = removeProfileGalleryListing(mockStyles[url], id);
           }
         }
@@ -76,14 +74,14 @@ const savedStyle = (profiles: StyleMap[string]['profiles'] = undefined) => ({
 const listing = (
   styleId: string,
   slug: string,
-  publishedBy?: string
+  authorId = 'someone'
 ): GalleryListing => ({
   styleId,
   group: 'github.com',
   slug,
   version: 1,
   cssHash: 'abc',
-  ...(publishedBy ? { publishedBy } : {}),
+  authorId,
 });
 
 const SCREENSHOT = 'data:image/png;base64,iVBORw0KGgo=';
@@ -222,7 +220,7 @@ describe('gallery messages', () => {
     });
   });
 
-  it('names the gallery style a profile was installed from, and hides one another account published', async () => {
+  it('names the gallery style a profile was installed from, and counts an install of the account’s own style as published', async () => {
     const published = (profileId: string) =>
       respond(send =>
         GetPublishedGalleryStyle(
@@ -234,9 +232,9 @@ describe('gallery messages', () => {
       'github.com': savedStyle({
         p1: { name: 'Night', galleryListing: listing('night', 'night') },
         p2: {
-          name: 'Theirs',
+          name: 'Mine',
           css: 'a {}',
-          galleryListing: listing('theirs', 'theirs', 'someone'),
+          galleryListing: listing('mine', 'mine', account.id),
         },
       }),
     };
@@ -245,7 +243,16 @@ describe('gallery messages', () => {
       published: null,
       installed: { group: 'github.com', slug: 'night' },
     });
-    expect(await published('p2')).toEqual({ published: null, installed: null });
+    expect(await published('p2')).toEqual({
+      published: {
+        styleId: 'mine',
+        group: 'github.com',
+        slug: 'mine',
+        version: 1,
+        cssHash: 'abc',
+      },
+      installed: null,
+    });
     expect(await published('missing')).toEqual({
       published: null,
       installed: null,
@@ -414,7 +421,7 @@ describe('gallery messages', () => {
       'github.com': savedStyle({
         default: {
           name: '',
-          galleryListing: listing(style.id, style.slug, 'me'),
+          galleryListing: listing(style.id, style.slug, account.id),
         },
         p1: {
           name: 'Installed',

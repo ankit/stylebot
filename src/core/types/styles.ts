@@ -22,9 +22,9 @@ export type GalleryListing = {
   version: number;
   // A hash of that version's CSS, to tell if the profile was edited since.
   cssHash: string;
-  // The gallery account that published it from this profile. Missing when it
-  // was installed from the gallery.
-  publishedBy?: string;
+  // The gallery account that wrote the style. The profile is the signed-in
+  // account's to publish from when it's theirs.
+  authorId: string;
 };
 
 export type StyleProfiles = {
