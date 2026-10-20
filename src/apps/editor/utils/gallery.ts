@@ -15,6 +15,7 @@ import type {
   PublishToGalleryResponse,
   SetGalleryUsername,
   SignInToGallery,
+  SignOutOfGallery,
   UnpublishFromGallery,
   UnpublishFromGalleryResponse,
 } from '@stylebot/types';
@@ -29,6 +30,11 @@ export const getGalleryAccount = (): Promise<GalleryAccountResponse> =>
 export const signInToGallery = (): Promise<GalleryAccountResponse> =>
   chrome.runtime.sendMessage<SignInToGallery, GalleryAccountResponse>({
     name: 'SignInToGallery',
+  });
+
+export const signOutOfGallery = (): Promise<GalleryAccountResponse> =>
+  chrome.runtime.sendMessage<SignOutOfGallery, GalleryAccountResponse>({
+    name: 'SignOutOfGallery',
   });
 
 export const setGalleryUsername = (

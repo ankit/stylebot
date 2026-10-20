@@ -1,5 +1,9 @@
 import fetchMock from 'jest-fetch-mock';
-import { clearGoogleToken, getGoogleToken } from '@stylebot/google-auth';
+import {
+  clearGoogleToken,
+  getGoogleToken,
+  signOutOfGoogle,
+} from '@stylebot/google-auth';
 
 import { galleryApiError } from './request';
 import { account, mockStorage, session } from './gallery.fixtures';
@@ -7,6 +11,7 @@ import {
   getSignedInAccount,
   getStoredSession,
   signIn,
+  signOut,
   storeAccount,
   withSession,
 } from './session';
@@ -14,6 +19,7 @@ import {
 jest.mock('@stylebot/google-auth', () => ({
   getGoogleToken: jest.fn(),
   clearGoogleToken: jest.fn(),
+  signOutOfGoogle: jest.fn(),
 }));
 
 const SESSION_KEY = 'gallery-session';
@@ -22,6 +28,7 @@ beforeEach(() => {
   fetchMock.resetMocks();
   jest.mocked(getGoogleToken).mockReset().mockResolvedValue('ya29.token');
   jest.mocked(clearGoogleToken).mockReset().mockResolvedValue(undefined);
+  jest.mocked(signOutOfGoogle).mockReset().mockResolvedValue(undefined);
 });
 
 describe('gallery session', () => {
@@ -57,6 +64,20 @@ describe('gallery session', () => {
     expect(clearGoogleToken).toHaveBeenCalledTimes(1);
     expect(JSON.parse(fetchMock.mock.calls[1][1]?.body as string)).toEqual({
       googleToken: 'ya29.fresh',
+    });
+  });
+
+  it('forgets the session and its Google tokens on sign-out', async () => {
+    const store = mockStorage({ [SESSION_KEY]: session });
+
+    await signOut();
+
+    expect(store[SESSION_KEY]).toBeUndefined();
+    expect(await getSignedInAccount()).toBeNull();
+    expect(signOutOfGoogle).toBeCalledWith({
+      scopes: ['openid', 'https://www.googleapis.com/auth/userinfo.profile'],
+      cacheKey: 'google-identity-access-token',
+      refreshTokenKey: 'google-identity-refresh-token',
     });
   });
 

@@ -17,6 +17,7 @@ import {
   setUsername,
   checkUsername,
   signIn,
+  signOut,
   storeAccount,
   toGalleryFailure,
   toGallerySite,
@@ -116,6 +117,17 @@ export const SignInToGallery = async (
 ): Promise<void> => {
   try {
     sendResponse({ ok: true, account: (await signIn()).account });
+  } catch (e) {
+    sendResponse(fail(e));
+  }
+};
+
+export const SignOutOfGallery = async (
+  sendResponse: (response: GalleryAccountResponse) => void
+): Promise<void> => {
+  try {
+    await signOut();
+    sendResponse({ ok: true, account: null });
   } catch (e) {
     sendResponse(fail(e));
   }

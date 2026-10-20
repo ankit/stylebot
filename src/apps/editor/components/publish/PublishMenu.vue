@@ -14,6 +14,7 @@
     <template #default="{ close }">
       <s-menu dense size="small" :min-width="210">
         <s-menu-item
+          v-if="styleData"
           @click="
             viewInGallery();
             close();
@@ -21,16 +22,26 @@
         >
           {{ t('view_in_gallery') }}
         </s-menu-item>
-        <s-menu-divider />
         <s-menu-item
-          danger
           @click="
-            $emit('unpublish');
+            $emit('sign-out');
             close();
           "
         >
-          {{ t('unpublish') }}
+          {{ t('sign_out') }}
         </s-menu-item>
+        <template v-if="styleData">
+          <s-menu-divider />
+          <s-menu-item
+            danger
+            @click="
+              $emit('unpublish');
+              close();
+            "
+          >
+            {{ t('unpublish') }}
+          </s-menu-item>
+        </template>
       </s-menu>
     </template>
   </s-anchored-menu>
@@ -51,11 +62,11 @@ import { getGalleryStyleUrl } from '@stylebot/gallery';
 import type { GalleryStyle } from '@stylebot/types';
 
 /**
- * The ⋯ menu for a published style: open it in the Gallery, or emit
- * `unpublish` to take it down.
+ * The publish view's ⋯ menu while signed in: emits `sign-out`, and for a
+ * published style also opens it in the Gallery or emits `unpublish`.
  */
 export default Vue.extend({
-  name: 'PublishedStyleMenu',
+  name: 'PublishMenu',
 
   components: {
     SAnchoredMenu,
@@ -68,8 +79,8 @@ export default Vue.extend({
 
   props: {
     styleData: {
-      type: Object as PropType<GalleryStyle>,
-      required: true,
+      type: Object as PropType<GalleryStyle | null>,
+      default: null,
     },
 
     disabled: {
@@ -80,7 +91,9 @@ export default Vue.extend({
 
   methods: {
     viewInGallery(): void {
-      window.open(getGalleryStyleUrl(this.styleData), '_blank', 'noopener');
+      if (this.styleData) {
+        window.open(getGalleryStyleUrl(this.styleData), '_blank', 'noopener');
+      }
     },
   },
 });

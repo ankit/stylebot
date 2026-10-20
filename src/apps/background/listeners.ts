@@ -66,6 +66,7 @@ import { syncStyles } from './sync';
 import {
   GetGalleryAccount,
   SignInToGallery,
+  SignOutOfGallery,
   GetMyGalleryStyles,
   CaptureGalleryScreenshot,
   CompressGalleryScreenshot,
@@ -415,6 +416,9 @@ export const initListeners = (): void => {
           return true;
         case 'SignInToGallery':
           SignInToGallery(sendResponse);
+          return true;
+        case 'SignOutOfGallery':
+          SignOutOfGallery(sendResponse);
           return true;
         case 'GetMyGalleryStyles':
           GetMyGalleryStyles(message, sendResponse);

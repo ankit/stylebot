@@ -18,6 +18,7 @@ const aliasedPackages = [
   'i18n',
   'sync',
   'gallery',
+  'google-auth',
   'history',
   'types',
   'utils',

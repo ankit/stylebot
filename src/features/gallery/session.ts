@@ -1,6 +1,7 @@
 import {
   clearGoogleToken,
   getGoogleToken,
+  signOutOfGoogle,
   type GoogleAccess,
 } from '@stylebot/google-auth';
 import type { GalleryAccount } from '@stylebot/types';
@@ -77,6 +78,14 @@ export const signIn = async (): Promise<GallerySession> => {
 
   await storeSession(session);
   return session;
+};
+
+/**
+ * Forgets the gallery session and the Google tokens behind it, leaving Drive
+ * sync's own sign-in alone.
+ */
+export const signOut = async (): Promise<void> => {
+  await Promise.all([clearSession(), signOutOfGoogle(GOOGLE_ACCESS)]);
 };
 
 /**

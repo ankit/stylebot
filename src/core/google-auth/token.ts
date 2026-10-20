@@ -52,6 +52,16 @@ export const clearGoogleToken = ({ cacheKey }: GoogleAccess): Promise<void> =>
   chrome.storage.local.remove(cacheKey);
 
 /**
+ * Forgets the access and refresh tokens, so the next sign-in asks Google
+ * again and can pick another account.
+ */
+export const signOutOfGoogle = ({
+  cacheKey,
+  refreshTokenKey,
+}: GoogleAccess): Promise<void> =>
+  chrome.storage.local.remove([cacheKey, refreshTokenKey]);
+
+/**
  * Checks with Google's tokeninfo endpoint that the token was issued to
  * `clientId`, which it reports as `aud`.
  */

@@ -1,10 +1,11 @@
 <template>
   <div class="publish-view">
     <subview-header :title="title" @back="back">
-      <published-style-menu
-        v-if="editing && target"
+      <publish-menu
+        v-if="editing"
         :style-data="target"
         :disabled="publishing"
+        @sign-out="signOut"
         @unpublish="confirmingUnpublish = true"
       />
     </subview-header>
@@ -96,6 +97,7 @@ import {
   getPublishedGalleryStyle,
   publishToGallery,
   setGalleryUsername,
+  signOutOfGallery,
   unpublishFromGallery,
 } from '../../utils/gallery';
 
@@ -103,8 +105,8 @@ import { galleryErrorText } from '@stylebot/gallery';
 import GalleryIntro from './GalleryIntro.vue';
 import GallerySignIn from './GallerySignIn.vue';
 import PublishedStyle from './PublishedStyle.vue';
-import PublishedStyleMenu from './PublishedStyleMenu.vue';
 import PublishFooter from './PublishFooter.vue';
+import PublishMenu from './PublishMenu.vue';
 import ScreenshotField from './ScreenshotField.vue';
 import StyleDetailsFields from './StyleDetailsFields.vue';
 import SubviewHeader from '../SubviewHeader.vue';
@@ -144,8 +146,8 @@ export default Vue.extend({
     GalleryIntro,
     GallerySignIn,
     PublishedStyle,
-    PublishedStyleMenu,
     PublishFooter,
+    PublishMenu,
     ScreenshotField,
     StyleDetailsFields,
   },
@@ -270,6 +272,11 @@ export default Vue.extend({
         getMyGalleryStyles({ site: url, url, profileId: activeProfile }),
         getPublishedGalleryStyle(url, activeProfile),
       ]);
+
+      // Signed out meanwhile.
+      if (!this.editing) {
+        return;
+      }
 
       if (!response.ok) {
         this.showError(response);
@@ -434,6 +441,35 @@ export default Vue.extend({
       } finally {
         this.publishing = false;
       }
+    },
+
+    /**
+     * Back to the locked form, keeping the draft unless it was the published
+     * style's, which belongs to the account signed out of.
+     */
+    async signOut(): Promise<void> {
+      this.error = '';
+
+      const response = await signOutOfGallery();
+
+      if (!response.ok) {
+        this.showError(response);
+        return;
+      }
+
+      if (this.target) {
+        this.name = this.$store.getters.activeProfileName;
+        this.description = '';
+        this.screenshot = '';
+        this.tookScreenshot = false;
+        this.publishedCssHash = '';
+        this.target = null;
+      }
+
+      this.account = null;
+      this.username = '';
+      this.usernameUnavailable = false;
+      this.step = 'signed-out';
     },
 
     async unpublish(): Promise<void> {

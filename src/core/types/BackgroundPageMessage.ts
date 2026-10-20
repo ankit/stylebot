@@ -261,6 +261,10 @@ export type SignInToGallery = {
   name: 'SignInToGallery';
 };
 
+export type SignOutOfGallery = {
+  name: 'SignOutOfGallery';
+};
+
 export type GetMyGalleryStyles = {
   name: 'GetMyGalleryStyles';
   site: string;
@@ -418,6 +422,7 @@ type BackgroundPageMessage =
   | RestoreTab
   | GetGalleryAccount
   | SignInToGallery
+  | SignOutOfGallery
   | GetMyGalleryStyles
   | CaptureGalleryScreenshot
   | CompressGalleryScreenshot
