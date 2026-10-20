@@ -1,6 +1,6 @@
 <template>
   <div class="publish-view">
-    <subview-header :title="title" @back="back">
+    <subview-header :title="title" closable @back="back">
       <publish-menu
         v-if="editing"
         :style-data="target"
@@ -53,16 +53,6 @@
       @publish="publish"
     />
 
-    <div v-else-if="publishedResult" class="view-footer">
-      <s-button
-        variant="primary"
-        size="large"
-        @click="viewInGallery(publishedResult)"
-      >
-        {{ t('view_in_gallery') }} ↗
-      </s-button>
-    </div>
-
     <s-confirm-dialog
       v-if="confirmingUnpublish && target"
       contained
@@ -79,8 +69,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SButton, SCallout, SConfirmDialog } from '@stylebot/components';
-import { getGalleryStyleUrl, getGalleryUrl, hashCss } from '@stylebot/gallery';
+import { SCallout, SConfirmDialog } from '@stylebot/components';
+import { getGalleryUrl, hashCss } from '@stylebot/gallery';
 import { getPageBridge } from '@stylebot/page-bridge';
 import type {
   GalleryAccount,
@@ -141,7 +131,6 @@ export default Vue.extend({
   name: 'ThePublishView',
 
   components: {
-    SButton,
     SCallout,
     SConfirmDialog,
     SubviewHeader,
@@ -318,10 +307,6 @@ export default Vue.extend({
       }
 
       return response.screenshot;
-    },
-
-    viewInGallery(style: GalleryStyle): void {
-      window.open(getGalleryStyleUrl(style), '_blank', 'noopener');
     },
 
     async capture(): Promise<void> {
@@ -572,16 +557,5 @@ export default Vue.extend({
   &.locked {
     opacity: 0.45;
   }
-}
-
-.view-footer {
-  flex: none;
-  display: flex;
-  padding: 14px;
-  border-top: 1px solid var(--panel-border);
-}
-
-.view-footer .button {
-  flex: 1;
 }
 </style>
