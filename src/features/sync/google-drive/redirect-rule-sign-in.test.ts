@@ -1,6 +1,6 @@
 import fetchMock from 'jest-fetch-mock';
 
-import getAccessToken from './get-access-token';
+import getAccessToken, { getIdentityAccessToken } from './get-access-token';
 import { DESKTOP_CLIENT_ID, REFRESH_TOKEN_KEY } from './desktop-client';
 import {
   CLOSE_GRACE_MS,
@@ -38,8 +38,9 @@ const mockChrome = () => {
         return { id: tabId };
       }),
       create: jest.fn(async () => {
-        openTabs.add(7);
-        return { id: 7 };
+        const id = 7 + jest.mocked(chrome.tabs.create).mock.calls.length - 1;
+        openTabs.add(id);
+        return { id };
       }),
       remove: jest.fn(async (tabId: number) => {
         openTabs.delete(tabId);
@@ -245,6 +246,41 @@ describe('getAccessToken without an identity API', () => {
 
     expect(chrome.tabs.create).toHaveBeenCalledTimes(1);
     expect(chrome.tabs.update).toBeCalledWith(7, { active: true });
+  });
+
+  it('keeps a Drive sign-in and a gallery sign-in apart', async () => {
+    tokenResponses = [
+      { access_token: 'a', refresh_token: 'identity-refresh' },
+      { access_token: 'identity', expires_in: 3600 },
+    ];
+
+    getAccessToken({ interactive: true }).catch(() => undefined);
+    await signInTabOpened();
+    const identity = getIdentityAccessToken();
+    for (let i = 0; i < 10; i++) {
+      await settle();
+    }
+
+    expect(chrome.tabs.create).toHaveBeenCalledTimes(2);
+    const auth = new URL(
+      jest.mocked(chrome.tabs.create).mock.calls[1][0].url as string
+    );
+    expect(auth.searchParams.get('scope')).toBe(
+      'openid https://www.googleapis.com/auth/userinfo.profile'
+    );
+
+    await expect(
+      handleSignInRedirect(redirectFor(auth.searchParams.get('state')))
+    ).resolves.toBe(true);
+    await expect(identity).resolves.toBe('identity');
+
+    expect(store['google-identity-refresh-token']).toBe('identity-refresh');
+    expect(store[REFRESH_TOKEN_KEY]).toBeUndefined();
+    expect(chrome.tabs.remove).toBeCalledWith(8);
+    expect(chrome.tabs.remove).not.toBeCalledWith(7);
+    expect(chrome.declarativeNetRequest.updateDynamicRules).not.toBeCalledWith({
+      removeRuleIds: [1],
+    });
   });
 
   it('ignores a redirect whose state does not match the sign-in it started', async () => {

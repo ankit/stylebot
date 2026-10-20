@@ -3,6 +3,7 @@ import { syncError } from '../errors';
 import { isUnavailable } from './http';
 import {
   DESKTOP_CLIENT_ID,
+  REFRESH_TOKEN_KEY,
   refreshAccessToken,
   type IssuedToken,
 } from './desktop-client';
@@ -18,15 +19,26 @@ const CACHE_KEY = 'google-drive-access-token';
 
 const SCOPES = ['https://www.googleapis.com/auth/drive.file'];
 
+// The gallery's sign-in only needs to know who the user is, not their Drive;
+// the profile scope lets a new account's username come from their name.
+const IDENTITY_SCOPES = [
+  'openid',
+  'https://www.googleapis.com/auth/userinfo.profile',
+];
+const IDENTITY_CACHE_KEY = 'google-identity-access-token';
+const IDENTITY_REFRESH_TOKEN_KEY = 'google-identity-refresh-token';
+
 // Retire the token a minute early so a sync started just under the wire does
 // not fail halfway through with a 401.
 const EXPIRY_SKEW_MS = 60 * 1000;
 
 type CachedToken = { token: AccessToken; expiresAt: number };
 
-const getCachedToken = async (): Promise<AccessToken | null> => {
-  const items = await chrome.storage.local.get(CACHE_KEY);
-  const cached: CachedToken | undefined = items[CACHE_KEY];
+const getCachedToken = async (
+  cacheKey = CACHE_KEY
+): Promise<AccessToken | null> => {
+  const items = await chrome.storage.local.get(cacheKey);
+  const cached: CachedToken | undefined = items[cacheKey];
 
   if (!cached || cached.expiresAt <= Date.now()) {
     return null;
@@ -37,14 +49,18 @@ const getCachedToken = async (): Promise<AccessToken | null> => {
 
 const setCachedToken = (
   token: AccessToken,
-  expiresIn: number
+  expiresIn: number,
+  cacheKey = CACHE_KEY
 ): Promise<void> => {
   const expiresAt = Date.now() + expiresIn * 1000 - EXPIRY_SKEW_MS;
-  return chrome.storage.local.set({ [CACHE_KEY]: { token, expiresAt } });
+  return chrome.storage.local.set({ [cacheKey]: { token, expiresAt } });
 };
 
 export const clearCachedToken = (): Promise<void> =>
   chrome.storage.local.remove(CACHE_KEY);
+
+export const clearCachedIdentityToken = (): Promise<void> =>
+  chrome.storage.local.remove(IDENTITY_CACHE_KEY);
 
 const extractTokenParams = (redirectUri: string) => {
   const m = redirectUri.match(/[#?](.*)/);
@@ -160,10 +176,17 @@ const renewWebClientToken = async (): Promise<AccessToken> => {
   return params.token;
 };
 
-const signIn = (): Promise<IssuedToken> =>
+/**
+ * Signs in with the browser's auth window where it can finish one, else in a
+ * tab, keeping the refresh token under `refreshTokenKey`.
+ */
+const signIn = (
+  scopes = SCOPES,
+  refreshTokenKey = REFRESH_TOKEN_KEY
+): Promise<IssuedToken> =>
   usesIdentitySignIn()
-    ? signInWithIdentityAPI(SCOPES)
-    : signInWithRedirectRule(SCOPES);
+    ? signInWithIdentityAPI(scopes, refreshTokenKey)
+    : signInWithRedirectRule(scopes, refreshTokenKey);
 
 /**
  * Resolves a usable token: the cached one, else one from the stored refresh
@@ -196,4 +219,26 @@ export default async (
   await setCachedToken(token.token, token.expiresIn);
 
   return token.token;
+};
+
+/**
+ * Resolves a token that only identifies the user, for the gallery: the
+ * cached one, else one from its own refresh token, else a sign-in. It's kept
+ * apart from Drive's, so neither sign-in nor sign-out touches the other.
+ */
+export const getIdentityAccessToken = async (): Promise<AccessToken> => {
+  const cached = await getCachedToken(IDENTITY_CACHE_KEY);
+
+  if (cached) {
+    return cached;
+  }
+
+  const refreshed = await refreshAccessToken(IDENTITY_REFRESH_TOKEN_KEY);
+  const issued =
+    refreshed ?? (await signIn(IDENTITY_SCOPES, IDENTITY_REFRESH_TOKEN_KEY));
+
+  await validate(issued.token, DESKTOP_CLIENT_ID);
+  await setCachedToken(issued.token, issued.expiresIn, IDENTITY_CACHE_KEY);
+
+  return issued.token;
 };

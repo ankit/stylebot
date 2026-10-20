@@ -71,6 +71,15 @@ export default Vue.extend({
   &:focus {
     @include field-active-border;
   }
+
+  &::-webkit-search-cancel-button,
+  &::-webkit-search-decoration {
+    appearance: none;
+  }
+}
+
+.text-input[type='search'] {
+  appearance: none;
 }
 
 .multiline {

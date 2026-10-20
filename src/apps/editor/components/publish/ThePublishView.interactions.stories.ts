@@ -28,7 +28,7 @@ const meta: Meta = {
 
 export default meta;
 
-const account = { id: 'me', name: 'maya' };
+const account = { id: 'me', username: 'maya', usernameConfirmed: true };
 
 const tokyoNight: GalleryStyle = {
   id: 'Xk3p9QaL2m',
@@ -37,7 +37,7 @@ const tokyoNight: GalleryStyle = {
   slug: 'tokyo-night',
   name: 'Tokyo Night',
   description: 'The Tokyo Night palette',
-  author: account,
+  author: { id: account.id, username: account.username },
   version: 2,
   installs: 120,
   createdAt: 0,
@@ -345,6 +345,60 @@ export const CancelDiscardsTheCapture: StoryObj = {
       canvas.getByRole('button', { name: 'Take screenshot' })
     ).toBeVisible();
     await expect(canvas.queryByRole('img', { name: 'Screenshot' })).toBeNull();
+  },
+};
+
+export const ChecksTheUsername: StoryObj = {
+  ...publishView({
+    account,
+    usernames: {
+      taken: { available: false, reason: 'taken', suggestion: 'taken-2' },
+      stylebot: { available: false, reason: 'reserved' },
+    },
+  }),
+  name: 'The username is checked as it is typed, and only an unavailable one holds back publishing',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const field = (): HTMLInputElement => canvas.getByLabelText(/^Username/);
+    const retype = async (username: string) => {
+      await user.clear(field());
+      await user.type(field(), username);
+    };
+
+    await takeScreenshot(canvas);
+    await user.type(canvas.getByLabelText('Name'), 'Night reading');
+    await expect(field()).toHaveValue('maya');
+
+    await step('a taken one offers the suggestion', async () => {
+      await retype('Taken');
+
+      await expect(field()).toHaveValue('taken');
+      await canvas.findByText('That username is taken.');
+      await expect(publishButton(canvas)).toBeDisabled();
+
+      await user.click(canvas.getByRole('button', { name: 'Use taken-2' }));
+      await expect(field()).toHaveValue('taken-2');
+      await canvas.findByText('Available');
+      await expect(publishButton(canvas)).toBeEnabled();
+    });
+
+    await step('a reserved or malformed one says why', async () => {
+      await retype('stylebot');
+      await canvas.findByText('That username is reserved.');
+      await expect(publishButton(canvas)).toBeDisabled();
+
+      await retype('no--way');
+      await canvas.findByText(
+        'Use 3 to 30 lowercase letters and numbers, with single hyphens between them.'
+      );
+      await expect(publishButton(canvas)).toBeDisabled();
+    });
+
+    await step('the account’s own one needs no check', async () => {
+      await retype('maya');
+      await expect(canvas.queryByRole('status')).toBeNull();
+      await expect(publishButton(canvas)).toBeEnabled();
+    });
   },
 };
 

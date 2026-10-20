@@ -25,9 +25,10 @@
             :name.sync="name"
             :description.sync="description"
             :notes.sync="notes"
-            :display-name.sync="displayName"
+            :username.sync="username"
+            :current-username="account ? account.username : ''"
+            :username-unavailable.sync="usernameUnavailable"
             :update="Boolean(target)"
-            @author-change="saveDisplayName"
           />
         </div>
 
@@ -81,7 +82,7 @@ import { SButton, SCallout, SConfirmDialog } from '@stylebot/components';
 import { getGalleryStyleUrl, hashCss } from '@stylebot/gallery';
 import { getPageBridge } from '@stylebot/page-bridge';
 import type {
-  GalleryAuthor,
+  GalleryAccount,
   GalleryFailure,
   GalleryPublishedStyle,
   GalleryStyle,
@@ -94,7 +95,7 @@ import {
   getMyGalleryStyles,
   getPublishedGalleryStyle,
   publishToGallery,
-  setGalleryDisplayName,
+  setGalleryUsername,
   unpublishFromGallery,
 } from '../../utils/gallery';
 
@@ -112,7 +113,7 @@ type Step = 'loading' | 'signed-out' | 'form' | 'published';
 
 type Data = {
   step: Step;
-  account: GalleryAuthor | null;
+  account: GalleryAccount | null;
   target: GalleryStyle | null;
   // The CSS hash of the version in the gallery, to tell if there's news.
   publishedCssHash: string;
@@ -120,7 +121,8 @@ type Data = {
   name: string;
   description: string;
   notes: string;
-  displayName: string;
+  username: string;
+  usernameUnavailable: boolean;
   screenshot: string;
   capturing: boolean;
   // Shrinking a capture to fit the gallery's limit, after showing it as taken.
@@ -158,7 +160,8 @@ export default Vue.extend({
       name: '',
       description: '',
       notes: '',
-      displayName: '',
+      username: '',
+      usernameUnavailable: false,
       screenshot: '',
       capturing: false,
       compressing: false,
@@ -219,6 +222,7 @@ export default Vue.extend({
         !this.publishing &&
         !this.capturing &&
         !this.compressing &&
+        !this.usernameUnavailable &&
         Boolean(this.screenshot) &&
         Boolean(this.name.trim()) &&
         Boolean(this.$store.state.css.trim())
@@ -248,9 +252,9 @@ export default Vue.extend({
       this.error = galleryErrorText(failure);
     },
 
-    showForm(account: GalleryAuthor): void {
+    showForm(account: GalleryAccount): void {
       this.account = account;
-      this.displayName = account.name ?? '';
+      this.username = account.username;
       this.step = 'form';
 
       this.loadTarget();
@@ -383,22 +387,6 @@ export default Vue.extend({
       }
     },
 
-    async saveDisplayName(): Promise<void> {
-      const displayName = this.displayName.trim();
-
-      if (!this.account || displayName === (this.account.name ?? '')) {
-        return;
-      }
-
-      const response = await setGalleryDisplayName(displayName);
-
-      if (response.ok) {
-        this.account = response.account;
-      } else {
-        this.showError(response);
-      }
-    },
-
     async publish(): Promise<void> {
       if (!this.canPublish || !this.account) {
         return;
@@ -408,10 +396,12 @@ export default Vue.extend({
       this.publishing = true;
 
       try {
-        const displayName = this.displayName.trim();
-
-        if (displayName !== (this.account.name ?? '')) {
-          const named = await setGalleryDisplayName(displayName);
+        // Publishing with the username the gallery made up confirms it.
+        if (
+          this.username !== this.account.username ||
+          !this.account.usernameConfirmed
+        ) {
+          const named = await setGalleryUsername(this.username);
 
           if (!named.ok) {
             this.showError(named);

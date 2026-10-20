@@ -18,7 +18,13 @@ export const SignedOut = {
 
 export const SignedIn = {
   ...editor({ ...WITH_RULE, publishing: true }),
-  parameters: { chrome: { gallery: { account: { id: 'me', name: 'maya' } } } },
+  parameters: {
+    chrome: {
+      gallery: {
+        account: { id: 'me', username: 'maya', usernameConfirmed: true },
+      },
+    },
+  },
 };
 
 const tokyoNight = {
@@ -28,7 +34,7 @@ const tokyoNight = {
   slug: 'tokyo-night',
   name: 'Tokyo Night',
   description: 'The Tokyo Night palette',
-  author: { id: 'me', name: 'maya' },
+  author: { id: 'me', username: 'maya' },
   version: 1,
   installs: 120,
   createdAt: 0,
@@ -42,7 +48,7 @@ export const Update = {
   parameters: {
     chrome: {
       gallery: {
-        account: tokyoNight.author,
+        account: { ...tokyoNight.author, usernameConfirmed: true },
         styles: [tokyoNight],
         published: {
           styleId: tokyoNight.id,

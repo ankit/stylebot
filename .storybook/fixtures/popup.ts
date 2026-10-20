@@ -56,7 +56,7 @@ const galleryStyle = (
   id: string,
   name: string,
   installs: number,
-  author: string | null
+  author: string
 ): GalleryStyle => ({
   id,
   site: 'example.com',
@@ -64,7 +64,7 @@ const galleryStyle = (
   slug: id,
   name,
   description: null,
-  author: { id: `author-${id}`, name: author },
+  author: { id: `author-${id}`, username: author },
   version: 1,
   installs,
   createdAt: 0,
@@ -76,5 +76,5 @@ const galleryStyle = (
 // The site's most installed gallery styles, as the popup suggests them.
 export const gallerySuggestions: Array<GalleryStyle> = [
   galleryStyle('tokyo-night', 'Tokyo Night', 1240, 'maya'),
-  galleryStyle('paper', 'Paper', 1, null),
+  galleryStyle('paper', 'Paper', 1, 'author-482913'),
 ];

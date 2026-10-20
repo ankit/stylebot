@@ -31,19 +31,13 @@
         />
       </gallery-field>
 
-      <gallery-field
-        :label="t('author')"
-        :hint="update ? '' : authorHint"
-        :tooltip="update ? authorHint : ''"
-      >
-        <s-text-input
-          :value="displayName"
-          :placeholder="t('anonymous')"
-          :maxlength="displayNameMaxLength"
-          @input="$emit('update:displayName', $event)"
-          @change="$emit('author-change')"
-        />
-      </gallery-field>
+      <username-field
+        :username="username"
+        :current="currentUsername"
+        :tooltip="update"
+        @update:username="$emit('update:username', $event)"
+        @update:unavailable="$emit('update:usernameUnavailable', $event)"
+      />
     </section>
   </div>
 </template>
@@ -53,18 +47,18 @@ import Vue from 'vue';
 import { SHeading, STextInput } from '@stylebot/components';
 import {
   DESCRIPTION_MAX_LENGTH,
-  DISPLAY_NAME_MAX_LENGTH,
   NAME_MAX_LENGTH,
   NOTES_MAX_LENGTH,
 } from '@stylebot/gallery';
 
 import GalleryField from './GalleryField.vue';
+import UsernameField from './UsernameField.vue';
 
 /**
  * The style's details for the Gallery, each bound with `.sync`: its name,
- * description and the author's alias, which emits `author-change` once
- * edited. An update asks what changed first, above the details it set last
- * time.
+ * description and the author's username, with `usernameUnavailable` while
+ * the typed one can't be taken. An update asks what changed first, above the
+ * details it set last time.
  */
 export default Vue.extend({
   name: 'StyleDetailsFields',
@@ -73,6 +67,7 @@ export default Vue.extend({
     SHeading,
     STextInput,
     GalleryField,
+    UsernameField,
   },
 
   props: {
@@ -91,7 +86,12 @@ export default Vue.extend({
       required: true,
     },
 
-    displayName: {
+    username: {
+      type: String,
+      required: true,
+    },
+
+    currentUsername: {
       type: String,
       required: true,
     },
@@ -104,10 +104,6 @@ export default Vue.extend({
   },
 
   computed: {
-    authorHint(): string {
-      return this.t('changes_the_name_on_all_your_published_styles');
-    },
-
     nameMaxLength(): number {
       return NAME_MAX_LENGTH;
     },
@@ -118,10 +114,6 @@ export default Vue.extend({
 
     notesMaxLength(): number {
       return NOTES_MAX_LENGTH;
-    },
-
-    displayNameMaxLength(): number {
-      return DISPLAY_NAME_MAX_LENGTH;
     },
   },
 });

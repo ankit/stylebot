@@ -1,7 +1,8 @@
 import type {
-  GalleryAuthor,
+  GalleryAccount,
   GalleryPublishedStyle,
   GalleryStyle,
+  GalleryUsernameCheck,
 } from '@stylebot/types';
 
 import { request } from './request';
@@ -14,24 +15,35 @@ import { toFormData, type StyleForm } from './to-form-data';
 export type GallerySession = {
   session: string;
   expiresAt: number;
-  account: GalleryAuthor;
+  account: GalleryAccount;
 };
 
 /**
- * Trades a Google access token from Drive sign-in for a gallery session.
+ * Trades a Google access token that identifies the user for a gallery
+ * session.
  */
 export const createSession = (googleToken: string): Promise<GallerySession> =>
   request('/session', { method: 'POST', json: { googleToken } });
 
 /**
- * Sets the alias shown as the author of the account's styles; an empty one
- * clears it, leaving them anonymous.
+ * Sets the username shown as the author of the account's styles, or
+ * confirms the one the gallery made up when it's sent unchanged.
  */
-export const setDisplayName = (
+export const setUsername = (
   session: string,
-  name: string
-): Promise<GalleryAuthor> =>
-  request('/me', { method: 'PATCH', session, json: { name: name || null } });
+  username: string
+): Promise<GalleryAccount> =>
+  request('/me', { method: 'PATCH', session, json: { username } });
+
+/**
+ * Whether the account can take a username; its own current and old ones
+ * are available.
+ */
+export const checkUsername = (
+  session: string,
+  username: string
+): Promise<GalleryUsernameCheck> =>
+  request(`/usernames/${encodeURIComponent(username)}`, { session });
 
 /**
  * The account's live and hidden styles, most recently updated first.

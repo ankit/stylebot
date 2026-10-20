@@ -1,4 +1,4 @@
-import type { GalleryAuthor } from '@stylebot/types';
+import type { GalleryAccount } from '@stylebot/types';
 
 import { createSession, type GallerySession } from './api';
 import { isGalleryApiError } from './request';
@@ -9,8 +9,9 @@ const SESSION_KEY = 'gallery-session';
 const EXPIRY_SKEW_MS = 24 * 60 * 60 * 1000;
 
 /**
- * Where gallery sign-in gets a Google access token: Drive sync's sign-in,
- * passed in since features don't import each other.
+ * Where gallery sign-in gets a Google access token that only identifies the
+ * user: sync's Google sign-in, passed in since features don't import each
+ * other.
  */
 export type GoogleTokenSource = {
   getToken(): Promise<string>;
@@ -22,14 +23,18 @@ export const getStoredSession = async (): Promise<GallerySession | null> => {
     await chrome.storage.local.get(SESSION_KEY)
   )[SESSION_KEY];
 
-  if (!stored || stored.expiresAt - EXPIRY_SKEW_MS <= Date.now()) {
+  // Sessions from before usernames have none, and need a new sign-in.
+  if (
+    !stored?.account?.username ||
+    stored.expiresAt - EXPIRY_SKEW_MS <= Date.now()
+  ) {
     return null;
   }
 
   return stored;
 };
 
-export const getSignedInAccount = async (): Promise<GalleryAuthor | null> =>
+export const getSignedInAccount = async (): Promise<GalleryAccount | null> =>
   (await getStoredSession())?.account ?? null;
 
 const storeSession = (session: GallerySession): Promise<void> =>
@@ -40,9 +45,9 @@ export const clearSession = (): Promise<void> =>
 
 /**
  * Keeps the stored session's account in step after it changes, such as a new
- * alias.
+ * username.
  */
-export const storeAccount = async (account: GalleryAuthor): Promise<void> => {
+export const storeAccount = async (account: GalleryAccount): Promise<void> => {
   const stored = await getStoredSession();
 
   if (stored) {

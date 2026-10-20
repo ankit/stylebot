@@ -18,8 +18,9 @@ import type {
   ReadabilitySettings,
   RunGoogleDriveSyncResponse,
   VersionHistory,
-  GalleryAuthor,
+  GalleryAccount,
   GalleryAccountResponse,
+  GalleryUsernameCheck,
   GalleryPublished,
   GalleryScreenshotResponse,
   GalleryStyle,
@@ -56,8 +57,12 @@ export type ChromeShimOptions = {
 
 export type GalleryShimOptions = {
   // Signed in already; left out, the editor starts signed out.
-  account?: GalleryAuthor;
+  account?: GalleryAccount;
   signIn?: GalleryAccountResponse;
+  // What checking a username answers, by username; others are available.
+  usernames?: Record<string, GalleryUsernameCheck>;
+  // What setting a username answers; left out, it's taken as asked.
+  setUsername?: GalleryAccountResponse;
   styles?: Array<GalleryStyle>;
   // What the profile published, and which of the account's styles that is.
   published?: GalleryPublished;
@@ -227,7 +232,7 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     SignInToGallery: () => {
       const response = gallery.signIn ?? {
         ok: true,
-        account: { id: 'me', name: null },
+        account: { id: 'me', username: 'maya', usernameConfirmed: false },
       };
 
       if (response.ok) {
@@ -236,12 +241,20 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
 
       return response;
     },
-    SetGalleryDisplayName: message => ({
-      ok: true,
-      account: {
-        id: gallery.account?.id ?? 'me',
-        name: (message as unknown as { displayName: string }).displayName,
+    SetGalleryUsername: message =>
+      gallery.setUsername ?? {
+        ok: true,
+        account: {
+          id: gallery.account?.id ?? 'me',
+          username: (message as unknown as { username: string }).username,
+          usernameConfirmed: true,
+        },
       },
+    CheckGalleryUsername: message => ({
+      ok: true,
+      ...(gallery.usernames?.[
+        (message as unknown as { username: string }).username
+      ] ?? { available: true }),
     }),
     GetMyGalleryStyles: () => ({
       ok: true,

@@ -1,5 +1,7 @@
 import type {
   CaptureGalleryScreenshot,
+  CheckGalleryUsername,
+  CheckGalleryUsernameResponse,
   CompressGalleryScreenshot,
   GalleryAccountResponse,
   GalleryScreenshotResponse,
@@ -11,7 +13,7 @@ import type {
   GetPublishedGalleryStyleResponse,
   PublishToGallery,
   PublishToGalleryResponse,
-  SetGalleryDisplayName,
+  SetGalleryUsername,
   SignInToGallery,
   UnpublishFromGallery,
   UnpublishFromGalleryResponse,
@@ -29,12 +31,23 @@ export const signInToGallery = (): Promise<GalleryAccountResponse> =>
     name: 'SignInToGallery',
   });
 
-export const setGalleryDisplayName = (
-  displayName: string
+export const setGalleryUsername = (
+  username: string
 ): Promise<GalleryAccountResponse> =>
-  chrome.runtime.sendMessage<SetGalleryDisplayName, GalleryAccountResponse>({
-    name: 'SetGalleryDisplayName',
-    displayName,
+  chrome.runtime.sendMessage<SetGalleryUsername, GalleryAccountResponse>({
+    name: 'SetGalleryUsername',
+    username,
+  });
+
+export const checkGalleryUsername = (
+  username: string
+): Promise<CheckGalleryUsernameResponse> =>
+  chrome.runtime.sendMessage<
+    CheckGalleryUsername,
+    CheckGalleryUsernameResponse
+  >({
+    name: 'CheckGalleryUsername',
+    username,
   });
 
 export const getMyGalleryStyles = (

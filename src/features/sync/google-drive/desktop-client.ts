@@ -70,12 +70,15 @@ export const getIssuedToken = (json: TokenResponse): IssuedToken | null =>
     : null;
 
 /**
- * Trades the stored refresh token for a new access token, without the user.
- * Resolves null when there's none, or Google no longer honours it.
+ * Trades the refresh token stored under `refreshTokenKey` for a new access
+ * token, without the user. Resolves null when there's none, or Google no
+ * longer honours it.
  */
-export const refreshAccessToken = async (): Promise<IssuedToken | null> => {
-  const items = await chrome.storage.local.get(REFRESH_TOKEN_KEY);
-  const refreshToken: string | undefined = items[REFRESH_TOKEN_KEY];
+export const refreshAccessToken = async (
+  refreshTokenKey = REFRESH_TOKEN_KEY
+): Promise<IssuedToken | null> => {
+  const items = await chrome.storage.local.get(refreshTokenKey);
+  const refreshToken: string | undefined = items[refreshTokenKey];
 
   if (!refreshToken) {
     return null;
@@ -88,14 +91,14 @@ export const refreshAccessToken = async (): Promise<IssuedToken | null> => {
 
   if (json.error) {
     console.error(
-      'Google Drive token refresh failed:',
+      'Google token refresh failed:',
       json.error,
       json.error_description
     );
   }
 
   if (json.error === 'invalid_grant') {
-    await chrome.storage.local.remove(REFRESH_TOKEN_KEY);
+    await chrome.storage.local.remove(refreshTokenKey);
   }
 
   return getIssuedToken(json);
