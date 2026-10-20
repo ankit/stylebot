@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, waitFor, within } from '@storybook/test';
-import { hashCss } from '@stylebot/gallery';
+import { getGalleryUrl, hashCss } from '@stylebot/gallery';
 import type { GalleryStyle } from '@stylebot/types';
 
 import ThePublishView from './ThePublishView.vue';
@@ -219,12 +219,9 @@ export const UpdatesWhatWasPublished: StoryObj = {
       await expect(publishButton(canvas, 'Publish version 3')).toBeDisabled();
     });
 
-    await step("the Gallery's screenshot is kept", async () => {
+    await step("the Gallery's screenshot shows from the Gallery", async () => {
       await waitFor(() =>
-        expect(canvas.getByRole('img', { name: 'Screenshot' })).toHaveAttribute(
-          'src',
-          GALLERY_PUBLISHED_SCREENSHOT
-        )
+        expect(screenshotSrc(canvas)).toBe(getGalleryUrl(tokyoNight.screenshot))
       );
     });
 
@@ -236,9 +233,9 @@ export const UpdatesWhatWasPublished: StoryObj = {
       );
       await closeReview(canvas, 'Done');
       await waitFor(() =>
-        expect(
-          canvas.getByRole('img', { name: 'Screenshot' })
-        ).not.toHaveAttribute('src', GALLERY_PUBLISHED_SCREENSHOT)
+        expect(screenshotSrc(canvas)).not.toBe(
+          getGalleryUrl(tokyoNight.screenshot)
+        )
       );
       await waitFor(() =>
         expect(publishButton(canvas, 'Publish version 3')).toBeEnabled()
@@ -246,6 +243,63 @@ export const UpdatesWhatWasPublished: StoryObj = {
       await user.click(publishButton(canvas, 'Publish version 3'));
 
       await canvas.findByText('Version 2 is live in the Gallery');
+    });
+  },
+};
+
+export const BlursThePublishedScreenshot: StoryObj = {
+  ...publishView(publishedTokyoNight),
+  name: "The Gallery's screenshot can be blurred, which is enough to publish",
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const shown = getGalleryUrl(tokyoNight.screenshot);
+
+    await step('reviewing it unchanged keeps it', async () => {
+      await canvas.findByRole('heading', { name: 'Update Tokyo Night' });
+      await waitFor(() => expect(screenshotSrc(canvas)).toBe(shown));
+      await user.click(
+        canvas.getByRole('button', { name: 'Review screenshot' })
+      );
+      await closeReview(canvas, 'Done');
+
+      await expect(screenshotSrc(canvas)).toBe(shown);
+      await expect(publishButton(canvas, 'Publish version 3')).toBeDisabled();
+    });
+
+    await step('blurring it makes it new', async () => {
+      await user.click(
+        canvas.getByRole('button', { name: 'Review screenshot' })
+      );
+      const review = within(
+        await canvas.findByRole('dialog', { name: 'Review screenshot' })
+      );
+      const image = review.getByRole('img', {
+        name: 'Screenshot',
+      }) as HTMLImageElement;
+
+      await expect(image).toHaveAttribute('src', GALLERY_PUBLISHED_SCREENSHOT);
+      await image.decode();
+      const { left, top, width, height } = image.getBoundingClientRect();
+
+      await user.pointer([
+        {
+          keys: '[MouseLeft>]',
+          target: image,
+          coords: { clientX: left + width * 0.1, clientY: top + height * 0.1 },
+        },
+        {
+          target: image,
+          coords: { clientX: left + width * 0.6, clientY: top + height * 0.4 },
+        },
+        { keys: '[/MouseLeft]', target: image },
+      ]);
+      await review.findByRole('button', { name: 'Remove blur' });
+      await user.click(review.getByRole('button', { name: 'Done' }));
+
+      await waitFor(() => expect(screenshotSrc(canvas)).not.toBe(shown));
+      await waitFor(() =>
+        expect(publishButton(canvas, 'Publish version 3')).toBeEnabled()
+      );
     });
   },
 };

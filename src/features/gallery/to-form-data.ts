@@ -5,7 +5,8 @@ export type StyleForm = {
   name: string;
   description: string;
   css: string;
-  screenshot: Blob;
+  // Required for a new style; a new version without one keeps the style's.
+  screenshot?: Blob;
   // What changed, for a new version; the gallery shows it in the history.
   notes?: string;
 };
@@ -32,8 +33,11 @@ export const toFormData = (form: StyleForm, site?: string): FormData => {
   }
 
   data.append('css', form.css);
+
   // The server reads the type from the file itself, so the name is only a label.
-  data.append('screenshot', form.screenshot, 'screenshot');
+  if (form.screenshot) {
+    data.append('screenshot', form.screenshot, 'screenshot');
+  }
 
   return data;
 };
