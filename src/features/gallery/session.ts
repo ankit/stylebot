@@ -1,3 +1,8 @@
+import {
+  clearGoogleToken,
+  getGoogleToken,
+  type GoogleAccess,
+} from '@stylebot/google-auth';
 import type { GalleryAccount } from '@stylebot/types';
 
 import { createSession, type GallerySession } from './api';
@@ -8,14 +13,11 @@ const SESSION_KEY = 'gallery-session';
 // Retire the session a day early rather than have a publish turned down.
 const EXPIRY_SKEW_MS = 24 * 60 * 60 * 1000;
 
-/**
- * Where gallery sign-in gets a Google access token that only identifies the
- * user: sync's Google sign-in, passed in since features don't import each
- * other.
- */
-export type GoogleTokenSource = {
-  getToken(): Promise<string>;
-  clearToken(): Promise<void>;
+// The profile scope lets a new account's username come from their name.
+const GOOGLE_ACCESS: GoogleAccess = {
+  scopes: ['openid', 'https://www.googleapis.com/auth/userinfo.profile'],
+  cacheKey: 'google-identity-access-token',
+  refreshTokenKey: 'google-identity-refresh-token',
 };
 
 export const getStoredSession = async (): Promise<GallerySession | null> => {
@@ -59,20 +61,18 @@ export const storeAccount = async (account: GalleryAccount): Promise<void> => {
  * Signs in to the gallery with a Google token, trying a fresh one once when
  * the gallery turns it down, since Google can revoke a cached token early.
  */
-export const signIn = async (
-  google: GoogleTokenSource
-): Promise<GallerySession> => {
+export const signIn = async (): Promise<GallerySession> => {
   let session: GallerySession;
 
   try {
-    session = await createSession(await google.getToken());
+    session = await createSession(await getGoogleToken(GOOGLE_ACCESS));
   } catch (e) {
     if (!isGalleryApiError(e) || e.status !== 401) {
       throw e;
     }
 
-    await google.clearToken();
-    session = await createSession(await google.getToken());
+    await clearGoogleToken(GOOGLE_ACCESS);
+    session = await createSession(await getGoogleToken(GOOGLE_ACCESS));
   }
 
   await storeSession(session);
@@ -84,10 +84,9 @@ export const signIn = async (
  * and again when the gallery reports the session expired.
  */
 export const withSession = async <T>(
-  google: GoogleTokenSource,
   run: (session: string) => Promise<T>
 ): Promise<T> => {
-  const stored = (await getStoredSession()) ?? (await signIn(google));
+  const stored = (await getStoredSession()) ?? (await signIn());
 
   try {
     return await run(stored.session);
@@ -97,6 +96,6 @@ export const withSession = async <T>(
     }
 
     await clearSession();
-    return run((await signIn(google)).session);
+    return run((await signIn()).session);
   }
 };

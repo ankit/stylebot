@@ -1,5 +1,4 @@
-import { syncError } from '../errors';
-import { isUnavailable } from './http';
+import { googleAuthError, isUnavailable } from './errors';
 
 export const DESKTOP_CLIENT_ID =
   '662998053209-uqalajpc4ei0nvdk164lmul35nbeocas.apps.googleusercontent.com';
@@ -9,7 +8,6 @@ export const DESKTOP_CLIENT_ID =
 const DESKTOP_CLIENT_SECRET = process.env.STYLEBOT_GOOGLE_CLIENT_SECRET ?? '';
 
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
-export const REFRESH_TOKEN_KEY = 'google-drive-refresh-token';
 
 export type IssuedToken = { token: string; expiresIn: number };
 
@@ -51,7 +49,7 @@ export const requestToken = async (
   });
 
   if (isUnavailable(response.status)) {
-    throw syncError(
+    throw googleAuthError(
       `Google sign-in unavailable (${response.status})`,
       'network'
     );
@@ -75,7 +73,7 @@ export const getIssuedToken = (json: TokenResponse): IssuedToken | null =>
  * longer honours it.
  */
 export const refreshAccessToken = async (
-  refreshTokenKey = REFRESH_TOKEN_KEY
+  refreshTokenKey: string
 ): Promise<IssuedToken | null> => {
   const items = await chrome.storage.local.get(refreshTokenKey);
   const refreshToken: string | undefined = items[refreshTokenKey];

@@ -80,7 +80,7 @@ import type {
   GetRecentColorsResponse,
   AddRecentColorResponse,
 } from '@stylebot/types';
-import { handleSignInRedirect } from '@stylebot/sync';
+import { handleSignInRedirect } from '@stylebot/google-auth';
 import { syncStyles } from './sync';
 
 import {

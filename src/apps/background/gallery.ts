@@ -22,12 +22,7 @@ import {
   toGallerySite,
   unpublishStyle,
   withSession,
-  type GoogleTokenSource,
 } from '@stylebot/gallery';
-import {
-  clearGoogleIdentityToken,
-  getGoogleIdentityToken,
-} from '@stylebot/sync';
 import type {
   GalleryAccountResponse,
   CaptureGalleryScreenshot as CaptureGalleryScreenshotType,
@@ -77,11 +72,6 @@ import {
 } from './gallery-preview';
 import { isStylebotSite } from './is-stylebot-site';
 
-const google: GoogleTokenSource = {
-  getToken: getGoogleIdentityToken,
-  clearToken: clearGoogleIdentityToken,
-};
-
 /**
  * Logs what went wrong, since the editor only shows a message for people.
  */
@@ -125,7 +115,7 @@ export const SignInToGallery = async (
   sendResponse: (response: GalleryAccountResponse) => void
 ): Promise<void> => {
   try {
-    sendResponse({ ok: true, account: (await signIn(google)).account });
+    sendResponse({ ok: true, account: (await signIn()).account });
   } catch (e) {
     sendResponse(fail(e));
   }
@@ -140,7 +130,7 @@ export const GetMyGalleryStyles = async (
   sendResponse: (response: GetMyGalleryStylesResponse) => void
 ): Promise<void> => {
   try {
-    const all = await withSession(google, getMyStyles);
+    const all = await withSession(getMyStyles);
     const styles = all.filter(style => style.site === toGallerySite(site));
     const account = await getSignedInAccount();
     const savedStyles = await getAll();
@@ -245,7 +235,7 @@ export const PublishToGallery = async (
       screenshot: await compressUnderLimit(message.screenshot),
     };
 
-    const style = await withSession(google, session =>
+    const style = await withSession(session =>
       message.styleId
         ? publishVersion(session, message.styleId, form)
         : publishStyle(session, message.site, form)
@@ -275,7 +265,7 @@ export const UnpublishFromGallery = async (
   sendResponse: (response: UnpublishFromGalleryResponse) => void
 ): Promise<void> => {
   try {
-    await withSession(google, session => unpublishStyle(session, id));
+    await withSession(session => unpublishStyle(session, id));
     await removeStyleGalleryListings(id);
     sendResponse({ ok: true });
   } catch (e) {
@@ -293,7 +283,7 @@ export const SetGalleryUsername = async (
   sendResponse: (response: GalleryAccountResponse) => void
 ): Promise<void> => {
   try {
-    const account = await withSession(google, session =>
+    const account = await withSession(session =>
       setUsername(session, username)
     );
 
@@ -330,7 +320,7 @@ export const CheckGalleryUsername = async (
   sendResponse: (response: CheckGalleryUsernameResponse) => void
 ): Promise<void> => {
   try {
-    const check = await withSession(google, session =>
+    const check = await withSession(session =>
       checkUsername(session, username)
     );
 

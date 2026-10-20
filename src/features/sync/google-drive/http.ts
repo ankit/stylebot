@@ -1,16 +1,11 @@
+import { isUnavailable, type AccessToken } from '@stylebot/google-auth';
+
 import { syncError, type SyncErrorCode } from '../errors';
-import type { AccessToken } from './get-access-token';
 
 export const getAuthorizationHeaders = (accessToken: AccessToken): Headers =>
   new Headers({
     Authorization: `Bearer ${accessToken}`,
   });
-
-/**
- * Whether Google is overloaded or down for now, so trying again later will do.
- */
-export const isUnavailable = (status: number): boolean =>
-  status === 429 || status >= 500;
 
 const RATE_LIMIT_REASONS = ['rateLimitExceeded', 'userRateLimitExceeded'];
 

@@ -1,9 +1,10 @@
+import type { GoogleAuthErrorCode } from '@stylebot/google-auth';
 import type { SyncErrorKey } from '@stylebot/types';
 
+// Google sign-in's errors share this shape, so sync reports them as its own.
 export type SyncErrorCode =
+  | GoogleAuthErrorCode
   | 'auth'
-  | 'sign-in'
-  | 'network'
   | 'not-found'
   | 'parse'
   | 'not-enabled'

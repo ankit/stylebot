@@ -1,6 +1,5 @@
-import { syncError } from '../errors';
+import { googleAuthError } from './errors';
 import {
-  REFRESH_TOKEN_KEY,
   getAuthURL,
   getRandomString,
   refreshAccessToken,
@@ -60,6 +59,9 @@ const removeRedirectRule = (): Promise<void> =>
  */
 const SIGN_INS_KEY = 'google-drive-sign-in';
 
+// Sign-ins started before each kept its own refresh token key were Drive's.
+const DRIVE_REFRESH_TOKEN_KEY = 'google-drive-refresh-token';
+
 type SignIn = {
   state: string;
   verifier: string;
@@ -71,7 +73,7 @@ type SignIn = {
 };
 
 const getRefreshTokenKey = (signIn: SignIn): string =>
-  signIn.refreshTokenKey ?? REFRESH_TOKEN_KEY;
+  signIn.refreshTokenKey ?? DRIVE_REFRESH_TOKEN_KEY;
 
 const isPendingForRefreshToken = (
   signIn: SignIn,
@@ -122,7 +124,7 @@ const waitForSignIn = (tabId: number): Promise<void> =>
       } else if (signIn.status === 'failed') {
         cleanUp();
         reject(
-          syncError(
+          googleAuthError(
             signIn.error
               ? `Authorization failure: ${signIn.error}`
               : 'Authorization failure',
@@ -152,7 +154,7 @@ const waitForSignIn = (tabId: number): Promise<void> =>
         ) {
           await removeRedirectRule();
         }
-        reject(syncError('Sign-in window closed', 'sign-in'));
+        reject(googleAuthError('Sign-in window closed', 'sign-in'));
       }
     };
 
@@ -253,14 +255,14 @@ const openSignInTab = (
  */
 export const signInWithRedirectRule = async (
   scopes: Array<string>,
-  refreshTokenKey = REFRESH_TOKEN_KEY
+  refreshTokenKey: string
 ): Promise<IssuedToken> => {
   const tabId = await openSignInTab(scopes, refreshTokenKey);
   await waitForSignIn(tabId);
 
   const issued = await refreshAccessToken(refreshTokenKey);
   if (!issued) {
-    throw syncError('Token refresh failure', 'sign-in');
+    throw googleAuthError('Token refresh failure', 'sign-in');
   }
 
   return issued;

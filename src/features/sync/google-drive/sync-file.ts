@@ -6,9 +6,9 @@ import type {
   SyncAccount,
 } from '@stylebot/types';
 import { isStyleMap, sanitizeStyleMap } from '@stylebot/saved-styles';
+import type { AccessToken } from '@stylebot/google-auth';
 
 import { syncError } from '../errors';
-import type { AccessToken } from './get-access-token';
 import { getAuthorizationHeaders, parseJsonResponse } from './http';
 import { SYNC_FOLDER_NAME, SYNC_FILE_NAME } from './constants';
 

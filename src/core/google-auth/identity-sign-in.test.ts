@@ -1,9 +1,10 @@
 import fetchMock from 'jest-fetch-mock';
 
-import { DESKTOP_CLIENT_ID, REFRESH_TOKEN_KEY } from './desktop-client';
+import { DESKTOP_CLIENT_ID } from './desktop-client';
 import { signInWithIdentityAPI, usesIdentitySignIn } from './identity-sign-in';
 
 const SCOPES = ['https://www.googleapis.com/auth/drive.file'];
+const REFRESH_TOKEN_KEY = 'drive-refresh-token';
 const REDIRECT_URI = 'http://127.0.0.1/mozoauth2/abc123';
 
 let store: Record<string, unknown>;
@@ -81,7 +82,9 @@ describe('usesIdentitySignIn', () => {
 
 describe('signInWithIdentityAPI', () => {
   it('signs in with PKCE on the loopback redirect and keeps the refresh token', async () => {
-    await expect(signInWithIdentityAPI(SCOPES)).resolves.toEqual({
+    await expect(
+      signInWithIdentityAPI(SCOPES, REFRESH_TOKEN_KEY)
+    ).resolves.toEqual({
       token: 'first',
       expiresIn: 3600,
     });
@@ -106,7 +109,9 @@ describe('signInWithIdentityAPI', () => {
   it('rejects when the user closes the auth window', async () => {
     respond = () => ({ lastError: 'User cancelled or denied access.' });
 
-    await expect(signInWithIdentityAPI(SCOPES)).rejects.toMatchObject({
+    await expect(
+      signInWithIdentityAPI(SCOPES, REFRESH_TOKEN_KEY)
+    ).rejects.toMatchObject({
       code: 'sign-in',
       message: 'User cancelled or denied access.',
     });
@@ -116,7 +121,9 @@ describe('signInWithIdentityAPI', () => {
   it('ignores a redirect for another sign-in', async () => {
     respond = () => ({ url: `${REDIRECT_URI}?state=other&code=c-1` });
 
-    await expect(signInWithIdentityAPI(SCOPES)).rejects.toMatchObject({
+    await expect(
+      signInWithIdentityAPI(SCOPES, REFRESH_TOKEN_KEY)
+    ).rejects.toMatchObject({
       code: 'sign-in',
     });
     expect(tokenRequests).toHaveLength(0);
@@ -129,17 +136,17 @@ describe('signInWithIdentityAPI', () => {
       )}&error=access_denied`,
     });
 
-    await expect(signInWithIdentityAPI(SCOPES)).rejects.toThrow(
-      'Authorization failure: access_denied'
-    );
+    await expect(
+      signInWithIdentityAPI(SCOPES, REFRESH_TOKEN_KEY)
+    ).rejects.toThrow('Authorization failure: access_denied');
   });
 
   it('fails without keeping anything when no refresh token comes back', async () => {
     tokenResponse = { error: 'invalid_grant' };
 
-    await expect(signInWithIdentityAPI(SCOPES)).rejects.toThrow(
-      'Authorization failure: invalid_grant'
-    );
+    await expect(
+      signInWithIdentityAPI(SCOPES, REFRESH_TOKEN_KEY)
+    ).rejects.toThrow('Authorization failure: invalid_grant');
     expect(store[REFRESH_TOKEN_KEY]).toBeUndefined();
   });
 });

@@ -60,11 +60,8 @@ import {
   isSyncAlarm,
   updatePeriodicSync,
 } from './sync-scheduler';
-import {
-  getGoogleDriveSyncEnabled,
-  isSignInRedirect,
-  SYNC_ISSUE_KEYS,
-} from '@stylebot/sync';
+import { getGoogleDriveSyncEnabled, SYNC_ISSUE_KEYS } from '@stylebot/sync';
+import { isSignInRedirect } from '@stylebot/google-auth';
 import { syncStyles } from './sync';
 import {
   GetGalleryAccount,

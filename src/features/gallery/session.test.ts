@@ -1,4 +1,5 @@
 import fetchMock from 'jest-fetch-mock';
+import { clearGoogleToken, getGoogleToken } from '@stylebot/google-auth';
 
 import { galleryApiError } from './request';
 import { account, mockStorage, session } from './gallery.fixtures';
@@ -8,22 +9,19 @@ import {
   signIn,
   storeAccount,
   withSession,
-  type GoogleTokenSource,
 } from './session';
+
+jest.mock('@stylebot/google-auth', () => ({
+  getGoogleToken: jest.fn(),
+  clearGoogleToken: jest.fn(),
+}));
 
 const SESSION_KEY = 'gallery-session';
 
-let google: GoogleTokenSource & {
-  getToken: jest.Mock;
-  clearToken: jest.Mock;
-};
-
 beforeEach(() => {
   fetchMock.resetMocks();
-  google = {
-    getToken: jest.fn(async () => 'ya29.token'),
-    clearToken: jest.fn(async () => undefined),
-  };
+  jest.mocked(getGoogleToken).mockReset().mockResolvedValue('ya29.token');
+  jest.mocked(clearGoogleToken).mockReset().mockResolvedValue(undefined);
 });
 
 describe('gallery session', () => {
@@ -31,15 +29,21 @@ describe('gallery session', () => {
     const store = mockStorage();
     fetchMock.mockResponseOnce(JSON.stringify(session));
 
-    await signIn(google);
+    await signIn();
 
     expect(store[SESSION_KEY]).toEqual(session);
     expect(await getSignedInAccount()).toEqual(account);
+    expect(getGoogleToken).toBeCalledWith({
+      scopes: ['openid', 'https://www.googleapis.com/auth/userinfo.profile'],
+      cacheKey: 'google-identity-access-token',
+      refreshTokenKey: 'google-identity-refresh-token',
+    });
   });
 
   it('signs in with a fresh Google token when the cached one is refused', async () => {
     mockStorage();
-    google.getToken
+    jest
+      .mocked(getGoogleToken)
       .mockResolvedValueOnce('ya29.revoked')
       .mockResolvedValueOnce('ya29.fresh');
     fetchMock
@@ -48,9 +52,9 @@ describe('gallery session', () => {
       })
       .mockResponseOnce(JSON.stringify(session));
 
-    await signIn(google);
+    await signIn();
 
-    expect(google.clearToken).toHaveBeenCalledTimes(1);
+    expect(clearGoogleToken).toHaveBeenCalledTimes(1);
     expect(JSON.parse(fetchMock.mock.calls[1][1]?.body as string)).toEqual({
       googleToken: 'ya29.fresh',
     });
@@ -68,8 +72,8 @@ describe('gallery session', () => {
     mockStorage({ [SESSION_KEY]: session });
     const run = jest.fn(async (value: string) => value);
 
-    expect(await withSession(google, run)).toBe(session.session);
-    expect(google.getToken).not.toHaveBeenCalled();
+    expect(await withSession(run)).toBe(session.session);
+    expect(jest.mocked(getGoogleToken)).not.toHaveBeenCalled();
   });
 
   it('signs in first when there is no session', async () => {
@@ -77,8 +81,8 @@ describe('gallery session', () => {
     fetchMock.mockResponseOnce(JSON.stringify(session));
     const run = jest.fn(async (value: string) => value);
 
-    expect(await withSession(google, run)).toBe(session.session);
-    expect(google.getToken).toHaveBeenCalledTimes(1);
+    expect(await withSession(run)).toBe(session.session);
+    expect(jest.mocked(getGoogleToken)).toHaveBeenCalledTimes(1);
   });
 
   it('signs in again and retries once when the session is refused', async () => {
@@ -91,7 +95,7 @@ describe('gallery session', () => {
       .mockRejectedValueOnce(galleryApiError('Session expired', 401))
       .mockResolvedValueOnce('done');
 
-    expect(await withSession(google, run)).toBe('done');
+    expect(await withSession(run)).toBe('done');
     expect(run).toHaveBeenLastCalledWith(session.session);
     expect(store[SESSION_KEY]).toEqual(session);
   });
@@ -102,11 +106,11 @@ describe('gallery session', () => {
       .fn()
       .mockRejectedValue(galleryApiError('Daily limit', 429));
 
-    await expect(withSession(google, run)).rejects.toMatchObject({
+    await expect(withSession(run)).rejects.toMatchObject({
       status: 429,
     });
     expect(run).toHaveBeenCalledTimes(1);
-    expect(google.getToken).not.toHaveBeenCalled();
+    expect(jest.mocked(getGoogleToken)).not.toHaveBeenCalled();
   });
 
   it('updates the stored account', async () => {
