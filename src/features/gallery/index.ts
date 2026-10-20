@@ -43,6 +43,7 @@ export {
   storeAccount,
   clearSession,
   signIn,
+  signOut,
   withSession,
 } from './session';
 

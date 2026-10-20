@@ -241,6 +241,10 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
 
       return response;
     },
+    SignOutOfGallery: () => {
+      gallery.account = undefined;
+      return { ok: true, account: null };
+    },
     SetGalleryUsername: message =>
       gallery.setUsername ?? {
         ok: true,

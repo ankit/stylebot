@@ -10,6 +10,7 @@ export {
   getStoredGoogleToken,
   signInToGoogle,
   clearGoogleToken,
+  signOutOfGoogle,
   cacheGoogleToken,
   validateGoogleToken,
   type AccessToken,

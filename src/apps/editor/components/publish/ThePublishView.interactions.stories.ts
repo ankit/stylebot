@@ -451,6 +451,31 @@ export const Unpublishes: StoryObj = {
   },
 };
 
+export const SignsOut: StoryObj = {
+  ...publishView(publishedTokyoNight),
+  name: 'Signing out locks the form again and forgets the published style',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await canvas.findByRole('heading', { name: 'Update Tokyo Night' });
+    await user.click(canvas.getByRole('button', { name: 'More' }));
+    await user.click(await canvas.findByRole('menuitem', { name: 'Sign out' }));
+
+    await expect(
+      await canvas.findByRole('button', {
+        name: 'Sign in with Google to publish',
+      })
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole('heading', { name: 'Publish to Gallery' })
+    ).toBeVisible();
+    await expect(
+      canvas.queryByRole('button', { name: 'More' })
+    ).not.toBeInTheDocument();
+    await expect(canvas.getByLabelText('Name')).not.toHaveValue('Tokyo Night');
+  },
+};
+
 export const ShowsPublishedStateUnderTheEditor: StoryObj = {
   ...editor(WITH_RULE),
   parameters: { chrome: { gallery: publishedTokyoNight } },
