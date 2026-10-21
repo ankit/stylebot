@@ -16,8 +16,7 @@ export type StyleProfile = {
  * lives on the profile, so it syncs with it and goes when it does.
  */
 export type GalleryListing = {
-  styleId: string;
-  group: string;
+  styleId: number;
   slug: string;
   version: number;
   // A hash of that version's CSS, to tell if the profile was edited since.

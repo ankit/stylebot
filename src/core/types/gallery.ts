@@ -35,11 +35,10 @@ export type GalleryStyleStatus = 'live' | 'hidden';
  * A style as the gallery lists it, describing its latest version.
  */
 export type GalleryStyle = {
-  id: string;
+  // Numbered in publish order.
+  id: number;
   site: string;
-  // The gallery's site group, such as wikipedia for any Wikipedia.
-  group: string;
-  // Unique within the group and fixed at first publish.
+  // Fixed at first publish, and not unique: the id is.
   slug: string;
   name: string;
   description: string | null;
@@ -79,11 +78,10 @@ export type GalleryPublishedStyle = GalleryStyle & {
  * hash of the CSS its latest version has, and where its gallery page is.
  */
 export type GalleryPublished = {
-  styleId: string;
+  styleId: number;
   version: number;
   // Compared with hashCss of the profile's CSS to tell if it has changed.
   cssHash: string;
-  group: string;
   slug: string;
 };
 

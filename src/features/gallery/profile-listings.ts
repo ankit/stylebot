@@ -49,7 +49,7 @@ const listProfilesWithListings = (styles: StyleMap): Array<ListedProfile> =>
  */
 export const getListedProfiles = (
   styles: StyleMap,
-  styleId: string
+  styleId: number
 ): Array<ListedProfile> =>
   listProfilesWithListings(styles)
     .filter(({ galleryListing }) => galleryListing.styleId === styleId)
@@ -58,7 +58,7 @@ export const getListedProfiles = (
 /**
  * The gallery styles installed or published here.
  */
-export const getListedStyleIds = (styles: StyleMap): Set<string> =>
+export const getListedStyleIds = (styles: StyleMap): Set<number> =>
   new Set(
     listProfilesWithListings(styles).map(
       ({ galleryListing }) => galleryListing.styleId
@@ -71,7 +71,7 @@ export const getListedStyleIds = (styles: StyleMap): Set<string> =>
  */
 export const getListedProfileNames = (
   styles: StyleMap,
-  styleIds: Array<string>
+  styleIds: Array<number>
 ): Record<string, string> => {
   const listed = listProfilesWithListings(styles).filter(({ galleryListing }) =>
     styleIds.includes(galleryListing.styleId)

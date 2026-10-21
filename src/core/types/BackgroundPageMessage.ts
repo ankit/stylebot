@@ -295,7 +295,7 @@ export type GetGalleryScreenshot = {
 export type PublishToGallery = {
   name: 'PublishToGallery';
   // Set to publish a new version of this gallery style.
-  styleId?: string;
+  styleId?: number;
   site: string;
   url: string;
   profileId: string;
@@ -311,7 +311,7 @@ export type PublishToGallery = {
 
 export type UnpublishFromGallery = {
   name: 'UnpublishFromGallery';
-  id: string;
+  id: number;
 };
 
 export type SetGalleryUsername = {
@@ -340,14 +340,14 @@ export type GetGallerySuggestions = {
 // Previews a gallery style on a tab: the popup's tab, or the page's own.
 export type PreviewGalleryStyle = {
   name: 'PreviewGalleryStyle';
-  id: string;
+  id: number;
   tabId?: number;
 };
 
 // Sent by the site bridge: opens the style's site in a new tab, previewing it.
 export type OpenGalleryPreview = {
   name: 'OpenGalleryPreview';
-  id: string;
+  id: number;
 };
 
 // A tab's gallery preview: the popup's tab, or the page's own.
@@ -364,7 +364,7 @@ export type InstallGalleryPreview = {
 // Sent by the site bridge: which of these gallery styles are installed.
 export type GetGalleryInstallStatus = {
   name: 'GetGalleryInstallStatus';
-  styleIds: Array<string>;
+  styleIds: Array<number>;
 };
 
 export type EndGalleryPreview = {

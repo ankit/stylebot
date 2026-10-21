@@ -121,7 +121,7 @@ export const publishToGallery = (
   });
 
 export const unpublishFromGallery = (
-  id: string
+  id: number
 ): Promise<UnpublishFromGalleryResponse> =>
   chrome.runtime.sendMessage<
     UnpublishFromGallery,

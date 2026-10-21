@@ -387,10 +387,9 @@ describe('style edits', () => {
   });
 
   describe('gallery listings', () => {
-    const listing = (styleId = 'night') => ({
+    const listing = (styleId = 7) => ({
       styleId,
-      group: 'example.com',
-      slug: styleId,
+      slug: `style-${styleId}`,
       version: 1,
       cssHash: 'abc',
       authorId: 'someone',
@@ -433,14 +432,14 @@ describe('style edits', () => {
     });
 
     it('sets and removes the listing a profile was published as', async () => {
-      await setGalleryListing('example.com', 'default', listing('mine'));
+      await setGalleryListing('example.com', 'default', listing(8));
       expect(stored('example.com').profiles?.default).toEqual({
         name: '',
-        galleryListing: listing('mine'),
+        galleryListing: listing(8),
       });
 
       const before = writes();
-      await setGalleryListing('example.com', 'default', listing('mine'));
+      await setGalleryListing('example.com', 'default', listing(8));
       expect(writes()).toBe(before);
 
       await removeGalleryListing('example.com', 'default');
@@ -453,9 +452,9 @@ describe('style edits', () => {
         css: 'a {}',
         galleryListing: listing(),
       });
-      await setGalleryListing('example.com', 'default', listing('mine'));
+      await setGalleryListing('example.com', 'default', listing(8));
 
-      await removeStyleGalleryListings('mine');
+      await removeStyleGalleryListings(8);
 
       expect(
         stored('example.com').profiles?.default?.galleryListing

@@ -31,9 +31,8 @@ export default meta;
 const account = { id: 'me', username: 'maya', usernameConfirmed: true };
 
 const tokyoNight: GalleryStyle = {
-  id: 'Xk3p9QaL2m',
+  id: 42,
   site: 'example.com',
-  group: 'example.com',
   slug: 'tokyo-night',
   name: 'Tokyo Night',
   description: 'The Tokyo Night palette',
@@ -42,7 +41,7 @@ const tokyoNight: GalleryStyle = {
   installs: 120,
   createdAt: 0,
   updatedAt: 0,
-  screenshot: '/screenshots/Xk3p9QaL2m/2',
+  screenshot: '/screenshots/42/2',
   status: 'live',
 };
 
@@ -54,7 +53,6 @@ const publishedTokyoNight: GalleryShimOptions = {
     styleId: tokyoNight.id,
     version: tokyoNight.version,
     cssHash: hashCss(RULE_CSS),
-    group: tokyoNight.group,
     slug: tokyoNight.slug,
   },
 };
@@ -136,7 +134,7 @@ export const SignsInThenPublishes: StoryObj = {
       ok: true,
       style: {
         ...tokyoNight,
-        id: 'new-style',
+        id: 43,
         slug: 'night-reading',
         name: 'Night reading',
         version: 1,
@@ -254,14 +252,12 @@ export const PublishedShowsTheShortLink: StoryObj = {
       ok: true,
       style: {
         ...tokyoNight,
-        site: 'www.wikipedia.org',
-        group: 'wikipedia',
         version: 1,
         removed: [],
       },
     },
   }),
-  name: 'Once published, the link shows the site and slug, and the close button closes Stylebot',
+  name: "Once published, the link shows the style's address, and the close button closes Stylebot",
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
 
@@ -277,7 +273,7 @@ export const PublishedShowsTheShortLink: StoryObj = {
     await step('the link leaves out the Gallery address', async () => {
       await expect(
         canvasElement.querySelector('.published .link')
-      ).toHaveTextContent(/^wikipedia\.org\/\s*tokyo-night$/);
+      ).toHaveTextContent(/^style\/42\/\s*tokyo-night$/);
     });
 
     await step('the close button closes Stylebot', async () => {
@@ -585,7 +581,7 @@ export const ShowsPublishedStateUnderTheEditor: StoryObj = {
 
       await expect(link).toHaveAttribute(
         'href',
-        'https://gallery.stylebot.dev/s/example.com/tokyo-night'
+        'https://gallery.stylebot.dev/style/42/tokyo-night'
       );
     });
 

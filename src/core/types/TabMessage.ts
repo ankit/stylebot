@@ -157,7 +157,7 @@ export type HideGalleryPreview = {
 // For the site bridge, on the gallery page a preview was opened from.
 export type GalleryStyleInstalled = {
   name: 'GalleryStyleInstalled';
-  id: string;
+  id: number;
   profileName: string;
 };
 

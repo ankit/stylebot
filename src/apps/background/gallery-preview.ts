@@ -140,7 +140,7 @@ const latestRequests = new Map<number, number>();
  */
 export const startGalleryPreview = async (
   tabId: number,
-  id: string,
+  id: number,
   galleryTabId?: number
 ): Promise<GalleryPreview | null> => {
   const request = (latestRequests.get(tabId) ?? 0) + 1;
@@ -164,7 +164,7 @@ export const startGalleryPreview = async (
  * previews the style there.
  */
 export const openGalleryPreview = async (
-  id: string,
+  id: number,
   galleryTab: chrome.tabs.Tab
 ): Promise<void> => {
   const { site } = await getStyle(id);
@@ -224,11 +224,10 @@ const isOwnStyle = async ({ author }: GalleryStyle): Promise<boolean> => {
  * The gallery listing for a profile installed at the style's latest version.
  */
 const getLatestVersionListing = (
-  { id, group, slug, author }: GalleryStyle,
+  { id, slug, author }: GalleryStyle,
   { version, css }: GalleryStyleToInstall
 ): GalleryListing => ({
   styleId: id,
-  group,
   slug,
   version,
   cssHash: hashCss(css),
@@ -260,7 +259,7 @@ type InstallPlan =
  */
 const planInstall = (
   styles: StyleMap,
-  styleId: string,
+  styleId: number,
   version: number,
   isOwn: boolean
 ): InstallPlan => {
