@@ -412,6 +412,47 @@ describe('style edits', () => {
       });
     });
 
+    it('replaces an empty default profile with the one installed from the gallery', async () => {
+      const { id } = await installProfile('new.com', {
+        name: 'Night',
+        css: 'a {}',
+        galleryListing: listing(),
+      });
+
+      expect(stored('new.com')).toMatchObject({
+        css: 'a {}',
+        activeProfile: id,
+        profiles: { [id]: { name: 'Night', galleryListing: listing() } },
+      });
+      expect(Object.keys(stored('new.com').profiles ?? {})).toEqual([id]);
+
+      store.styles['blank.com'] = {
+        css: ' \n',
+        readability: false,
+        enabled: true,
+        modifiedTime: '1',
+      };
+      await installProfile('blank.com', {
+        name: 'Night',
+        css: 'a {}',
+        galleryListing: listing(),
+      });
+      expect(stored('blank.com').profiles?.default).toBeUndefined();
+    });
+
+    it('keeps a default profile with css when installing from the gallery', async () => {
+      await installProfile('example.com', {
+        name: 'Night',
+        css: 'a {}',
+        galleryListing: listing(),
+      });
+
+      expect(stored('example.com').profiles?.default).toEqual({
+        name: '',
+        css: 'body { color: red; }',
+      });
+    });
+
     it('updates the listing of a profile it reinstalls', async () => {
       const { id } = await installProfile('example.com', {
         name: 'Night',
