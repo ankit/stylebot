@@ -19,8 +19,10 @@
         :disable-off="isOpen"
         :joined="hasToggleRows"
         :previewing="galleryPreviewing"
+        :publish-items="publishItems"
         @pick="pickSiteProfile"
         @edit="editSiteProfile"
+        @publish="publishSiteProfile"
         @rename="renameSiteProfile"
         @delete="deleteSiteProfile"
       />
@@ -134,7 +136,11 @@ import {
   renameProfile,
   deleteProfile,
   getRestoredPageSupport,
+  getPublishMenuItem,
 } from './utils';
+
+import { requestPublishing } from '@stylebot/gallery';
+import type { GalleryMenuItem } from '@stylebot/gallery';
 
 import { getGoogleDriveSyncEnabled } from '@stylebot/sync';
 import {
@@ -190,6 +196,8 @@ export default Vue.extend({
     dockLocation: StylebotDockLocation | '';
     // A gallery style is shown on the page in place of the site's own.
     galleryPreviewing: boolean;
+    // Each site profile's way into publishing, once known.
+    publishItems: Record<string, GalleryMenuItem | null>;
   } {
     return {
       styles: [],
@@ -205,6 +213,7 @@ export default Vue.extend({
       appearance: 'system',
       dockLocation: '',
       galleryPreviewing: false,
+      publishItems: {},
     };
   },
 
@@ -347,9 +356,23 @@ export default Vue.extend({
         if (site) {
           this.siteEnabled = site.enabled;
           this.siteActiveProfile = expandProfiles(site).active;
+          this.loadPublishItems(site);
         }
         this.readability = !!defaultStyle && defaultStyle.readability;
       });
+    },
+
+    async loadPublishItems(site: Style): Promise<void> {
+      const { sheets } = expandProfiles(site);
+      const entries = await Promise.all(
+        Object.entries(sheets).map(async ([id, { css }]) => {
+          const item = await getPublishMenuItem(site.url, id, css);
+
+          return [id, item] as const;
+        })
+      );
+
+      this.publishItems = Object.fromEntries(entries);
     },
 
     profilesOf(style: Style): Array<ProfileSummary> {
@@ -395,6 +418,20 @@ export default Vue.extend({
 
       if (!this.isOpen) {
         (this.$refs.toggle as InstanceType<typeof ToggleStylebot>).toggle();
+      }
+    },
+
+    /**
+     * Opens the editor on a profile, straight into publishing it.
+     */
+    publishSiteProfile(id: string): void {
+      requestPublishing(this.styles[0].url, id);
+
+      if (this.isOpen) {
+        this.pickSiteProfile(id);
+        window.close();
+      } else {
+        this.editSiteProfile(id);
       }
     },
 

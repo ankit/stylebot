@@ -24,6 +24,7 @@ jest.mock('./utils', () => ({
   getIsStylebotOpen: jest.fn(),
   getIsPageReaderable: jest.fn(),
   getRestoredPageSupport: jest.fn(),
+  getPublishMenuItem: jest.fn(async () => null),
 }));
 
 jest.mock('../../features/sync/google-drive/sync-metadata', () => ({

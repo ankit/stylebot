@@ -53,7 +53,9 @@
 
       <profile-menu
         v-if="menuOpen"
+        :publish-item="publishItem"
         @edit="$emit('edit')"
+        @publish="$emit('publish')"
         @rename="$emit('rename')"
         @delete="$emit('delete')"
         @close="closeMenu"
@@ -63,11 +65,13 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import Vue from 'vue';
 import { SText } from '@stylebot/components';
 import { CheckIcon, MoreIcon } from '@stylebot/icons';
 
 import ProfileMenu from './ProfileMenu.vue';
+import type { GalleryMenuItem } from '@stylebot/gallery';
 
 /**
  * One row of the popup's profile list: No style, or a profile with a •••
@@ -109,6 +113,11 @@ export default Vue.extend({
     error: {
       type: String,
       default: '',
+    },
+
+    publishItem: {
+      type: Object as PropType<GalleryMenuItem | null>,
+      default: null,
     },
   },
 

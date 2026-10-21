@@ -24,7 +24,11 @@ import type {
   InstallGalleryPreview,
   InstallGalleryPreviewResponse,
   EndGalleryPreview,
+  GetPublishedGalleryStyle,
+  GetPublishedGalleryStyleResponse,
 } from '@stylebot/types';
+import { getGalleryMenuItem } from '@stylebot/gallery';
+import type { GalleryMenuItem } from '@stylebot/gallery';
 import { STYLES_KEY, getStylesForPage } from '@stylebot/saved-styles';
 import { defaultOptions } from '@stylebot/settings';
 
@@ -362,3 +366,20 @@ export const endGalleryPreview = (tabId: number): Promise<void> =>
     name: 'EndGalleryPreview',
     tabId,
   });
+
+/**
+ * A profile's Gallery menu item; none for someone else's installed style.
+ */
+export const getPublishMenuItem = async (
+  url: string,
+  profileId: string,
+  css: string
+): Promise<GalleryMenuItem | null> => {
+  const response = await chrome.runtime.sendMessage<
+    GetPublishedGalleryStyle,
+    GetPublishedGalleryStyleResponse
+  >({ name: 'GetPublishedGalleryStyle', url, profileId });
+  const item = getGalleryMenuItem(response, css);
+
+  return item.label === 'view_in_gallery' ? null : item;
+};

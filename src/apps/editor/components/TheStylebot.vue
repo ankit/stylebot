@@ -46,6 +46,7 @@ import TheKeyboardShortcutsView from './shortcuts/TheKeyboardShortcutsView.vue';
 import ThePublishView from './publish/ThePublishView.vue';
 import TheGalleryStatus from './publish/TheGalleryStatus.vue';
 
+import { onPublishRequest } from '@stylebot/gallery';
 import type { StylebotEditingMode } from '@stylebot/types';
 
 type HeaderRef = { focusModeTab(): void };
@@ -65,9 +66,13 @@ export default Vue.extend({
     TheGalleryStatus,
   },
 
-  data(): { codeEditorMounted: boolean } {
+  data(): {
+    codeEditorMounted: boolean;
+    stopPublishRequests: (() => void) | null;
+  } {
     return {
       codeEditorMounted: false,
+      stopPublishRequests: null,
     };
   },
 
@@ -120,6 +125,17 @@ export default Vue.extend({
         }
       },
     },
+  },
+
+  mounted() {
+    // Opening answers the popup's request itself; this is for an open editor.
+    this.stopPublishRequests = onPublishRequest(() =>
+      this.$store.dispatch('openPublishRequest')
+    );
+  },
+
+  beforeDestroy() {
+    this.stopPublishRequests?.();
   },
 
   methods: {

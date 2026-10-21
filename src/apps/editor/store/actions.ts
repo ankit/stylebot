@@ -33,6 +33,8 @@ import type {
   GalleryScreenshotResponse,
 } from '@stylebot/types';
 
+import { clearPublishRequest, getPublishRequest } from '@stylebot/gallery';
+
 import {
   captureGalleryScreenshot,
   getPublishedGalleryStyle,
@@ -210,7 +212,11 @@ export default {
     },
     { inspect = false }: { inspect?: boolean } = {}
   ): Promise<void> {
-    await dispatch('refreshPage');
+    // Decided before showing, so the panel doesn't open on the editor first.
+    await Promise.all([
+      dispatch('refreshPage'),
+      dispatch('openPublishRequest'),
+    ]);
 
     if (!state.enabled) {
       enableStyle(state.url);
@@ -224,7 +230,7 @@ export default {
       commit('setOptions', { ...state.options, mode: 'magic' });
     }
 
-    if (state.options.mode === 'basic' && inspect) {
+    if (state.options.mode === 'basic' && inspect && !state.publishing) {
       commit('setInspecting', true);
     }
   },
@@ -341,6 +347,33 @@ export default {
 
     commit('setPublishedGalleryStyle', published);
     commit('setInstalledGalleryStyle', installed);
+  },
+
+  /**
+   * Shows the publish view when the popup asked to publish a profile here.
+   * The popup already switched to it, so the editor moves there without
+   * waiting for the switch to arrive.
+   */
+  async openPublishRequest({
+    state,
+    commit,
+    dispatch,
+  }: {
+    state: State;
+    commit: Commit;
+    dispatch: Dispatch;
+  }): Promise<void> {
+    const profileId = await getPublishRequest(state.url);
+
+    if (!profileId) {
+      return;
+    }
+
+    await clearPublishRequest();
+
+    dispatch('syncFromPage', { activeProfile: profileId });
+    commit('setHelp', false);
+    commit('setPublishing', true);
   },
 
   setMode(
