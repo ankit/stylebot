@@ -22,6 +22,7 @@ import {
   expandProfiles,
   getProfileSheet,
   freeProfileName,
+  DEFAULT_PROFILE_ID,
 } from '@stylebot/saved-styles';
 
 import type {
@@ -494,10 +495,9 @@ export const createProfile = async (
 };
 
 /**
- * Adds css as a new, active profile of a url's style, under the name or the
- * first free variant of it, and turns the style on. Without a gallery listing,
- * installing the same css under the same name again switches back to that
- * profile instead. Resolves with the profile's name and id.
+ * Adds css as a new, active profile of a url's style and turns the style on.
+ * Without a gallery listing, the same name and css switch back to that
+ * profile; with one, it replaces an empty default profile.
  */
 export const installProfile = async (
   url: string,
@@ -543,14 +543,22 @@ export const installProfile = async (
     );
     installedId = crypto.randomUUID();
 
+    const added = addProfile(existing, {
+      id: installedId,
+      name: installedName,
+      css,
+      galleryListing,
+      activate: true,
+    });
+    const defaultSheet = sheets[DEFAULT_PROFILE_ID];
+    const replacesDefault =
+      galleryListing &&
+      defaultSheet &&
+      !defaultSheet.css.trim() &&
+      !defaultSheet.galleryListing;
+
     styles[url] = editStyle(
-      addProfile(existing, {
-        id: installedId,
-        name: installedName,
-        css,
-        galleryListing,
-        activate: true,
-      }),
+      replacesDefault ? removeProfile(added, DEFAULT_PROFILE_ID) : added,
       { enabled: true }
     );
 
