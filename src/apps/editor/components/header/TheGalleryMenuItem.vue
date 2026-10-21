@@ -1,7 +1,7 @@
 <template>
   <s-menu-item @click="openPublishing">
     <span class="menu-item-row">
-      <span>{{ item.label }}</span>
+      <span>{{ t(item.label) }}</span>
       <s-status-dot v-if="item.changed" tone="warning" :size="8" />
     </span>
   </s-menu-item>
@@ -10,9 +10,8 @@
 <script lang="ts">
 import Vue from 'vue';
 import { SMenuItem, SStatusDot } from '@stylebot/components';
-import { getGalleryStyleUrl } from '@stylebot/gallery';
-
-type Item = { label: string; changed: boolean };
+import { getGalleryMenuItem, getGalleryStyleUrl } from '@stylebot/gallery';
+import type { GalleryMenuItem } from '@stylebot/gallery';
 
 /**
  * The ⋯ menu's way into publishing to the Gallery, with an amber dot when a
@@ -28,23 +27,14 @@ export default Vue.extend({
   },
 
   computed: {
-    item(): Item {
-      const { publishedGalleryStyle, installedGalleryStyle } =
+    item(): GalleryMenuItem {
+      const { publishedGalleryStyle, installedGalleryStyle, css } =
         this.$store.state;
 
-      if (!publishedGalleryStyle && installedGalleryStyle) {
-        return { label: this.t('view_in_gallery'), changed: false };
-      }
-
-      if (!publishedGalleryStyle) {
-        return { label: this.t('publish_to_gallery'), changed: false };
-      }
-
-      if (this.$store.getters.hasUnpublishedChanges) {
-        return { label: this.t('publish_update'), changed: true };
-      }
-
-      return { label: this.t('manage_publishing'), changed: false };
+      return getGalleryMenuItem(
+        { published: publishedGalleryStyle, installed: installedGalleryStyle },
+        css
+      );
     },
   },
 

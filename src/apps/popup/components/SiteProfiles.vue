@@ -30,10 +30,12 @@
         :menu-open="menuFor === profile.id"
         :renaming="renaming === profile.id"
         :error="nameError"
+        :publish-item="publishItems[profile.id] || null"
         @pick="$emit('pick', profile.id)"
         @more="toggleMenu(profile.id)"
         @close-menu="menuFor = null"
         @edit="edit(profile.id)"
+        @publish="publish(profile.id)"
         @rename="startRename(profile)"
         @delete="remove(profile.id)"
         @submit="submitRename"
@@ -49,6 +51,8 @@ import Vue from 'vue';
 import { SHeading } from '@stylebot/components';
 import { isProfileNameTaken } from '@stylebot/saved-styles';
 import type { ProfileSummary } from '@stylebot/saved-styles';
+
+import type { GalleryMenuItem } from '@stylebot/gallery';
 
 import OptionsButton from './OptionsButton.vue';
 import ProfileRow from './ProfileRow.vue';
@@ -87,6 +91,11 @@ export default Vue.extend({
     joined: {
       type: Boolean,
       default: false,
+    },
+
+    publishItems: {
+      type: Object as PropType<Record<string, GalleryMenuItem | null>>,
+      default: () => ({}),
     },
 
     // A gallery preview is on the page, so the saved pick's check greys out.
@@ -162,6 +171,11 @@ export default Vue.extend({
     edit(id: string): void {
       this.menuFor = null;
       this.$emit('edit', id);
+    },
+
+    publish(id: string): void {
+      this.menuFor = null;
+      this.$emit('publish', id);
     },
 
     startRename(profile: ProfileSummary): void {

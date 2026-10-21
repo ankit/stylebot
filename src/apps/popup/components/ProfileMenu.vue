@@ -9,6 +9,12 @@
     <template v-if="!confirming">
       <s-menu-item @click="$emit('edit')">{{ t('edit') }}</s-menu-item>
       <s-menu-item @click="$emit('rename')">{{ t('rename') }}</s-menu-item>
+      <s-menu-item v-if="publishItem" @click="$emit('publish')">
+        <span class="publish-item">
+          <span>{{ t(publishItem.label) }}</span>
+          <s-status-dot v-if="publishItem.changed" tone="warning" :size="8" />
+        </span>
+      </s-menu-item>
       <s-menu-divider />
       <s-menu-item danger @click="startConfirm">{{ t('delete') }}</s-menu-item>
     </template>
@@ -28,8 +34,17 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import Vue from 'vue';
-import { SButton, SMenu, SMenuDivider, SMenuItem } from '@stylebot/components';
+import {
+  SButton,
+  SMenu,
+  SMenuDivider,
+  SMenuItem,
+  SStatusDot,
+} from '@stylebot/components';
+
+import type { GalleryMenuItem } from '@stylebot/gallery';
 
 /**
  * A profile row's own actions, opened from its •••. Delete asks again in
@@ -43,6 +58,15 @@ export default Vue.extend({
     SMenu,
     SMenuDivider,
     SMenuItem,
+    SStatusDot,
+  },
+
+  props: {
+    // Publishing to the Gallery, where the profile can be.
+    publishItem: {
+      type: Object as PropType<GalleryMenuItem | null>,
+      default: null,
+    },
   },
 
   data(): { confirming: boolean } {
@@ -94,6 +118,14 @@ export default Vue.extend({
   top: calc(100% + 2px);
   right: 4px;
   z-index: 1;
+}
+
+.publish-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
 }
 
 .confirm {

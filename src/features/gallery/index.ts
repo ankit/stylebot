@@ -65,3 +65,10 @@ export {
   type GalleryPreviewAppWindow,
 } from './preview';
 export { galleryErrorText } from './gallery-error-text';
+export {
+  requestPublishing,
+  getPublishRequest,
+  clearPublishRequest,
+  onPublishRequest,
+} from './publish-request';
+export { getGalleryMenuItem, type GalleryMenuItem } from './menu-item';
