@@ -80,7 +80,7 @@ export type CheckGalleryUsernameResponse = GalleryResult<GalleryUsernameCheck>;
 export type GetMyGalleryStylesResponse = GalleryResult<{
   styles: Array<GalleryStyle>;
   // The style published from this Stylebot style and profile, if still listed.
-  publishedId: string | null;
+  publishedId: number | null;
 }>;
 // The screenshot is a data URL.
 export type GalleryScreenshotResponse = GalleryResult<{ screenshot: string }>;
@@ -92,12 +92,12 @@ export type UnpublishFromGalleryResponse = GalleryResult;
 // profile was installed from.
 export type GetPublishedGalleryStyleResponse = {
   published: GalleryPublished | null;
-  installed: { group: string; slug: string } | null;
+  installed: { id: number; slug: string } | null;
 };
-// The site's group, to browse the rest of its styles in the gallery.
+// The page's gallery site, to browse the rest of its styles in the gallery.
 export type GetGallerySuggestionsResponse = GalleryResult<{
   styles: Array<GalleryStyle>;
-  group: string | null;
+  site: string;
 }>;
 export type PreviewGalleryStyleResponse = GalleryResult;
 // replacedUrl is only for the tab's own page, as in ShowGalleryPreview.
@@ -105,7 +105,7 @@ export type GetGalleryPreviewResponse = {
   preview: GalleryPreview | null;
   replacedUrl?: string;
 };
-// The profile name each requested gallery style is installed as.
+// The profile name each requested gallery style is installed as, by its id.
 export type GetGalleryInstallStatusResponse = {
   installed: Record<string, string>;
 };

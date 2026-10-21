@@ -19,9 +19,8 @@ export const session: GallerySession = {
 };
 
 export const style: GalleryStyle = {
-  id: 'Xk3p9QaL2m',
+  id: 42,
   site: 'github.com',
-  group: 'github.com',
   slug: 'tokyo-night',
   name: 'Tokyo Night',
   description: 'The Tokyo Night palette',
@@ -30,7 +29,7 @@ export const style: GalleryStyle = {
   installs: 120,
   createdAt: 1791849600000,
   updatedAt: 1792022400000,
-  screenshot: '/screenshots/Xk3p9QaL2m/2',
+  screenshot: '/screenshots/42/2',
   status: 'live',
 };
 

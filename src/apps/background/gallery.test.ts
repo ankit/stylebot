@@ -51,7 +51,7 @@ jest.mock('./styles', () => {
         );
       }
     ),
-    removeStyleGalleryListings: jest.fn(async (styleId: string) => {
+    removeStyleGalleryListings: jest.fn(async (styleId: number) => {
       for (const [url, saved] of Object.entries(mockStyles)) {
         const { sheets } = expandProfiles(saved);
 
@@ -74,12 +74,11 @@ const savedStyle = (profiles: StyleMap[string]['profiles'] = undefined) => ({
 });
 
 const listing = (
-  styleId: string,
+  styleId: number,
   slug: string,
   authorId = 'someone'
 ): GalleryListing => ({
   styleId,
-  group: 'github.com',
   slug,
   version: 1,
   cssHash: 'abc',
@@ -172,7 +171,7 @@ describe('gallery messages', () => {
   it('lists only styles for this site', async () => {
     fetchMock.mockResponseOnce(
       JSON.stringify({
-        styles: [style, { ...style, id: 'other', site: 'example.com' }],
+        styles: [style, { ...style, id: 10, site: 'example.com' }],
       })
     );
 
@@ -300,7 +299,6 @@ describe('gallery messages', () => {
         styleId: style.id,
         version: style.version,
         cssHash: hashCss(publishMessage.css),
-        group: style.group,
         slug: style.slug,
       },
       installed: null,
@@ -317,23 +315,22 @@ describe('gallery messages', () => {
       );
     mockStyles = {
       'github.com': savedStyle({
-        p1: { name: 'Night', galleryListing: listing('night', 'night') },
+        p1: { name: 'Night', galleryListing: listing(7, 'night') },
         p2: {
           name: 'Mine',
           css: 'a {}',
-          galleryListing: listing('mine', 'mine', account.id),
+          galleryListing: listing(8, 'mine', account.id),
         },
       }),
     };
 
     expect(await published('p1')).toEqual({
       published: null,
-      installed: { group: 'github.com', slug: 'night' },
+      installed: { id: 7, slug: 'night' },
     });
     expect(await published('p2')).toEqual({
       published: {
-        styleId: 'mine',
-        group: 'github.com',
+        styleId: 8,
         slug: 'mine',
         version: 1,
         cssHash: 'abc',
@@ -502,8 +499,8 @@ describe('gallery messages', () => {
   });
 
   it("suggests the site's styles that are neither installed nor published here", async () => {
-    const other = { ...style, id: 'other', slug: 'other' };
-    const installed = { ...style, id: 'installed', slug: 'installed' };
+    const other = { ...style, id: 10, slug: 'other' };
+    const installed = { ...style, id: 9, slug: 'installed' };
     mockStyles = {
       'github.com': savedStyle({
         default: {
@@ -512,7 +509,7 @@ describe('gallery messages', () => {
         },
         p1: {
           name: 'Installed',
-          galleryListing: listing('installed', 'installed'),
+          galleryListing: listing(9, 'installed'),
         },
       }),
     };
@@ -536,12 +533,12 @@ describe('gallery messages', () => {
     expect(response).toEqual({
       ok: true,
       styles: [other],
-      group: 'github.com',
+      site: 'github.com',
     });
   });
 
   it('suggests an installed style again once its profile is removed', async () => {
-    const installed = { ...style, id: 'installed', slug: 'installed' };
+    const installed = { ...style, id: 9, slug: 'installed' };
     mockStyles = {
       'github.com': savedStyle({ default: { name: '' } }),
     };
@@ -567,7 +564,7 @@ describe('gallery messages', () => {
       (global.chrome as { runtime?: unknown }).runtime = { id: 'stylebot' };
       mockStyles = {
         'github.com': savedStyle({
-          p1: { name: 'Night', galleryListing: listing('night', 'night') },
+          p1: { name: 'Night', galleryListing: listing(7, 'night') },
         }),
       };
     };
@@ -577,7 +574,7 @@ describe('gallery messages', () => {
         GetGalleryInstallStatus(
           {
             name: 'GetGalleryInstallStatus',
-            styleIds: styleIds as Array<string>,
+            styleIds: styleIds as Array<number>,
           },
           { id: 'stylebot', url },
           send
@@ -588,21 +585,24 @@ describe('gallery messages', () => {
       installedStyles();
 
       expect(
-        await status(['night', 'other', 42], 'https://gallery.stylebot.dev/s')
-      ).toEqual({ installed: { night: 'Night' } });
+        await status(
+          [7, 10, '7', 7.5, -7],
+          'https://gallery.stylebot.dev/site/github.com'
+        )
+      ).toEqual({ installed: { 7: 'Night' } });
     });
 
     it('tells other sites nothing', async () => {
       installedStyles();
 
-      expect(await status(['night'], 'https://example.com/')).toEqual({
+      expect(await status([7], 'https://example.com/')).toEqual({
         installed: {},
       });
     });
 
     it('only looks up the first 100 ids', async () => {
       installedStyles();
-      const ids = [...Array.from({ length: 100 }, (_, i) => `x${i}`), 'night'];
+      const ids = [...Array.from({ length: 100 }, (_, i) => i + 100), 7];
 
       expect(await status(ids, 'https://stylebot.dev/')).toEqual({
         installed: {},

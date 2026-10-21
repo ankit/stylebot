@@ -26,24 +26,25 @@ export type InstalledReply = {
   profileName: string | null;
 };
 
-export type PreviewRequest = { type: 'stylebot:preview'; id: string };
+// The style's gallery id doubles as the request's.
+export type PreviewRequest = { type: 'stylebot:preview'; id: number };
 
 export type PreviewResult = {
   type: 'stylebot:preview:result';
-  id: string;
+  id: number;
   ok: boolean;
 };
 
 export type StatusRequest = {
   type: 'stylebot:status';
   id: string;
-  styleIds: Array<string>;
+  styleIds: Array<number>;
 };
 
 export type StatusResult = {
   type: 'stylebot:status:result';
   id: string;
-  // The profile name each requested style is installed as.
+  // The profile name each requested style is installed as, by its id.
   installed: Record<string, string>;
 };
 
@@ -62,6 +63,6 @@ export type SiteReply = SiteMessages[SiteRequestType]['reply'];
 // A style previewed from the page was installed from its preview's tab.
 export type InstalledEvent = {
   type: 'stylebot:event:installed';
-  id: string;
+  id: number;
   profileName: string;
 };

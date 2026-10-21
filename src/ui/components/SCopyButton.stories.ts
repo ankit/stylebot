@@ -21,5 +21,5 @@ export const Focused: StoryObj = {
 
 export const WithLabel = fromTemplate(
   { SCopyButton },
-  `<s-copy-button text="https://gallery.stylebot.dev/s/github.com/tokyo-night" label="Copy" />`
+  `<s-copy-button text="https://gallery.stylebot.dev/style/42/tokyo-night" label="Copy" />`
 );

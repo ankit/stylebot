@@ -40,8 +40,7 @@ const isProfile = (value: unknown): value is StyleProfile =>
 
 const isGalleryListing = (value: unknown): value is GalleryListing =>
   isPlainObject(value) &&
-  typeof value.styleId === 'string' &&
-  typeof value.group === 'string' &&
+  Number.isSafeInteger(value.styleId) &&
   typeof value.slug === 'string' &&
   typeof value.version === 'number' &&
   typeof value.cssHash === 'string' &&
@@ -56,9 +55,9 @@ const repairGalleryListing = (value: unknown): GalleryListing | undefined => {
     return undefined;
   }
 
-  const { styleId, group, slug, version, cssHash, authorId } = value;
+  const { styleId, slug, version, cssHash, authorId } = value;
 
-  return { styleId, group, slug, version, cssHash, authorId };
+  return { styleId, slug, version, cssHash, authorId };
 };
 
 /**
@@ -75,7 +74,6 @@ export const isSameGalleryListing = (
 
   return (
     a.styleId === b.styleId &&
-    a.group === b.group &&
     a.slug === b.slug &&
     a.version === b.version &&
     a.cssHash === b.cssHash &&

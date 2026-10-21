@@ -29,8 +29,7 @@ const style = (rest: Partial<StyleWithoutUrl> = {}): StyleWithoutUrl => ({
 });
 
 const GALLERY_LISTING = {
-  styleId: 'night',
-  group: 'github.com',
+  styleId: 7,
   slug: 'night',
   version: 1,
   cssHash: 'abc',
@@ -175,6 +174,22 @@ describe('gallery listings', () => {
 
     expect(normalizeProfiles(broken).profiles).toEqual({ a: { name: 'A' } });
 
+    // Gallery styles were once ids of random letters, which it no longer has.
+    const lettered = style({
+      profiles: {
+        a: {
+          name: 'A',
+          galleryListing: {
+            ...GALLERY_LISTING,
+            styleId: 'Xk3p9QaL2m',
+          } as never,
+        },
+      },
+      activeProfile: 'a',
+    });
+
+    expect(normalizeProfiles(lettered).profiles).toEqual({ a: { name: 'A' } });
+
     const padded = style({
       profiles: {
         a: {
@@ -194,15 +209,15 @@ describe('gallery listings', () => {
     const listed = setProfileGalleryListing(
       setProfileGalleryListing(withTwo(), 'default', GALLERY_LISTING),
       'dark',
-      { ...GALLERY_LISTING, styleId: 'other' }
+      { ...GALLERY_LISTING, styleId: 10 }
     );
-    const isNight = ({ styleId }: { styleId: string }) => styleId === 'night';
+    const isNight = ({ styleId }: { styleId: number }) => styleId === 7;
 
     const removed = removeGalleryListings(listed, isNight);
 
     expect(removed.profiles?.default?.galleryListing).toBeUndefined();
     expect(removed.profiles?.dark?.galleryListing).toMatchObject({
-      styleId: 'other',
+      styleId: 10,
     });
     expect(removeGalleryListings(removed, isNight)).toBe(removed);
   });
@@ -306,6 +321,22 @@ describe('normalizeProfiles', () => {
     });
 
     expect(normalizeProfiles(broken).profiles).toEqual({ a: { name: 'A' } });
+
+    // Gallery styles were once ids of random letters, which it no longer has.
+    const lettered = style({
+      profiles: {
+        a: {
+          name: 'A',
+          galleryListing: {
+            ...GALLERY_LISTING,
+            styleId: 'Xk3p9QaL2m',
+          } as never,
+        },
+      },
+      activeProfile: 'a',
+    });
+
+    expect(normalizeProfiles(lettered).profiles).toEqual({ a: { name: 'A' } });
   });
 
   it('picks the profile without css when the active id is unknown', () => {

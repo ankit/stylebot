@@ -125,7 +125,7 @@ describe('gallery API', () => {
   it('publishes a new version without a site', async () => {
     fetchMock.mockResponseOnce(JSON.stringify(publishedStyle));
 
-    await publishVersion('abc', 'Xk3p9QaL2m', {
+    await publishVersion('abc', 42, {
       ...form,
       description: 'Dark',
       notes: 'Darker links',
@@ -134,7 +134,7 @@ describe('gallery API', () => {
     const { url, init } = lastRequest();
     const body = init.body as FormData;
 
-    expect(url).toBe(`${GALLERY_API_URL}/styles/Xk3p9QaL2m/versions`);
+    expect(url).toBe(`${GALLERY_API_URL}/styles/42/versions`);
     expect(body.has('site')).toBe(false);
     expect(body.get('description')).toBe('Dark');
     expect(body.get('notes')).toBe('Darker links');
@@ -143,11 +143,11 @@ describe('gallery API', () => {
   it('resolves an unpublish that returns no content', async () => {
     fetchMock.mockResponseOnce('', { status: 204 });
 
-    await expect(unpublishStyle('abc', 'Xk3p9QaL2m')).resolves.toBeUndefined();
+    await expect(unpublishStyle('abc', 42)).resolves.toBeUndefined();
 
     const { url, init } = lastRequest();
 
-    expect(url).toBe(`${GALLERY_API_URL}/styles/Xk3p9QaL2m/unpublish`);
+    expect(url).toBe(`${GALLERY_API_URL}/styles/42/unpublish`);
     expect(init.method).toBe('POST');
   });
 

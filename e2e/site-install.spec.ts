@@ -136,9 +136,8 @@ test('other sites get no bridge to install through', async ({ context }) => {
 const GALLERY_API = 'https://stylebot-styles.ahuja-ankit.workers.dev/api/v1';
 
 const night = {
-  id: 'night',
+  id: 7,
   site: 'example.com',
-  group: 'example.com',
   slug: 'night',
   name: 'Night',
   description: null,
@@ -147,7 +146,7 @@ const night = {
   installs: 0,
   createdAt: 0,
   updatedAt: 0,
-  screenshot: '/screenshots/night/1',
+  screenshot: '/screenshots/7/1',
   css: `h1 { color: ${PURPLE}; }`,
 };
 
@@ -155,7 +154,7 @@ const night = {
  * Asks the bridge which of the gallery styles are installed, the way the
  * gallery's browse grid does, and resolves with its answer.
  */
-const installStatus = (page: Page, styleIds: Array<string>) =>
+const installStatus = (page: Page, styleIds: Array<number>) =>
   page.evaluate(
     styleIds =>
       new Promise<Record<string, string> | null>(resolve => {
@@ -201,7 +200,7 @@ test.describe('install status', () => {
 
     const gallery = await context.newPage();
     await gallery.goto(GALLERY_URL);
-    expect(await installStatus(gallery, ['night', 'unknown'])).toEqual({});
+    expect(await installStatus(gallery, [7, 8])).toEqual({});
 
     await test.step('preview it from the gallery and install it', async () => {
       await gallery.evaluate(() => {
@@ -210,7 +209,7 @@ test.describe('install status', () => {
         button.textContent = 'Try on site';
         button.onclick = () =>
           window.postMessage(
-            { type: 'stylebot:preview', id: 'night' },
+            { type: 'stylebot:preview', id: 7 },
             location.origin
           );
         document.body.append(button);
@@ -238,8 +237,8 @@ test.describe('install status', () => {
       await extensionPage.close();
     });
 
-    expect(await installStatus(gallery, ['night', 'unknown'])).toEqual({
-      night: 'Night',
+    expect(await installStatus(gallery, [7, 8])).toEqual({
+      7: 'Night',
     });
 
     await extension.evaluate(async () => {
@@ -253,7 +252,7 @@ test.describe('install status', () => {
       await chrome.storage.local.set({ styles });
     });
 
-    expect(await installStatus(gallery, ['night', 'unknown'])).toEqual({});
+    expect(await installStatus(gallery, [7, 8])).toEqual({});
   });
 
   test('other sites get no install status', async ({ context }) => {
@@ -262,6 +261,6 @@ test.describe('install status', () => {
     const other = await context.newPage();
     await other.goto(OTHER_SITE_URL);
 
-    expect(await installStatus(other, ['night'])).toBeNull();
+    expect(await installStatus(other, [7])).toBeNull();
   });
 });

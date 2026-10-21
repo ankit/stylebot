@@ -62,8 +62,8 @@ const SHOWN = 2;
 
 type Data = {
   styles: Array<GalleryStyle>;
-  group: string | null;
-  previewId: string | null;
+  site: string | null;
+  previewId: number | null;
   installing: boolean;
   error: string;
 };
@@ -100,7 +100,7 @@ export default Vue.extend({
   data(): Data {
     return {
       styles: [],
-      group: null,
+      site: null,
       previewId: null,
       installing: false,
       error: '',
@@ -109,7 +109,7 @@ export default Vue.extend({
 
   computed: {
     browseUrl(): string {
-      return this.group ? getGallerySiteUrl(this.group) : '';
+      return this.site ? getGallerySiteUrl(this.site) : '';
     },
 
     shownStyles(): Array<GalleryStyle> {
@@ -138,7 +138,7 @@ export default Vue.extend({
     // A gallery that can't be reached leaves the popup as it always was.
     if (response?.ok) {
       this.styles = response.styles;
-      this.group = response.group;
+      this.site = response.site;
     }
 
     const preview = current?.preview;
@@ -181,7 +181,7 @@ export default Vue.extend({
      * is picked.
      */
     cancel(): void {
-      if (this.previewId && this.tab.id !== undefined) {
+      if (this.previewId !== null && this.tab.id !== undefined) {
         endGalleryPreview(this.tab.id);
       }
 

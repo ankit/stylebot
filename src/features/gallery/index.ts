@@ -4,6 +4,7 @@ export {
   getGalleryUrl,
   getGalleryStyleUrl,
   getGallerySiteUrl,
+  isGalleryStyleId,
   NAME_MAX_LENGTH,
   DESCRIPTION_MAX_LENGTH,
   NOTES_MAX_LENGTH,

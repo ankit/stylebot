@@ -645,7 +645,7 @@ export const restoreStyles = (
 /**
  * Drops a gallery style's listing from every profile, once it's unpublished.
  */
-export const removeStyleGalleryListings = (styleId: string) =>
+export const removeStyleGalleryListings = (styleId: number) =>
   update(styles => {
     const isUnpublished = (galleryListing: GalleryListing) =>
       galleryListing.styleId === styleId;

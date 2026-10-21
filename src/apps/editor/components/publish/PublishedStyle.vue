@@ -93,10 +93,10 @@ export default Vue.extend({
       return getGalleryStyleUrl(this.styleData);
     },
 
-    // The site and slug, which tell styles apart; the site gives way when long.
+    // The style's address without the Gallery's; the id gives way when long.
     link(): { base: string; slug: string } {
       return {
-        base: `${this.styleData.site.replace(/^www\./, '')}/`,
+        base: `style/${this.styleData.id}/`,
         slug: this.styleData.slug,
       };
     },

@@ -7,10 +7,12 @@ import {
   getProfileGalleryListing,
 } from './profile-listings';
 
-const listing = (styleId: string, version = 1): GalleryListing => ({
+const NIGHT = 7;
+const MINE = 8;
+
+const listing = (styleId: number, version = 1): GalleryListing => ({
   styleId,
-  group: 'github.com',
-  slug: styleId,
+  slug: `style-${styleId}`,
   version,
   cssHash: 'abc',
   authorId: 'someone',
@@ -25,40 +27,41 @@ const styles: StyleMap = {
     activeProfile: 'p1',
     profiles: {
       default: { name: '', css: 'a {}' },
-      p1: { name: 'Night', galleryListing: listing('night') },
-      p2: { name: 'Mine', css: 'b {}', galleryListing: listing('mine') },
-      p3: { name: 'Mine 2', css: 'c {}', galleryListing: listing('mine', 2) },
+      p1: { name: 'Night', galleryListing: listing(NIGHT) },
+      p2: { name: 'Mine', css: 'b {}', galleryListing: listing(MINE) },
+      p3: { name: 'Mine 2', css: 'c {}', galleryListing: listing(MINE, 2) },
     },
   },
 };
 
 describe('profile listings', () => {
   it('lists the profiles a style is listed as, with their css, latest version first', () => {
-    expect(getListedProfiles(styles, 'night')).toEqual([
+    expect(getListedProfiles(styles, NIGHT)).toEqual([
       {
         url: 'github.com',
         profileId: 'p1',
         name: 'Night',
         css: 'a { color: navy; }',
-        galleryListing: listing('night'),
+        galleryListing: listing(NIGHT),
       },
     ]);
     expect(
-      getListedProfiles(styles, 'mine').map(({ profileId }) => profileId)
+      getListedProfiles(styles, MINE).map(({ profileId }) => profileId)
     ).toEqual(['p3', 'p2']);
-    expect(getListedProfiles(styles, 'unknown')).toEqual([]);
+    expect(getListedProfiles(styles, 99)).toEqual([]);
   });
 
   it('lists the styles installed or published here, and their profile names', () => {
-    expect(getListedStyleIds(styles)).toEqual(new Set(['night', 'mine']));
-    expect(getListedProfileNames(styles, ['night', 'mine', 'unknown'])).toEqual(
-      { night: 'Night', mine: 'Mine 2' }
-    );
+    expect(getListedStyleIds(styles)).toEqual(new Set([NIGHT, MINE]));
+    expect(getListedProfileNames(styles, [NIGHT, MINE, 99])).toEqual({
+      [NIGHT]: 'Night',
+      [MINE]: 'Mine 2',
+    });
   });
 
   it('reads one profile’s listing', () => {
     expect(getProfileGalleryListing(styles, 'github.com', 'p2')).toEqual(
-      listing('mine')
+      listing(MINE)
     );
     expect(
       getProfileGalleryListing(styles, 'github.com', 'default')

@@ -400,8 +400,7 @@ describe('mergeThreeWay with profiles', () => {
 
   describe('gallery listings', () => {
     const listing = (version: number) => ({
-      styleId: 'night',
-      group: 'a.com',
+      styleId: 7,
       slug: 'night',
       version,
       cssHash: 'abc',

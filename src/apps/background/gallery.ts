@@ -11,6 +11,7 @@ import {
   getSignedInAccount,
   hashCss,
   isGalleryApiError,
+  isGalleryStyleId,
   publishStyle,
   publishVersion,
   SCREENSHOT_MAX_BYTES,
@@ -87,7 +88,7 @@ const fail = (e: unknown) => {
  */
 const removeListingIfNotFound = async (
   e: unknown,
-  styleId: string
+  styleId: number
 ): Promise<void> => {
   if (isGalleryApiError(e) && e.status === 404) {
     await removeStyleGalleryListings(styleId);
@@ -257,7 +258,6 @@ export const PublishToGallery = async (
 
     await setGalleryListing(message.url, message.profileId, {
       styleId: style.id,
-      group: style.group,
       slug: style.slug,
       version: style.version,
       cssHash: hashCss(message.css),
@@ -364,8 +364,8 @@ export const GetPublishedGalleryStyle = async (
   const { authorId, ...published } = listing;
 
   if (authorId !== account?.id) {
-    const { group, slug } = listing;
-    sendResponse({ published: null, installed: { group, slug } });
+    const { styleId, slug } = listing;
+    sendResponse({ published: null, installed: { id: styleId, slug } });
     return;
   }
 
@@ -394,7 +394,7 @@ export const GetGallerySuggestions = async (
     sendResponse({
       ok: true,
       styles: styles.filter(style => !listed.has(style.id)),
-      group: styles[0]?.group ?? null,
+      site,
     });
   } catch (e) {
     sendResponse(fail(e));
@@ -444,10 +444,9 @@ export const OpenGalleryPreview = async (
 ): Promise<void> => {
   const fromSiteBridge =
     sender.id === chrome.runtime.id && isStylebotSite(sender.url);
-  const isValidId = typeof id === 'string' && id.length <= 64;
 
   try {
-    if (!fromSiteBridge || !isValidId || !sender.tab) {
+    if (!fromSiteBridge || !isGalleryStyleId(id) || !sender.tab) {
       throw new Error('Preview refused');
     }
 
@@ -541,12 +540,7 @@ export const GetGalleryInstallStatus = async (
   }
 
   const maxStyles = 100;
-  const maxIdLength = 64;
-  const ids = styleIds
-    .filter(
-      (id): id is string => typeof id === 'string' && id.length <= maxIdLength
-    )
-    .slice(0, maxStyles);
+  const ids = styleIds.filter(isGalleryStyleId).slice(0, maxStyles);
   const savedStyles = await getAll();
 
   sendResponse({ installed: getListedProfileNames(savedStyles, ids) });

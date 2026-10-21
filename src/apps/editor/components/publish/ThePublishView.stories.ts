@@ -28,9 +28,8 @@ export const SignedIn = {
 };
 
 const tokyoNight = {
-  id: 'Xk3p9QaL2m',
+  id: 42,
   site: 'example.com',
-  group: 'example.com',
   slug: 'tokyo-night',
   name: 'Tokyo Night',
   description: 'The Tokyo Night palette',
@@ -39,7 +38,7 @@ const tokyoNight = {
   installs: 120,
   createdAt: 0,
   updatedAt: 0,
-  screenshot: '/screenshots/Xk3p9QaL2m/1',
+  screenshot: '/screenshots/42/1',
   status: 'live' as const,
 };
 
@@ -54,7 +53,6 @@ export const Update = {
           styleId: tokyoNight.id,
           version: 1,
           cssHash: '',
-          group: tokyoNight.group,
           slug: tokyoNight.slug,
         },
       },

@@ -97,8 +97,7 @@ describe('isEquivalentStyleMap with profiles', () => {
           name: 'Dark',
           css: 'b {}',
           galleryListing: {
-            styleId: 'night',
-            group: 'a.com',
+            styleId: 7,
             slug: 'night',
             version: 1,
             cssHash: 'abc',

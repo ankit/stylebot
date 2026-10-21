@@ -51,7 +51,13 @@ export default Vue.extend({
     },
 
     link(): string {
-      return this.published ? getGalleryStyleUrl(this.published) : '';
+      if (!this.published) {
+        return '';
+      }
+
+      const { styleId, slug } = this.published;
+
+      return getGalleryStyleUrl({ id: styleId, slug });
     },
   },
 

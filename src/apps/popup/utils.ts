@@ -333,7 +333,7 @@ export const getGallerySuggestions = (
 
 export const previewGalleryStyle = (
   tabId: number,
-  id: string
+  id: number
 ): Promise<PreviewGalleryStyleResponse> =>
   chrome.runtime.sendMessage<PreviewGalleryStyle, PreviewGalleryStyleResponse>({
     name: 'PreviewGalleryStyle',

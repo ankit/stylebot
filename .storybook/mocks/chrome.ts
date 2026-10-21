@@ -75,7 +75,7 @@ export type GalleryShimOptions = {
   previewing?: GalleryStyle;
   install?: InstallGalleryPreviewResponse;
   // The gallery style the profile was installed from.
-  installed?: { group: string; slug: string };
+  installed?: { id: number; slug: string };
 };
 
 const GALLERY_SCREENSHOT =
@@ -283,10 +283,10 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     GetGallerySuggestions: () => ({
       ok: true,
       styles: gallery.suggestions ?? [],
-      group: gallery.suggestions?.[0]?.group ?? null,
+      site: 'example.com',
     }),
     PreviewGalleryStyle: message => {
-      const { id } = message as unknown as { id: string };
+      const { id } = message as unknown as { id: number };
       previewing = gallery.suggestions?.find(each => each.id === id);
 
       return { ok: true };
@@ -312,15 +312,14 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
 
       const { title, styleId } = message as unknown as {
         title: string;
-        styleId?: string;
+        styleId?: number;
       };
 
       return {
         ok: true,
         style: {
-          id: styleId ?? 'new-style',
+          id: styleId ?? 99,
           site: 'example.com',
-          group: 'example.com',
           slug: 'new-style',
           name: title,
           description: null,

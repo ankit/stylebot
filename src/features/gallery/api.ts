@@ -76,10 +76,10 @@ export const publishStyle = (
  */
 export const publishVersion = (
   session: string,
-  id: string,
+  id: number,
   form: StyleForm
 ): Promise<GalleryPublishedStyle> =>
-  request(`/styles/${encodeURIComponent(id)}/versions`, {
+  request(`/styles/${id}/versions`, {
     method: 'POST',
     session,
     form: toFormData(form),
@@ -89,8 +89,8 @@ export const publishVersion = (
  * Takes one of the account's styles out of the gallery; the website can
  * publish it again or delete it for good.
  */
-export const unpublishStyle = (session: string, id: string): Promise<void> =>
-  request(`/styles/${encodeURIComponent(id)}/unpublish`, {
+export const unpublishStyle = (session: string, id: number): Promise<void> =>
+  request(`/styles/${id}/unpublish`, {
     method: 'POST',
     session,
   });
@@ -126,18 +126,18 @@ export const getSiteStyles = (
 /**
  * A live style with the CSS of its latest version.
  */
-export const getStyle = (id: string): Promise<GalleryStyleWithCss> =>
-  request(`/styles/${encodeURIComponent(id)}`);
+export const getStyle = (id: number): Promise<GalleryStyleWithCss> =>
+  request(`/styles/${id}`);
 
 /**
  * Counts an install of a style, once per install id however often it's
  * sent, and answers with its latest CSS.
  */
 export const recordInstall = (
-  id: string,
+  id: number,
   installId: string
 ): Promise<GalleryStyleToInstall> =>
-  request(`/styles/${encodeURIComponent(id)}/installs`, {
+  request(`/styles/${id}/installs`, {
     method: 'POST',
     json: { installId },
   });

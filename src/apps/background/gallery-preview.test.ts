@@ -98,7 +98,6 @@ describe('gallery preview', () => {
             name: 'Tokyo Night',
             galleryListing: {
               styleId: style.id,
-              group: 'github.com',
               slug: 'tokyo-night',
               version: 2,
               cssHash: hashCss('a {}'),
@@ -182,7 +181,6 @@ describe('gallery preview', () => {
       css: 'a { color: red; }',
       galleryListing: {
         styleId: style.id,
-        group: 'github.com',
         slug: 'tokyo-night',
         version: 2,
         cssHash: hashCss('a { color: red; }'),
@@ -210,7 +208,6 @@ describe('gallery preview', () => {
     const LATEST_CSS = 'a { color: blue; }';
     const LATEST_LISTING: GalleryListing = {
       styleId: style.id,
-      group: 'github.com',
       slug: 'tokyo-night',
       version: 2,
       cssHash: hashCss(LATEST_CSS),

@@ -53,15 +53,15 @@ export const ratingEligible = (
 });
 
 const galleryStyle = (
-  id: string,
+  id: number,
+  slug: string,
   name: string,
   installs: number,
   author: string
 ): GalleryStyle => ({
   id,
   site: 'example.com',
-  group: 'example.com',
-  slug: id,
+  slug,
   name,
   description: null,
   author: { id: `author-${id}`, username: author },
@@ -75,6 +75,6 @@ const galleryStyle = (
 
 // The site's most installed gallery styles, as the popup suggests them.
 export const gallerySuggestions: Array<GalleryStyle> = [
-  galleryStyle('tokyo-night', 'Tokyo Night', 1240, 'maya'),
-  galleryStyle('paper', 'Paper', 1, 'author-482913'),
+  galleryStyle(1, 'tokyo-night', 'Tokyo Night', 1240, 'maya'),
+  galleryStyle(2, 'paper', 'Paper', 1, 'author-482913'),
 ];

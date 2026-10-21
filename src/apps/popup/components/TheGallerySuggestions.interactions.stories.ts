@@ -66,7 +66,7 @@ export const PreviewsThenInstalls: StoryObj = {
       await expect(sent).toHaveBeenCalledWith(
         expect.objectContaining({
           name: 'PreviewGalleryStyle',
-          id: 'tokyo-night',
+          id: 1,
         })
       );
     });
@@ -172,7 +172,7 @@ export const BrowsesAll: StoryObj = {
 
     await expect(link).toHaveAttribute(
       'href',
-      'https://gallery.stylebot.dev/s/example.com'
+      'https://gallery.stylebot.dev/site/example.com'
     );
     await expect(link).toHaveAttribute('target', '_blank');
   },
