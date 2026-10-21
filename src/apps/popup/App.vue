@@ -1,5 +1,9 @@
 <template>
-  <s-theme-provider class="popup" :mode="appearance">
+  <s-theme-provider
+    class="popup"
+    :class="{ 'full-page': fullPage }"
+    :mode="appearance"
+  >
     <div v-if="tab && pageSupport && pageSupport !== 'supported'">
       <unsupported-page :url="tab.url || ''" :support="pageSupport" />
 
@@ -134,7 +138,7 @@ import type {
   StylebotLayout,
   StylebotDockLocation,
 } from '@stylebot/types';
-import { detectChromiumVariant } from '@stylebot/utils';
+import { detectChromiumVariant, isAndroid } from '@stylebot/utils';
 import type { PageSupport } from '@stylebot/utils';
 
 export default Vue.extend({
@@ -187,6 +191,11 @@ export default Vue.extend({
   },
 
   computed: {
+    // Firefox for Android opens the popup as a whole page.
+    fullPage(): boolean {
+      return isAndroid();
+    },
+
     domain(): string {
       try {
         return this.tab?.url ? new URL(this.tab.url).hostname : '';
@@ -386,6 +395,10 @@ body {
 
 .popup {
   width: 320px;
+
+  &.full-page {
+    width: auto;
+  }
 }
 
 .popup-header {

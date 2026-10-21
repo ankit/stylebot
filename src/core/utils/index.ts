@@ -3,6 +3,7 @@ export type { Debounced } from './debounce';
 export { throttle } from './throttle';
 export { splitCommaList } from './split-comma-list';
 export { isMac } from './is-mac';
+export { isAndroid } from './is-android';
 export { isSaveShortcut } from './save-shortcut';
 export { isSafari } from './is-safari';
 export {
