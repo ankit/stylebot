@@ -50,6 +50,11 @@ export type DeleteProfile = {
   profileId: string;
 };
 
+export type DeleteStyle = {
+  name: 'DeleteStyle';
+  url: string;
+};
+
 export type EnableStyle = {
   name: 'EnableStyle';
   url: string;
@@ -390,6 +395,7 @@ type BackgroundPageMessage =
   | InstallStyle
   | RenameProfile
   | DeleteProfile
+  | DeleteStyle
   | GetAllOptions
   | GetOption
   | SetOption

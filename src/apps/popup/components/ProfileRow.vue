@@ -4,19 +4,12 @@
     :class="{ checked, disabled, 'menu-open': menuOpen }"
   >
     <div v-if="renaming" class="profile-option">
-      <input
-        ref="input"
+      <profile-name-input
         :value="value"
-        class="name-input"
-        autocomplete="off"
-        :class="{ invalid: !!error }"
-        :aria-label="t('profile_name')"
-        :aria-invalid="error ? 'true' : 'false'"
-        :title="error"
-        @input="onInput"
-        @keydown.enter.prevent="$emit('submit')"
-        @keydown.esc.prevent.stop="$emit('cancel')"
-        @blur="$emit('submit')"
+        :error="error"
+        @input="$emit('input', $event)"
+        @submit="$emit('submit')"
+        @cancel="$emit('cancel')"
       />
       <span class="check-slot" aria-hidden="true">
         <check-icon v-if="checked" :size="16" />
@@ -71,6 +64,7 @@ import { SText } from '@stylebot/components';
 import { CheckIcon, MoreIcon } from '@stylebot/icons';
 
 import ProfileMenu from './ProfileMenu.vue';
+import ProfileNameInput from './ProfileNameInput.vue';
 import type { GalleryMenuItem } from '@stylebot/gallery';
 
 /**
@@ -85,6 +79,7 @@ export default Vue.extend({
     CheckIcon,
     MoreIcon,
     ProfileMenu,
+    ProfileNameInput,
   },
 
   props: {
@@ -121,26 +116,7 @@ export default Vue.extend({
     },
   },
 
-  watch: {
-    async renaming(renaming: boolean): Promise<void> {
-      if (!renaming) {
-        return;
-      }
-
-      await this.$nextTick();
-
-      const input = this.$refs.input as HTMLInputElement;
-
-      input.focus();
-      input.select();
-    },
-  },
-
   methods: {
-    onInput(event: Event): void {
-      this.$emit('input', (event.target as HTMLInputElement).value);
-    },
-
     /**
      * Closes the menu and hands focus back to the ••• that opened it.
      */
@@ -249,26 +225,5 @@ export default Vue.extend({
   }
 
   @include focus-ring;
-}
-
-.name-input {
-  flex: 1;
-  width: 0;
-  min-width: 0;
-  height: 26px;
-  margin-left: -6px;
-  padding: 0 6px;
-  border: none;
-  border-radius: 6px;
-  outline: none;
-  font: inherit;
-  font-size: 14px;
-  color: var(--text-primary);
-  background: var(--field-surface);
-  box-shadow: 0 0 0 1.5px var(--accent);
-
-  &.invalid {
-    box-shadow: 0 0 0 1.5px var(--danger);
-  }
 }
 </style>

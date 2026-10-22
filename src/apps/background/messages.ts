@@ -17,6 +17,7 @@ import {
   installProfile,
   renameProfile,
   deleteProfile,
+  deleteStyle,
 } from './styles';
 import * as styleStorage from './styles';
 import { isStylebotSite } from './is-stylebot-site';
@@ -40,6 +41,7 @@ import type {
   InstallStyleResponse,
   RenameProfile as RenameProfileType,
   DeleteProfile as DeleteProfileType,
+  DeleteStyle as DeleteStyleType,
   MoveStyle as MoveStyleType,
   SetAllStyles as SetAllStylesType,
   SetReadability as SetReadabilityType,
@@ -202,6 +204,11 @@ export const DeleteProfile = async (
   message: DeleteProfileType
 ): Promise<void> => {
   await deleteProfile(message.url, message.profileId);
+  return applyStylesToAllTabs();
+};
+
+export const DeleteStyle = async (message: DeleteStyleType): Promise<void> => {
+  await deleteStyle(message.url);
   return applyStylesToAllTabs();
 };
 

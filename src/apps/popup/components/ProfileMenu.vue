@@ -3,6 +3,7 @@
     dense
     class="row-menu"
     :min-width="180"
+    :max-height="POPUP_MAX_HEIGHT"
     @keydown.native="onKeydown"
     @click.native.stop
   >
@@ -20,7 +21,9 @@
     </template>
 
     <div v-else class="confirm">
-      <span class="confirm-message">{{ t('delete_this_profile') }}</span>
+      <span class="confirm-message">
+        {{ deletesStyle ? t('delete_this_style') : t('delete_this_profile') }}
+      </span>
       <div class="confirm-actions">
         <s-button size="small" @click="$emit('close')">
           {{ t('cancel') }}
@@ -46,6 +49,11 @@ import {
 
 import type { GalleryMenuItem } from '@stylebot/gallery';
 
+// Room left below the menu once the popup grows to fit it.
+const MENU_MARGIN = 8;
+// The tallest a browser shows an extension's popup.
+const POPUP_MAX_HEIGHT = 600;
+
 /**
  * A profile row's own actions, opened from its •••. Delete asks again in
  * place, so the popup never loses the menu to a dialog.
@@ -62,6 +70,9 @@ export default Vue.extend({
   },
 
   props: {
+    // Deleting the style's only profile deletes the style.
+    deletesStyle: Boolean,
+
     // Publishing to the Gallery, where the profile can be.
     publishItem: {
       type: Object as PropType<GalleryMenuItem | null>,
@@ -69,15 +80,32 @@ export default Vue.extend({
     },
   },
 
-  data(): { confirming: boolean } {
-    return { confirming: false };
+  data(): { confirming: boolean; POPUP_MAX_HEIGHT: number } {
+    return { confirming: false, POPUP_MAX_HEIGHT };
   },
 
   mounted() {
+    this.fitPopup();
     this.focusItem(0);
   },
 
+  beforeDestroy() {
+    document.body.style.minHeight = '';
+  },
+
   methods: {
+    /**
+     * Grows the popup to fit the menu, since the browser sizes a popup to
+     * its content and the menu floats over it rather than adding to it.
+     */
+    fitPopup(): void {
+      const menu = this.$el as HTMLElement;
+      const bottom =
+        menu.getBoundingClientRect().top + window.scrollY + menu.offsetHeight;
+
+      document.body.style.minHeight = `${Math.ceil(bottom) + MENU_MARGIN}px`;
+    },
+
     items(): Array<HTMLElement> {
       return Array.from(this.$el.querySelectorAll<HTMLElement>('button'));
     },

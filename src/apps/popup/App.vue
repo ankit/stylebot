@@ -52,6 +52,11 @@
           :shortcut="styleShortcut"
           :disable-toggle="isOpen || (pageReaderable && readability)"
           :initial-enabled="styles[0].enabled"
+          :publish-item="publishItems[siteProfiles[0].id] || null"
+          @edit="editSiteProfile(siteProfiles[0].id)"
+          @rename="renameSiteProfile(siteProfiles[0].id, $event)"
+          @publish="publishSiteProfile(siteProfiles[0].id)"
+          @delete="deleteSiteStyle"
         />
 
         <style-component
@@ -135,6 +140,7 @@ import {
   setActiveProfile,
   renameProfile,
   deleteProfile,
+  deleteStyle,
   getRestoredPageSupport,
   getPublishMenuItem,
 } from './utils';
@@ -462,6 +468,16 @@ export default Vue.extend({
 
       this.styles = [updated, ...rest];
       this.siteActiveProfile = expandProfiles(updated).active;
+    },
+
+    /**
+     * Deletes the site's style, leaving the page unstyled.
+     */
+    deleteSiteStyle(): void {
+      const [site, ...rest] = this.styles;
+
+      deleteStyle(site.url);
+      this.styles = rest;
     },
   },
 });
