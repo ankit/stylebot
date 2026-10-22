@@ -679,6 +679,19 @@ export const renameProfile = (url: string, profileId: string, name: string) =>
   updateStyle(url, style => renameStyleProfile(style, profileId, name));
 
 /**
+ * Deletes a url's style, with all its profiles.
+ */
+export const deleteStyle = (url: string) =>
+  update(styles => {
+    if (!styles[url]) {
+      return undefined;
+    }
+
+    delete styles[url];
+    return styles;
+  });
+
+/**
  * Deletes one of a url's profiles, never its last one.
  */
 export const deleteProfile = (url: string, profileId: string) =>

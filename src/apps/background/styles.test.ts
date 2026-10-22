@@ -22,6 +22,7 @@ import {
   removeStyleGalleryListings,
   renameProfile,
   deleteProfile,
+  deleteStyle,
   getGoogleWebFontExists,
   getGoogleFontFile,
   ensureCompiledStyles,
@@ -308,6 +309,15 @@ describe('style edits', () => {
     await deleteProfile('example.com', 'default');
 
     expect(writes()).toBe(0);
+  });
+
+  it('deletes a style with all its profiles, and skips the write for one that is gone', async () => {
+    await deleteStyle('example.com');
+    expect(stored('example.com')).toBeUndefined();
+
+    const written = writes();
+    await deleteStyle('example.com');
+    expect(writes()).toBe(written);
   });
 
   it('installs css as a new active profile, keeping the existing css and turning the style on', async () => {

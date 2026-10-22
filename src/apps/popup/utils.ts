@@ -10,6 +10,7 @@ import type {
   SetActiveProfile,
   RenameProfile,
   DeleteProfile,
+  DeleteStyle,
   StylebotOptions,
   EditorSidePanelOpened,
   OpenEditorSidePanel,
@@ -137,6 +138,12 @@ export const renameProfile = (
 
 export const deleteProfile = (url: string, profileId: string): void => {
   const message: DeleteProfile = { name: 'DeleteProfile', url, profileId };
+
+  chrome.runtime.sendMessage(message);
+};
+
+export const deleteStyle = (url: string): void => {
+  const message: DeleteStyle = { name: 'DeleteStyle', url };
 
   chrome.runtime.sendMessage(message);
 };

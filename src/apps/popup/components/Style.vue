@@ -1,5 +1,9 @@
 <template>
-  <popup-row :hover="profiles.length < 2" :disabled="disableToggle">
+  <popup-row
+    :hover="profiles.length < 2"
+    :disabled="disableToggle"
+    :class="{ 'menu-open': menuOpen }"
+  >
     <s-toggle-switch
       v-model="enabled"
       :disabled="disableToggle"
@@ -7,12 +11,50 @@
       @change="onChange"
     >
       <span v-if="site" class="site-style-label">
-        <s-text as="span" size="large">{{ name || t('style') }}</s-text>
-        <span v-if="shortcut" class="shortcut-hint">
-          <s-shortcut-kbd :value="shortcut" />
-        </span>
+        <profile-name-input
+          v-if="renaming"
+          v-model="draft"
+          @submit="submitRename"
+          @cancel="renaming = false"
+        />
+        <template v-else>
+          <s-text as="span" size="large" class="site-style-name">
+            {{ displayedName }}
+          </s-text>
+          <span v-if="shortcut" class="shortcut-hint">
+            <s-shortcut-kbd :value="shortcut" />
+          </span>
+        </template>
       </span>
       <span v-else class="style-url">{{ url }}</span>
+
+      <template v-if="site" #trailing>
+        <span ref="actions" class="row-actions" @click.prevent.stop>
+          <button
+            ref="more"
+            type="button"
+            class="row-more"
+            :aria-label="t('profile_actions')"
+            aria-haspopup="menu"
+            :aria-expanded="menuOpen ? 'true' : 'false'"
+            @click="menuOpen = !menuOpen"
+          >
+            <more-icon :size="16" />
+          </button>
+
+          <profile-menu
+            v-if="menuOpen"
+            deletes-style
+            :publish-item="publishItem"
+            @click.native.prevent
+            @edit="act('edit')"
+            @rename="startRename"
+            @publish="act('publish')"
+            @delete="act('delete')"
+            @close="closeMenu"
+          />
+        </span>
+      </template>
     </s-toggle-switch>
 
     <span v-if="editable" class="edit-button" @click.stop>
@@ -50,7 +92,10 @@ import Vue from 'vue';
 import type { PropType } from 'vue';
 import type { ProfileSummary } from '@stylebot/saved-styles';
 import PopupRow from './PopupRow.vue';
-import { ComposeIcon } from '@stylebot/icons';
+import { ComposeIcon, MoreIcon } from '@stylebot/icons';
+import type { GalleryMenuItem } from '@stylebot/gallery';
+import ProfileMenu from './ProfileMenu.vue';
+import ProfileNameInput from './ProfileNameInput.vue';
 import {
   SIconButton,
   SMenuItem,
@@ -71,7 +116,10 @@ export default Vue.extend({
 
   components: {
     ComposeIcon,
+    MoreIcon,
     PopupRow,
+    ProfileMenu,
+    ProfileNameInput,
     SIconButton,
     SToggleSwitch,
     SShortcutKbd,
@@ -112,19 +160,33 @@ export default Vue.extend({
       type: Array as PropType<Array<ProfileSummary>>,
       default: () => [],
     },
+    publishItem: {
+      type: Object as PropType<GalleryMenuItem | null>,
+      default: null,
+    },
   },
 
   data(): {
     enabled: boolean;
     activeProfile: string;
+    menuOpen: boolean;
+    renaming: boolean;
+    draft: string;
   } {
     return {
       enabled: this.initialEnabled,
       activeProfile: this.profiles.find(profile => profile.active)?.id ?? '',
+      menuOpen: false,
+      renaming: false,
+      draft: '',
     };
   },
 
   computed: {
+    displayedName(): string {
+      return this.name || this.t('style');
+    },
+
     activeName(): string {
       const active = this.profiles.find(
         profile => profile.id === this.activeProfile
@@ -134,8 +196,63 @@ export default Vue.extend({
     },
   },
 
+  watch: {
+    menuOpen(open: boolean): void {
+      if (open) {
+        document.addEventListener('mousedown', this.onDocumentMousedown);
+      } else {
+        document.removeEventListener('mousedown', this.onDocumentMousedown);
+      }
+    },
+  },
+
+  beforeDestroy() {
+    document.removeEventListener('mousedown', this.onDocumentMousedown);
+  },
+
   methods: {
     openStyleInOptions,
+
+    onDocumentMousedown(event: MouseEvent): void {
+      const actions = this.$refs.actions as HTMLElement | undefined;
+
+      if (!actions?.contains(event.target as Node)) {
+        this.menuOpen = false;
+      }
+    },
+
+    /**
+     * Closes the menu and hands focus back to the ••• that opened it.
+     */
+    closeMenu(): void {
+      this.menuOpen = false;
+      (this.$refs.more as HTMLElement | undefined)?.focus();
+    },
+
+    act(action: 'edit' | 'publish' | 'delete'): void {
+      this.menuOpen = false;
+      this.$emit(action);
+    },
+
+    startRename(): void {
+      this.menuOpen = false;
+      this.draft = this.displayedName;
+      this.renaming = true;
+    },
+
+    submitRename(): void {
+      const name = this.draft.trim();
+
+      if (!this.renaming) {
+        return;
+      }
+
+      this.renaming = false;
+
+      if (name && name !== this.displayedName) {
+        this.$emit('rename', name);
+      }
+    },
 
     displayName(profile: ProfileSummary): string {
       return profile.name || this.t('profile_default_name');
@@ -177,6 +294,7 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 100%;
 }
 
 .profile-select {
@@ -202,15 +320,62 @@ export default Vue.extend({
   color: var(--icon-color);
 }
 
+.site-style-label .name-input {
+  position: static;
+  margin-top: -3px;
+  margin-bottom: -3px;
+  overflow: visible;
+  clip: auto;
+}
+
+.site-style-name {
+  @include truncate;
+
+  min-width: 0;
+}
+
+.row-actions {
+  position: relative;
+  display: flex;
+  flex: none;
+  cursor: default;
+}
+
+.row-more {
+  @include button-reset;
+
+  display: flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+  color: var(--text-muted);
+  opacity: var(--row-extras-shown, 0);
+  cursor: pointer;
+
+  &:hover,
+  .menu-open & {
+    color: var(--text-primary);
+  }
+
+  @include focus-ring;
+}
+
+.popup-row:hover,
+.popup-row:has(:focus-visible),
+.popup-row.menu-open {
+  --row-extras-shown: 1;
+}
+
+.popup-row.menu-open {
+  background: var(--hover-tint);
+}
+
 .shortcut-hint {
   display: inline-flex;
   color: var(--text-muted);
-  opacity: 0;
+  opacity: var(--row-extras-shown, 0);
   transition: opacity 0.12s ease;
-}
-
-.popup-row:hover .shortcut-hint,
-.popup-row:focus-within .shortcut-hint {
-  opacity: 1;
 }
 </style>

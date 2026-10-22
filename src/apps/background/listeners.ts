@@ -32,6 +32,7 @@ import {
   InstallStyle,
   RenameProfile,
   DeleteProfile,
+  DeleteStyle,
   SetReadability,
   GetReadabilitySettings,
   SetReadabilitySettings,
@@ -332,6 +333,9 @@ export const initListeners = (): void => {
           break;
         case 'DeleteProfile':
           DeleteProfile(message);
+          break;
+        case 'DeleteStyle':
+          DeleteStyle(message);
           break;
 
         case 'SetReadability':
