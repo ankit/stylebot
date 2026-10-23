@@ -284,9 +284,13 @@ describe('getPublishMenuItem', () => {
     });
   });
 
-  it("offers nothing for someone else's installed style", async () => {
+  it("links someone else's installed style to its Gallery page", async () => {
     answer({ published: null, installed: { id: 2, slug: 's' } });
 
-    expect(await getPublishMenuItem('example.com', 'p', 'h1 {}')).toBeNull();
+    expect(await getPublishMenuItem('example.com', 'p', 'h1 {}')).toEqual({
+      label: 'view_in_gallery',
+      changed: false,
+      url: expect.stringMatching(/\/style\/2\/s$/),
+    });
   });
 });

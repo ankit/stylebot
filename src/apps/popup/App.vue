@@ -144,9 +144,9 @@ import {
   getRestoredPageSupport,
   getPublishMenuItem,
 } from './utils';
+import type { ProfileGalleryItem } from './utils';
 
 import { requestPublishing } from '@stylebot/gallery';
-import type { GalleryMenuItem } from '@stylebot/gallery';
 
 import { getGoogleDriveSyncEnabled } from '@stylebot/sync';
 import {
@@ -203,7 +203,7 @@ export default Vue.extend({
     // A gallery style is shown on the page in place of the site's own.
     galleryPreviewing: boolean;
     // Each site profile's way into publishing, once known.
-    publishItems: Record<string, GalleryMenuItem | null>;
+    publishItems: Record<string, ProfileGalleryItem | null>;
   } {
     return {
       styles: [],
@@ -428,9 +428,18 @@ export default Vue.extend({
     },
 
     /**
-     * Opens the editor on a profile, straight into publishing it.
+     * Opens an installed profile's page in the Gallery, or the editor on a
+     * profile of yours, straight into publishing it.
      */
     publishSiteProfile(id: string): void {
+      const galleryUrl = this.publishItems[id]?.url;
+
+      if (galleryUrl) {
+        chrome.tabs.create({ url: galleryUrl });
+        window.close();
+        return;
+      }
+
       requestPublishing(this.styles[0].url, id);
 
       if (this.isOpen) {
