@@ -50,3 +50,6 @@ export const isValidUsername = (username: string): boolean =>
   username.length <= USERNAME_MAX_LENGTH &&
   /^[a-z0-9]+(-[a-z0-9]+)*$/.test(username);
 export const SCREENSHOT_MAX_BYTES = 1024 * 1024;
+
+// The code the gallery refuses a new version with when its CSS is the latest's.
+export const CSS_UNCHANGED = 'css_unchanged';

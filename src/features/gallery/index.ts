@@ -11,6 +11,7 @@ export {
   USERNAME_MAX_LENGTH,
   isValidUsername,
   SCREENSHOT_MAX_BYTES,
+  CSS_UNCHANGED,
 } from './config';
 
 export {
@@ -19,7 +20,7 @@ export {
   type GalleryApiError,
 } from './request';
 
-export { type StyleForm } from './to-form-data';
+export { type StyleDetailsForm, type StyleForm } from './to-form-data';
 
 export {
   createSession,
@@ -28,6 +29,7 @@ export {
   getMyStyles,
   publishStyle,
   publishVersion,
+  editStyle,
   unpublishStyle,
   getSiteStyles,
   getGallerySites,

@@ -30,6 +30,7 @@
             :current-username="account ? account.username : ''"
             :username-unavailable.sync="usernameUnavailable"
             :update="Boolean(target)"
+            :new-version="newVersion"
           />
         </div>
 
@@ -50,6 +51,7 @@
       :publishing="publishing"
       :can-publish="canPublish"
       :has-changes="hasChanges"
+      :new-version="newVersion"
       @publish="publish"
     />
 
@@ -195,6 +197,14 @@ export default Vue.extend({
       return this.t('publish_to_gallery');
     },
 
+    // An update with unchanged CSS edits the details, without a new version.
+    newVersion(): boolean {
+      return (
+        Boolean(this.target) &&
+        hashCss(this.$store.state.css) !== this.publishedCssHash
+      );
+    },
+
     // An update needs something new; the author is the account's, not a version's.
     hasChanges(): boolean {
       if (!this.target) {
@@ -202,8 +212,8 @@ export default Vue.extend({
       }
 
       return (
+        this.newVersion ||
         this.tookScreenshot ||
-        hashCss(this.$store.state.css) !== this.publishedCssHash ||
         this.name.trim() !== this.target.name ||
         this.description.trim() !== (this.target.description ?? '')
       );
@@ -441,7 +451,7 @@ export default Vue.extend({
           profileId: activeProfile,
           title: this.name.trim(),
           description: this.description.trim(),
-          notes: this.notes.trim(),
+          notes: this.newVersion ? this.notes.trim() : '',
           css,
           screenshot,
         });

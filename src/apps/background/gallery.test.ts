@@ -180,6 +180,58 @@ describe('gallery messages', () => {
     expect(body.has('screenshot')).toBe(false);
   });
 
+  describe('updating a published style', () => {
+    const update = { ...publishMessage, styleId: style.id, notes: 'Darker' };
+
+    beforeEach(() => {
+      mockStyles = {
+        'github.com': savedStyle({
+          default: {
+            name: '',
+            css: publishMessage.css,
+            galleryListing: {
+              ...listing(style.id, style.slug, account.id),
+              cssHash: hashCss(publishMessage.css),
+            },
+          },
+        }),
+      };
+    });
+
+    it("edits only the details when the CSS hasn't changed", async () => {
+      fetchMock.mockResponseOnce(JSON.stringify(publishedStyle));
+
+      await respond(send => PublishToGallery(update, send));
+
+      const [url, init] = fetchMock.mock.calls[0];
+      const body = init?.body as FormData;
+
+      expect(url).toBe(`${GALLERY_API_URL}/styles/${style.id}`);
+      expect(init?.method).toBe('PATCH');
+      expect(body.has('css')).toBe(false);
+      expect(body.has('notes')).toBe(false);
+    });
+
+    it('edits the details when the gallery finds the new CSS the same', async () => {
+      fetchMock
+        .mockResponseOnce(
+          JSON.stringify({ error: 'Nothing changed.', code: 'css_unchanged' }),
+          { status: 422 }
+        )
+        .mockResponseOnce(JSON.stringify(publishedStyle));
+
+      const response = await respond(send =>
+        PublishToGallery({ ...update, css: `${publishMessage.css}\n` }, send)
+      );
+
+      expect(response).toEqual({ ok: true, style: publishedStyle });
+      expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+        `${GALLERY_API_URL}/styles/${style.id}/versions`,
+        `${GALLERY_API_URL}/styles/${style.id}`,
+      ]);
+    });
+  });
+
   it('lists only styles for this site', async () => {
     fetchMock.mockResponseOnce(
       JSON.stringify({
