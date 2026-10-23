@@ -1,6 +1,7 @@
 import * as postcss from 'postcss';
 
 import { getCurrentTimestamp } from '@stylebot/utils';
+import { hashCss } from '@stylebot/gallery';
 import {
   COMPILED_STYLES_KEY,
   STYLES_KEY,
@@ -613,6 +614,33 @@ export const reinstallProfile = async (
 
   return name;
 };
+
+/**
+ * Updates an installed profile to a newer version of its gallery style,
+ * leaving which profile is active and whether the style is on as they are.
+ * Skips a profile edited since it was installed, or already at that version.
+ */
+export const updateGalleryProfile = (
+  url: string,
+  profileId: string,
+  css: string,
+  galleryListing: GalleryListing
+) =>
+  updateStyle(url, style => {
+    const sheet = getProfileSheet(style, profileId);
+    const current = sheet?.galleryListing;
+    const isOutdated =
+      current?.styleId === galleryListing.styleId &&
+      current.version < galleryListing.version &&
+      hashCss(sheet?.css ?? '') === current.cssHash;
+
+    if (!isOutdated) {
+      return style;
+    }
+
+    const updated = setProfileCss(style, profileId, css);
+    return setProfileGalleryListing(updated, profileId, galleryListing);
+  });
 
 /**
  * Sets the gallery listing one of a url's profiles was published as.

@@ -223,7 +223,7 @@ const isOwnStyle = async ({ author }: GalleryStyle): Promise<boolean> => {
 /**
  * The gallery listing for a profile installed at the style's latest version.
  */
-const getLatestVersionListing = (
+export const getLatestVersionListing = (
   { id, slug, author }: GalleryStyle,
   { version, css }: GalleryStyleToInstall
 ): GalleryListing => ({
