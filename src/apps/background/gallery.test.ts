@@ -29,6 +29,11 @@ jest.mock('@stylebot/google-auth', () => ({
 }));
 jest.mock('./capture-tab', () => ({ captureTab: jest.fn() }));
 jest.mock('./gallery-preview', () => ({}));
+let mockGallerySuggestions: boolean;
+
+jest.mock('./options', () => ({
+  get: jest.fn(async () => mockGallerySuggestions),
+}));
 let mockStyles: StyleMap;
 
 jest.mock('./styles', () => {
@@ -110,7 +115,14 @@ beforeEach(() => {
   // Failures are logged for debugging; the tests check what's sent back.
   jest.spyOn(console, 'error').mockImplementation(() => undefined);
   fetchMock.resetMocks();
-  mockStorage({ 'gallery-session': session });
+  mockGallerySuggestions = true;
+  mockStorage({
+    'gallery-session': session,
+    'gallery-suggestion-sites': {
+      sites: ['github.com'],
+      fetchedAt: Date.now(),
+    },
+  });
   mockStyles = { 'github.com': savedStyle() };
 });
 
@@ -522,6 +534,7 @@ describe('gallery messages', () => {
         {
           name: 'GetGallerySuggestions',
           pageUrl: 'https://www.github.com/ankit',
+          incognito: false,
         },
         send
       )
@@ -551,12 +564,60 @@ describe('gallery messages', () => {
         {
           name: 'GetGallerySuggestions',
           pageUrl: 'https://github.com/',
+          incognito: false,
         },
         send
       )
     );
 
     expect(response).toMatchObject({ ok: true, styles: [installed] });
+  });
+
+  describe("doesn't ask the gallery", () => {
+    const suggest = (pageUrl: string, incognito = false) =>
+      respond(send =>
+        GetGallerySuggestions(
+          { name: 'GetGallerySuggestions', pageUrl, incognito },
+          send
+        )
+      );
+
+    it('with suggestions turned off', async () => {
+      mockGallerySuggestions = false;
+
+      expect(await suggest('https://github.com/')).toMatchObject({
+        ok: true,
+        styles: [],
+      });
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('from an incognito tab', async () => {
+      expect(await suggest('https://github.com/', true)).toMatchObject({
+        styles: [],
+      });
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('about a site the gallery has no styles for', async () => {
+      expect(await suggest('https://example.org/')).toMatchObject({
+        styles: [],
+      });
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('about a local or internal address', async () => {
+      for (const pageUrl of [
+        'http://localhost:3000/',
+        'http://192.168.1.1/',
+        'https://jira.corp/',
+        'https://github.com:8443/',
+      ]) {
+        expect(await suggest(pageUrl)).toMatchObject({ styles: [] });
+      }
+
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
   });
 
   describe('install status', () => {

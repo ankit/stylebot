@@ -6,6 +6,7 @@
       <the-theme />
       <the-position />
       <the-context-menu />
+      <the-gallery-suggestions />
     </s-list>
 
     <the-cli-access v-if="showCliAccess" />
@@ -22,6 +23,7 @@ import { supportsCLI } from '@stylebot/settings';
 import TheTheme from './basics/TheTheme.vue';
 import ThePosition from './basics/ThePosition.vue';
 import TheContextMenu from './basics/TheContextMenu.vue';
+import TheGallerySuggestions from './basics/TheGallerySuggestions.vue';
 import TheCliAccess from './basics/TheCliAccess.vue';
 import TheKeyboardShortcuts from './basics/TheKeyboardShortcuts.vue';
 
@@ -34,6 +36,7 @@ export default Vue.extend({
     TheTheme,
     ThePosition,
     TheContextMenu,
+    TheGallerySuggestions,
     TheCliAccess,
     TheKeyboardShortcuts,
   },

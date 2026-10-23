@@ -12,6 +12,8 @@ import {
   hashCss,
   isGalleryApiError,
   isGalleryStyleId,
+  isPublicSite,
+  getSuggestionSites,
   publishStyle,
   publishVersion,
   SCREENSHOT_MAX_BYTES,
@@ -73,6 +75,7 @@ import {
   undoGalleryInstall,
 } from './gallery-preview';
 import { isStylebotSite } from './is-stylebot-site';
+import { get as getOption } from './options';
 
 /**
  * Logs what went wrong, since the editor only shows a message for people.
@@ -377,15 +380,43 @@ export const GetPublishedGalleryStyle = async (
 const SUGGESTIONS_FETCHED = 12;
 
 /**
+ * Whether the gallery may be asked about a page's site: suggestions are on,
+ * the tab isn't private, the site is public and the gallery lists it, so the
+ * site's name never leaves the browser otherwise.
+ */
+const canAskGalleryAbout = async (
+  url: URL,
+  site: string,
+  incognito: boolean
+): Promise<boolean> => {
+  const enabled = await getOption('gallerySuggestions');
+
+  if (!enabled || incognito || !isPublicSite(url)) {
+    return false;
+  }
+
+  const sites = await getSuggestionSites();
+  return sites.has(site);
+};
+
+/**
  * The page's site's most installed gallery styles, leaving out the ones
  * installed or published here.
  */
 export const GetGallerySuggestions = async (
-  { pageUrl }: GetGallerySuggestionsType,
+  { pageUrl, incognito }: GetGallerySuggestionsType,
   sendResponse: (response: GetGallerySuggestionsResponse) => void
 ): Promise<void> => {
   try {
-    const site = toGallerySite(new URL(pageUrl).hostname);
+    const url = new URL(pageUrl);
+    const site = toGallerySite(url.hostname);
+    const allowed = await canAskGalleryAbout(url, site, incognito);
+
+    if (!allowed) {
+      sendResponse({ ok: true, styles: [], site });
+      return;
+    }
+
     const [{ styles }, listed] = await Promise.all([
       getSiteStyles(site, SUGGESTIONS_FETCHED),
       getAll().then(getListedStyleIds),
