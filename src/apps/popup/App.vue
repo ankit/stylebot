@@ -146,8 +146,6 @@ import {
 } from './utils';
 import type { ProfileGalleryItem } from './utils';
 
-import { requestPublishing } from '@stylebot/gallery';
-
 import { getGoogleDriveSyncEnabled } from '@stylebot/sync';
 import {
   expandProfiles,
@@ -374,7 +372,7 @@ export default Vue.extend({
         Object.entries(sheets).map(async ([id, { css }]) => {
           const item = await getPublishMenuItem(site.url, id, css);
 
-          return [id, item] as const;
+          return [id, item?.url ? item : null] as const;
         })
       );
 
@@ -428,8 +426,7 @@ export default Vue.extend({
     },
 
     /**
-     * Opens an installed profile's page in the Gallery, or the editor on a
-     * profile of yours, straight into publishing it.
+     * Opens an installed profile's page in the Gallery.
      */
     publishSiteProfile(id: string): void {
       const galleryUrl = this.publishItems[id]?.url;
@@ -437,16 +434,6 @@ export default Vue.extend({
       if (galleryUrl) {
         chrome.tabs.create({ url: galleryUrl });
         window.close();
-        return;
-      }
-
-      requestPublishing(this.styles[0].url, id);
-
-      if (this.isOpen) {
-        this.pickSiteProfile(id);
-        window.close();
-      } else {
-        this.editSiteProfile(id);
       }
     },
 

@@ -272,7 +272,7 @@ import SiteIcon from '../site/SiteIcon.vue';
 import StyleRowMenu from './StyleRowMenu.vue';
 import CodeEditor from './CodeEditor.vue';
 import IconMenuTrigger from '../IconMenuTrigger.vue';
-import { getGalleryAccount, getGalleryStyle } from '../../utils';
+import { getGalleryStyle } from '../../utils';
 
 type ProfileDialog = 'new' | 'rename';
 type GalleryRole = 'installed' | 'published';
@@ -336,7 +336,6 @@ export default Vue.extend({
     leaving: boolean;
     pendingNext: NavigationGuardNext | null;
     savedTimer: ReturnType<typeof setTimeout> | null;
-    galleryAccountId: string | null;
     // Usernames of the authors of installed gallery styles, by style id.
     galleryAuthors: Record<number, string>;
   } {
@@ -356,7 +355,6 @@ export default Vue.extend({
       leaving: false,
       pendingNext: null,
       savedTimer: null,
-      galleryAccountId: null,
       galleryAuthors: {},
     };
   },
@@ -501,7 +499,6 @@ export default Vue.extend({
 
   created(): void {
     window.addEventListener('keydown', this.onKeydown);
-    this.loadGalleryAccount();
 
     if (this.justSaved) {
       this.showSavedStatus();
@@ -616,19 +613,10 @@ export default Vue.extend({
     },
 
     /**
-     * Whether the profile was installed from the Gallery or published to it
-     * by the signed-in account.
+     * Whether the profile was installed from the Gallery.
      */
     galleryRole(id: string): GalleryRole | null {
-      const listing = this.expanded.sheets[id]?.galleryListing;
-
-      if (!listing) {
-        return null;
-      }
-
-      return listing.authorId === this.galleryAccountId
-        ? 'published'
-        : 'installed';
+      return this.expanded.sheets[id]?.galleryListing ? 'installed' : null;
     },
 
     async loadGalleryAuthor(): Promise<void> {
@@ -647,14 +635,6 @@ export default Vue.extend({
           [listing.styleId]: response.style.author.username,
         };
       }
-    },
-
-    async loadGalleryAccount(): Promise<void> {
-      const response = await getGalleryAccount();
-
-      this.galleryAccountId = response?.ok
-        ? response.account?.id ?? null
-        : null;
     },
 
     validateProfileName(name: string): string {

@@ -258,76 +258,10 @@ export type RestoreTab = {
   tabId: number;
 };
 
-export type GetGalleryAccount = {
-  name: 'GetGalleryAccount';
-};
-
-export type SignInToGallery = {
-  name: 'SignInToGallery';
-};
-
-export type SignOutOfGallery = {
-  name: 'SignOutOfGallery';
-};
-
-export type GetMyGalleryStyles = {
-  name: 'GetMyGalleryStyles';
-  site: string;
-  // The Stylebot style and profile, to find the one published from them.
-  url: string;
-  profileId: string;
-};
-
-// Leave out tabId to capture the tab the message came from. Returns the
-// capture as taken; CompressGalleryScreenshot makes it fit the gallery's limit.
+// Leave out tabId to capture the tab the message came from.
 export type CaptureGalleryScreenshot = {
   name: 'CaptureGalleryScreenshot';
   tabId?: number;
-};
-
-export type CompressGalleryScreenshot = {
-  name: 'CompressGalleryScreenshot';
-  screenshot: string;
-};
-
-// A screenshot the gallery already shows, by its path or URL, to review or
-// publish again.
-export type GetGalleryScreenshot = {
-  name: 'GetGalleryScreenshot';
-  path: string;
-};
-
-export type PublishToGallery = {
-  name: 'PublishToGallery';
-  // Set to publish a new version of this gallery style.
-  styleId?: number;
-  site: string;
-  url: string;
-  profileId: string;
-  title: string;
-  description: string;
-  // What changed; sent only with a new version.
-  notes: string;
-  css: string;
-  // A data URL, as CaptureGalleryScreenshot returns it. Required for a new
-  // style; a new version without one keeps the style's.
-  screenshot?: string;
-};
-
-export type UnpublishFromGallery = {
-  name: 'UnpublishFromGallery';
-  id: number;
-};
-
-export type SetGalleryUsername = {
-  name: 'SetGalleryUsername';
-  // The account's current one confirms it.
-  username: string;
-};
-
-export type CheckGalleryUsername = {
-  name: 'CheckGalleryUsername';
-  username: string;
 };
 
 export type GetPublishedGalleryStyle = {
@@ -435,17 +369,7 @@ type BackgroundPageMessage =
   | ReloadForSidePanelGrant
   | RunPageCommand
   | RestoreTab
-  | GetGalleryAccount
-  | SignInToGallery
-  | SignOutOfGallery
-  | GetMyGalleryStyles
   | CaptureGalleryScreenshot
-  | CompressGalleryScreenshot
-  | GetGalleryScreenshot
-  | PublishToGallery
-  | UnpublishFromGallery
-  | SetGalleryUsername
-  | CheckGalleryUsername
   | GetPublishedGalleryStyle
   | GetGallerySuggestions
   | GetGalleryStyle

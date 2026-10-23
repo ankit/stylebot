@@ -30,10 +30,7 @@ describe('LocalPageBridge', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     localStorage.clear();
-    bridge = new LocalPageBridge({
-      getStylebotCss: () => '',
-      reviewScreenshot: async () => null,
-    });
+    bridge = new LocalPageBridge({ getStylebotCss: () => '' });
   });
 
   describe('applyCss', () => {

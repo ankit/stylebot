@@ -24,7 +24,6 @@ export type RemotePageBridgeRequestArgs = {
   getAppliedDeclarations: [selector: string];
   getPageDeclarations: [selector: string];
   getSelectorAlternatives: [selector: string];
-  reviewScreenshot: [screenshot: string];
 };
 
 export type RemotePageBridgeRequestMethod = keyof RemotePageBridgeRequestArgs;
@@ -37,7 +36,6 @@ export type RemotePageBridgeRequestResult = {
   getAppliedDeclarations: Array<AppliedDeclaration>;
   getPageDeclarations: Array<CssDeclaration>;
   getSelectorAlternatives: SelectorAlternatives;
-  reviewScreenshot: string | null;
 };
 
 export type RemotePageBridgeRequest = {

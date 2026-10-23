@@ -8,30 +8,6 @@ export type GalleryAuthor = {
 };
 
 /**
- * The signed-in account: an author whose username the gallery made up until
- * they confirm it, by publishing with it or picking another.
- */
-export type GalleryAccount = GalleryAuthor & {
-  usernameConfirmed: boolean;
-};
-
-/**
- * Whether a username can be the account's, and if not, why and what the
- * gallery suggests instead.
- */
-export type GalleryUsernameCheck = {
-  available: boolean;
-  reason?: 'invalid' | 'reserved' | 'taken';
-  suggestion?: string;
-};
-
-/**
- * Whether one of the author's own styles is listed, or hidden after
- * reports until it's looked at.
- */
-export type GalleryStyleStatus = 'live' | 'hidden';
-
-/**
  * A style as the gallery lists it, describing its latest version.
  */
 export type GalleryStyle = {
@@ -49,8 +25,6 @@ export type GalleryStyle = {
   updatedAt: number;
   // A path on the gallery's server, for the latest version.
   screenshot: string;
-  // Only on the author's own styles.
-  status?: GalleryStyleStatus;
 };
 
 /**
@@ -63,14 +37,6 @@ export type GalleryPreview = {
   importUrls: Array<string>;
   // The gallery page it was opened from, told when it's installed.
   galleryTabId?: number;
-};
-
-/**
- * A style as publishing returns it, with what the server took out of the CSS
- * so the author can see it.
- */
-export type GalleryPublishedStyle = GalleryStyle & {
-  removed: Array<string>;
 };
 
 /**
@@ -90,16 +56,9 @@ export type GalleryPublished = {
  * language. The server's own message is passed along where it's specific.
  */
 export type GalleryErrorKey =
-  | 'gallery_error_sign_in'
   | 'gallery_error_network'
   | 'gallery_error_invalid'
-  | 'gallery_error_not_yours'
   | 'gallery_error_not_found'
-  | 'gallery_error_conflict'
-  | 'that_username_is_taken'
-  | 'that_username_is_reserved'
-  | 'gallery_error_screenshot_too_large'
-  | 'gallery_error_screenshot'
   | 'gallery_error_unknown';
 
 /**

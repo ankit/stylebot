@@ -1,22 +1,4 @@
-import type {
-  GalleryAccount,
-  GalleryPublishedStyle,
-  GalleryStyle,
-} from '@stylebot/types';
-
-import type { GallerySession } from './api';
-
-export const account: GalleryAccount = {
-  id: 'b7Rr2KdQ0z',
-  username: 'maya',
-  usernameConfirmed: true,
-};
-
-export const session: GallerySession = {
-  session: 'b7Rr2KdQ0z.1794614400000.secret',
-  expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000,
-  account,
-};
+import type { GalleryStyle } from '@stylebot/types';
 
 export const style: GalleryStyle = {
   id: 42,
@@ -24,18 +6,12 @@ export const style: GalleryStyle = {
   slug: 'tokyo-night',
   name: 'Tokyo Night',
   description: 'The Tokyo Night palette',
-  author: { id: account.id, username: account.username },
+  author: { id: 'b7Rr2KdQ0z', username: 'maya' },
   version: 2,
   installs: 120,
   createdAt: 1791849600000,
   updatedAt: 1792022400000,
   screenshot: '/screenshots/42/2',
-  status: 'live',
-};
-
-export const publishedStyle: GalleryPublishedStyle = {
-  ...style,
-  removed: ['@import url(https://example.com/theme.css);'],
 };
 
 /**

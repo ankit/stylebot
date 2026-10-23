@@ -158,23 +158,3 @@ export const MenuKeepsToggle: StoryObj = {
     ).toBeChecked();
   },
 };
-
-export const PublishStyle: StoryObj = {
-  ...oneStyle,
-  name: "the style's menu publishes it to the Gallery",
-  play: async ({ canvasElement }) => {
-    const setStorage = spyOn(chrome.storage.local, 'set');
-    const menu = await openStyleMenu(canvasElement);
-
-    await user.click(
-      await within(menu).findByRole('menuitem', { name: 'Publish to Gallery' })
-    );
-
-    await expect(setStorage).toHaveBeenCalledWith({
-      'gallery-publish-request': expect.objectContaining({
-        url: 'example.com',
-        profileId: 'default',
-      }),
-    });
-  },
-};

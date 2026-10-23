@@ -90,12 +90,8 @@ export type State = {
   selectors: Array<CssSelectorMetadata>;
 
   help: boolean;
-  // Whether the gallery's publish view replaces the editor.
-  publishing: boolean;
   // Page host: hides the panel while the page is captured for the gallery.
   capturing: boolean;
-  // The screenshot being reviewed over the page, whichever host asked.
-  screenshotReview: string | null;
   // What this style's profile last published to the gallery, if anything.
   publishedGalleryStyle: GalleryPublished | null;
   // The gallery style this profile was installed from, if any.
@@ -143,9 +139,7 @@ export const createStore = (host: EditorHost): Store<State> => {
       contextMenuSelector: '',
 
       help: false,
-      publishing: false,
       capturing: false,
-      screenshotReview: null,
       publishedGalleryStyle: null,
       installedGalleryStyle: null,
       visible: false,
