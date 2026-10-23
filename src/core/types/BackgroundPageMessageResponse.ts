@@ -94,6 +94,9 @@ export type GetPublishedGalleryStyleResponse = {
   published: GalleryPublished | null;
   installed: { id: number; slug: string } | null;
 };
+export type GetGalleryStyleResponse = GalleryResult<{
+  style: GalleryStyle;
+}>;
 // The page's gallery site, to browse the rest of its styles in the gallery.
 export type GetGallerySuggestionsResponse = GalleryResult<{
   styles: Array<GalleryStyle>;

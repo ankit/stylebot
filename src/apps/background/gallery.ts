@@ -7,6 +7,7 @@ import {
   getListedStyleIds,
   getMyStyles,
   getSiteStyles,
+  getStyle,
   getProfileGalleryListing,
   getSignedInAccount,
   hashCss,
@@ -36,6 +37,8 @@ import type {
   GetGalleryScreenshot as GetGalleryScreenshotType,
   GetGallerySuggestions as GetGallerySuggestionsType,
   GetGallerySuggestionsResponse,
+  GetGalleryStyle as GetGalleryStyleType,
+  GetGalleryStyleResponse,
   PreviewGalleryStyle as PreviewGalleryStyleType,
   PreviewGalleryStyleResponse,
   OpenGalleryPreview as OpenGalleryPreviewType,
@@ -427,6 +430,22 @@ export const GetGallerySuggestions = async (
       styles: styles.filter(style => !listed.has(style.id)),
       site,
     });
+  } catch (e) {
+    sendResponse(fail(e));
+  }
+};
+
+/**
+ * A gallery style without its CSS, for who wrote it and its latest version.
+ */
+export const GetGalleryStyle = async (
+  { styleId }: GetGalleryStyleType,
+  sendResponse: (response: GetGalleryStyleResponse) => void
+): Promise<void> => {
+  try {
+    const { css: _css, ...style } = await getStyle(styleId);
+
+    sendResponse({ ok: true, style });
   } catch (e) {
     sendResponse(fail(e));
   }

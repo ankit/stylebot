@@ -1,18 +1,19 @@
 <template>
   <div v-if="published" class="gallery-status">
-    <span v-if="!hasChanges" class="state">
-      <s-status-dot tone="success" />
+    <a
+      v-if="!hasChanges"
+      class="state published-link"
+      :href="link"
+      target="_blank"
+      rel="noopener"
+    >
+      <tray-out-icon class="status-icon" />
       {{ t('published') }}
-      <span class="separator">·</span>
-      <a class="version-link" :href="link" target="_blank" rel="noopener">
-        {{ t('version_number', [String(published.version)]) }}
-        <span class="arrow">↗</span>
-      </a>
-    </span>
+    </a>
 
     <template v-else>
       <span class="state">
-        <s-status-dot tone="warning" />
+        <tray-out-icon class="status-icon changed" />
         {{ t('unpublished_changes') }}
       </span>
       <s-button size="small" @click="openPublishing">
@@ -24,7 +25,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SButton, SStatusDot } from '@stylebot/components';
+import { SButton } from '@stylebot/components';
+import { TrayOutIcon } from '@stylebot/icons';
 import { getGalleryStyleUrl } from '@stylebot/gallery';
 import type { GalleryPublished } from '@stylebot/types';
 
@@ -38,7 +40,7 @@ export default Vue.extend({
 
   components: {
     SButton,
-    SStatusDot,
+    TrayOutIcon,
   },
 
   computed: {
@@ -92,7 +94,16 @@ export default Vue.extend({
   color: var(--text-muted);
 }
 
-.version-link {
+.status-icon {
+  flex: none;
+  color: var(--success);
+
+  &.changed {
+    color: var(--warning-icon);
+  }
+}
+
+.published-link {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -104,11 +115,6 @@ export default Vue.extend({
   }
 
   @include focus-ring(2px);
-}
-
-.separator,
-.arrow {
-  color: var(--text-faint);
 }
 
 .gallery-status .button.size-small {

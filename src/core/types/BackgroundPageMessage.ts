@@ -336,6 +336,12 @@ export type GetPublishedGalleryStyle = {
   profileId: string;
 };
 
+// A gallery style's author and latest version, by its id.
+export type GetGalleryStyle = {
+  name: 'GetGalleryStyle';
+  styleId: number;
+};
+
 export type GetGallerySuggestions = {
   name: 'GetGallerySuggestions';
   // The page's url; suggestions are the gallery's styles for its site.
@@ -442,6 +448,7 @@ type BackgroundPageMessage =
   | CheckGalleryUsername
   | GetPublishedGalleryStyle
   | GetGallerySuggestions
+  | GetGalleryStyle
   | PreviewGalleryStyle
   | OpenGalleryPreview
   | GetGalleryPreview
