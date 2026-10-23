@@ -143,8 +143,9 @@ import {
   deleteStyle,
   getRestoredPageSupport,
   getPublishMenuItem,
+  publishProfileToGallery,
 } from './utils';
-import type { ProfileGalleryItem } from './utils';
+import type { GalleryMenuItem } from '@stylebot/gallery';
 
 import { getGoogleDriveSyncEnabled } from '@stylebot/sync';
 import {
@@ -201,7 +202,7 @@ export default Vue.extend({
     // A gallery style is shown on the page in place of the site's own.
     galleryPreviewing: boolean;
     // Each site profile's way into publishing, once known.
-    publishItems: Record<string, ProfileGalleryItem | null>;
+    publishItems: Record<string, GalleryMenuItem | null>;
   } {
     return {
       styles: [],
@@ -372,7 +373,7 @@ export default Vue.extend({
         Object.entries(sheets).map(async ([id, { css }]) => {
           const item = await getPublishMenuItem(site.url, id, css);
 
-          return [id, item?.url ? item : null] as const;
+          return [id, item] as const;
         })
       );
 
@@ -426,15 +427,19 @@ export default Vue.extend({
     },
 
     /**
-     * Opens an installed profile's page in the Gallery.
+     * Opens the Gallery page a profile's item links to, or else publishes a
+     * profile of yours on the gallery site, without opening the editor.
      */
     publishSiteProfile(id: string): void {
       const galleryUrl = this.publishItems[id]?.url;
 
       if (galleryUrl) {
         chrome.tabs.create({ url: galleryUrl });
-        window.close();
+      } else if (this.tab?.id) {
+        publishProfileToGallery(this.tab.id, this.styles[0].url, id);
       }
+
+      window.close();
     },
 
     renameSiteProfile(id: string, name: string): void {
