@@ -133,7 +133,7 @@ test('other sites get no bridge to install through', async ({ context }) => {
   ).toBeNull();
 });
 
-const GALLERY_API = 'https://stylebot-styles.ahuja-ankit.workers.dev/api/v1';
+const GALLERY_API = 'https://api.stylebot.dev/v1';
 
 const night = {
   id: 7,

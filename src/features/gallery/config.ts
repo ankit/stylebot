@@ -1,5 +1,4 @@
-const DEFAULT_API_URL =
-  'https://stylebot-styles.ahuja-ankit.workers.dev/api/v1';
+const DEFAULT_API_URL = 'https://api.stylebot.dev/v1';
 
 // Development builds take STYLEBOT_GALLERY_API_URL, such as a local Worker's.
 export const GALLERY_API_URL =
