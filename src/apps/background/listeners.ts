@@ -69,17 +69,7 @@ import { getGoogleDriveSyncEnabled, SYNC_ISSUE_KEYS } from '@stylebot/sync';
 import { isSignInRedirect } from '@stylebot/google-auth';
 import { syncStyles } from './sync';
 import {
-  GetGalleryAccount,
-  SignInToGallery,
-  SignOutOfGallery,
-  GetMyGalleryStyles,
   CaptureGalleryScreenshot,
-  CompressGalleryScreenshot,
-  GetGalleryScreenshot,
-  PublishToGallery,
-  UnpublishFromGallery,
-  SetGalleryUsername,
-  CheckGalleryUsername,
   GetPublishedGalleryStyle,
   GetGallerySuggestions,
   GetGalleryStyle,
@@ -424,38 +414,8 @@ export const initListeners = (): void => {
           restoreTab(message.tabId).then(() => sendResponse({ ok: true }));
           return true;
 
-        case 'GetGalleryAccount':
-          GetGalleryAccount(sendResponse);
-          return true;
-        case 'SignInToGallery':
-          SignInToGallery(sendResponse);
-          return true;
-        case 'SignOutOfGallery':
-          SignOutOfGallery(sendResponse);
-          return true;
-        case 'GetMyGalleryStyles':
-          GetMyGalleryStyles(message, sendResponse);
-          return true;
         case 'CaptureGalleryScreenshot':
           CaptureGalleryScreenshot(message, sender, sendResponse);
-          return true;
-        case 'CompressGalleryScreenshot':
-          CompressGalleryScreenshot(message, sendResponse);
-          return true;
-        case 'GetGalleryScreenshot':
-          GetGalleryScreenshot(message, sendResponse);
-          return true;
-        case 'PublishToGallery':
-          PublishToGallery(message, sendResponse);
-          return true;
-        case 'UnpublishFromGallery':
-          UnpublishFromGallery(message, sendResponse);
-          return true;
-        case 'SetGalleryUsername':
-          SetGalleryUsername(message, sendResponse);
-          return true;
-        case 'CheckGalleryUsername':
-          CheckGalleryUsername(message, sendResponse);
           return true;
         case 'GetPublishedGalleryStyle':
           GetPublishedGalleryStyle(message, sendResponse);

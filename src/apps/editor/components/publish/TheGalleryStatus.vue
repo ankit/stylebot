@@ -11,35 +11,27 @@
       {{ t('published') }}
     </a>
 
-    <template v-else>
-      <span class="state">
-        <tray-out-icon class="status-icon changed" />
-        {{ t('unpublished_changes') }}
-      </span>
-      <s-button size="small" @click="openPublishing">
-        {{ t('publish') }}
-      </s-button>
-    </template>
+    <span v-else class="state">
+      <tray-out-icon class="status-icon changed" />
+      {{ t('unpublished_changes') }}
+    </span>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { SButton } from '@stylebot/components';
 import { TrayOutIcon } from '@stylebot/icons';
 import { getGalleryStyleUrl } from '@stylebot/gallery';
 import type { GalleryPublished } from '@stylebot/types';
 
 /**
  * A published style's Gallery state under the editor: the live version,
- * linking to its Gallery page, or edits the Gallery doesn't have yet with a
- * way to publish them.
+ * linking to its Gallery page, or edits the Gallery doesn't have yet.
  */
 export default Vue.extend({
   name: 'TheGalleryStatus',
 
   components: {
-    SButton,
     TrayOutIcon,
   },
 
@@ -60,12 +52,6 @@ export default Vue.extend({
       const { styleId, slug } = this.published;
 
       return getGalleryStyleUrl({ id: styleId, slug });
-    },
-  },
-
-  methods: {
-    openPublishing(): void {
-      this.$store.commit('setPublishing', true);
     },
   },
 });
@@ -115,11 +101,5 @@ export default Vue.extend({
   }
 
   @include focus-ring(2px);
-}
-
-.gallery-status .button.size-small {
-  padding: 7px 10px;
-  font-size: 13px;
-  font-weight: 500;
 }
 </style>

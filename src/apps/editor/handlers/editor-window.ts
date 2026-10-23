@@ -182,8 +182,6 @@ export const createEditorWindowHandler = (
                 return bridge.getPageDeclarations(...message.args);
               case 'getSelectorAlternatives':
                 return bridge.getSelectorAlternatives(...message.args);
-              case 'reviewScreenshot':
-                return bridge.reviewScreenshot(...message.args);
             }
           });
           break;

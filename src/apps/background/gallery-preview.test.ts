@@ -1,6 +1,6 @@
 import fetchMock from 'jest-fetch-mock';
 
-import { session, style } from '../../features/gallery/gallery.fixtures';
+import { style } from '../../features/gallery/gallery.fixtures';
 import {
   endGalleryPreviewOffSite,
   getGalleryPreview,
@@ -275,16 +275,6 @@ describe('gallery preview', () => {
         css: LATEST_CSS,
         galleryListing: LATEST_LISTING,
       });
-    });
-
-    it('switches back to an edited, older copy of the signed-in account’s own style, keeping it as it is', async () => {
-      await seed('a { color: pink; }', installedAt(1, 'a { color: red; }'));
-      store['gallery-session'] = session;
-
-      expect(await installGalleryPreview(TAB_ID)).toBe('Mine');
-      expect(reinstallProfile).toHaveBeenCalledWith('github.com', 'p0', {});
-      expect(removeGalleryListing).not.toHaveBeenCalled();
-      expect(installProfile).not.toHaveBeenCalled();
     });
 
     it("installs anew when no profile has the style's listing", async () => {

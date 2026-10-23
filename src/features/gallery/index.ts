@@ -5,13 +5,7 @@ export {
   getGalleryStyleUrl,
   getGallerySiteUrl,
   isGalleryStyleId,
-  NAME_MAX_LENGTH,
-  DESCRIPTION_MAX_LENGTH,
-  NOTES_MAX_LENGTH,
-  USERNAME_MAX_LENGTH,
-  isValidUsername,
   SCREENSHOT_MAX_BYTES,
-  CSS_UNCHANGED,
 } from './config';
 
 export {
@@ -20,36 +14,15 @@ export {
   type GalleryApiError,
 } from './request';
 
-export { type StyleDetailsForm, type StyleForm } from './to-form-data';
-
 export {
-  createSession,
-  setUsername,
-  checkUsername,
-  getMyStyles,
-  publishStyle,
-  publishVersion,
-  editStyle,
-  unpublishStyle,
   getSiteStyles,
   getGallerySites,
   getStyle,
   recordInstall,
-  type GallerySession,
   type GalleryStylesPage,
   type GalleryStyleWithCss,
   type GalleryStyleToInstall,
 } from './api';
-
-export {
-  getSignedInAccount,
-  getStoredSession,
-  storeAccount,
-  clearSession,
-  signIn,
-  signOut,
-  withSession,
-} from './session';
 
 export { toGalleryFailure } from './to-gallery-failure';
 export { compressScreenshot } from './compress-screenshot';
@@ -75,10 +48,4 @@ export {
   type GalleryPreviewAppWindow,
 } from './preview';
 export { galleryErrorText } from './gallery-error-text';
-export {
-  requestPublishing,
-  getPublishRequest,
-  clearPublishRequest,
-  onPublishRequest,
-} from './publish-request';
 export { getGalleryMenuItem, type GalleryMenuItem } from './menu-item';

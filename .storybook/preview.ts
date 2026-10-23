@@ -41,8 +41,6 @@ const resetPageBridge = (overrides: Partial<PageBridge> = {}): void => {
   pageBridge?.unhighlight();
   pageBridge = new LocalPageBridge({
     getStylebotCss: () => mountedStoryStore()?.state.css ?? '',
-    reviewScreenshot: async screenshot =>
-      mountedStoryStore()?.dispatch('reviewScreenshot', screenshot) ?? null,
   });
   Object.assign(pageBridge, overrides);
   setPageBridge(pageBridge);

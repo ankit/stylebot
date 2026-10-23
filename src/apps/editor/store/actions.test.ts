@@ -38,7 +38,6 @@ const mockBridge = {
   getAppliedDeclarations: jest.fn(),
   getPageDeclarations: jest.fn(),
   getSelectorAlternatives: jest.fn(),
-  reviewScreenshot: jest.fn(),
   countMatches: jest.fn(),
   openInPage: jest.fn(),
   focusPage: jest.fn(),
@@ -1042,47 +1041,6 @@ describe('actions', () => {
       expect(mockCommit).toBeCalledWith('setComputedStyles', {
         'font-size': '20px',
       });
-    });
-  });
-
-  describe('reviewScreenshot', () => {
-    it('resolves with what the review hands back', async () => {
-      const review = actions.reviewScreenshot(
-        { state: mockState, commit: mockCommit },
-        'data:image/png;base64,a'
-      );
-
-      expect(mockCommit).toHaveBeenCalledWith(
-        'setScreenshotReview',
-        'data:image/png;base64,a'
-      );
-
-      actions.finishScreenshotReview(
-        { commit: mockCommit },
-        'data:image/webp;base64,b'
-      );
-
-      await expect(review).resolves.toBe('data:image/webp;base64,b');
-      expect(mockCommit).toHaveBeenLastCalledWith('setScreenshotReview', null);
-    });
-
-    it('keeps the screenshot of a review another replaces', async () => {
-      const first = actions.reviewScreenshot(
-        { state: mockState, commit: mockCommit },
-        'first'
-      );
-      const second = actions.reviewScreenshot(
-        {
-          state: { ...mockState, screenshotReview: 'first' },
-          commit: mockCommit,
-        },
-        'second'
-      );
-
-      await expect(first).resolves.toBe('first');
-
-      actions.finishScreenshotReview({ commit: mockCommit }, null);
-      await expect(second).resolves.toBeNull();
     });
   });
 });

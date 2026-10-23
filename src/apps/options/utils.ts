@@ -22,8 +22,6 @@ import type {
   UndoRestore,
   UndoRestoreResponse,
   ReloadForSidePanelGrant,
-  GetGalleryAccount,
-  GalleryAccountResponse,
   GetGalleryStyle,
   GetGalleryStyleResponse,
 } from '@stylebot/types';
@@ -193,11 +191,6 @@ export const grantSidePanel = (): void => {
     }
   });
 };
-
-export const getGalleryAccount = (): Promise<GalleryAccountResponse> =>
-  chrome.runtime.sendMessage<GetGalleryAccount, GalleryAccountResponse>({
-    name: 'GetGalleryAccount',
-  });
 
 export const getGalleryStyle = (
   styleId: number

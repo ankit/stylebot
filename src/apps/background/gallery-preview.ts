@@ -2,7 +2,6 @@ import {
   GALLERY_PREVIEW_SITES_KEY,
   getInstallId,
   getListedProfiles,
-  getSignedInAccount,
   getStyle,
   hashCss,
   recordInstall,
@@ -212,15 +211,6 @@ export const endGalleryPreview = async (
 };
 
 /**
- * Whether a gallery style is the signed-in account's own.
- */
-const isOwnStyle = async ({ author }: GalleryStyle): Promise<boolean> => {
-  const account = await getSignedInAccount();
-
-  return account?.id === author.id;
-};
-
-/**
  * The gallery listing for a profile installed at the style's latest version.
  */
 export const getLatestVersionListing = (
@@ -254,14 +244,12 @@ type InstallPlan =
 
 /**
  * Plans installing a version of a gallery style: switch to a profile already
- * at that version, else update an unedited older one, else add a new one. The
- * account's own style switches to its edited profile instead of adding one.
+ * at that version, else update an unedited older one, else add a new one.
  */
 const planInstall = (
   styles: StyleMap,
   styleId: number,
-  version: number,
-  isOwn: boolean
+  version: number
 ): InstallPlan => {
   const listed = getListedProfiles(styles, styleId);
   const current = listed.find(
@@ -276,11 +264,6 @@ const planInstall = (
 
   if (unedited) {
     return { kind: 'update', profile: unedited };
-  }
-
-  // Edits to the account's own style are its unpublished changes.
-  if (isOwn && listed.length > 0) {
-    return { kind: 'switch', profile: listed[0] };
   }
 
   return { kind: 'add', edited: listed };
@@ -320,8 +303,7 @@ const installLatestVersion = async (
   pageUrl: string
 ): Promise<string> => {
   const styles = await getAll();
-  const isOwn = await isOwnStyle(style);
-  const plan = planInstall(styles, style.id, latest.version, isOwn);
+  const plan = planInstall(styles, style.id, latest.version);
 
   if (plan.kind === 'add') {
     return addGalleryProfile(pageUrl, style, latest, plan.edited);
@@ -357,8 +339,7 @@ export const getInstallTargetUrl = async (
   pageUrl: string
 ): Promise<string> => {
   const styles = await getAll();
-  const isOwn = await isOwnStyle(style);
-  const plan = planInstall(styles, style.id, style.version, isOwn);
+  const plan = planInstall(styles, style.id, style.version);
 
   if (plan.kind === 'add') {
     return getPageStyleUrl(pageUrl, styles);

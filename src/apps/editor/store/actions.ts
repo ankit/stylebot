@@ -33,8 +33,6 @@ import type {
   GalleryScreenshotResponse,
 } from '@stylebot/types';
 
-import { clearPublishRequest, getPublishRequest } from '@stylebot/gallery';
-
 import {
   captureGalleryScreenshot,
   getPublishedGalleryStyle,
@@ -75,9 +73,6 @@ import {
   redoChange,
 } from './undo-stack';
 import type { UndoMerge, UndoMove } from './undo-stack';
-
-// Settles the screenshot review open over the page.
-let finishReview: ((screenshot: string | null) => void) | null = null;
 
 export type ApplyCssArgs = {
   css: string;
@@ -212,11 +207,7 @@ export default {
     },
     { inspect = false }: { inspect?: boolean } = {}
   ): Promise<void> {
-    // Decided before showing, so the panel doesn't open on the editor first.
-    await Promise.all([
-      dispatch('refreshPage'),
-      dispatch('openPublishRequest'),
-    ]);
+    await dispatch('refreshPage');
 
     if (!state.enabled) {
       enableStyle(state.url);
@@ -230,7 +221,7 @@ export default {
       commit('setOptions', { ...state.options, mode: 'magic' });
     }
 
-    if (state.options.mode === 'basic' && inspect && !state.publishing) {
+    if (state.options.mode === 'basic' && inspect) {
       commit('setInspecting', true);
     }
   },
@@ -261,11 +252,6 @@ export default {
   }): void {
     if (state.help) {
       commit('setHelp', false);
-      return;
-    }
-
-    if (state.publishing) {
-      commit('setPublishing', false);
       return;
     }
 
@@ -307,32 +293,6 @@ export default {
     }
   },
 
-  /**
-   * Shows a screenshot over the page for review, resolving with the one to
-   * keep, blurred or as it was, or null when the user cancels. A review that
-   * another replaces keeps its screenshot as it was.
-   */
-  reviewScreenshot(
-    { state, commit }: { state: State; commit: Commit },
-    screenshot: string
-  ): Promise<string | null> {
-    finishReview?.(state.screenshotReview);
-    commit('setScreenshotReview', screenshot);
-
-    return new Promise(resolve => {
-      finishReview = resolve;
-    });
-  },
-
-  finishScreenshotReview(
-    { commit }: { commit: Commit },
-    screenshot: string | null
-  ): void {
-    commit('setScreenshotReview', null);
-    finishReview?.(screenshot);
-    finishReview = null;
-  },
-
   async loadPublishedGalleryStyle({
     state,
     commit,
@@ -347,33 +307,6 @@ export default {
 
     commit('setPublishedGalleryStyle', published);
     commit('setInstalledGalleryStyle', installed);
-  },
-
-  /**
-   * Shows the publish view when the popup asked to publish a profile here.
-   * The popup already switched to it, so the editor moves there without
-   * waiting for the switch to arrive.
-   */
-  async openPublishRequest({
-    state,
-    commit,
-    dispatch,
-  }: {
-    state: State;
-    commit: Commit;
-    dispatch: Dispatch;
-  }): Promise<void> {
-    const profileId = await getPublishRequest(state.url);
-
-    if (!profileId) {
-      return;
-    }
-
-    await clearPublishRequest();
-
-    dispatch('syncFromPage', { activeProfile: profileId });
-    commit('setHelp', false);
-    commit('setPublishing', true);
   },
 
   setMode(

@@ -1,68 +1,11 @@
 import type {
   CaptureGalleryScreenshot,
-  CheckGalleryUsername,
-  CheckGalleryUsernameResponse,
-  CompressGalleryScreenshot,
-  GalleryAccountResponse,
   GalleryScreenshotResponse,
-  GetGalleryAccount,
-  GetMyGalleryStyles,
-  GetMyGalleryStylesResponse,
-  GetGalleryScreenshot,
   GetPublishedGalleryStyle,
   GetPublishedGalleryStyleResponse,
-  PublishToGallery,
-  PublishToGalleryResponse,
-  SetGalleryUsername,
-  SignInToGallery,
-  SignOutOfGallery,
-  UnpublishFromGallery,
-  UnpublishFromGalleryResponse,
 } from '@stylebot/types';
 
 import { flashPage, playShutterSound } from './shutter';
-
-export const getGalleryAccount = (): Promise<GalleryAccountResponse> =>
-  chrome.runtime.sendMessage<GetGalleryAccount, GalleryAccountResponse>({
-    name: 'GetGalleryAccount',
-  });
-
-export const signInToGallery = (): Promise<GalleryAccountResponse> =>
-  chrome.runtime.sendMessage<SignInToGallery, GalleryAccountResponse>({
-    name: 'SignInToGallery',
-  });
-
-export const signOutOfGallery = (): Promise<GalleryAccountResponse> =>
-  chrome.runtime.sendMessage<SignOutOfGallery, GalleryAccountResponse>({
-    name: 'SignOutOfGallery',
-  });
-
-export const setGalleryUsername = (
-  username: string
-): Promise<GalleryAccountResponse> =>
-  chrome.runtime.sendMessage<SetGalleryUsername, GalleryAccountResponse>({
-    name: 'SetGalleryUsername',
-    username,
-  });
-
-export const checkGalleryUsername = (
-  username: string
-): Promise<CheckGalleryUsernameResponse> =>
-  chrome.runtime.sendMessage<
-    CheckGalleryUsername,
-    CheckGalleryUsernameResponse
-  >({
-    name: 'CheckGalleryUsername',
-    username,
-  });
-
-export const getMyGalleryStyles = (
-  message: Omit<GetMyGalleryStyles, 'name'>
-): Promise<GetMyGalleryStylesResponse> =>
-  chrome.runtime.sendMessage<GetMyGalleryStyles, GetMyGalleryStylesResponse>({
-    name: 'GetMyGalleryStyles',
-    ...message,
-  });
 
 export const getPublishedGalleryStyle = (
   url: string,
@@ -95,35 +38,3 @@ export const captureGalleryScreenshot = async (
 
   return response;
 };
-
-export const compressGalleryScreenshot = (
-  screenshot: string
-): Promise<GalleryScreenshotResponse> =>
-  chrome.runtime.sendMessage<
-    CompressGalleryScreenshot,
-    GalleryScreenshotResponse
-  >({ name: 'CompressGalleryScreenshot', screenshot });
-
-export const getGalleryScreenshot = (
-  path: string
-): Promise<GalleryScreenshotResponse> =>
-  chrome.runtime.sendMessage<GetGalleryScreenshot, GalleryScreenshotResponse>({
-    name: 'GetGalleryScreenshot',
-    path,
-  });
-
-export const publishToGallery = (
-  message: Omit<PublishToGallery, 'name'>
-): Promise<PublishToGalleryResponse> =>
-  chrome.runtime.sendMessage<PublishToGallery, PublishToGalleryResponse>({
-    name: 'PublishToGallery',
-    ...message,
-  });
-
-export const unpublishFromGallery = (
-  id: number
-): Promise<UnpublishFromGalleryResponse> =>
-  chrome.runtime.sendMessage<
-    UnpublishFromGallery,
-    UnpublishFromGalleryResponse
-  >({ name: 'UnpublishFromGallery', id });

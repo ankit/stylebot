@@ -5,9 +5,7 @@ describe('toGalleryFailure', () => {
   it.each([
     [0, 'gallery_error_network'],
     [400, 'gallery_error_invalid'],
-    [401, 'gallery_error_sign_in'],
-    [409, 'gallery_error_conflict'],
-    [413, 'gallery_error_screenshot_too_large'],
+    [404, 'gallery_error_not_found'],
     [500, 'gallery_error_unknown'],
   ])('maps status %i to %s', (status, errorKey) => {
     expect(toGalleryFailure(galleryApiError('message', status))).toEqual({
@@ -22,9 +20,9 @@ describe('toGalleryFailure', () => {
     expect(toGalleryFailure(error).errorKey).toBe('gallery_error_network');
   });
 
-  it('reports other errors as a failed sign-in', () => {
-    expect(toGalleryFailure(new Error('Sign-in window closed')).errorKey).toBe(
-      'gallery_error_sign_in'
+  it('reports other errors as unknown', () => {
+    expect(toGalleryFailure(new Error('Tab closed')).errorKey).toBe(
+      'gallery_error_unknown'
     );
   });
 });

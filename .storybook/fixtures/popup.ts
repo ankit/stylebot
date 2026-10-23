@@ -70,7 +70,6 @@ const galleryStyle = (
   createdAt: 0,
   updatedAt: 0,
   screenshot: GALLERY_PUBLISHED_SCREENSHOT,
-  status: 'live',
 });
 
 // The site's most installed gallery styles, as the popup suggests them.

@@ -2,12 +2,6 @@
   <s-theme-provider class="stylebot-app" :mode="appearance">
     <the-stylebot v-if="visible" />
     <the-keyboard-shortcuts />
-    <screenshot-review
-      v-if="screenshotReview"
-      :screenshot="screenshotReview"
-      @cancel="$store.dispatch('finishScreenshotReview', null)"
-      @done="$store.dispatch('finishScreenshotReview', $event)"
-    />
   </s-theme-provider>
 </template>
 
@@ -18,7 +12,6 @@ import { SThemeProvider } from '@stylebot/components';
 
 import TheStylebot from './TheStylebot.vue';
 import TheKeyboardShortcuts from './shortcuts/TheKeyboardShortcuts.vue';
-import ScreenshotReview from './publish/ScreenshotReview.vue';
 
 export default Vue.extend({
   name: 'App',
@@ -27,7 +20,6 @@ export default Vue.extend({
     SThemeProvider,
     TheStylebot,
     TheKeyboardShortcuts,
-    ScreenshotReview,
   },
 
   data(): { previouslyFocused: HTMLElement | null } {
@@ -39,10 +31,6 @@ export default Vue.extend({
   computed: {
     visible(): boolean {
       return this.$store.state.visible;
-    },
-
-    screenshotReview(): string | null {
-      return this.$store.state.screenshotReview;
     },
 
     commands(): StylebotCommands | undefined {

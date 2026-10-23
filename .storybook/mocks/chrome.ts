@@ -18,14 +18,9 @@ import type {
   ReadabilitySettings,
   RunGoogleDriveSyncResponse,
   VersionHistory,
-  GalleryAccount,
-  GalleryAccountResponse,
-  GalleryUsernameCheck,
   GalleryPublished,
-  GalleryScreenshotResponse,
   GalleryStyle,
   InstallGalleryPreviewResponse,
-  PublishToGalleryResponse,
 } from '@stylebot/types';
 
 import { isMac, toBrowserShortcut } from '@stylebot/utils';
@@ -56,19 +51,8 @@ export type ChromeShimOptions = {
 };
 
 export type GalleryShimOptions = {
-  // Signed in already; left out, the editor starts signed out.
-  account?: GalleryAccount;
-  signIn?: GalleryAccountResponse;
-  // What checking a username answers, by username; others are available.
-  usernames?: Record<string, GalleryUsernameCheck>;
-  // What setting a username answers; left out, it's taken as asked.
-  setUsername?: GalleryAccountResponse;
-  styles?: Array<GalleryStyle>;
-  // What the profile published, and which of the account's styles that is.
+  // What the profile published.
   published?: GalleryPublished;
-  publish?: PublishToGalleryResponse;
-  // Fitting a capture to the gallery's limit; pending keeps it compressing.
-  compress?: Pending<GalleryScreenshotResponse>;
   // The popup's suggestions for the site, the one the tab previews already,
   // and what installing a preview answers.
   suggestions?: Array<GalleryStyle>;
@@ -228,43 +212,6 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
 
     OpenEditorSidePanel: () => true,
 
-    GetGalleryAccount: () => ({ ok: true, account: gallery.account ?? null }),
-    SignInToGallery: () => {
-      const response = gallery.signIn ?? {
-        ok: true,
-        account: { id: 'me', username: 'maya', usernameConfirmed: false },
-      };
-
-      if (response.ok) {
-        gallery.account = response.account ?? undefined;
-      }
-
-      return response;
-    },
-    SignOutOfGallery: () => {
-      gallery.account = undefined;
-      return { ok: true, account: null };
-    },
-    SetGalleryUsername: message =>
-      gallery.setUsername ?? {
-        ok: true,
-        account: {
-          id: gallery.account?.id ?? 'me',
-          username: (message as unknown as { username: string }).username,
-          usernameConfirmed: true,
-        },
-      },
-    CheckGalleryUsername: message => ({
-      ok: true,
-      ...(gallery.usernames?.[
-        (message as unknown as { username: string }).username
-      ] ?? { available: true }),
-    }),
-    GetMyGalleryStyles: () => ({
-      ok: true,
-      styles: gallery.styles ?? [],
-      publishedId: gallery.published?.styleId ?? null,
-    }),
     GetPublishedGalleryStyle: () => ({
       published: gallery.published ?? null,
       installed: gallery.installed ?? null,
@@ -273,13 +220,6 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
       ok: true,
       screenshot: GALLERY_SCREENSHOT,
     }),
-    CompressGalleryScreenshot: () => {
-      if (gallery.compress === 'pending') {
-        return new Promise(() => undefined);
-      }
-
-      return gallery.compress ?? { ok: true, screenshot: GALLERY_SCREENSHOT };
-    },
     GetGallerySuggestions: () => ({
       ok: true,
       styles: gallery.suggestions ?? [],
@@ -301,39 +241,6 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     EndGalleryPreview: () => {
       previewing = undefined;
     },
-    GetGalleryScreenshot: () => ({
-      ok: true,
-      screenshot: GALLERY_PUBLISHED_SCREENSHOT,
-    }),
-    PublishToGallery: message => {
-      if (gallery.publish) {
-        return gallery.publish;
-      }
-
-      const { title, styleId } = message as unknown as {
-        title: string;
-        styleId?: number;
-      };
-
-      return {
-        ok: true,
-        style: {
-          id: styleId ?? 99,
-          site: 'example.com',
-          slug: 'new-style',
-          name: title,
-          description: null,
-          author: gallery.account ?? { id: 'me', name: null },
-          version: styleId ? 2 : 1,
-          installs: 0,
-          createdAt: 0,
-          updatedAt: 0,
-          screenshot: GALLERY_SCREENSHOT,
-          removed: [],
-        },
-      };
-    },
-    UnpublishFromGallery: () => ({ ok: true }),
   };
 
   const tabResponses: Record<string, () => unknown> = {

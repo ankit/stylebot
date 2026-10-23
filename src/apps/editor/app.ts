@@ -8,20 +8,11 @@ import initOptionsListener from './listeners/options';
 import type { EditorApp, EditorAppWindow } from './load-editor';
 import { createStore } from './store';
 import { getStylesForPage } from './utils/chrome';
-import { initEditor, preloadEditorCss } from './utils/init-editor';
+import { preloadEditorCss } from './utils/init-editor';
 
 const store = createStore('page');
 store.commit('setUrl', document.domain);
-setPageBridge(
-  new LocalPageBridge({
-    getStylebotCss: () => store.state.css,
-    // The side panel and window ask for it too, before the page has a panel.
-    reviewScreenshot: screenshot => {
-      initEditor(store);
-      return store.dispatch('reviewScreenshot', screenshot);
-    },
-  })
-);
+setPageBridge(new LocalPageBridge({ getStylebotCss: () => store.state.css }));
 
 preloadEditorCss().catch(() => undefined);
 

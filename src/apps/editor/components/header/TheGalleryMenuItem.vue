@@ -1,5 +1,5 @@
 <template>
-  <s-menu-item @click="openPublishing">
+  <s-menu-item v-if="item.label === 'view_in_gallery'" @click="openPublishing">
     <span class="menu-item-row">
       <span>{{ t(item.label) }}</span>
       <s-status-dot v-if="item.changed" tone="warning" :size="8" />
@@ -14,9 +14,8 @@ import { getGalleryMenuItem, getGalleryStyleUrl } from '@stylebot/gallery';
 import type { GalleryMenuItem } from '@stylebot/gallery';
 
 /**
- * The ⋯ menu's way into publishing to the Gallery, with an amber dot when a
- * published style has changes to publish. A profile installed from the
- * Gallery links to its page there instead.
+ * The ⋯ menu's link to a profile's page in the Gallery, for one installed
+ * from it.
  */
 export default Vue.extend({
   name: 'TheGalleryMenuItem',
@@ -49,8 +48,6 @@ export default Vue.extend({
           '_blank',
           'noopener'
         );
-      } else {
-        this.$store.commit('setPublishing', true);
       }
 
       this.$emit('click');

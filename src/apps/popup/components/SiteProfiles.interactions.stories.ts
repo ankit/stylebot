@@ -257,55 +257,6 @@ const openProfileMenu = async (canvasElement: HTMLElement, name: string) => {
   return within(row).findByRole('menu');
 };
 
-export const PublishProfile: StoryObj = {
-  ...twoProfiles,
-  name: "a profile's menu offers Publish to Gallery, which opens the editor straight into publishing it",
-  play: async ({ canvasElement }) => {
-    const sendMessage = sentMessages();
-    const setStorage = spyOn(chrome.storage.local, 'set');
-    const menu = await openProfileMenu(canvasElement, 'Dark');
-
-    await user.click(
-      await within(menu).findByRole('menuitem', { name: 'Publish to Gallery' })
-    );
-
-    await expect(setStorage).toHaveBeenCalledWith({
-      'gallery-publish-request': expect.objectContaining({
-        url: 'example.com',
-        profileId: 'dark',
-      }),
-    });
-    await expect(sendMessage).toHaveBeenCalledWith(
-      expect.objectContaining({ name: 'SetActiveProfile', profileId: 'dark' })
-    );
-  },
-};
-
-export const PublishUpdate: StoryObj = {
-  ...popup({
-    styles: [profiledStyle('example.com')],
-    defaultStyle: profiledStyle('example.com'),
-    gallery: {
-      published: {
-        styleId: 1,
-        version: 1,
-        cssHash: 'stale',
-        slug: 'dark',
-      },
-    },
-  }),
-  name: 'a published profile with changes offers to publish an update',
-  play: async ({ canvasElement }) => {
-    const menu = await openProfileMenu(canvasElement, 'Dark');
-
-    await waitFor(() =>
-      expect(
-        within(menu).getByRole('menuitem', { name: 'Publish update' })
-      ).toBeVisible()
-    );
-  },
-};
-
 export const InstalledProfile: StoryObj = {
   ...popup({
     styles: [profiledStyle('example.com')],

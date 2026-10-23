@@ -5,8 +5,6 @@
 
       <the-keyboard-shortcuts-view v-if="help" />
 
-      <the-publish-view v-else-if="publishing" />
-
       <template v-else>
         <the-header ref="header" />
 
@@ -43,10 +41,8 @@ import ThePresetsEditor from './ThePresetsEditor.vue';
 import TheStylebotResizer from './TheStylebotResizer.vue';
 import TheWindowStatus from './TheWindowStatus.vue';
 import TheKeyboardShortcutsView from './shortcuts/TheKeyboardShortcutsView.vue';
-import ThePublishView from './publish/ThePublishView.vue';
 import TheGalleryStatus from './publish/TheGalleryStatus.vue';
 
-import { onPublishRequest } from '@stylebot/gallery';
 import type { StylebotEditingMode } from '@stylebot/types';
 
 type HeaderRef = { focusModeTab(): void };
@@ -62,17 +58,12 @@ export default Vue.extend({
     TheStylebotResizer,
     TheWindowStatus,
     TheKeyboardShortcutsView,
-    ThePublishView,
     TheGalleryStatus,
   },
 
-  data(): {
-    codeEditorMounted: boolean;
-    stopPublishRequests: (() => void) | null;
-  } {
+  data(): { codeEditorMounted: boolean } {
     return {
       codeEditorMounted: false,
-      stopPublishRequests: null,
     };
   },
 
@@ -97,19 +88,15 @@ export default Vue.extend({
       return this.$store.state.help;
     },
 
-    publishing(): boolean {
-      return this.$store.state.publishing;
-    },
-
     galleryKey(): string {
-      const { url, activeProfile, publishing } = this.$store.state;
+      const { url, activeProfile } = this.$store.state;
 
-      return JSON.stringify([url, activeProfile, publishing]);
+      return JSON.stringify([url, activeProfile]);
     },
   },
 
   watch: {
-    // Reloads what was published as the profile changes or a publish ends.
+    // Reloads what was published as the profile changes.
     galleryKey: {
       immediate: true,
       handler(): void {
@@ -125,17 +112,6 @@ export default Vue.extend({
         }
       },
     },
-  },
-
-  mounted() {
-    // Opening answers the popup's request itself; this is for an open editor.
-    this.stopPublishRequests = onPublishRequest(() =>
-      this.$store.dispatch('openPublishRequest')
-    );
-  },
-
-  beforeDestroy() {
-    this.stopPublishRequests?.();
   },
 
   methods: {
