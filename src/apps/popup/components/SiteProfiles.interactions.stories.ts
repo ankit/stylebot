@@ -312,17 +312,20 @@ export const InstalledProfile: StoryObj = {
     defaultStyle: profiledStyle('example.com'),
     gallery: { installed: { id: 2, slug: 'dark' } },
   }),
-  name: "a profile installed from someone else's Gallery style has nothing to publish",
+  name: "a profile installed from someone else's Gallery style offers View in Gallery, which opens its page there",
   play: async ({ canvasElement }) => {
+    const createTab = spyOn(chrome.tabs, 'create');
     const menu = await openProfileMenu(canvasElement, 'Dark');
 
-    await waitFor(() =>
-      expect(
-        within(menu).getByRole('menuitem', { name: 'Rename' })
-      ).toBeVisible()
-    );
     await expect(
       within(menu).queryByRole('menuitem', { name: /Publish/ })
     ).toBeNull();
+    await user.click(
+      await within(menu).findByRole('menuitem', { name: 'View in Gallery' })
+    );
+
+    await expect(createTab).toHaveBeenCalledWith({
+      url: expect.stringMatching(/\/style\/2\/dark$/),
+    });
   },
 };

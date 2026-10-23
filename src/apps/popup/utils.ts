@@ -28,7 +28,7 @@ import type {
   GetPublishedGalleryStyle,
   GetPublishedGalleryStyleResponse,
 } from '@stylebot/types';
-import { getGalleryMenuItem } from '@stylebot/gallery';
+import { getGalleryMenuItem, getGalleryStyleUrl } from '@stylebot/gallery';
 import type { GalleryMenuItem } from '@stylebot/gallery';
 import { STYLES_KEY, getStylesForPage } from '@stylebot/saved-styles';
 import { defaultOptions } from '@stylebot/settings';
@@ -378,19 +378,29 @@ export const endGalleryPreview = (tabId: number): Promise<void> =>
     tabId,
   });
 
+export type ProfileGalleryItem = GalleryMenuItem & {
+  // The installed style's page in the Gallery, which the item opens.
+  url?: string;
+};
+
 /**
- * A profile's Gallery menu item; none for someone else's installed style.
+ * A profile's Gallery menu item, with the Gallery page to open for someone
+ * else's installed style.
  */
 export const getPublishMenuItem = async (
   url: string,
   profileId: string,
   css: string
-): Promise<GalleryMenuItem | null> => {
+): Promise<ProfileGalleryItem> => {
   const response = await chrome.runtime.sendMessage<
     GetPublishedGalleryStyle,
     GetPublishedGalleryStyleResponse
   >({ name: 'GetPublishedGalleryStyle', url, profileId });
   const item = getGalleryMenuItem(response, css);
 
-  return item.label === 'view_in_gallery' ? null : item;
+  if (item.label === 'view_in_gallery' && response.installed) {
+    return { ...item, url: getGalleryStyleUrl(response.installed) };
+  }
+
+  return item;
 };
