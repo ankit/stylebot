@@ -158,3 +158,24 @@ export const MenuKeepsToggle: StoryObj = {
     ).toBeChecked();
   },
 };
+
+export const PublishStyle: StoryObj = {
+  ...oneStyle,
+  name: "the style's menu publishes it to the Gallery",
+  play: async ({ canvasElement }) => {
+    const sendMessage = spyOn(chrome.runtime, 'sendMessage');
+    const menu = await openStyleMenu(canvasElement);
+
+    await user.click(
+      await within(menu).findByRole('menuitem', { name: 'Publish to Gallery' })
+    );
+
+    await expect(sendMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'PublishProfileToGallery',
+        url: 'example.com',
+        profileId: 'default',
+      })
+    );
+  },
+};

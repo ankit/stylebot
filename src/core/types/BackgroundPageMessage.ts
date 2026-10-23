@@ -275,6 +275,15 @@ export type OpenGalleryDraft = {
   screenshot: string | null;
 };
 
+// The popup's Publish: shows the profile on the tab if it isn't already,
+// then captures it and hands it to the gallery site like OpenGalleryDraft.
+export type PublishProfileToGallery = {
+  name: 'PublishProfileToGallery';
+  tabId: number;
+  url: string;
+  profileId: string;
+};
+
 // For the site bridge on the gallery, by the id its publish page was given.
 export type GetGalleryDraft = {
   name: 'GetGalleryDraft';
@@ -397,6 +406,7 @@ type BackgroundPageMessage =
   | RestoreTab
   | CaptureGalleryScreenshot
   | OpenGalleryDraft
+  | PublishProfileToGallery
   | GetGalleryDraft
   | GalleryDraftPublished
   | GetPublishedGalleryStyle

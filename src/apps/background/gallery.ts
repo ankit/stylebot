@@ -17,10 +17,12 @@ import {
   toGalleryFailure,
   toGallerySite,
 } from '@stylebot/gallery';
+import { expandProfiles } from '@stylebot/saved-styles';
 import type {
   CaptureGalleryScreenshot as CaptureGalleryScreenshotType,
   OpenGalleryDraft as OpenGalleryDraftType,
   OpenGalleryDraftResponse,
+  PublishProfileToGallery as PublishProfileToGalleryType,
   GetGalleryDraft as GetGalleryDraftType,
   GetGalleryDraftResponse,
   GalleryDraftPublished as GalleryDraftPublishedType,
@@ -46,7 +48,13 @@ import type {
 } from '@stylebot/types';
 
 import { captureTab } from './capture-tab';
-import { getAll, setGalleryListing } from './styles';
+import {
+  applyStylesToAllTabs,
+  enable,
+  getAll,
+  setActiveProfile,
+  setGalleryListing,
+} from './styles';
 import {
   endGalleryPreview,
   getGalleryPreview,
@@ -154,6 +162,62 @@ export const OpenGalleryDraft = async (
 ): Promise<void> => {
   try {
     await openDraft(draft, sender.tab?.id);
+    sendResponse({ ok: true });
+  } catch (e) {
+    sendResponse(fail(e));
+  }
+};
+
+// Long enough for a tab to paint a profile it was just switched to.
+const PROFILE_PAINT_MS = 300;
+
+/**
+ * Captures a tab, or resolves with null when it can't be, so the gallery site
+ * asks for a screenshot instead.
+ */
+const captureOrNull = async (tabId: number): Promise<string | null> => {
+  try {
+    return await captureTab(await chrome.tabs.get(tabId));
+  } catch (e) {
+    fail(e);
+    return null;
+  }
+};
+
+/**
+ * Publishes a profile from the popup without opening the editor: switches the
+ * tab to it if it isn't showing, captures the tab and opens a draft of it.
+ */
+export const PublishProfileToGallery = async (
+  { tabId, url, profileId }: PublishProfileToGalleryType,
+  sendResponse: (response: OpenGalleryDraftResponse) => void
+): Promise<void> => {
+  try {
+    const style = (await getAll())[url];
+    const expanded = style && expandProfiles(style);
+    const sheet = expanded?.sheets[profileId];
+
+    if (!expanded || !sheet) {
+      throw new Error('No profile to publish');
+    }
+
+    if (expanded.active !== profileId || !style.enabled) {
+      await setActiveProfile(url, profileId);
+      await enable(url);
+      await applyStylesToAllTabs();
+      await new Promise(resolve => setTimeout(resolve, PROFILE_PAINT_MS));
+    }
+
+    await openDraft(
+      {
+        url,
+        profileId,
+        css: sheet.css,
+        profileName: sheet.name,
+        screenshot: await captureOrNull(tabId),
+      },
+      tabId
+    );
     sendResponse({ ok: true });
   } catch (e) {
     sendResponse(fail(e));

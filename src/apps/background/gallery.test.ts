@@ -20,7 +20,9 @@ import {
   GetGallerySuggestions,
   GetPublishedGalleryStyle,
   OpenGalleryDraft,
+  PublishProfileToGallery,
 } from './gallery';
+import { applyStylesToAllTabs } from './styles';
 
 jest.mock('./capture-tab', () => ({ captureTab: jest.fn() }));
 jest.mock('./gallery-preview', () => ({}));
@@ -43,6 +45,13 @@ jest.mock('./styles', () => {
 
   return {
     getAll: jest.fn(async () => mockStyles),
+    setActiveProfile: jest.fn(async (url: string, activeProfile: string) => {
+      mockStyles[url] = { ...mockStyles[url], activeProfile };
+    }),
+    enable: jest.fn(async (url: string) => {
+      mockStyles[url] = { ...mockStyles[url], enabled: true };
+    }),
+    applyStylesToAllTabs: jest.fn(async () => undefined),
     setGalleryListing: jest.fn(
       async (url: string, id: string, galleryListing: GalleryListing) => {
         mockStyles[url] = setProfileGalleryListing(
@@ -110,7 +119,10 @@ describe('gallery messages', () => {
       createTab = jest.fn(async () => ({}));
       Object.assign(global.chrome, {
         runtime: { id: 'stylebot' },
-        tabs: { create: createTab },
+        tabs: {
+          create: createTab,
+          get: jest.fn(async (id: number) => ({ id, windowId: 1 })),
+        },
       });
     });
 
@@ -268,6 +280,90 @@ describe('gallery messages', () => {
       });
       expect(await getDraft(id)).toEqual({ draft: null });
       expect(await published(id)).toEqual({ ok: false });
+    });
+
+    describe("the popup's Publish", () => {
+      const publishFromPopup = (profileId: string) =>
+        respond(send =>
+          PublishProfileToGallery(
+            {
+              name: 'PublishProfileToGallery',
+              tabId: 3,
+              url: 'github.com',
+              profileId,
+            },
+            send
+          )
+        );
+
+      beforeEach(() => {
+        (applyStylesToAllTabs as jest.Mock).mockClear();
+        jest.useFakeTimers({ doNotFake: ['nextTick', 'setImmediate'] });
+        mockStyles = {
+          'github.com': {
+            ...savedStyle({
+              default: { name: '' },
+              dark: { name: 'Dark', css: CSS },
+            }),
+            css: 'a {}',
+          },
+        };
+        (captureTab as jest.Mock).mockResolvedValue(
+          'data:image/png;base64,iVBORw0KGgo='
+        );
+      });
+
+      afterEach(() => {
+        jest.useRealTimers();
+      });
+
+      it('shows the profile on the tab, captures it and opens a draft of it', async () => {
+        const published = publishFromPopup('dark');
+        await jest.runAllTimersAsync();
+
+        expect(await published).toEqual({ ok: true });
+        expect(mockStyles['github.com'].activeProfile).toBe('dark');
+        expect(applyStylesToAllTabs).toHaveBeenCalled();
+        expect(captureTab).toHaveBeenCalledWith({ id: 3, windowId: 1 });
+
+        const { url, openerTabId } = createTab.mock.calls[0][0];
+        const { draft } = await getDraft(
+          new URL(url).searchParams.get('draft') as string
+        );
+
+        expect(openerTabId).toBe(3);
+        expect(draft).toMatchObject({ css: CSS, name: 'Dark' });
+        expect(draft?.screenshot).toMatch(/^data:image\/webp;base64,/);
+      });
+
+      it('captures the profile showing without switching, and opens a draft without a screenshot when the capture fails', async () => {
+        (captureTab as jest.Mock).mockRejectedValueOnce(new Error('No access'));
+
+        expect(await publishFromPopup('default')).toEqual({ ok: true });
+        expect(applyStylesToAllTabs).not.toHaveBeenCalled();
+
+        const { url } = createTab.mock.calls[0][0];
+        const { draft } = await getDraft(
+          new URL(url).searchParams.get('draft') as string
+        );
+
+        expect(draft).toMatchObject({ css: 'a {}', screenshot: null });
+      });
+
+      it('turns a style that is off on before capturing it', async () => {
+        mockStyles['github.com'] = {
+          ...mockStyles['github.com'],
+          enabled: false,
+        };
+
+        const published = publishFromPopup('default');
+        await jest.runAllTimersAsync();
+
+        expect(await published).toEqual({ ok: true });
+        expect(mockStyles['github.com'].enabled).toBe(true);
+        expect(applyStylesToAllTabs).toHaveBeenCalled();
+        expect(captureTab).toHaveBeenCalled();
+      });
     });
 
     it('turns down a publish that names no gallery style', async () => {

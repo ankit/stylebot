@@ -71,6 +71,7 @@ import { syncStyles } from './sync';
 import {
   CaptureGalleryScreenshot,
   OpenGalleryDraft,
+  PublishProfileToGallery,
   GetGalleryDraft,
   GalleryDraftPublished,
   GetPublishedGalleryStyle,
@@ -422,6 +423,9 @@ export const initListeners = (): void => {
           return true;
         case 'OpenGalleryDraft':
           OpenGalleryDraft(message, sender, sendResponse);
+          return true;
+        case 'PublishProfileToGallery':
+          PublishProfileToGallery(message, sendResponse);
           return true;
         case 'GetGalleryDraft':
           GetGalleryDraft(message, sender, sendResponse);
