@@ -22,6 +22,10 @@ import type {
   UndoRestore,
   UndoRestoreResponse,
   ReloadForSidePanelGrant,
+  GetGalleryAccount,
+  GalleryAccountResponse,
+  GetGalleryStyle,
+  GetGalleryStyleResponse,
 } from '@stylebot/types';
 import { requestSidePanelPermission } from '@stylebot/side-panel';
 
@@ -189,3 +193,16 @@ export const grantSidePanel = (): void => {
     }
   });
 };
+
+export const getGalleryAccount = (): Promise<GalleryAccountResponse> =>
+  chrome.runtime.sendMessage<GetGalleryAccount, GalleryAccountResponse>({
+    name: 'GetGalleryAccount',
+  });
+
+export const getGalleryStyle = (
+  styleId: number
+): Promise<GetGalleryStyleResponse> =>
+  chrome.runtime.sendMessage<GetGalleryStyle, GetGalleryStyleResponse>({
+    name: 'GetGalleryStyle',
+    styleId,
+  });

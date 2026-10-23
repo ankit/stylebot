@@ -78,6 +78,7 @@ import {
   CheckGalleryUsername,
   GetPublishedGalleryStyle,
   GetGallerySuggestions,
+  GetGalleryStyle,
   PreviewGalleryStyle,
   OpenGalleryPreview,
   GetGalleryPreview,
@@ -453,6 +454,9 @@ export const initListeners = (): void => {
           return true;
         case 'GetGallerySuggestions':
           GetGallerySuggestions(message, sendResponse);
+          return true;
+        case 'GetGalleryStyle':
+          GetGalleryStyle(message, sendResponse);
           return true;
         case 'PreviewGalleryStyle':
           PreviewGalleryStyle(message, sender, sendResponse);

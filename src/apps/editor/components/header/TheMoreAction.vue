@@ -63,10 +63,7 @@
             close();
           "
         >
-          <span class="menu-item-row">
-            <span>{{ t('view_options') }}</span>
-            <arrow-up-right-icon :size="12" class="menu-item-hint-icon" />
-          </span>
+          {{ t('view_options') }}
         </s-menu-item>
       </s-menu>
     </template>
@@ -85,7 +82,6 @@ import {
   SText,
 } from '@stylebot/components';
 import {
-  ArrowUpRightIcon,
   MoreIcon,
   DockLeftIcon,
   DockRightIcon,
@@ -126,7 +122,6 @@ export default Vue.extend({
     SIconButton,
     SSegmentedControl,
     SText,
-    ArrowUpRightIcon,
     MoreIcon,
     DockLeftIcon,
     DockRightIcon,
@@ -283,11 +278,6 @@ export default Vue.extend({
 .menu-item-hint {
   font-family: var(--font-mono);
   font-size: 12px;
-  color: var(--text-muted);
-}
-
-.menu-item-hint-icon {
-  flex: none;
   color: var(--text-muted);
 }
 
