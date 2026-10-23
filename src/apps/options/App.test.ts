@@ -66,8 +66,12 @@ const flush = () => new Promise(resolve => setTimeout(resolve, 0));
 
 beforeEach(() => {
   // App subscribes to storage changes so background syncs refresh the page.
+  // The style editor asks for the gallery account, signed out here.
   global.chrome = {
     storage: { onChanged: { addListener: jest.fn() } },
+    runtime: {
+      sendMessage: jest.fn(async () => ({ ok: true, account: null })),
+    },
   } as unknown as typeof chrome;
 });
 

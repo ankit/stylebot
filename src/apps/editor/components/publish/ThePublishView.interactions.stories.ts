@@ -205,7 +205,7 @@ export const SignsInThenPublishes: StoryObj = {
 
 export const UpdatesWhatWasPublished: StoryObj = {
   ...publishView(publishedTokyoNight),
-  name: 'A published style is prefilled and publishes as a new version',
+  name: 'A published style is prefilled, and a new screenshot saves its details without a new version',
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
 
@@ -214,7 +214,8 @@ export const UpdatesWhatWasPublished: StoryObj = {
       await waitFor(() =>
         expect(canvas.getByLabelText('Name')).toHaveValue('Tokyo Night')
       );
-      await expect(publishButton(canvas, 'Publish version 3')).toBeDisabled();
+      await expect(publishButton(canvas, 'Save')).toBeDisabled();
+      await expect(canvas.queryByLabelText(/What changed/)).toBeNull();
     });
 
     await step("the Gallery's screenshot shows from the Gallery", async () => {
@@ -223,7 +224,7 @@ export const UpdatesWhatWasPublished: StoryObj = {
       );
     });
 
-    await step('a new screenshot is enough to publish', async () => {
+    await step('a new screenshot is enough to save', async () => {
       await user.click(
         canvas.getByRole('button', {
           name: 'Retake',
@@ -235,13 +236,29 @@ export const UpdatesWhatWasPublished: StoryObj = {
           getGalleryUrl(tokyoNight.screenshot)
         )
       );
-      await waitFor(() =>
-        expect(publishButton(canvas, 'Publish version 3')).toBeEnabled()
-      );
-      await user.click(publishButton(canvas, 'Publish version 3'));
+      await waitFor(() => expect(publishButton(canvas, 'Save')).toBeEnabled());
+      await user.click(publishButton(canvas, 'Save'));
 
       await canvas.findByText('Version 2 is live in the Gallery');
     });
+  },
+};
+
+export const PublishesNewCssAsAVersion: StoryObj = {
+  ...publishView({
+    ...publishedTokyoNight,
+    published: { ...publishedTokyoNight.published!, cssHash: hashCss('a {}') },
+  }),
+  name: 'A published style whose CSS changed publishes as a new version, asking what changed',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await canvas.findByRole('heading', { name: 'Update Tokyo Night' });
+    await user.type(await canvas.findByLabelText(/What changed/), 'Darker');
+    await waitFor(() => expect(publishButton(canvas, 'Publish')).toBeEnabled());
+    await user.click(publishButton(canvas, 'Publish'));
+
+    await canvas.findByText('Version 2 is live in the Gallery');
   },
 };
 
@@ -299,7 +316,7 @@ export const BlursThePublishedScreenshot: StoryObj = {
       await closeReview(canvas, 'Done');
 
       await expect(screenshotSrc(canvas)).toBe(shown);
-      await expect(publishButton(canvas, 'Publish version 3')).toBeDisabled();
+      await expect(publishButton(canvas, 'Save')).toBeDisabled();
     });
 
     await step('blurring it makes it new', async () => {
@@ -333,9 +350,7 @@ export const BlursThePublishedScreenshot: StoryObj = {
       await user.click(review.getByRole('button', { name: 'Done' }));
 
       await waitFor(() => expect(screenshotSrc(canvas)).not.toBe(shown));
-      await waitFor(() =>
-        expect(publishButton(canvas, 'Publish version 3')).toBeEnabled()
-      );
+      await waitFor(() => expect(publishButton(canvas, 'Save')).toBeEnabled());
     });
   },
 };
@@ -569,15 +584,13 @@ export const SignsOut: StoryObj = {
 export const ShowsPublishedStateUnderTheEditor: StoryObj = {
   ...editor(WITH_RULE),
   parameters: { chrome: { gallery: publishedTokyoNight } },
-  name: 'A published style shows its live version under the editor, and Unpublished changes after an edit',
+  name: 'A published style links to its Gallery page under the editor, and shows Unpublished changes after an edit',
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
 
     await step('published, linking to its Gallery page', async () => {
-      const link = await canvas.findByRole('link', {
-        name: /Version 2/,
-      });
+      const link = await canvas.findByRole('link', { name: /Published/ });
 
       await expect(link).toHaveAttribute(
         'href',
@@ -589,7 +602,7 @@ export const ShowsPublishedStateUnderTheEditor: StoryObj = {
       store.commit('setCss', `${RULE_CSS}\n\np { color: red; }`);
 
       await canvas.findByText('Unpublished changes');
-      await user.click(canvas.getByRole('button', { name: 'Publish update' }));
+      await user.click(canvas.getByRole('button', { name: 'Publish' }));
       await waitFor(() => expect(store.state.publishing).toBe(true));
     });
   },

@@ -7,6 +7,7 @@ import {
   publishVersion,
   setUsername,
   checkUsername,
+  editStyle,
   unpublishStyle,
 } from './api';
 import { GALLERY_API_URL } from './config';
@@ -140,6 +141,21 @@ describe('gallery API', () => {
     expect(body.get('notes')).toBe('Darker links');
   });
 
+  it('edits only the details, sending an empty description to clear it', async () => {
+    fetchMock.mockResponseOnce(JSON.stringify(publishedStyle));
+
+    await editStyle('abc', 42, { name: 'Tokyo Night', description: '' });
+
+    const { url, init } = lastRequest();
+    const body = init.body as FormData;
+
+    expect(url).toBe(`${GALLERY_API_URL}/styles/42`);
+    expect(init.method).toBe('PATCH');
+    expect(body.get('description')).toBe('');
+    expect(body.has('css')).toBe(false);
+    expect(body.has('screenshot')).toBe(false);
+  });
+
   it('resolves an unpublish that returns no content', async () => {
     fetchMock.mockResponseOnce('', { status: 204 });
 
@@ -162,6 +178,17 @@ describe('gallery API', () => {
       400,
       'The name is over 60 characters.'
     );
+  });
+
+  it("rejects with the server's code where it sends one", async () => {
+    fetchMock.mockResponseOnce(
+      JSON.stringify({ error: 'Nothing changed.', code: 'css_unchanged' }),
+      { status: 422 }
+    );
+
+    const error = await publishVersion('abc', 42, form).catch(e => e);
+
+    expect(error).toMatchObject({ status: 422, code: 'css_unchanged' });
   });
 
   it('rejects with the status when the body is not JSON', async () => {

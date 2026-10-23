@@ -17,7 +17,7 @@
         {{ t('unpublished_changes') }}
       </span>
       <s-button size="small" @click="openPublishing">
-        {{ t('publish_update') }}
+        {{ t('publish') }}
       </s-button>
     </template>
   </div>

@@ -2,6 +2,8 @@ import {
   blobToDataUrl,
   dataUrlToBlob,
   compressScreenshot,
+  CSS_UNCHANGED,
+  editStyle,
   getGalleryUrl,
   getListedProfileNames,
   getListedStyleIds,
@@ -27,9 +29,11 @@ import {
   toGallerySite,
   unpublishStyle,
   withSession,
+  type StyleForm,
 } from '@stylebot/gallery';
 import type {
   GalleryAccountResponse,
+  GalleryPublishedStyle,
   CaptureGalleryScreenshot as CaptureGalleryScreenshotType,
   CompressGalleryScreenshot as CompressGalleryScreenshotType,
   GetMyGalleryStyles as GetMyGalleryStylesType,
@@ -238,18 +242,67 @@ export const GetGalleryScreenshot = async (
 };
 
 /**
- * Publishes a style, or a new version of one with styleId, and remembers it
- * for the profile it came from.
+ * Whether the gallery refused a new version because its CSS is the latest's.
+ */
+const isCssUnchanged = (e: unknown): boolean =>
+  isGalleryApiError(e) && e.code === CSS_UNCHANGED;
+
+/**
+ * Publishes a new version of a gallery style when the profile's CSS has
+ * changed since it was last published, else edits only its details.
+ */
+const publishUpdate = async (
+  session: string,
+  styleId: number,
+  form: StyleForm,
+  cssChanged: boolean
+): Promise<GalleryPublishedStyle> => {
+  const details = {
+    name: form.name,
+    description: form.description,
+    screenshot: form.screenshot,
+  };
+
+  if (!cssChanged) {
+    return editStyle(session, styleId, details);
+  }
+
+  try {
+    return await publishVersion(session, styleId, form);
+  } catch (e) {
+    // The CSS can differ only in what the gallery's sanitizer takes out.
+    if (isCssUnchanged(e)) {
+      return editStyle(session, styleId, details);
+    }
+
+    throw e;
+  }
+};
+
+/**
+ * Publishes a style, or updates one with styleId, and remembers it for the
+ * profile it came from. An update is a new version only if the CSS changed.
  */
 export const PublishToGallery = async (
   message: PublishToGalleryType,
   sendResponse: (response: PublishToGalleryResponse) => void
 ): Promise<void> => {
   try {
-    const form = {
+    const { styleId } = message;
+    const cssHash = hashCss(message.css);
+    const savedStyles = await getAll();
+    const listing = getProfileGalleryListing(
+      savedStyles,
+      message.url,
+      message.profileId
+    );
+
+    const cssChanged =
+      listing?.styleId !== styleId || listing?.cssHash !== cssHash;
+    const form: StyleForm = {
       name: message.title,
       description: message.description,
-      notes: message.styleId ? message.notes : undefined,
+      notes: styleId ? message.notes : undefined,
       css: message.css,
       screenshot: message.screenshot
         ? await compressUnderLimit(message.screenshot)
@@ -257,8 +310,8 @@ export const PublishToGallery = async (
     };
 
     const style = await withSession(session =>
-      message.styleId
-        ? publishVersion(session, message.styleId, form)
+      styleId
+        ? publishUpdate(session, styleId, form, cssChanged)
         : publishStyle(session, message.site, form)
     );
 
@@ -266,7 +319,7 @@ export const PublishToGallery = async (
       styleId: style.id,
       slug: style.slug,
       version: style.version,
-      cssHash: hashCss(message.css),
+      cssHash,
       authorId: style.author.id,
     });
 

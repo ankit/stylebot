@@ -1,6 +1,6 @@
 <template>
   <div class="details">
-    <gallery-field v-if="update" :label="t('what_changed')" optional>
+    <gallery-field v-if="newVersion" :label="t('what_changed')" optional>
       <s-text-input
         :value="notes"
         :maxlength="notesMaxLength"
@@ -8,8 +8,8 @@
       />
     </gallery-field>
 
-    <section class="gallery-details" :class="{ update }">
-      <s-heading v-if="update" as="h3" size="sm">
+    <section class="gallery-details" :class="{ 'new-version': newVersion }">
+      <s-heading v-if="newVersion" as="h3" size="sm">
         {{ t('gallery_details') }}
       </s-heading>
 
@@ -57,8 +57,8 @@ import UsernameField from './UsernameField.vue';
 /**
  * The style's details for the Gallery, each bound with `.sync`: its name,
  * description and the author's username, with `usernameUnavailable` while
- * the typed one can't be taken. An update asks what changed first, above the
- * details it set last time.
+ * the typed one can't be taken. A new version asks what changed first, above
+ * the details it set last time.
  */
 export default Vue.extend({
   name: 'StyleDetailsFields',
@@ -96,8 +96,14 @@ export default Vue.extend({
       required: true,
     },
 
-    // A new version of a published style, which asks what changed.
+    // Of a published style, whether a new version or only its details.
     update: {
+      type: Boolean,
+      default: false,
+    },
+
+    // An update with new CSS, which asks what changed.
+    newVersion: {
       type: Boolean,
       default: false,
     },
@@ -127,7 +133,7 @@ export default Vue.extend({
   gap: 18px;
 }
 
-.gallery-details.update {
+.gallery-details.new-version {
   gap: 14px;
   padding-top: 18px;
   border-top: 1px solid var(--panel-border);

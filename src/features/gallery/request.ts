@@ -1,9 +1,10 @@
 import { GALLERY_API_URL } from './config';
 
 /**
- * status is the HTTP status, or 0 when the request never got an answer.
+ * status is the HTTP status, or 0 when the request never got an answer. code
+ * tells apart errors that share a status, where the server sends one.
  */
-export type GalleryApiError = Error & { status: number };
+export type GalleryApiError = Error & { status: number; code?: string };
 
 /**
  * A factory rather than an Error subclass: tsconfig sets no `target`, so
@@ -11,8 +12,10 @@ export type GalleryApiError = Error & { status: number };
  */
 export const galleryApiError = (
   message: string,
-  status: number
-): GalleryApiError => Object.assign(new Error(message), { status });
+  status: number,
+  code?: string
+): GalleryApiError =>
+  Object.assign(new Error(message), code ? { status, code } : { status });
 
 export const isGalleryApiError = (e: unknown): e is GalleryApiError =>
   e instanceof Error && typeof (e as GalleryApiError).status === 'number';
@@ -63,7 +66,8 @@ export const request = async <T>(
   if (!response.ok) {
     throw galleryApiError(
       body?.error ?? `Gallery request failed (${response.status})`,
-      response.status
+      response.status,
+      typeof body?.code === 'string' ? body.code : undefined
     );
   }
 

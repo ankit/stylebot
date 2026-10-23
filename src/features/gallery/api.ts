@@ -6,7 +6,12 @@ import type {
 } from '@stylebot/types';
 
 import { request } from './request';
-import { toFormData, type StyleForm } from './to-form-data';
+import {
+  toDetailsFormData,
+  toFormData,
+  type StyleDetailsForm,
+  type StyleForm,
+} from './to-form-data';
 
 /**
  * A signed-in session: the token sent as a bearer on requests that need an
@@ -72,7 +77,8 @@ export const publishStyle = (
 
 /**
  * Publishes a new version of one of the account's styles, replacing its name
- * and description too.
+ * and description too. The gallery refuses one whose CSS is unchanged, with
+ * the code CSS_UNCHANGED.
  */
 export const publishVersion = (
   session: string,
@@ -83,6 +89,21 @@ export const publishVersion = (
     method: 'POST',
     session,
     form: toFormData(form),
+  });
+
+/**
+ * Edits one of the account's styles' name, description or screenshot
+ * without a new version, so installs don't get an update.
+ */
+export const editStyle = (
+  session: string,
+  id: number,
+  form: StyleDetailsForm
+): Promise<GalleryPublishedStyle> =>
+  request(`/styles/${id}`, {
+    method: 'PATCH',
+    session,
+    form: toDetailsFormData(form),
   });
 
 /**

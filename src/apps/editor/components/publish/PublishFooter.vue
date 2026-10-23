@@ -20,8 +20,8 @@ import { SButton, SSpinner } from '@stylebot/components';
 import type { GalleryStyle } from '@stylebot/types';
 
 /**
- * The publish form's footer: the button that emits `publish`, naming the
- * version an update makes.
+ * The publish form's footer: the button that emits `publish`, which saves
+ * an update that makes no new version.
  */
 export default Vue.extend({
   name: 'PublishFooter',
@@ -52,21 +52,21 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
+
+    // An update with new CSS, rather than only new details.
+    newVersion: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   computed: {
     label(): string {
-      if (this.publishing) {
-        return this.t('publishing');
+      if (this.target && !this.newVersion) {
+        return this.t(this.publishing ? 'saving' : 'save');
       }
 
-      if (this.target) {
-        return this.t('publish_version_number', [
-          String(this.target.version + 1),
-        ]);
-      }
-
-      return this.t('publish');
+      return this.t(this.publishing ? 'publishing' : 'publish');
     },
   },
 });
