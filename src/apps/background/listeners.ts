@@ -55,6 +55,10 @@ import {
 } from './messages';
 
 import { updateBadge } from './badge';
+import {
+  isGalleryUpdatesAlarm,
+  updateGalleryInstalls,
+} from './gallery-updates';
 import { get as getOption, pruneRetired } from './options';
 import {
   AWAY_SECONDS,
@@ -157,6 +161,10 @@ export const initListeners = (): void => {
   chrome.alarms.onAlarm.addListener(alarm => {
     if (isSyncAlarm(alarm.name)) {
       syncStyles({ interactive: false });
+    }
+
+    if (isGalleryUpdatesAlarm(alarm.name)) {
+      updateGalleryInstalls();
     }
   });
 

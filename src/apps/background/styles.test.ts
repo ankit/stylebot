@@ -1,4 +1,5 @@
 import 'jest-fetch-mock';
+import { hashCss } from '@stylebot/gallery';
 import type { StyleProfiles } from '@stylebot/types';
 
 jest.mock('./sync-scheduler', () => ({
@@ -17,6 +18,7 @@ import {
   createProfile,
   installProfile,
   reinstallProfile,
+  updateGalleryProfile,
   setGalleryListing,
   removeGalleryListing,
   removeStyleGalleryListings,
@@ -480,6 +482,44 @@ describe('style edits', () => {
         css: 'b {}',
         profiles: { [id]: { name: 'Night', galleryListing: newer } },
       });
+    });
+
+    it('updates an unedited install in place, leaving the active profile and whether the style is on', async () => {
+      const installed = { ...listing(), cssHash: hashCss('a {}') };
+      const newer = { ...installed, version: 2, cssHash: hashCss('b {}') };
+      const { id } = await installProfile('example.com', {
+        name: 'Night',
+        css: 'a {}',
+        galleryListing: installed,
+      });
+      await setActiveProfile('example.com', 'default');
+      await disable('example.com');
+
+      await updateGalleryProfile('example.com', id, 'b {}', newer);
+
+      expect(stored('example.com')).toMatchObject({
+        css: 'body { color: red; }',
+        activeProfile: 'default',
+        enabled: false,
+        profiles: { [id]: { css: 'b {}', galleryListing: newer } },
+      });
+    });
+
+    it('leaves an edited install, and one already at the version, as they are', async () => {
+      const installed = { ...listing(), cssHash: hashCss('a {}') };
+      const newer = { ...installed, version: 2, cssHash: hashCss('b {}') };
+      const { id } = await installProfile('example.com', {
+        name: 'Night',
+        css: 'a {}',
+        galleryListing: installed,
+      });
+      await set('example.com', 'a { color: red; }', false);
+
+      const before = writes();
+      await updateGalleryProfile('example.com', id, 'b {}', newer);
+      await updateGalleryProfile('example.com', id, 'b {}', installed);
+      expect(writes()).toBe(before);
+      expect(stored('example.com').css).toBe('a { color: red; }');
     });
 
     it('sets and removes the listing a profile was published as', async () => {
