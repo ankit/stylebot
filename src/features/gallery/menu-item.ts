@@ -1,5 +1,6 @@
 import type { GetPublishedGalleryStyleResponse } from '@stylebot/types';
 
+import { getGalleryEditUrl, getGalleryStyleUrl } from './config';
 import { hashCss } from './utils';
 
 export type GalleryMenuItem = {
@@ -7,22 +8,28 @@ export type GalleryMenuItem = {
     | 'view_in_gallery'
     | 'publish_to_gallery'
     | 'publish_update'
-    | 'manage_publishing';
+    | 'edit_in_gallery';
   // The published style has changes to publish.
   changed: boolean;
+  // The gallery page the item opens, rather than publishing.
+  url?: string;
 };
 
 /**
  * What a profile's menu offers for the Gallery: a style installed from
  * someone else links to its page there, and one of yours is published,
- * updated or managed.
+ * updated, or edited on the gallery site.
  */
 export const getGalleryMenuItem = (
   { published, installed }: GetPublishedGalleryStyleResponse,
   css: string
 ): GalleryMenuItem => {
   if (!published && installed) {
-    return { label: 'view_in_gallery', changed: false };
+    return {
+      label: 'view_in_gallery',
+      changed: false,
+      url: getGalleryStyleUrl(installed),
+    };
   }
 
   if (!published) {
@@ -33,5 +40,9 @@ export const getGalleryMenuItem = (
     return { label: 'publish_update', changed: true };
   }
 
-  return { label: 'manage_publishing', changed: false };
+  return {
+    label: 'edit_in_gallery',
+    changed: false,
+    url: getGalleryEditUrl(published.styleId),
+  };
 };

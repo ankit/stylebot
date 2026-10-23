@@ -36,6 +36,7 @@ import type {
 import {
   captureGalleryScreenshot,
   getPublishedGalleryStyle,
+  openGalleryDraft,
 } from '../utils/gallery';
 import { waitForPanelToSlideAway } from '../utils/panel-slide';
 
@@ -290,6 +291,45 @@ export default {
       return await captureGalleryScreenshot();
     } finally {
       commit('setCapturing', false);
+    }
+  },
+
+  /**
+   * Captures the page and hands the active profile to the gallery site to
+   * publish, in a new tab. Without a screenshot, the site asks for one.
+   */
+  async publishToGallery({
+    state,
+    getters,
+    commit,
+    dispatch,
+  }: {
+    state: State;
+    getters: Getters;
+    commit: Commit;
+    dispatch: Dispatch;
+  }): Promise<void> {
+    if (state.publishing) {
+      return;
+    }
+
+    commit('setPublishing', true);
+    commit('setInspecting', false);
+
+    try {
+      const capture: GalleryScreenshotResponse = await dispatch(
+        'captureGalleryScreenshot'
+      );
+
+      await openGalleryDraft({
+        url: state.url,
+        profileId: state.activeProfile,
+        css: state.css,
+        profileName: getters.activeProfileName,
+        screenshot: capture.ok ? capture.screenshot : null,
+      });
+    } finally {
+      commit('setPublishing', false);
     }
   },
 

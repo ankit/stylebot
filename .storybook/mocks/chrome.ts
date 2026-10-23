@@ -19,6 +19,7 @@ import type {
   RunGoogleDriveSyncResponse,
   VersionHistory,
   GalleryPublished,
+  GalleryScreenshotResponse,
   GalleryStyle,
   InstallGalleryPreviewResponse,
 } from '@stylebot/types';
@@ -53,6 +54,8 @@ export type ChromeShimOptions = {
 export type GalleryShimOptions = {
   // What the profile published.
   published?: GalleryPublished;
+  // Capturing the tab; pending keeps it capturing.
+  capture?: Pending<GalleryScreenshotResponse>;
   // The popup's suggestions for the site, the one the tab previews already,
   // and what installing a preview answers.
   suggestions?: Array<GalleryStyle>;
@@ -216,10 +219,14 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
       published: gallery.published ?? null,
       installed: gallery.installed ?? null,
     }),
-    CaptureGalleryScreenshot: () => ({
-      ok: true,
-      screenshot: GALLERY_SCREENSHOT,
-    }),
+    CaptureGalleryScreenshot: () => {
+      if (gallery.capture === 'pending') {
+        return new Promise(() => undefined);
+      }
+
+      return gallery.capture ?? { ok: true, screenshot: GALLERY_SCREENSHOT };
+    },
+    OpenGalleryDraft: () => ({ ok: true }),
     GetGallerySuggestions: () => ({
       ok: true,
       styles: gallery.suggestions ?? [],

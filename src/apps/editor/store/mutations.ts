@@ -153,6 +153,10 @@ export default {
     state.help = value;
   },
 
+  setPublishing(state: State, value: boolean): void {
+    state.publishing = value;
+  },
+
   setCapturing(state: State, value: boolean): void {
     state.capturing = value;
   },

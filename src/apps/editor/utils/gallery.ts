@@ -3,6 +3,8 @@ import type {
   GalleryScreenshotResponse,
   GetPublishedGalleryStyle,
   GetPublishedGalleryStyleResponse,
+  OpenGalleryDraft,
+  OpenGalleryDraftResponse,
 } from '@stylebot/types';
 
 import { flashPage, playShutterSound } from './shutter';
@@ -38,3 +40,11 @@ export const captureGalleryScreenshot = async (
 
   return response;
 };
+
+export const openGalleryDraft = (
+  message: Omit<OpenGalleryDraft, 'name'>
+): Promise<OpenGalleryDraftResponse> =>
+  chrome.runtime.sendMessage<OpenGalleryDraft, OpenGalleryDraftResponse>({
+    name: 'OpenGalleryDraft',
+    ...message,
+  });
