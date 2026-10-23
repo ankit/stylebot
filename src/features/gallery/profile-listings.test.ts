@@ -15,7 +15,7 @@ const listing = (styleId: number, version = 1): GalleryListing => ({
   slug: `style-${styleId}`,
   version,
   cssHash: 'abc',
-  authorId: 'someone',
+  published: false,
 });
 
 const styles: StyleMap = {

@@ -1,4 +1,8 @@
 import type {
+  GalleryDraftPublished,
+  GalleryDraftPublishedResponse,
+  GetGalleryDraft,
+  GetGalleryDraftResponse,
   GetGalleryInstallStatus,
   GetGalleryInstallStatusResponse,
   InstallStyle,
@@ -68,6 +72,40 @@ const handlers: { [T in SiteRequestType]: Handler<T> } = {
       type: 'stylebot:status:result',
       id,
       installed: response?.installed ?? {},
+    };
+  },
+
+  'stylebot:draft': async ({ id }) => {
+    const message: GetGalleryDraft = { name: 'GetGalleryDraft', id };
+    const response = await chrome.runtime
+      .sendMessage<GetGalleryDraft, GetGalleryDraftResponse>(message)
+      .catch((): null => null);
+
+    return {
+      type: 'stylebot:draft:result',
+      id,
+      draft: response?.draft ?? null,
+    };
+  },
+
+  'stylebot:published': async ({ id, styleId, version, slug }) => {
+    const message: GalleryDraftPublished = {
+      name: 'GalleryDraftPublished',
+      id,
+      styleId,
+      version,
+      slug,
+    };
+    const response = await chrome.runtime
+      .sendMessage<GalleryDraftPublished, GalleryDraftPublishedResponse>(
+        message
+      )
+      .catch((): null => null);
+
+    return {
+      type: 'stylebot:published:result',
+      id,
+      ok: Boolean(response?.ok),
     };
   },
 };

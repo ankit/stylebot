@@ -1,18 +1,34 @@
 import fetchMock from 'jest-fetch-mock';
-import { GALLERY_API_URL } from '@stylebot/gallery';
-import type { GalleryListing, StyleMap } from '@stylebot/types';
+import {
+  GALLERY_API_URL,
+  getGalleryPublishUrl,
+  hashCss,
+} from '@stylebot/gallery';
+import type {
+  GalleryListing,
+  GetGalleryDraftResponse,
+  StyleMap,
+} from '@stylebot/types';
 
 import { mockStorage, style } from '../../features/gallery/gallery.fixtures';
 import { captureTab } from './capture-tab';
 import {
   CaptureGalleryScreenshot,
+  GalleryDraftPublished,
+  GetGalleryDraft,
   GetGalleryInstallStatus,
   GetGallerySuggestions,
   GetPublishedGalleryStyle,
+  OpenGalleryDraft,
 } from './gallery';
 
 jest.mock('./capture-tab', () => ({ captureTab: jest.fn() }));
 jest.mock('./gallery-preview', () => ({}));
+jest.mock('../../features/gallery/compress-screenshot', () => ({
+  compressScreenshot: jest.fn(
+    async () => new Blob(['webp'], { type: 'image/webp' })
+  ),
+}));
 let mockGallerySuggestions: boolean;
 
 jest.mock('./options', () => ({
@@ -20,9 +36,24 @@ jest.mock('./options', () => ({
 }));
 let mockStyles: StyleMap;
 
-jest.mock('./styles', () => ({
-  getAll: jest.fn(async () => mockStyles),
-}));
+jest.mock('./styles', () => {
+  const { setProfileGalleryListing } = jest.requireActual<
+    typeof import('@stylebot/saved-styles')
+  >('@stylebot/saved-styles');
+
+  return {
+    getAll: jest.fn(async () => mockStyles),
+    setGalleryListing: jest.fn(
+      async (url: string, id: string, galleryListing: GalleryListing) => {
+        mockStyles[url] = setProfileGalleryListing(
+          mockStyles[url],
+          id,
+          galleryListing
+        );
+      }
+    ),
+  };
+});
 
 const savedStyle = (profiles: StyleMap[string]['profiles'] = undefined) => ({
   css: '',
@@ -35,13 +66,13 @@ const savedStyle = (profiles: StyleMap[string]['profiles'] = undefined) => ({
 const listing = (
   styleId: number,
   slug: string,
-  authorId = 'someone'
+  published = false
 ): GalleryListing => ({
   styleId,
   slug,
   version: 1,
   cssHash: 'abc',
-  authorId,
+  published,
 });
 
 const respond = <T>(
@@ -66,7 +97,202 @@ beforeEach(() => {
 });
 
 describe('gallery messages', () => {
-  it('names the gallery style a profile was installed from', async () => {
+  describe('drafts', () => {
+    const CSS = 'body { color: red; }';
+    const GALLERY = {
+      id: 'stylebot',
+      url: 'https://gallery.stylebot.dev/publish',
+    };
+
+    let createTab: jest.Mock;
+
+    beforeEach(() => {
+      createTab = jest.fn(async () => ({}));
+      Object.assign(global.chrome, {
+        runtime: { id: 'stylebot' },
+        tabs: { create: createTab },
+      });
+    });
+
+    /**
+     * Opens a draft of github.com's default profile from tab 3, and resolves
+     * with the id the publish page was opened with.
+     */
+    const openDraft = async (screenshot: string | null = null) => {
+      await respond(send =>
+        OpenGalleryDraft(
+          {
+            name: 'OpenGalleryDraft',
+            url: 'github.com',
+            profileId: 'default',
+            css: CSS,
+            profileName: 'Night',
+            screenshot,
+          },
+          { tab: { id: 3 } as chrome.tabs.Tab },
+          send
+        )
+      );
+
+      const { url } = createTab.mock.calls[0][0] as { url: string };
+
+      return new URL(url).searchParams.get('draft') as string;
+    };
+
+    const getDraft = (id: string, sender = GALLERY) =>
+      respond<GetGalleryDraftResponse>(send =>
+        GetGalleryDraft({ name: 'GetGalleryDraft', id }, sender, send)
+      );
+
+    const published = (id: string, sender = GALLERY) =>
+      respond(send =>
+        GalleryDraftPublished(
+          {
+            name: 'GalleryDraftPublished',
+            id,
+            styleId: 9,
+            version: 3,
+            slug: 'night',
+          },
+          sender,
+          send
+        )
+      );
+
+    it('opens the publish page beside the tab, on a draft the gallery can read', async () => {
+      const id = await openDraft();
+
+      expect(createTab).toHaveBeenCalledWith({
+        url: getGalleryPublishUrl(id),
+        openerTabId: 3,
+      });
+      expect(await getDraft(id)).toEqual({
+        draft: {
+          site: 'github.com',
+          url: 'github.com',
+          css: CSS,
+          name: 'Night',
+          screenshot: null,
+          styleId: null,
+        },
+      });
+    });
+
+    it('fits the screenshot to the gallery’s limit', async () => {
+      const id = await openDraft('data:image/png;base64,iVBORw0KGgo=');
+      const { draft } = await getDraft(id);
+
+      expect(draft?.screenshot).toMatch(/^data:image\/webp;base64,/);
+    });
+
+    it('updates the gallery style the profile was published as, not one it was installed from', async () => {
+      mockStyles = {
+        'github.com': savedStyle({
+          default: { name: '', galleryListing: listing(8, 'mine', true) },
+          other: { name: 'Other', galleryListing: listing(7, 'night') },
+        }),
+      };
+
+      const { draft } = await getDraft(await openDraft());
+      expect(draft?.styleId).toBe(8);
+
+      createTab.mockClear();
+      mockStyles['github.com'].activeProfile = 'other';
+      await respond(send =>
+        OpenGalleryDraft(
+          {
+            name: 'OpenGalleryDraft',
+            url: 'github.com',
+            profileId: 'other',
+            css: CSS,
+            profileName: 'Other',
+            screenshot: null,
+          },
+          {},
+          send
+        )
+      );
+      const { url } = createTab.mock.calls[0][0] as { url: string };
+      const other = await getDraft(
+        new URL(url).searchParams.get('draft') as string
+      );
+
+      expect(other.draft?.styleId).toBeNull();
+    });
+
+    it('gives drafts only to the gallery', async () => {
+      const id = await openDraft();
+
+      expect(
+        await getDraft(id, { id: 'stylebot', url: 'https://stylebot.dev/' })
+      ).toEqual({ draft: null });
+      expect(
+        await getDraft(id, {
+          id: 'stylebot',
+          url: 'https://gallery.stylebot.dev.example.com/',
+        })
+      ).toEqual({ draft: null });
+      expect(await getDraft(id, { id: 'other', url: GALLERY.url })).toEqual({
+        draft: null,
+      });
+      expect(
+        await published(id, { id: 'stylebot', url: 'https://example.com/' })
+      ).toEqual({
+        ok: false,
+      });
+    });
+
+    it("remembers what was published on the draft's profile, hashing the draft's CSS, and forgets the draft", async () => {
+      const id = await openDraft();
+
+      expect(await published(id)).toEqual({ ok: true });
+      expect(
+        await respond(send =>
+          GetPublishedGalleryStyle(
+            {
+              name: 'GetPublishedGalleryStyle',
+              url: 'github.com',
+              profileId: 'default',
+            },
+            send
+          )
+        )
+      ).toEqual({
+        published: {
+          styleId: 9,
+          version: 3,
+          cssHash: hashCss(CSS),
+          slug: 'night',
+        },
+        installed: null,
+      });
+      expect(await getDraft(id)).toEqual({ draft: null });
+      expect(await published(id)).toEqual({ ok: false });
+    });
+
+    it('turns down a publish that names no gallery style', async () => {
+      const id = await openDraft();
+
+      expect(
+        await respond(send =>
+          GalleryDraftPublished(
+            {
+              name: 'GalleryDraftPublished',
+              id,
+              styleId: -1,
+              version: 1,
+              slug: 'night',
+            },
+            GALLERY,
+            send
+          )
+        )
+      ).toEqual({ ok: false });
+      expect((await getDraft(id)).draft).not.toBeNull();
+    });
+  });
+
+  it('names the gallery style a profile was installed from, and what was published from another', async () => {
     const publishedFrom = (profileId: string) =>
       respond(send =>
         GetPublishedGalleryStyle(
@@ -77,12 +303,26 @@ describe('gallery messages', () => {
     mockStyles = {
       'github.com': savedStyle({
         p1: { name: 'Night', galleryListing: listing(7, 'night') },
+        p2: {
+          name: 'Mine',
+          css: 'a {}',
+          galleryListing: listing(8, 'mine', true),
+        },
       }),
     };
 
     expect(await publishedFrom('p1')).toEqual({
       published: null,
       installed: { id: 7, slug: 'night' },
+    });
+    expect(await publishedFrom('p2')).toEqual({
+      published: {
+        styleId: 8,
+        slug: 'mine',
+        version: 1,
+        cssHash: 'abc',
+      },
+      installed: null,
     });
     expect(await publishedFrom('missing')).toEqual({
       published: null,
@@ -116,7 +356,7 @@ describe('gallery messages', () => {
       'github.com': savedStyle({
         default: {
           name: '',
-          galleryListing: listing(style.id, style.slug),
+          galleryListing: listing(style.id, style.slug, true),
         },
         p1: {
           name: 'Installed',

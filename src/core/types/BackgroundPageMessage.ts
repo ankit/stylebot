@@ -258,10 +258,36 @@ export type RestoreTab = {
   tabId: number;
 };
 
-// Leave out tabId to capture the tab the message came from.
+// Leave out tabId to capture the tab the message came from, as taken.
 export type CaptureGalleryScreenshot = {
   name: 'CaptureGalleryScreenshot';
   tabId?: number;
+};
+
+// Hands a profile to the gallery site to publish, opening it in a new tab.
+// The screenshot is a data URL, fitted to the gallery's limit here.
+export type OpenGalleryDraft = {
+  name: 'OpenGalleryDraft';
+  url: string;
+  profileId: string;
+  css: string;
+  profileName: string;
+  screenshot: string | null;
+};
+
+// For the site bridge on the gallery, by the id its publish page was given.
+export type GetGalleryDraft = {
+  name: 'GetGalleryDraft';
+  id: string;
+};
+
+// The gallery site published a draft, as this version of a gallery style.
+export type GalleryDraftPublished = {
+  name: 'GalleryDraftPublished';
+  id: string;
+  styleId: number;
+  version: number;
+  slug: string;
 };
 
 export type GetPublishedGalleryStyle = {
@@ -370,6 +396,9 @@ type BackgroundPageMessage =
   | RunPageCommand
   | RestoreTab
   | CaptureGalleryScreenshot
+  | OpenGalleryDraft
+  | GetGalleryDraft
+  | GalleryDraftPublished
   | GetPublishedGalleryStyle
   | GetGallerySuggestions
   | GetGalleryStyle

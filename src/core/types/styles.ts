@@ -21,9 +21,9 @@ export type GalleryListing = {
   version: number;
   // A hash of that version's CSS, to tell if the profile was edited since.
   cssHash: string;
-  // The gallery account that wrote the style. The profile is the signed-in
-  // account's to publish from when it's theirs.
-  authorId: string;
+  // Published from here, so publishing it again updates the gallery style,
+  // rather than installed from it.
+  published: boolean;
 };
 
 export type StyleProfiles = {

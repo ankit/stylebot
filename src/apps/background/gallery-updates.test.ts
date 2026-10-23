@@ -21,7 +21,7 @@ const listing = (version: number, css: string): GalleryListing => ({
   slug: style.slug,
   version,
   cssHash: hashCss(css),
-  authorId: style.author.id,
+  published: false,
 });
 
 /**

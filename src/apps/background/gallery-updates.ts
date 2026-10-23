@@ -69,10 +69,14 @@ export const updateGalleryInstalls = async (): Promise<void> => {
       continue;
     }
 
-    const galleryListing = getLatestVersionListing(latest, latest);
-
     for (const { url, profileId, galleryListing: current } of unedited) {
       if (current.version < latest.version) {
+        const galleryListing = getLatestVersionListing(
+          latest,
+          latest,
+          current.published
+        );
+
         await updateGalleryProfile(url, profileId, latest.css, galleryListing);
         updated = true;
       }

@@ -101,7 +101,7 @@ describe('gallery preview', () => {
               slug: 'tokyo-night',
               version: 2,
               cssHash: hashCss('a {}'),
-              authorId: style.author.id,
+              published: false,
             },
           },
         },
@@ -184,7 +184,7 @@ describe('gallery preview', () => {
         slug: 'tokyo-night',
         version: 2,
         cssHash: hashCss('a { color: red; }'),
-        authorId: style.author.id,
+        published: false,
       },
     });
     expect(await getGalleryPreview(TAB_ID)).toBeNull();
@@ -211,7 +211,7 @@ describe('gallery preview', () => {
       slug: 'tokyo-night',
       version: 2,
       cssHash: hashCss(LATEST_CSS),
-      authorId: style.author.id,
+      published: false,
     };
 
     /**
@@ -275,6 +275,18 @@ describe('gallery preview', () => {
         css: LATEST_CSS,
         galleryListing: LATEST_LISTING,
       });
+    });
+
+    it('switches back to an edited, older copy of a style published from here, keeping it as it is', async () => {
+      await seed('a { color: pink; }', {
+        ...installedAt(1, 'a { color: red; }'),
+        published: true,
+      });
+
+      expect(await installGalleryPreview(TAB_ID)).toBe('Mine');
+      expect(reinstallProfile).toHaveBeenCalledWith('github.com', 'p0', {});
+      expect(removeGalleryListing).not.toHaveBeenCalled();
+      expect(installProfile).not.toHaveBeenCalled();
     });
 
     it("installs anew when no profile has the style's listing", async () => {

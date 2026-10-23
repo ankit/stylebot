@@ -15,7 +15,21 @@ export const style: GalleryStyle = {
 };
 
 /**
- * An in-memory chrome.storage.local, enough for the gallery's own keys.
+ * An in-memory storage area, kept in store.
+ */
+const mockStorageArea = (store: Record<string, unknown>) => ({
+  get: jest.fn(async (key: string) => ({ [key]: store[key] })),
+  set: jest.fn(async (items: Record<string, unknown>) => {
+    Object.assign(store, items);
+  }),
+  remove: jest.fn(async (key: string) => {
+    delete store[key];
+  }),
+});
+
+/**
+ * In-memory chrome.storage.local and session areas, enough for the gallery's
+ * own keys, returning what local holds.
  */
 export const mockStorage = (
   initial: Record<string, unknown> = {}
@@ -23,17 +37,7 @@ export const mockStorage = (
   const store: Record<string, unknown> = { ...initial };
 
   global.chrome = {
-    storage: {
-      local: {
-        get: jest.fn(async (key: string) => ({ [key]: store[key] })),
-        set: jest.fn(async (items: Record<string, unknown>) => {
-          Object.assign(store, items);
-        }),
-        remove: jest.fn(async (key: string) => {
-          delete store[key];
-        }),
-      },
-    },
+    storage: { local: mockStorageArea(store), session: mockStorageArea({}) },
   } as unknown as typeof chrome;
 
   return store;

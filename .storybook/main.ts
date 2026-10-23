@@ -65,6 +65,7 @@ const config: StorybookConfig = {
       define: {
         'process.env.STYLEBOT_CLI': JSON.stringify('true'),
         'process.env.STYLEBOT_GALLERY_API_URL': JSON.stringify(''),
+        'process.env.STYLEBOT_GALLERY_SITE_URL': JSON.stringify(''),
       },
       resolve: {
         alias: [

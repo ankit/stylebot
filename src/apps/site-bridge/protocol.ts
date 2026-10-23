@@ -5,6 +5,8 @@
  * ping → pong and install → installed predate this and stay for stylebot.dev.
  */
 
+import type { GalleryDraft } from '@stylebot/types';
+
 // The protocol's version, which the bridge marks on <html>.
 export const BRIDGE_VERSION = '1';
 
@@ -48,12 +50,38 @@ export type StatusResult = {
   installed: Record<string, string>;
 };
 
+export type DraftRequest = { type: 'stylebot:draft'; id: string };
+
+export type DraftResult = {
+  type: 'stylebot:draft:result';
+  id: string;
+  // Null for a draft that's unknown, expired or already published.
+  draft: GalleryDraft | null;
+};
+
+// The gallery published a draft, by the id its publish page was opened with.
+export type PublishedRequest = {
+  type: 'stylebot:published';
+  id: string;
+  styleId: number;
+  version: number;
+  slug: string;
+};
+
+export type PublishedResult = {
+  type: 'stylebot:published:result';
+  id: string;
+  ok: boolean;
+};
+
 // Each request a page can send, and the reply the bridge answers it with.
 export type SiteMessages = {
   'stylebot:ping': { request: PingRequest; reply: PongReply };
   'stylebot:install': { request: InstallRequest; reply: InstalledReply };
   'stylebot:preview': { request: PreviewRequest; reply: PreviewResult };
   'stylebot:status': { request: StatusRequest; reply: StatusResult };
+  'stylebot:draft': { request: DraftRequest; reply: DraftResult };
+  'stylebot:published': { request: PublishedRequest; reply: PublishedResult };
 };
 
 export type SiteRequestType = keyof SiteMessages;
