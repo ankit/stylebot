@@ -264,6 +264,10 @@ const config = {
           to: 'monaco-editor/iframe/theme-init.js',
         },
         {
+          from: 'apps/monaco-iframe/editor.css',
+          to: 'monaco-editor/iframe/editor.css',
+        },
+        {
           from: '../node_modules/monaco-editor/min/**/*',
           to: 'monaco-editor/iframe/monaco-editor/',
           // The editor only edits CSS. AMO's linter can't parse the TypeScript

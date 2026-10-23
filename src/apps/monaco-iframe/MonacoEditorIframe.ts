@@ -205,18 +205,30 @@ class MonacEditorIframe {
       ...wrapOptions,
       scrollBeyondLastLine: false,
       language: 'css',
-      folding: false,
+      stickyScroll: {
+        enabled: true,
+        maxLineCount: 2,
+        defaultModel: 'indentationModel',
+      },
+      colorDecoratorsActivatedOn: 'click',
       renderLineHighlight: 'none',
       suggestOnTriggerCharacters: false,
       cursorBlinking: 'smooth',
+      smoothScrolling: true,
       mouseWheelZoom: false,
       lineNumbers: isOptions ? 'on' : 'off',
       lineNumbersMinChars: isOptions ? 8 : undefined,
+      lineDecorationsWidth: isOptions ? undefined : 4,
       // Lets the scrollbar reach the container's true edges instead of an
       // outer CSS padding clipping it; no horizontal equivalent in Monaco.
       padding: isOptions ? { top: 14, bottom: 18 } : undefined,
       minimap: {
         enabled: false,
+      },
+      scrollbar: {
+        verticalScrollbarSize: 8,
+        horizontalScrollbarSize: 8,
+        useShadows: false,
       },
       hover: {
         enabled: true,

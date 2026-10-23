@@ -1,0 +1,170 @@
+#container .monaco-editor {
+  .margin-view-overlays .codicon[class*='codicon-folding-'] {
+    justify-content: flex-start;
+    margin-left: 4px;
+    font-size: 100%;
+  }
+
+  .find-widget {
+    left: 0;
+    right: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+    margin-top: 0;
+    border: 0;
+    border-bottom: 1px solid #eceef1;
+    border-radius: 0;
+    box-shadow: none;
+    background: #fcfcfd;
+
+    html.theme-dark & {
+      border-bottom-color: #2c2e33;
+      background: #1a1b1e;
+    }
+
+    > .find-part .monaco-findInput {
+      max-width: 360px;
+    }
+
+    .monaco-findInput .input,
+    .monaco-findInput .mirror {
+      font-family: 'Geist Mono', Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+    }
+
+    .matchesCount {
+      color: #9aa0aa;
+
+      html.theme-dark & {
+        color: #8a8f98;
+      }
+    }
+
+    &.reduced-find-widget .matchesCount {
+      display: flex;
+    }
+
+    &.no-results .matchesCount {
+      color: #c0507f;
+
+      html.theme-dark & {
+        color: #f4a7c3;
+      }
+    }
+
+    &.collapsed-find-widget > .find-part .monaco-findInput .controls {
+      display: block;
+    }
+
+    .codicon-find-selection {
+      display: none;
+    }
+  }
+
+  .monaco-resizable-hover:has(.colorpicker-widget) {
+    border-color: #dcdfe5;
+    border-radius: 11px;
+    background: #fff;
+    box-shadow: 0 14px 32px rgb(0 0 0 / 20%);
+    translate: -4px 0;
+
+    html.theme-dark & {
+      border-color: #3a3e46;
+      background: #23262b;
+      box-shadow: 0 14px 32px rgb(0 0 0 / 45%);
+    }
+
+    .monaco-hover {
+      background: transparent;
+    }
+
+    .monaco-sash,
+    .hover-copy-button {
+      display: none;
+    }
+  }
+
+  .colorpicker-widget {
+    height: auto;
+    padding: 10px;
+
+    &:focus:not(:focus-visible) {
+      outline: none;
+    }
+  }
+
+  .colorpicker-header,
+  .colorpicker-body .saturation-wrap,
+  .colorpicker-body .strip {
+    outline: 1px solid rgb(0 0 0 / 10%);
+    outline-offset: -1px;
+  }
+
+  .colorpicker-header {
+    height: 28px;
+    border-radius: 6px;
+    overflow: hidden;
+
+    .picked-color {
+      font: 12px/28px 'Geist Mono', Menlo, Monaco, Consolas, monospace;
+    }
+
+    .original-color {
+      width: 56px;
+    }
+  }
+
+  .colorpicker-body {
+    padding: 10px 0 0;
+
+    .saturation-wrap {
+      height: 140px;
+      border-radius: 7px;
+    }
+
+    .saturation-box {
+      height: 140px;
+    }
+
+    .saturation-selection {
+      width: 12px;
+      height: 12px;
+      margin: -6px 0 0 -6px;
+      border: 0;
+      box-shadow: 0 0 0 2px #fff, 0 0 0 3px rgb(0 0 0 / 25%),
+        0 1px 3px rgb(0 0 0 / 40%);
+    }
+
+    .strip {
+      width: 12px;
+      height: 140px;
+      margin-left: 12px;
+      border-radius: 6px;
+    }
+
+    .strip .overlay {
+      height: 140px;
+      border-radius: 6px;
+    }
+
+    .slider {
+      left: 0;
+      width: 12px;
+      height: 0;
+      border: 0;
+      box-shadow: none;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: -6px;
+        left: 0;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        box-shadow: 0 0 0 2px #fff, 0 0 0 3px rgb(0 0 0 / 25%),
+          0 1px 3px rgb(0 0 0 / 40%);
+      }
+    }
+  }
+}
