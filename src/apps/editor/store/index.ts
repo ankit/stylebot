@@ -90,6 +90,8 @@ export type State = {
   selectors: Array<CssSelectorMetadata>;
 
   help: boolean;
+  // Capturing the page to hand the profile to the gallery site.
+  publishing: boolean;
   // Page host: hides the panel while the page is captured for the gallery.
   capturing: boolean;
   // What this style's profile last published to the gallery, if anything.
@@ -139,6 +141,7 @@ export const createStore = (host: EditorHost): Store<State> => {
       contextMenuSelector: '',
 
       help: false,
+      publishing: false,
       capturing: false,
       publishedGalleryStyle: null,
       installedGalleryStyle: null,

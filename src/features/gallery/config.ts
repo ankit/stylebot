@@ -40,6 +40,12 @@ export const getGalleryPublishUrl = (draftId: string): string =>
   `${GALLERY_SITE_URL}/publish?${new URLSearchParams({ draft: draftId })}`;
 
 /**
+ * A style's edit page on the gallery site.
+ */
+export const getGalleryEditUrl = (styleId: number): string =>
+  `${GALLERY_SITE_URL}/edit/${styleId}`;
+
+/**
  * Whether a value from one of Stylebot's sites is a gallery style id.
  */
 export const isGalleryStyleId = (value: unknown): value is number =>

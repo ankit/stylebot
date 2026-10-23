@@ -6,12 +6,14 @@ import * as stylebotCss from '@stylebot/css';
 import * as googleFonts from '@stylebot/google-fonts';
 import * as chromeUtils from '../utils/chrome';
 import * as page from '@stylebot/page-bridge';
+import * as galleryUtils from '../utils/gallery';
 
 jest.mock('postcss');
 jest.mock('@stylebot/css');
 jest.mock('@stylebot/google-fonts');
 jest.mock('../utils/chrome');
 jest.mock('@stylebot/page-bridge');
+jest.mock('../utils/gallery');
 
 const mockRoot = {
   some: jest.fn(),
@@ -1041,6 +1043,44 @@ describe('actions', () => {
       expect(mockCommit).toBeCalledWith('setComputedStyles', {
         'font-size': '20px',
       });
+    });
+  });
+
+  describe('publishToGallery', () => {
+    const publish = (capture: unknown) => {
+      const dispatch = jest.fn(async () => capture);
+
+      return actions
+        .publishToGallery({
+          state: { ...mockState, css: 'a { color: red; }' },
+          getters: { activeProfileName: 'Dark' } as never,
+          commit: mockCommit,
+          dispatch,
+        })
+        .then(() => dispatch);
+    };
+
+    it('captures the page and hands the profile and screenshot to the gallery site', async () => {
+      const dispatch = await publish({ ok: true, screenshot: 'data:a' });
+
+      expect(dispatch).toHaveBeenCalledWith('captureGalleryScreenshot');
+      expect(galleryUtils.openGalleryDraft).toHaveBeenCalledWith({
+        url: mockState.url,
+        profileId: mockState.activeProfile,
+        css: 'a { color: red; }',
+        profileName: 'Dark',
+        screenshot: 'data:a',
+      });
+      expect(mockCommit).toHaveBeenCalledWith('setInspecting', false);
+      expect(mockCommit).toHaveBeenLastCalledWith('setPublishing', false);
+    });
+
+    it('hands it over without a screenshot when the capture fails', async () => {
+      await publish({ ok: false, errorKey: 'gallery_error_unknown' });
+
+      expect(galleryUtils.openGalleryDraft).toHaveBeenCalledWith(
+        expect.objectContaining({ screenshot: null })
+      );
     });
   });
 });

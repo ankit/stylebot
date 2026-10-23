@@ -5,6 +5,7 @@ export {
   getGalleryStyleUrl,
   getGallerySiteUrl,
   getGalleryPublishUrl,
+  getGalleryEditUrl,
   isGalleryStyleId,
   SCREENSHOT_MAX_BYTES,
 } from './config';
