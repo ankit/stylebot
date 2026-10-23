@@ -404,7 +404,7 @@ describe('mergeThreeWay with profiles', () => {
       slug: 'night',
       version,
       cssHash: 'abc',
-      authorId: 'someone',
+      published: false,
     });
 
     const withListing = (version: number | undefined, time: string) =>

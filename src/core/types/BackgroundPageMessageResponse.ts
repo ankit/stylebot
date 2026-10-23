@@ -5,6 +5,7 @@ import type { ReadabilitySettings } from './readability';
 import type { GoogleDriveSyncMetadata } from './sync';
 import type { RestoreResult, VersionHistory } from './history';
 import type {
+  GalleryDraft,
   GalleryPublished,
   GalleryPreview,
   GalleryResult,
@@ -71,6 +72,10 @@ export type RestoreTabResponse = { ok: true };
 
 // The screenshot is a data URL.
 export type GalleryScreenshotResponse = GalleryResult<{ screenshot: string }>;
+export type OpenGalleryDraftResponse = GalleryResult;
+// Null for a draft that's unknown, expired or already published.
+export type GetGalleryDraftResponse = { draft: GalleryDraft | null };
+export type GalleryDraftPublishedResponse = { ok: boolean };
 // What was published from a profile, or the gallery style the profile was
 // installed from.
 export type GetPublishedGalleryStyleResponse = {
@@ -124,6 +129,9 @@ type BackgroundPageMessageResponse =
   | OpenEditorSidePanelResponse
   | RestoreTabResponse
   | GalleryScreenshotResponse
+  | OpenGalleryDraftResponse
+  | GetGalleryDraftResponse
+  | GalleryDraftPublishedResponse
   | GetPublishedGalleryStyleResponse
   | GetGallerySuggestionsResponse
   | PreviewGalleryStyleResponse

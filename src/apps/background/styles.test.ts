@@ -404,7 +404,7 @@ describe('style edits', () => {
       slug: `style-${styleId}`,
       version: 1,
       cssHash: 'abc',
-      authorId: 'someone',
+      published: false,
     });
 
     it('keeps the listing of a profile installed from the gallery, even when its name and css match another', async () => {

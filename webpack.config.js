@@ -31,13 +31,15 @@ const isCLISupported = supportsCLI(process.env.BROWSER);
 const cliDefinitions = {
   'process.env.STYLEBOT_CLI': JSON.stringify(String(isCLISupported)),
 };
-// A development build can point the styles gallery at another API, such as a local Worker.
+// A development build can point the styles gallery at another API, such as a
+// local Worker, and at another site, such as the gallery's dev server.
+const devOnly = name =>
+  JSON.stringify(
+    process.env.NODE_ENV === 'production' ? '' : process.env[name] ?? ''
+  );
 const galleryDefinitions = {
-  'process.env.STYLEBOT_GALLERY_API_URL': JSON.stringify(
-    process.env.NODE_ENV === 'production'
-      ? ''
-      : process.env.STYLEBOT_GALLERY_API_URL ?? ''
-  ),
+  'process.env.STYLEBOT_GALLERY_API_URL': devOnly('STYLEBOT_GALLERY_API_URL'),
+  'process.env.STYLEBOT_GALLERY_SITE_URL': devOnly('STYLEBOT_GALLERY_SITE_URL'),
 };
 
 // Drive sign-in can't exchange codes or refresh tokens without it, so a

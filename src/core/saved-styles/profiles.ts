@@ -44,7 +44,7 @@ const isGalleryListing = (value: unknown): value is GalleryListing =>
   typeof value.slug === 'string' &&
   typeof value.version === 'number' &&
   typeof value.cssHash === 'string' &&
-  typeof value.authorId === 'string';
+  typeof value.published === 'boolean';
 
 /**
  * A stored gallery listing with only the fields a listing has, or undefined
@@ -55,14 +55,14 @@ const repairGalleryListing = (value: unknown): GalleryListing | undefined => {
     return undefined;
   }
 
-  const { styleId, slug, version, cssHash, authorId } = value;
+  const { styleId, slug, version, cssHash, published } = value;
 
-  return { styleId, slug, version, cssHash, authorId };
+  return { styleId, slug, version, cssHash, published };
 };
 
 /**
  * Whether two gallery listings are of the same style at the same version,
- * by the same author.
+ * both installed or both published.
  */
 export const isSameGalleryListing = (
   a: GalleryListing | undefined,
@@ -77,7 +77,7 @@ export const isSameGalleryListing = (
     a.slug === b.slug &&
     a.version === b.version &&
     a.cssHash === b.cssHash &&
-    a.authorId === b.authorId
+    a.published === b.published
   );
 };
 

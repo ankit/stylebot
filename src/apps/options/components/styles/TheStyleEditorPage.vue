@@ -613,10 +613,17 @@ export default Vue.extend({
     },
 
     /**
-     * Whether the profile was installed from the Gallery.
+     * Whether the profile was installed from the Gallery or published to it
+     * from here.
      */
     galleryRole(id: string): GalleryRole | null {
-      return this.expanded.sheets[id]?.galleryListing ? 'installed' : null;
+      const listing = this.expanded.sheets[id]?.galleryListing;
+
+      if (!listing) {
+        return null;
+      }
+
+      return listing.published ? 'published' : 'installed';
     },
 
     async loadGalleryAuthor(): Promise<void> {

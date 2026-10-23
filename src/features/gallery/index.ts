@@ -4,6 +4,7 @@ export {
   getGalleryUrl,
   getGalleryStyleUrl,
   getGallerySiteUrl,
+  getGalleryPublishUrl,
   isGalleryStyleId,
   SCREENSHOT_MAX_BYTES,
 } from './config';
@@ -23,6 +24,13 @@ export {
   type GalleryStyleWithCss,
   type GalleryStyleToInstall,
 } from './api';
+
+export {
+  saveGalleryDraft,
+  getGalleryDraft,
+  deleteGalleryDraft,
+  type StoredGalleryDraft,
+} from './drafts';
 
 export { toGalleryFailure } from './to-gallery-failure';
 export { compressScreenshot } from './compress-screenshot';

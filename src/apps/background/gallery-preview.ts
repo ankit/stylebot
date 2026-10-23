@@ -214,14 +214,15 @@ export const endGalleryPreview = async (
  * The gallery listing for a profile installed at the style's latest version.
  */
 export const getLatestVersionListing = (
-  { id, slug, author }: GalleryStyle,
-  { version, css }: GalleryStyleToInstall
+  { id, slug }: GalleryStyle,
+  { version, css }: GalleryStyleToInstall,
+  published = false
 ): GalleryListing => ({
   styleId: id,
   slug,
   version,
   cssHash: hashCss(css),
-  authorId: author.id,
+  published,
 });
 
 /**
@@ -244,7 +245,8 @@ type InstallPlan =
 
 /**
  * Plans installing a version of a gallery style: switch to a profile already
- * at that version, else update an unedited older one, else add a new one.
+ * at that version, else update an unedited older one, else add a new one. A
+ * style published from here switches to its edited profile instead.
  */
 const planInstall = (
   styles: StyleMap,
@@ -264,6 +266,13 @@ const planInstall = (
 
   if (unedited) {
     return { kind: 'update', profile: unedited };
+  }
+
+  // Edits to a style published from here are its unpublished changes.
+  const published = listed.find(profile => profile.galleryListing.published);
+
+  if (published) {
+    return { kind: 'switch', profile: published };
   }
 
   return { kind: 'add', edited: listed };
@@ -314,7 +323,11 @@ const installLatestVersion = async (
 
   if (plan.kind === 'update') {
     update.css = latest.css;
-    update.galleryListing = getLatestVersionListing(style, latest);
+    update.galleryListing = getLatestVersionListing(
+      style,
+      latest,
+      plan.profile.galleryListing.published
+    );
   }
 
   const name = await reinstallProfile(url, profileId, update);

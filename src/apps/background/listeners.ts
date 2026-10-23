@@ -70,6 +70,9 @@ import { isSignInRedirect } from '@stylebot/google-auth';
 import { syncStyles } from './sync';
 import {
   CaptureGalleryScreenshot,
+  OpenGalleryDraft,
+  GetGalleryDraft,
+  GalleryDraftPublished,
   GetPublishedGalleryStyle,
   GetGallerySuggestions,
   GetGalleryStyle,
@@ -416,6 +419,15 @@ export const initListeners = (): void => {
 
         case 'CaptureGalleryScreenshot':
           CaptureGalleryScreenshot(message, sender, sendResponse);
+          return true;
+        case 'OpenGalleryDraft':
+          OpenGalleryDraft(message, sender, sendResponse);
+          return true;
+        case 'GetGalleryDraft':
+          GetGalleryDraft(message, sender, sendResponse);
+          return true;
+        case 'GalleryDraftPublished':
+          GalleryDraftPublished(message, sender, sendResponse);
           return true;
         case 'GetPublishedGalleryStyle':
           GetPublishedGalleryStyle(message, sendResponse);

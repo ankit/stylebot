@@ -10,7 +10,11 @@ export const GALLERY_API_URL =
 export const getGalleryUrl = (path: string): string =>
   new URL(path, GALLERY_API_URL).href;
 
-export const GALLERY_SITE_URL = 'https://gallery.stylebot.dev';
+const DEFAULT_SITE_URL = 'https://gallery.stylebot.dev';
+
+// Development builds take STYLEBOT_GALLERY_SITE_URL, such as a dev server's.
+export const GALLERY_SITE_URL =
+  process.env.STYLEBOT_GALLERY_SITE_URL || DEFAULT_SITE_URL;
 
 /**
  * A style's page on the gallery site.
@@ -28,6 +32,12 @@ export const getGalleryStyleUrl = ({
  */
 export const getGallerySiteUrl = (site: string): string =>
   `${GALLERY_SITE_URL}/site/${encodeURIComponent(site)}`;
+
+/**
+ * The gallery site's publish page, filled in from the draft with this id.
+ */
+export const getGalleryPublishUrl = (draftId: string): string =>
+  `${GALLERY_SITE_URL}/publish?${new URLSearchParams({ draft: draftId })}`;
 
 /**
  * Whether a value from one of Stylebot's sites is a gallery style id.

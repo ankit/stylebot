@@ -52,6 +52,20 @@ export type GalleryPublished = {
 };
 
 /**
+ * A profile handed to the gallery site to publish, as the site bridge gives
+ * it: the site and Stylebot style it's for, its CSS and name, a screenshot
+ * under the gallery's limit as a data URL, and the gallery style it updates.
+ */
+export type GalleryDraft = {
+  site: string;
+  url: string;
+  css: string;
+  name: string;
+  screenshot: string | null;
+  styleId: number | null;
+};
+
+/**
  * i18n keys for what went wrong, so the editor shows it in the user's
  * language. The server's own message is passed along where it's specific.
  */
