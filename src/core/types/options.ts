@@ -39,4 +39,6 @@ export type StylebotOptions = {
   lastColorSet: string;
   // Lets the stylebot CLI connect, while its optional permissions are granted too.
   cliAccess: boolean;
+  // Shows popular gallery styles for the site in the popup.
+  gallerySuggestions: boolean;
 };

@@ -335,12 +335,16 @@ export const forwardClickToInput = (
 };
 
 export const getGallerySuggestions = (
-  pageUrl: string
+  tab: chrome.tabs.Tab
 ): Promise<GetGallerySuggestionsResponse> =>
   chrome.runtime.sendMessage<
     GetGallerySuggestions,
     GetGallerySuggestionsResponse
-  >({ name: 'GetGallerySuggestions', pageUrl });
+  >({
+    name: 'GetGallerySuggestions',
+    pageUrl: tab.url ?? '',
+    incognito: tab.incognito,
+  });
 
 export const previewGalleryStyle = (
   tabId: number,

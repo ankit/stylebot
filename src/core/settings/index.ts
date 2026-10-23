@@ -32,6 +32,7 @@ export const defaultOptions: StylebotOptions = {
   appearance: 'system',
   lastColorSet: 'neutrals',
   cliAccess: false,
+  gallerySuggestions: true,
 };
 
 export const defaultCommands: StylebotCommands = {

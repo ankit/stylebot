@@ -7,6 +7,22 @@ export const toGallerySite = (hostname: string): string =>
     .toLowerCase()
     .replace(/^www\./, '');
 
+const PRIVATE_SUFFIX =
+  /\.(local|localhost|internal|intranet|lan|home|corp|arpa|test|example|invalid)$/;
+
+/**
+ * Whether a page is on a public website, rather than a local or internal
+ * address the gallery has no business hearing about: an IP, a single-label
+ * name, a reserved or intranet suffix, or a non-default port.
+ */
+export const isPublicSite = ({ protocol, hostname, port }: URL): boolean =>
+  /^https?:$/.test(protocol) &&
+  !port &&
+  hostname.includes('.') &&
+  !hostname.startsWith('[') &&
+  !/^\d+(\.\d+){3}$/.test(hostname) &&
+  !PRIVATE_SUFFIX.test(hostname.replace(/\.$/, ''));
+
 /**
  * Decodes a data URL into a blob of its type, without fetch, which a page's
  * content security policy can block.

@@ -30,6 +30,7 @@ export {
   publishVersion,
   unpublishStyle,
   getSiteStyles,
+  getGallerySites,
   getStyle,
   recordInstall,
   type GallerySession,
@@ -50,7 +51,14 @@ export {
 
 export { toGalleryFailure } from './to-gallery-failure';
 export { compressScreenshot } from './compress-screenshot';
-export { blobToDataUrl, dataUrlToBlob, hashCss, toGallerySite } from './utils';
+export {
+  blobToDataUrl,
+  dataUrlToBlob,
+  hashCss,
+  isPublicSite,
+  toGallerySite,
+} from './utils';
+export { getSuggestionSites } from './suggestion-sites';
 export { getInstallId } from './install-id';
 export {
   getListedProfiles,

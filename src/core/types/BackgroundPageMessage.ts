@@ -340,6 +340,7 @@ export type GetGallerySuggestions = {
   name: 'GetGallerySuggestions';
   // The page's url; suggestions are the gallery's styles for its site.
   pageUrl: string;
+  incognito: boolean;
 };
 
 // Previews a gallery style on a tab: the popup's tab, or the page's own.

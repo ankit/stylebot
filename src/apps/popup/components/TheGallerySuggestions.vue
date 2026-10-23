@@ -131,7 +131,7 @@ export default Vue.extend({
   async mounted() {
     const tabId = this.tab.id;
     const [response, current] = await Promise.all([
-      getGallerySuggestions(this.tab.url ?? ''),
+      getGallerySuggestions(this.tab),
       tabId === undefined ? null : getGalleryPreview(tabId),
     ]);
 

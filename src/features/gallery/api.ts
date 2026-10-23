@@ -124,6 +124,14 @@ export const getSiteStyles = (
   request(`/styles?${new URLSearchParams({ site, limit: String(limit) })}`);
 
 /**
+ * Every hostname that has a live style.
+ */
+export const getGallerySites = async (): Promise<Array<string>> => {
+  const { hosts } = await request<{ hosts: Array<string> }>('/sites/hosts');
+  return hosts;
+};
+
+/**
  * A live style with the CSS of its latest version.
  */
 export const getStyle = (id: number): Promise<GalleryStyleWithCss> =>
