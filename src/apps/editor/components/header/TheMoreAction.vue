@@ -73,7 +73,7 @@
           "
         >
           <span class="menu-item-row">
-            <span>{{ t('feedback') }}</span>
+            <span>{{ t('send_feedback') }}</span>
             <arrow-up-right-icon :size="12" class="menu-item-hint-icon" />
           </span>
         </s-menu-item>
