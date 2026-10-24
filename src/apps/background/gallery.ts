@@ -10,6 +10,7 @@ import {
   getStyle,
   getProfileGalleryListing,
   hashCss,
+  isGalleryApiError,
   isGalleryStyleId,
   isPublicSite,
   newGalleryDraftId,
@@ -47,6 +48,8 @@ import type {
   GetGalleryInstallStatusResponse,
   GetPublishedGalleryStyle as GetPublishedGalleryStyleType,
   GetPublishedGalleryStyleResponse,
+  ResetGalleryProfile as ResetGalleryProfileType,
+  ResetGalleryProfileResponse,
   GalleryScreenshotResponse,
 } from '@stylebot/types';
 
@@ -56,6 +59,7 @@ import {
   enable,
   getAll,
   removeStyleGalleryListings,
+  resetGalleryProfile,
   setActiveProfile,
   setGalleryListing,
 } from './styles';
@@ -63,6 +67,7 @@ import {
   endGalleryPreview,
   getGalleryPreview,
   getInstallTargetUrl,
+  getLatestVersionListing,
   installGalleryPreview,
   openGalleryPreview,
   startGalleryPreview,
@@ -366,12 +371,58 @@ export const GetPublishedGalleryStyle = async (
   if (!published) {
     sendResponse({
       published: null,
-      installed: { id: rest.styleId, slug: rest.slug },
+      installed: { id: rest.styleId, slug: rest.slug, cssHash: rest.cssHash },
     });
     return;
   }
 
   sendResponse({ published: rest, installed: null });
+};
+
+/**
+ * Puts the latest version of the gallery style a profile was installed from
+ * back in it, and applies it to open tabs. Drops the style's listings when
+ * the gallery no longer has it, as the daily update check does.
+ */
+export const ResetGalleryProfile = async (
+  { url, profileId }: ResetGalleryProfileType,
+  sendResponse: (response: ResetGalleryProfileResponse) => void
+): Promise<void> => {
+  try {
+    const savedStyles = await getAll();
+    const listing = getProfileGalleryListing(savedStyles, url, profileId);
+
+    if (!listing) {
+      throw new Error('The profile wasn’t installed from the gallery');
+    }
+
+    const latest = await getStyle(listing.styleId).catch(async e => {
+      if (isGalleryApiError(e) && e.status === 404) {
+        await removeStyleGalleryListings(listing.styleId);
+      }
+
+      throw e;
+    });
+
+    // Versions only grow, so an older one means the id now names another style.
+    if (latest.version < listing.version) {
+      await removeStyleGalleryListings(listing.styleId);
+      sendResponse({ ok: false, errorKey: 'gallery_error_not_found' });
+      return;
+    }
+
+    const galleryListing = getLatestVersionListing(
+      latest,
+      latest,
+      listing.published
+    );
+
+    await resetGalleryProfile(url, profileId, latest.css, galleryListing);
+    await applyStylesToAllTabs();
+    sendResponse({ ok: true });
+  } catch (e) {
+    sendResponse(fail(e));
+  }
 };
 
 // Enough of a site's styles to still have a couple to suggest after leaving

@@ -126,7 +126,11 @@ export const FromGallery: StoryObj = {
   parameters: {
     chrome: {
       gallery: {
-        installed: { id: 1, slug: 'tokyo-night' },
+        installed: {
+          id: 1,
+          slug: 'tokyo-night',
+          cssHash: hashCss(RULE_CSS),
+        },
         suggestions: gallerySuggestions,
       },
     },

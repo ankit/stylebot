@@ -23,11 +23,19 @@ import {
   GetPublishedGalleryStyle,
   OpenGalleryDraft,
   PublishProfileToGallery,
+  ResetGalleryProfile,
 } from './gallery';
-import { applyStylesToAllTabs, removeStyleGalleryListings } from './styles';
+import {
+  applyStylesToAllTabs,
+  removeStyleGalleryListings,
+  resetGalleryProfile,
+} from './styles';
 
 jest.mock('./capture-tab', () => ({ captureTab: jest.fn() }));
-jest.mock('./gallery-preview', () => ({}));
+jest.mock('./gallery-preview', () => ({
+  getLatestVersionListing:
+    jest.requireActual('./gallery-preview').getLatestVersionListing,
+}));
 jest.mock('../../features/gallery/compress-screenshot', () => ({
   compressScreenshot: jest.fn(
     async () => new Blob(['webp'], { type: 'image/webp' })
@@ -55,6 +63,7 @@ jest.mock('./styles', () => {
     }),
     applyStylesToAllTabs: jest.fn(async () => undefined),
     removeStyleGalleryListings: jest.fn(async () => undefined),
+    resetGalleryProfile: jest.fn(async () => undefined),
     setGalleryListing: jest.fn(
       async (url: string, id: string, galleryListing: GalleryListing) => {
         mockStyles[url] = setProfileGalleryListing(
@@ -478,7 +487,7 @@ describe('gallery messages', () => {
 
     expect(await publishedFrom('p1')).toEqual({
       published: null,
-      installed: { id: 7, slug: 'night' },
+      installed: { id: 7, slug: 'night', cssHash: 'abc' },
     });
     expect(await publishedFrom('p2')).toEqual({
       published: {
@@ -492,6 +501,104 @@ describe('gallery messages', () => {
     expect(await publishedFrom('missing')).toEqual({
       published: null,
       installed: null,
+    });
+  });
+
+  describe('resetting a profile to its gallery version', () => {
+    const reset = (profileId: string) =>
+      respond(send =>
+        ResetGalleryProfile(
+          { name: 'ResetGalleryProfile', url: 'github.com', profileId },
+          send
+        )
+      );
+
+    beforeEach(() => {
+      jest.clearAllMocks();
+      mockStyles = {
+        'github.com': savedStyle({
+          p1: {
+            name: 'Night',
+            css: 'a { color: pink; }',
+            galleryListing: listing(42, 'tokyo-night'),
+          },
+        }),
+      };
+    });
+
+    it('puts the latest version back in place of the edits', async () => {
+      const css = 'a { color: red; }';
+      fetchMock.mockResponseOnce(JSON.stringify({ ...style, css }));
+
+      expect(await reset('p1')).toEqual({ ok: true });
+      expect(fetchMock.mock.calls[0][0]).toBe(`${GALLERY_API_URL}/styles/42`);
+      expect(resetGalleryProfile).toHaveBeenCalledWith(
+        'github.com',
+        'p1',
+        css,
+        {
+          styleId: 42,
+          slug: 'tokyo-night',
+          version: 2,
+          cssHash: hashCss(css),
+          published: false,
+        }
+      );
+      expect(applyStylesToAllTabs).toHaveBeenCalled();
+    });
+
+    it('fails and drops the listings when the gallery no longer has the style', async () => {
+      fetchMock.mockResponseOnce(JSON.stringify({ error: 'Not found' }), {
+        status: 404,
+      });
+
+      const response = await reset('p1');
+
+      expect(response).toMatchObject({
+        ok: false,
+        errorKey: 'gallery_error_not_found',
+      });
+      expect(resetGalleryProfile).not.toHaveBeenCalled();
+      expect(removeStyleGalleryListings).toHaveBeenCalledWith(42);
+    });
+
+    it('fails and drops the listings when the id now names another style', async () => {
+      mockStyles['github.com'] = savedStyle({
+        p1: {
+          name: 'Night',
+          css: 'a { color: pink; }',
+          galleryListing: { ...listing(42, 'tokyo-night'), version: 5 },
+        },
+      });
+      fetchMock.mockResponseOnce(JSON.stringify(style));
+
+      const response = await reset('p1');
+
+      expect(response).toEqual({
+        ok: false,
+        errorKey: 'gallery_error_not_found',
+      });
+      expect(resetGalleryProfile).not.toHaveBeenCalled();
+      expect(removeStyleGalleryListings).toHaveBeenCalledWith(42);
+    });
+
+    it('keeps the listings when the gallery can’t be reached', async () => {
+      fetchMock.mockRejectOnce(new TypeError('Failed to fetch'));
+
+      const response = await reset('p1');
+
+      expect(response).toMatchObject({
+        ok: false,
+        errorKey: 'gallery_error_network',
+      });
+      expect(removeStyleGalleryListings).not.toHaveBeenCalled();
+    });
+
+    it('fails for a profile not installed from the gallery', async () => {
+      const response = await reset('missing');
+
+      expect(response).toMatchObject({ ok: false });
+      expect(fetchMock).not.toHaveBeenCalled();
     });
   });
 

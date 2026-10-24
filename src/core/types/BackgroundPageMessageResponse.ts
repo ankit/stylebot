@@ -6,6 +6,7 @@ import type { GoogleDriveSyncMetadata } from './sync';
 import type { RestoreResult, VersionHistory } from './history';
 import type {
   GalleryDraft,
+  GalleryInstalled,
   GalleryPublished,
   GalleryPreview,
   GalleryResult,
@@ -81,8 +82,10 @@ export type GalleryStyleDeletedResponse = { ok: boolean };
 // installed from.
 export type GetPublishedGalleryStyleResponse = {
   published: GalleryPublished | null;
-  installed: { id: number; slug: string } | null;
+  installed: GalleryInstalled | null;
 };
+// Fails when the gallery can't be reached or no longer has the style.
+export type ResetGalleryProfileResponse = GalleryResult;
 export type GetGalleryStyleResponse = GalleryResult<{
   style: GalleryStyle;
 }>;
@@ -135,6 +138,7 @@ type BackgroundPageMessageResponse =
   | GalleryDraftPublishedResponse
   | GalleryStyleDeletedResponse
   | GetPublishedGalleryStyleResponse
+  | ResetGalleryProfileResponse
   | GetGallerySuggestionsResponse
   | PreviewGalleryStyleResponse
   | GetGalleryPreviewResponse

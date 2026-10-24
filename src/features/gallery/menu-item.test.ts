@@ -32,7 +32,7 @@ describe('getGalleryMenuItem', () => {
   it("links someone else's installed style to its Gallery page", () => {
     expect(
       getGalleryMenuItem(
-        { published: null, installed: { id: 2, slug: 's' } },
+        { published: null, installed: { id: 2, slug: 's', cssHash: 'abc' } },
         'h1 {}'
       )
     ).toEqual({

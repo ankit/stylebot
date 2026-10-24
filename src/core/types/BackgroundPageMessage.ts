@@ -312,6 +312,14 @@ export type GetPublishedGalleryStyle = {
   profileId: string;
 };
 
+// Puts the latest version of the gallery style a profile was installed from
+// back in it, dropping the user's edits.
+export type ResetGalleryProfile = {
+  name: 'ResetGalleryProfile';
+  url: string;
+  profileId: string;
+};
+
 // A gallery style's author and latest version, by its id.
 export type GetGalleryStyle = {
   name: 'GetGalleryStyle';
@@ -418,6 +426,7 @@ type BackgroundPageMessage =
   | GalleryDraftPublished
   | GalleryStyleDeleted
   | GetPublishedGalleryStyle
+  | ResetGalleryProfile
   | GetGallerySuggestions
   | GetGalleryStyle
   | PreviewGalleryStyle

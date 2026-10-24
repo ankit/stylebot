@@ -654,6 +654,21 @@ export const setGalleryListing = (
   );
 
 /**
+ * Puts a gallery style's css back in one of a url's profiles, dropping the
+ * user's edits, with the listing of the version it came from.
+ */
+export const resetGalleryProfile = (
+  url: string,
+  profileId: string,
+  css: string,
+  galleryListing: GalleryListing
+) =>
+  updateStyle(url, style => {
+    const updated = setProfileCss(style, profileId, css);
+    return setProfileGalleryListing(updated, profileId, galleryListing);
+  });
+
+/**
  * Puts urls' styles back as they were, removing those that had none.
  */
 export const restoreStyles = (

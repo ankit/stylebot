@@ -20,6 +20,7 @@ import {
   reinstallProfile,
   updateGalleryProfile,
   setGalleryListing,
+  resetGalleryProfile,
   removeStyleGalleryListings,
   renameProfile,
   deleteProfile,
@@ -531,6 +532,23 @@ describe('style edits', () => {
       const before = writes();
       await setGalleryListing('example.com', 'default', listing(8));
       expect(writes()).toBe(before);
+    });
+
+    it('resets an edited profile to a gallery version, keeping it active and off', async () => {
+      const { id } = await installProfile('example.com', {
+        name: 'Night',
+        css: 'b {}',
+        galleryListing: listing(),
+      });
+      await setActiveProfile('example.com', 'default');
+      const newer = { ...listing(), version: 2, cssHash: hashCss('c {}') };
+
+      await resetGalleryProfile('example.com', id, 'c {}', newer);
+
+      expect(stored('example.com')).toMatchObject({
+        activeProfile: 'default',
+        profiles: { [id]: { css: 'c {}', galleryListing: newer } },
+      });
     });
 
     it('drops an unpublished style’s listing from every profile, keeping other styles’', async () => {

@@ -18,6 +18,7 @@ import type {
   ReadabilitySettings,
   RunGoogleDriveSyncResponse,
   VersionHistory,
+  GalleryInstalled,
   GalleryPublished,
   GalleryScreenshotResponse,
   GalleryStyle,
@@ -62,7 +63,7 @@ export type GalleryShimOptions = {
   previewing?: GalleryStyle;
   install?: InstallGalleryPreviewResponse;
   // The gallery style the profile was installed from.
-  installed?: { id: number; slug: string };
+  installed?: GalleryInstalled;
 };
 
 const GALLERY_SCREENSHOT =

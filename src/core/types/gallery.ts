@@ -52,6 +52,16 @@ export type GalleryPublished = {
 };
 
 /**
+ * The gallery style a profile was installed from, with a hash of the CSS it
+ * was installed or last updated with, to tell if the user has edited it.
+ */
+export type GalleryInstalled = {
+  id: number;
+  slug: string;
+  cssHash: string;
+};
+
+/**
  * A profile handed to the gallery site to publish, as the site bridge gives
  * it: the site and Stylebot style it's for, its CSS and name, a screenshot
  * under the gallery's limit as a data URL, and the gallery style it updates.

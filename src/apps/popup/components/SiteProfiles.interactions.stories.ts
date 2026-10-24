@@ -307,7 +307,7 @@ export const InstalledProfile: StoryObj = {
   ...popup({
     styles: [profiledStyle('example.com')],
     defaultStyle: profiledStyle('example.com'),
-    gallery: { installed: { id: 2, slug: 'dark' } },
+    gallery: { installed: { id: 2, slug: 'dark', cssHash: 'abc' } },
   }),
   name: "a profile installed from someone else's Gallery style offers View in Gallery, which opens its page there",
   play: async ({ canvasElement }) => {

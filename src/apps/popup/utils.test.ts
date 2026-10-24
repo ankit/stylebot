@@ -285,7 +285,10 @@ describe('getPublishMenuItem', () => {
   });
 
   it("links someone else's installed style to its Gallery page", async () => {
-    answer({ published: null, installed: { id: 2, slug: 's' } });
+    answer({
+      published: null,
+      installed: { id: 2, slug: 's', cssHash: 'abc' },
+    });
 
     expect(await getPublishMenuItem('example.com', 'p', 'h1 {}')).toEqual({
       label: 'view_in_gallery',
