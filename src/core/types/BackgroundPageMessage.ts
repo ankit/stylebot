@@ -129,6 +129,10 @@ export type OpenReportIssuePage = {
   name: 'OpenReportIssuePage';
 };
 
+export type OpenFeedbackPage = {
+  name: 'OpenFeedbackPage';
+};
+
 export type SetReadability = {
   name: 'SetReadability';
   url: string;
@@ -418,6 +422,7 @@ type BackgroundPageMessage =
   | OpenShortcutsPage
   | OpenDonatePage
   | OpenReportIssuePage
+  | OpenFeedbackPage
   | SetReadability
   | GetCommands
   | GetReadabilitySettings

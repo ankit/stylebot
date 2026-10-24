@@ -29,6 +29,7 @@ export { getNotification, setNotification } from './notification';
 export { INSTALL_TIME_KEY, recordInstallTime } from './install-time';
 export {
   getExtensionVersion,
+  getFeedbackUrl,
   getGoodbyeUrl,
   getReleaseVersion,
   getReleaseNotificationId,
@@ -41,6 +42,7 @@ export {
   openOptionsPage,
   openShortcutsPage,
   openReportIssuePage,
+  openFeedbackPage,
   openDonatePage,
 } from './open-page';
 export { tryPermissionsCall } from './permissions';

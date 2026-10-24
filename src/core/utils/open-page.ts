@@ -2,6 +2,7 @@ import type {
   OpenOptionsPage,
   OpenShortcutsPage,
   OpenReportIssuePage,
+  OpenFeedbackPage,
   OpenDonatePage,
 } from '@stylebot/types';
 
@@ -24,6 +25,11 @@ export const openReportIssuePage = (): void => {
     name: 'OpenReportIssuePage',
   };
 
+  chrome.runtime.sendMessage(message);
+};
+
+export const openFeedbackPage = (): void => {
+  const message: OpenFeedbackPage = { name: 'OpenFeedbackPage' };
   chrome.runtime.sendMessage(message);
 };
 

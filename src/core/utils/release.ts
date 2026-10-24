@@ -26,6 +26,9 @@ export const hasReleasePage = (): boolean =>
 export const getGoodbyeUrl = (): string =>
   getSiteUrl(`/goodbye?version=${getExtensionVersion()}`);
 
+export const getFeedbackUrl = (): string =>
+  getSiteUrl(`/feedback?version=${getExtensionVersion()}`);
+
 const getMajorVersion = (version?: string): number | undefined => {
   const match = /^(\d+)(\.\d+)*$/.exec(version?.trim() ?? '');
   return match ? Number(match[1]) : undefined;

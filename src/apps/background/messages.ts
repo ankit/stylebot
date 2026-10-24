@@ -20,6 +20,8 @@ import {
   deleteProfile,
   deleteStyle,
 } from './styles';
+import { getFeedbackUrl } from '@stylebot/utils';
+
 import * as styleStorage from './styles';
 import { isStylebotSite } from './is-stylebot-site';
 
@@ -307,6 +309,10 @@ export const OpenDonatePage = (): void => {
 
 export const OpenReportIssuePage = (): void => {
   chrome.tabs.create({ url: 'https://github.com/ankit/stylebot/issues' });
+};
+
+export const OpenFeedbackPage = (): void => {
+  chrome.tabs.create({ url: getFeedbackUrl() });
 };
 
 export const SetOption = (message: SetOptionType): void => {

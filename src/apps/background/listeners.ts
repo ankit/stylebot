@@ -20,6 +20,7 @@ import {
   syncAfterSignInRedirect,
   OpenDonatePage,
   OpenReportIssuePage,
+  OpenFeedbackPage,
   SetStyle,
   MoveStyle,
   GetAllStyles,
@@ -303,6 +304,9 @@ export const initListeners = (): void => {
           break;
         case 'OpenReportIssuePage':
           OpenReportIssuePage();
+          break;
+        case 'OpenFeedbackPage':
+          OpenFeedbackPage();
           break;
 
         case 'SetStyle':

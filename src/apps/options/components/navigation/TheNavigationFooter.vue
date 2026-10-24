@@ -2,9 +2,7 @@
   <div class="footer">
     <div class="links">
       <a target="_blank" :href="manualUrl">{{ t('help_options') }}</a>
-      <a target="_blank" href="https://github.com/ankit/stylebot/issues">
-        {{ t('feedback') }}
-      </a>
+      <a target="_blank" :href="feedbackUrl">{{ t('feedback') }}</a>
       <a target="_blank" href="https://ko-fi.com/stylebot">{{ t('donate') }}</a>
     </div>
 
@@ -21,15 +19,20 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { getExtensionVersion, getSiteUrl } from '@stylebot/utils';
+import {
+  getExtensionVersion,
+  getFeedbackUrl,
+  getSiteUrl,
+} from '@stylebot/utils';
 
 export default Vue.extend({
   name: 'TheNavigationFooter',
 
-  data(): { version: string; manualUrl: string } {
+  data(): { version: string; manualUrl: string; feedbackUrl: string } {
     return {
       version: getExtensionVersion(),
       manualUrl: getSiteUrl('/manual'),
+      feedbackUrl: getFeedbackUrl(),
     };
   },
 });

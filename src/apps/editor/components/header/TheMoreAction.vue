@@ -111,7 +111,7 @@ import type {
   StylebotDockLocation,
 } from '@stylebot/types';
 
-import { openOptionsPage, openReportIssuePage } from '@stylebot/utils';
+import { openOptionsPage, openFeedbackPage } from '@stylebot/utils';
 
 import { hasSidePanel } from '../../utils/side-panel';
 import TheGalleryMenuItem from './TheGalleryMenuItem.vue';
@@ -249,7 +249,7 @@ export default Vue.extend({
     },
 
     feedbackPage(): void {
-      openReportIssuePage();
+      openFeedbackPage();
     },
   },
 });
