@@ -43,7 +43,7 @@ export const ListsSuggestions: StoryObj = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    await canvas.findByText('Popular in Gallery');
+    await canvas.findByText('Gallery');
     await expect(await suggestion(canvas, 'Tokyo Night')).toHaveTextContent(
       /maya\s*1\.2K/
     );
