@@ -5,6 +5,7 @@ import TheTextProperties from './TheTextProperties.vue';
 import { editor, WITH_RULE } from '@stylebot/storybook/fixtures/editor';
 import {
   declaration,
+  findOpenMenu,
   numberInput,
   pageStyle,
   pressKey,
@@ -96,6 +97,70 @@ export const ComputedPlaceholders: StoryObj = {
     await waitFor(() =>
       expect(lineHeight).toHaveAttribute('placeholder', '25.6')
     );
+  },
+};
+
+export const FontWeightSelect: StoryObj = {
+  ...editor(WITH_RULE),
+  name: "an unset weight shows the page's own, a pick applies it and Default clears it",
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const trigger = within(propertyControl(canvas, 'Weight')).getByRole(
+      'button'
+    );
+
+    await waitFor(() => expect(trigger).toHaveTextContent('Semibold'));
+
+    await user.click(trigger);
+    await user.click(
+      within(await findOpenMenu(canvas)).getByRole('menuitem', {
+        name: /^300/,
+      })
+    );
+    await expect(declaration(store, 'h1', 'font-weight')).toBe('300');
+    await expect(pageStyle(canvasElement, 'h1', 'font-weight')).toBe('300');
+    await waitFor(() => expect(trigger).toHaveTextContent('Light'));
+
+    await user.click(trigger);
+    await user.click(
+      within(await findOpenMenu(canvas)).getByRole('menuitem', {
+        name: 'Default',
+      })
+    );
+    await expect(declaration(store, 'h1', 'font-weight')).toBeUndefined();
+  },
+};
+
+export const FontWeightHoverPreviews: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'hovering a weight previews it on the page, and closing the menu drops it',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const trigger = within(propertyControl(canvas, 'Weight')).getByRole(
+      'button'
+    );
+    const pageWeight = pageStyle(canvasElement, 'h1', 'font-weight');
+
+    await user.click(trigger);
+    const menu = await findOpenMenu(canvas);
+
+    await step('hovering shows the weight without saving it', async () => {
+      await user.hover(within(menu).getByRole('menuitem', { name: /^300/ }));
+      await waitFor(() =>
+        expect(pageStyle(canvasElement, 'h1', 'font-weight')).toBe('300')
+      );
+      await expect(declaration(store, 'h1', 'font-weight')).toBeUndefined();
+    });
+
+    await step('closing the menu puts the page back', async () => {
+      await pressKey('Escape');
+      await waitFor(() =>
+        expect(pageStyle(canvasElement, 'h1', 'font-weight')).toBe(pageWeight)
+      );
+      await expect(declaration(store, 'h1', 'font-weight')).toBeUndefined();
+    });
   },
 };
 

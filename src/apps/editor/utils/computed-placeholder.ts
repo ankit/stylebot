@@ -36,6 +36,7 @@ export const PLACEHOLDER_PROPERTIES = [
   'text-decoration-line',
   'text-align',
   'font-family',
+  'font-weight',
   'color',
   'background-color',
 ];
