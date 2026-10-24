@@ -192,4 +192,20 @@ test("a profile's Publish to Gallery in the popup hands it to the gallery site, 
 
     expect(await readDraft(gallery, draftId)).toMatchObject({ draft: null });
   });
+
+  await test.step('deleting the style on the gallery forgets its listing', async () => {
+    expect(
+      await askBridge(
+        gallery,
+        { type: 'stylebot:deleted', id: 7 },
+        'stylebot:deleted:result'
+      )
+    ).toEqual({ type: 'stylebot:deleted:result', id: 7, ok: true });
+
+    const listing = await extension.evaluate(async () => {
+      const { styles } = await chrome.storage.local.get('styles');
+      return styles.localhost.profiles.dark.galleryListing;
+    });
+    expect(listing).toBeUndefined();
+  });
 });

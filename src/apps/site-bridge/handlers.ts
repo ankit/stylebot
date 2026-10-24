@@ -1,6 +1,8 @@
 import type {
   GalleryDraftPublished,
   GalleryDraftPublishedResponse,
+  GalleryStyleDeleted,
+  GalleryStyleDeletedResponse,
   GetGalleryDraft,
   GetGalleryDraftResponse,
   GetGalleryInstallStatus,
@@ -107,6 +109,18 @@ const handlers: { [T in SiteRequestType]: Handler<T> } = {
       id,
       ok: Boolean(response?.ok),
     };
+  },
+
+  'stylebot:deleted': async ({ id }) => {
+    const message: GalleryStyleDeleted = {
+      name: 'GalleryStyleDeleted',
+      styleId: id,
+    };
+    const response = await chrome.runtime
+      .sendMessage<GalleryStyleDeleted, GalleryStyleDeletedResponse>(message)
+      .catch((): null => null);
+
+    return { type: 'stylebot:deleted:result', id, ok: Boolean(response?.ok) };
   },
 };
 

@@ -27,6 +27,8 @@ import type {
   GetGalleryDraftResponse,
   GalleryDraftPublished as GalleryDraftPublishedType,
   GalleryDraftPublishedResponse,
+  GalleryStyleDeleted as GalleryStyleDeletedType,
+  GalleryStyleDeletedResponse,
   GetGallerySuggestions as GetGallerySuggestionsType,
   GetGallerySuggestionsResponse,
   GetGalleryStyle as GetGalleryStyleType,
@@ -52,6 +54,7 @@ import {
   applyStylesToAllTabs,
   enable,
   getAll,
+  removeStyleGalleryListings,
   setActiveProfile,
   setGalleryListing,
 } from './styles';
@@ -296,6 +299,29 @@ export const GalleryDraftPublished = async (
       published: true,
     });
     await deleteGalleryDraft(id);
+    sendResponse({ ok: true });
+  } catch (e) {
+    fail(e);
+    sendResponse({ ok: false });
+  }
+};
+
+/**
+ * Forgets a style the gallery site deleted, so profiles published or
+ * installed from it no longer link to it. Their CSS stays.
+ */
+export const GalleryStyleDeleted = async (
+  { styleId }: GalleryStyleDeletedType,
+  sender: chrome.runtime.MessageSender,
+  sendResponse: (response: GalleryStyleDeletedResponse) => void
+): Promise<void> => {
+  if (!isFromGallery(sender) || !isGalleryStyleId(styleId)) {
+    sendResponse({ ok: false });
+    return;
+  }
+
+  try {
+    await removeStyleGalleryListings(styleId);
     sendResponse({ ok: true });
   } catch (e) {
     fail(e);

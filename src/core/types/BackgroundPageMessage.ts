@@ -299,6 +299,12 @@ export type GalleryDraftPublished = {
   slug: string;
 };
 
+// The gallery site deleted one of its styles, by its id.
+export type GalleryStyleDeleted = {
+  name: 'GalleryStyleDeleted';
+  styleId: number;
+};
+
 export type GetPublishedGalleryStyle = {
   name: 'GetPublishedGalleryStyle';
   url: string;
@@ -409,6 +415,7 @@ type BackgroundPageMessage =
   | PublishProfileToGallery
   | GetGalleryDraft
   | GalleryDraftPublished
+  | GalleryStyleDeleted
   | GetPublishedGalleryStyle
   | GetGallerySuggestions
   | GetGalleryStyle
