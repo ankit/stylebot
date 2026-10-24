@@ -1,6 +1,7 @@
 export const TEXT_PROPERTIES = [
   'font-family',
   'font-size',
+  'font-weight',
   'line-height',
   'color',
   'text-decoration',

@@ -1,5 +1,9 @@
 <template>
-  <s-anchored-menu class="select" :class="{ 'full-width': fullWidth }">
+  <s-anchored-menu
+    class="select"
+    :class="{ 'full-width': fullWidth }"
+    @close="$emit('close')"
+  >
     <template #trigger="{ toggle, open }">
       <button
         type="button"
