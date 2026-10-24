@@ -86,10 +86,12 @@
       </div>
 
       <the-gallery-suggestions
+        v-if="stylesLoaded"
         ref="gallery"
         :tab="tab"
-        :profile-names="siteProfiles.map(profile => profile.name)"
+        :compact="styles.length > 0"
         @preview="galleryPreviewing = $event"
+        @installing="galleryInstalling = $event"
         @installed="loadStyles"
       />
 
@@ -99,7 +101,25 @@
         class="popup-footer"
         :class="{ 'popup-footer--above-sync': syncEnabled }"
       >
+        <template v-if="galleryPreviewing">
+          <s-pill-button
+            class="popup-preview-stop"
+            :disabled="galleryInstalling"
+            @click="stopGalleryPreview"
+          >
+            {{ t('stop_preview') }}
+          </s-pill-button>
+          <s-pill-button
+            :disabled="galleryInstalling"
+            :aria-busy="galleryInstalling ? 'true' : undefined"
+            @click="installGalleryPreview"
+          >
+            {{ t('install') }}
+          </s-pill-button>
+        </template>
+        <!-- Kept in place so editing a profile can still open the editor. -->
         <toggle-stylebot
+          v-show="!galleryPreviewing"
           ref="toggle"
           :is-open="isOpen"
           :tab="tab"
@@ -122,7 +142,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SHeading, SThemeProvider } from '@stylebot/components';
+import { SHeading, SPillButton, SThemeProvider } from '@stylebot/components';
 
 import StyleComponent from './components/Style.vue';
 import SiteProfiles from './components/SiteProfiles.vue';
@@ -181,6 +201,7 @@ export default Vue.extend({
 
   components: {
     SHeading,
+    SPillButton,
     SThemeProvider,
     OptionsButton,
     StyleComponent,
@@ -201,6 +222,8 @@ export default Vue.extend({
     pageReaderable: boolean;
     tab?: chrome.tabs.Tab;
     styles: Array<Style>;
+    // The gallery waits for the styles, to know which way to show itself.
+    stylesLoaded: boolean;
     // The site's own style, as picked here since the popup opened.
     siteActiveProfile: string;
     siteEnabled: boolean;
@@ -212,11 +235,13 @@ export default Vue.extend({
     dockLocation: StylebotDockLocation | '';
     // A gallery style is shown on the page in place of the site's own.
     galleryPreviewing: boolean;
+    galleryInstalling: boolean;
     // Each site profile's way into publishing, once known.
     publishItems: Record<string, GalleryMenuItem | null>;
   } {
     return {
       styles: [],
+      stylesLoaded: false,
       siteActiveProfile: '',
       siteEnabled: true,
       isOpen: false,
@@ -229,6 +254,7 @@ export default Vue.extend({
       appearance: 'system',
       dockLocation: '',
       galleryPreviewing: false,
+      galleryInstalling: false,
       publishItems: {},
     };
   },
@@ -372,6 +398,7 @@ export default Vue.extend({
               Number(b.url === defaultStyle?.url) -
               Number(a.url === defaultStyle?.url)
           );
+        this.stylesLoaded = true;
 
         const [site] = this.styles;
 
@@ -430,6 +457,18 @@ export default Vue.extend({
 
       this.siteActiveProfile = id;
       this.siteEnabled = true;
+    },
+
+    stopGalleryPreview(): void {
+      (
+        this.$refs.gallery as InstanceType<typeof TheGallerySuggestions>
+      )?.cancel();
+    },
+
+    installGalleryPreview(): void {
+      (
+        this.$refs.gallery as InstanceType<typeof TheGallerySuggestions>
+      )?.install();
     },
 
     /**
@@ -589,6 +628,19 @@ body {
   display: flex;
   gap: 8px;
   padding: 10px 16px 12px;
+}
+
+.popup-footer .popup-preview-stop.pill-btn {
+  background: transparent;
+
+  &:hover:not(:disabled) {
+    background: var(--hover-tint);
+  }
+}
+
+.popup-footer .pill-btn:disabled {
+  cursor: default;
+  opacity: 0.6;
 }
 
 .popup-footer.popup-footer--above-sync {

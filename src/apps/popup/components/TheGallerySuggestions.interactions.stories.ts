@@ -5,7 +5,6 @@ import TheGallerySuggestions from './TheGallerySuggestions.vue';
 import {
   gallerySuggestions,
   popup,
-  profiledStyle,
   style,
 } from '@stylebot/storybook/fixtures/popup';
 import { focusViaTab, user } from '@stylebot/storybook/story-helpers';
@@ -20,9 +19,7 @@ const meta: Meta = {
 export default meta;
 
 const withSuggestions = popup({
-  styles: [style('example.com')],
-  defaultStyle: style('example.com'),
-  gallery: { suggestions: gallerySuggestions },
+  gallery: { suggestions: gallerySuggestions, total: 14 },
 });
 
 /**
@@ -63,7 +60,7 @@ export const ListsSuggestions: StoryObj = {
 
 export const PreviewsThenInstalls: StoryObj = {
   ...withSuggestions,
-  name: 'clicking a suggestion previews it on the tab, keeping its row with Install, which adds it as a profile',
+  name: 'clicking a suggestion previews it on the tab, swapping the footer for Stop preview and Install, which adds it as a profile',
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
     const sent = spyOn(chrome.runtime, 'sendMessage');
@@ -77,6 +74,12 @@ export const PreviewsThenInstalls: StoryObj = {
       );
       await expect(
         (await suggestion(canvas, 'Tokyo Night')).querySelector('.installs')
+      ).toHaveTextContent('1.2K');
+      await expect(
+        canvas.getByRole('button', { name: 'Stop preview' })
+      ).toBeVisible();
+      await expect(
+        canvas.queryByRole('button', { name: /Style this page/ })
       ).toBeNull();
       await expect(sent).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -103,7 +106,7 @@ export const PreviewsThenInstalls: StoryObj = {
 
 export const StopEndsThePreview: StoryObj = {
   ...withSuggestions,
-  name: 'Stop preview on the previewing row ends the preview',
+  name: 'Stop preview in the footer ends the preview and brings the footer back',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const sent = spyOn(chrome.runtime, 'sendMessage');
@@ -120,13 +123,14 @@ export const StopEndsThePreview: StoryObj = {
       'aria-pressed',
       'false'
     );
+    await expect(
+      await canvas.findByRole('button', { name: /Style this page/ })
+    ).toBeVisible();
   },
 };
 
 export const ShowsTheTabsPreview: StoryObj = {
   ...popup({
-    styles: [style('example.com')],
-    defaultStyle: style('example.com'),
     gallery: {
       suggestions: gallerySuggestions,
       previewing: gallerySuggestions[1],
@@ -146,32 +150,65 @@ export const ShowsTheTabsPreview: StoryObj = {
   },
 };
 
-export const LeavesOutInstalledProfiles: StoryObj = {
+export const OpensTheGallery: StoryObj = {
+  ...popup({ gallery: { suggestions: gallerySuggestions } }),
+  name: 'with every style of the site listed, the link just opens the Gallery',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const link = await canvas.findByRole('link', { name: 'Open Gallery' });
+
+    await expect(link).toHaveAttribute(
+      'href',
+      'https://gallery.stylebot.dev/site/example.com'
+    );
+    await expect(canvas.queryByText(/Browse all/)).toBeNull();
+  },
+};
+
+export const LinksOnAStyledSite: StoryObj = {
   ...popup({
-    styles: [profiledStyle('example.com')],
-    defaultStyle: profiledStyle('example.com'),
+    styles: [style('example.com')],
+    defaultStyle: style('example.com'),
+    gallery: { suggestions: gallerySuggestions, total: 14 },
+  }),
+  name: "a styled site shows just a link to the site's Gallery styles, with how many there are, in its own section",
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const link = await canvas.findByRole('link', {
+      name: /Styles in Gallery/,
+    });
+
+    await expect(link).toHaveTextContent(/Styles in Gallery\s*14/);
+    await expect(link).toHaveAttribute(
+      'href',
+      'https://gallery.stylebot.dev/site/example.com'
+    );
+    await expect(canvas.queryByText('Tokyo Night')).toBeNull();
+  },
+};
+
+export const ShowsAtMostThree: StoryObj = {
+  ...popup({
     gallery: {
       suggestions: [
-        { ...gallerySuggestions[0], name: 'Dark' },
-        gallerySuggestions[1],
+        ...gallerySuggestions,
+        { ...gallerySuggestions[0], id: 3, name: 'Solarized' },
+        { ...gallerySuggestions[0], id: 4, name: 'Mono' },
       ],
     },
   }),
-  name: 'a suggestion named like one of the site’s profiles is left out',
+  name: "lists at most three of the site's Gallery styles",
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    await suggestion(canvas, 'Paper');
-    await expect(
-      canvas.queryByText('Dark', { selector: '.suggestion *' })
-    ).toBeNull();
+    await suggestion(canvas, 'Solarized');
+    await expect(canvasElement.querySelectorAll('.suggestion')).toHaveLength(3);
+    await expect(canvas.queryByText('Mono')).toBeNull();
   },
 };
 
 export const LeavesOutNoInstalls: StoryObj = {
   ...popup({
-    styles: [style('example.com')],
-    defaultStyle: style('example.com'),
     gallery: {
       suggestions: [{ ...gallerySuggestions[0], installs: 0 }],
     },
@@ -188,10 +225,12 @@ export const LeavesOutNoInstalls: StoryObj = {
 
 export const BrowsesAll: StoryObj = {
   ...withSuggestions,
-  name: "Browse all opens the site's styles in the Gallery",
+  name: 'Browse all shows how many styles the site has, and opens them in the Gallery',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const link = await canvas.findByRole('link', { name: 'Browse all' });
+    const link = await canvas.findByRole('link', { name: /Browse all/ });
+
+    await expect(link).toHaveTextContent(/Browse all\s*14/);
 
     await expect(link).toHaveAttribute(
       'href',

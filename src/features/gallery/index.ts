@@ -43,7 +43,7 @@ export {
   toGallerySite,
 } from './utils';
 export { getSuggestionSites } from './suggestion-sites';
-export { getSiteSuggestions } from './site-suggestions';
+export { getSiteSuggestions, type SiteSuggestions } from './site-suggestions';
 export { getInstallId } from './install-id';
 export {
   getListedProfiles,

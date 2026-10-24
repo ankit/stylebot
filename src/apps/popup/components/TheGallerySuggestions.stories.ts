@@ -16,14 +16,16 @@ const meta: Meta = {
 export default meta;
 
 export const Suggestions = popup({
+  gallery: { suggestions: gallerySuggestions, total: 14 },
+});
+
+export const OnAStyledSite = popup({
   styles: [style('example.com')],
   defaultStyle: style('example.com'),
-  gallery: { suggestions: gallerySuggestions },
+  gallery: { suggestions: gallerySuggestions, total: 14 },
 });
 
 export const Previewing = popup({
-  styles: [style('example.com')],
-  defaultStyle: style('example.com'),
   gallery: {
     suggestions: gallerySuggestions,
     previewing: gallerySuggestions[0],
@@ -36,8 +38,6 @@ const longNamed = {
 };
 
 export const PreviewingLongName = popup({
-  styles: [style('example.com')],
-  defaultStyle: style('example.com'),
   gallery: {
     suggestions: [
       longNamed,

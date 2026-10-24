@@ -8,6 +8,8 @@ import { request } from './request';
 export type GalleryStylesPage = {
   styles: Array<GalleryStyle>;
   nextOffset: number | null;
+  // Every style matching, across pages; missing from an older API.
+  total?: number;
 };
 
 export type GalleryStyleWithCss = GalleryStyle & { css: string };

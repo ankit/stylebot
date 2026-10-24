@@ -7,10 +7,15 @@ const FRESH_FOR = 60 * 60 * 1000;
 const KEPT_FOR = 7 * 24 * 60 * 60 * 1000;
 const KEPT_SITES = 50;
 
-type StoredSuggestions = { styles: Array<GalleryStyle>; fetchedAt: number };
+export type SiteSuggestions = { styles: Array<GalleryStyle>; total: number };
+type StoredSuggestions = {
+  styles: Array<GalleryStyle>;
+  total?: number;
+  fetchedAt: number;
+};
 type StoredSites = Record<string, StoredSuggestions>;
 
-const refreshing = new Map<string, Promise<Array<GalleryStyle>>>();
+const refreshing = new Map<string, Promise<SiteSuggestions>>();
 let writing: Promise<void> = Promise.resolve();
 
 const read = async (): Promise<StoredSites> =>
@@ -41,7 +46,7 @@ const refresh = (
   site: string,
   limit: number,
   now: number
-): Promise<Array<GalleryStyle>> => {
+): Promise<SiteSuggestions> => {
   const pending = refreshing.get(site);
 
   if (pending) {
@@ -49,9 +54,9 @@ const refresh = (
   }
 
   const request = getSiteStyles(site, limit)
-    .then(async ({ styles }) => {
-      await store(site, { styles, fetchedAt: now });
-      return styles;
+    .then(async ({ styles, total = styles.length }) => {
+      await store(site, { styles, total, fetchedAt: now });
+      return { styles, total };
     })
     .finally(() => {
       refreshing.delete(site);
@@ -62,7 +67,8 @@ const refresh = (
 };
 
 /**
- * A site's most installed gallery styles, answered from the last fetch so
+ * A site's most installed gallery styles and how many it has in all,
+ * answered from the last fetch so
  * the popup opens with them in place. One older than an hour is still
  * answered with, and fetched again for the next time.
  */
@@ -70,7 +76,7 @@ export const getSiteSuggestions = async (
   site: string,
   limit: number,
   now = Date.now()
-): Promise<Array<GalleryStyle>> => {
+): Promise<SiteSuggestions> => {
   const stored = (await read())[site];
   const age = stored ? now - stored.fetchedAt : Infinity;
 
@@ -82,5 +88,8 @@ export const getSiteSuggestions = async (
     refresh(site, limit, now).catch(() => {});
   }
 
-  return stored.styles;
+  return {
+    styles: stored.styles,
+    total: stored.total ?? stored.styles.length,
+  };
 };

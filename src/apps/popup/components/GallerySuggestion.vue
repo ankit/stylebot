@@ -12,7 +12,7 @@
           {{ styleData.name }}
         </s-text>
         <s-text
-          v-if="styleData.installs && !previewing"
+          v-if="styleData.installs"
           as="span"
           size="caption"
           variant="muted"
@@ -23,53 +23,29 @@
         </s-text>
       </button>
     </s-tooltip>
-
-    <s-button
-      v-if="previewing"
-      size="small"
-      class="install"
-      :disabled="disabled"
-      :aria-busy="disabled ? 'true' : undefined"
-      @click="$emit('install')"
-    >
-      {{ t('install') }}
-    </s-button>
-    <s-icon-button
-      v-if="previewing"
-      :size="28"
-      :tooltip="t('stop_preview')"
-      class="stop"
-      :disabled="disabled"
-      @click="$emit('cancel')"
-    >
-      <x-icon :size="16" />
-    </s-icon-button>
   </div>
 </template>
 
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-import { SButton, SIconButton, SText, STooltip } from '@stylebot/components';
-import { DownloadIcon, XIcon } from '@stylebot/icons';
+import { SText, STooltip } from '@stylebot/components';
+import { DownloadIcon } from '@stylebot/icons';
 import { getGalleryByline } from '@stylebot/gallery';
 import type { GalleryStyle } from '@stylebot/types';
 
 /**
  * A suggested gallery style, with its installs, as a button that emits
- * `preview`; while it previews, Install emits `install` and × `cancel`. Its
- * tooltip has the author and exact installs.
+ * `preview`, highlighted while it previews. Its tooltip has the author and
+ * exact installs.
  */
 export default Vue.extend({
   name: 'GallerySuggestion',
 
   components: {
     DownloadIcon,
-    SButton,
-    SIconButton,
     SText,
     STooltip,
-    XIcon,
   },
 
   props: {
@@ -122,11 +98,16 @@ export default Vue.extend({
 .suggestion {
   display: flex;
   align-items: center;
-  gap: 8px;
   border-radius: 8px;
 
-  &:hover:not(.previewing),
+  &:hover:not(.previewing) {
+    background: var(--hover-tint);
+  }
+
   &.previewing {
+    margin: 0 -6px;
+    padding: 0 6px;
+    border-radius: 0;
     background: var(--hover-tint);
   }
 }
@@ -151,29 +132,5 @@ export default Vue.extend({
   }
 
   @include focus-ring;
-}
-
-.install {
-  flex: none;
-}
-
-.stop {
-  flex: none;
-  margin-right: 6px;
-
-  ::v-deep .icon-button {
-    color: var(--text-muted);
-
-    &:hover:not(:disabled) {
-      color: var(--text-primary);
-      background: var(--panel-border);
-    }
-  }
-}
-
-.suggestion .install.button:hover:not(:disabled) {
-  background: var(--inset-button-hover);
-  border-color: var(--inset-button-hover-border);
-  box-shadow: var(--inset-button-hover-shadow);
 }
 </style>

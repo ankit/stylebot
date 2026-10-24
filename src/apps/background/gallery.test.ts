@@ -621,7 +621,7 @@ describe('gallery messages', () => {
     });
   });
 
-  it("suggests the site's styles that are neither installed nor published here", async () => {
+  it("suggests the site's styles that are neither installed nor published here, with the site's total", async () => {
     const other = { ...style, id: 10, slug: 'other' };
     const installed = { ...style, id: 9, slug: 'installed' };
     mockStyles = {
@@ -637,7 +637,11 @@ describe('gallery messages', () => {
       }),
     };
     fetchMock.mockResponseOnce(
-      JSON.stringify({ styles: [style, installed, other], nextOffset: null })
+      JSON.stringify({
+        styles: [style, installed, other],
+        nextOffset: null,
+        total: 14,
+      })
     );
 
     const response = await respond(send =>
@@ -657,6 +661,7 @@ describe('gallery messages', () => {
     expect(response).toEqual({
       ok: true,
       styles: [other],
+      total: 14,
       site: 'github.com',
     });
   });

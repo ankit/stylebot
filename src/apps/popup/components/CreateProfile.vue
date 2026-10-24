@@ -10,7 +10,6 @@
   </div>
 
   <button v-else type="button" class="create-profile" @click="start">
-    <layers-icon :size="15" class="create-profile-icon" />
     <span class="create-profile-label">{{ t('create_profile') }}</span>
   </button>
 </template>
@@ -18,7 +17,6 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-import { LayersIcon } from '@stylebot/icons';
 import { freeProfileName, isProfileNameTaken } from '@stylebot/saved-styles';
 
 import ProfileNameInput from './ProfileNameInput.vue';
@@ -31,7 +29,6 @@ export default Vue.extend({
   name: 'CreateProfile',
 
   components: {
-    LayersIcon,
     ProfileNameInput,
   },
 
@@ -102,10 +99,6 @@ export default Vue.extend({
   }
 
   @include focus-ring;
-}
-
-.create-profile-icon {
-  flex: none;
 }
 
 .create-profile-label {

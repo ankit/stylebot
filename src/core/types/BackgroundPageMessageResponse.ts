@@ -89,9 +89,11 @@ export type ResetGalleryProfileResponse = GalleryResult;
 export type GetGalleryStyleResponse = GalleryResult<{
   style: GalleryStyle;
 }>;
-// The page's gallery site, to browse the rest of its styles in the gallery.
+// The page's gallery site, to browse the rest of its styles in the gallery,
+// and how many it has there.
 export type GetGallerySuggestionsResponse = GalleryResult<{
   styles: Array<GalleryStyle>;
+  total: number;
   site: string;
 }>;
 export type PreviewGalleryStyleResponse = GalleryResult;

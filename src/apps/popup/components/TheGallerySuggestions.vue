@@ -1,5 +1,33 @@
 <template>
-  <div v-if="shownStyles.length">
+  <div v-if="compact && (previewed || total)">
+    <div class="popup-divider" />
+
+    <section class="gallery gallery--compact">
+      <gallery-suggestion
+        v-if="previewed"
+        :style-data="previewed"
+        previewing
+        :disabled="installing"
+      />
+      <a
+        v-else
+        class="more"
+        :href="browseUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <span class="more-label">{{ t('styles_in_gallery') }}</span>
+        <s-text as="span" size="large" variant="muted" class="more-count">
+          {{ total }}
+          <arrow-up-right-icon :size="14" />
+        </s-text>
+      </a>
+
+      <s-callout v-if="error" tone="danger">{{ error }}</s-callout>
+    </section>
+  </div>
+
+  <div v-else-if="!compact && shownStyles.length">
     <div class="popup-divider" />
 
     <section class="gallery">
@@ -14,7 +42,11 @@
           target="_blank"
           rel="noopener noreferrer"
         >
-          {{ t('browse_all') }}
+          <template v-if="shownStyles.length < total">
+            {{ t('browse_all') }}
+            <span class="browse-count">{{ total }}</span>
+          </template>
+          <template v-else>{{ t('open_gallery') }}</template>
         </a>
       </div>
 
@@ -25,8 +57,6 @@
         :previewing="style.id === previewId"
         :disabled="installing"
         @preview="preview(style)"
-        @install="install(style)"
-        @cancel="cancel"
       />
 
       <s-callout v-if="error" tone="danger">{{ error }}</s-callout>
@@ -38,6 +68,7 @@
 import type { PropType } from 'vue';
 import Vue from 'vue';
 import { SCallout, SText } from '@stylebot/components';
+import { ArrowUpRightIcon } from '@stylebot/icons';
 import { galleryErrorText, getGallerySiteUrl } from '@stylebot/gallery';
 import type { GalleryStyle } from '@stylebot/types';
 
@@ -50,10 +81,12 @@ import {
   previewGalleryStyle,
 } from '../utils';
 
-const SHOWN = 2;
+const SHOWN = 3;
 
 type Data = {
   styles: Array<GalleryStyle>;
+  // How many the site has in the gallery, as its page there lists.
+  total: number;
   site: string | null;
   previewId: number | null;
   installing: boolean;
@@ -63,12 +96,14 @@ type Data = {
 /**
  * The site's most installed gallery styles. Clicking one previews it on the
  * tab in place of the site's own style, as the tab moves around the site,
- * until it's installed as a new profile or cancelled, here or on the page.
+ * until it's installed as a new profile or cancelled, from the popup's
+ * footer or on the page.
  */
 export default Vue.extend({
   name: 'TheGallerySuggestions',
 
   components: {
+    ArrowUpRightIcon,
     GallerySuggestion,
     SCallout,
     SText,
@@ -80,17 +115,15 @@ export default Vue.extend({
       required: true,
     },
 
-    // The site's profile names; a gallery style with one of them is taken
-    // to be installed already.
-    profileNames: {
-      type: Array as PropType<Array<string>>,
-      default: () => [],
-    },
+    // Just a link to the site's styles in the Gallery, for a site already
+    // styled, or the row of a style the tab is previewing.
+    compact: Boolean,
   },
 
   data(): Data {
     return {
       styles: [],
+      total: 0,
       site: null,
       previewId: null,
       installing: false,
@@ -103,15 +136,13 @@ export default Vue.extend({
       return this.site ? getGallerySiteUrl(this.site) : '';
     },
 
-    shownStyles(): Array<GalleryStyle> {
-      const names = new Set(
-        this.profileNames.map(name => name.trim().toLowerCase())
-      );
+    previewed(): GalleryStyle | null {
+      return this.styles.find(style => style.id === this.previewId) ?? null;
+    },
 
-      const shown = this.styles
-        .filter(style => !names.has(style.name.trim().toLowerCase()))
-        .slice(0, SHOWN);
-      const previewed = this.styles.find(style => style.id === this.previewId);
+    shownStyles(): Array<GalleryStyle> {
+      const shown = this.styles.slice(0, SHOWN);
+      const { previewed } = this;
 
       return previewed && !shown.includes(previewed)
         ? [previewed, ...shown.slice(0, SHOWN - 1)]
@@ -129,6 +160,7 @@ export default Vue.extend({
     // A gallery that can't be reached leaves the popup as it always was.
     if (response?.ok) {
       this.styles = response.styles;
+      this.total = response.total;
       this.site = response.site;
     }
 
@@ -180,17 +212,25 @@ export default Vue.extend({
       this.$emit('preview', false);
     },
 
-    async install(style: GalleryStyle): Promise<void> {
-      if (this.tab.id === undefined) {
+    /**
+     * Installs the previewed style as a new profile; the popup's footer
+     * offers it while a style previews.
+     */
+    async install(): Promise<void> {
+      const style = this.previewed;
+
+      if (!style || this.tab.id === undefined) {
         return;
       }
 
       this.installing = true;
+      this.$emit('installing', true);
       this.error = '';
 
       const response = await installGalleryPreview(this.tab.id);
 
       this.installing = false;
+      this.$emit('installing', false);
 
       if (!response.ok) {
         this.error = galleryErrorText(response);
@@ -213,6 +253,10 @@ export default Vue.extend({
   flex-direction: column;
   gap: 2px;
   padding: 12px 6px 6px;
+
+  &.gallery--compact {
+    padding: 6px;
+  }
 }
 
 .gallery-heading {
@@ -233,5 +277,45 @@ export default Vue.extend({
   }
 
   @include focus-ring(2px);
+}
+
+.browse-count {
+  margin-left: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.more {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 36px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  text-decoration: none;
+
+  &:hover {
+    color: var(--text-primary);
+    background: var(--hover-tint);
+  }
+
+  @include focus-ring;
+}
+
+.more-label {
+  @include truncate;
+
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.more-count {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-variant-numeric: tabular-nums;
 }
 </style>
