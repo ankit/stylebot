@@ -14,7 +14,6 @@ import {
   listProfiles,
   setProfileCss,
   setProfileGalleryListing,
-  removeProfileGalleryListing,
   removeGalleryListings,
   addProfile,
   activateProfile,
@@ -653,12 +652,6 @@ export const setGalleryListing = (
   updateStyle(url, style =>
     setProfileGalleryListing(style, profileId, galleryListing)
   );
-
-/**
- * Removes the gallery listing from one of a url's profiles.
- */
-export const removeGalleryListing = (url: string, profileId: string) =>
-  updateStyle(url, style => removeProfileGalleryListing(style, profileId));
 
 /**
  * Puts urls' styles back as they were, removing those that had none.

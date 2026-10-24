@@ -20,7 +20,6 @@ import {
   reinstallProfile,
   updateGalleryProfile,
   setGalleryListing,
-  removeGalleryListing,
   removeStyleGalleryListings,
   renameProfile,
   deleteProfile,
@@ -522,7 +521,7 @@ describe('style edits', () => {
       expect(stored('example.com').css).toBe('a { color: red; }');
     });
 
-    it('sets and removes the listing a profile was published as', async () => {
+    it('sets the listing a profile was published as', async () => {
       await setGalleryListing('example.com', 'default', listing(8));
       expect(stored('example.com').profiles?.default).toEqual({
         name: '',
@@ -532,9 +531,6 @@ describe('style edits', () => {
       const before = writes();
       await setGalleryListing('example.com', 'default', listing(8));
       expect(writes()).toBe(before);
-
-      await removeGalleryListing('example.com', 'default');
-      expect(stored('example.com').profiles?.default).toEqual({ name: '' });
     });
 
     it('drops an unpublished style’s listing from every profile, keeping other styles’', async () => {

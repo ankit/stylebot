@@ -16,7 +16,6 @@ import {
   getAll,
   installProfile,
   reinstallProfile,
-  removeGalleryListing,
   restoreStyles,
 } from './styles';
 
@@ -24,7 +23,6 @@ jest.mock('./styles', () => ({
   getAll: jest.fn(async () => ({})),
   installProfile: jest.fn(async () => ({ name: 'Tokyo Night', id: 'p1' })),
   reinstallProfile: jest.fn(async () => 'Mine'),
-  removeGalleryListing: jest.fn(async () => undefined),
   applyStylesToAllTabs: jest.fn(async () => undefined),
   restoreStyles: jest.fn(async () => undefined),
 }));
@@ -244,8 +242,8 @@ describe('gallery preview', () => {
       cssHash: hashCss(css),
     });
 
-    it('switches back to an install of the latest version, keeping its edits', async () => {
-      await seed('a { color: pink; }', installedAt(2, 'a { color: red; }'));
+    it('switches back to an untouched install of the latest version', async () => {
+      await seed('a { color: red; }', installedAt(2, 'a { color: red; }'));
 
       expect(await installGalleryPreview(TAB_ID)).toBe('Mine');
       expect(reinstallProfile).toHaveBeenCalledWith('github.com', 'p0', {});
@@ -263,30 +261,38 @@ describe('gallery preview', () => {
       });
     });
 
-    it('adds a newer version beside an edited install, which keeps the edits but loses the listing', async () => {
-      await seed('a { color: pink; }', installedAt(1, 'a { color: red; }'));
+    it.each([
+      ['the latest', 2],
+      ['an older', 1],
+    ])(
+      'adds a new profile beside an edited install of %s version, leaving it as it is',
+      async (_, version) => {
+        await seed(
+          'a { color: pink; }',
+          installedAt(version, 'a { color: red; }')
+        );
 
-      await installGalleryPreview(TAB_ID);
+        await installGalleryPreview(TAB_ID);
 
-      expect(reinstallProfile).not.toHaveBeenCalled();
-      expect(removeGalleryListing).toHaveBeenCalledWith('github.com', 'p0');
-      expect(installProfile).toHaveBeenCalledWith('github.com', {
-        name: 'Tokyo Night',
-        css: LATEST_CSS,
-        galleryListing: LATEST_LISTING,
-      });
-    });
+        expect(reinstallProfile).not.toHaveBeenCalled();
+        expect(installProfile).toHaveBeenCalledWith('github.com', {
+          name: 'Tokyo Night',
+          css: LATEST_CSS,
+          galleryListing: LATEST_LISTING,
+        });
+      }
+    );
 
-    it('switches back to an edited, older copy of a style published from here, keeping it as it is', async () => {
+    it('adds a new profile beside an edited copy of a style published from here', async () => {
       await seed('a { color: pink; }', {
         ...installedAt(1, 'a { color: red; }'),
         published: true,
       });
 
-      expect(await installGalleryPreview(TAB_ID)).toBe('Mine');
-      expect(reinstallProfile).toHaveBeenCalledWith('github.com', 'p0', {});
-      expect(removeGalleryListing).not.toHaveBeenCalled();
-      expect(installProfile).not.toHaveBeenCalled();
+      await installGalleryPreview(TAB_ID);
+
+      expect(reinstallProfile).not.toHaveBeenCalled();
+      expect(installProfile).toHaveBeenCalled();
     });
 
     it("installs anew when no profile has the style's listing", async () => {
@@ -295,7 +301,6 @@ describe('gallery preview', () => {
       await installGalleryPreview(TAB_ID);
 
       expect(reinstallProfile).not.toHaveBeenCalled();
-      expect(removeGalleryListing).not.toHaveBeenCalled();
       expect(installProfile).toHaveBeenCalled();
     });
   });

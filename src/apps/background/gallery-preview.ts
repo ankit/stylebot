@@ -28,7 +28,6 @@ import {
   getAll,
   installProfile,
   reinstallProfile,
-  removeGalleryListing,
   restoreStyles,
 } from './styles';
 
@@ -236,63 +235,44 @@ const isUnedited = ({ css, galleryListing }: ListedProfile): boolean =>
  * already listed as here.
  */
 type InstallPlan =
-  // Switch to a profile as it is.
+  // Switch to an unedited profile already at the version.
   | { kind: 'switch'; profile: ListedProfile }
   // Update an older, unedited profile to the version in place.
   | { kind: 'update'; profile: ListedProfile }
-  // Add a new profile, taking the listing off the edited ones.
-  | { kind: 'add'; edited: Array<ListedProfile> };
+  // Add a new profile beside the edited ones, which are the user's own now.
+  | { kind: 'add' };
 
 /**
- * Plans installing a version of a gallery style: switch to a profile already
- * at that version, else update an unedited older one, else add a new one. A
- * style published from here switches to its edited profile instead.
+ * Plans installing a version of a gallery style: reuse an unedited profile,
+ * updating it if it's older, else add a new one.
  */
 const planInstall = (
   styles: StyleMap,
   styleId: number,
   version: number
 ): InstallPlan => {
-  const listed = getListedProfiles(styles, styleId);
-  const current = listed.find(
-    profile => profile.galleryListing.version >= version
-  );
+  const unedited = getListedProfiles(styles, styleId).find(isUnedited);
 
-  if (current) {
-    return { kind: 'switch', profile: current };
+  if (!unedited) {
+    return { kind: 'add' };
   }
 
-  const unedited = listed.find(isUnedited);
-
-  if (unedited) {
-    return { kind: 'update', profile: unedited };
+  if (unedited.galleryListing.version >= version) {
+    return { kind: 'switch', profile: unedited };
   }
 
-  // Edits to a style published from here are its unpublished changes.
-  const published = listed.find(profile => profile.galleryListing.published);
-
-  if (published) {
-    return { kind: 'switch', profile: published };
-  }
-
-  return { kind: 'add', edited: listed };
+  return { kind: 'update', profile: unedited };
 };
 
 /**
- * Adds a gallery style's latest version as a new profile of pageUrl's style,
- * taking the listing off its edited profiles, which keep their css. Resolves
- * with the new profile's name.
+ * Adds a gallery style's latest version as a new profile of pageUrl's style.
+ * Resolves with the new profile's name.
  */
 const addGalleryProfile = async (
   pageUrl: string,
   style: GalleryStyle,
-  latest: GalleryStyleToInstall,
-  edited: Array<ListedProfile>
+  latest: GalleryStyleToInstall
 ): Promise<string> => {
-  for (const { url, profileId } of edited) {
-    await removeGalleryListing(url, profileId);
-  }
-
   const profile = await installProfile(pageUrl, {
     name: latest.name,
     css: latest.css,
@@ -315,7 +295,7 @@ const installLatestVersion = async (
   const plan = planInstall(styles, style.id, latest.version);
 
   if (plan.kind === 'add') {
-    return addGalleryProfile(pageUrl, style, latest, plan.edited);
+    return addGalleryProfile(pageUrl, style, latest);
   }
 
   const { url, profileId } = plan.profile;
@@ -333,7 +313,7 @@ const installLatestVersion = async (
   const name = await reinstallProfile(url, profileId, update);
 
   // The profile was deleted meanwhile, so the style goes in a new one.
-  return name ?? addGalleryProfile(pageUrl, style, latest, []);
+  return name ?? addGalleryProfile(pageUrl, style, latest);
 };
 
 /**
