@@ -36,19 +36,19 @@ const writeDrafts = (drafts: Drafts): Promise<void> =>
   chrome.storage.session.set({ [DRAFTS_KEY]: drafts });
 
 /**
- * Keeps a draft for the gallery site to read, by a new id that's hard to
- * guess, and resolves with the id.
+ * Keeps a draft for the gallery site to read, by an id that's hard to guess
+ * from newGalleryDraftId.
  */
 export const saveGalleryDraft = async (
+  id: string,
   draft: Omit<StoredGalleryDraft, 'createdAt'>
-): Promise<string> => {
-  const id = crypto.randomUUID();
+): Promise<void> => {
   const drafts = await readDrafts();
 
   await writeDrafts({ ...drafts, [id]: { ...draft, createdAt: Date.now() } });
-
-  return id;
 };
+
+export const newGalleryDraftId = (): string => crypto.randomUUID();
 
 /**
  * A draft by its id, or null once it's expired or published.
