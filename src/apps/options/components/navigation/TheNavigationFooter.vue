@@ -8,6 +8,9 @@
       <a target="_blank" href="http://github.com/ankit/stylebot">
         {{ t('github') }}
       </a>
+      <a target="_blank" href="https://github.com/ankit/stylebot/issues">
+        {{ t('feedback') }}
+      </a>
       <a target="_blank" href="https://ko-fi.com/stylebot">{{ t('donate') }}</a>
     </div>
   </div>

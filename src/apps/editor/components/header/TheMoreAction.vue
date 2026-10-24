@@ -65,6 +65,18 @@
         >
           {{ t('view_options') }}
         </s-menu-item>
+
+        <s-menu-item
+          @click="
+            feedbackPage();
+            close();
+          "
+        >
+          <span class="menu-item-row">
+            <span>{{ t('feedback') }}</span>
+            <arrow-up-right-icon :size="12" class="menu-item-hint-icon" />
+          </span>
+        </s-menu-item>
       </s-menu>
     </template>
   </s-anchored-menu>
@@ -99,7 +111,7 @@ import type {
   StylebotDockLocation,
 } from '@stylebot/types';
 
-import { openOptionsPage } from '@stylebot/utils';
+import { openOptionsPage, openReportIssuePage } from '@stylebot/utils';
 
 import { hasSidePanel } from '../../utils/side-panel';
 import TheGalleryMenuItem from './TheGalleryMenuItem.vue';
@@ -234,6 +246,10 @@ export default Vue.extend({
 
     optionsPage(): void {
       openOptionsPage();
+    },
+
+    feedbackPage(): void {
+      openReportIssuePage();
     },
   },
 });
