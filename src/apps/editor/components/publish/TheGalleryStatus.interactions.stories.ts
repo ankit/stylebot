@@ -28,6 +28,12 @@ const published = (css: string) => ({
   },
 });
 
+const installed = (css: string) => ({
+  id: 1,
+  slug: 'tokyo-night',
+  cssHash: hashCss(css),
+});
+
 /**
  * The OpenGalleryDraft messages sent, once one has been.
  */
@@ -126,11 +132,7 @@ export const FromGallery: StoryObj = {
   parameters: {
     chrome: {
       gallery: {
-        installed: {
-          id: 1,
-          slug: 'tokyo-night',
-          cssHash: hashCss(RULE_CSS),
-        },
+        installed: installed(RULE_CSS),
         suggestions: gallerySuggestions,
       },
     },
@@ -140,7 +142,7 @@ export const FromGallery: StoryObj = {
     const canvas = within(canvasElement);
 
     await expect(
-      await canvas.findByText('From Gallery · by maya')
+      await canvas.findByText('Gallery style by maya')
     ).toBeVisible();
     await expect(canvas.getByRole('link', { name: 'View' })).toHaveAttribute(
       'href',
@@ -149,5 +151,69 @@ export const FromGallery: StoryObj = {
 
     const menu = within(await openEditorMenu(canvas, 'Options'));
     await expect(menu.queryByRole('menuitem', { name: /Gallery/ })).toBeNull();
+  },
+};
+
+export const ResetEditedInstall: StoryObj = {
+  ...editor(WITH_RULE),
+  parameters: {
+    chrome: {
+      gallery: {
+        installed: installed('h1 { color: red; }'),
+        suggestions: gallerySuggestions,
+      },
+    },
+  },
+  name: "a profile edited since it was installed from the Gallery names it as your edit of its author's style, and Revert puts the Gallery version back",
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const send = spyOn(chrome.runtime, 'sendMessage');
+
+    await expect(
+      await canvas.findByText("Your edit of maya's style")
+    ).toBeVisible();
+    await expect(canvas.getByRole('link', { name: 'View' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('/style/1/tokyo-night')
+    );
+    await user.click(
+      canvas.getByRole('button', { name: 'Use Gallery version' })
+    );
+
+    await waitFor(() =>
+      expect(send).toHaveBeenCalledWith({
+        name: 'ResetGalleryProfile',
+        url: 'example.com',
+        profileId: 'default',
+      })
+    );
+  },
+};
+
+export const ResetFails: StoryObj = {
+  ...editor(WITH_RULE),
+  parameters: {
+    chrome: {
+      gallery: {
+        installed: installed('h1 { color: red; }'),
+        reset: { ok: false, errorKey: 'gallery_error_not_found' },
+      },
+    },
+  },
+  name: 'an edited install whose author is unknown says it is your edit of a Gallery style, and a failed Revert says why',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await expect(
+      await canvas.findByText('Your edit of a Gallery style')
+    ).toBeVisible();
+
+    await user.click(
+      await canvas.findByRole('button', { name: 'Use Gallery version' })
+    );
+
+    await expect(
+      await canvas.findByText("This style isn't in the Gallery anymore.")
+    ).toBeVisible();
   },
 };

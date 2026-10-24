@@ -7,6 +7,8 @@ import type {
   GetPublishedGalleryStyleResponse,
   OpenGalleryDraft,
   OpenGalleryDraftResponse,
+  ResetGalleryProfile,
+  ResetGalleryProfileResponse,
 } from '@stylebot/types';
 
 export const getPublishedGalleryStyle = (
@@ -17,6 +19,16 @@ export const getPublishedGalleryStyle = (
     GetPublishedGalleryStyle,
     GetPublishedGalleryStyleResponse
   >({ name: 'GetPublishedGalleryStyle', url, profileId });
+
+export const resetGalleryProfile = (
+  url: string,
+  profileId: string
+): Promise<ResetGalleryProfileResponse> =>
+  chrome.runtime.sendMessage<ResetGalleryProfile, ResetGalleryProfileResponse>({
+    name: 'ResetGalleryProfile',
+    url,
+    profileId,
+  });
 
 /**
  * Captures a tab for the gallery. Without tabId it's the tab the editor is in.

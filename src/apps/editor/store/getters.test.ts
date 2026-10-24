@@ -1,4 +1,5 @@
 import { getDeclarationValue } from '@stylebot/css';
+import { hashCss } from '@stylebot/gallery';
 
 import getters from './getters';
 import mockState from './state.fixtures';
@@ -198,6 +199,45 @@ describe('getters', () => {
       };
 
       expect(getters.grayscale(state)).toBe(0);
+    });
+  });
+  describe('hasUnpublishedChanges and hasChangesSinceInstall', () => {
+    const saved = 'a { color: red; }';
+    const gallery = {
+      styleId: 1,
+      slug: 'red',
+      version: 1,
+      cssHash: hashCss(saved),
+    };
+    const installed = { id: 1, slug: 'red', cssHash: hashCss(saved) };
+    const stateWith = (css: string) => ({
+      ...mockState,
+      css,
+      publishedGalleryStyle: gallery as never,
+      installedGalleryStyle: installed,
+    });
+
+    it('ignores a blank rule typed after the last one', () => {
+      const state = stateWith(`${saved}\n\na {\n  \n}`);
+
+      expect(
+        getters.hasChangesSinceInstall({ ...state, css: `${saved}\n` })
+      ).toBe(false);
+      expect(getters.hasChangesSinceInstall(state)).toBe(false);
+    });
+
+    it('ignores the blank rule picking an element adds, which saving drops', () => {
+      const state = stateWith(`${saved}\n\nb {\n}`);
+
+      expect(getters.hasUnpublishedChanges(state)).toBe(false);
+      expect(getters.hasChangesSinceInstall(state)).toBe(false);
+    });
+
+    it('is true once a declaration changes', () => {
+      const state = stateWith('a { color: blue; }');
+
+      expect(getters.hasUnpublishedChanges(state)).toBe(true);
+      expect(getters.hasChangesSinceInstall(state)).toBe(true);
     });
   });
 });

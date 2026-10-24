@@ -23,6 +23,7 @@ import type {
   GalleryScreenshotResponse,
   GalleryStyle,
   InstallGalleryPreviewResponse,
+  ResetGalleryProfileResponse,
 } from '@stylebot/types';
 
 import { isMac, toBrowserShortcut } from '@stylebot/utils';
@@ -64,6 +65,8 @@ export type GalleryShimOptions = {
   install?: InstallGalleryPreviewResponse;
   // The gallery style the profile was installed from.
   installed?: GalleryInstalled;
+  // What ResetGalleryProfile answers; ok by default.
+  reset?: ResetGalleryProfileResponse;
 };
 
 const GALLERY_SCREENSHOT =
@@ -220,6 +223,7 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
       published: gallery.published ?? null,
       installed: gallery.installed ?? null,
     }),
+    ResetGalleryProfile: () => gallery.reset ?? { ok: true },
     CaptureGalleryScreenshot: () => {
       if (gallery.capture === 'pending') {
         return new Promise(() => undefined);

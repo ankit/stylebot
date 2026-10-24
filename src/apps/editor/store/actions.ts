@@ -31,12 +31,14 @@ import type {
   StylebotDockLocation,
   StylebotAppearance,
   GalleryScreenshotResponse,
+  ResetGalleryProfileResponse,
 } from '@stylebot/types';
 
 import {
   captureGalleryScreenshot,
   getPublishedGalleryStyle,
   openGalleryDraft,
+  resetGalleryProfile,
 } from '../utils/gallery';
 import { waitForPanelToSlideAway } from '../utils/panel-slide';
 
@@ -325,7 +327,7 @@ export default {
       await openGalleryDraft({
         url: state.url,
         profileId: state.activeProfile,
-        css: state.css,
+        css: removeEmptyRules(state.css),
         profileName: getters.activeProfileName,
         screenshot: capture.ok ? capture.screenshot : null,
       });
@@ -348,6 +350,34 @@ export default {
 
     commit('setPublishedGalleryStyle', published);
     commit('setInstalledGalleryStyle', installed);
+  },
+
+  /**
+   * Puts the gallery version back in place of the user's edits, as an undo
+   * step. The background's push of the saved styles brings the css in.
+   */
+  async resetToGalleryVersion({
+    state,
+    commit,
+  }: {
+    state: State;
+    commit: Commit;
+  }): Promise<ResetGalleryProfileResponse> {
+    const { url, activeProfile, css } = state;
+    const response = await resetGalleryProfile(url, activeProfile);
+
+    // Undoing past a profile switch would write one profile's css into another.
+    const sameProfile =
+      state.url === url && state.activeProfile === activeProfile;
+
+    if (response.ok && sameProfile) {
+      commit(
+        'setUndoStack',
+        recordChange(state.undoStack, css, 'gallery-reset', Date.now(), 'never')
+      );
+    }
+
+    return response;
   },
 
   setMode(

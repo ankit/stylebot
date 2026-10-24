@@ -9,6 +9,7 @@ import type {
   ReadabilitySettings,
   StylebotEditorCommands,
   GalleryPublished,
+  GalleryInstalled,
 } from '@stylebot/types';
 
 import {
@@ -97,7 +98,7 @@ export type State = {
   // What this style's profile last published to the gallery, if anything.
   publishedGalleryStyle: GalleryPublished | null;
   // The gallery style this profile was installed from, if any.
-  installedGalleryStyle: { id: number; slug: string } | null;
+  installedGalleryStyle: GalleryInstalled | null;
   visible: boolean;
   inspecting: boolean;
   // The element under the inspector while picking, previewed in the panel.

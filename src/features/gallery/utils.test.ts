@@ -52,4 +52,8 @@ describe('hashCss', () => {
       hashCss('a { color: blue; }')
     );
   });
+
+  it('ignores whitespace around the CSS', () => {
+    expect(hashCss('\na { color: red; }\n')).toBe(hashCss('a { color: red; }'));
+  });
 });
