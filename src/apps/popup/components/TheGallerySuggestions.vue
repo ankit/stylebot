@@ -128,7 +128,7 @@ export default Vue.extend({
     },
   },
 
-  async mounted() {
+  async created() {
     const tabId = this.tab.id;
     const [response, current] = await Promise.all([
       getGallerySuggestions(this.tab),
