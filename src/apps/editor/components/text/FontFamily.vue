@@ -2,6 +2,7 @@
   <property-row :label="t('font_family')" property="font-family">
     <s-autocomplete
       v-model="draft"
+      menu-size="small"
       chips
       select-on-focus
       blur-on-commit

@@ -1,5 +1,6 @@
 <template>
   <s-autocomplete
+    menu-size="small"
     mono
     large
     chips
