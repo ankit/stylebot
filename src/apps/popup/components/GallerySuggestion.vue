@@ -1,46 +1,75 @@
 <template>
-  <button
-    type="button"
-    class="suggestion"
-    :disabled="disabled"
-    @click="$emit('preview')"
-  >
-    <gallery-style-summary :style-data="styleData">
-      <s-text as="span" size="caption" variant="muted" class="meta">
-        <span class="author">{{ author }}</span>
-        <span v-if="styleData.installs" class="installs" :title="installsTitle">
+  <div class="suggestion" :class="{ previewing }">
+    <s-tooltip grow :text="details" :disabled="disabled">
+      <button
+        type="button"
+        class="pick"
+        :disabled="disabled"
+        :aria-pressed="previewing ? 'true' : 'false'"
+        @click="!previewing && $emit('preview')"
+      >
+        <s-text as="span" size="large" class="name">
+          {{ styleData.name }}
+        </s-text>
+        <s-text
+          v-if="styleData.installs && !previewing"
+          as="span"
+          size="caption"
+          variant="muted"
+          class="installs"
+        >
           <download-icon :size="11" />
           {{ installsCount }}
-        </span>
-      </s-text>
-    </gallery-style-summary>
-    <span class="preview-icon">
-      <eye-icon :size="16" role="img" :aria-label="t('preview')" />
-    </span>
-  </button>
+        </s-text>
+      </button>
+    </s-tooltip>
+
+    <s-button
+      v-if="previewing"
+      size="small"
+      class="install"
+      :disabled="disabled"
+      :aria-busy="disabled ? 'true' : undefined"
+      @click="$emit('install')"
+    >
+      {{ t('install') }}
+    </s-button>
+    <s-icon-button
+      v-if="previewing"
+      :size="28"
+      :tooltip="t('stop_preview')"
+      class="stop"
+      :disabled="disabled"
+      @click="$emit('cancel')"
+    >
+      <x-icon :size="16" />
+    </s-icon-button>
+  </div>
 </template>
 
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-import { SText } from '@stylebot/components';
-import { DownloadIcon, EyeIcon } from '@stylebot/icons';
+import { SButton, SIconButton, SText, STooltip } from '@stylebot/components';
+import { DownloadIcon, XIcon } from '@stylebot/icons';
+import { getGalleryByline } from '@stylebot/gallery';
 import type { GalleryStyle } from '@stylebot/types';
 
-import GalleryStyleSummary from './GalleryStyleSummary.vue';
-
 /**
- * A suggested gallery style, with its author and installs, as a button that
- * emits `preview`.
+ * A suggested gallery style, with its installs, as a button that emits
+ * `preview`; while it previews, Install emits `install` and × `cancel`. Its
+ * tooltip has the author and exact installs.
  */
 export default Vue.extend({
   name: 'GallerySuggestion',
 
   components: {
     DownloadIcon,
-    EyeIcon,
-    GalleryStyleSummary,
+    SButton,
+    SIconButton,
     SText,
+    STooltip,
+    XIcon,
   },
 
   props: {
@@ -53,13 +82,14 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
+
+    previewing: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   computed: {
-    author(): string {
-      return this.styleData.author.username;
-    },
-
     // Short, as in 1.2K; the title has the whole number.
     installsCount(): string {
       return new Intl.NumberFormat(undefined, { notation: 'compact' }).format(
@@ -67,28 +97,19 @@ export default Vue.extend({
       );
     },
 
-    installsTitle(): string {
-      const { installs } = this.styleData;
-
-      return this.t(installs === 1 ? 'installs_one' : 'installs_other', [
-        installs.toLocaleString(),
-      ]);
+    details(): string {
+      return getGalleryByline(this.styleData);
     },
   },
 });
 </script>
 
 <style lang="scss" scoped>
-.meta {
+.name {
   @include truncate;
 
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.author {
-  @include truncate;
+  flex: 1;
+  min-width: 0;
 }
 
 .installs {
@@ -99,22 +120,32 @@ export default Vue.extend({
 }
 
 .suggestion {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 8px;
+
+  &:hover:not(.previewing),
+  &.previewing {
+    background: var(--hover-tint);
+  }
+}
+
+.pick {
   @include button-reset;
 
   display: flex;
   align-items: center;
   gap: 12px;
   width: 100%;
+  min-height: 36px;
   padding: 8px 10px;
   border-radius: 8px;
   color: inherit;
   text-align: start;
   cursor: pointer;
 
-  &:hover:not(:disabled) {
-    background: var(--hover-tint);
-  }
-
+  .previewing &,
   &:disabled {
     cursor: default;
   }
@@ -122,20 +153,27 @@ export default Vue.extend({
   @include focus-ring;
 }
 
-.preview-icon {
-  display: flex;
+.install {
   flex: none;
-  max-width: 0;
-  margin-left: -12px;
-  overflow: hidden;
-  color: var(--text-muted);
-  opacity: 0;
 }
 
-.suggestion:hover:not(:disabled) .preview-icon,
-.suggestion:focus-visible .preview-icon {
-  max-width: none;
-  margin-left: 0;
-  opacity: 1;
+.stop {
+  flex: none;
+  margin-right: 6px;
+
+  ::v-deep .icon-button {
+    color: var(--text-muted);
+
+    &:hover:not(:disabled) {
+      color: var(--text-primary);
+      background: var(--panel-border);
+    }
+  }
+}
+
+.suggestion .install.button:hover:not(:disabled) {
+  background: var(--inset-button-hover);
+  border-color: var(--inset-button-hover-border);
+  box-shadow: var(--inset-button-hover-shadow);
 }
 </style>

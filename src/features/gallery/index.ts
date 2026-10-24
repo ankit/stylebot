@@ -1,7 +1,6 @@
 export {
   GALLERY_API_URL,
   GALLERY_SITE_URL,
-  getGalleryUrl,
   getGalleryStyleUrl,
   getGallerySiteUrl,
   getGalleryPublishUrl,
@@ -59,4 +58,5 @@ export {
   type GalleryPreviewAppWindow,
 } from './preview';
 export { galleryErrorText } from './gallery-error-text';
+export { getGalleryByline } from './byline';
 export { getGalleryMenuItem, type GalleryMenuItem } from './menu-item';

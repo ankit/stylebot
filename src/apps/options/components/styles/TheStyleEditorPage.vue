@@ -55,14 +55,6 @@
           :title="profileName(id)"
           @click="selectedProfile = id"
         >
-          <tray-out-icon
-            v-if="galleryRole(id) === 'published'"
-            class="gallery-icon published"
-          />
-          <tray-in-icon
-            v-else-if="galleryRole(id) === 'installed'"
-            class="gallery-icon"
-          />
           <span class="profile-tab-name">{{ profileName(id) }}</span>
           <span v-if="id === activeProfile" class="visually-hidden">
             {{ t('active') }}
@@ -127,29 +119,13 @@
       </s-anchored-menu>
     </div>
 
-    <div v-if="selectedGalleryRole" class="gallery-line">
-      <tray-out-icon
-        v-if="selectedGalleryRole === 'published'"
-        class="gallery-icon published"
-      />
-      <tray-in-icon v-else class="gallery-icon" />
-
-      <span v-if="selectedGalleryRole === 'published'" class="gallery-strong">
-        {{ t('published') }}
-      </span>
-      <template v-else>
-        <span>{{ t('installed') }}</span>
-        <template v-if="galleryAuthor">
-          <span>·</span>
-          <span>{{ galleryAuthor }}</span>
-        </template>
-      </template>
-
-      <span>·</span>
-      <a class="gallery-view" :href="galleryUrl" target="_blank" rel="noopener">
-        {{ t('view_in_gallery') }}
-      </a>
-    </div>
+    <gallery-status
+      v-if="selectedListing"
+      :listing="selectedListing"
+      :css="expanded.sheets[selectedProfile].css"
+      :url="initialUrl"
+      :profile-id="selectedProfile"
+    />
 
     <div class="editor-code-area">
       <code-editor
@@ -244,7 +220,7 @@
 import Vue from 'vue';
 import type { NavigationGuardNext, Route } from 'vue-router';
 
-import type { StyleWithoutUrl } from '@stylebot/types';
+import type { GalleryListing, StyleWithoutUrl } from '@stylebot/types';
 import {
   SAnchoredMenu,
   SButton,
@@ -257,26 +233,18 @@ import {
   SToggleSwitch,
 } from '@stylebot/components';
 import { countRules } from '@stylebot/css';
-import {
-  ChevronLeftIcon,
-  PlusIcon,
-  TrayInIcon,
-  TrayOutIcon,
-} from '@stylebot/icons';
+import { ChevronLeftIcon, PlusIcon } from '@stylebot/icons';
 import { DEFAULT_PROFILE_ID, expandProfiles } from '@stylebot/saved-styles';
 import type { ExpandedProfiles } from '@stylebot/saved-styles';
 import { isSaveShortcut } from '@stylebot/utils';
-import { getGalleryStyleUrl } from '@stylebot/gallery';
 
 import SiteIcon from '../site/SiteIcon.vue';
+import GalleryStatus from './GalleryStatus.vue';
 import StyleRowMenu from './StyleRowMenu.vue';
 import CodeEditor from './CodeEditor.vue';
 import IconMenuTrigger from '../IconMenuTrigger.vue';
-import { getGalleryStyle } from '../../utils';
 
 type ProfileDialog = 'new' | 'rename';
-type GalleryRole = 'installed' | 'published';
-
 const SAVED_DURATION = 1500;
 
 export default Vue.extend({
@@ -286,10 +254,9 @@ export default Vue.extend({
     SStatusDot,
     SToggleSwitch,
     ChevronLeftIcon,
-    TrayInIcon,
-    TrayOutIcon,
     PlusIcon,
     SiteIcon,
+    GalleryStatus,
     SText,
     SButton,
     SAnchoredMenu,
@@ -336,8 +303,6 @@ export default Vue.extend({
     leaving: boolean;
     pendingNext: NavigationGuardNext | null;
     savedTimer: ReturnType<typeof setTimeout> | null;
-    // Usernames of the authors of installed gallery styles, by style id.
-    galleryAuthors: Record<number, string>;
   } {
     const existing = this.$store.state.styles[this.initialUrl];
 
@@ -355,7 +320,6 @@ export default Vue.extend({
       leaving: false,
       pendingNext: null,
       savedTimer: null,
-      galleryAuthors: {},
     };
   },
 
@@ -386,24 +350,8 @@ export default Vue.extend({
       ];
     },
 
-    selectedGalleryRole(): GalleryRole | null {
-      return this.galleryRole(this.selectedProfile);
-    },
-
-    galleryAuthor(): string {
-      const listing =
-        this.expanded.sheets[this.selectedProfile]?.galleryListing;
-
-      return listing ? this.galleryAuthors[listing.styleId] ?? '' : '';
-    },
-
-    galleryUrl(): string {
-      const listing =
-        this.expanded.sheets[this.selectedProfile]?.galleryListing;
-
-      return listing
-        ? getGalleryStyleUrl({ id: listing.styleId, slug: listing.slug })
-        : '';
+    selectedListing(): GalleryListing | undefined {
+      return this.expanded.sheets[this.selectedProfile]?.galleryListing;
     },
 
     selectedName(): string {
@@ -481,15 +429,6 @@ export default Vue.extend({
   },
 
   watch: {
-    selectedGalleryRole: {
-      immediate: true,
-      handler(role: GalleryRole | null): void {
-        if (role === 'installed') {
-          this.loadGalleryAuthor();
-        }
-      },
-    },
-
     profileIds(ids: Array<string>): void {
       if (!ids.includes(this.selectedProfile)) {
         this.selectedProfile = this.activeProfile;
@@ -610,38 +549,6 @@ export default Vue.extend({
 
     isInGallery(id: string): boolean {
       return !!this.expanded.sheets[id]?.galleryListing;
-    },
-
-    /**
-     * Whether the profile was installed from the Gallery or published to it
-     * from here.
-     */
-    galleryRole(id: string): GalleryRole | null {
-      const listing = this.expanded.sheets[id]?.galleryListing;
-
-      if (!listing) {
-        return null;
-      }
-
-      return listing.published ? 'published' : 'installed';
-    },
-
-    async loadGalleryAuthor(): Promise<void> {
-      const listing =
-        this.expanded.sheets[this.selectedProfile]?.galleryListing;
-
-      if (!listing || this.galleryAuthors[listing.styleId]) {
-        return;
-      }
-
-      const response = await getGalleryStyle(listing.styleId);
-
-      if (response?.ok) {
-        this.galleryAuthors = {
-          ...this.galleryAuthors,
-          [listing.styleId]: response.style.author.username,
-        };
-      }
     },
 
     validateProfileName(name: string): string {
@@ -941,42 +848,5 @@ export default Vue.extend({
 .dirty-text,
 .saved-text {
   flex: none;
-}
-
-.gallery-icon {
-  flex: none;
-  color: var(--text-muted);
-
-  &.published {
-    color: var(--success);
-  }
-}
-
-.gallery-line {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 24px;
-  border-bottom: 1px solid var(--panel-border);
-  background: var(--inset-surface);
-  font-size: 13px;
-  line-height: 1;
-  color: var(--text-muted);
-}
-
-.gallery-strong {
-  color: var(--text-primary);
-}
-
-.gallery-view {
-  font-weight: 500;
-  color: inherit;
-  text-decoration: none;
-
-  &:hover {
-    color: var(--text-primary);
-  }
-
-  @include focus-ring(2px);
 }
 </style>

@@ -279,7 +279,8 @@ export type OpenGalleryDraft = {
 // then captures it and hands it to the gallery site like OpenGalleryDraft.
 export type PublishProfileToGallery = {
   name: 'PublishProfileToGallery';
-  tabId: number;
+  // The tab to capture; none from the options page.
+  tabId?: number;
   url: string;
   profileId: string;
 };

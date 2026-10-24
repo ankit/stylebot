@@ -1,16 +1,15 @@
 <template>
   <span class="preview-controls">
     <preview-summary
-      :style-data="styleData"
       :title="styleData.name"
       :href="styleUrl"
-      :status="
-        held ? t('showing_the_page_as_it_was') : t('preview_not_installed')
-      "
+      :status="held ? t('showing_original_page') : byline"
+      :dimmed="held"
     />
 
     <hold-to-compare-button :disabled="installing" @change="compare" />
     <install-button
+      :class="{ dimmed: held }"
       :installing="installing"
       @install="$emit('install')"
       @filled="$emit('filled')"
@@ -18,8 +17,8 @@
     <s-icon-button
       class="close"
       :size="33"
-      :title="t('cancel_preview_esc')"
-      :aria-label="t('cancel_preview_esc')"
+      :tooltip="t('stop_preview')"
+      tooltip-shortcut="esc"
       :disabled="installing"
       @click="$emit('cancel')"
     >
@@ -33,7 +32,7 @@ import type { PropType } from 'vue';
 import Vue from 'vue';
 import { SIconButton } from '@stylebot/components';
 import { XIcon } from '@stylebot/icons';
-import { getGalleryStyleUrl } from '@stylebot/gallery';
+import { getGalleryByline, getGalleryStyleUrl } from '@stylebot/gallery';
 import type { GalleryStyle } from '@stylebot/types';
 
 import HoldToCompareButton from './HoldToCompareButton.vue';
@@ -77,6 +76,10 @@ export default Vue.extend({
     styleUrl(): string {
       return getGalleryStyleUrl(this.styleData);
     },
+
+    byline(): string {
+      return getGalleryByline(this.styleData);
+    },
   },
 
   methods: {
@@ -95,5 +98,10 @@ export default Vue.extend({
 
 .close {
   color: var(--icon-color);
+}
+
+.dimmed {
+  opacity: 0.5;
+  transition: opacity 0.12s ease;
 }
 </style>

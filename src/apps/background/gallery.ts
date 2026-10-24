@@ -201,8 +201,8 @@ const captureOrNull = async (tabId: number): Promise<string | null> => {
 };
 
 /**
- * Publishes a profile from the popup without opening the editor: switches the
- * tab to it if it isn't showing, captures the tab and opens a draft of it.
+ * Publishes a profile without opening the editor, capturing the tab when
+ * there is one.
  */
 export const PublishProfileToGallery = async (
   { tabId, url, profileId }: PublishProfileToGalleryType,
@@ -217,7 +217,9 @@ export const PublishProfileToGallery = async (
       throw new Error('No profile to publish');
     }
 
-    if (expanded.active !== profileId || !style.enabled) {
+    const showsProfile = expanded.active === profileId && style.enabled;
+
+    if (tabId !== undefined && !showsProfile) {
       await setActiveProfile(url, profileId);
       await enable(url);
       await applyStylesToAllTabs();
@@ -230,7 +232,7 @@ export const PublishProfileToGallery = async (
         profileId,
         css: sheet.css,
         profileName: sheet.name,
-        screenshot: await captureOrNull(tabId),
+        screenshot: tabId === undefined ? null : await captureOrNull(tabId),
       },
       tabId
     );

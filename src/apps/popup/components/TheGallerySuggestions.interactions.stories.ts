@@ -8,7 +8,7 @@ import {
   profiledStyle,
   style,
 } from '@stylebot/storybook/fixtures/popup';
-import { user } from '@stylebot/storybook/story-helpers';
+import { focusViaTab, user } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
   title: 'Tests/Browser Action/Gallery Suggestions',
@@ -34,27 +34,36 @@ const suggestion = async (
 ): Promise<HTMLElement> =>
   (await canvas.findByText(name)).closest('.suggestion') as HTMLElement;
 
+const pickButton = async (
+  canvas: ReturnType<typeof within>,
+  name: string
+): Promise<HTMLElement> =>
+  (await suggestion(canvas, name)).querySelector('.pick') as HTMLElement;
+
 const preview = async (canvas: ReturnType<typeof within>, name: string) =>
-  user.click(await suggestion(canvas, name));
+  user.click(await pickButton(canvas, name));
 
 export const ListsSuggestions: StoryObj = {
   ...withSuggestions,
-  name: "lists the site's popular Gallery styles with their author and installs",
+  name: "lists the site's popular Gallery styles with their installs, and their author and exact installs in a tooltip",
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
     await canvas.findByText('Gallery');
-    await expect(await suggestion(canvas, 'Tokyo Night')).toHaveTextContent(
-      /maya\s*1\.2K/
+    const row = await suggestion(canvas, 'Tokyo Night');
+    await expect(row).toHaveTextContent(/Tokyo Night\s*1\.2K/);
+    await expect(row).not.toHaveTextContent('maya');
+
+    focusViaTab(row, '.pick');
+    await expect(await canvas.findByRole('tooltip')).toHaveTextContent(
+      'by maya · 1,240 installs'
     );
-    await expect(canvas.getByTitle('1,240 installs')).toBeVisible();
-    await expect(canvas.getByTitle('1 install')).toHaveTextContent('1');
   },
 };
 
 export const PreviewsThenInstalls: StoryObj = {
   ...withSuggestions,
-  name: 'clicking a suggestion previews it on the tab, and Install adds it as a profile',
+  name: 'clicking a suggestion previews it on the tab, keeping its row with Install, which adds it as a profile',
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
     const sent = spyOn(chrome.runtime, 'sendMessage');
@@ -62,7 +71,13 @@ export const PreviewsThenInstalls: StoryObj = {
     await step('preview', async () => {
       await preview(canvas, 'Tokyo Night');
 
-      await canvas.findByText('Preview · not installed');
+      await expect(await pickButton(canvas, 'Tokyo Night')).toHaveAttribute(
+        'aria-pressed',
+        'true'
+      );
+      await expect(
+        (await suggestion(canvas, 'Tokyo Night')).querySelector('.installs')
+      ).toBeNull();
       await expect(sent).toHaveBeenCalledWith(
         expect.objectContaining({
           name: 'PreviewGalleryStyle',
@@ -80,26 +95,31 @@ export const PreviewsThenInstalls: StoryObj = {
         )
       );
       await waitFor(() =>
-        expect(canvas.queryByText('Preview · not installed')).toBeNull()
+        expect(canvas.queryByRole('button', { name: 'Install' })).toBeNull()
       );
     });
   },
 };
 
-export const CancelEndsThePreview: StoryObj = {
+export const StopEndsThePreview: StoryObj = {
   ...withSuggestions,
-  name: 'Cancel ends the preview',
+  name: 'Stop preview on the previewing row ends the preview',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const sent = spyOn(chrome.runtime, 'sendMessage');
 
     await preview(canvas, 'Paper');
-    await user.click(await canvas.findByRole('button', { name: 'Cancel' }));
+    await user.click(
+      await canvas.findByRole('button', { name: 'Stop preview' })
+    );
 
     await expect(sent).toHaveBeenLastCalledWith(
       expect.objectContaining({ name: 'EndGalleryPreview' })
     );
-    await expect(canvas.queryByText('Preview · not installed')).toBeNull();
+    await expect(await pickButton(canvas, 'Paper')).toHaveAttribute(
+      'aria-pressed',
+      'false'
+    );
   },
 };
 
@@ -116,10 +136,13 @@ export const ShowsTheTabsPreview: StoryObj = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    await canvas.findByText('Preview · not installed');
-    await expect(
-      canvas.getByText('Paper').closest('.preview-card')
-    ).not.toBeNull();
+    await waitFor(async () =>
+      expect(await pickButton(canvas, 'Paper')).toHaveAttribute(
+        'aria-pressed',
+        'true'
+      )
+    );
+    await expect(canvas.getByRole('button', { name: 'Install' })).toBeVisible();
   },
 };
 
@@ -153,12 +176,12 @@ export const LeavesOutNoInstalls: StoryObj = {
       suggestions: [{ ...gallerySuggestions[0], installs: 0 }],
     },
   }),
-  name: 'a suggestion nobody has installed yet shows just its author',
+  name: 'a suggestion nobody has installed yet shows just its name',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const row = await suggestion(canvas, 'Tokyo Night');
 
-    await expect(row).toHaveTextContent('maya');
+    await expect(row.textContent?.trim()).toBe('Tokyo Night');
     await expect(row.querySelector('.installs')).toBeNull();
   },
 };

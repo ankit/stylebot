@@ -1,6 +1,8 @@
 import type {
   CaptureGalleryScreenshot,
   GalleryScreenshotResponse,
+  GetGalleryStyle,
+  GetGalleryStyleResponse,
   GetPublishedGalleryStyle,
   GetPublishedGalleryStyleResponse,
   OpenGalleryDraft,
@@ -33,4 +35,12 @@ export const openGalleryDraft = (
   chrome.runtime.sendMessage<OpenGalleryDraft, OpenGalleryDraftResponse>({
     name: 'OpenGalleryDraft',
     ...message,
+  });
+
+export const getGalleryStyle = (
+  styleId: number
+): Promise<GetGalleryStyleResponse> =>
+  chrome.runtime.sendMessage<GetGalleryStyle, GetGalleryStyleResponse>({
+    name: 'GetGalleryStyle',
+    styleId,
   });

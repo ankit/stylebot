@@ -23,7 +23,7 @@ describe('getGalleryMenuItem', () => {
     expect(
       getGalleryMenuItem({ published, installed: null }, 'h1 { color: red; }')
     ).toEqual({
-      label: 'edit_in_gallery',
+      label: 'manage_in_gallery',
       changed: false,
       url: getGalleryEditUrl(1),
     });

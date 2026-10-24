@@ -18,23 +18,16 @@
         </a>
       </div>
 
-      <template v-for="style in shownStyles">
-        <gallery-preview-card
-          v-if="style.id === previewId"
-          :key="style.id"
-          :style-data="style"
-          :installing="installing"
-          @install="install(style)"
-          @cancel="cancel"
-        />
-        <gallery-suggestion
-          v-else
-          :key="style.id"
-          :style-data="style"
-          :disabled="installing"
-          @preview="preview(style)"
-        />
-      </template>
+      <gallery-suggestion
+        v-for="style in shownStyles"
+        :key="style.id"
+        :style-data="style"
+        :previewing="style.id === previewId"
+        :disabled="installing"
+        @preview="preview(style)"
+        @install="install(style)"
+        @cancel="cancel"
+      />
 
       <s-callout v-if="error" tone="danger">{{ error }}</s-callout>
     </section>
@@ -48,7 +41,6 @@ import { SCallout, SText } from '@stylebot/components';
 import { galleryErrorText, getGallerySiteUrl } from '@stylebot/gallery';
 import type { GalleryStyle } from '@stylebot/types';
 
-import GalleryPreviewCard from './GalleryPreviewCard.vue';
 import GallerySuggestion from './GallerySuggestion.vue';
 import {
   endGalleryPreview,
@@ -77,7 +69,6 @@ export default Vue.extend({
   name: 'TheGallerySuggestions',
 
   components: {
-    GalleryPreviewCard,
     GallerySuggestion,
     SCallout,
     SText,

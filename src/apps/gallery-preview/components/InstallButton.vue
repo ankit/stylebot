@@ -4,10 +4,11 @@
     class="install"
     :class="{ installing }"
     :disabled="installing"
+    :aria-busy="installing ? 'true' : undefined"
     @click="$emit('install')"
     @animationend.native="$emit('filled')"
   >
-    {{ installing ? t('installing') : t('install') }}
+    {{ t('install') }}
   </s-button>
 </template>
 
@@ -39,7 +40,6 @@ export default Vue.extend({
 .install {
   position: relative;
   overflow: hidden;
-  min-width: 96px;
 }
 
 .button.install.installing:disabled {

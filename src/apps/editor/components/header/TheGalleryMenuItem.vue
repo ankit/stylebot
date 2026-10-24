@@ -1,28 +1,22 @@
 <template>
-  <s-menu-item :disabled="publishing" @click="openPublishing">
-    <span class="menu-item-row">
-      <span>{{ t(item.label) }}</span>
-      <s-status-dot v-if="item.changed" tone="warning" :size="8" />
-    </span>
+  <s-menu-item v-if="unlisted" :disabled="publishing" @click="publish">
+    {{ t('publish_to_gallery') }}
   </s-menu-item>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { SMenuItem, SStatusDot } from '@stylebot/components';
-import { getGalleryMenuItem } from '@stylebot/gallery';
-import type { GalleryMenuItem } from '@stylebot/gallery';
+import { SMenuItem } from '@stylebot/components';
 
 /**
- * The ⋯ menu's Gallery item: publishes the profile, or links to its Gallery
- * page or the gallery site's form for editing it.
+ * The ⋯ menu's Publish to Gallery, for a profile neither published from here
+ * nor installed from the Gallery; the bar under the editor covers those.
  */
 export default Vue.extend({
   name: 'TheGalleryMenuItem',
 
   components: {
     SMenuItem,
-    SStatusDot,
   },
 
   computed: {
@@ -30,37 +24,19 @@ export default Vue.extend({
       return this.$store.state.publishing;
     },
 
-    item(): GalleryMenuItem {
-      const { publishedGalleryStyle, installedGalleryStyle, css } =
+    unlisted(): boolean {
+      const { publishedGalleryStyle, installedGalleryStyle } =
         this.$store.state;
 
-      return getGalleryMenuItem(
-        { published: publishedGalleryStyle, installed: installedGalleryStyle },
-        css
-      );
+      return !publishedGalleryStyle && !installedGalleryStyle;
     },
   },
 
   methods: {
-    openPublishing(): void {
-      if (this.item.url) {
-        window.open(this.item.url, '_blank', 'noopener');
-      } else {
-        this.$store.dispatch('publishToGallery');
-      }
-
+    publish(): void {
+      this.$store.dispatch('publishToGallery');
       this.$emit('click');
     },
   },
 });
 </script>
-
-<style lang="scss" scoped>
-.menu-item-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  width: 100%;
-}
-</style>

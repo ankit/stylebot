@@ -227,6 +227,14 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
       return gallery.capture ?? { ok: true, screenshot: GALLERY_SCREENSHOT };
     },
     OpenGalleryDraft: () => ({ ok: true }),
+    GetGalleryStyle: message => {
+      const { styleId } = message as unknown as { styleId: number };
+      const style = gallery.suggestions?.find(each => each.id === styleId);
+
+      return style
+        ? { ok: true, style }
+        : { ok: false, errorKey: 'gallery_error_not_found' };
+    },
     GetGallerySuggestions: () => ({
       ok: true,
       styles: gallery.suggestions ?? [],

@@ -13,7 +13,12 @@
     @keydown.native.enter.prevent="setHeld(true)"
     @keyup.native="release"
   >
-    {{ t('hold_to_compare') }}
+    <span class="labels">
+      <span :class="{ hidden: held }">{{ t('hold_to_compare') }}</span>
+      <span :class="{ hidden: !held }" aria-hidden="true">
+        {{ t('original') }}
+      </span>
+    </span>
     <s-shortcut-chip small value="c" class="key" aria-hidden="true" />
   </s-button>
 </template>
@@ -124,6 +129,16 @@ export default Vue.extend({
 .compare {
   touch-action: none;
   user-select: none;
+
+  .key.chip {
+    margin: -2px 0;
+    padding: 2px 5px;
+    border-radius: 4px;
+
+    ::v-deep kbd {
+      font-size: 10px;
+    }
+  }
 }
 
 // No keyboard to press it on.
@@ -133,10 +148,22 @@ export default Vue.extend({
   }
 }
 
+.labels {
+  display: grid;
+
+  > * {
+    grid-area: 1 / 1;
+  }
+}
+
+.hidden {
+  visibility: hidden;
+}
+
 .button.compare.held,
 .button.compare.held:hover:not(:disabled) {
-  border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 16%, transparent);
-  color: var(--accent);
+  border-color: var(--text-primary);
+  background: var(--text-primary);
+  color: var(--panel-surface);
 }
 </style>

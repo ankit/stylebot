@@ -8,7 +8,7 @@ export type GalleryMenuItem = {
     | 'view_in_gallery'
     | 'publish_to_gallery'
     | 'publish_update'
-    | 'edit_in_gallery';
+    | 'manage_in_gallery';
   // The published style has changes to publish.
   changed: boolean;
   // The gallery page the item opens, rather than publishing.
@@ -41,7 +41,7 @@ export const getGalleryMenuItem = (
   }
 
   return {
-    label: 'edit_in_gallery',
+    label: 'manage_in_gallery',
     changed: false,
     url: getGalleryEditUrl(published.styleId),
   };

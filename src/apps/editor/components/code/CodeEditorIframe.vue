@@ -99,9 +99,10 @@ export default Vue.extend({
 
 <style lang="scss">
 .stylebot-code-editor-iframe {
-  height: calc(100% - 10px);
+  height: 100%;
 
   iframe {
+    display: block;
     width: 100%;
     height: 100%;
     border: none;

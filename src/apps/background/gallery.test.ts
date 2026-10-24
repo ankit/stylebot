@@ -401,6 +401,38 @@ describe('gallery messages', () => {
         expect(applyStylesToAllTabs).toHaveBeenCalled();
         expect(captureTab).toHaveBeenCalled();
       });
+
+      it("from the options page, with no tab, leaves the site's profile alone and opens a draft without a screenshot", async () => {
+        (captureTab as jest.Mock).mockClear();
+
+        const published = await respond(send =>
+          PublishProfileToGallery(
+            {
+              name: 'PublishProfileToGallery',
+              url: 'github.com',
+              profileId: 'dark',
+            },
+            send
+          )
+        );
+
+        expect(published).toEqual({ ok: true });
+        expect(mockStyles['github.com'].activeProfile).toBe('default');
+        expect(applyStylesToAllTabs).not.toHaveBeenCalled();
+        expect(captureTab).not.toHaveBeenCalled();
+
+        const { url, openerTabId } = createTab.mock.calls[0][0];
+        const { draft } = await getDraft(
+          new URL(url).searchParams.get('draft') as string
+        );
+
+        expect(openerTabId).toBeUndefined();
+        expect(draft).toMatchObject({
+          css: CSS,
+          name: 'Dark',
+          screenshot: null,
+        });
+      });
     });
 
     it('turns down a publish that names no gallery style', async () => {

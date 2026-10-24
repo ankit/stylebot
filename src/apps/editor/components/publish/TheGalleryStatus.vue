@@ -1,23 +1,26 @@
 <template>
-  <div v-if="published" class="gallery-status">
-    <a
-      v-if="!hasChanges"
-      class="state published-link"
-      :href="link"
-      target="_blank"
-      rel="noopener"
-    >
-      <tray-out-icon class="status-icon" />
-      {{ t('published') }}
-    </a>
+  <div v-if="published || installed" class="gallery-status">
+    <template v-if="!published">
+      <span class="state">{{ installedText }}</span>
+      <a class="link" :href="viewUrl" target="_blank" rel="noopener">
+        {{ t('view') }}
+      </a>
+    </template>
+
+    <template v-else-if="!hasChanges">
+      <span class="state">{{ t('published') }}</span>
+      <a class="link" :href="manageUrl" target="_blank" rel="noopener">
+        {{ t('manage') }}
+      </a>
+    </template>
 
     <template v-else>
       <span class="state">
-        <tray-out-icon class="status-icon changed" />
+        <s-status-dot tone="warning" :size="8" />
         {{ t('unpublished_changes') }}
       </span>
       <s-button size="small" :disabled="publishing" @click="publish">
-        {{ t('publish_update') }}
+        {{ t('publish') }}
       </s-button>
     </template>
   </div>
@@ -25,27 +28,51 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SButton } from '@stylebot/components';
-import { TrayOutIcon } from '@stylebot/icons';
-import { getGalleryStyleUrl } from '@stylebot/gallery';
+import { SButton, SStatusDot } from '@stylebot/components';
+import { getGalleryEditUrl, getGalleryStyleUrl } from '@stylebot/gallery';
 import type { GalleryPublished } from '@stylebot/types';
 
+import { getGalleryStyle } from '../../utils/gallery';
+
+type Installed = { id: number; slug: string };
+
 /**
- * A published style's Gallery state under the editor: the live version,
- * linking to its Gallery page, or edits the Gallery doesn't have yet with a
- * way to publish them on the gallery site.
+ * The profile's Gallery state under the editor: installed, published, or
+ * with changes to publish.
  */
 export default Vue.extend({
   name: 'TheGalleryStatus',
 
   components: {
     SButton,
-    TrayOutIcon,
+    SStatusDot,
+  },
+
+  data(): { author: string } {
+    return {
+      author: '',
+    };
   },
 
   computed: {
     published(): GalleryPublished | null {
       return this.$store.state.publishedGalleryStyle;
+    },
+
+    installed(): Installed | null {
+      return this.$store.state.installedGalleryStyle;
+    },
+
+    installedText(): string {
+      const from = this.t('from_gallery');
+
+      return this.author
+        ? `${from} · ${this.t('by_author', [this.author])}`
+        : from;
+    },
+
+    viewUrl(): string {
+      return this.installed ? getGalleryStyleUrl(this.installed) : '';
     },
 
     publishing(): boolean {
@@ -56,14 +83,29 @@ export default Vue.extend({
       return this.$store.getters.hasUnpublishedChanges;
     },
 
-    link(): string {
-      if (!this.published) {
-        return '';
-      }
+    manageUrl(): string {
+      return this.published ? getGalleryEditUrl(this.published.styleId) : '';
+    },
+  },
 
-      const { styleId, slug } = this.published;
+  watch: {
+    installed: {
+      immediate: true,
 
-      return getGalleryStyleUrl({ id: styleId, slug });
+      async handler(installed: Installed | null): Promise<void> {
+        this.author = '';
+
+        if (!installed) {
+          return;
+        }
+
+        const response = await getGalleryStyle(installed.id);
+
+        // Another profile may have been picked while this one loaded.
+        if (response?.ok && this.installed?.id === installed.id) {
+          this.author = response.style.author.username;
+        }
+      },
     },
   },
 
@@ -84,7 +126,7 @@ export default Vue.extend({
   justify-content: space-between;
   gap: 8px;
   height: 40px;
-  padding: 0 6px 0 14px;
+  padding: 0 var(--panel-gutter);
   border-top: 1px solid var(--panel-border);
 }
 
@@ -98,20 +140,17 @@ export default Vue.extend({
   color: var(--text-muted);
 }
 
-.status-icon {
+.link {
+  display: inline-flex;
   flex: none;
-  color: var(--success);
-
-  &.changed {
-    color: var(--warning-icon);
-  }
-}
-
-.published-link {
-  display: flex;
   align-items: center;
-  gap: 8px;
-  color: inherit;
+  height: 28px;
+  margin-right: -8px;
+  padding: 0 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
   text-decoration: none;
 
   &:hover {

@@ -1,10 +1,7 @@
 <template>
   <span class="preview-summary">
-    <span class="summary">
-      <span class="thumbnail">
-        <s-thumbnail :src="thumbnail" :width="69" :height="43" />
-        <slot name="badge" />
-      </span>
+    <span class="summary" :class="{ dimmed }">
+      <slot name="icon" />
       <span
         class="details"
         :class="{ confirming }"
@@ -13,6 +10,7 @@
         <s-text
           :as="href ? 'a' : 'span'"
           size="large"
+          medium
           class="name"
           :href="href || undefined"
           :title="title"
@@ -26,37 +24,24 @@
         </s-text>
       </span>
     </span>
-
-    <span class="divider" />
   </span>
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
 import Vue from 'vue';
-import { SText, SThumbnail } from '@stylebot/components';
-import { getGalleryUrl } from '@stylebot/gallery';
-import type { GalleryStyle } from '@stylebot/types';
+import { SText } from '@stylebot/components';
 
 /**
- * The style's thumbnail with a title and status beside it, then a divider
- * before the bar's buttons. A `badge` slot sits on the thumbnail's corner,
- * and `confirming` announces the text and slides it in.
+ * The style's title with its status below, after an optional `icon`.
  */
 export default Vue.extend({
   name: 'PreviewSummary',
 
   components: {
     SText,
-    SThumbnail,
   },
 
   props: {
-    styleData: {
-      type: Object as PropType<GalleryStyle>,
-      required: true,
-    },
-
     title: {
       type: String,
       required: true,
@@ -76,11 +61,10 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
-  },
 
-  computed: {
-    thumbnail(): string {
-      return getGalleryUrl(this.styleData.screenshot);
+    dimmed: {
+      type: Boolean,
+      default: false,
     },
   },
 });
@@ -97,15 +81,7 @@ export default Vue.extend({
   align-items: center;
   gap: 12px;
   min-width: 0;
-  padding-left: 2px;
-}
-
-.thumbnail {
-  position: relative;
-  display: flex;
-  flex: none;
-  min-width: 12px;
-  min-height: 12px;
+  padding: 0 16px 0 6px;
 }
 
 .details {
@@ -138,12 +114,8 @@ export default Vue.extend({
   @include truncate;
 }
 
-.divider {
-  flex: none;
-  align-self: stretch;
-  width: 1px;
-  margin: 4px;
-  background: var(--panel-border);
+.dimmed .name {
+  color: var(--text-muted);
 }
 
 @keyframes slide-in {

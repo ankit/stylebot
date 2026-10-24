@@ -4,12 +4,6 @@ const DEFAULT_API_URL = 'https://api.stylebot.dev/v1';
 export const GALLERY_API_URL =
   process.env.STYLEBOT_GALLERY_API_URL || DEFAULT_API_URL;
 
-/**
- * The full URL of a path the API returns, such as a style's screenshot.
- */
-export const getGalleryUrl = (path: string): string =>
-  new URL(path, GALLERY_API_URL).href;
-
 const DEFAULT_SITE_URL = 'https://gallery.stylebot.dev';
 
 // Development builds take STYLEBOT_GALLERY_SITE_URL, such as a dev server's.

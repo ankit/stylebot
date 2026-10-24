@@ -23,6 +23,7 @@ import type {
   UndoRestoreResponse,
   ReloadForSidePanelGrant,
   GetGalleryStyle,
+  PublishProfileToGallery,
   GetGalleryStyleResponse,
 } from '@stylebot/types';
 import { requestSidePanelPermission } from '@stylebot/side-panel';
@@ -199,3 +200,20 @@ export const getGalleryStyle = (
     name: 'GetGalleryStyle',
     styleId,
   });
+
+/**
+ * Opens a draft of a profile on the gallery's publish page, without a
+ * screenshot, since there's no page here to capture.
+ */
+export const publishProfileToGallery = (
+  url: string,
+  profileId: string
+): void => {
+  const message: PublishProfileToGallery = {
+    name: 'PublishProfileToGallery',
+    url,
+    profileId,
+  };
+
+  chrome.runtime.sendMessage(message);
+};

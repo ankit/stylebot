@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue';
-import { expect, waitFor, within } from '@storybook/test';
+import { expect, spyOn, waitFor, within } from '@storybook/test';
 
 import type Vue from 'vue';
 import type { Store } from 'vuex';
@@ -11,6 +11,8 @@ import {
 } from '@stylebot/storybook/fixtures/options';
 import { findOpenMenu, user } from '@stylebot/storybook/story-helpers';
 import { isMac } from '@stylebot/utils';
+import { getGalleryEditUrl, hashCss } from '@stylebot/gallery';
+import { gallerySuggestions } from '@stylebot/storybook/fixtures/popup';
 
 const meta: Meta = {
   title: 'Tests/Options/Profiles',
@@ -96,6 +98,116 @@ export const TabsDoNotScrollVertically: StoryObj = {
     await expect(
       selected.getBoundingClientRect().bottom
     ).toBeGreaterThanOrEqual(bar.getBoundingClientRect().bottom);
+  },
+};
+
+const publishedStyles = {
+  ...seededStyles,
+  [URL]: {
+    ...seededStyles[URL],
+    profiles: {
+      default: {
+        name: '',
+        galleryListing: {
+          styleId: 1,
+          slug: 'reader',
+          version: 1,
+          cssHash: hashCss('body { max-width: 680px; }'),
+          published: true,
+        },
+      },
+      night: {
+        name: 'Night',
+        css: 'body { background: #111; }',
+        galleryListing: {
+          styleId: 2,
+          slug: 'night',
+          version: 1,
+          cssHash: 'stale',
+          published: true,
+        },
+      },
+    },
+  },
+};
+
+const publishedStyleEditor = optionsPage(
+  'Styles',
+  { styles: publishedStyles },
+  openProfiledStyle
+);
+
+export const GalleryLine: StoryObj = {
+  ...publishedStyleEditor,
+  name: "a published profile's Gallery line says Published with Manage, or Unpublished changes with Publish, which publishes without a tab to capture",
+  play: async context => {
+    await publishedStyleEditor.play?.(context);
+    const canvas = within(context.canvasElement);
+    const sent = spyOn(chrome.runtime, 'sendMessage');
+
+    await expect(await canvas.findByText('Published')).toBeVisible();
+    await expect(canvas.getByRole('link', { name: 'Manage' })).toHaveAttribute(
+      'href',
+      getGalleryEditUrl(1)
+    );
+
+    await user.click(canvas.getByRole('tab', { name: /Night/ }));
+    await expect(await canvas.findByText('Unpublished changes')).toBeVisible();
+
+    await user.click(canvas.getByRole('button', { name: 'Publish' }));
+    await expect(sent).toHaveBeenCalledWith({
+      name: 'PublishProfileToGallery',
+      url: URL,
+      profileId: 'night',
+    });
+  },
+};
+
+const installedStyles = {
+  ...seededStyles,
+  [URL]: {
+    ...seededStyles[URL],
+    profiles: {
+      ...seededStyles[URL].profiles,
+      night: {
+        ...seededStyles[URL].profiles.night,
+        galleryListing: {
+          styleId: 1,
+          slug: 'tokyo-night',
+          version: 1,
+          cssHash: 'stale',
+          published: false,
+        },
+      },
+    },
+  },
+};
+
+const installedStyleEditor = optionsPage(
+  'Styles',
+  { styles: installedStyles },
+  openProfiledStyle
+);
+
+export const InstalledGalleryLine: StoryObj = {
+  ...installedStyleEditor,
+  parameters: {
+    ...installedStyleEditor.parameters,
+    chrome: { gallery: { suggestions: gallerySuggestions } },
+  },
+  name: 'a profile installed from the Gallery names its author on its Gallery line, with View in Gallery opening its page',
+  play: async context => {
+    await installedStyleEditor.play?.(context);
+    const canvas = within(context.canvasElement);
+
+    await user.click(canvas.getByRole('tab', { name: /Night/ }));
+    await expect(await canvas.findByText('by maya')).toBeVisible();
+    await expect(
+      canvas.getByRole('link', { name: 'View in Gallery' })
+    ).toHaveAttribute(
+      'href',
+      expect.stringMatching(/\/style\/1\/tokyo-night$/)
+    );
   },
 };
 

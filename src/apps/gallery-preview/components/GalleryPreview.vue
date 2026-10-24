@@ -3,7 +3,7 @@
     <div
       ref="bar"
       class="preview"
-      :class="{ leaving }"
+      :class="{ leaving, resizing }"
       role="region"
       :aria-label="t('preview')"
       @mouseenter="pause"
@@ -108,6 +108,7 @@ export default Vue.extend({
       filled: false,
       undoing: false,
       leaving: false,
+      resizing: false,
       error: '',
       timer: 0,
     };
@@ -135,10 +136,14 @@ export default Vue.extend({
       const to = bar.offsetWidth;
 
       if (from !== to && !reducesMotion()) {
-        bar.animate([{ width: `${from}px` }, { width: `${to}px` }], {
-          duration: 380,
-          easing: 'cubic-bezier(0.3, 0.8, 0.2, 1)',
-        });
+        this.resizing = true;
+
+        const resize = bar.animate(
+          [{ width: `${from}px` }, { width: `${to}px` }],
+          { duration: 380, easing: 'cubic-bezier(0.3, 0.8, 0.2, 1)' }
+        );
+
+        resize.onfinish = resize.oncancel = () => (this.resizing = false);
       }
     },
 
@@ -259,7 +264,6 @@ export default Vue.extend({
   gap: 8px;
   box-sizing: border-box;
   padding: 10px;
-  overflow: hidden;
   border: 1px solid var(--field-border);
   border-radius: 14px;
   background: var(--panel-surface);
@@ -269,6 +273,15 @@ export default Vue.extend({
 
   @media (prefers-reduced-motion: reduce) {
     animation: none;
+  }
+}
+
+.preview.resizing {
+  flex-wrap: nowrap;
+  overflow: hidden;
+
+  ::v-deep .summary {
+    flex: none;
   }
 }
 
