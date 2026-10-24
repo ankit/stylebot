@@ -5,7 +5,7 @@
     <section class="gallery">
       <div class="gallery-heading">
         <s-text as="h2" size="caption" variant="muted" medium>
-          {{ t('popular_in_gallery') }}
+          {{ t('gallery') }}
         </s-text>
         <a
           v-if="browseUrl"
