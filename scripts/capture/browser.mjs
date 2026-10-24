@@ -171,16 +171,21 @@ export const openSite = async (
 };
 
 /**
+ * The id the extension knows a page's tab by.
+ */
+const tabIdOf = (browser, page) =>
+  browser.evaluate(
+    async url => (await chrome.tabs.query({})).find(tab => tab.url === url)?.id,
+    page.url()
+  );
+
+/**
  * Opens the side panel's page for the site's tab in a tab of its own, at the
  * panel's width. Playwright can't reach the real side panel, and this is the
  * same page connected to the same tab.
  */
 export const openPanel = async (browser, page, width = PANEL_WIDTH) => {
-  const url = page.url();
-  const tabId = await browser.evaluate(
-    async url => (await chrome.tabs.query({})).find(tab => tab.url === url)?.id,
-    url
-  );
+  const tabId = await tabIdOf(browser, page);
 
   const panel = await browser.context.newPage();
   // Cards and menus appear at once rather than animating in.
@@ -196,6 +201,87 @@ export const openPanel = async (browser, page, width = PANEL_WIDTH) => {
   await panel.waitForTimeout(2500);
   return panel;
 };
+
+export const POPUP_WIDTH = 320;
+
+/**
+ * Opens the toolbar popup for the site's tab in a tab of its own, sized to
+ * its content. Playwright can't click the toolbar icon, so the popup is told
+ * the site's tab is the active one.
+ */
+export const openPopup = async (browser, page) => {
+  const tabId = await tabIdOf(browser, page);
+
+  const popup = await browser.context.newPage();
+  await popup.emulateMedia({ reducedMotion: 'reduce' });
+  await popup.setViewportSize({ width: POPUP_WIDTH, height: HEIGHT });
+  await popup.addInitScript(tabId => {
+    const query = chrome.tabs.query.bind(chrome.tabs);
+    chrome.tabs.query = (info, callback) => {
+      if (!info.active) {
+        return query(info, callback);
+      }
+
+      const found = chrome.tabs.get(tabId).then(tab => [tab]);
+      found.then(tabs => callback?.(tabs));
+      return found;
+    };
+  }, tabId);
+  await popup.goto(`chrome-extension://${browser.id}/popup/index.html`);
+  await popup.waitForTimeout(1500);
+  return popup;
+};
+
+/**
+ * Fits a popup's viewport to its content, as the browser sizes the real one.
+ */
+export const fitPopup = async popup => {
+  const height = await popup.evaluate(() => document.body.scrollHeight);
+  await popup.setViewportSize({ width: POPUP_WIDTH, height });
+};
+
+/**
+ * Answers the extension's Gallery API requests with these styles, for a
+ * site, instead of the live Gallery's. `total` is how many the site has.
+ */
+export const stubGallery = (browser, site, styles, total = styles.length) =>
+  browser.evaluate(
+    ({ site, styles, total }) => {
+      const realFetch = globalThis.fetch;
+      const json = body =>
+        new Response(JSON.stringify(body), {
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+      globalThis.fetch = (input, init) => {
+        const url = new URL(typeof input === 'string' ? input : input.url);
+
+        if (url.hostname !== 'api.stylebot.dev') {
+          return realFetch(input, init);
+        }
+
+        const id = Number(url.pathname.match(/\/styles\/(\d+)$/)?.[1]);
+
+        if (url.pathname.endsWith('/sites/hosts')) {
+          return Promise.resolve(json({ hosts: [site] }));
+        }
+
+        if (url.pathname.endsWith('/styles')) {
+          const listed = styles.map(({ css: _css, ...style }) => style);
+          return Promise.resolve(
+            json({ styles: listed, total, nextOffset: null })
+          );
+        }
+
+        if (id) {
+          return Promise.resolve(json(styles.find(style => style.id === id)));
+        }
+
+        return Promise.resolve(new Response(null, { status: 404 }));
+      };
+    },
+    { site, styles, total }
+  );
 
 /**
  * Stops the inspector the side panel opens with, and switches to a tab.
@@ -352,6 +438,40 @@ export const capture = async (
       height: PHONE.height,
     });
   }
+  return frame
+    ? slide(context, { image, width }, file, { ...frame, scale })
+    : image;
+};
+
+/**
+ * Saves the page with the popup open over its top right corner, as the
+ * browser shows it below the toolbar, as one shot or a slide.
+ */
+export const capturePopup = async (
+  context,
+  file,
+  page,
+  popup,
+  { appearance, scale, slide: frame }
+) => {
+  const [site, menu] = await Promise.all([png(page), png(popup)]);
+  const width = page.viewportSize().width;
+  const { height } = popup.viewportSize();
+  const shadow = {
+    light: '0 0 0 1px #0000001f,0 12px 40px #00000033',
+    dark: '0 0 0 1px #ffffff26,0 12px 40px #00000099',
+  };
+
+  const image = await render(
+    context,
+    `<body style="margin:0;position:relative;overflow:hidden">
+      <img src="data:image/png;base64,${site}" style="display:block;width:${width}px;height:${HEIGHT}px">
+      <img src="data:image/png;base64,${menu}" style="position:absolute;top:8px;right:16px;width:${POPUP_WIDTH}px;height:${height}px;border-radius:10px;box-shadow:${shadow[appearance]}">
+    </body>`,
+    frame ? null : file,
+    { scale: frame ? 'device' : scale, width }
+  );
+
   return frame
     ? slide(context, { image, width }, file, { ...frame, scale })
     : image;

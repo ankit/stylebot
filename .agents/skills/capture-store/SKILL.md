@@ -18,7 +18,7 @@ image still takes a look, because the sites it shows change under it.
 yarn capture:store
 ```
 
-- `--only 7-readability 2` retakes some shots, by name or number; `--no-build` reuses `dist/`.
+- `--only 8-readability 2` retakes some shots, by name or number; `--no-build` reuses `dist/`.
 - `--safari` takes the Mac App Store set into `store/safari/` instead: every shot but the CLI, which Safari builds don't carry, at 2560×1600. Safari can't be automated with an extension loaded, so these are rendered in headless Chrome too; no browser UI shows, and the panel looks the same.
 - `--phone` cuts the same screens out for the feature tour on stylebot.dev's phone layout, into `captures/tour/` (or `--out <dir>`) as WebP, for the site's repo's `src/assets/tour/`: the panel at Chrome's narrowest side panel width plus a strip of the page, with no headline (the site shows each as translated text, in `home.tour`). Each shot's `phone` entry sets its layout; check that panel text still reads at a phone's card width.
 - It takes about a minute. A shot that fails says why and the others still run.

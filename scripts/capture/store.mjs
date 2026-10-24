@@ -21,7 +21,7 @@ const USAGE = `usage: yarn capture:store [--safari | --phone] [--only <name>...]
   --phone     cut the screens out for stylebot.dev's phone tour, into
               captures/tour/
   --out       save into this directory instead
-  --only      retake just these shots, by name or number (e.g. --only 7-readability 2)
+  --only      retake just these shots, by name or number (e.g. --only 8-readability 2)
   --no-build  skip the rebuild (dist must already be current)
 
 Shots:

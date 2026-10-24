@@ -10,24 +10,66 @@ import {
   HEIGHT,
   PHONE,
   capture,
+  capturePopup,
+  fitPopup,
   openPanel,
+  openPopup,
   openSite,
   profiles,
   seed,
   showTab,
   style,
+  stubGallery,
   syncState,
   wait,
 } from './browser.mjs';
 import { captureCli } from './cli-shot.mjs';
 import { gallery } from './themes.mjs';
 
-// Hacker News' Modern profile, which the site's gallery doesn't list.
-export const hnModern = () =>
+/**
+ * A theme kept beside these scripts, for one the site's gallery doesn't list.
+ */
+const localTheme = name =>
   fs.readFileSync(
-    path.join(path.dirname(fileURLToPath(import.meta.url)), 'hn-modern.css'),
+    path.join(path.dirname(fileURLToPath(import.meta.url)), `${name}.css`),
     'utf8'
   );
+
+export const hnModern = () => localTheme('hn-modern');
+
+/**
+ * Gallery styles for Craigslist as the API lists them, with their CSS.
+ */
+const craigslistGallery = () => {
+  const day = 24 * 60 * 60 * 1000;
+  const listed = (id, name, username, installs, css) => ({
+    id,
+    site: 'craigslist.org',
+    slug: name.toLowerCase().replace(/\s+/g, '-'),
+    name,
+    description: null,
+    author: { id: `author-${id}`, username },
+    version: 3,
+    installs,
+    createdAt: Date.now() - 90 * day,
+    updatedAt: Date.now() - 6 * day,
+    screenshot: '',
+    css,
+  });
+
+  return [
+    listed(
+      57,
+      'Classifieds',
+      'ankit',
+      1240,
+      localTheme('craigslist-classifieds')
+    ),
+    // Listed but never previewed, so they need no CSS.
+    listed(41, 'Night Market', 'maya', 860, ''),
+    listed(63, 'Swap Meet', 'jun', 410, ''),
+  ];
+};
 
 // GitHub wraps the repo's last-commit row at the panel's width, so it's laid
 // out a little wider and scaled into the space.
@@ -181,30 +223,29 @@ export const SHOTS = [
     },
   },
   {
-    name: '3-profiles',
-    about: 'Profiles: Hacker News in Newspaper Dark',
-    appearance: 'dark',
+    name: '3-gallery',
+    about: "The popup's Gallery: Craigslist previewing Classifieds",
+    appearance: 'light',
     slide: {
-      title: 'Switch *looks* in a click.',
-      accent: 'yellow',
-      pageWidth: 400,
+      title: 'Try styles from the *Gallery*.',
+      accent: 'pink',
+      crop: { x: 598 },
     },
-    phone: { pageWidth: 400 },
     run: async (browser, file, options) => {
-      await seed(browser, {
-        styles: { 'news.ycombinator.com': hackerNews('Newspaper Dark') },
-      });
+      await stubGallery(browser, 'craigslist.org', craigslistGallery(), 14);
       const page = await openSite(
         browser.context,
-        'https://news.ycombinator.com/',
-        { space: pageWidth(options) }
+        'https://www.craigslist.org/area/newyork',
+        { full: true }
       );
-      const panel = await openPanelFor(browser, page, options);
-      await showTab(panel);
-      await panel.getByRole('button', { name: 'Switch profile' }).click();
-      await wait(600);
-      await capture(browser.context, file, page, panel, {
-        appearance: 'dark',
+      const popup = await openPopup(browser, page);
+      await popup.getByRole('button', { name: /Classifieds/ }).click();
+      await wait(2500);
+      await fitPopup(popup);
+      await page.bringToFront();
+      await wait(500);
+      await capturePopup(browser.context, file, page, popup, {
+        appearance: 'light',
         ...options,
       });
     },
@@ -247,7 +288,36 @@ export const SHOTS = [
       captureCli(file, gallery('hn', 'newspaper'), options),
   },
   {
-    name: '6-version-history',
+    name: '6-profiles',
+    about: 'Profiles: Hacker News in Newspaper Dark',
+    appearance: 'dark',
+    slide: {
+      title: 'Switch *looks* in a click.',
+      accent: 'yellow',
+      pageWidth: 400,
+    },
+    phone: { pageWidth: 400 },
+    run: async (browser, file, options) => {
+      await seed(browser, {
+        styles: { 'news.ycombinator.com': hackerNews('Newspaper Dark') },
+      });
+      const page = await openSite(
+        browser.context,
+        'https://news.ycombinator.com/',
+        { space: pageWidth(options) }
+      );
+      const panel = await openPanelFor(browser, page, options);
+      await showTab(panel);
+      await panel.getByRole('button', { name: 'Switch profile' }).click();
+      await wait(600);
+      await capture(browser.context, file, page, panel, {
+        appearance: 'dark',
+        ...options,
+      });
+    },
+  },
+  {
+    name: '7-version-history',
     about: 'Version history in Options',
     appearance: 'dark',
     slide: {
@@ -287,7 +357,7 @@ export const SHOTS = [
     },
   },
   {
-    name: '7-readability',
+    name: '8-readability',
     about: 'Readability: Wikipedia with its settings open',
     appearance: 'light',
     slide: {
