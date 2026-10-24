@@ -28,6 +28,7 @@ export { getNotification, setNotification } from './notification';
 export { INSTALL_TIME_KEY, recordInstallTime } from './install-time';
 export {
   getExtensionVersion,
+  getGoodbyeUrl,
   getReleaseVersion,
   getReleaseNotificationId,
   getReleaseUrl,

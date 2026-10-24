@@ -14,6 +14,9 @@ export const getReleaseNotificationId = (): NotificationId =>
 export const getReleaseUrl = (): string =>
   getSiteUrl(`/releases/${getReleaseVersion()}`);
 
+export const getGoodbyeUrl = (): string =>
+  getSiteUrl(`/goodbye?version=${getExtensionVersion()}`);
+
 const getMajorVersion = (version?: string): number | undefined => {
   const match = /^(\d+)(\.\d+)*$/.exec(version?.trim() ?? '');
   return match ? Number(match[1]) : undefined;

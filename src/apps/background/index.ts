@@ -1,5 +1,5 @@
 import { supportsCLI } from '@stylebot/settings';
-import { getSiteUrl } from '@stylebot/utils';
+import { getGoodbyeUrl } from '@stylebot/utils';
 
 import { updateBadge } from './badge';
 import { initCliBridge } from './cli';
@@ -18,7 +18,7 @@ holdWritesUntil(runMigrations());
 ensureCompiledStyles().then(updatePeriodicSync);
 scheduleGalleryUpdates();
 
-chrome.runtime.setUninstallURL(getSiteUrl('/goodbye'));
+chrome.runtime.setUninstallURL(getGoodbyeUrl());
 updateBadge();
 
 ContextMenu.init();
