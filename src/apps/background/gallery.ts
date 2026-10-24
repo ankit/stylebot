@@ -6,7 +6,7 @@ import {
   getGalleryPublishUrl,
   getListedProfileNames,
   getListedStyleIds,
-  getSiteStyles,
+  getSiteSuggestions,
   getStyle,
   getProfileGalleryListing,
   hashCss,
@@ -414,8 +414,8 @@ export const GetGallerySuggestions = async (
       return;
     }
 
-    const [{ styles }, listed] = await Promise.all([
-      getSiteStyles(site, SUGGESTIONS_FETCHED),
+    const [styles, listed] = await Promise.all([
+      getSiteSuggestions(site, SUGGESTIONS_FETCHED),
       getAll().then(getListedStyleIds),
     ]);
 
