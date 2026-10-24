@@ -16,7 +16,7 @@ export const openOptionsTab = async (route?: string): Promise<void> => {
       ...(route ? { url } : {}),
     });
 
-    if (existing.windowId !== undefined) {
+    if (existing.windowId !== undefined && chrome.windows) {
       await chrome.windows.update(existing.windowId, { focused: true });
     }
 

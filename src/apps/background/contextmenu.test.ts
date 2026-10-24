@@ -79,6 +79,23 @@ describe('ContextMenu.sync', () => {
   });
 });
 
+describe('without chrome.contextMenus', () => {
+  beforeEach(() => {
+    delete (global.chrome as Partial<typeof chrome>).contextMenus;
+    mockOptions({ contextMenu: true });
+  });
+
+  it('skips setting up the menu', () => {
+    expect(() => ContextMenu.init()).not.toThrow();
+    expect(getAllOptions).not.toBeCalled();
+  });
+
+  it('skips updating the menu for a tab', async () => {
+    await expect(ContextMenu.update(tab)).resolves.toBeUndefined();
+    expect(chrome.tabs.sendMessage).not.toBeCalled();
+  });
+});
+
 describe('handleContextMenuClick', () => {
   it('opens the side panel straight from the click on its item', () => {
     handleContextMenuClick(
