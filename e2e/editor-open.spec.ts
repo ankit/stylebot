@@ -19,10 +19,23 @@ const RTL_PAGE_HTML = `
   </html>
 `;
 
+const SMALL_CAPS_PAGE_HTML = `
+  <!doctype html>
+  <html>
+    <body style="font-variant: small-caps; letter-spacing: 4px">
+      <h1>Test page</h1>
+    </body>
+  </html>
+`;
+
 let server: Awaited<ReturnType<typeof startTestServer>>;
 
 test.beforeAll(async () => {
-  server = await startTestServer({ '/': PAGE_HTML, '/rtl': RTL_PAGE_HTML });
+  server = await startTestServer({
+    '/': PAGE_HTML,
+    '/rtl': RTL_PAGE_HTML,
+    '/small-caps': SMALL_CAPS_PAGE_HTML,
+  });
 });
 
 test.afterAll(() => server.close());
@@ -84,3 +97,26 @@ for (const dockLocation of ['left', 'right'] as const) {
     }
   });
 }
+
+// Inherited text styles, like a small-caps body, cross the shadow root too.
+test("the editor doesn't inherit the page's text styles", async ({
+  context,
+  openPopup,
+}) => {
+  const page = await context.newPage();
+  await page.goto(`${server.baseUrl}/small-caps`);
+
+  const editorRoot = await openEditor(page, openPopup);
+  const panel = editorRoot.locator('.stylebot-docked');
+  await expect(panel).toBeVisible();
+
+  const style = await panel.evaluate(el => {
+    const computed = getComputedStyle(el);
+
+    return {
+      fontVariant: computed.fontVariantCaps,
+      letterSpacing: computed.letterSpacing,
+    };
+  });
+  expect(style).toEqual({ fontVariant: 'normal', letterSpacing: 'normal' });
+});

@@ -15,6 +15,7 @@ import GalleryPreview from './components/GalleryPreview.vue';
 
 // Inline and important on the host, so no page or preview rule can move it.
 const HOST_CSS = `
+  all: initial !important;
   position: fixed !important;
   inset: auto 0 20px 0 !important;
   z-index: 2147483647 !important;

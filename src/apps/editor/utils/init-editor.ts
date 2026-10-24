@@ -103,6 +103,8 @@ const initEditor = (store: Store<State>): void => {
   // !important beats page rules that would hide this; fixed + max z-index
   // beats page content stacked above it. Sized 0x0, the panel is its own fixed element.
   const hostStyle = stylebotAppHost.style;
+  // Inherited page styles, like a small-caps body, cross into the shadow tree.
+  hostStyle.setProperty('all', 'initial', 'important');
   hostStyle.setProperty('display', 'block', 'important');
   hostStyle.setProperty('position', 'fixed', 'important');
   hostStyle.setProperty('top', '0', 'important');
