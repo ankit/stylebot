@@ -74,6 +74,15 @@ export type PublishedResult = {
   ok: boolean;
 };
 
+// The gallery deleted one of its styles; its id doubles as the request's.
+export type DeletedRequest = { type: 'stylebot:deleted'; id: number };
+
+export type DeletedResult = {
+  type: 'stylebot:deleted:result';
+  id: number;
+  ok: boolean;
+};
+
 // Each request a page can send, and the reply the bridge answers it with.
 export type SiteMessages = {
   'stylebot:ping': { request: PingRequest; reply: PongReply };
@@ -82,6 +91,7 @@ export type SiteMessages = {
   'stylebot:status': { request: StatusRequest; reply: StatusResult };
   'stylebot:draft': { request: DraftRequest; reply: DraftResult };
   'stylebot:published': { request: PublishedRequest; reply: PublishedResult };
+  'stylebot:deleted': { request: DeletedRequest; reply: DeletedResult };
 };
 
 export type SiteRequestType = keyof SiteMessages;

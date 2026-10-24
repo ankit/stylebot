@@ -74,6 +74,7 @@ import {
   PublishProfileToGallery,
   GetGalleryDraft,
   GalleryDraftPublished,
+  GalleryStyleDeleted,
   GetPublishedGalleryStyle,
   GetGallerySuggestions,
   GetGalleryStyle,
@@ -432,6 +433,9 @@ export const initListeners = (): void => {
           return true;
         case 'GalleryDraftPublished':
           GalleryDraftPublished(message, sender, sendResponse);
+          return true;
+        case 'GalleryStyleDeleted':
+          GalleryStyleDeleted(message, sender, sendResponse);
           return true;
         case 'GetPublishedGalleryStyle':
           GetPublishedGalleryStyle(message, sendResponse);

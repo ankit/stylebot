@@ -76,6 +76,7 @@ export type OpenGalleryDraftResponse = GalleryResult;
 // Null for a draft that's unknown, expired or already published.
 export type GetGalleryDraftResponse = { draft: GalleryDraft | null };
 export type GalleryDraftPublishedResponse = { ok: boolean };
+export type GalleryStyleDeletedResponse = { ok: boolean };
 // What was published from a profile, or the gallery style the profile was
 // installed from.
 export type GetPublishedGalleryStyleResponse = {
@@ -132,6 +133,7 @@ type BackgroundPageMessageResponse =
   | OpenGalleryDraftResponse
   | GetGalleryDraftResponse
   | GalleryDraftPublishedResponse
+  | GalleryStyleDeletedResponse
   | GetPublishedGalleryStyleResponse
   | GetGallerySuggestionsResponse
   | PreviewGalleryStyleResponse

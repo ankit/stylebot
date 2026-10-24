@@ -15,6 +15,7 @@ import { captureTab } from './capture-tab';
 import {
   CaptureGalleryScreenshot,
   GalleryDraftPublished,
+  GalleryStyleDeleted,
   GetGalleryDraft,
   GetGalleryInstallStatus,
   GetGallerySuggestions,
@@ -22,7 +23,7 @@ import {
   OpenGalleryDraft,
   PublishProfileToGallery,
 } from './gallery';
-import { applyStylesToAllTabs } from './styles';
+import { applyStylesToAllTabs, removeStyleGalleryListings } from './styles';
 
 jest.mock('./capture-tab', () => ({ captureTab: jest.fn() }));
 jest.mock('./gallery-preview', () => ({}));
@@ -52,6 +53,7 @@ jest.mock('./styles', () => {
       mockStyles[url] = { ...mockStyles[url], enabled: true };
     }),
     applyStylesToAllTabs: jest.fn(async () => undefined),
+    removeStyleGalleryListings: jest.fn(async () => undefined),
     setGalleryListing: jest.fn(
       async (url: string, id: string, galleryListing: GalleryListing) => {
         mockStyles[url] = setProfileGalleryListing(
@@ -603,6 +605,37 @@ describe('gallery messages', () => {
       expect(await status(ids, 'https://stylebot.dev/')).toEqual({
         installed: {},
       });
+    });
+  });
+
+  describe('deleted styles', () => {
+    const deleted = (styleId: unknown, url: string) =>
+      respond(send =>
+        GalleryStyleDeleted(
+          { name: 'GalleryStyleDeleted', styleId: styleId as number },
+          { id: 'stylebot', url },
+          send
+        )
+      );
+
+    beforeEach(() => {
+      (global.chrome as { runtime?: unknown }).runtime = { id: 'stylebot' };
+      jest.mocked(removeStyleGalleryListings).mockClear();
+    });
+
+    it('forgets the listings of a style the gallery deleted', async () => {
+      expect(await deleted(7, 'https://gallery.stylebot.dev/me')).toEqual({
+        ok: true,
+      });
+      expect(removeStyleGalleryListings).toHaveBeenCalledWith(7);
+    });
+
+    it('ignores other sites and ids that aren’t a style’s', async () => {
+      expect(await deleted(7, 'https://example.com/')).toEqual({ ok: false });
+      expect(await deleted('7', 'https://gallery.stylebot.dev/me')).toEqual({
+        ok: false,
+      });
+      expect(removeStyleGalleryListings).not.toHaveBeenCalled();
     });
   });
 });
