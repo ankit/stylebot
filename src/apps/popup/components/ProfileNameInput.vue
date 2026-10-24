@@ -11,7 +11,7 @@
     @input="onInput"
     @keydown.enter.prevent="$emit('submit')"
     @keydown.esc.prevent.stop="$emit('cancel')"
-    @blur="$emit('submit')"
+    @blur="$emit(cancelOnBlur ? 'cancel' : 'submit')"
   />
 </template>
 
@@ -19,7 +19,7 @@
 import Vue from 'vue';
 
 /**
- * The field a profile's name turns into while it's renamed, focused with
+ * The field a profile's name turns into while it's named, focused with
  * its text selected.
  */
 export default Vue.extend({
@@ -35,6 +35,9 @@ export default Vue.extend({
       type: String,
       default: '',
     },
+
+    // Leaving the field throws the name away instead of saving it.
+    cancelOnBlur: Boolean,
   },
 
   mounted() {

@@ -25,6 +25,7 @@
         @publish="publishSiteProfile"
         @rename="renameSiteProfile"
         @delete="deleteSiteProfile"
+        @create="createSiteProfile"
       />
       <template v-else>
         <div class="popup-header">
@@ -57,6 +58,12 @@
           @rename="renameSiteProfile(siteProfiles[0].id, $event)"
           @publish="publishSiteProfile(siteProfiles[0].id)"
           @delete="deleteSiteStyle"
+        />
+
+        <create-profile
+          v-if="showSiteStyle"
+          :names="siteProfileNames"
+          @create="createSiteProfile"
         />
 
         <style-component
@@ -119,6 +126,7 @@ import { SHeading, SThemeProvider } from '@stylebot/components';
 
 import StyleComponent from './components/Style.vue';
 import SiteProfiles from './components/SiteProfiles.vue';
+import CreateProfile from './components/CreateProfile.vue';
 import OptionsButton from './components/OptionsButton.vue';
 import Readability from './components/Readability.vue';
 import SyncStylebot from './components/SyncStylebot.vue';
@@ -141,6 +149,7 @@ import {
   renameProfile,
   deleteProfile,
   deleteStyle,
+  createProfile,
   getRestoredPageSupport,
   getPublishMenuItem,
   publishProfileToGallery,
@@ -149,6 +158,7 @@ import type { GalleryMenuItem } from '@stylebot/gallery';
 
 import { getGoogleDriveSyncEnabled } from '@stylebot/sync';
 import {
+  addProfile,
   expandProfiles,
   hasAnyCss,
   listProfiles,
@@ -175,6 +185,7 @@ export default Vue.extend({
     OptionsButton,
     StyleComponent,
     SiteProfiles,
+    CreateProfile,
     ToggleStylebot,
     Readability,
     SyncStylebot,
@@ -233,6 +244,12 @@ export default Vue.extend({
 
     siteProfiles(): Array<ProfileSummary> {
       return this.styles.length ? listProfiles(this.styles[0]) : [];
+    },
+
+    siteProfileNames(): Array<string> {
+      return this.siteProfiles.map(
+        profile => profile.name || this.t('profile_default_name')
+      );
     },
 
     // Several matching styles each get the same row instead, so the list
@@ -479,6 +496,32 @@ export default Vue.extend({
 
       deleteStyle(site.url);
       this.styles = rest;
+    },
+
+    /**
+     * Adds a blank profile to the site's style, applies it and opens the
+     * editor on it, turning the style on if it was off. The editor opens
+     * straight away, while the keypress still allows a side panel.
+     */
+    async createSiteProfile(name: string): Promise<void> {
+      const [site] = this.styles;
+      const created = createProfile(site.url, name);
+
+      if (!this.siteEnabled) {
+        enableStyle(site.url);
+      }
+
+      if (!this.isOpen) {
+        (this.$refs.toggle as InstanceType<typeof ToggleStylebot>).toggle();
+      }
+
+      const { profileId } = await created;
+
+      this.styles = [
+        addProfile(site, { id: profileId, name, css: '', activate: true }),
+      ];
+      this.siteActiveProfile = profileId;
+      this.siteEnabled = true;
     },
   },
 });

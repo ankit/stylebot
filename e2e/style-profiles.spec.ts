@@ -1,7 +1,13 @@
 import type { Locator } from '@playwright/test';
 
 import { test, expect } from './fixtures';
-import { PAGE_URL, openEditor, seedStyles, servePage } from './helpers';
+import {
+  PAGE_URL,
+  openEditor,
+  seedStyles,
+  servePage,
+  waitForEditorListener,
+} from './helpers';
 
 const PAGE_HTML = `
   <!doctype html>
@@ -149,4 +155,33 @@ test('a switch sent the way the popup does restyles every tab and the open edito
   await expect(page.locator('h1')).toHaveCSS('color', BLUE);
   await expect(other.locator('h1')).toHaveCSS('color', BLUE);
   await expect(switcher(editor)).toHaveText('Dark');
+});
+
+test('creating a profile from the popup applies it blank and opens the editor on it', async ({
+  context,
+  extension,
+  openPopup,
+}) => {
+  await servePage(context, PAGE_HTML);
+  await seedStyles(extension, { localhost: TWO_PROFILES });
+
+  const page = await context.newPage();
+  await page.goto(PAGE_URL);
+  await expect(page.locator('h1')).toHaveCSS('color', PINK);
+  await page.bringToFront();
+
+  const popup = await openPopup();
+  await waitForEditorListener(popup);
+  await popup.locator('button', { hasText: 'Create profile' }).click();
+  // The harness popup only clicks, so this keeps the name it's prefilled with.
+  await popup.evaluate(() => {
+    document
+      .querySelector('input[aria-label="Profile name"]')!
+      .dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
+  });
+
+  const editor = page.locator('#stylebot');
+  await expect(switcher(editor)).toHaveText('Untitled');
+  await expect(page.locator('h1')).not.toHaveCSS('color', PINK);
+  await expect(page.locator('h1')).not.toHaveCSS('color', BLUE);
 });

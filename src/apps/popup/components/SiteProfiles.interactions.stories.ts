@@ -25,6 +25,14 @@ const twoProfiles = popup({
 
 const sentMessages = () => spyOn(chrome.runtime, 'sendMessage');
 
+/**
+ * Watches the page messages that open the editor, keeping the popup open.
+ */
+const editorToggles = () => {
+  spyOn(window, 'close').mockImplementation(() => undefined);
+  return spyOn(chrome.tabs, 'sendMessage');
+};
+
 export const ListsProfiles: StoryObj = {
   ...twoProfiles,
   name: 'a site with several profiles lists them after No style, checks the one that is on, and edits it',
@@ -139,6 +147,140 @@ export const SingleProfile: StoryObj = {
     await expect(
       canvas.getByRole('button', { name: /^Style this page/ })
     ).toBeVisible();
+  },
+};
+
+export const CreateProfile: StoryObj = {
+  ...twoProfiles,
+  name: 'Create profile names a new profile below the list, applies it and opens the editor on it',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const sendMessage = sentMessages();
+    const tabMessages = editorToggles();
+
+    await user.click(
+      await canvas.findByRole('button', { name: 'Create profile' })
+    );
+    const field = canvas.getByRole('textbox', { name: 'Profile name' });
+
+    await expect(field).toHaveFocus();
+    await expect(field).toHaveValue('Untitled');
+
+    await user.keyboard('Reading{Enter}');
+
+    await expect(sendMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'CreateProfile',
+        url: 'example.com',
+        profileName: 'Reading',
+        activate: true,
+      })
+    );
+    await expect(tabMessages).toHaveBeenCalledWith(
+      expect.any(Number),
+      expect.objectContaining({ name: 'ToggleStylebot' })
+    );
+    await expect(
+      await canvas.findByRole('radio', { name: 'Reading' })
+    ).toBeChecked();
+  },
+};
+
+export const CreateProfileWhileEditing: StoryObj = {
+  ...popup({
+    styles: [profiledStyle('example.com')],
+    defaultStyle: profiledStyle('example.com'),
+    isOpen: true,
+  }),
+  name: 'with the editor open, Create profile switches it to the new profile without closing it',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const tabMessages = editorToggles();
+
+    await waitFor(() =>
+      expect(canvas.getByRole('radio', { name: 'No style' })).toBeDisabled()
+    );
+    await user.click(canvas.getByRole('button', { name: 'Create profile' }));
+    await user.keyboard('{Enter}');
+
+    await expect(
+      await canvas.findByRole('radio', { name: 'Untitled' })
+    ).toBeChecked();
+    await expect(tabMessages).not.toHaveBeenCalledWith(
+      expect.any(Number),
+      expect.objectContaining({ name: 'ToggleStylebot' })
+    );
+  },
+};
+
+export const CreateProfileNameTaken: StoryObj = {
+  ...twoProfiles,
+  name: 'Create profile refuses a name another profile has, and Escape or clicking away cancels',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const sendMessage = sentMessages();
+
+    await user.click(
+      await canvas.findByRole('button', { name: 'Create profile' })
+    );
+    await user.keyboard('dark{Enter}');
+
+    await expect(
+      canvas.getByRole('textbox', { name: 'Profile name' })
+    ).toHaveAttribute('aria-invalid', 'true');
+    await expect(sendMessage).not.toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'CreateProfile' })
+    );
+
+    await step('Escape cancels', async () => {
+      await user.keyboard('{Escape}');
+
+      await expect(canvas.queryByRole('textbox')).toBeNull();
+    });
+
+    await step('clicking away cancels', async () => {
+      await user.click(canvas.getByRole('button', { name: 'Create profile' }));
+      await user.click(canvas.getByText('example.com'));
+
+      await expect(canvas.queryByRole('textbox')).toBeNull();
+      await expect(sendMessage).not.toHaveBeenCalledWith(
+        expect.objectContaining({ name: 'CreateProfile' })
+      );
+    });
+  },
+};
+
+export const CreateSecondProfile: StoryObj = {
+  ...popup({
+    styles: [style('example.com', false)],
+    defaultStyle: style('example.com', false),
+  }),
+  name: 'Create profile under a site’s one style turns it on and switches the popup to the profile list',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const sendMessage = sentMessages();
+    editorToggles();
+
+    await user.click(
+      await canvas.findByRole('button', { name: 'Create profile' })
+    );
+    await user.keyboard('{Enter}');
+
+    await expect(sendMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'CreateProfile',
+        profileName: 'Untitled',
+      })
+    );
+    await expect(sendMessage).toHaveBeenCalledWith(
+      expect.objectContaining({ name: 'EnableStyle', url: 'example.com' })
+    );
+    await expect(
+      await canvas.findByRole('radio', { name: 'Untitled' })
+    ).toBeChecked();
+    await expect(
+      canvas.getAllByRole('radio').map(radio => radio.textContent?.trim())
+    ).toEqual(['No style', 'Default', 'Untitled']);
   },
 };
 

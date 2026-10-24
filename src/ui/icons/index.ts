@@ -45,3 +45,4 @@ export { default as LogoIcon } from './LogoIcon.vue';
 export { default as PlusIcon } from './PlusIcon.vue';
 export { default as CameraIcon } from './CameraIcon.vue';
 export { default as DownloadIcon } from './DownloadIcon.vue';
+export { default as LayersIcon } from './LayersIcon.vue';

@@ -10,37 +10,39 @@
     <div
       class="profile-list"
       :class="{ 'profile-list--joined': joined, previewing }"
-      role="radiogroup"
-      :aria-label="url"
     >
-      <profile-row
-        :name="t('no_style')"
-        :checked="!enabled"
-        :disabled="disableOff"
-        :actions="false"
-        @pick="$emit('pick', null)"
-      />
+      <div class="profile-options" role="radiogroup" :aria-label="url">
+        <profile-row
+          :name="t('no_style')"
+          :checked="!enabled"
+          :disabled="disableOff"
+          :actions="false"
+          @pick="$emit('pick', null)"
+        />
 
-      <profile-row
-        v-for="profile in profiles"
-        :key="profile.id"
-        v-model="draft"
-        :name="displayName(profile)"
-        :checked="enabled && profile.id === activeProfile"
-        :menu-open="menuFor === profile.id"
-        :renaming="renaming === profile.id"
-        :error="nameError"
-        :publish-item="publishItems[profile.id] || null"
-        @pick="$emit('pick', profile.id)"
-        @more="toggleMenu(profile.id)"
-        @close-menu="menuFor = null"
-        @edit="edit(profile.id)"
-        @publish="publish(profile.id)"
-        @rename="startRename(profile)"
-        @delete="remove(profile.id)"
-        @submit="submitRename"
-        @cancel="renaming = null"
-      />
+        <profile-row
+          v-for="profile in profiles"
+          :key="profile.id"
+          v-model="draft"
+          :name="displayName(profile)"
+          :checked="enabled && profile.id === activeProfile"
+          :menu-open="menuFor === profile.id"
+          :renaming="renaming === profile.id"
+          :error="nameError"
+          :publish-item="publishItems[profile.id] || null"
+          @pick="$emit('pick', profile.id)"
+          @more="toggleMenu(profile.id)"
+          @close-menu="menuFor = null"
+          @edit="edit(profile.id)"
+          @publish="publish(profile.id)"
+          @rename="startRename(profile)"
+          @delete="remove(profile.id)"
+          @submit="submitRename"
+          @cancel="renaming = null"
+        />
+      </div>
+
+      <create-profile :names="names" @create="$emit('create', $event)" />
     </div>
   </div>
 </template>
@@ -56,6 +58,7 @@ import type { GalleryMenuItem } from '@stylebot/gallery';
 
 import OptionsButton from './OptionsButton.vue';
 import ProfileRow from './ProfileRow.vue';
+import CreateProfile from './CreateProfile.vue';
 
 export default Vue.extend({
   name: 'SiteProfiles',
@@ -64,6 +67,7 @@ export default Vue.extend({
     SHeading,
     OptionsButton,
     ProfileRow,
+    CreateProfile,
   },
 
   props: {
@@ -126,6 +130,10 @@ export default Vue.extend({
   },
 
   computed: {
+    names(): Array<string> {
+      return this.profiles.map(this.displayName);
+    },
+
     nameError(): string {
       const others = this.profiles
         .filter(profile => profile.id !== this.renaming)
@@ -223,12 +231,15 @@ export default Vue.extend({
 }
 
 .profile-list {
-  display: flex;
-  flex-direction: column;
   padding: 6px;
 
   &.profile-list--joined {
     padding-bottom: 0;
   }
+}
+
+.profile-options {
+  display: flex;
+  flex-direction: column;
 }
 </style>

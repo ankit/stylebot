@@ -11,6 +11,8 @@ import type {
   RenameProfile,
   DeleteProfile,
   DeleteStyle,
+  CreateProfile,
+  CreateProfileResponse,
   StylebotOptions,
   EditorSidePanelOpened,
   OpenEditorSidePanel,
@@ -147,6 +149,25 @@ export const deleteStyle = (url: string): void => {
   const message: DeleteStyle = { name: 'DeleteStyle', url };
 
   chrome.runtime.sendMessage(message);
+};
+
+/**
+ * Adds a blank profile to a url's style and applies it.
+ */
+export const createProfile = (
+  url: string,
+  profileName: string
+): Promise<CreateProfileResponse> => {
+  const message: CreateProfile = {
+    name: 'CreateProfile',
+    url,
+    profileName,
+    activate: true,
+  };
+
+  return chrome.runtime.sendMessage<CreateProfile, CreateProfileResponse>(
+    message
+  );
 };
 
 /**

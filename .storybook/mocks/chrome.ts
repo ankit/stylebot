@@ -261,6 +261,8 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     EndGalleryPreview: () => {
       previewing = undefined;
     },
+
+    CreateProfile: () => ({ profileId: 'created' }),
   };
 
   const tabResponses: Record<string, () => unknown> = {
