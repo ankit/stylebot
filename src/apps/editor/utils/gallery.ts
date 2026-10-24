@@ -7,8 +7,6 @@ import type {
   OpenGalleryDraftResponse,
 } from '@stylebot/types';
 
-import { flashPage, playShutterSound } from './shutter';
-
 export const getPublishedGalleryStyle = (
   url: string,
   profileId: string
@@ -19,27 +17,15 @@ export const getPublishedGalleryStyle = (
   >({ name: 'GetPublishedGalleryStyle', url, profileId });
 
 /**
- * Captures a tab for the gallery with a shutter sound. Without tabId it's the
- * tab the editor is in, which also flashes like a camera.
+ * Captures a tab for the gallery. Without tabId it's the tab the editor is in.
  */
-export const captureGalleryScreenshot = async (
+export const captureGalleryScreenshot = (
   tabId?: number
-): Promise<GalleryScreenshotResponse> => {
-  const response = await chrome.runtime.sendMessage<
+): Promise<GalleryScreenshotResponse> =>
+  chrome.runtime.sendMessage<
     CaptureGalleryScreenshot,
     GalleryScreenshotResponse
   >({ name: 'CaptureGalleryScreenshot', tabId });
-
-  if (response.ok) {
-    playShutterSound();
-
-    if (tabId === undefined) {
-      flashPage();
-    }
-  }
-
-  return response;
-};
 
 export const openGalleryDraft = (
   message: Omit<OpenGalleryDraft, 'name'>
