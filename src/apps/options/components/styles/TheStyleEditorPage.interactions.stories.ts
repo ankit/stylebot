@@ -163,7 +163,11 @@ export const GalleryLine: StoryObj = {
   },
 };
 
-const installedStyles = {
+/**
+ * The seeded styles with the Night profile installed from the Gallery, with
+ * a hash of the css it was installed with.
+ */
+const installedStyles = (cssHash: string) => ({
   ...seededStyles,
   [URL]: {
     ...seededStyles[URL],
@@ -175,17 +179,23 @@ const installedStyles = {
           styleId: 1,
           slug: 'tokyo-night',
           version: 1,
-          cssHash: 'stale',
+          cssHash,
           published: false,
         },
       },
     },
   },
-};
+});
 
 const installedStyleEditor = optionsPage(
   'Styles',
-  { styles: installedStyles },
+  { styles: installedStyles(hashCss(seededStyles[URL].profiles.night.css)) },
+  openProfiledStyle
+);
+
+const editedInstallEditor = optionsPage(
+  'Styles',
+  { styles: installedStyles('stale') },
   openProfiledStyle
 );
 
@@ -201,13 +211,36 @@ export const InstalledGalleryLine: StoryObj = {
     const canvas = within(context.canvasElement);
 
     await user.click(canvas.getByRole('tab', { name: /Night/ }));
-    await expect(await canvas.findByText('by maya')).toBeVisible();
+    await expect(
+      await canvas.findByText('Gallery style by maya')
+    ).toBeVisible();
     await expect(
       canvas.getByRole('link', { name: 'View in Gallery' })
     ).toHaveAttribute(
       'href',
       expect.stringMatching(/\/style\/1\/tokyo-night$/)
     );
+  },
+};
+
+export const EditedInstallGalleryLine: StoryObj = {
+  ...editedInstallEditor,
+  parameters: {
+    ...editedInstallEditor.parameters,
+    chrome: { gallery: { suggestions: gallerySuggestions } },
+  },
+  name: "a profile edited since it was installed from the Gallery says it's the user's edit of the author's style, with View in Gallery",
+  play: async context => {
+    await editedInstallEditor.play?.(context);
+    const canvas = within(context.canvasElement);
+
+    await user.click(canvas.getByRole('tab', { name: /Night/ }));
+    await expect(
+      await canvas.findByText("Your edit of maya's style")
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole('link', { name: 'View in Gallery' })
+    ).toBeVisible();
   },
 };
 

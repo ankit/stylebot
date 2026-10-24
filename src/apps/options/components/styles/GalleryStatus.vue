@@ -1,14 +1,19 @@
 <template>
   <div class="gallery-status">
     <template v-if="!listing.published">
-      <span v-if="author">{{ t('by_author', [author]) }}</span>
-      <span v-if="author" class="dot">·</span>
+      <span
+        v-if="labelText"
+        :title="edited ? t('edited_styles_dont_get_gallery_updates') : null"
+      >
+        {{ labelText }}
+      </span>
+      <span v-if="labelText" class="dot">·</span>
       <a class="action" :href="viewUrl" target="_blank" rel="noopener">
         {{ t('view_in_gallery') }}
       </a>
     </template>
 
-    <template v-else-if="hasChanges">
+    <template v-else-if="edited">
       <s-status-dot tone="warning" :size="6" />
       <span>{{ t('unpublished_changes') }}</span>
       <span class="dot">·</span>
@@ -41,8 +46,8 @@ import type { GalleryListing } from '@stylebot/types';
 import { getGalleryStyle, publishProfileToGallery } from '../../utils';
 
 /**
- * A profile's Gallery state above its code: installed, published, or with
- * changes to publish.
+ * A profile's Gallery state above its code: installed, edited since it was
+ * installed, published, or with changes to publish.
  */
 export default Vue.extend({
   name: 'GalleryStatus',
@@ -57,7 +62,7 @@ export default Vue.extend({
       required: true,
     },
 
-    // The profile's saved css, to tell if it has changes to publish.
+    // The profile's saved css, to tell if it was edited or has changes to publish.
     css: {
       type: String,
       required: true,
@@ -74,15 +79,33 @@ export default Vue.extend({
     },
   },
 
-  data(): { author: string } {
+  data(): { author: string; authorLoaded: boolean } {
     return {
       author: '',
+      authorLoaded: false,
     };
   },
 
   computed: {
-    hasChanges(): boolean {
+    edited(): boolean {
       return hashCss(this.css) !== this.listing.cssHash;
+    },
+
+    // What an install is, once its author is known.
+    labelText(): string {
+      if (!this.authorLoaded) {
+        return '';
+      }
+
+      if (this.edited) {
+        return this.author
+          ? this.t('your_edit_of_authors_style', [this.author])
+          : this.t('your_edit_of_a_gallery_style');
+      }
+
+      return this.author
+        ? this.t('gallery_style_by_author', [this.author])
+        : this.t('gallery_style');
     },
 
     viewUrl(): string {
@@ -102,6 +125,7 @@ export default Vue.extend({
 
       async handler(styleId: number): Promise<void> {
         this.author = '';
+        this.authorLoaded = false;
 
         if (this.listing.published) {
           return;
@@ -110,9 +134,15 @@ export default Vue.extend({
         const response = await getGalleryStyle(styleId);
 
         // Another profile may have been picked while this one loaded.
-        if (response?.ok && this.listing.styleId === styleId) {
+        if (this.listing.styleId !== styleId) {
+          return;
+        }
+
+        if (response?.ok) {
           this.author = response.style.author.username;
         }
+
+        this.authorLoaded = true;
       },
     },
   },
