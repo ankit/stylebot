@@ -240,6 +240,7 @@ export default {
 
     commit('setVisible', false);
     commit('setUndoStack', emptyUndoStack());
+    commit('setActiveSelector', '');
   },
 
   escape({

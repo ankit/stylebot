@@ -376,7 +376,7 @@ describe('actions', () => {
   });
 
   describe('closeStylebot', () => {
-    it('hides the in-page panel', () => {
+    it('hides the in-page panel and forgets its selection', () => {
       actions.closeStylebot({ state: mockState, commit: mockCommit });
 
       expect(mockCommit).toBeCalledWith('setVisible', false);
@@ -384,6 +384,7 @@ describe('actions', () => {
         past: [],
         future: [],
       });
+      expect(mockCommit).toBeCalledWith('setActiveSelector', '');
       expect(chromeUtils.closeEditorWindow).not.toBeCalled();
     });
 
