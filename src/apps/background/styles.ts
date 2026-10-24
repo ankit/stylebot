@@ -643,7 +643,7 @@ export const updateGalleryProfile = (
   });
 
 /**
- * Sets the gallery listing one of a url's profiles was published as.
+ * Sets the gallery listing of one of a url's profiles.
  */
 export const setGalleryListing = (
   url: string,

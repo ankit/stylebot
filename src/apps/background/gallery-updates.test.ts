@@ -8,11 +8,19 @@ import {
   scheduleGalleryUpdates,
   updateGalleryInstalls,
 } from './gallery-updates';
-import { applyStylesToAllTabs, getAll, updateGalleryProfile } from './styles';
+import {
+  applyStylesToAllTabs,
+  getAll,
+  removeStyleGalleryListings,
+  setGalleryListing,
+  updateGalleryProfile,
+} from './styles';
 
 jest.mock('./styles', () => ({
   getAll: jest.fn(async () => ({})),
   updateGalleryProfile: jest.fn(async () => undefined),
+  setGalleryListing: jest.fn(async () => undefined),
+  removeStyleGalleryListings: jest.fn(async () => undefined),
   applyStylesToAllTabs: jest.fn(async () => undefined),
 }));
 
@@ -68,13 +76,14 @@ describe('gallery updates', () => {
     expect(applyStylesToAllTabs).toHaveBeenCalled();
   });
 
-  it('leaves an edited install without asking the gallery', async () => {
+  it('leaves an edited install at its version', async () => {
     installed(1, 'a {}', 'a { color: red; }');
+    fetchMock.mockResponseOnce(JSON.stringify({ ...style, css: 'b {}' }));
 
     await updateGalleryInstalls();
 
-    expect(fetchMock).not.toHaveBeenCalled();
     expect(updateGalleryProfile).not.toHaveBeenCalled();
+    expect(removeStyleGalleryListings).not.toHaveBeenCalled();
   });
 
   it('leaves an install already at the latest version', async () => {
@@ -84,18 +93,76 @@ describe('gallery updates', () => {
     await updateGalleryInstalls();
 
     expect(updateGalleryProfile).not.toHaveBeenCalled();
+    expect(setGalleryListing).not.toHaveBeenCalled();
     expect(applyStylesToAllTabs).not.toHaveBeenCalled();
   });
 
-  it('leaves an install the gallery no longer has', async () => {
-    installed(1, 'a {}', 'a {}');
+  it('drops the listings of a style the gallery no longer has', async () => {
+    installed(1, 'a {}', 'a { color: red; }');
     fetchMock.mockResponseOnce(JSON.stringify({ error: 'Not found' }), {
       status: 404,
     });
 
     await updateGalleryInstalls();
 
+    expect(removeStyleGalleryListings).toHaveBeenCalledWith(style.id);
     expect(updateGalleryProfile).not.toHaveBeenCalled();
+    expect(applyStylesToAllTabs).not.toHaveBeenCalled();
+  });
+
+  it('drops the listings when the gallery has an older version, so the id names another style', async () => {
+    installed(style.version + 1, 'a {}', 'a {}');
+    fetchMock.mockResponseOnce(JSON.stringify({ ...style, css: 'b {}' }));
+
+    await updateGalleryInstalls();
+
+    expect(removeStyleGalleryListings).toHaveBeenCalledWith(style.id);
+    expect(updateGalleryProfile).not.toHaveBeenCalled();
+  });
+
+  it.each([
+    ['a server error', () => fetchMock.mockResponseOnce('', { status: 500 })],
+    ['a network error', () => fetchMock.mockRejectOnce(new Error('offline'))],
+  ])('keeps the listings after %s', async (_, respond) => {
+    installed(1, 'a {}', 'a {}');
+    respond();
+
+    await updateGalleryInstalls();
+
+    expect(removeStyleGalleryListings).not.toHaveBeenCalled();
+    expect(updateGalleryProfile).not.toHaveBeenCalled();
+  });
+
+  it("gives an edited install of a renamed style the style's new slug", async () => {
+    installed(1, 'a {}', 'a { color: red; }');
+    fetchMock.mockResponseOnce(
+      JSON.stringify({ ...style, slug: 'renamed', css: 'b {}' })
+    );
+
+    await updateGalleryInstalls();
+
+    expect(setGalleryListing).toHaveBeenCalledWith('github.com', 'night', {
+      ...listing(1, 'a {}'),
+      slug: 'renamed',
+    });
+    expect(removeStyleGalleryListings).not.toHaveBeenCalled();
+  });
+
+  it('updates an unedited install of a renamed style with its new slug', async () => {
+    installed(1, 'a {}', 'a {}');
+    fetchMock.mockResponseOnce(
+      JSON.stringify({ ...style, slug: 'renamed', css: 'b {}' })
+    );
+
+    await updateGalleryInstalls();
+
+    expect(updateGalleryProfile).toHaveBeenCalledWith(
+      'github.com',
+      'night',
+      'b {}',
+      { ...listing(style.version, 'b {}'), slug: 'renamed' }
+    );
+    expect(setGalleryListing).not.toHaveBeenCalled();
   });
 
   it('schedules the daily check once, keeping an existing alarm', async () => {
