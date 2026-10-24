@@ -2,6 +2,7 @@
   <property-row :label="t('border')">
     <div class="border-control">
       <s-select
+        menu-size="small"
         class="border-style"
         :text="text"
         :muted="!styleValue"

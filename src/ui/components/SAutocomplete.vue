@@ -83,6 +83,7 @@
 
     <s-menu
       dense
+      :size="menuSize"
       :min-width="minWidth"
       class="autocomplete-menu"
       @pointerdown.native="pointerPick = true"
@@ -167,6 +168,11 @@ export default Vue.extend({
     minWidth: {
       type: Number,
       default: 176,
+    },
+
+    menuSize: {
+      type: String as PropType<'default' | 'small'>,
+      default: 'default',
     },
 
     // Render the input in a monospace font (e.g. for CSS selectors / values).

@@ -18,7 +18,12 @@
     </template>
 
     <template #default="{ close }">
-      <s-menu dense :min-width="menuMinWidth" :max-height="menuMaxHeight">
+      <s-menu
+        dense
+        :size="menuSize"
+        :min-width="menuMinWidth"
+        :max-height="menuMaxHeight"
+      >
         <slot :close="close" />
       </s-menu>
     </template>
@@ -26,6 +31,7 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import Vue from 'vue';
 
 import { ChevronDownIcon } from '@stylebot/icons';
@@ -75,6 +81,11 @@ export default Vue.extend({
     menuMaxHeight: {
       type: Number,
       default: 260,
+    },
+
+    menuSize: {
+      type: String as PropType<'default' | 'small'>,
+      default: 'default',
     },
   },
 });

@@ -13,6 +13,7 @@
         />
 
         <s-select
+          menu-size="small"
           class="spacing-mode"
           full-width
           :text="modeText"
