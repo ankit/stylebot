@@ -27,6 +27,7 @@ export {
 } from './api';
 
 export {
+  newGalleryDraftId,
   saveGalleryDraft,
   getGalleryDraft,
   deleteGalleryDraft,

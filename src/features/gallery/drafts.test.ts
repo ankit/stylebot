@@ -2,6 +2,7 @@ import {
   DRAFT_TTL,
   deleteGalleryDraft,
   getGalleryDraft,
+  newGalleryDraftId,
   saveGalleryDraft,
 } from './drafts';
 
@@ -36,8 +37,19 @@ afterEach(() => {
 });
 
 describe('gallery drafts', () => {
+  /**
+   * Saves the draft by a new id, and resolves with the id.
+   */
+  const save = async (): Promise<string> => {
+    const id = newGalleryDraftId();
+
+    await saveGalleryDraft(id, draft);
+
+    return id;
+  };
+
   it('reads a draft back by its id, as often as asked', async () => {
-    const id = await saveGalleryDraft(draft);
+    const id = await save();
 
     expect(await getGalleryDraft(id)).toEqual({
       ...draft,
@@ -48,13 +60,11 @@ describe('gallery drafts', () => {
   });
 
   it('gives a new id each time', async () => {
-    expect(await saveGalleryDraft(draft)).not.toBe(
-      await saveGalleryDraft(draft)
-    );
+    expect(newGalleryDraftId()).not.toBe(newGalleryDraftId());
   });
 
   it('forgets a draft once it expires', async () => {
-    const id = await saveGalleryDraft(draft);
+    const id = await save();
 
     jest.advanceTimersByTime(DRAFT_TTL);
 
@@ -62,8 +72,8 @@ describe('gallery drafts', () => {
   });
 
   it('forgets a deleted draft and keeps the others', async () => {
-    const deleted = await saveGalleryDraft(draft);
-    const kept = await saveGalleryDraft(draft);
+    const deleted = await save();
+    const kept = await save();
 
     await deleteGalleryDraft(deleted);
 

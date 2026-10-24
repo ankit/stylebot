@@ -12,6 +12,7 @@ import {
   hashCss,
   isGalleryStyleId,
   isPublicSite,
+  newGalleryDraftId,
   getSuggestionSites,
   saveGalleryDraft,
   toGalleryFailure,
@@ -125,10 +126,12 @@ const fitScreenshot = async (
   }
 };
 
+// Drafts the publish page may ask for while their screenshot is still fitted.
+const pendingDrafts = new Map<string, Promise<void>>();
+
 /**
- * Keeps a profile as a draft and opens the gallery site's publish page on it,
- * beside the tab it came from. A profile published from here before updates
- * its gallery style.
+ * Opens the gallery's publish page on a profile, then saves it as the draft
+ * the page reads.
  */
 const openDraft = async (
   {
@@ -140,22 +143,32 @@ const openDraft = async (
   }: Omit<OpenGalleryDraftType, 'name'>,
   openerTabId: number | undefined
 ): Promise<void> => {
-  const savedStyles = await getAll();
-  const listing = getProfileGalleryListing(savedStyles, url, profileId);
-  const id = await saveGalleryDraft({
-    site: url,
-    url,
-    profileId,
-    css,
-    name: profileName,
-    screenshot: await fitScreenshot(screenshot),
-    styleId: listing?.published ? listing.styleId : null,
-  });
+  const id = newGalleryDraftId();
+  const saved = (async () => {
+    const savedStyles = await getAll();
+    const listing = getProfileGalleryListing(savedStyles, url, profileId);
 
-  await chrome.tabs.create({
-    url: getGalleryPublishUrl(id),
-    ...(openerTabId !== undefined ? { openerTabId } : {}),
-  });
+    await saveGalleryDraft(id, {
+      site: url,
+      url,
+      profileId,
+      css,
+      name: profileName,
+      screenshot: await fitScreenshot(screenshot),
+      styleId: listing?.published ? listing.styleId : null,
+    });
+  })();
+
+  pendingDrafts.set(id, saved);
+
+  try {
+    await chrome.tabs.create({
+      url: getGalleryPublishUrl(id),
+      ...(openerTabId !== undefined ? { openerTabId } : {}),
+    });
+  } finally {
+    await saved.finally(() => pendingDrafts.delete(id));
+  }
 };
 
 export const OpenGalleryDraft = async (
@@ -241,6 +254,7 @@ export const GetGalleryDraft = async (
     return;
   }
 
+  await pendingDrafts.get(id)?.catch(() => undefined);
   const stored = await getGalleryDraft(id);
 
   if (!stored) {

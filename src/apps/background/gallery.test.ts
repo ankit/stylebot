@@ -11,6 +11,7 @@ import type {
 } from '@stylebot/types';
 
 import { mockStorage, style } from '../../features/gallery/gallery.fixtures';
+import { compressScreenshot } from '../../features/gallery/compress-screenshot';
 import { captureTab } from './capture-tab';
 import {
   CaptureGalleryScreenshot,
@@ -197,6 +198,40 @@ describe('gallery messages', () => {
       const { draft } = await getDraft(id);
 
       expect(draft?.screenshot).toMatch(/^data:image\/webp;base64,/);
+    });
+
+    it('opens the publish page before fitting the screenshot, and gives the draft once it fits', async () => {
+      let fitted: (blob: Blob) => void = () => undefined;
+      jest
+        .mocked(compressScreenshot)
+        .mockImplementationOnce(
+          () => new Promise(resolve => (fitted = resolve))
+        );
+
+      const opened = respond(send =>
+        OpenGalleryDraft(
+          {
+            name: 'OpenGalleryDraft',
+            url: 'github.com',
+            profileId: 'default',
+            css: CSS,
+            profileName: 'Night',
+            screenshot: 'data:image/png;base64,iVBORw0KGgo=',
+          },
+          { tab: { id: 3 } as chrome.tabs.Tab },
+          send
+        )
+      );
+
+      await new Promise(resolve => setTimeout(resolve, 0));
+      expect(createTab).toHaveBeenCalled();
+      const { url } = createTab.mock.calls[0][0] as { url: string };
+      const draft = getDraft(new URL(url).searchParams.get('draft') as string);
+
+      fitted(new Blob(['webp'], { type: 'image/webp' }));
+
+      expect(await opened).toEqual({ ok: true });
+      expect((await draft).draft?.screenshot).toMatch(/^data:image\/webp;/);
     });
 
     it('updates the gallery style the profile was published as, not one it was installed from', async () => {

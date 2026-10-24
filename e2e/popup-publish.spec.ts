@@ -144,9 +144,7 @@ test("a profile's Publish to Gallery in the popup hands it to the gallery site, 
     });
 
     const { screenshot } = (reply?.draft ?? {}) as { screenshot?: unknown };
-    expect(
-      screenshot === null || /^data:image\//.test(String(screenshot))
-    ).toBe(true);
+    expect(String(screenshot)).toMatch(/^data:image\/(webp|jpeg);base64,/);
     expect(await readDraft(gallery, draftId)).toMatchObject({
       draft: { name: 'Dark' },
     });
