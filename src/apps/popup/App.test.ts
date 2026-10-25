@@ -12,6 +12,8 @@ import {
   getStyles,
   getCommands,
   getRestoredPageSupport,
+  deleteProfile,
+  disableStyle,
 } from './utils';
 import type { PageSupport } from '@stylebot/utils';
 import { getGoogleDriveSyncEnabled } from '../../features/sync/google-drive/sync-metadata';
@@ -25,6 +27,8 @@ jest.mock('./utils', () => ({
   getIsPageReaderable: jest.fn(),
   getRestoredPageSupport: jest.fn(),
   getPublishMenuItem: jest.fn(async () => null),
+  deleteProfile: jest.fn(),
+  disableStyle: jest.fn(),
 }));
 
 jest.mock('../../features/sync/google-drive/sync-metadata', () => ({
@@ -160,5 +164,31 @@ describe('App.vue', () => {
     expect(wrapper.findComponent(ToggleStylebot).props('profileName')).toBe(
       'www.google.com'
     );
+  });
+
+  it('should turn the style off before deleting its active profile, so the page never gets the next one', async () => {
+    const site = {
+      url: 'example.com',
+      css: 'a { color: red; }',
+      enabled: true,
+      readability: false,
+      activeProfile: 'dark',
+      profiles: {
+        default: { name: '', css: 'a { color: blue; }' },
+        dark: { name: 'Dark' },
+      },
+    };
+
+    (getStyles as jest.Mock).mockImplementation((_tab, cb) =>
+      cb({ styles: [site], defaultStyle: site })
+    );
+
+    const wrapper = await openPopup('https://example.com/');
+    wrapper.findComponent(SiteProfiles).vm.$emit('delete', 'dark');
+
+    const disabled = (disableStyle as jest.Mock).mock.invocationCallOrder[0];
+    const deleted = (deleteProfile as jest.Mock).mock.invocationCallOrder[0];
+
+    expect(disabled).toBeLessThan(deleted);
   });
 });

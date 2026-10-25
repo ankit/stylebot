@@ -514,12 +514,13 @@ export default Vue.extend({
       const turnOff =
         this.siteEnabled && id === this.siteActiveProfile && !this.isOpen;
 
-      deleteProfile(site.url, id);
-
+      // Turned off first, or the page briefly gets the next profile's css.
       if (turnOff) {
         disableStyle(site.url);
         this.siteEnabled = false;
       }
+
+      deleteProfile(site.url, id);
 
       const updated = { ...removeProfile(site, id), enabled: this.siteEnabled };
 
