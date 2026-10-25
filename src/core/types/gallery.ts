@@ -14,6 +14,8 @@ export type GalleryStyle = {
   // Numbered in publish order.
   id: number;
   site: string;
+  // The url pattern to install under; null for the whole site.
+  urlPattern?: string | null;
   // Fixed at first publish, and not unique: the id is.
   slug: string;
   name: string;
@@ -72,12 +74,13 @@ export type GalleryPublishStatus = {
 
 /**
  * A profile handed to the gallery site to publish, as the site bridge gives
- * it: the site and Stylebot style it's for, its CSS and name, a screenshot
+ * it: the site and url pattern it's for, its CSS and name, a screenshot
  * under the gallery's limit as a data URL, and the gallery style it updates.
  */
 export type GalleryDraft = {
   site: string;
-  url: string;
+  // Null for a profile made for the whole site.
+  urlPattern: string | null;
   css: string;
   name: string;
   screenshot: string | null;

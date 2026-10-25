@@ -8,7 +8,8 @@ import {
 
 const draft = {
   site: 'github.com',
-  url: 'github.com',
+  urlPattern: null,
+  styleUrl: 'github.com',
   profileId: 'dark',
   css: 'body { color: red; }',
   name: 'Dark',

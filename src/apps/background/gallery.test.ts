@@ -197,13 +197,44 @@ describe('gallery messages', () => {
       expect(await getDraft(id)).toEqual({
         draft: {
           site: 'github.com',
-          url: 'github.com',
+          urlPattern: null,
           css: CSS,
           name: 'Night',
           screenshot: null,
           styleId: null,
         },
       });
+    });
+
+    it("names a pattern profile's site by the hostname in it, and publishes on the pattern", async () => {
+      const PATTERN = '^https://www\\.github\\.com/(?!settings)';
+      mockStyles = { [PATTERN]: savedStyle() };
+
+      await respond(send =>
+        OpenGalleryDraft(
+          {
+            name: 'OpenGalleryDraft',
+            url: PATTERN,
+            profileId: 'default',
+            css: CSS,
+            profileName: 'Night',
+            screenshot: null,
+          },
+          {},
+          send
+        )
+      );
+      const { url } = createTab.mock.calls[0][0] as { url: string };
+      const id = new URL(url).searchParams.get('draft') as string;
+
+      expect((await getDraft(id)).draft).toMatchObject({
+        site: 'github.com',
+        urlPattern: PATTERN,
+      });
+      expect(await published(id)).toEqual({ ok: true });
+      expect(
+        mockStyles[PATTERN].profiles?.default.galleryListing
+      ).toMatchObject({ styleId: 9 });
     });
 
     it('fits the screenshot to the gallery’s limit', async () => {
@@ -499,7 +530,7 @@ describe('gallery messages', () => {
         expect(await getDraft(id)).toEqual({
           draft: {
             site: 'github.com',
-            url: 'github.com',
+            urlPattern: null,
             css: CSS,
             name: 'Mine',
             screenshot: null,

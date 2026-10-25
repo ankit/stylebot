@@ -1,6 +1,8 @@
 import {
   blobToDataUrl,
   dataUrlToBlob,
+  getStyleUrlPattern,
+  getStyleSite,
   hashCss,
   isPublicSite,
   toGallerySite,
@@ -21,6 +23,28 @@ describe('toGallerySite', () => {
   it('keeps a bare hostname without www', () => {
     expect(toGallerySite(' WWW.GitHub.com ')).toBe('github.com');
     expect(toGallerySite('docs.python.org')).toBe('docs.python.org');
+  });
+});
+
+describe('saved style urls', () => {
+  it('reads the site from the first hostname in a key, without www', () => {
+    expect(getStyleSite('github.com')).toBe('github.com');
+    expect(getStyleSite('www.GitHub.com/ankit')).toBe('github.com');
+    expect(getStyleSite('^https://chatgpt\\.com/(?!codex)')).toBe(
+      'chatgpt.com'
+    );
+    expect(getStyleSite('*.wikipedia.org/wiki/*')).toBe('wikipedia.org');
+    expect(getStyleSite('*')).toBe('*');
+  });
+
+  it('has a pattern for any key but a plain hostname', () => {
+    expect(getStyleUrlPattern('github.com')).toBeNull();
+    expect(getStyleUrlPattern('docs.python.org')).toBeNull();
+    expect(getStyleUrlPattern('github.com/ankit')).toBe('github.com/ankit');
+    expect(getStyleUrlPattern('*.github.com')).toBe('*.github.com');
+    expect(getStyleUrlPattern('^https://chatgpt\\.com/')).toBe(
+      '^https://chatgpt\\.com/'
+    );
   });
 });
 

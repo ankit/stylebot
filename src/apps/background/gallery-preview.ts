@@ -265,15 +265,15 @@ const planInstall = (
 };
 
 /**
- * Adds a gallery style's latest version as a new profile of pageUrl's style.
- * Resolves with the new profile's name.
+ * Adds a gallery style's latest version as a new profile of targetUrl's
+ * style. Resolves with the new profile's name.
  */
 const addGalleryProfile = async (
-  pageUrl: string,
+  targetUrl: string,
   style: GalleryStyle,
   latest: GalleryStyleToInstall
 ): Promise<string> => {
-  const profile = await installProfile(pageUrl, {
+  const profile = await installProfile(targetUrl, {
     name: latest.name,
     css: latest.css,
     galleryListing: getLatestVersionListing(style, latest),
@@ -289,13 +289,13 @@ const addGalleryProfile = async (
 const installLatestVersion = async (
   style: GalleryStyle,
   latest: GalleryStyleToInstall,
-  pageUrl: string
+  targetUrl: string
 ): Promise<string> => {
   const styles = await getAll();
   const plan = planInstall(styles, style.id, latest.version);
 
   if (plan.kind === 'add') {
-    return addGalleryProfile(pageUrl, style, latest);
+    return addGalleryProfile(targetUrl, style, latest);
   }
 
   const { url, profileId } = plan.profile;
@@ -313,7 +313,7 @@ const installLatestVersion = async (
   const name = await reinstallProfile(url, profileId, update);
 
   // The profile was deleted meanwhile, so the style goes in a new one.
-  return name ?? addGalleryProfile(pageUrl, style, latest);
+  return name ?? addGalleryProfile(targetUrl, style, latest);
 };
 
 /**
@@ -322,6 +322,17 @@ const installLatestVersion = async (
  */
 const getPageStyleUrl = (pageUrl: string, styles: StyleMap): string =>
   getStylesForPage(pageUrl, styles).styles[0]?.url ?? new URL(pageUrl).hostname;
+
+/**
+ * The url to install a gallery style under: the url pattern its author
+ * published it for (e.g. `^https://chatgpt\.com/(?!codex)`), or else, for a
+ * style made for the whole site, the page's saved style.
+ */
+const getGalleryInstallUrl = (
+  style: GalleryStyle,
+  pageUrl: string,
+  styles: StyleMap
+): string => style.urlPattern ?? getPageStyleUrl(pageUrl, styles);
 
 /**
  * The saved style that installing a gallery style from a page goes in, which
@@ -335,7 +346,7 @@ export const getInstallTargetUrl = async (
   const plan = planInstall(styles, style.id, style.version);
 
   if (plan.kind === 'add') {
-    return getPageStyleUrl(pageUrl, styles);
+    return getGalleryInstallUrl(style, pageUrl, styles);
   }
 
   return plan.profile.url;
@@ -406,14 +417,18 @@ export const installGalleryPreview = async (tabId: number): Promise<string> => {
   }
 
   const tab = await chrome.tabs.get(tabId);
-  const pageUrl = getPageStyleUrl(tab.url ?? '', await getAll());
+  const targetUrl = getGalleryInstallUrl(
+    preview.style,
+    tab.url ?? '',
+    await getAll()
+  );
 
   const latest = await recordInstall(preview.style.id, await getInstallId());
   const before = await getAll();
   const profileName = await installLatestVersion(
     preview.style,
     latest,
-    pageUrl
+    targetUrl
   );
 
   await rememberInstall(tabId, preview, before, await getAll());

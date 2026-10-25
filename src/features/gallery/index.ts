@@ -38,6 +38,8 @@ export { compressScreenshot } from './compress-screenshot';
 export {
   blobToDataUrl,
   dataUrlToBlob,
+  getStyleUrlPattern,
+  getStyleSite,
   hashCss,
   isPublicSite,
   toGallerySite,

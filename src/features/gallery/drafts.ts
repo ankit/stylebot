@@ -10,6 +10,8 @@ export const DRAFT_TTL = 10 * 60 * 1000;
  * when it was handed over.
  */
 export type StoredGalleryDraft = GalleryDraft & {
+  // The saved style the profile is in, by its url key.
+  styleUrl: string;
   profileId: string;
   createdAt: number;
 };

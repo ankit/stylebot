@@ -7,6 +7,27 @@ export const toGallerySite = (hostname: string): string =>
     .toLowerCase()
     .replace(/^www\./, '');
 
+const HOSTNAME = /(?:[a-z0-9-]+\.)+[a-z]{2,}/;
+
+const PLAIN_HOSTNAME = new RegExp(`^${HOSTNAME.source}$`, 'i');
+
+/**
+ * The gallery site a saved style's url is for: its first hostname, read as
+ * the gallery reads it, or the url itself when it has none.
+ */
+export const getStyleSite = (url: string): string => {
+  const hostname = url.replace(/\\\./g, '.').toLowerCase().match(HOSTNAME)?.[0];
+
+  return hostname ? toGallerySite(hostname) : url;
+};
+
+/**
+ * The url pattern a saved style is published for: its url, unless that's a
+ * plain hostname, which stands for the whole site.
+ */
+export const getStyleUrlPattern = (url: string): string | null =>
+  PLAIN_HOSTNAME.test(url) ? null : url;
+
 const PRIVATE_SUFFIX =
   /\.(local|localhost|internal|intranet|lan|home|corp|arpa|test|example|invalid)$/;
 

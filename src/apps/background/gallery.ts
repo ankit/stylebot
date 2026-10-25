@@ -9,6 +9,8 @@ import {
   getSiteSuggestions,
   getStyle,
   getProfileGalleryListing,
+  getStyleUrlPattern,
+  getStyleSite,
   getPublishedProfile,
   getPublishedStatus,
   hashCss,
@@ -169,8 +171,9 @@ const openDraft = async (
     const listing = getProfileGalleryListing(savedStyles, url, profileId);
 
     await saveGalleryDraft(id, {
-      site: url,
-      url,
+      site: getStyleSite(url),
+      urlPattern: getStyleUrlPattern(url),
+      styleUrl: url,
       profileId,
       css,
       name: profileName,
@@ -323,8 +326,10 @@ export const GetGalleryDraft = async (
     return;
   }
 
-  const { site, url, css, name, screenshot, styleId } = stored;
-  sendResponse({ draft: { site, url, css, name, screenshot, styleId } });
+  const { site, urlPattern, css, name, screenshot, styleId } = stored;
+  sendResponse({
+    draft: { site, urlPattern, css, name, screenshot, styleId },
+  });
 };
 
 /**
@@ -366,7 +371,7 @@ export const GalleryDraftPublished = async (
   }
 
   try {
-    await setGalleryListing(draft.url, draft.profileId, {
+    await setGalleryListing(draft.styleUrl, draft.profileId, {
       styleId,
       slug,
       version,

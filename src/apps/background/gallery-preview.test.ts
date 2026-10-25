@@ -42,8 +42,8 @@ const area = () => ({
   }),
 });
 
-const styleResponse = (css: string) =>
-  fetchMock.mockResponseOnce(JSON.stringify({ ...style, css }));
+const styleResponse = (css: string, urlPattern: string | null = null) =>
+  fetchMock.mockResponseOnce(JSON.stringify({ ...style, urlPattern, css }));
 
 beforeEach(() => {
   jest.clearAllMocks();
@@ -200,6 +200,61 @@ describe('gallery preview', () => {
       },
       expect.any(Function)
     );
+  });
+
+  describe('a style published for a url pattern', () => {
+    const PATTERN = '^https://github\\.com/(?!settings)';
+
+    beforeEach(() => {
+      store['gallery-install-id'] = 'install-1';
+      (getAll as jest.Mock).mockResolvedValue({
+        'github.com': { css: 'p {}', enabled: true },
+      });
+    });
+
+    /**
+     * Previews the style on a tab at pageUrl, then installs it.
+     */
+    const install = async (pageUrl: string) => {
+      (chrome.tabs.get as jest.Mock).mockResolvedValue({
+        id: TAB_ID,
+        url: pageUrl,
+      });
+      styleResponse('a {}', PATTERN);
+      await startGalleryPreview(TAB_ID, style.id);
+      fetchMock.mockResponseOnce(JSON.stringify({ ...style, css: 'a {}' }));
+
+      return installGalleryPreview(TAB_ID);
+    };
+
+    it("previews in place of the pattern's style, keeping the site's own", async () => {
+      (chrome.tabs.get as jest.Mock).mockResolvedValue({
+        id: TAB_ID,
+        url: 'https://github.com/',
+      });
+      styleResponse('a {}', PATTERN);
+
+      await startGalleryPreview(TAB_ID, style.id);
+
+      expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(
+        TAB_ID,
+        expect.objectContaining({ replacedUrl: PATTERN }),
+        expect.any(Function)
+      );
+    });
+
+    it("installs under the pattern, apart from the user's own style for the site", async () => {
+      expect(await install('https://github.com/ankit')).toBe('Tokyo Night');
+      expect(installProfile).toHaveBeenCalledWith(
+        PATTERN,
+        expect.objectContaining({ name: 'Tokyo Night' })
+      );
+    });
+
+    it('installs under the pattern from a page it leaves out', async () => {
+      expect(await install('https://github.com/settings')).toBe('Tokyo Night');
+      expect(installProfile).toHaveBeenCalledWith(PATTERN, expect.anything());
+    });
   });
 
   describe('installing a style installed or published here before', () => {
