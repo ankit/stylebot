@@ -62,6 +62,15 @@ export type GalleryInstalled = {
 };
 
 /**
+ * The version of a gallery style published from here, and whether its
+ * profile was edited since.
+ */
+export type GalleryPublishStatus = {
+  version: number;
+  changed: boolean;
+};
+
+/**
  * A profile handed to the gallery site to publish, as the site bridge gives
  * it: the site and Stylebot style it's for, its CSS and name, a screenshot
  * under the gallery's limit as a data URL, and the gallery style it updates.

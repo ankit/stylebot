@@ -1,9 +1,12 @@
 import { expandProfiles } from '@stylebot/saved-styles';
 import type {
   GalleryListing,
+  GalleryPublishStatus,
   StyleMap,
   StyleWithoutUrl,
 } from '@stylebot/types';
+
+import { hashCss } from './utils';
 
 /**
  * A profile with a gallery listing, with where it is and its css.
@@ -80,6 +83,45 @@ export const getListedProfileNames = (
   return Object.fromEntries(
     listed.map(({ galleryListing, name }) => [galleryListing.styleId, name])
   );
+};
+
+/**
+ * The one profile a gallery style was published from, or null when none or
+ * several were, so there's no telling which to publish.
+ */
+export const getPublishedProfile = (
+  styles: StyleMap,
+  styleId: number
+): ListedProfile | null => {
+  const published = getListedProfiles(styles, styleId).filter(
+    ({ galleryListing }) => galleryListing.published
+  );
+
+  return published.length === 1 ? published[0] : null;
+};
+
+/**
+ * The version each of the given gallery styles was published at from here,
+ * and whether its profile was edited since, leaving out the ones that weren't.
+ */
+export const getPublishedStatus = (
+  styles: StyleMap,
+  styleIds: Array<number>
+): Record<string, GalleryPublishStatus> => {
+  const status: Record<string, GalleryPublishStatus> = {};
+
+  for (const styleId of styleIds) {
+    const profile = getPublishedProfile(styles, styleId);
+
+    if (profile) {
+      const { version, cssHash } = profile.galleryListing;
+      const changed = hashCss(profile.css) !== cssHash;
+
+      status[styleId] = { version, changed };
+    }
+  }
+
+  return status;
 };
 
 /**

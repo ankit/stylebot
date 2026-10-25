@@ -8,6 +8,7 @@ import type {
   GalleryDraft,
   GalleryInstalled,
   GalleryPublished,
+  GalleryPublishStatus,
   GalleryPreview,
   GalleryResult,
   GalleryStyle,
@@ -102,9 +103,11 @@ export type GetGalleryPreviewResponse = {
   preview: GalleryPreview | null;
   replacedUrl?: string;
 };
-// The profile name each requested gallery style is installed as, by its id.
+// The profile name each requested gallery style is installed as, and for the
+// gallery, which were published from here, by their ids.
 export type GetGalleryInstallStatusResponse = {
   installed: Record<string, string>;
+  published: Record<string, GalleryPublishStatus>;
 };
 export type InstallGalleryPreviewResponse = GalleryResult<{
   profileName: string;

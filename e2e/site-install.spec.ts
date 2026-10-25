@@ -264,3 +264,108 @@ test.describe('install status', () => {
     expect(await installStatus(other, [7])).toBeNull();
   });
 });
+
+test.describe('published styles', () => {
+  const PUBLISHED_CSS = `h1 { color: ${PINK}; }`;
+
+  test.beforeEach(async ({ context, extension }) => {
+    await serveSites(context);
+    await extension.evaluate(async css => {
+      await chrome.storage.local.set({
+        styles: {
+          'example.com': {
+            css: '',
+            enabled: true,
+            readability: false,
+            modifiedTime: new Date().toISOString(),
+            activeProfile: 'default',
+            profiles: {
+              default: { name: '' },
+              mine: {
+                name: 'Mine',
+                css,
+                galleryListing: {
+                  styleId: 8,
+                  slug: 'mine',
+                  version: 2,
+                  cssHash: 'stale',
+                  published: true,
+                },
+              },
+            },
+          },
+        },
+      });
+    }, PUBLISHED_CSS);
+  });
+
+  test('the gallery sees a style published from here with unpublished edits, and publishes them from its tab', async ({
+    context,
+  }) => {
+    const gallery = await context.newPage();
+    await gallery.goto(`${GALLERY_URL}mine`);
+
+    expect(
+      await postToBridge(
+        gallery,
+        { type: 'stylebot:status', id: 'status', styleIds: [8, 9] },
+        'stylebot:status:result'
+      )
+    ).toEqual({
+      type: 'stylebot:status:result',
+      id: 'status',
+      installed: { 8: 'Mine' },
+      published: { 8: { version: 2, changed: true } },
+    });
+
+    await test.step('click Publish update', async () => {
+      await gallery.evaluate(() => {
+        const button = document.createElement('button');
+
+        button.textContent = 'Publish update';
+        button.onclick = () =>
+          window.postMessage(
+            { type: 'stylebot:publish', id: 8 },
+            location.origin
+          );
+        document.body.append(button);
+      });
+
+      const pages = context.pages().length;
+      await gallery.click('text=Publish update');
+      await gallery.waitForURL(`${GALLERY_URL}publish?draft=*`);
+      expect(context.pages()).toHaveLength(pages);
+    });
+
+    const draftId = new URL(gallery.url()).searchParams.get('draft');
+
+    expect(
+      await postToBridge(
+        gallery,
+        { type: 'stylebot:draft', id: draftId },
+        'stylebot:draft:result'
+      )
+    ).toMatchObject({
+      draft: {
+        url: 'example.com',
+        css: PUBLISHED_CSS,
+        name: 'Mine',
+        screenshot: null,
+        styleId: 8,
+      },
+    });
+  });
+
+  test('stylebot.dev gets no published status', async ({ context }) => {
+    const site = await context.newPage();
+    await site.goto(SITE_URL);
+
+    expect(
+      await postToBridge(
+        site,
+        { type: 'stylebot:status', id: 'status', styleIds: [8] },
+        'stylebot:status:result'
+      )
+    ).toMatchObject({ installed: { 8: 'Mine' }, published: {} });
+  });
+});

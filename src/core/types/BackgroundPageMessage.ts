@@ -346,6 +346,13 @@ export type OpenGalleryPreview = {
   id: number;
 };
 
+// Sent by the site bridge on the gallery: takes its tab to the publish page,
+// on the profile published as the style.
+export type PublishGalleryStyleUpdate = {
+  name: 'PublishGalleryStyleUpdate';
+  styleId: number;
+};
+
 // A tab's gallery preview: the popup's tab, or the page's own.
 export type GetGalleryPreview = {
   name: 'GetGalleryPreview';
@@ -435,6 +442,7 @@ type BackgroundPageMessage =
   | InstallGalleryPreview
   | EndGalleryPreview
   | UndoGalleryInstall
-  | GetGalleryInstallStatus;
+  | GetGalleryInstallStatus
+  | PublishGalleryStyleUpdate;
 
 export default BackgroundPageMessage;

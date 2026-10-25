@@ -50,6 +50,8 @@ export {
   getListedStyleIds,
   getListedProfileNames,
   getProfileGalleryListing,
+  getPublishedProfile,
+  getPublishedStatus,
   type ListedProfile,
 } from './profile-listings';
 export {

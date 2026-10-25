@@ -5,7 +5,10 @@ import {
   getListedProfiles,
   getListedStyleIds,
   getProfileGalleryListing,
+  getPublishedProfile,
+  getPublishedStatus,
 } from './profile-listings';
+import { hashCss } from './utils';
 
 const NIGHT = 7;
 const MINE = 8;
@@ -67,5 +70,82 @@ describe('profile listings', () => {
       getProfileGalleryListing(styles, 'github.com', 'default')
     ).toBeNull();
     expect(getProfileGalleryListing(styles, 'other.com', 'p1')).toBeNull();
+  });
+
+  describe('published styles', () => {
+    const published = (
+      styleId: number,
+      css: string,
+      version = 1
+    ): GalleryListing => ({
+      ...listing(styleId, version),
+      cssHash: hashCss(css),
+      published: true,
+    });
+
+    const publishedStyles: StyleMap = {
+      'github.com': {
+        css: '',
+        enabled: true,
+        readability: false,
+        modifiedTime: '',
+        activeProfile: 'default',
+        profiles: {
+          default: { name: '' },
+          p1: {
+            name: 'Dim',
+            css: 'a { color: gray; }',
+            galleryListing: published(1, 'a { color: gray; }', 3),
+          },
+          p2: {
+            name: 'Edited',
+            css: 'b { color: red; }',
+            galleryListing: published(2, 'b { color: blue; }', 2),
+          },
+          p3: {
+            name: 'Twice',
+            css: 'c {}',
+            galleryListing: published(3, 'c {}'),
+          },
+          p4: { name: 'Night', css: 'd {}', galleryListing: listing(4) },
+        },
+      },
+      'example.com': {
+        css: '',
+        enabled: true,
+        readability: false,
+        modifiedTime: '',
+        activeProfile: 'default',
+        profiles: {
+          default: { name: '' },
+          p1: {
+            name: 'Twice',
+            css: 'c {}',
+            galleryListing: published(3, 'c {}'),
+          },
+        },
+      },
+    };
+
+    it('finds the one profile a style was published from', () => {
+      expect(getPublishedProfile(publishedStyles, 2)).toMatchObject({
+        url: 'github.com',
+        profileId: 'p2',
+        css: 'b { color: red; }',
+      });
+    });
+
+    it('finds none for a style installed, published from several profiles, or not here', () => {
+      expect(getPublishedProfile(publishedStyles, 4)).toBeNull();
+      expect(getPublishedProfile(publishedStyles, 3)).toBeNull();
+      expect(getPublishedProfile(publishedStyles, 99)).toBeNull();
+    });
+
+    it('gives the published version of each requested style, and whether it was edited since', () => {
+      expect(getPublishedStatus(publishedStyles, [1, 2, 3, 4, 99])).toEqual({
+        1: { version: 3, changed: false },
+        2: { version: 2, changed: true },
+      });
+    });
   });
 });

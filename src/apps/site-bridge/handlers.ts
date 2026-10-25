@@ -10,7 +10,9 @@ import type {
   InstallStyle,
   InstallStyleResponse,
   OpenGalleryPreview,
+  OpenGalleryDraftResponse,
   PreviewGalleryStyleResponse,
+  PublishGalleryStyleUpdate,
 } from '@stylebot/types';
 
 import type {
@@ -74,7 +76,25 @@ const handlers: { [T in SiteRequestType]: Handler<T> } = {
       type: 'stylebot:status:result',
       id,
       installed: response?.installed ?? {},
+      published: response?.published ?? {},
     };
+  },
+
+  'stylebot:publish': async ({ id }) => {
+    // It leaves the page, so only right after the user clicked.
+    if (!navigator.userActivation?.isActive) {
+      return { type: 'stylebot:publish:result', id, ok: false };
+    }
+
+    const message: PublishGalleryStyleUpdate = {
+      name: 'PublishGalleryStyleUpdate',
+      styleId: id,
+    };
+    const response = await chrome.runtime
+      .sendMessage<PublishGalleryStyleUpdate, OpenGalleryDraftResponse>(message)
+      .catch((): null => null);
+
+    return { type: 'stylebot:publish:result', id, ok: Boolean(response?.ok) };
   },
 
   'stylebot:draft': async ({ id }) => {

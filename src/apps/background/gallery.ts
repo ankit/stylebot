@@ -9,6 +9,8 @@ import {
   getSiteSuggestions,
   getStyle,
   getProfileGalleryListing,
+  getPublishedProfile,
+  getPublishedStatus,
   hashCss,
   isGalleryApiError,
   isGalleryStyleId,
@@ -48,6 +50,7 @@ import type {
   GetGalleryInstallStatusResponse,
   GetPublishedGalleryStyle as GetPublishedGalleryStyleType,
   GetPublishedGalleryStyleResponse,
+  PublishGalleryStyleUpdate as PublishGalleryStyleUpdateType,
   ResetGalleryProfile as ResetGalleryProfileType,
   ResetGalleryProfileResponse,
   GalleryScreenshotResponse,
@@ -135,7 +138,19 @@ const fitScreenshot = async (
 const pendingDrafts = new Map<string, Promise<void>>();
 
 /**
- * Opens the gallery's publish page on a profile, then saves it as the draft
+ * Opens a page in a new tab, beside the one it was asked from.
+ */
+const openInNewTab = (
+  url: string,
+  openerTabId: number | undefined
+): Promise<chrome.tabs.Tab> =>
+  chrome.tabs.create({
+    url,
+    ...(openerTabId !== undefined ? { openerTabId } : {}),
+  });
+
+/**
+ * Shows the gallery's publish page on a profile, then saves it as the draft
  * the page reads.
  */
 const openDraft = async (
@@ -146,7 +161,7 @@ const openDraft = async (
     profileName,
     screenshot,
   }: Omit<OpenGalleryDraftType, 'name'>,
-  openerTabId: number | undefined
+  showPublishPage: (url: string) => Promise<unknown>
 ): Promise<void> => {
   const id = newGalleryDraftId();
   const saved = (async () => {
@@ -167,10 +182,7 @@ const openDraft = async (
   pendingDrafts.set(id, saved);
 
   try {
-    await chrome.tabs.create({
-      url: getGalleryPublishUrl(id),
-      ...(openerTabId !== undefined ? { openerTabId } : {}),
-    });
+    await showPublishPage(getGalleryPublishUrl(id));
   } finally {
     await saved.finally(() => pendingDrafts.delete(id));
   }
@@ -182,7 +194,7 @@ export const OpenGalleryDraft = async (
   sendResponse: (response: OpenGalleryDraftResponse) => void
 ): Promise<void> => {
   try {
-    await openDraft(draft, sender.tab?.id);
+    await openDraft(draft, url => openInNewTab(url, sender.tab?.id));
     sendResponse({ ok: true });
   } catch (e) {
     sendResponse(fail(e));
@@ -239,7 +251,49 @@ export const PublishProfileToGallery = async (
         profileName: sheet.name,
         screenshot: tabId === undefined ? null : await captureOrNull(tabId),
       },
-      tabId
+      url => openInNewTab(url, tabId)
+    );
+    sendResponse({ ok: true });
+  } catch (e) {
+    sendResponse(fail(e));
+  }
+};
+
+/**
+ * Takes the gallery's tab to the publish page on the profile published as a
+ * style, without a screenshot: the gallery keeps the style's own.
+ */
+export const PublishGalleryStyleUpdate = async (
+  { styleId }: PublishGalleryStyleUpdateType,
+  sender: chrome.runtime.MessageSender,
+  sendResponse: (response: OpenGalleryDraftResponse) => void
+): Promise<void> => {
+  try {
+    if (!isFromGallery(sender) || !isGalleryStyleId(styleId)) {
+      throw new Error('Publish refused');
+    }
+
+    const tabId = sender.tab?.id;
+
+    if (tabId === undefined) {
+      throw new Error('No tab to publish from');
+    }
+
+    const profile = getPublishedProfile(await getAll(), styleId);
+
+    if (!profile) {
+      throw new Error('No single profile published as the style');
+    }
+
+    await openDraft(
+      {
+        url: profile.url,
+        profileId: profile.profileId,
+        css: profile.css,
+        profileName: profile.name,
+        screenshot: null,
+      },
+      url => chrome.tabs.update(tabId, { url })
     );
     sendResponse({ ok: true });
   } catch (e) {
@@ -622,7 +676,8 @@ export const UndoGalleryInstall = async (
 
 /**
  * Which of the requested gallery styles are installed, and as which profile,
- * for the site bridge on Stylebot's own sites.
+ * for the site bridge on Stylebot's own sites, and for the gallery alone,
+ * which were published from here.
  */
 export const GetGalleryInstallStatus = async (
   { styleIds }: GetGalleryInstallStatusType,
@@ -633,7 +688,7 @@ export const GetGalleryInstallStatus = async (
     sender.id === chrome.runtime.id && isStylebotSite(sender.url);
 
   if (!fromSiteBridge || !Array.isArray(styleIds)) {
-    sendResponse({ installed: {} });
+    sendResponse({ installed: {}, published: {} });
     return;
   }
 
@@ -641,5 +696,10 @@ export const GetGalleryInstallStatus = async (
   const ids = styleIds.filter(isGalleryStyleId).slice(0, maxStyles);
   const savedStyles = await getAll();
 
-  sendResponse({ installed: getListedProfileNames(savedStyles, ids) });
+  sendResponse({
+    installed: getListedProfileNames(savedStyles, ids),
+    published: isGallerySite(sender.url)
+      ? getPublishedStatus(savedStyles, ids)
+      : {},
+  });
 };

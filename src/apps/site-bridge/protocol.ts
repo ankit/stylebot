@@ -5,7 +5,7 @@
  * ping → pong and install → installed predate this and stay for stylebot.dev.
  */
 
-import type { GalleryDraft } from '@stylebot/types';
+import type { GalleryDraft, GalleryPublishStatus } from '@stylebot/types';
 
 // The protocol's version, which the bridge marks on <html>.
 export const BRIDGE_VERSION = '1';
@@ -48,6 +48,17 @@ export type StatusResult = {
   id: string;
   // The profile name each requested style is installed as, by its id.
   installed: Record<string, string>;
+  // On the gallery, the requested styles published from here, by their ids.
+  published: Record<string, GalleryPublishStatus>;
+};
+
+// Publishes the edits to the style, by its id, from the requesting tab.
+export type PublishRequest = { type: 'stylebot:publish'; id: number };
+
+export type PublishResult = {
+  type: 'stylebot:publish:result';
+  id: number;
+  ok: boolean;
 };
 
 export type DraftRequest = { type: 'stylebot:draft'; id: string };
@@ -89,6 +100,7 @@ export type SiteMessages = {
   'stylebot:install': { request: InstallRequest; reply: InstalledReply };
   'stylebot:preview': { request: PreviewRequest; reply: PreviewResult };
   'stylebot:status': { request: StatusRequest; reply: StatusResult };
+  'stylebot:publish': { request: PublishRequest; reply: PublishResult };
   'stylebot:draft': { request: DraftRequest; reply: DraftResult };
   'stylebot:published': { request: PublishedRequest; reply: PublishedResult };
   'stylebot:deleted': { request: DeletedRequest; reply: DeletedResult };

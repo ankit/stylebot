@@ -22,6 +22,7 @@ import {
   GetGallerySuggestions,
   GetPublishedGalleryStyle,
   OpenGalleryDraft,
+  PublishGalleryStyleUpdate,
   PublishProfileToGallery,
   ResetGalleryProfile,
 } from './gallery';
@@ -126,13 +127,16 @@ describe('gallery messages', () => {
     };
 
     let createTab: jest.Mock;
+    let updateTab: jest.Mock;
 
     beforeEach(() => {
       createTab = jest.fn(async () => ({}));
+      updateTab = jest.fn(async () => ({}));
       Object.assign(global.chrome, {
         runtime: { id: 'stylebot' },
         tabs: {
           create: createTab,
+          update: updateTab,
           get: jest.fn(async (id: number) => ({ id, windowId: 1 })),
         },
       });
@@ -441,6 +445,87 @@ describe('gallery messages', () => {
           name: 'Dark',
           screenshot: null,
         });
+      });
+    });
+
+    describe("the gallery's Publish update", () => {
+      const GALLERY_TAB = { ...GALLERY, tab: { id: 5 } as chrome.tabs.Tab };
+
+      const publishUpdate = (
+        styleId: unknown,
+        sender: chrome.runtime.MessageSender = GALLERY_TAB
+      ) =>
+        respond(send =>
+          PublishGalleryStyleUpdate(
+            {
+              name: 'PublishGalleryStyleUpdate',
+              styleId: styleId as number,
+            },
+            sender,
+            send
+          )
+        );
+
+      beforeEach(() => {
+        mockStyles = {
+          'github.com': savedStyle({
+            default: { name: '' },
+            mine: {
+              name: 'Mine',
+              css: CSS,
+              galleryListing: listing(8, 'mine', true),
+            },
+            twice: { name: 'Twice', galleryListing: listing(9, 'twice', true) },
+            night: { name: 'Night', galleryListing: listing(7, 'night') },
+          }),
+          'example.com': savedStyle({
+            twice: { name: 'Twice', galleryListing: listing(9, 'twice', true) },
+          }),
+        };
+      });
+
+      it("takes the gallery's tab to the publish page, on a draft of the profile published as the style", async () => {
+        expect(await publishUpdate(8)).toEqual({ ok: true });
+        expect(createTab).not.toHaveBeenCalled();
+
+        const [tabId, { url }] = updateTab.mock.calls[0] as [
+          number,
+          { url: string }
+        ];
+        const id = new URL(url).searchParams.get('draft') as string;
+
+        expect(tabId).toBe(5);
+        expect(url).toBe(getGalleryPublishUrl(id));
+        expect(await getDraft(id)).toEqual({
+          draft: {
+            site: 'github.com',
+            url: 'github.com',
+            css: CSS,
+            name: 'Mine',
+            screenshot: null,
+            styleId: 8,
+          },
+        });
+      });
+
+      it('turns down a style installed, published from several profiles, or not here', async () => {
+        for (const styleId of [7, 9, 99, -1]) {
+          expect(await publishUpdate(styleId)).toMatchObject({ ok: false });
+        }
+
+        expect(updateTab).not.toHaveBeenCalled();
+      });
+
+      it('turns down other sites, and messages without a tab', async () => {
+        expect(
+          await publishUpdate(8, {
+            id: 'stylebot',
+            url: 'https://stylebot.dev/',
+            tab: GALLERY_TAB.tab,
+          })
+        ).toMatchObject({ ok: false });
+        expect(await publishUpdate(8, GALLERY)).toMatchObject({ ok: false });
+        expect(updateTab).not.toHaveBeenCalled();
       });
     });
 
@@ -766,7 +851,7 @@ describe('gallery messages', () => {
           [7, 10, '7', 7.5, -7],
           'https://gallery.stylebot.dev/site/github.com'
         )
-      ).toEqual({ installed: { 7: 'Night' } });
+      ).toEqual({ installed: { 7: 'Night' }, published: {} });
     });
 
     it('tells other sites nothing', async () => {
@@ -774,6 +859,50 @@ describe('gallery messages', () => {
 
       expect(await status([7], 'https://example.com/')).toEqual({
         installed: {},
+        published: {},
+      });
+    });
+
+    describe('of styles published from here', () => {
+      beforeEach(() => {
+        (global.chrome as { runtime?: unknown }).runtime = { id: 'stylebot' };
+        mockStyles = {
+          'github.com': savedStyle({
+            default: { name: '' },
+            p1: {
+              name: 'Dim',
+              css: 'a {}',
+              galleryListing: {
+                ...listing(8, 'dim', true),
+                version: 4,
+                cssHash: hashCss('a {}'),
+              },
+            },
+            p2: {
+              name: 'Edited',
+              css: 'b { color: red; }',
+              galleryListing: listing(9, 'edited', true),
+            },
+          }),
+        };
+      });
+
+      it('gives their versions and whether they were edited since, to the gallery', async () => {
+        expect(
+          await status([8, 9], 'https://gallery.stylebot.dev/mine')
+        ).toEqual({
+          installed: { 8: 'Dim', 9: 'Edited' },
+          published: {
+            8: { version: 4, changed: false },
+            9: { version: 1, changed: true },
+          },
+        });
+      });
+
+      it('leaves them out for stylebot.dev', async () => {
+        expect(await status([8, 9], 'https://stylebot.dev/')).toMatchObject({
+          published: {},
+        });
       });
     });
 
@@ -783,6 +912,7 @@ describe('gallery messages', () => {
 
       expect(await status(ids, 'https://stylebot.dev/')).toEqual({
         installed: {},
+        published: {},
       });
     });
   });
