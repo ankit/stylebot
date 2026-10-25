@@ -421,6 +421,7 @@ describe('style edits', () => {
       expect(stored('example.com').profiles?.[listed.id]).toEqual({
         name: 'Night 2',
         galleryListing: listing(),
+        createdAt: expect.any(String),
       });
     });
 

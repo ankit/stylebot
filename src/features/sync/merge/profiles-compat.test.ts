@@ -118,6 +118,7 @@ describe('a device still on 3.2.4', () => {
     expect(styles['a.com'].profiles?.dark).toEqual({
       name: 'Dark',
       css: 'a { color: white; }',
+      createdAt: expect.any(String),
     });
   });
 
@@ -130,6 +131,7 @@ describe('a device still on 3.2.4', () => {
     expect(merged['a.com'].profiles?.dark).toEqual({
       name: 'Dark',
       css: 'a { color: white; }',
+      createdAt: expect.any(String),
     });
   });
 });

@@ -9,6 +9,8 @@ export type StyleProfile = {
   name: string;
   css?: string;
   galleryListing?: GalleryListing;
+  // Missing on profiles added before Stylebot recorded it.
+  createdAt?: Timestamp;
 };
 
 /**

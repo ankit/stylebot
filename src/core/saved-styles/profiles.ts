@@ -3,7 +3,9 @@ import type {
   StyleProfile,
   StyleProfiles,
   StyleWithoutUrl,
+  Timestamp,
 } from '@stylebot/types';
+import { getCurrentTimestamp } from '@stylebot/utils';
 
 export const DEFAULT_PROFILE_ID = 'default';
 
@@ -13,11 +15,13 @@ export type ProfileSheet = {
   name: string;
   css: string;
   galleryListing?: GalleryListing;
+  createdAt?: Timestamp;
 };
 
 /**
  * Every profile of a style with its css in one place, whichever is active.
- * Sheets are in display order: the default profile, then by name.
+ * Sheets are in display order: the default profile, then in the order they
+ * were added.
  */
 export type ExpandedProfiles = {
   active: string;
@@ -181,8 +185,18 @@ export const normalizeProfiles = <T extends WithProfiles>(style: T): T => {
 };
 
 /**
- * Orders profile ids for display: the default profile first, then by name,
- * with the id breaking a tie between two profiles of the same name.
+ * When a profile was added, or 0 for one added before Stylebot recorded it.
+ */
+const getCreatedTime = (profile: StyleProfile): number => {
+  const time = new Date(profile.createdAt ?? '').getTime();
+
+  return Number.isNaN(time) ? 0 : time;
+};
+
+/**
+ * Orders profile ids for display: the default profile first, then in the
+ * order they were added, so a rename doesn't move one. Profiles from before
+ * that was recorded come first, by name, and the id breaks any tie.
  */
 const inDisplayOrder =
   (profiles: StyleProfiles) =>
@@ -192,6 +206,13 @@ const inDisplayOrder =
     }
     if (b === DEFAULT_PROFILE_ID) {
       return 1;
+    }
+
+    const timeA = getCreatedTime(profiles[a]);
+    const timeB = getCreatedTime(profiles[b]);
+
+    if (timeA || timeB) {
+      return timeA - timeB || a.localeCompare(b);
     }
 
     return (
@@ -272,8 +293,8 @@ export const hasAnyCss = (style: WithProfiles): boolean =>
   Object.values(style.profiles ?? {}).some(profile => !!profile.css);
 
 /**
- * Adds a profile, turning a style without profiles into one whose existing
- * css is the default profile.
+ * Adds a profile, stamped with when it was added, turning a style without
+ * profiles into one whose existing css is the default profile.
  */
 export const addProfile = <T extends WithProfiles>(
   style: T,
@@ -299,7 +320,10 @@ export const addProfile = <T extends WithProfiles>(
 
   return collapseProfiles(style, {
     active: activate ? id : expanded.active,
-    sheets: { ...expanded.sheets, [id]: { name, css, galleryListing } },
+    sheets: {
+      ...expanded.sheets,
+      [id]: { name, css, galleryListing, createdAt: getCurrentTimestamp() },
+    },
   });
 };
 

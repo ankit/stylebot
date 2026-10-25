@@ -69,7 +69,7 @@ describe('profiles', () => {
     expect(switched.activeProfile).toBe('dark');
     expect(switched.profiles).toEqual({
       default: { name: '', css: 'a { color: red; }' },
-      dark: { name: 'Dark' },
+      dark: { name: 'Dark', createdAt: expect.any(String) },
     });
   });
 
@@ -102,7 +102,9 @@ describe('profiles', () => {
 
     expect(removed.css).toBe('a { color: white; }');
     expect(removed.activeProfile).toBe('dark');
-    expect(removed.profiles).toEqual({ dark: { name: 'Dark' } });
+    expect(removed.profiles).toEqual({
+      dark: { name: 'Dark', createdAt: expect.any(String) },
+    });
   });
 
   it('renames a profile', () => {
@@ -143,6 +145,7 @@ describe('getProfileSheet', () => {
     expect(getProfileSheet(two, 'dark')).toEqual({
       name: 'Dark',
       css: 'a { color: white; }',
+      createdAt: expect.any(String),
     });
   });
 
@@ -164,7 +167,11 @@ describe('gallery listings', () => {
 
     expect(activateProfile(listed, 'night').profiles).toEqual({
       default: { name: '', css: 'a { color: red; }' },
-      night: { name: 'Night', galleryListing: GALLERY_LISTING },
+      night: {
+        name: 'Night',
+        galleryListing: GALLERY_LISTING,
+        createdAt: expect.any(String),
+      },
     });
 
     const broken = style({
@@ -230,13 +237,18 @@ describe('gallery listings', () => {
       name: 'Dark',
       css: 'a { color: white; }',
       galleryListing: GALLERY_LISTING,
+      createdAt: expect.any(String),
     });
     expect(
       setProfileGalleryListing(withListing, 'dark', { ...GALLERY_LISTING })
     ).toBe(withListing);
     expect(
       removeProfileGalleryListing(withListing, 'dark').profiles?.dark
-    ).toEqual({ name: 'Dark', css: 'a { color: white; }' });
+    ).toEqual({
+      name: 'Dark',
+      css: 'a { color: white; }',
+      createdAt: expect.any(String),
+    });
     expect(setProfileGalleryListing(two, 'missing', GALLERY_LISTING)).toBe(two);
   });
 });
@@ -387,6 +399,49 @@ describe('profile order', () => {
       'Dark',
       'Night',
       'Print',
+    ]);
+  });
+
+  it('lists profiles in the order they were added, so a rename keeps its place', () => {
+    const stored = style({
+      profiles: {
+        default: { name: '' },
+        b: {
+          name: 'Night',
+          css: '',
+          createdAt: '2026-10-02T09:00:00.000+00:00',
+        },
+        a: {
+          name: 'Print',
+          css: '',
+          createdAt: '2026-10-01T09:00:00.000+00:00',
+        },
+        old: { name: 'Zebra', css: '' },
+      },
+      activeProfile: 'default',
+    });
+    const renamed = renameProfile(stored, 'a', 'Zzz');
+
+    expect(listProfiles(renamed).map(profile => profile.id)).toEqual([
+      'default',
+      'old',
+      'a',
+      'b',
+    ]);
+  });
+
+  it('stamps an added profile with when it was added', () => {
+    const added = addProfile(style({ css: 'a { color: red; }' }), {
+      id: 'dark',
+      name: 'Dark',
+      css: '',
+      activate: false,
+    });
+
+    expect(added.profiles?.dark.createdAt).toEqual(expect.any(String));
+    expect(listProfiles(added).map(profile => profile.id)).toEqual([
+      'default',
+      'dark',
     ]);
   });
 });
