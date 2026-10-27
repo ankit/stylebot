@@ -22,7 +22,9 @@
         v-else
         :style-data="styleData"
         :installing="installing"
+        :scheme="pickedScheme"
         @compare="handlers.compare"
+        @scheme="pickScheme"
         @install="install"
         @filled="filled = true"
         @cancel="cancel"
@@ -43,7 +45,11 @@ import {
   galleryErrorText,
   type GalleryPreviewHandlers,
 } from '@stylebot/gallery';
-import type { GalleryStyle, StylebotAppearance } from '@stylebot/types';
+import type {
+  GalleryStyle,
+  StyleColorScheme,
+  StylebotAppearance,
+} from '@stylebot/types';
 
 import InstallConfirmation from './InstallConfirmation.vue';
 import PreviewControls from './PreviewControls.vue';
@@ -100,6 +106,12 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
+
+    // The color scheme the style declares by default, if it declares one.
+    scheme: {
+      type: String as PropType<StyleColorScheme | undefined>,
+      default: undefined,
+    },
   },
 
   data() {
@@ -111,6 +123,7 @@ export default Vue.extend({
       resizing: false,
       error: '',
       timer: 0,
+      pickedScheme: this.scheme,
     };
   },
 
@@ -164,6 +177,11 @@ export default Vue.extend({
   },
 
   methods: {
+    pickScheme(scheme: StyleColorScheme): void {
+      this.pickedScheme = scheme;
+      this.handlers.setScheme(scheme);
+    },
+
     onKeydown(event: KeyboardEvent): void {
       const isEscape =
         event.key === 'Escape' &&

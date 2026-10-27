@@ -9,8 +9,8 @@ import {
   type GalleryStyleToInstall,
   type ListedProfile,
 } from '@stylebot/gallery';
-import { compileStyle } from '@stylebot/css';
-import { getStylesForPage } from '@stylebot/saved-styles';
+import { compileStyle, getColorScheme } from '@stylebot/css';
+import { expandProfiles, getStylesForPage } from '@stylebot/saved-styles';
 import type {
   GalleryPreview,
   GalleryStyle,
@@ -18,6 +18,7 @@ import type {
   HideGalleryPreview,
   GalleryListing,
   ShowGalleryPreview,
+  StyleColorScheme,
   StyleMap,
   StyleWithoutUrl,
   TabMessage,
@@ -29,6 +30,7 @@ import {
   installProfile,
   reinstallProfile,
   restoreStyles,
+  setStyleOption,
 } from './styles';
 
 // Each tab's preview, by tab id.
@@ -93,6 +95,25 @@ export const getGalleryPreview = async (
 ): Promise<GalleryPreview | null> => (await readPreviews())[tabId] ?? null;
 
 /**
+ * Records the color scheme a tab's preview is showing, so it stays as the
+ * preview moves to the site's other pages, and is kept once it's installed.
+ */
+export const setGalleryPreviewScheme = async (
+  tabId: number,
+  scheme: StyleColorScheme
+): Promise<void> => {
+  const previews = await readPreviews();
+  const preview = previews[tabId];
+
+  if (!preview?.scheme) {
+    return;
+  }
+
+  previews[tabId] = { ...preview, scheme };
+  await writePreviews(previews);
+};
+
+/**
  * Tells a tab on a web page to show its preview, with the saved style that
  * installing it would replace there.
  */
@@ -151,7 +172,14 @@ export const startGalleryPreview = async (
     return null;
   }
 
-  const preview: GalleryPreview = { style, css, importUrls, galleryTabId };
+  const scheme = getColorScheme(source);
+  const preview: GalleryPreview = {
+    style,
+    css,
+    importUrls,
+    galleryTabId,
+    ...(scheme && { scheme }),
+  };
 
   await showPreview(tabId, preview);
   return preview;
@@ -430,6 +458,19 @@ export const installGalleryPreview = async (tabId: number): Promise<string> => {
     latest,
     targetUrl
   );
+
+  // Only a scheme picked over the declared default is stored, as from the popup.
+  const installed = (await getAll())[targetUrl];
+
+  if (
+    installed &&
+    preview.scheme &&
+    preview.scheme !== getColorScheme(preview.css)
+  ) {
+    const { active } = expandProfiles(installed);
+
+    await setStyleOption(targetUrl, active, 'scheme', preview.scheme);
+  }
 
   await rememberInstall(tabId, preview, before, await getAll());
 

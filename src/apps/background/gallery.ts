@@ -47,6 +47,7 @@ import type {
   InstallGalleryPreview as InstallGalleryPreviewType,
   InstallGalleryPreviewResponse,
   EndGalleryPreview as EndGalleryPreviewType,
+  SetGalleryPreviewScheme as SetGalleryPreviewSchemeType,
   UndoGalleryInstallResponse,
   GetGalleryInstallStatus as GetGalleryInstallStatusType,
   GetGalleryInstallStatusResponse,
@@ -75,6 +76,7 @@ import {
   getLatestVersionListing,
   installGalleryPreview,
   openGalleryPreview,
+  setGalleryPreviewScheme,
   startGalleryPreview,
   undoGalleryInstall,
 } from './gallery-preview';
@@ -660,6 +662,15 @@ export const EndGalleryPreview = async (
 
   if (target !== undefined) {
     await endGalleryPreview(target);
+  }
+};
+
+export const SetGalleryPreviewScheme = async (
+  { scheme }: SetGalleryPreviewSchemeType,
+  sender: chrome.runtime.MessageSender
+): Promise<void> => {
+  if (sender.tab?.id !== undefined) {
+    await setGalleryPreviewScheme(sender.tab.id, scheme);
   }
 };
 

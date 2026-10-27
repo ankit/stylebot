@@ -3,7 +3,11 @@ import {
   toGallerySite,
   type GalleryPreviewAppWindow,
 } from '@stylebot/gallery';
-import { injectStylesheet, removeStylesheet } from '@stylebot/stylesheets';
+import {
+  injectStylesheet,
+  removeStylesheet,
+  setSchemeAttribute,
+} from '@stylebot/stylesheets';
 import type {
   EndGalleryPreview,
   GalleryPreview,
@@ -11,6 +15,8 @@ import type {
   GetGalleryPreviewResponse,
   InstallGalleryPreview,
   InstallGalleryPreviewResponse,
+  SetGalleryPreviewScheme,
+  StyleColorScheme,
   UndoGalleryInstall,
   UndoGalleryInstallResponse,
 } from '@stylebot/types';
@@ -44,13 +50,15 @@ const applyOwnStyles = async (): Promise<void> =>
 
 /**
  * Shows a gallery style in place of the saved style installing it replaces,
- * keeping the page's other styles as they'd stay once it's installed.
+ * keeping the page's other styles as they'd stay once it's installed, and in
+ * the color scheme it declares by default.
  */
 const applyPreview = (
-  { css, importUrls }: GalleryPreview,
+  { css, importUrls, scheme }: GalleryPreview,
   replacedUrl: string
 ): void => {
   removeStylesheet(replacedUrl);
+  setSchemeAttribute(scheme);
   injectStylesheet(PREVIEW_KEY, css, importUrls);
 };
 
@@ -131,6 +139,23 @@ const cancel = (): void => {
   chrome.runtime.sendMessage(message);
 };
 
+const setScheme = (scheme: StyleColorScheme): void => {
+  const current = shared.stylebotGalleryPreview;
+
+  if (!current) {
+    return;
+  }
+
+  current.preview = { ...current.preview, scheme };
+  crossfade(async () => setSchemeAttribute(scheme));
+
+  const message: SetGalleryPreviewScheme = {
+    name: 'SetGalleryPreviewScheme',
+    scheme,
+  };
+  chrome.runtime.sendMessage(message);
+};
+
 const compare = (on: boolean): void => {
   const current = shared.stylebotGalleryPreview;
 
@@ -185,12 +210,11 @@ export const showGalleryPreview = async (
     return;
   }
 
-  shared.stylebotGalleryPreview.unmount = app?.mount(preview.style, {
-    install,
-    undo,
-    cancel,
-    compare,
-  });
+  shared.stylebotGalleryPreview.unmount = app?.mount(
+    preview.style,
+    { install, undo, cancel, compare, setScheme },
+    preview.scheme
+  );
 };
 
 /**

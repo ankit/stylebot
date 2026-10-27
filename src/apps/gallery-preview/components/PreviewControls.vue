@@ -7,6 +7,12 @@
       :dimmed="held"
     />
 
+    <s-color-scheme-switch
+      v-if="scheme"
+      :value="scheme"
+      :class="{ dimmed: held }"
+      @change="$emit('scheme', $event)"
+    />
     <hold-to-compare-button :disabled="installing" @change="compare" />
     <install-button
       :class="{ dimmed: held }"
@@ -30,18 +36,19 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-import { SIconButton } from '@stylebot/components';
+import { SColorSchemeSwitch, SIconButton } from '@stylebot/components';
 import { XIcon } from '@stylebot/icons';
 import { getGalleryByline, getGalleryStyleUrl } from '@stylebot/gallery';
-import type { GalleryStyle } from '@stylebot/types';
+import type { GalleryStyle, StyleColorScheme } from '@stylebot/types';
 
 import HoldToCompareButton from './HoldToCompareButton.vue';
 import InstallButton from './InstallButton.vue';
 import PreviewSummary from './PreviewSummary.vue';
 
 /**
- * The bar while it previews a style: hold to compare, Install, and cancel.
- * Emits `compare`, `install`, `filled` and `cancel`.
+ * The bar while it previews a style: its color scheme when it declares one,
+ * hold to compare, Install, and cancel.
+ * Emits `scheme`, `compare`, `install`, `filled` and `cancel`.
  */
 export default Vue.extend({
   name: 'PreviewControls',
@@ -50,6 +57,7 @@ export default Vue.extend({
     HoldToCompareButton,
     InstallButton,
     PreviewSummary,
+    SColorSchemeSwitch,
     SIconButton,
     XIcon,
   },
@@ -63,6 +71,12 @@ export default Vue.extend({
     installing: {
       type: Boolean,
       default: false,
+    },
+
+    // The color scheme shown, when the style declares one.
+    scheme: {
+      type: String as PropType<StyleColorScheme | undefined>,
+      default: undefined,
     },
   },
 
