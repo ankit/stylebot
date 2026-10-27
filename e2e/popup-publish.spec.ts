@@ -136,7 +136,6 @@ test("a profile's Publish to Gallery in the popup hands it to the gallery site, 
       id: draftId,
       draft: {
         site: 'localhost',
-        url: 'localhost',
         css: DARK_CSS,
         name: 'Dark',
         styleId: null,

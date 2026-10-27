@@ -347,7 +347,8 @@ test.describe('published styles', () => {
       )
     ).toMatchObject({
       draft: {
-        url: 'example.com',
+        site: 'example.com',
+        urlPattern: null,
         css: PUBLISHED_CSS,
         name: 'Mine',
         screenshot: null,
