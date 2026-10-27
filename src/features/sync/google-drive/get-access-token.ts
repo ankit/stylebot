@@ -9,11 +9,13 @@ import {
 } from '@stylebot/google-auth';
 
 import { syncError } from '../errors';
+import { forgetSyncAccount, getSyncAccountEmail } from './sync-metadata';
 
 const DRIVE_ACCESS: GoogleAccess = {
   scopes: ['https://www.googleapis.com/auth/drive.file'],
   cacheKey: 'google-drive-access-token',
   refreshTokenKey: 'google-drive-refresh-token',
+  getLoginHint: getSyncAccountEmail,
 };
 
 const WEB_CLIENT_ID =
@@ -113,7 +115,10 @@ export default async (
   }
 
   if (interactive) {
-    return signInToGoogle(DRIVE_ACCESS);
+    const token = await signInToGoogle(DRIVE_ACCESS);
+    await forgetSyncAccount();
+
+    return token;
   }
 
   // Safari has no identity API.

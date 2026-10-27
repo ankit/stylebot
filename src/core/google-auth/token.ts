@@ -12,12 +12,14 @@ export type AccessToken = string;
 
 /**
  * What a sign-in asks Google for, and where its tokens are kept, so each
- * sign-in and sign-out leaves the others alone.
+ * sign-in and sign-out leaves the others alone. `getLoginHint` resolves the
+ * email of the account the next sign-in should suggest.
  */
 export type GoogleAccess = {
   scopes: Array<string>;
   cacheKey: string;
   refreshTokenKey: string;
+  getLoginHint?: () => Promise<string | undefined>;
 };
 
 // Retire the token a minute early so a request started just under the wire
@@ -131,10 +133,11 @@ export const getStoredGoogleToken = async (
 export const signInToGoogle = async (
   access: GoogleAccess
 ): Promise<AccessToken> => {
-  const { scopes, refreshTokenKey } = access;
+  const { scopes, refreshTokenKey, getLoginHint } = access;
+  const loginHint = await getLoginHint?.();
   const issued = usesIdentitySignIn()
-    ? await signInWithIdentityAPI(scopes, refreshTokenKey)
-    : await signInWithRedirectRule(scopes, refreshTokenKey);
+    ? await signInWithIdentityAPI(scopes, refreshTokenKey, loginHint)
+    : await signInWithRedirectRule(scopes, refreshTokenKey, loginHint);
 
   return keepIssuedToken(access, issued);
 };

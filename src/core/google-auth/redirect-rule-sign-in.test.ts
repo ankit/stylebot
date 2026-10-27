@@ -187,6 +187,7 @@ describe('Google sign-in without an identity API', () => {
     expect(auth.searchParams.get('client_id')).toBe(DESKTOP_CLIENT_ID);
     expect(auth.searchParams.get('access_type')).toBe('offline');
     expect(auth.searchParams.get('prompt')).toBe('select_account consent');
+    expect(auth.searchParams.has('login_hint')).toBe(false);
 
     await expect(
       handleSignInRedirect(redirectFor(auth.searchParams.get('state')))
@@ -209,6 +210,15 @@ describe('Google sign-in without an identity API', () => {
     expect(
       chrome.declarativeNetRequest.updateDynamicRules
     ).toHaveBeenLastCalledWith({ removeRuleIds: [1] });
+  });
+
+  it('suggests the account it is given, still letting the user pick', async () => {
+    getGoogleToken({ ...DRIVE, getLoginHint: async () => 'me@example.com' });
+    await signInTabOpened();
+    const auth = openedAuthURL();
+
+    expect(auth.searchParams.get('login_hint')).toBe('me@example.com');
+    expect(auth.searchParams.get('prompt')).toBe('select_account consent');
   });
 
   it('finishes a sign-in whose opener went away with the background', async () => {

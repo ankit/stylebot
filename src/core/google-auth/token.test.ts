@@ -30,6 +30,11 @@ const OTHER_ACCESS = {
   refreshTokenKey: 'other-refresh-token',
 };
 
+const HINTED_ACCESS = {
+  ...OTHER_ACCESS,
+  getLoginHint: async () => 'me@example.com',
+};
+
 let store: Record<string, unknown>;
 
 const mockChrome = (extensionURL = 'chrome-extension://abc/') => {
@@ -138,7 +143,8 @@ describe('getGoogleToken', () => {
 
     expect(signInWithRedirectRule).toBeCalledWith(
       ACCESS.scopes,
-      ACCESS.refreshTokenKey
+      ACCESS.refreshTokenKey,
+      undefined
     );
     expect(signInWithIdentityAPI).not.toBeCalled();
     expect((store[ACCESS.cacheKey] as { token: string }).token).toBe(
@@ -157,9 +163,41 @@ describe('getGoogleToken', () => {
 
     expect(signInWithIdentityAPI).toBeCalledWith(
       ACCESS.scopes,
-      ACCESS.refreshTokenKey
+      ACCESS.refreshTokenKey,
+      undefined
     );
     expect(signInWithRedirectRule).not.toBeCalled();
+  });
+
+  it('suggests the account its owner names', async () => {
+    jest
+      .mocked(signInWithRedirectRule)
+      .mockResolvedValue({ token: 'signed-in', expiresIn: 3600 });
+    mockGoogle({});
+
+    await getGoogleToken(HINTED_ACCESS);
+
+    expect(signInWithRedirectRule).toBeCalledWith(
+      HINTED_ACCESS.scopes,
+      HINTED_ACCESS.refreshTokenKey,
+      'me@example.com'
+    );
+  });
+
+  it('suggests the account its owner names on Firefox too', async () => {
+    mockChrome('moz-extension://abc/');
+    jest
+      .mocked(signInWithIdentityAPI)
+      .mockResolvedValue({ token: 'signed-in', expiresIn: 3600 });
+    mockGoogle({});
+
+    await getGoogleToken(HINTED_ACCESS);
+
+    expect(signInWithIdentityAPI).toBeCalledWith(
+      HINTED_ACCESS.scopes,
+      HINTED_ACCESS.refreshTokenKey,
+      'me@example.com'
+    );
   });
 
   it('rejects and does not cache when the token fails validation', async () => {

@@ -31,6 +31,25 @@ export const clearSyncState = (): Promise<void> =>
   ]);
 
 /**
+ * The email of the Google account the last sync ran as, which sign-in
+ * suggests so a browser with several accounts doesn't pick another one.
+ */
+export const getSyncAccountEmail = async (): Promise<string | undefined> =>
+  (await getSyncState())?.account?.email;
+
+/**
+ * Forgets the account the last sync ran as, so the next run asks Drive whose
+ * token it has, after a sign-in that may have picked another account.
+ */
+export const forgetSyncAccount = async (): Promise<void> => {
+  const state = await getSyncState();
+
+  if (state?.account) {
+    await setSyncState({ ...state, account: undefined });
+  }
+};
+
+/**
  * Drops a url from the recorded conflicts once the user has looked at it.
  */
 export const dismissSyncConflict = async (url: string): Promise<void> => {

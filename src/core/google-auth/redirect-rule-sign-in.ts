@@ -174,7 +174,8 @@ const waitForSignIn = (tabId: number): Promise<void> =>
  */
 const startSignIn = async (
   scopes: Array<string>,
-  refreshTokenKey: string
+  refreshTokenKey: string,
+  loginHint?: string
 ): Promise<number> => {
   const signIns = await getSignIns();
   const pending = signIns.filter(each =>
@@ -198,6 +199,7 @@ const startSignIn = async (
     redirectURI: REDIRECT_URI,
     verifier,
     state,
+    loginHint,
   });
 
   const [opener] = await chrome.tabs.query({
@@ -232,7 +234,8 @@ const opening = new Map<string, Promise<number>>();
  */
 const openSignInTab = (
   scopes: Array<string>,
-  refreshTokenKey: string
+  refreshTokenKey: string,
+  loginHint?: string
 ): Promise<number> => {
   const pending = opening.get(refreshTokenKey);
 
@@ -240,7 +243,7 @@ const openSignInTab = (
     return pending;
   }
 
-  const tab = startSignIn(scopes, refreshTokenKey).finally(() =>
+  const tab = startSignIn(scopes, refreshTokenKey, loginHint).finally(() =>
     opening.delete(refreshTokenKey)
   );
 
@@ -255,9 +258,10 @@ const openSignInTab = (
  */
 export const signInWithRedirectRule = async (
   scopes: Array<string>,
-  refreshTokenKey: string
+  refreshTokenKey: string,
+  loginHint?: string
 ): Promise<IssuedToken> => {
-  const tabId = await openSignInTab(scopes, refreshTokenKey);
+  const tabId = await openSignInTab(scopes, refreshTokenKey, loginHint);
   await waitForSignIn(tabId);
 
   const issued = await refreshAccessToken(refreshTokenKey);
