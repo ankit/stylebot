@@ -6,7 +6,10 @@ import {
   type IssuedToken,
 } from './desktop-client';
 import { signInWithIdentityAPI, usesIdentitySignIn } from './identity-sign-in';
-import { signInWithRedirectRule } from './redirect-rule-sign-in';
+import {
+  showPendingSignIn,
+  signInWithRedirectRule,
+} from './redirect-rule-sign-in';
 
 export type AccessToken = string;
 
@@ -151,4 +154,16 @@ export const getGoogleToken = async (
   const stored = await getStoredGoogleToken(access);
 
   return stored ?? signInToGoogle(access);
+};
+
+/**
+ * Brings back the tab of a sign-in still waiting on the user, where sign-in
+ * runs in a tab.
+ */
+export const showGoogleSignIn = async ({
+  refreshTokenKey,
+}: GoogleAccess): Promise<void> => {
+  if (!usesIdentitySignIn()) {
+    await showPendingSignIn(refreshTokenKey);
+  }
 };

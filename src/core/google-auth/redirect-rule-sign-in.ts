@@ -100,9 +100,13 @@ const isTabOpen = (tabId: number): Promise<boolean> =>
     () => false
   );
 
+const hasPendingSignIn = (signIns: Array<SignIn>): boolean =>
+  signIns.some(each => each.status === 'pending');
+
 /**
- * Settles when the sign-in in `tabId` finishes, or fails if the user closes
- * the tab before Google sends them back.
+ * Settles when the sign-in in `tabId` finishes. Fails if the user closes the
+ * tab before Google sends them back, or the sign-in is cleared, as on
+ * disconnect.
  */
 const waitForSignIn = (tabId: number): Promise<void> =>
   new Promise((resolve, reject) => {
@@ -110,28 +114,38 @@ const waitForSignIn = (tabId: number): Promise<void> =>
       changes: Record<string, chrome.storage.StorageChange>,
       area: string
     ) => {
-      const signIns: Array<SignIn> | undefined =
-        changes[SIGN_INS_KEY]?.newValue;
-      const signIn = signIns?.find(each => each.tabId === tabId);
+      if (area !== 'local' || !changes[SIGN_INS_KEY]) {
+        return;
+      }
 
-      if (area !== 'local' || !signIn) {
+      const signIns: Array<SignIn> = changes[SIGN_INS_KEY].newValue ?? [];
+      const signIn = signIns.find(each => each.tabId === tabId);
+
+      if (signIn?.status === 'pending') {
+        return;
+      }
+
+      cleanUp();
+
+      if (!signIn) {
+        if (!hasPendingSignIn(signIns)) {
+          removeRedirectRule();
+        }
+
+        reject(googleAuthError('Sign-in cancelled', 'sign-in'));
         return;
       }
 
       if (signIn.status === 'done') {
-        cleanUp();
         resolve();
-      } else if (signIn.status === 'failed') {
-        cleanUp();
-        reject(
-          googleAuthError(
-            signIn.error
-              ? `Authorization failure: ${signIn.error}`
-              : 'Authorization failure',
-            'sign-in'
-          )
-        );
+        return;
       }
+
+      const reason = signIn.error
+        ? `Authorization failure: ${signIn.error}`
+        : 'Authorization failure';
+
+      reject(googleAuthError(reason, 'sign-in'));
     };
 
     const onRemoved = async (removedTabId: number) => {
@@ -168,15 +182,12 @@ const waitForSignIn = (tabId: number): Promise<void> =>
   });
 
 /**
- * Opens Google's consent page in a tab, with PKCE, or brings back one
- * already open for the same refresh token so a second sync doesn't start a
- * second sign-in.
+ * Brings back the tab of a sign-in for `refreshTokenKey` still waiting on the
+ * user. Resolves its id, or undefined when none is open.
  */
-const startSignIn = async (
-  scopes: Array<string>,
-  refreshTokenKey: string,
-  loginHint?: string
-): Promise<number> => {
+export const showPendingSignIn = async (
+  refreshTokenKey: string
+): Promise<number | undefined> => {
   const signIns = await getSignIns();
   const pending = signIns.filter(each =>
     isPendingForRefreshToken(each, refreshTokenKey)
@@ -191,6 +202,26 @@ const startSignIn = async (
     }
   }
 
+  return undefined;
+};
+
+/**
+ * Opens Google's consent page in a tab, with PKCE, or brings back one
+ * already open for the same refresh token so a second sync doesn't start a
+ * second sign-in.
+ */
+const startSignIn = async (
+  scopes: Array<string>,
+  refreshTokenKey: string,
+  loginHint?: string
+): Promise<number> => {
+  const shown = await showPendingSignIn(refreshTokenKey);
+
+  if (shown !== undefined) {
+    return shown;
+  }
+
+  const signIns = await getSignIns();
   const verifier = getRandomString();
   const state = getRandomString();
 

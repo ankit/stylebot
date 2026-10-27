@@ -1,6 +1,10 @@
 import fetchMock from 'jest-fetch-mock';
 
-import { getGoogleToken, getStoredGoogleToken } from './token';
+import {
+  getGoogleToken,
+  getStoredGoogleToken,
+  showGoogleSignIn,
+} from './token';
 import { DESKTOP_CLIENT_ID } from './desktop-client';
 import {
   CLOSE_GRACE_MS,
@@ -87,6 +91,9 @@ const mockChrome = () => {
         }),
         remove: jest.fn(async (key: string) => {
           delete store[key];
+          [...changeListeners].forEach(listener =>
+            listener({ [key]: { newValue: undefined } }, 'local')
+          );
         }),
       },
     },
@@ -276,6 +283,36 @@ describe('Google sign-in without an identity API', () => {
 
     expect(chrome.tabs.create).toHaveBeenCalledTimes(1);
     expect(chrome.tabs.update).toBeCalledWith(7, { active: true });
+  });
+
+  it('brings back the open sign-in tab when asked to show it', async () => {
+    getGoogleToken(DRIVE).catch(() => undefined);
+    await signInTabOpened();
+
+    await showGoogleSignIn(DRIVE);
+
+    expect(chrome.tabs.update).toBeCalledWith(7, { active: true });
+  });
+
+  it('shows nothing when no sign-in is waiting', async () => {
+    await showGoogleSignIn(DRIVE);
+
+    expect(chrome.tabs.update).not.toBeCalled();
+  });
+
+  it('rejects instead of waiting forever when its sign-in is cleared, as on disconnect', async () => {
+    const result = getGoogleToken(DRIVE).catch(e => e);
+    await signInTabOpened();
+
+    await chrome.storage.local.remove('google-drive-sign-in');
+
+    expect(await result).toMatchObject({
+      code: 'sign-in',
+      message: 'Sign-in cancelled',
+    });
+    expect(
+      chrome.declarativeNetRequest.updateDynamicRules
+    ).toHaveBeenLastCalledWith({ removeRuleIds: [1] });
   });
 
   it('keeps sign-ins with their own refresh tokens apart', async () => {

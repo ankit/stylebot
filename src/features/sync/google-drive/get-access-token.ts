@@ -2,6 +2,7 @@ import {
   cacheGoogleToken,
   clearGoogleToken,
   getStoredGoogleToken,
+  showGoogleSignIn,
   signInToGoogle,
   validateGoogleToken,
   type AccessToken,
@@ -23,6 +24,8 @@ const WEB_CLIENT_ID =
 
 export const clearCachedToken = (): Promise<void> =>
   clearGoogleToken(DRIVE_ACCESS);
+
+export const showSignIn = (): Promise<void> => showGoogleSignIn(DRIVE_ACCESS);
 
 const extractTokenParams = (redirectUri: string) => {
   const m = redirectUri.match(/[#?](.*)/);
@@ -48,9 +51,8 @@ const extractTokenParams = (redirectUri: string) => {
 };
 
 /**
- * Wraps the callback API: @types/chrome has no promise overload for
- * launchWebAuthFlow, unlike the storage calls elsewhere in sync. Without
- * `loginHint`, Google can't finish when the browser has several accounts.
+ * Wraps launchWebAuthFlow's callback API. Google needs `loginHint` to finish
+ * silently when the browser has several accounts.
  */
 const authorizeSilently = (loginHint?: string): Promise<string | undefined> => {
   return new Promise((resolve, reject) => {
