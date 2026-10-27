@@ -236,6 +236,17 @@ describe('parseStyleOptions', () => {
     expect(warn).not.toHaveBeenCalled();
   });
 
+  it('skips @modes without a warning', () => {
+    const css = dedent`
+      /* ==Stylebot==
+      @modes light, dark
+      ==/Stylebot== */
+    `;
+
+    expect(parseStyleOptions(css)).toEqual({});
+    expect(warn).not.toHaveBeenCalled();
+  });
+
   it('keeps the first of two declarations', () => {
     const css = dedent`
       /**

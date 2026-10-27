@@ -27,6 +27,18 @@ Anything Stylebot can't use is skipped with a warning in the page's console: an 
 
 Keys other than `@option`, such as `@name` or `@author`, are skipped without a warning. They're left for later versions and other tools, so adding one never troubles an older Stylebot.
 
+## Describing a style
+
+`@modes light, dark` says a style works in both light and dark without Stylebot's switch, because it follows the site's own theme setting (a `.dark` class, claude.ai's `data-mode`) or `prefers-color-scheme`:
+
+```css
+/* ==Stylebot==
+@modes light, dark
+==/Stylebot== */
+```
+
+Stylebot doesn't act on it. The gallery (gallery.stylebot.dev) reads it to badge the style as "Light and dark", since a style that follows the site's theme can't be told apart from its CSS. A style that declares `@option scheme` doesn't need it: the gallery already treats that as light and dark.
+
 ## What the page gets
 
 While a style declaring `scheme` is applied, Stylebot sets the choice on `<html>` as `data-stylebot-scheme`: `system`, `light` or `dark`.

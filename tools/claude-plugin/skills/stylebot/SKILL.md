@@ -93,10 +93,17 @@ When the user wants a theme in both light and dark, one that follows their syste
 
 First check whether the site has its own light/dark mode: a theme or appearance toggle in the outline, or rules under a theme class or attribute on `html` or `body` (`.dark`, `[data-theme='dark']`, `[data-color-mode]`) or under `@media (prefers-color-scheme: dark)` in `stylebot page-rules html --tab <tab>` and `stylebot page-rules body --tab <tab>`. Rules under a theme class only show while that theme is on, so a toggle in the outline is the surer sign.
 
-- **When it has one, follow the site's mode.** Write the dark variant under the site's own selector or media query, and leave out Stylebot's switch: two switches that disagree would confuse the user. You can only check the variant the page is showing, so tell the user the other wasn't checked, and that the style follows the site's own theme setting. Offer Stylebot's switch instead, for when the site's setting needs an account or they'd rather pick light or dark in Stylebot.
+- **When it has one, follow the site's mode.** Write the dark variant under the site's own selector or media query, and leave out Stylebot's switch: two switches that disagree would confuse the user. You can only check the variant the page is showing, so tell the user the other wasn't checked, and that the style follows the site's own theme setting. Offer Stylebot's switch instead, for when the site's setting needs an account or they'd rather pick light or dark in Stylebot. Declare at the top of the CSS that the style covers both, so the gallery can say so when it's published:
+
+  ```css
+  /* ==Stylebot==
+  @modes light, dark
+  ==/Stylebot== */
+  ```
+
 - **When the user asks to pick light or dark in Stylebot, or the site has no mode of its own, declare Stylebot's switch** as below. Stylebot then shows a Mode control (System, Light, Dark) for it in the popup, and sets `data-stylebot-scheme` on `<html>` to the choice.
 
-1. Put the declaration at the top of the CSS. The last word is the default; use `system` unless the user asked for one variant by default:
+1. Put the declaration at the top of the CSS, in place of any `@modes` line. The last word is the default; use `system` unless the user asked for one variant by default:
 
    ```css
    /**
