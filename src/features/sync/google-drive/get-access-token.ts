@@ -49,9 +49,10 @@ const extractTokenParams = (redirectUri: string) => {
 
 /**
  * Wraps the callback API: @types/chrome has no promise overload for
- * launchWebAuthFlow, unlike the storage calls elsewhere in sync.
+ * launchWebAuthFlow, unlike the storage calls elsewhere in sync. Without
+ * `loginHint`, Google can't finish when the browser has several accounts.
  */
-const authorizeSilently = (): Promise<string | undefined> => {
+const authorizeSilently = (loginHint?: string): Promise<string | undefined> => {
   return new Promise((resolve, reject) => {
     const redirectURL = chrome.identity.getRedirectURL();
 
@@ -60,6 +61,10 @@ const authorizeSilently = (): Promise<string | undefined> => {
     authURL += `&response_type=token`;
     authURL += `&redirect_uri=${encodeURIComponent(redirectURL)}`;
     authURL += `&scope=${encodeURIComponent(DRIVE_ACCESS.scopes.join(' '))}`;
+
+    if (loginHint) {
+      authURL += `&login_hint=${encodeURIComponent(loginHint)}`;
+    }
 
     chrome.identity.launchWebAuthFlow(
       { interactive: false, url: authURL },
@@ -88,7 +93,8 @@ const authorizeSilently = (): Promise<string | undefined> => {
  * while Google can finish without the user.
  */
 const renewWebClientToken = async (): Promise<AccessToken> => {
-  const params = extractTokenParams((await authorizeSilently()) ?? '');
+  const loginHint = await getSyncAccountEmail();
+  const params = extractTokenParams((await authorizeSilently(loginHint)) ?? '');
 
   if (!params) {
     throw syncError('Authorization failure', 'sign-in');

@@ -194,6 +194,29 @@ describe('getAccessToken', () => {
     expect(signInToGoogle).not.toBeCalled();
   });
 
+  it('names the account the last sync ran as to the silent fallback', async () => {
+    store[SYNC_STATE_KEY] = { account: { email: 'me+work@example.com' } };
+    flows = [{ url: redirectWith('silent') }];
+    mockGoogle({});
+
+    await getAccessToken({ interactive: false });
+
+    const [[{ url }]] = launchWebAuthFlow.mock.calls;
+    expect(new URL(url).searchParams.get('login_hint')).toBe(
+      'me+work@example.com'
+    );
+  });
+
+  it('names no account to the silent fallback before a sync has run', async () => {
+    flows = [{ url: redirectWith('silent') }];
+    mockGoogle({});
+
+    await getAccessToken({ interactive: false });
+
+    const [[{ url }]] = launchWebAuthFlow.mock.calls;
+    expect(new URL(url).searchParams.has('login_hint')).toBe(false);
+  });
+
   it('asks for a sign-in without opening anything when the fallback needs the user', async () => {
     flows = [{ lastError: { message: 'User interaction required.' } }];
 
