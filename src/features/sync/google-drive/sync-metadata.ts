@@ -92,21 +92,30 @@ export const getSyncError = async (): Promise<SyncErrorKey | null> => {
   return items[SYNC_ERROR_KEY] ?? null;
 };
 
+export type SyncIssue = 'sign-in' | 'error';
+
 /**
- * Whether sync is on but not working: it needs a sign-in, or its last run
- * failed.
+ * What's wrong while sync is on: it needs a sign-in, or its last run failed
+ * for another reason, which wins as the more serious. Null when sync is off
+ * or working.
  */
-export const hasSyncIssue = async (): Promise<boolean> => {
+export const getSyncIssue = async (): Promise<SyncIssue | null> => {
   const items = await chrome.storage.local.get([
     'google-drive-sync-enabled',
     NEEDS_AUTH_KEY,
     SYNC_ERROR_KEY,
   ]);
+  const errorKey: SyncErrorKey | undefined = items[SYNC_ERROR_KEY];
 
-  return Boolean(
-    items['google-drive-sync-enabled'] &&
-      (items[NEEDS_AUTH_KEY] || items[SYNC_ERROR_KEY])
-  );
+  if (!items['google-drive-sync-enabled']) {
+    return null;
+  }
+
+  if (errorKey && errorKey !== 'sync_error_auth') {
+    return 'error';
+  }
+
+  return items[NEEDS_AUTH_KEY] || errorKey ? 'sign-in' : null;
 };
 
 export const SYNC_ISSUE_KEYS = [

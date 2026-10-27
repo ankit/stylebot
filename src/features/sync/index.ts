@@ -7,7 +7,8 @@ export {
   getSyncNeedsAuth,
   getLastSyncedAt,
   getSyncError,
-  hasSyncIssue,
+  getSyncIssue,
+  type SyncIssue,
   SYNC_ISSUE_KEYS,
 } from './google-drive/sync-metadata';
 

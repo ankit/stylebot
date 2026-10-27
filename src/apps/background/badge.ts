@@ -1,14 +1,22 @@
-import { hasSyncIssue } from '@stylebot/sync';
+import { getSyncIssue, type SyncIssue } from '@stylebot/sync';
 
-const ALERT_BADGE_COLOR = '#ef4444';
+const BADGES: Record<SyncIssue, { text: string; color: string }> = {
+  'sign-in': { text: '•', color: '#6b7280' },
+  error: { text: '!', color: '#ef4444' },
+};
 
 /**
- * Shows a ! on the toolbar icon while sync has stopped working, the one
- * thing the user has to act on. Otherwise the icon carries no badge.
+ * Marks the toolbar icon while sync has stopped: a dot when it needs a
+ * sign-in, a red ! when a run failed.
  */
 export const updateBadge = async (): Promise<void> => {
-  const syncIssue = await hasSyncIssue();
+  const issue = await getSyncIssue();
 
-  chrome.action.setBadgeBackgroundColor({ color: ALERT_BADGE_COLOR });
-  chrome.action.setBadgeText({ text: syncIssue ? '!' : '' });
+  if (!issue) {
+    chrome.action.setBadgeText({ text: '' });
+    return;
+  }
+
+  chrome.action.setBadgeBackgroundColor({ color: BADGES[issue].color });
+  chrome.action.setBadgeText({ text: BADGES[issue].text });
 };

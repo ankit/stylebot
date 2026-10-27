@@ -1,8 +1,8 @@
 import { updateBadge } from './badge';
-import { hasSyncIssue } from '@stylebot/sync';
+import { getSyncIssue } from '@stylebot/sync';
 
 jest.mock('@stylebot/sync', () => ({
-  hasSyncIssue: jest.fn(),
+  getSyncIssue: jest.fn(),
 }));
 
 describe('updateBadge', () => {
@@ -13,15 +13,26 @@ describe('updateBadge', () => {
   });
 
   it('leaves the icon without a badge', async () => {
-    (hasSyncIssue as jest.Mock).mockResolvedValue(false);
+    jest.mocked(getSyncIssue).mockResolvedValue(null);
 
     await updateBadge();
 
     expect(chrome.action.setBadgeText).toBeCalledWith({ text: '' });
   });
 
-  it('flags a sync issue', async () => {
-    (hasSyncIssue as jest.Mock).mockResolvedValue(true);
+  it('marks a needed sign-in with a quiet dot', async () => {
+    jest.mocked(getSyncIssue).mockResolvedValue('sign-in');
+
+    await updateBadge();
+
+    expect(chrome.action.setBadgeText).toBeCalledWith({ text: '•' });
+    expect(chrome.action.setBadgeBackgroundColor).toBeCalledWith({
+      color: '#6b7280',
+    });
+  });
+
+  it('flags a failed sync in red', async () => {
+    jest.mocked(getSyncIssue).mockResolvedValue('error');
 
     await updateBadge();
 

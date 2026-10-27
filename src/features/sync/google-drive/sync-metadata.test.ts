@@ -2,6 +2,7 @@ import {
   clearSyncState,
   forgetSyncAccount,
   getSyncAccountEmail,
+  getSyncIssue,
 } from './sync-metadata';
 
 const SYNC_STATE_KEY = 'google-drive-sync-state';
@@ -13,7 +14,9 @@ beforeEach(() => {
   global.chrome = {
     storage: {
       local: {
-        get: jest.fn(async (key: string) => ({ [key]: store[key] })),
+        get: jest.fn(async (keys: string | Array<string>) =>
+          Object.fromEntries([keys].flat().map(key => [key, store[key]]))
+        ),
         set: jest.fn(async (items: Record<string, unknown>) => {
           Object.assign(store, items);
         }),
@@ -60,5 +63,41 @@ describe('forgetSyncAccount', () => {
     await forgetSyncAccount();
 
     expect(chrome.storage.local.set).not.toBeCalled();
+  });
+});
+
+describe('getSyncIssue', () => {
+  beforeEach(() => {
+    store['google-drive-sync-enabled'] = true;
+  });
+
+  it('reports nothing while sync works', async () => {
+    await expect(getSyncIssue()).resolves.toBeNull();
+  });
+
+  it('reports nothing once sync is off', async () => {
+    store['google-drive-sync-enabled'] = false;
+    store['google-drive-sync-error'] = 'sync_error_parse';
+
+    await expect(getSyncIssue()).resolves.toBeNull();
+  });
+
+  it('asks for a sign-in when a scheduled run could not get a token', async () => {
+    store['google-drive-sync-needs-auth'] = true;
+
+    await expect(getSyncIssue()).resolves.toBe('sign-in');
+  });
+
+  it('asks for a sign-in when Google turned the run down', async () => {
+    store['google-drive-sync-error'] = 'sync_error_auth';
+
+    await expect(getSyncIssue()).resolves.toBe('sign-in');
+  });
+
+  it('reports a failed run over a needed sign-in', async () => {
+    store['google-drive-sync-needs-auth'] = true;
+    store['google-drive-sync-error'] = 'sync_error_unknown';
+
+    await expect(getSyncIssue()).resolves.toBe('error');
   });
 });
