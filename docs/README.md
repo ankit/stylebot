@@ -19,5 +19,7 @@
 - [Selectors](selectors.md) — how the inspector picks a selector for an element
 - [CSS](css.md) — how edits land in the user's CSS, and how it's prepared and injected
 - [Readability](readability.md) — the reader view and how it loads
+- [Style storage](style-storage.md) — the style map, how a page finds its styles, and the copies kept to apply them fast
 - [Profiles](profiles.md) — several named stylesheets per site, how they're stored, saved and synced
+- [Style options](style-options.md) — options a style declares in its CSS, like the light/dark switch, and how choices are stored
 - [Sync](sync.md) — Google Drive sync and its three-way merge

@@ -1,5 +1,6 @@
 import 'jest-fetch-mock';
 import { hashCss } from '@stylebot/gallery';
+import { COMPILED_STYLES_VERSION } from '@stylebot/saved-styles';
 import type { StyleProfiles } from '@stylebot/types';
 
 jest.mock('./sync-scheduler', () => ({
@@ -15,6 +16,7 @@ import {
   move,
   setReadability,
   setActiveProfile,
+  setStyleOption,
   createProfile,
   installProfile,
   reinstallProfile,
@@ -311,6 +313,36 @@ describe('style edits', () => {
     await deleteProfile('example.com', 'default');
 
     expect(writes()).toBe(0);
+  });
+
+  it('keeps option values per profile, without stamping an edit', async () => {
+    const id = await createProfile('example.com', {
+      name: 'Dark',
+      activate: false,
+    });
+    const { modifiedTime } = stored('example.com');
+
+    await setStyleOption('example.com', 'default', 'scheme', 'dark');
+    await setStyleOption('example.com', id, 'scheme', 'light');
+
+    expect(stored('example.com')).toMatchObject({
+      modifiedTime,
+      profileOptions: {
+        default: { scheme: 'dark' },
+        [id]: { scheme: 'light' },
+      },
+    });
+
+    const written = writes();
+    await setStyleOption('example.com', id, 'scheme', 'light');
+    await setStyleOption('example.com', 'missing', 'scheme', 'light');
+    await setStyleOption('other.com', 'default', 'scheme', 'light');
+    expect(writes()).toBe(written);
+
+    await deleteProfile('example.com', id);
+    expect(stored('example.com')).toHaveProperty('profileOptions', {
+      default: { scheme: 'dark' },
+    });
   });
 
   it('deletes a style with all its profiles, and skips the write for one that is gone', async () => {
@@ -718,7 +750,7 @@ describe('compiled styles', () => {
       .modifiedTime;
 
     expect(store['styles-compiled']).toEqual({
-      version: 1,
+      version: COMPILED_STYLES_VERSION,
       revision,
       styles: {
         'a.com': {
@@ -761,7 +793,11 @@ describe('compiled styles', () => {
   });
 
   it('keeps a stored copy that matches the current styles', async () => {
-    const stored = { version: 1, revision: 'rev-1', styles: {} };
+    const stored = {
+      version: COMPILED_STYLES_VERSION,
+      revision: 'rev-1',
+      styles: {},
+    };
     store.styles = { 'a.com': { ...style, modifiedTime: 't' } };
     store['styles-metadata'] = { modifiedTime: 'rev-1' };
     store['styles-compiled'] = stored;
@@ -771,8 +807,14 @@ describe('compiled styles', () => {
   });
 
   it.each([
-    ['built from other styles', { version: 1, revision: 'rev-0', styles: {} }],
-    ['from an older compiler', { version: 0, revision: 'rev-1', styles: {} }],
+    [
+      'built from other styles',
+      { version: COMPILED_STYLES_VERSION, revision: 'rev-0', styles: {} },
+    ],
+    [
+      'from an older compiler',
+      { version: COMPILED_STYLES_VERSION - 1, revision: 'rev-1', styles: {} },
+    ],
   ])('rebuilds a stored copy %s', async (_label, stored) => {
     store.styles = { 'a.com': { ...style, modifiedTime: 't' } };
     store['styles-metadata'] = { modifiedTime: 'rev-1' };
@@ -780,7 +822,10 @@ describe('compiled styles', () => {
 
     const compiled = await ensureCompiledStyles();
 
-    expect(compiled).toMatchObject({ version: 1, revision: 'rev-1' });
+    expect(compiled).toMatchObject({
+      version: COMPILED_STYLES_VERSION,
+      revision: 'rev-1',
+    });
     expect(Object.keys(compiled.styles)).toEqual(['a.com']);
   });
 });

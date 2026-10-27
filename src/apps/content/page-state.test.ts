@@ -1,4 +1,6 @@
 import type { CachedState, CachedStyle } from '@stylebot/stylesheets';
+import { COMPILED_STYLES_VERSION } from '@stylebot/saved-styles';
+import type { CompiledStyle, CompiledStyles } from '@stylebot/types';
 
 jest.mock('@stylebot/stylesheets', () => ({
   ...jest.requireActual('@stylebot/stylesheets'),
@@ -109,5 +111,54 @@ describe('applyPageState', () => {
       '.a{updated}',
       []
     );
+  });
+
+  it('sets the color scheme along with the css, and removes it once gone', () => {
+    applyPageState({ ...applied, scheme: 'dark' });
+
+    expect(document.documentElement.dataset.stylebotScheme).toBe('dark');
+
+    applyPageState(applied, applied);
+
+    expect(document.documentElement.hasAttribute('data-stylebot-scheme')).toBe(
+      false
+    );
+  });
+});
+
+describe('getPageState', () => {
+  let getPageState: typeof import('./page-state').getPageState;
+
+  const compiled = (style: Partial<CompiledStyle>): CompiledStyles => ({
+    version: COMPILED_STYLES_VERSION,
+    revision: 'rev',
+    styles: {
+      localhost: {
+        css: 'a{}',
+        importUrls: [],
+        enabled: true,
+        readability: false,
+        ...style,
+      },
+    },
+  });
+
+  beforeEach(() => {
+    jest.resetModules();
+    ({ getPageState } = require('./page-state'));
+  });
+
+  it("takes the default style's color scheme", () => {
+    expect(getPageState(compiled({ scheme: 'light' })).scheme).toBe('light');
+  });
+
+  it('has no color scheme when the default style is off', () => {
+    const state = getPageState(compiled({ scheme: 'light', enabled: false }));
+
+    expect(state).not.toHaveProperty('scheme');
+  });
+
+  it('has no color scheme when the default style declares none', () => {
+    expect(getPageState(compiled({}))).not.toHaveProperty('scheme');
   });
 });

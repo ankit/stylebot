@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { COMPILED_STYLES_VERSION } from '@stylebot/saved-styles';
 import type { CompiledStyles } from '@stylebot/types';
 
 jest.mock('@stylebot/stylesheets', () => ({
@@ -11,7 +12,7 @@ jest.mock('@stylebot/readability');
 const REVISION = '2026-09-26T00:00:00.000Z';
 
 const compiled = (styles: CompiledStyles['styles']): CompiledStyles => ({
-  version: 1,
+  version: COMPILED_STYLES_VERSION,
   revision: REVISION,
   styles,
 });

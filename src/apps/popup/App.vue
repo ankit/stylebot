@@ -20,7 +20,9 @@
         :joined="hasToggleRows"
         :previewing="galleryPreviewing"
         :publish-items="publishItems"
+        :scheme="siteColorScheme"
         @pick="pickSiteProfile"
+        @scheme="pickSiteColorScheme"
         @edit="editSiteProfile"
         @publish="publishSiteProfile"
         @rename="renameSiteProfile"
@@ -45,20 +47,26 @@
         class="popup-menu"
         :class="{ 'popup-menu--after-profiles': showProfileList }"
       >
-        <style-component
+        <profile-options
           v-if="showSiteStyle"
-          site
-          :url="styles[0].url"
-          :name="siteProfiles[0].name"
-          :shortcut="styleShortcut"
-          :disable-toggle="isOpen || (pageReaderable && readability)"
-          :initial-enabled="styles[0].enabled"
-          :publish-item="publishItems[siteProfiles[0].id] || null"
-          @edit="editSiteProfile(siteProfiles[0].id)"
-          @rename="renameSiteProfile(siteProfiles[0].id, $event)"
-          @publish="publishSiteProfile(siteProfiles[0].id)"
-          @delete="deleteSiteStyle"
-        />
+          :scheme="siteColorScheme"
+          @scheme="pickSiteColorScheme"
+        >
+          <style-component
+            site
+            :url="styles[0].url"
+            :name="siteProfiles[0].name"
+            :shortcut="styleShortcut"
+            :disable-toggle="isOpen || (pageReaderable && readability)"
+            :initial-enabled="styles[0].enabled"
+            :publish-item="publishItems[siteProfiles[0].id] || null"
+            @edit="editSiteProfile(siteProfiles[0].id)"
+            @rename="renameSiteProfile(siteProfiles[0].id, $event)"
+            @publish="publishSiteProfile(siteProfiles[0].id)"
+            @delete="deleteSiteStyle"
+            @toggle="siteEnabled = $event"
+          />
+        </profile-options>
 
         <create-profile
           v-if="showSiteStyle"
@@ -146,6 +154,7 @@ import { SHeading, SPillButton, SThemeProvider } from '@stylebot/components';
 
 import StyleComponent from './components/Style.vue';
 import SiteProfiles from './components/SiteProfiles.vue';
+import ProfileOptions from './components/ProfileOptions.vue';
 import CreateProfile from './components/CreateProfile.vue';
 import OptionsButton from './components/OptionsButton.vue';
 import Readability from './components/Readability.vue';
@@ -166,6 +175,7 @@ import {
   enableStyle,
   disableStyle,
   setActiveProfile,
+  setStyleOption,
   renameProfile,
   deleteProfile,
   deleteStyle,
@@ -177,16 +187,20 @@ import {
 import type { GalleryMenuItem } from '@stylebot/gallery';
 
 import { getGoogleDriveSyncEnabled } from '@stylebot/sync';
+import { getColorScheme } from '@stylebot/css';
 import {
   addProfile,
   expandProfiles,
+  getProfileOptions,
   hasAnyCss,
   listProfiles,
   removeProfile,
   renameProfile as renameStyleProfile,
+  setProfileOption,
 } from '@stylebot/saved-styles';
 import type { ProfileSummary } from '@stylebot/saved-styles';
 import type {
+  StyleColorScheme,
   GetCommandsResponse,
   Style,
   StylebotAppearance,
@@ -206,6 +220,7 @@ export default Vue.extend({
     OptionsButton,
     StyleComponent,
     SiteProfiles,
+    ProfileOptions,
     CreateProfile,
     ToggleStylebot,
     Readability,
@@ -222,6 +237,8 @@ export default Vue.extend({
     pageReaderable: boolean;
     tab?: chrome.tabs.Tab;
     styles: Array<Style>;
+    // Only this style's scheme reaches the page.
+    defaultStyleUrl: string;
     // The gallery waits for the styles, to know which way to show itself.
     stylesLoaded: boolean;
     // The site's own style, as picked here since the popup opened.
@@ -241,6 +258,7 @@ export default Vue.extend({
   } {
     return {
       styles: [],
+      defaultStyleUrl: '',
       stylesLoaded: false,
       siteActiveProfile: '',
       siteEnabled: true,
@@ -298,6 +316,21 @@ export default Vue.extend({
     // every matching style is a row named by its url.
     rowStyles(): Array<Style> {
       return this.styles.length > 1 ? this.styles : [];
+    },
+
+    // The site's active profile's color scheme, if it declares one and is on.
+    siteColorScheme(): StyleColorScheme | null {
+      const site = this.styles.find(({ url }) => url === this.defaultStyleUrl);
+
+      if (!site || !this.siteEnabled) {
+        return null;
+      }
+
+      const profileId = this.siteActiveProfile;
+      const sheet = expandProfiles(site).sheets[profileId];
+      const options = getProfileOptions(site, profileId);
+
+      return getColorScheme(sheet?.css ?? '', options) ?? null;
     },
 
     hasToggleRows(): boolean {
@@ -398,6 +431,7 @@ export default Vue.extend({
               Number(b.url === defaultStyle?.url) -
               Number(a.url === defaultStyle?.url)
           );
+        this.defaultStyleUrl = defaultStyle?.url ?? '';
         this.stylesLoaded = true;
 
         const [site] = this.styles;
@@ -457,6 +491,18 @@ export default Vue.extend({
 
       this.siteActiveProfile = id;
       this.siteEnabled = true;
+    },
+
+    pickSiteColorScheme(value: StyleColorScheme): void {
+      const [site] = this.styles;
+      const profileId = this.siteActiveProfile;
+
+      setStyleOption(site.url, profileId, 'scheme', value);
+      this.styles.splice(
+        0,
+        1,
+        setProfileOption(site, profileId, 'scheme', value)
+      );
     },
 
     stopGalleryPreview(): void {

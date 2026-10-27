@@ -271,6 +271,8 @@ export default Vue.extend({
       } else {
         disableStyle(this.url);
       }
+
+      this.$emit('toggle', this.enabled);
     },
   },
 });

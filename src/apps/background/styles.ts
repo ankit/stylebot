@@ -22,6 +22,8 @@ import {
   expandProfiles,
   getProfileSheet,
   freeProfileName,
+  setProfileOption,
+  pruneProfileOptions,
   DEFAULT_PROFILE_ID,
 } from '@stylebot/saved-styles';
 
@@ -29,6 +31,8 @@ import type {
   CompiledStyles,
   GalleryListing,
   StyleMap,
+  SupportedStyleOptions,
+  StyleOptionName,
   StyleWithoutUrl,
   ApplyStylesToTab,
   Timestamp,
@@ -460,6 +464,33 @@ export const setActiveProfile = (url: string, profileId: string) =>
   });
 
 /**
+ * Sets the value of an option a profile's css declares. Not stamped as an
+ * edit, since like the applied profile it's this device's choice.
+ */
+export const setStyleOption = <T extends StyleOptionName>(
+  url: string,
+  profileId: string,
+  name: T,
+  value: SupportedStyleOptions[T]
+) =>
+  update(styles => {
+    const style = styles[url];
+
+    if (!style || !(profileId in expandProfiles(style).sheets)) {
+      return undefined;
+    }
+
+    const updated = setProfileOption(style, profileId, name, value);
+
+    if (updated === style) {
+      return undefined;
+    }
+
+    styles[url] = updated;
+    return styles;
+  });
+
+/**
  * Adds a profile to a url's style, blank or a copy of sourceProfileId, and
  * returns its id. Creates the style when the url has none yet.
  */
@@ -731,7 +762,9 @@ export const deleteStyle = (url: string) =>
  * Deletes one of a url's profiles, never its last one.
  */
 export const deleteProfile = (url: string, profileId: string) =>
-  updateStyle(url, style => removeProfile(style, profileId));
+  updateStyle(url, style =>
+    pruneProfileOptions(removeProfile(style, profileId))
+  );
 
 /**
  * Checks whether a Google Web Fonts stylesheet url resolves to a real font.

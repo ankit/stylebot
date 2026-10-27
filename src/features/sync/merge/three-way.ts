@@ -7,6 +7,7 @@ import {
   isEquivalentStyle,
   hasSameUnknownFields,
   isSameGalleryListing,
+  keepLocalProfileOptions,
 } from '@stylebot/saved-styles';
 import type { ExpandedProfiles, ProfileSheet } from '@stylebot/saved-styles';
 
@@ -254,10 +255,13 @@ export const mergeThreeWay = (
       }
     }
 
-    // Which profile is applied is this device's, as long as it still exists.
+    // Which profile is applied, and the options picked, are this device's.
     if (result) {
       styles[url] = l
-        ? activateProfile(result, expandProfiles(l).active)
+        ? keepLocalProfileOptions(
+            activateProfile(result, expandProfiles(l).active),
+            l
+          )
         : result;
     }
   });

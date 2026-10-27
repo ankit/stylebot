@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { COMPILED_STYLES_VERSION } from '@stylebot/saved-styles';
 import type { CompiledStyles } from '@stylebot/types';
 
 jest.mock('./page-state', () => ({
@@ -20,7 +21,7 @@ const REVISION = '2026-09-25T00:00:00.000Z';
 const compiledStyles = (
   overrides: Partial<CompiledStyles> = {}
 ): CompiledStyles => ({
-  version: 1,
+  version: COMPILED_STYLES_VERSION,
   revision: REVISION,
   styles: {
     a: { css: '.a{}', importUrls: [], enabled: true, readability: false },

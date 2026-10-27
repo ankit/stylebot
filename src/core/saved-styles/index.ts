@@ -55,3 +55,9 @@ export type {
   ImportPreview,
   ParsedBackup,
 } from './backup';
+export {
+  getProfileOptions,
+  setProfileOption,
+  pruneProfileOptions,
+  keepLocalProfileOptions,
+} from './profile-options';

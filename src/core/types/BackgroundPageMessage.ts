@@ -1,4 +1,8 @@
-import type { StyleMap } from './styles';
+import type {
+  StyleMap,
+  SupportedStyleOptions,
+  StyleOptionName,
+} from './styles';
 import type { StylebotOptions } from './options';
 import type { ReadabilitySettings } from './readability';
 import type { StylebotCommandName } from './commands';
@@ -19,6 +23,16 @@ export type SetActiveProfile = {
   url: string;
   profileId: string;
 };
+
+export type SetStyleOption = {
+  [option in StyleOptionName]: {
+    name: 'SetStyleOption';
+    url: string;
+    profileId: string;
+    option: option;
+    value: SupportedStyleOptions[option];
+  };
+}[StyleOptionName];
 
 export type CreateProfile = {
   name: 'CreateProfile';
@@ -389,6 +403,7 @@ type BackgroundPageMessage =
   | MoveStyle
   | GetStylesForPage
   | SetActiveProfile
+  | SetStyleOption
   | CreateProfile
   | InstallStyle
   | RenameProfile

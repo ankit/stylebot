@@ -13,6 +13,7 @@ import {
   applyStylesToAllTabs,
   ensureCompiledStyles,
   setActiveProfile,
+  setStyleOption,
   createProfile,
   installProfile,
   renameProfile,
@@ -35,6 +36,7 @@ import type {
   EnableStyle as EnableStyleType,
   SetStyle as SetStyleType,
   SetActiveProfile as SetActiveProfileType,
+  SetStyleOption as SetStyleOptionType,
   CreateProfile as CreateProfileType,
   CreateProfileResponse,
   InstallStyle as InstallStyleType,
@@ -139,6 +141,18 @@ export const SetActiveProfile = async (
   message: SetActiveProfileType
 ): Promise<void> => {
   await setActiveProfile(message.url, message.profileId);
+  return applyStylesToAllTabs();
+};
+
+export const SetStyleOption = async (
+  message: SetStyleOptionType
+): Promise<void> => {
+  await setStyleOption(
+    message.url,
+    message.profileId,
+    message.option,
+    message.value
+  );
   return applyStylesToAllTabs();
 };
 

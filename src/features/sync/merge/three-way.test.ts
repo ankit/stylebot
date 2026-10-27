@@ -332,6 +332,34 @@ describe('mergeThreeWay with profiles', () => {
     ).toEqual({ 'a.com': switched });
   });
 
+  it("keeps this device's option values through a newer edit from the other side", () => {
+    const local = { ...base, profileOptions: { default: { scheme: 'dark' } } };
+    const remote = style('a { color: pink; }', T3, {
+      profiles: base.profiles,
+      activeProfile: 'default',
+      profileOptions: { default: { scheme: 'light' } },
+    });
+
+    const { styles } = merge(
+      { 'a.com': base },
+      { 'a.com': local },
+      { 'a.com': remote }
+    );
+
+    expect(styles['a.com'].css).toBe('a { color: pink; }');
+    expect(styles['a.com'].profileOptions).toEqual({
+      default: { scheme: 'dark' },
+    });
+  });
+
+  it('takes the option values of a style new to this device', () => {
+    const remote = style(RED, T2, {
+      profileOptions: { default: { scheme: 'light' } },
+    });
+
+    expect(merge({}, {}, { 'a.com': remote }).styles['a.com']).toEqual(remote);
+  });
+
   it("keeps this device's applied profile through a newer edit that switched", () => {
     const switchedAndEdited = style('a { color: pink; }', T3, {
       profiles: { default: { name: '', css: RED }, dark: { name: 'Dark' } },

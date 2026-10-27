@@ -20,26 +20,31 @@
           @pick="$emit('pick', null)"
         />
 
-        <profile-row
+        <profile-options
           v-for="profile in profiles"
           :key="profile.id"
-          v-model="draft"
-          :name="displayName(profile)"
-          :checked="enabled && profile.id === activeProfile"
-          :menu-open="menuFor === profile.id"
-          :renaming="renaming === profile.id"
-          :error="nameError"
-          :publish-item="publishItems[profile.id] || null"
-          @pick="$emit('pick', profile.id)"
-          @more="toggleMenu(profile.id)"
-          @close-menu="menuFor = null"
-          @edit="edit(profile.id)"
-          @publish="publish(profile.id)"
-          @rename="startRename(profile)"
-          @delete="remove(profile.id)"
-          @submit="submitRename"
-          @cancel="renaming = null"
-        />
+          :scheme="enabled && profile.id === activeProfile ? scheme : null"
+          @scheme="$emit('scheme', $event)"
+        >
+          <profile-row
+            v-model="draft"
+            :name="displayName(profile)"
+            :checked="enabled && profile.id === activeProfile"
+            :menu-open="menuFor === profile.id"
+            :renaming="renaming === profile.id"
+            :error="nameError"
+            :publish-item="publishItems[profile.id] || null"
+            @pick="$emit('pick', profile.id)"
+            @more="toggleMenu(profile.id)"
+            @close-menu="menuFor = null"
+            @edit="edit(profile.id)"
+            @publish="publish(profile.id)"
+            @rename="startRename(profile)"
+            @delete="remove(profile.id)"
+            @submit="submitRename"
+            @cancel="renaming = null"
+          />
+        </profile-options>
       </div>
 
       <create-profile :names="names" @create="$emit('create', $event)" />
@@ -53,12 +58,14 @@ import Vue from 'vue';
 import { SHeading } from '@stylebot/components';
 import { isProfileNameTaken } from '@stylebot/saved-styles';
 import type { ProfileSummary } from '@stylebot/saved-styles';
+import type { StyleColorScheme } from '@stylebot/types';
 
 import type { GalleryMenuItem } from '@stylebot/gallery';
 
 import OptionsButton from './OptionsButton.vue';
 import ProfileRow from './ProfileRow.vue';
 import CreateProfile from './CreateProfile.vue';
+import ProfileOptions from './ProfileOptions.vue';
 
 export default Vue.extend({
   name: 'SiteProfiles',
@@ -68,6 +75,7 @@ export default Vue.extend({
     OptionsButton,
     ProfileRow,
     CreateProfile,
+    ProfileOptions,
   },
 
   props: {
@@ -95,6 +103,11 @@ export default Vue.extend({
     joined: {
       type: Boolean,
       default: false,
+    },
+
+    scheme: {
+      type: String as PropType<StyleColorScheme | null>,
+      default: null,
     },
 
     publishItems: {

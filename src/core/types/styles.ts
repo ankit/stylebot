@@ -44,6 +44,39 @@ export type Style = {
   // Missing means one unnamed profile holding css.
   profiles?: StyleProfiles;
   activeProfile?: string;
+  // The values picked for the options each profile's css declares, by
+  // profile id. Like activeProfile, this device's choice; sync keeps it local.
+  profileOptions?: { [profileId: string]: StyleOptionValues };
+};
+
+/**
+ * An option a style's css declares in its `==Stylebot==` block, which
+ * Stylebot shows a control for. Only `select` exists so far.
+ */
+export type StyleOptionDeclaration = {
+  type: 'select';
+  values: Array<string>;
+  default: string;
+};
+
+export type StyleColorScheme = 'system' | 'light' | 'dark';
+
+/**
+ * Each option Stylebot supports, with the values it can take.
+ */
+export type SupportedStyleOptions = {
+  scheme: StyleColorScheme;
+};
+
+export type StyleOptionName = keyof SupportedStyleOptions;
+
+export type StyleOptionDeclarations = {
+  [name in StyleOptionName]?: StyleOptionDeclaration;
+};
+
+// As stored, so read back loosely: a value may predate a change to the css.
+export type StyleOptionValues = {
+  [name: string]: string;
 };
 
 export type StyleWithoutUrl = Omit<Style, 'url'>;
@@ -61,6 +94,8 @@ export type CompiledStyle = {
   importUrls: Array<string>;
   enabled: boolean;
   readability: boolean;
+  // Set when the active profile declares the scheme option.
+  scheme?: StyleColorScheme;
 };
 
 export type CompiledStyleMap = {

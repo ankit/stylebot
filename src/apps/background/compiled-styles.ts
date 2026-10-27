@@ -1,6 +1,8 @@
-import { compileStyle } from '@stylebot/css';
+import { compileStyle, getColorScheme } from '@stylebot/css';
 import {
   COMPILED_STYLES_VERSION,
+  DEFAULT_PROFILE_ID,
+  getProfileOptions,
   isForceImportant,
 } from '@stylebot/saved-styles';
 import type {
@@ -46,11 +48,17 @@ export const compileStyles = (
 
     const { css, importUrls } = reusable || compile(style.css, force);
 
+    const scheme = getColorScheme(
+      style.css,
+      getProfileOptions(style, style.activeProfile ?? DEFAULT_PROFILE_ID)
+    );
+
     compiledMap[url] = {
       css,
       importUrls,
       enabled: style.enabled,
       readability: style.readability,
+      ...(scheme && { scheme }),
     };
   }
 

@@ -108,4 +108,63 @@ describe('compileStyles', () => {
 
     expect(next.styles['a.com'].css).toBe('a { color: red; }');
   });
+
+  describe('scheme', () => {
+    const declared =
+      '/**\n * ==Stylebot==\n * @option scheme select [system, light, dark] system\n * ==/Stylebot==\n */\na { color: red; }';
+
+    it('is left out for a style that does not declare it', () => {
+      const compiled = compileStyles(
+        {
+          'a.com': style('a { color: red; }', {
+            profileOptions: { default: { scheme: 'dark' } },
+          }),
+        },
+        'rev-1'
+      );
+
+      expect(compiled.styles['a.com']).not.toHaveProperty('scheme');
+    });
+
+    it('is the declared default without a stored value', () => {
+      const compiled = compileStyles({ 'a.com': style(declared) }, 'rev-1');
+
+      expect(compiled.styles['a.com'].scheme).toBe('system');
+    });
+
+    it("is the active profile's stored value", () => {
+      const compiled = compileStyles(
+        {
+          'a.com': style(declared, {
+            activeProfile: 'p2',
+            profiles: { default: { name: '', css: '' }, p2: { name: 'Two' } },
+            profileOptions: {
+              default: { scheme: 'light' },
+              p2: { scheme: 'dark' },
+            },
+          }),
+        },
+        'rev-1'
+      );
+
+      expect(compiled.styles['a.com'].scheme).toBe('dark');
+    });
+
+    it('follows a new stored value when the css is reused', () => {
+      const styles: StyleMap = { 'a.com': style(declared) };
+      const previous = compileStyles(styles, 'rev-1');
+
+      const next = compileStyles(
+        {
+          'a.com': style(declared, {
+            profileOptions: { default: { scheme: 'light' } },
+          }),
+        },
+        'rev-2',
+        { styles, compiled: previous.styles }
+      );
+
+      expect(next.styles['a.com'].scheme).toBe('light');
+    });
+  });
 });
