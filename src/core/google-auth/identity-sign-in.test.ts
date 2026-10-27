@@ -98,6 +98,7 @@ describe('signInWithIdentityAPI', () => {
     expect(auth.searchParams.get('response_type')).toBe('code');
     expect(auth.searchParams.get('code_challenge_method')).toBe('S256');
     expect(auth.searchParams.get('access_type')).toBe('offline');
+    expect(auth.searchParams.get('prompt')).toBe('select_account consent');
 
     expect(tokenRequests[0].get('grant_type')).toBe('authorization_code');
     expect(tokenRequests[0].get('code')).toBe('c-1');

@@ -127,9 +127,10 @@ export const getAuthURL = async ({
     code_challenge_method: 'S256',
     state,
     // A refresh token only comes with offline access, and on a repeat
-    // sign-in only when the consent screen is shown again.
+    // sign-in only when the consent screen is shown again. Without
+    // select_account Google picks the browser's default account.
     access_type: 'offline',
-    prompt: 'consent',
+    prompt: 'select_account consent',
   }).toString();
 
   return authURL.toString();

@@ -186,6 +186,7 @@ describe('Google sign-in without an identity API', () => {
 
     expect(auth.searchParams.get('client_id')).toBe(DESKTOP_CLIENT_ID);
     expect(auth.searchParams.get('access_type')).toBe('offline');
+    expect(auth.searchParams.get('prompt')).toBe('select_account consent');
 
     await expect(
       handleSignInRedirect(redirectFor(auth.searchParams.get('state')))
