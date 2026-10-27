@@ -55,7 +55,6 @@ import {
   CloseEditorSidePanel,
 } from './messages';
 
-import { updateBadge } from './badge';
 import {
   isGalleryUpdatesAlarm,
   updateGalleryInstalls,
@@ -66,7 +65,7 @@ import {
   isSyncAlarm,
   updatePeriodicSync,
 } from './sync-scheduler';
-import { getGoogleDriveSyncEnabled, SYNC_ISSUE_KEYS } from '@stylebot/sync';
+import { getGoogleDriveSyncEnabled } from '@stylebot/sync';
 import { isSignInRedirect } from '@stylebot/google-auth';
 import { syncStyles } from './sync';
 import {
@@ -186,10 +185,6 @@ export const initListeners = (): void => {
 
     if (changes['google-drive-sync-enabled']) {
       updatePeriodicSync();
-    }
-
-    if (SYNC_ISSUE_KEYS.some(key => changes[key])) {
-      updateBadge();
     }
   });
 

@@ -79,8 +79,8 @@ export const getSyncNeedsAuth = async (): Promise<boolean> => {
 };
 
 /**
- * Why the last run failed, kept until a run succeeds, so the popup and the
- * toolbar icon can flag a failed scheduled sync that nobody saw.
+ * Why the last run failed, kept until a run succeeds, so the popup can flag
+ * a failed scheduled sync that nobody saw.
  */
 export const setSyncError = (errorKey: SyncErrorKey | null): Promise<void> =>
   errorKey
@@ -91,38 +91,6 @@ export const getSyncError = async (): Promise<SyncErrorKey | null> => {
   const items = await chrome.storage.local.get(SYNC_ERROR_KEY);
   return items[SYNC_ERROR_KEY] ?? null;
 };
-
-export type SyncIssue = 'sign-in' | 'error';
-
-/**
- * What's wrong while sync is on: it needs a sign-in, or its last run failed
- * for another reason, which wins as the more serious. Null when sync is off
- * or working.
- */
-export const getSyncIssue = async (): Promise<SyncIssue | null> => {
-  const items = await chrome.storage.local.get([
-    'google-drive-sync-enabled',
-    NEEDS_AUTH_KEY,
-    SYNC_ERROR_KEY,
-  ]);
-  const errorKey: SyncErrorKey | undefined = items[SYNC_ERROR_KEY];
-
-  if (!items['google-drive-sync-enabled']) {
-    return null;
-  }
-
-  if (errorKey && errorKey !== 'sync_error_auth') {
-    return 'error';
-  }
-
-  return items[NEEDS_AUTH_KEY] || errorKey ? 'sign-in' : null;
-};
-
-export const SYNC_ISSUE_KEYS = [
-  'google-drive-sync-enabled',
-  NEEDS_AUTH_KEY,
-  SYNC_ERROR_KEY,
-];
 
 export const getLastSyncedAt = async (): Promise<string | undefined> =>
   (await getSyncState())?.lastSyncedAt;

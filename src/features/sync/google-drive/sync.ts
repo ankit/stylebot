@@ -297,7 +297,7 @@ const run = async (
 
 /**
  * Keeps the failure until a run succeeds. A dropped connection isn't kept:
- * the next run retries it, so it's nothing for the toolbar icon to flag.
+ * the next run retries it, so it's nothing for the popup to flag.
  * Nor is anything once sync is off, so a late run can't undo a disconnect.
  */
 const recordOutcome = async (
