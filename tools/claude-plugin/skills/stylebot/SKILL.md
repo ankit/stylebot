@@ -86,3 +86,44 @@ Always check the page's CSS variables first (`stylebot css-variables <tab>`). Ma
 Keep text readable: light text on dark backgrounds or the reverse, never dark on dark, and a contrast of at least 4.5.
 
 When asked to surprise the user, pick one coherent direction, a palette and a font pairing, and say in a sentence what you're going for: the colors, the fonts and the feel.
+
+## Light and dark in one style
+
+When the user wants a theme in both light and dark, one that follows their system's appearance, or to merge a light and a dark profile into one, write a single style that carries both.
+
+First check whether the site has its own light/dark mode: a theme or appearance toggle in the outline, or rules under a theme class or attribute on `html` or `body` (`.dark`, `[data-theme='dark']`, `[data-color-mode]`) or under `@media (prefers-color-scheme: dark)` in `stylebot page-rules html --tab <tab>` and `stylebot page-rules body --tab <tab>`. Rules under a theme class only show while that theme is on, so a toggle in the outline is the surer sign.
+
+- **When it has one, follow the site's mode.** Write the dark variant under the site's own selector or media query, and leave out Stylebot's switch: two switches that disagree would confuse the user. You can only check the variant the page is showing, so tell the user the other wasn't checked, and that the style follows the site's own theme setting. Offer Stylebot's switch instead, for when the site's setting needs an account or they'd rather pick light or dark in Stylebot.
+- **When the user asks to pick light or dark in Stylebot, or the site has no mode of its own, declare Stylebot's switch** as below. Stylebot then shows a Mode control (System, Light, Dark) for it in the popup, and sets `data-stylebot-scheme` on `<html>` to the choice.
+
+1. Put the declaration at the top of the CSS. The last word is the default; use `system` unless the user asked for one variant by default:
+
+   ```css
+   /**
+    * ==Stylebot==
+    * @option scheme select [system, light, dark] system
+    * ==/Stylebot==
+    */
+   ```
+
+2. Define every color once, as a variable on `:root` holding both variants with `light-dark(<light>, <dark>)`, and use only those variables in the rest of the CSS. Then let the choice pin the variant:
+
+   ```css
+   :root {
+     color-scheme: light dark;
+     --paper: light-dark(#f7f4ec, #1c1b19);
+     --ink: light-dark(#2b2b33, #dcdbe2);
+   }
+   :root[data-stylebot-scheme='light'] {
+     color-scheme: light;
+   }
+   :root[data-stylebot-scheme='dark'] {
+     color-scheme: dark;
+   }
+   ```
+
+3. Check both variants, since `css set` and screenshots only see the one showing. Run `stylebot options <site> --profile "<profile>"` first to note the value it's set to. Then for each of `light` and `dark`: run `stylebot option set scheme <value> <site> --profile "<profile>"`, save the file again with `css set` so its check runs on that variant, and take a screenshot. Fix what either variant reports, in the variable's light or dark half.
+4. Set the scheme back to the value you noted, since it's the user's choice: `stylebot option set scheme <value> <site> --profile "<profile>"`.
+5. When you tell the user what changed, mention the Mode switch in Stylebot's popup for picking System, Light or Dark.
+
+When a profile you're updating already declares `scheme`, keep the declaration and both variants, and check both after your changes.

@@ -6,6 +6,7 @@
 import { Command } from 'commander';
 
 import { addInspectCommands } from './commands/inspect.mjs';
+import { addOptionCommands } from './commands/options.mjs';
 import { addPageCommands } from './commands/pages.mjs';
 import { addPointerCommands } from './commands/pointer.mjs';
 import { addProfileCommands } from './commands/profiles.mjs';
@@ -46,6 +47,7 @@ addInspectCommands(program);
 addPointerCommands(program);
 addStyleCommands(program);
 addProfileCommands(program);
+addOptionCommands(program);
 
 program.commandsGroup('Setup');
 

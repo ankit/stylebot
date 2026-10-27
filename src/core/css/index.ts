@@ -75,4 +75,8 @@ export { toHexColors } from './to-hex-colors';
 export { compareSpecificity, getSpecificity } from './specificity';
 export type { Specificity } from './specificity';
 export { mergeShorthands } from './shorthands';
-export { getColorScheme } from './style-options';
+export {
+  getColorScheme,
+  getStyleOptionValue,
+  parseStyleOptions,
+} from './style-options';

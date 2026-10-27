@@ -136,6 +136,17 @@ yarn stylebot css set news.ycombinator.com --profile Dark < dark.css
 - `profile create`, `use`, `rename` and `delete` manage them.
 - `css get` and `css set` take `--profile` to name the profile rather than use the active one. The `/stylebot` skill always passes it, so a profile switch mid-session can't send its css into your own style.
 
+### Style options
+
+```bash
+yarn stylebot options news.ycombinator.com
+yarn stylebot option set scheme dark news.ycombinator.com
+```
+
+- `options` lists the options a profile's css declares (see [Style options](style-options.md)), each with its value, the values it takes and its default.
+- `option set` sets one, applying it to open tabs as the popup does. It refuses an option the profile doesn't declare, or a value it doesn't take.
+- Both take `--profile` to name the profile rather than use the active one. The `/stylebot` skill uses `option set` to check a light/dark style in each variant, then sets it back to the user's choice.
+
 ### Output
 
 Every command takes `--json` to print the raw response instead of text.

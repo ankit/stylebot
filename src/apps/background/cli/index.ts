@@ -4,6 +4,7 @@ import type { StylebotOptions } from '@stylebot/types';
 import { get as getOption } from '../options';
 import { reloadForGrant, resumeAfterGrantReload } from '../grant-reload';
 import { inspectCommands } from './inspect';
+import { optionCommands } from './options';
 import { pageCommands } from './pages';
 import { pointerCommands } from './pointer';
 import { profileCommands } from './profiles';
@@ -23,6 +24,7 @@ const commands: CliCommands = {
   ...inspectCommands,
   ...styleCommands,
   ...profileCommands,
+  ...optionCommands,
 };
 
 let port: chrome.runtime.Port | undefined;
