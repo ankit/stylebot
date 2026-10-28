@@ -11,6 +11,7 @@ import {
 } from '@stylebot/page-bridge';
 import { isReaderable } from '@stylebot/readability';
 import type {
+  ElementFrame,
   FragileSelector,
   InspectorHost,
   PageInspection,
@@ -20,6 +21,7 @@ import type {
 } from '@stylebot/types';
 
 import { usePointer } from './pointer';
+import { frameElement, restoreScroll } from './screenshot';
 
 /**
  * Once a saved style has applied: how many elements each selector matches,
@@ -54,6 +56,7 @@ export const inspectPage = async (
   | Array<number | null>
   | StyleCheckReport
   | PointerResult
+  | ElementFrame
   | null
 > => {
   switch (inspection.kind) {
@@ -83,5 +86,10 @@ export const inspectPage = async (
       return finishCheck(inspection.selectors, host);
     case 'pointer':
       return usePointer(inspection.action);
+    case 'frameElement':
+      return frameElement(inspection.selector);
+    case 'restoreScroll':
+      restoreScroll();
+      return null;
   }
 };

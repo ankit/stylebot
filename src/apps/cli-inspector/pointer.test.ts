@@ -128,7 +128,7 @@ describe('usePointer', () => {
     expect(result).toEqual({ x: 100, y: 20, selector: '#menu' });
   });
 
-  it('reads and reports points in screenshot pixels', () => {
+  it('reads and reports points in css pixels, whatever the device pixel ratio', () => {
     const points: Array<[number, number]> = [];
     document.elementFromPoint = (x: number, y: number) => {
       points.push([x, y]);
@@ -142,7 +142,7 @@ describe('usePointer', () => {
     try {
       const result = usePointer({ kind: 'hover', x: 40, y: 220 });
 
-      expect(points[0]).toEqual([20, 110]);
+      expect(points[0]).toEqual([40, 220]);
       expect(result).toEqual({ x: 40, y: 220, selector: '#intro' });
     } finally {
       Object.defineProperty(window, 'devicePixelRatio', {

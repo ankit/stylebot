@@ -6,8 +6,8 @@ import {
   serializeTab,
   waitForLoad,
 } from './cli-window';
-import { captureTab } from '../capture-tab';
-import { inspectTab, requireNamed, resolveTab } from './targets';
+import { takeScreenshot } from './screenshot';
+import { inspectTab, resolveTab } from './targets';
 import type { CliCommands } from './types';
 
 export const pageCommands: CliCommands = {
@@ -56,11 +56,11 @@ export const pageCommands: CliCommands = {
     return inspectTab<string>(id as number, { kind: 'outline' });
   },
 
-  async screenshot({ tab }) {
-    requireNamed(tab, 'tab');
-    const target = await resolveTab(tab);
+  async screenshot(args) {
+    const screenshot = await takeScreenshot(args);
 
-    return captureTab(target);
+    // A CLI from before --scale wants the bare data url.
+    return args.scale === undefined ? screenshot.dataUrl : screenshot;
   },
 
   async done() {

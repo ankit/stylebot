@@ -381,6 +381,82 @@ test('profiles switch which css the page gets', async () => {
   );
 });
 
+/**
+ * A PNG's width and height, from its header.
+ */
+const pngSize = (file: string): { width: number; height: number } => {
+  const png = fs.readFileSync(file);
+  return { width: png.readUInt32BE(16), height: png.readUInt32BE(20) };
+};
+
+test('screenshot shoots at 1x, an element, or a clip, and says how big', async () => {
+  const page = cliPage()!;
+  const [tab] = (await json<Array<Tab>>(['tabs'])).filter(
+    ({ url }) => url === `${baseUrl}/`
+  );
+  const id = String(tab.id);
+  const out = path.join(home, 'shots', 'part.png');
+  const viewport = await page.evaluate(() => ({
+    width: innerWidth,
+    height: innerHeight,
+  }));
+
+  await page.evaluate(() => {
+    const box = (id: string, style: string) => {
+      const el = document.createElement('div');
+      el.id = id;
+      el.style.cssText = style;
+      document.body.append(el);
+    };
+    box(
+      'below',
+      'margin-top: 2000px; width: 200px; height: 50px; background: red'
+    );
+    box('tall', 'width: 300px; height: 5000px; background: blue');
+  });
+
+  const full = await ok(['screenshot', id, '-o', out]);
+  expect(pngSize(out)).toEqual(viewport);
+  expect(full).toContain(
+    `${viewport.width}×${viewport.height}, scale 1 (1 image px = 1 CSS px)`
+  );
+
+  await ok(['screenshot', id, '-o', out, '--scale', '2']);
+  expect(pngSize(out)).toEqual({
+    width: viewport.width * 2,
+    height: viewport.height * 2,
+  });
+
+  const clip = await ok([
+    'screenshot',
+    id,
+    '-o',
+    out,
+    '--clip',
+    '10,20,300,40',
+  ]);
+  expect(pngSize(out)).toEqual({ width: 300, height: 40 });
+  expect(clip).toContain('300×40, scale 1');
+
+  const below = await ok(['screenshot', id, '-o', out, '--selector', '#below']);
+  expect(pngSize(out)).toEqual({ width: 208, height: 58 });
+  expect(below).not.toContain('Cut off');
+  expect(await page.evaluate(() => scrollY)).toBe(0);
+
+  const tall = await ok(['screenshot', id, '-o', out, '--selector', '#tall']);
+  expect(pngSize(out)).toEqual({ width: 308, height: viewport.height });
+  expect(tall).toContain('Cut off');
+  expect(await page.evaluate(() => scrollY)).toBe(0);
+
+  const missing = await cli(['screenshot', id, '--selector', '.missing']);
+  expect(missing.code).toBe(1);
+  expect(missing.stderr).toContain('No visible element matches .missing');
+
+  await page.evaluate(() =>
+    document.querySelectorAll('#below, #tall').forEach(el => el.remove())
+  );
+});
+
 test("screenshot saves a png, and done closes the CLI's window", async () => {
   const page = cliPage()!;
   const [tab] = (await json<Array<Tab>>(['tabs'])).filter(
@@ -388,9 +464,9 @@ test("screenshot saves a png, and done closes the CLI's window", async () => {
   );
   const out = path.join(home, 'shots', 'page.png');
 
-  expect((await ok(['screenshot', String(tab.id), '-o', out])).trim()).toBe(
-    out
-  );
+  expect(
+    (await ok(['screenshot', String(tab.id), '-o', out])).split('\n')[0]
+  ).toBe(out);
   expect(fs.readFileSync(out).subarray(0, 8)).toEqual(
     Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])
   );

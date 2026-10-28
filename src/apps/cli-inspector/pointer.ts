@@ -52,8 +52,8 @@ const resolveTarget = (
   action: PointerAction
 ): { x: number; y: number; el: Element } => {
   if (action.selector === undefined) {
-    const x = (action.x ?? 0) / devicePixelRatio;
-    const y = (action.y ?? 0) / devicePixelRatio;
+    const x = action.x ?? 0;
+    const y = action.y ?? 0;
     const el = elementAt(x, y);
 
     if (!el) {
@@ -172,14 +172,11 @@ const inspectElement = (
 /**
  * Points at an element or point. A hover sends the events a mouse would,
  * which are synthetic, so CSS :hover doesn't apply. An inspect sends none and
- * reports the selector the inspector would pick. Points are in screenshot pixels.
+ * reports the selector the inspector would pick. Points are in css pixels.
  */
 export const usePointer = (action: PointerAction): PointerResult => {
   const { x, y, el } = resolveTarget(action);
-  const point = {
-    x: Math.round(x * devicePixelRatio),
-    y: Math.round(y * devicePixelRatio),
-  };
+  const point = { x: Math.round(x), y: Math.round(y) };
 
   if (action.kind === 'inspect') {
     return { ...point, ...inspectElement(el as HTMLElement, action.css ?? '') };

@@ -74,7 +74,9 @@ export type PageInspection =
   | { kind: 'matchCount'; selectors: Array<string> }
   | { kind: 'startCheck'; edits: Array<CssEdit> }
   | { kind: 'finishCheck'; selectors: Array<string> }
-  | { kind: 'pointer'; action: PointerAction };
+  | { kind: 'pointer'; action: PointerAction }
+  | { kind: 'frameElement'; selector: string }
+  | { kind: 'restoreScroll' };
 
 // What the content script lends the inspector bundle, which can't import it.
 export type InspectorHost = {
@@ -93,7 +95,7 @@ export type InspectorWindow = Window & {
 };
 
 // Where the CLI's pointer goes: the middle of a selector's first match, or a
-// point in screenshot pixels, which are css pixels times the device pixel ratio.
+// point in css pixels of the viewport, as in a screenshot at scale 1.
 export type PointerAction = {
   kind: 'hover' | 'inspect';
   selector?: string;
@@ -120,6 +122,17 @@ export type PointerResult = {
   matches?: number | null;
   alternatives?: Array<InspectedSelector>;
 };
+
+// A box in css pixels, relative to the viewport.
+export type ViewportRect = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+// An element a screenshot frames, scrolled into view if it wasn't.
+export type ElementFrame = { rect: ViewportRect; scrolled: boolean };
 
 // A selector built on class names the site generates, which change when it rebuilds.
 export type FragileSelector = {

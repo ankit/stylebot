@@ -71,13 +71,18 @@ Commands that only read default to the active tab, or take `--tab` when their ar
 stylebot open news.ycombinator.com
 stylebot outline 54432929
 stylebot screenshot 54432929 -o page.png
+stylebot screenshot 54432929 --selector '.titleline > a' -o link.png
+stylebot screenshot 54432929 --clip 0,0,600,400 --scale 2 -o corner.png
 stylebot done
 ```
 
 - `open` shows the page in the CLI's own window, which opens behind yours without taking focus, so an agent never switches your tabs. It reuses that window's tab for the page (any page on the site, for a bare site); `--new` always opens another.
 - `tabs` lists open tabs, starring the one each window shows.
 - `outline` prints the page's visible elements as an indented outline.
-- `screenshot` saves a PNG of a tab. A hidden tab is shown for a moment to capture it, then the window switches back.
+- `screenshot` saves a PNG of a tab's viewport. A hidden tab is shown for a moment to capture it, then the window switches back. It prints the file, the image's size and its scale.
+  - `--selector` keeps only the first visible element a selector matches, with a few pixels around it. One out of view is scrolled to for the capture, and the page scrolled back after. One bigger than the viewport is cut to the part that fits, and the output says so. Checking one element this way is quicker and smaller than a whole page.
+  - `--clip x,y,w,h` keeps a region, in CSS pixels of the viewport. It can't be combined with `--selector`.
+  - `--scale` sets image pixels per CSS pixel. The default, 1, makes a point in a full screenshot the CSS pixel `hover` and `inspect` take; 2 keeps a 2× screen's full resolution.
 - `done` closes the CLI's window.
 
 ### Inspecting a page
@@ -107,7 +112,7 @@ stylebot inspect 54432929 120,340
 
 These point at the page, so an agent can open what only shows on hover, and find the selector for an element it sees in a screenshot. Neither clicks anything or draws on the page, so screenshots stay clean. Each needs the tab named.
 
-- `hover` moves the pointer onto an element, or a point given as `x,y` in the pixels of a `screenshot` of the tab. A selector aims at the middle of its first visible match, scrolled into view.
+- `hover` moves the pointer onto an element, or a point given as `x,y` in CSS pixels of the viewport, as read off a full `screenshot` at the default scale. A selector aims at the middle of its first visible match, scrolled into view.
 - `inspect` prints the selector Stylebot's inspector would pick for an element or point, preferring one the site's style already has rules for. Below it come the other selectors the editor's selector menu would offer for the element, each with how many elements it matches, so an agent can pick a narrower or broader one. It sends the page no events and doesn't open the editor.
 
 Hover's events are synthetic: the page's own handlers run, but CSS `:hover` doesn't apply, and a site that checks for a real user can ignore them.
