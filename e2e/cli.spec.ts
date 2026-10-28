@@ -336,6 +336,33 @@ test('css set reports only the rules a save changed, unless --verbose', async ()
   expect(verbose).toContain('- p: 1 element');
 });
 
+test("css set checks the CLI window's tab, naming the others, or the tab given", async () => {
+  const yours = await context.newPage();
+  await yours.goto(`${baseUrl}/yours`);
+
+  const opened = await json<Tab>(['open', baseUrl]);
+  const tabs = await json<Array<Tab>>(['tabs']);
+  const yourTab = tabs.find(tab => tab.url === `${baseUrl}/yours`)!;
+
+  const file = path.join(home, 'two-tabs.css');
+  fs.writeFileSync(file, `h1 { color: ${BLUE}; }`);
+
+  const report = await ok(['css', 'set', 'localhost', '--file', file]);
+  expect(report).toContain(`Checked on tab ${opened.id}.`);
+  expect(report).toContain(
+    `Also shown on tab ${yourTab.id}: name a tab id instead of the site to check that tab.`
+  );
+
+  fs.writeFileSync(file, `h1 { color: ${PINK}; }`);
+  const named = await ok(['css', 'set', String(yourTab.id), '--file', file]);
+  expect(named).toContain('Saved localhost');
+  expect(named).toContain(`Checked on tab ${yourTab.id}.`);
+  expect(named).toContain('- h1: 0 elements');
+  expect(named).not.toContain('Also shown on');
+
+  await yours.close();
+});
+
 test('a write that names no site or tab is refused', async () => {
   const file = path.join(home, 'pink.css');
 
