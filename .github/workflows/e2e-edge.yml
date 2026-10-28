@@ -32,20 +32,10 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Cache Playwright browsers
-        id: playwright-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-msedge-${{ hashFiles('**/yarn.lock') }}
-
+      # Edge installs to /opt, outside Playwright's cache, so install it on every
+      # run; the runner's preinstalled Edge has a sandbox it can't launch with.
       - name: Install Playwright Edge
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps msedge
-
-      - name: Install Playwright system dependencies
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: npx playwright install-deps msedge
 
       - name: Run e2e tests
         run: yarn e2e --edge
