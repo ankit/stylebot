@@ -427,7 +427,8 @@ const runCase = async ({ plain, testCase, variant, scorer, dir }) => {
       failedTurns: results.filter(result => result.is_error).length,
       turns: results.reduce((sum, result) => sum + (result.num_turns ?? 0), 0),
       commands: commands.length,
-      saves: commands.filter(command => /\bcss set\b/.test(command)).length,
+      saves: commands.filter(command => /\bcss (set|rule|add)\b/.test(command))
+        .length,
       screenshots: commands.filter(command => /\bscreenshot\b/.test(command))
         .length,
       denied: results.reduce(
@@ -656,7 +657,7 @@ const summarise = (results, variants, cases, references) => {
 
   return [
     `# Styling eval`,
-    `${args.runs} run(s) per case. Each case runs /stylebot in headless Claude Code with that version's skill and CLI. Checks are measured on the page Stylebot styles after each step, and on the unstyled page and with the case's reference stylesheet when it has one. Tokens, cost (as Claude Code estimates it) and seconds are means per case, as are turns (the agent's model calls), commands (stylebot commands it ran), saves (css set) and denied (tool calls refused as outside what the skill allows). Unreadable, missed surfaces, overridden and zero-match are counted on the final stylesheet; asked counts cases that ended with no CSS saved.`,
+    `${args.runs} run(s) per case. Each case runs /stylebot in headless Claude Code with that version's skill and CLI. Checks are measured on the page Stylebot styles after each step, and on the unstyled page and with the case's reference stylesheet when it has one. Tokens, cost (as Claude Code estimates it) and seconds are means per case, as are turns (the agent's model calls), commands (stylebot commands it ran), saves (css set, rule or add) and denied (tool calls refused as outside what the skill allows). Unreadable, missed surfaces, overridden and zero-match are counted on the final stylesheet; asked counts cases that ended with no CSS saved.`,
     ...(variants.length
       ? [
           `## Overall`,

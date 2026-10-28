@@ -3,11 +3,10 @@ import {
   changedDeclarations,
   compareRules,
   googleFontImports,
-  parseCss,
-  parseSavedCss,
   ruleSelectors,
   useStableSelectors,
 } from './style-check';
+import { parseCss, parseSavedCss } from './stylesheet';
 
 describe('changedDeclarations', () => {
   it('returns only the declarations added or changed', () => {
@@ -44,6 +43,20 @@ describe('changedDeclarations', () => {
 });
 
 describe('compareRules', () => {
+  it('counts a second rule with the same selector on its own', () => {
+    const before = parseCss('h1 { color: red; } h1 { font-size: 2em; }');
+    const after = parseCss('h1 { color: red; }');
+
+    expect(compareRules(before, after)).toMatchObject({
+      changed: [],
+      removed: [{ selector: 'h1', context: '' }],
+    });
+    expect(compareRules(after, before)).toMatchObject({
+      changed: [{ index: 1, context: '' }],
+      removed: [],
+    });
+  });
+
   it('lists the rules added or changed by index, and those removed', () => {
     const before = parseCss(
       'a { color: red; } p { color: blue; } .gone { margin: 0; }'
@@ -52,7 +65,7 @@ describe('compareRules', () => {
       'a { color: red; } p { color: green; } h1 { font-size: 2em; }'
     );
 
-    expect(compareRules(before, after)).toEqual({
+    expect(compareRules(before, after)).toMatchObject({
       changed: [
         { index: 1, context: '' },
         { index: 2, context: '' },
@@ -67,7 +80,7 @@ describe('compareRules', () => {
     );
     const after = parseCss('@media (max-width: 600px) { a { color: blue; } }');
 
-    expect(compareRules(before, after)).toEqual({
+    expect(compareRules(before, after)).toMatchObject({
       changed: [{ index: 0, context: '@media (max-width: 600px)' }],
       removed: [{ selector: 'a', context: '' }],
     });
@@ -114,20 +127,6 @@ describe('googleFontImports', () => {
     );
 
     expect(googleFontImports(root)).toEqual(['Source Serif 4']);
-  });
-});
-
-describe('parseCss', () => {
-  it('says where css stops parsing', () => {
-    expect(() => parseCss('a { color: red;\n\nb {')).toThrow(
-      /doesn't parse at line \d/
-    );
-  });
-});
-
-describe('parseSavedCss', () => {
-  it('reads css that does not parse as empty', () => {
-    expect(parseSavedCss('a { color: red;').nodes).toEqual([]);
   });
 });
 

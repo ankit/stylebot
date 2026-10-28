@@ -23,6 +23,7 @@ stylebot tabs
 stylebot open news.ycombinator.com
 stylebot outline 1234
 stylebot css set news.ycombinator.com --file hn.css
+stylebot css rule 1234 '.titleline a' --set color=#e8e6e3
 stylebot screenshot 1234 -o page.png
 ```
 

@@ -43,7 +43,11 @@ const describeProblem = (problem: StyleProblem): string => {
   }
 };
 
-const inContext = (selector: string, context: string): string =>
+/**
+ * A rule as the report names it: its selector, and the at-rules it sits in
+ * when it sits in any, as `.title (in @media print)`.
+ */
+export const describeRule = (selector: string, context: string): string =>
   context ? `${selector} (in ${context})` : selector;
 
 /**
@@ -88,7 +92,7 @@ const describeChanges = (
   const changedLines = describeMatchList(
     'Elements each added or changed rule matched:',
     changed.map(({ index, context }) => ({
-      selector: inContext(selectors[index], context),
+      selector: describeRule(selectors[index], context),
       count: matches[index],
     }))
   );
@@ -97,7 +101,7 @@ const describeChanges = (
     ? [
         'Removed rules:',
         ...removed.map(
-          ({ selector, context }) => `- ${inContext(selector, context)}`
+          ({ selector, context }) => `- ${describeRule(selector, context)}`
         ),
       ]
     : [];
