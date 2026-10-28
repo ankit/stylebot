@@ -11,6 +11,7 @@ export {
   signInToGoogle,
   clearGoogleToken,
   signOutOfGoogle,
+  showGoogleSignIn,
   cacheGoogleToken,
   validateGoogleToken,
   type AccessToken,

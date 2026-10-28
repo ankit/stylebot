@@ -2,6 +2,7 @@ import {
   cacheGoogleToken,
   clearGoogleToken,
   getStoredGoogleToken,
+  showGoogleSignIn,
   signInToGoogle,
   validateGoogleToken,
   type AccessToken,
@@ -9,11 +10,13 @@ import {
 } from '@stylebot/google-auth';
 
 import { syncError } from '../errors';
+import { forgetSyncAccount, getSyncAccountEmail } from './sync-metadata';
 
 const DRIVE_ACCESS: GoogleAccess = {
   scopes: ['https://www.googleapis.com/auth/drive.file'],
   cacheKey: 'google-drive-access-token',
   refreshTokenKey: 'google-drive-refresh-token',
+  getLoginHint: getSyncAccountEmail,
 };
 
 const WEB_CLIENT_ID =
@@ -21,6 +24,8 @@ const WEB_CLIENT_ID =
 
 export const clearCachedToken = (): Promise<void> =>
   clearGoogleToken(DRIVE_ACCESS);
+
+export const showSignIn = (): Promise<void> => showGoogleSignIn(DRIVE_ACCESS);
 
 const extractTokenParams = (redirectUri: string) => {
   const m = redirectUri.match(/[#?](.*)/);
@@ -46,10 +51,10 @@ const extractTokenParams = (redirectUri: string) => {
 };
 
 /**
- * Wraps the callback API: @types/chrome has no promise overload for
- * launchWebAuthFlow, unlike the storage calls elsewhere in sync.
+ * Wraps launchWebAuthFlow's callback API. Google needs `loginHint` to finish
+ * silently when the browser has several accounts.
  */
-const authorizeSilently = (): Promise<string | undefined> => {
+const authorizeSilently = (loginHint?: string): Promise<string | undefined> => {
   return new Promise((resolve, reject) => {
     const redirectURL = chrome.identity.getRedirectURL();
 
@@ -58,6 +63,10 @@ const authorizeSilently = (): Promise<string | undefined> => {
     authURL += `&response_type=token`;
     authURL += `&redirect_uri=${encodeURIComponent(redirectURL)}`;
     authURL += `&scope=${encodeURIComponent(DRIVE_ACCESS.scopes.join(' '))}`;
+
+    if (loginHint) {
+      authURL += `&login_hint=${encodeURIComponent(loginHint)}`;
+    }
 
     chrome.identity.launchWebAuthFlow(
       { interactive: false, url: authURL },
@@ -86,7 +95,8 @@ const authorizeSilently = (): Promise<string | undefined> => {
  * while Google can finish without the user.
  */
 const renewWebClientToken = async (): Promise<AccessToken> => {
-  const params = extractTokenParams((await authorizeSilently()) ?? '');
+  const loginHint = await getSyncAccountEmail();
+  const params = extractTokenParams((await authorizeSilently(loginHint)) ?? '');
 
   if (!params) {
     throw syncError('Authorization failure', 'sign-in');
@@ -113,7 +123,10 @@ export default async (
   }
 
   if (interactive) {
-    return signInToGoogle(DRIVE_ACCESS);
+    const token = await signInToGoogle(DRIVE_ACCESS);
+    await forgetSyncAccount();
+
+    return token;
   }
 
   // Safari has no identity API.

@@ -104,18 +104,21 @@ export const refreshAccessToken = async (
 
 /**
  * Google's consent page for the Desktop client, with PKCE, asking for the
- * offline access that brings a refresh token.
+ * offline access that brings a refresh token. `loginHint` is the email of the
+ * account the chooser should suggest.
  */
 export const getAuthURL = async ({
   scopes,
   redirectURI,
   verifier,
   state,
+  loginHint,
 }: {
   scopes: Array<string>;
   redirectURI: string;
   verifier: string;
   state: string;
+  loginHint?: string;
 }): Promise<string> => {
   const authURL = new URL('https://accounts.google.com/o/oauth2/v2/auth');
   authURL.search = new URLSearchParams({
@@ -127,9 +130,11 @@ export const getAuthURL = async ({
     code_challenge_method: 'S256',
     state,
     // A refresh token only comes with offline access, and on a repeat
-    // sign-in only when the consent screen is shown again.
+    // sign-in only when the consent screen is shown again. Without
+    // select_account Google picks the browser's default account.
     access_type: 'offline',
-    prompt: 'consent',
+    prompt: 'select_account consent',
+    ...(loginHint ? { login_hint: loginHint } : {}),
   }).toString();
 
   return authURL.toString();

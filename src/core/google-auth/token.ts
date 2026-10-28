@@ -6,18 +6,23 @@ import {
   type IssuedToken,
 } from './desktop-client';
 import { signInWithIdentityAPI, usesIdentitySignIn } from './identity-sign-in';
-import { signInWithRedirectRule } from './redirect-rule-sign-in';
+import {
+  showPendingSignIn,
+  signInWithRedirectRule,
+} from './redirect-rule-sign-in';
 
 export type AccessToken = string;
 
 /**
  * What a sign-in asks Google for, and where its tokens are kept, so each
- * sign-in and sign-out leaves the others alone.
+ * sign-in and sign-out leaves the others alone. `getLoginHint` resolves the
+ * email of the account the next sign-in should suggest.
  */
 export type GoogleAccess = {
   scopes: Array<string>;
   cacheKey: string;
   refreshTokenKey: string;
+  getLoginHint?: () => Promise<string | undefined>;
 };
 
 // Retire the token a minute early so a request started just under the wire
@@ -131,10 +136,11 @@ export const getStoredGoogleToken = async (
 export const signInToGoogle = async (
   access: GoogleAccess
 ): Promise<AccessToken> => {
-  const { scopes, refreshTokenKey } = access;
+  const { scopes, refreshTokenKey, getLoginHint } = access;
+  const loginHint = await getLoginHint?.();
   const issued = usesIdentitySignIn()
-    ? await signInWithIdentityAPI(scopes, refreshTokenKey)
-    : await signInWithRedirectRule(scopes, refreshTokenKey);
+    ? await signInWithIdentityAPI(scopes, refreshTokenKey, loginHint)
+    : await signInWithRedirectRule(scopes, refreshTokenKey, loginHint);
 
   return keepIssuedToken(access, issued);
 };
@@ -148,4 +154,16 @@ export const getGoogleToken = async (
   const stored = await getStoredGoogleToken(access);
 
   return stored ?? signInToGoogle(access);
+};
+
+/**
+ * Brings back the tab of a sign-in still waiting on the user, where sign-in
+ * runs in a tab.
+ */
+export const showGoogleSignIn = async ({
+  refreshTokenKey,
+}: GoogleAccess): Promise<void> => {
+  if (!usesIdentitySignIn()) {
+    await showPendingSignIn(refreshTokenKey);
+  }
 };

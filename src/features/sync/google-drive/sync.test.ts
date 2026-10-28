@@ -2,6 +2,7 @@ jest.mock('./get-access-token', () => ({
   __esModule: true,
   default: jest.fn().mockResolvedValue('access-token'),
   clearCachedToken: jest.fn().mockResolvedValue(undefined),
+  showSignIn: jest.fn().mockResolvedValue(undefined),
 }));
 
 jest.mock('./sync-file', () => ({
@@ -16,7 +17,8 @@ import type { StyleMap, SyncState } from '@stylebot/types';
 
 import * as styleStorage from '../../../apps/background/styles';
 import type { SyncOptions } from './sync';
-import getAccessToken from './get-access-token';
+import getAccessToken, { showSignIn } from './get-access-token';
+import { syncError } from '../errors';
 import { runGoogleDriveSync as runSync } from './sync';
 import {
   getSyncFileMetadata,
@@ -146,6 +148,72 @@ beforeEach(() => {
 });
 
 describe('runGoogleDriveSync', () => {
+  /**
+   * Holds the next token request until the test settles it, so a second run
+   * can start while the first is still signing in.
+   */
+  const holdNextToken = () => {
+    let resolve: (token: string) => void = () => undefined;
+    let reject: (error: Error) => void = () => undefined;
+    const token = new Promise<string>((onResolve, onReject) => {
+      resolve = onResolve;
+      reject = onReject;
+    });
+
+    jest.mocked(getAccessToken).mockReturnValueOnce(token);
+    return { resolve, reject };
+  };
+
+  it('shares a run already going with a scheduled run, showing nothing', async () => {
+    seed({ styles: RED });
+    mockedGetRemote.mockResolvedValue(null);
+    mockedWrite.mockResolvedValue(remoteMetadata('remote-1'));
+    const held = holdNextToken();
+
+    const first = runGoogleDriveSync({ interactive: false });
+    const second = runGoogleDriveSync({ interactive: false });
+    held.resolve('access-token');
+
+    await expect(second).resolves.toEqual(await first);
+    expect(getAccessToken).toBeCalledTimes(1);
+    expect(showSignIn).not.toBeCalled();
+  });
+
+  it('brings back the sign-in a run waits on when someone asks to sync', async () => {
+    seed({ styles: RED });
+    mockedGetRemote.mockResolvedValue(null);
+    mockedWrite.mockResolvedValue(remoteMetadata('remote-1'));
+    const held = holdNextToken();
+
+    const first = runGoogleDriveSync();
+    const second = runGoogleDriveSync();
+    await Promise.resolve();
+
+    expect(showSignIn).toBeCalledTimes(1);
+
+    held.resolve('access-token');
+    await expect(second).resolves.toEqual(await first);
+    expect(getAccessToken).toBeCalledTimes(1);
+  });
+
+  it('signs in afresh when the run it joined ends needing a sign-in', async () => {
+    seed({ styles: RED });
+    mockedGetRemote.mockResolvedValue(null);
+    mockedWrite.mockResolvedValue(remoteMetadata('remote-1'));
+    const held = holdNextToken();
+
+    const first = runGoogleDriveSync();
+    const second = runGoogleDriveSync();
+    held.reject(syncError('Sign-in window closed', 'sign-in'));
+
+    await expect(first).resolves.toMatchObject({
+      ok: false,
+      errorKey: 'sync_error_auth',
+    });
+    await expect(second).resolves.toMatchObject({ ok: true });
+    expect(getAccessToken).toBeCalledTimes(2);
+  });
+
   it('refuses to sync when Google Drive sync is disabled', async () => {
     seed({ enabled: false });
 

@@ -18,6 +18,7 @@ const WEB_CLIENT_ID =
 
 const CACHE_KEY = 'google-drive-access-token';
 const REFRESH_TOKEN_KEY = 'google-drive-refresh-token';
+const SYNC_STATE_KEY = 'google-drive-sync-state';
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 
 type FlowResult = { url?: string; lastError?: { message: string } };
@@ -135,8 +136,49 @@ describe('getAccessToken', () => {
       scopes: ['https://www.googleapis.com/auth/drive.file'],
       cacheKey: CACHE_KEY,
       refreshTokenKey: REFRESH_TOKEN_KEY,
+      getLoginHint: expect.any(Function),
     });
     expect(launchWebAuthFlow).not.toBeCalled();
+  });
+
+  it('suggests the account the last sync ran as when signing in', async () => {
+    store[SYNC_STATE_KEY] = { account: { email: 'me@example.com' } };
+    let loginHint: string | undefined;
+    jest.mocked(signInToGoogle).mockImplementation(async access => {
+      loginHint = await access.getLoginHint?.();
+      return 'signed-in';
+    });
+
+    await getAccessToken();
+
+    expect(loginHint).toBe('me@example.com');
+  });
+
+  it('suggests no account before a sync has run', async () => {
+    let loginHint: string | undefined = 'unset';
+    jest.mocked(signInToGoogle).mockImplementation(async access => {
+      loginHint = await access.getLoginHint?.();
+      return 'signed-in';
+    });
+
+    await getAccessToken();
+
+    expect(loginHint).toBeUndefined();
+  });
+
+  it('forgets the account after signing in, as the user may have picked another', async () => {
+    store[SYNC_STATE_KEY] = {
+      lastSyncedAt: 'then',
+      account: { email: 'old@example.com' },
+    };
+    jest.mocked(signInToGoogle).mockResolvedValue('signed-in');
+
+    await getAccessToken();
+
+    expect(store[SYNC_STATE_KEY]).toEqual({
+      lastSyncedAt: 'then',
+      account: undefined,
+    });
   });
 
   it('falls back to the web client silently when a scheduled run has no refresh token', async () => {
@@ -150,6 +192,29 @@ describe('getAccessToken', () => {
     expect(launchWebAuthFlow).toBeCalledTimes(1);
     expect(interactiveFlows()).toHaveLength(0);
     expect(signInToGoogle).not.toBeCalled();
+  });
+
+  it('names the account the last sync ran as to the silent fallback', async () => {
+    store[SYNC_STATE_KEY] = { account: { email: 'me+work@example.com' } };
+    flows = [{ url: redirectWith('silent') }];
+    mockGoogle({});
+
+    await getAccessToken({ interactive: false });
+
+    const [[{ url }]] = launchWebAuthFlow.mock.calls;
+    expect(new URL(url).searchParams.get('login_hint')).toBe(
+      'me+work@example.com'
+    );
+  });
+
+  it('names no account to the silent fallback before a sync has run', async () => {
+    flows = [{ url: redirectWith('silent') }];
+    mockGoogle({});
+
+    await getAccessToken({ interactive: false });
+
+    const [[{ url }]] = launchWebAuthFlow.mock.calls;
+    expect(new URL(url).searchParams.has('login_hint')).toBe(false);
   });
 
   it('asks for a sign-in without opening anything when the fallback needs the user', async () => {

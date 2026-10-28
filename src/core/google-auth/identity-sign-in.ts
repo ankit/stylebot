@@ -60,7 +60,8 @@ const launchWebAuthFlow = (url: string): Promise<string> =>
  */
 export const signInWithIdentityAPI = async (
   scopes: Array<string>,
-  refreshTokenKey: string
+  refreshTokenKey: string,
+  loginHint?: string
 ): Promise<IssuedToken> => {
   const verifier = getRandomString();
   const state = getRandomString();
@@ -68,7 +69,7 @@ export const signInWithIdentityAPI = async (
 
   const redirect = new URL(
     await launchWebAuthFlow(
-      await getAuthURL({ scopes, redirectURI, verifier, state })
+      await getAuthURL({ scopes, redirectURI, verifier, state, loginHint })
     )
   );
   const code = redirect.searchParams.get('code');

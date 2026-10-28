@@ -21,7 +21,6 @@ jest.mock('./restore-tabs', () => ({
   restoreOpenTabs: jest.fn(),
   restoreTab: jest.fn(async () => undefined),
 }));
-jest.mock('./badge', () => ({ updateBadge: jest.fn() }));
 jest.mock('./options', () => ({ get: jest.fn(), pruneRetired: jest.fn() }));
 jest.mock('./side-panel', () => ({
   initSidePanel: jest.fn(),
@@ -35,7 +34,6 @@ jest.mock('./sync-scheduler', () => ({
 jest.mock('@stylebot/sync', () => ({
   runGoogleDriveSync: jest.fn(),
   getGoogleDriveSyncEnabled: jest.fn(),
-  SYNC_ISSUE_KEYS: [],
 }));
 jest.mock('@stylebot/google-auth', () => ({
   isSignInRedirect: () => false,

@@ -15,7 +15,10 @@ import {
 } from '../errors';
 import { mergeThreeWay } from '../merge/three-way';
 import { isEquivalentStyleMap } from '@stylebot/saved-styles';
-import getAccessToken, { clearCachedToken } from './get-access-token';
+import getAccessToken, {
+  clearCachedToken,
+  showSignIn,
+} from './get-access-token';
 import {
   getSyncState,
   setSyncState,
@@ -294,7 +297,7 @@ const run = async (
 
 /**
  * Keeps the failure until a run succeeds. A dropped connection isn't kept:
- * the next run retries it, so it's nothing for the toolbar icon to flag.
+ * the next run retries it, so it's nothing for the popup to flag.
  * Nor is anything once sync is off, so a late run can't undo a disconnect.
  */
 const recordOutcome = async (
@@ -311,12 +314,12 @@ const recordOutcome = async (
 };
 
 /**
- * Never rejects. Callers are message handlers whose sendResponse must always
- * fire, so failures come back as a result rather than an exception.
+ * Starts a run, or hands back the one in flight, so overlapping calls share
+ * a single run.
  */
-export const runGoogleDriveSync = (
+const coalesce = (
   storage: StyleStorage,
-  options: SyncOptions = { interactive: true }
+  options: SyncOptions
 ): Promise<RunGoogleDriveSyncResponse> => {
   // Not .finally(): tsconfig sets no target, so ES3 output has no
   // Promise.prototype.finally.
@@ -335,4 +338,39 @@ export const runGoogleDriveSync = (
     );
 
   return inFlight;
+};
+
+/**
+ * Joins the run in flight for someone who asked to sync: brings back the
+ * sign-in it waits on, and signs in afresh if that run ends needing one,
+ * rather than handing them a sign-in they gave up on.
+ */
+const join = async (
+  running: Promise<RunGoogleDriveSyncResponse>,
+  storage: StyleStorage,
+  options: SyncOptions
+): Promise<RunGoogleDriveSyncResponse> => {
+  await showSignIn().catch(() => undefined);
+  const response = await running;
+
+  if (!response.ok && response.errorKey === 'sync_error_auth') {
+    return coalesce(storage, options);
+  }
+
+  return response;
+};
+
+/**
+ * Never rejects. Callers are message handlers whose sendResponse must always
+ * fire, so failures come back as a result rather than an exception.
+ */
+export const runGoogleDriveSync = (
+  storage: StyleStorage,
+  options: SyncOptions = { interactive: true }
+): Promise<RunGoogleDriveSyncResponse> => {
+  if (inFlight && options.interactive) {
+    return join(inFlight, storage, options);
+  }
+
+  return coalesce(storage, options);
 };

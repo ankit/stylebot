@@ -31,6 +31,25 @@ export const clearSyncState = (): Promise<void> =>
   ]);
 
 /**
+ * The email of the Google account the last sync ran as, which sign-in
+ * suggests so a browser with several accounts doesn't pick another one.
+ */
+export const getSyncAccountEmail = async (): Promise<string | undefined> =>
+  (await getSyncState())?.account?.email;
+
+/**
+ * Forgets the account the last sync ran as, so the next run asks Drive whose
+ * token it has, after a sign-in that may have picked another account.
+ */
+export const forgetSyncAccount = async (): Promise<void> => {
+  const state = await getSyncState();
+
+  if (state?.account) {
+    await setSyncState({ ...state, account: undefined });
+  }
+};
+
+/**
  * Drops a url from the recorded conflicts once the user has looked at it.
  */
 export const dismissSyncConflict = async (url: string): Promise<void> => {
@@ -60,8 +79,8 @@ export const getSyncNeedsAuth = async (): Promise<boolean> => {
 };
 
 /**
- * Why the last run failed, kept until a run succeeds, so the popup and the
- * toolbar icon can flag a failed scheduled sync that nobody saw.
+ * Why the last run failed, kept until a run succeeds, so the popup can flag
+ * a failed scheduled sync that nobody saw.
  */
 export const setSyncError = (errorKey: SyncErrorKey | null): Promise<void> =>
   errorKey
@@ -72,29 +91,6 @@ export const getSyncError = async (): Promise<SyncErrorKey | null> => {
   const items = await chrome.storage.local.get(SYNC_ERROR_KEY);
   return items[SYNC_ERROR_KEY] ?? null;
 };
-
-/**
- * Whether sync is on but not working: it needs a sign-in, or its last run
- * failed.
- */
-export const hasSyncIssue = async (): Promise<boolean> => {
-  const items = await chrome.storage.local.get([
-    'google-drive-sync-enabled',
-    NEEDS_AUTH_KEY,
-    SYNC_ERROR_KEY,
-  ]);
-
-  return Boolean(
-    items['google-drive-sync-enabled'] &&
-      (items[NEEDS_AUTH_KEY] || items[SYNC_ERROR_KEY])
-  );
-};
-
-export const SYNC_ISSUE_KEYS = [
-  'google-drive-sync-enabled',
-  NEEDS_AUTH_KEY,
-  SYNC_ERROR_KEY,
-];
 
 export const getLastSyncedAt = async (): Promise<string | undefined> =>
   (await getSyncState())?.lastSyncedAt;

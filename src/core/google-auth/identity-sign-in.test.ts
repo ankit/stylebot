@@ -98,12 +98,24 @@ describe('signInWithIdentityAPI', () => {
     expect(auth.searchParams.get('response_type')).toBe('code');
     expect(auth.searchParams.get('code_challenge_method')).toBe('S256');
     expect(auth.searchParams.get('access_type')).toBe('offline');
+    expect(auth.searchParams.get('prompt')).toBe('select_account consent');
+    expect(auth.searchParams.has('login_hint')).toBe(false);
 
     expect(tokenRequests[0].get('grant_type')).toBe('authorization_code');
     expect(tokenRequests[0].get('code')).toBe('c-1');
     expect(tokenRequests[0].get('redirect_uri')).toBe(REDIRECT_URI);
     expect(tokenRequests[0].get('code_verifier')).toBeTruthy();
     expect(store[REFRESH_TOKEN_KEY]).toBe('r-1');
+  });
+
+  it('suggests the account it is given, still letting the user pick', async () => {
+    await signInWithIdentityAPI(SCOPES, REFRESH_TOKEN_KEY, 'me@example.com');
+
+    const [[options]] = launchWebAuthFlow.mock.calls;
+    const auth = new URL(options.url);
+
+    expect(auth.searchParams.get('login_hint')).toBe('me@example.com');
+    expect(auth.searchParams.get('prompt')).toBe('select_account consent');
   });
 
   it('rejects when the user closes the auth window', async () => {
