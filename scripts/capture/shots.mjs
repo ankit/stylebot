@@ -37,38 +37,29 @@ const localTheme = name =>
 
 export const hnModern = () => localTheme('hn-modern');
 
-/**
- * Gallery styles for Craigslist as the API lists them, with their CSS.
- */
-const craigslistGallery = () => {
-  const day = 24 * 60 * 60 * 1000;
-  const listed = (id, name, username, installs, css) => ({
-    id,
-    site: 'craigslist.org',
-    slug: name.toLowerCase().replace(/\s+/g, '-'),
-    name,
-    description: null,
-    author: { id: `author-${id}`, username },
-    version: 3,
-    installs,
-    createdAt: Date.now() - 90 * day,
-    updatedAt: Date.now() - 6 * day,
-    screenshot: '',
-    css,
-  });
+const GALLERY_API = 'https://api.stylebot.dev/v1';
 
-  return [
-    listed(
-      57,
-      'Classifieds',
-      'ankit',
-      1240,
-      localTheme('craigslist-classifieds')
-    ),
-    // Listed but never previewed, so they need no CSS.
-    listed(41, 'Night Market', 'maya', 860, ''),
-    listed(63, 'Swap Meet', 'jun', 410, ''),
-  ];
+/**
+ * A site's styles as the Gallery lists them, each with its CSS, so the
+ * slide shows what someone would really find there.
+ */
+const listedGallery = async site => {
+  const fetchJson = async url => {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`${url} answered ${response.status}`);
+    }
+
+    return response.json();
+  };
+  const { styles } = await fetchJson(
+    `${GALLERY_API}/styles?${new URLSearchParams({ site })}`
+  );
+
+  return Promise.all(
+    styles.map(({ id }) => fetchJson(`${GALLERY_API}/styles/${id}`))
+  );
 };
 
 // GitHub wraps the repo's last-commit row at the panel's width, so it's laid
@@ -224,28 +215,28 @@ export const SHOTS = [
   },
   {
     name: '3-gallery',
-    about: "The popup's Gallery: Craigslist previewing Classifieds",
-    appearance: 'light',
+    about: "The popup's Gallery: Hacker News previewing Daily HN Edition, dark",
+    appearance: 'dark',
     slide: {
       title: 'Try styles from the *Gallery*.',
       accent: 'pink',
-      crop: { x: 598 },
+      crop: { x: 380 },
     },
     run: async (browser, file, options) => {
-      await stubGallery(browser, 'craigslist.org', craigslistGallery(), 14);
-      const page = await openSite(
-        browser.context,
-        'https://www.craigslist.org/area/newyork',
-        { full: true }
-      );
+      const site = 'news.ycombinator.com';
+
+      await stubGallery(browser, site, await listedGallery(site));
+      const page = await openSite(browser.context, `https://${site}/`, {
+        full: true,
+      });
       const popup = await openPopup(browser, page);
-      await popup.getByRole('button', { name: /Classifieds/ }).click();
+      await popup.getByRole('button', { name: /Daily HN Edition/ }).click();
       await wait(2500);
       await fitPopup(popup);
       await page.bringToFront();
       await wait(500);
       await capturePopup(browser.context, file, page, popup, {
-        appearance: 'light',
+        appearance: 'dark',
         ...options,
       });
     },
