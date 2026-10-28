@@ -51,14 +51,19 @@ export const pruneImportCache = (liveUrls: ReadonlySet<string>): void => {
 };
 
 /**
- * Fetches one @import's CSS via the background service worker, to get around CORS.
+ * Fetches a stylesheet's CSS via the background service worker, to get
+ * around CORS. Empty when it can't be fetched.
  */
-const fetchAndCacheImportCss = async (url: string): Promise<string> => {
+export const requestImportCss = (url: string): Promise<string> => {
   const message: GetImportCss = { name: 'GetImportCss', url };
 
-  const response = await chrome.runtime
+  return chrome.runtime
     .sendMessage<GetImportCss, GetImportCssResponse>(message)
     .catch(() => '');
+};
+
+const fetchAndCacheImportCss = async (url: string): Promise<string> => {
+  const response = await requestImportCss(url);
 
   if (response) {
     writeImportCache(url, response);

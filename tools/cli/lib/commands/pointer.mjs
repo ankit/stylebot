@@ -54,7 +54,8 @@ export const addPointerCommands = program => {
   addHelpSections(hover, {
     Notes: [
       "The page's mouse handlers run, so menus and tooltips open, but css",
-      ":hover doesn't apply: the events don't come from a real mouse.",
+      ":hover doesn't apply: the events don't come from a real mouse. To see",
+      'hover styles, use force or screenshot --state.',
     ],
   });
 

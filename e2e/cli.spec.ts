@@ -51,6 +51,36 @@ const PAGE_HTML = `
   </html>
 `;
 
+const DARK = 'rgb(20, 20, 20)';
+const WHITE = 'rgb(255, 255, 255)';
+const GREEN = 'rgb(0, 128, 0)';
+
+/**
+ * A page whose rows, field and a cross-origin stylesheet style :hover and
+ * :focus-visible, which the CLI can't reach with a real pointer.
+ */
+const statesPageHtml = (crossOrigin: string) => `
+  <!doctype html>
+  <html>
+    <head>
+      <title>States</title>
+      <style>
+        .row { background: ${DARK}; color: ${WHITE}; transition: background 2s; }
+        .row:hover { background: ${WHITE}; }
+        .row:hover .icon { color: ${PINK}; }
+        input:focus-visible { outline: 3px solid ${BLUE}; }
+      </style>
+      <link rel="stylesheet" href="${crossOrigin}/remote.css">
+    </head>
+    <body>
+      <div class="row"><span class="icon">*</span> First</div>
+      <div class="row"><span class="icon">*</span> Second</div>
+      <input name="q">
+      <p class="remote">Styled from another origin</p>
+    </body>
+  </html>
+`;
+
 const OTHER_PAGE_HTML = `
   <!doctype html>
   <html><head><title>Your page</title></head><body>Yours</body></html>
@@ -208,10 +238,17 @@ test.beforeAll(async ({}, testInfo) => {
     copyBuild('stylebot', () => {})
   ));
 
-  ({ baseUrl, close: closeServer } = await startTestServer({
+  const routes: Parameters<typeof startTestServer>[0] = {
     '/': PAGE_HTML,
     '/yours': OTHER_PAGE_HTML,
-  }));
+    '/remote.css': {
+      body: `.remote:hover { color: ${GREEN}; }`,
+      headers: { 'Content-Type': 'text/css' },
+    },
+  };
+  ({ baseUrl, close: closeServer } = await startTestServer(routes));
+  // Another origin on the same server, whose sheet the page can't read.
+  routes['/states'] = statesPageHtml(baseUrl.replace('localhost', '127.0.0.1'));
 
   // Registers the host in the test browser's user data, its only browser.
   await ok(['install']);
@@ -553,6 +590,84 @@ test('screenshot shoots at 1x, an element, or a clip, and says how big', async (
   await page.evaluate(() =>
     document.querySelectorAll('#below, #tall').forEach(el => el.remove())
   );
+});
+
+test("force applies the page's state rules, and --clear takes them off", async () => {
+  const opened = await json<Tab>(['open', `${baseUrl}/states`]);
+  const id = String(opened.id);
+  const computed = async (selector: string, property: string) =>
+    (await ok(['computed-styles', selector, property, '--tab', id])).trim();
+
+  expect(await computed('.row', 'background-color')).toBe(
+    `background-color: ${DARK};`
+  );
+
+  expect(await ok(['force', id, '.row', 'hover'])).toBe(
+    'Forced hover on .row (1 element, 2 ancestors).\n'
+  );
+  expect(await computed('.row', 'background-color')).toBe(
+    `background-color: ${WHITE};`
+  );
+  expect(await computed('.row .icon', 'color')).toBe(`color: ${PINK};`);
+  expect(await computed('.row + .row', 'background-color')).toBe(
+    `background-color: ${DARK};`
+  );
+
+  await ok(['force', id, 'input', 'focus-visible']);
+  expect(await computed('input', 'outline')).toBe(
+    `outline: ${BLUE} solid 3px;`
+  );
+
+  await ok(['force', id, '.remote', 'hover']);
+  expect(await computed('.remote', 'color')).toBe(`color: ${GREEN};`);
+
+  expect(await ok(['force', id])).toBe(
+    [
+      'Forced:',
+      '- hover on .row (1 element, 2 ancestors)',
+      '- focus-visible on input (1 element, 2 ancestors)',
+      '- hover on .remote (1 element, 2 ancestors)',
+      '',
+    ].join('\n')
+  );
+
+  // A save rewrites Stylebot's own sheet, whose state rules follow it.
+  const file = path.join(home, 'states.css');
+  fs.writeFileSync(file, `.row:hover { background: ${GREEN}; }`);
+  await ok(['css', 'set', id, '--file', file]);
+  expect(await computed('.row', 'background-color')).toBe(
+    `background-color: ${GREEN};`
+  );
+
+  expect(await ok(['force', id, '--clear'])).toBe(
+    'Cleared hover on .row, focus-visible on input, hover on .remote.\n'
+  );
+  expect(await computed('.row', 'background-color')).toBe(
+    `background-color: ${DARK};`
+  );
+  expect(await computed('.row .icon', 'color')).toBe(`color: ${WHITE};`);
+  expect(await computed('.remote', 'color')).not.toBe(`color: ${GREEN};`);
+  expect(await ok(['force', id])).toBe('Nothing is forced.\n');
+
+  const all = await ok(['force', id, '.row', 'hover', '--all']);
+  expect(all).toBe('Forced hover on .row (2 elements, 2 ancestors).\n');
+  await ok(['force', id, '--clear']);
+
+  const out = path.join(home, 'shots', 'hover.png');
+  const shot = await ok([
+    'screenshot',
+    id,
+    '--state',
+    'hover',
+    '--on',
+    '.row',
+    '--selector',
+    '.row',
+    '-o',
+    out,
+  ]);
+  expect(shot).toContain('With hover forced on .row');
+  expect(await ok(['force', id])).toBe('Nothing is forced.\n');
 });
 
 test("screenshot saves a png, and done closes the CLI's window", async () => {

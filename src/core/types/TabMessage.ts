@@ -76,7 +76,38 @@ export type PageInspection =
   | { kind: 'finishCheck'; selectors: Array<string> }
   | { kind: 'pointer'; action: PointerAction }
   | { kind: 'frameElement'; selector: string }
-  | { kind: 'restoreScroll' };
+  | { kind: 'restoreScroll' }
+  | { kind: 'force'; action: PseudoStateAction };
+
+export type PseudoState =
+  | 'hover'
+  | 'active'
+  | 'focus'
+  | 'focus-visible'
+  | 'focus-within';
+
+// Forces a state on a selector's first visible match, or every match with
+// all; release undoes one force, clear every one.
+export type PseudoStateAction =
+  | { op: 'add'; selector: string; state: PseudoState; all?: boolean }
+  | { op: 'release'; selector: string; state: PseudoState }
+  | { op: 'list' }
+  | { op: 'clear' };
+
+export type ForcedPseudoState = {
+  selector: string;
+  state: PseudoState;
+  elements: number;
+  ancestors: number;
+};
+
+export type PseudoStateResult = {
+  forced: Array<ForcedPseudoState>;
+  // What this action added or removed.
+  changed: Array<ForcedPseudoState>;
+  // Stylesheets whose rules couldn't be read or fetched.
+  unreadable: Array<string>;
+};
 
 // What the content script lends the inspector bundle, which can't import it.
 export type InspectorHost = {

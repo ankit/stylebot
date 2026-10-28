@@ -12,6 +12,7 @@ import {
 import { isReaderable } from '@stylebot/readability';
 import type {
   ElementFrame,
+  PseudoStateResult,
   FragileSelector,
   InspectorHost,
   PageInspection,
@@ -20,6 +21,7 @@ import type {
   SuggestionContext,
 } from '@stylebot/types';
 
+import { forcePseudoStates, refreshPseudoStates } from './pseudo-states';
 import { usePointer } from './pointer';
 import { frameElement, restoreScroll } from './screenshot';
 
@@ -33,6 +35,7 @@ const finishCheck = async (
 ): Promise<StyleCheckReport> => {
   // The background's own reapply may not have landed yet.
   await host.reapplySavedStyles();
+  await refreshPseudoStates();
 
   return {
     matchCounts: countMatches(selectors),
@@ -57,8 +60,12 @@ export const inspectPage = async (
   | StyleCheckReport
   | PointerResult
   | ElementFrame
+  | PseudoStateResult
   | null
 > => {
+  // A forced state's copies follow the page's styles as they change.
+  await refreshPseudoStates();
+
   switch (inspection.kind) {
     case 'outline':
       return getPageOutline();
@@ -91,5 +98,7 @@ export const inspectPage = async (
     case 'restoreScroll':
       restoreScroll();
       return null;
+    case 'force':
+      return forcePseudoStates(inspection.action);
   }
 };

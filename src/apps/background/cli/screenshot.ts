@@ -1,6 +1,7 @@
-import type { ElementFrame, ViewportRect } from '@stylebot/types';
+import type { ElementFrame, PseudoState, ViewportRect } from '@stylebot/types';
 
 import { captureTab } from '../capture-tab';
+import { withPseudoState } from './pseudo-states';
 import {
   getClipRegion,
   getElementRegion,
@@ -23,6 +24,9 @@ export type Screenshot = {
   viewport: Size;
   cutOff: boolean;
 };
+
+// The tab's capture, and the part of it the screenshot keeps.
+type Capture = { dataUrl: string; region?: Region };
 
 /**
  * A tab's viewport in css pixels: its size divided by its page zoom.
@@ -104,7 +108,7 @@ const captureElement = async (
   tab: chrome.tabs.Tab,
   selector: string,
   viewport: Size
-): Promise<{ dataUrl: string; region: Region }> => {
+): Promise<Required<Capture>> => {
   const tabId = tab.id as number;
   const frame = await inspectTab<ElementFrame>(tabId, {
     kind: 'frameElement',
@@ -128,13 +132,15 @@ const captureElement = async (
 
 /**
  * A PNG of a tab's viewport, or of one element or a clip of it, at a scale in
- * image pixels per css pixel.
+ * image pixels per css pixel, with a state forced on an element if asked.
  */
 export const takeScreenshot = async ({
   tab,
   selector,
   clip,
   scale,
+  state,
+  on,
 }: Record<string, unknown>): Promise<Screenshot> => {
   requireNamed(tab, 'tab');
 
@@ -142,23 +148,39 @@ export const takeScreenshot = async ({
     throw new Error('Pass --selector or --clip, not both');
   }
 
+  if ((state === undefined) !== (on === undefined)) {
+    throw new Error(
+      "Pass --state with --on, the selector of the element it's forced on"
+    );
+  }
+
   const outputScale = parseScale(scale);
   const clipRect = clip === undefined ? undefined : parseClip(clip);
   const target = await resolveTab(tab);
   const viewport = await getViewport(target);
-  let dataUrl: string;
-  let region: Region | undefined;
 
-  if (selector !== undefined) {
-    ({ dataUrl, region } = await captureElement(
-      target,
-      String(selector),
-      viewport
-    ));
+  const capture = async (): Promise<Capture> => {
+    if (selector !== undefined) {
+      return captureElement(target, String(selector), viewport);
+    }
+
+    return {
+      region: clipRect && getClipRegion(clipRect, viewport),
+      dataUrl: await captureTab(target),
+    };
+  };
+
+  let shot: Capture;
+
+  if (state === undefined) {
+    shot = await capture();
   } else {
-    region = clipRect && getClipRegion(clipRect, viewport);
-    dataUrl = await captureTab(target);
+    const tabId = target.id as number;
+    const forced = String(state) as PseudoState;
+    shot = await withPseudoState(tabId, String(on), forced, capture);
   }
+
+  const { dataUrl, region } = shot;
 
   return {
     ...(await renderCapture(dataUrl, viewport, region?.rect, outputScale)),

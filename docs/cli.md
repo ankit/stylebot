@@ -1,6 +1,6 @@
 # Stylebot CLI
 
-A command line for driving Stylebot in a running browser: list tabs, read and inspect pages, hover and pick elements, get and set styles, and take screenshots. It's meant for scripting and for coding agents such as Claude Code, Codex or Cursor, which can restyle a page and check the result without the editor open.
+A command line for driving Stylebot in a running browser: list tabs, read and inspect pages, hover and pick elements, force hover and focus states, get and set styles, and take screenshots. It's meant for scripting and for coding agents such as Claude Code, Codex or Cursor, which can restyle a page and check the result without the editor open.
 
 It works with Stylebot on Chrome, Edge and the other Chromium browsers listed below, on macOS, Linux and Windows, once turned on in Stylebot's options. Firefox and Safari aren't supported yet.
 
@@ -59,7 +59,7 @@ The Stylebot skill relays these messages to you as they are.
 
 ### Naming the target
 
-Commands that only read default to the active tab, or take `--tab` when their arguments are selectors. Commands that change a style, take a screenshot or move the pointer (`css set`, `css rule`, `css add`, `profile`, `screenshot`, `hover`, `inspect`) need the site or tab named, because an agent runs its commands over several steps and the active tab can change in between.
+Commands that only read default to the active tab, or take `--tab` when their arguments are selectors. Commands that change a style, take a screenshot, move the pointer or force a state (`css set`, `css rule`, `css add`, `profile`, `screenshot`, `hover`, `inspect`, `force`) need the site or tab named, because an agent runs its commands over several steps and the active tab can change in between.
 
 - A **tab** is a tab id, from `tabs` or `open`.
 - A **target** is a tab id or a site, such as `news.ycombinator.com`.
@@ -73,6 +73,7 @@ stylebot outline 54432929
 stylebot screenshot 54432929 -o page.png
 stylebot screenshot 54432929 --selector '.titleline > a' -o link.png
 stylebot screenshot 54432929 --clip 0,0,600,400 --scale 2 -o corner.png
+stylebot screenshot 54432929 --state hover --on '.athing' --selector '.athing' -o row.png
 stylebot done
 ```
 
@@ -83,6 +84,7 @@ stylebot done
   - `--selector` keeps only the first visible element a selector matches, with a few pixels around it. One out of view is scrolled to for the capture, and the page scrolled back after. One bigger than the viewport is cut to the part that fits, and the output says so. Checking one element this way is quicker and smaller than a whole page.
   - `--clip x,y,w,h` keeps a region, in CSS pixels of the viewport. It can't be combined with `--selector`.
   - `--scale` sets image pixels per CSS pixel. The default, 1, makes a point in a full screenshot the CSS pixel `hover` and `inspect` take; 2 keeps a 2× screen's full resolution.
+  - `--state <state> --on '<selector>'` forces a state on the selector's first visible match for this capture only, as `force` does, then takes it off again, unless it was already forced.
 - `done` closes the CLI's window.
 
 ### Inspecting a page
@@ -115,7 +117,36 @@ These point at the page, so an agent can open what only shows on hover, and find
 - `hover` moves the pointer onto an element, or a point given as `x,y` in CSS pixels of the viewport, as read off a full `screenshot` at the default scale. A selector aims at the middle of its first visible match, scrolled into view.
 - `inspect` prints the selector Stylebot's inspector would pick for an element or point, preferring one the site's style already has rules for. Below it come the other selectors the editor's selector menu would offer for the element, each with how many elements it matches, so an agent can pick a narrower or broader one. It sends the page no events and doesn't open the editor.
 
-Hover's events are synthetic: the page's own handlers run, but CSS `:hover` doesn't apply, and a site that checks for a real user can ignore them.
+Hover's events are synthetic: the page's own handlers run, but CSS `:hover` doesn't apply, and a site that checks for a real user can ignore them. To see hover styles, force the state.
+
+### Forced states
+
+```bash
+stylebot force 54432929 '.athing' hover
+stylebot force 54432929 'input[name=q]' focus-visible
+stylebot force 54432929
+stylebot force 54432929 --clear
+```
+
+`force <tab> '<selector>' <state>` makes the page's CSS for a state apply as if a real pointer or focus were there: `hover`, `active`, `focus`, `focus-visible` or `focus-within`. It goes on the selector's first visible match, or every match with `--all`, and stays until `--clear`. While it's forced, `outline`, `computed-styles`, `page-rules`, `inspect`, the page check after a save and `screenshot` all see the page in that state, so an agent can check a theme's hover and focus colors instead of reading them off the CSS. `force <tab>` lists what's forced.
+
+```text
+$ stylebot force 1234 '.athing' hover
+Forced hover on .athing (1 element, 6 ancestors).
+```
+
+It works the way Storybook's pseudo-states addon does, without the browser's debugger, so it needs no extra permission:
+
+- It copies every rule on the page that names one of those states, from the page's stylesheets, its constructed ones and those of open shadow roots, with the state swapped for an attribute of the same specificity, inside the same `@media`, `@supports`, `@layer` and `@container`, `!important` kept. The copies go after the scope's own sheets. A cross-origin stylesheet the page can't read is fetched by the extension, which says when it couldn't fetch one.
+- Hover and active go on the element and every ancestor, across shadow boundaries; a focus state goes on the element, with focus-within on its ancestors. Transitions the change starts jump to their end, so a screenshot shows the state rather than part of the fade.
+- While anything is forced, it copies the rules again when stylesheets are added or change, including Stylebot's own when a save applies, and before every command reads the page.
+
+Its limits:
+
+- Only the top frame is forced, as the CLI only reads that one; iframes keep their real state.
+- A forced state doesn't stop the page's rules for when an element isn't in that state, such as `.button:not(:hover)`, from applying to it too.
+- The copies come after every other rule, so where a state rule and a later rule tie on specificity without `!important`, the state rule wins, where with a real pointer the later one would. Stylebot's own rules carry `!important` unless the site turns that off, so they still win.
+- An element the page replaces, as a framework re-render can, loses its forced state; `force` again.
 
 ### Styles
 
@@ -304,7 +335,7 @@ To try the CLI against a release-like build, run `yarn preview:chrome` instead o
 
 The browser starts the native host when the extension connects to it, and keeps it running while the connection is open. The host listens on a Unix socket in `~/.stylebot/`, readable only by you, and relays each CLI command to the extension and its answer back.
 
-The code that reads a page loads into it the first time the CLI asks about that page, so pages the CLI never touches don't carry it.
+The code that reads a page loads into it the first time the CLI asks about that page, so pages the CLI never touches don't carry it. It runs in the top frame only.
 
 The extension connects only while the setting is on and the browser has granted its optional `nativeMessaging` permission for the host. Screenshots need `<all_urls>`, which Stylebot already holds on Chrome and Edge, to restore open tabs after an update.
 
