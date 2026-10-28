@@ -1,3 +1,5 @@
+const dedent = require('dedent');
+
 import fetchMock from 'jest-fetch-mock';
 
 import { style } from '../../features/gallery/gallery.fixtures';
@@ -6,6 +8,7 @@ import {
   getGalleryPreview,
   installGalleryPreview,
   openGalleryPreview,
+  setGalleryPreviewScheme,
   startGalleryPreview,
   undoGalleryInstall,
 } from './gallery-preview';
@@ -17,6 +20,7 @@ import {
   installProfile,
   reinstallProfile,
   restoreStyles,
+  setStyleOption,
 } from './styles';
 
 jest.mock('./styles', () => ({
@@ -25,6 +29,7 @@ jest.mock('./styles', () => ({
   reinstallProfile: jest.fn(async () => 'Mine'),
   applyStylesToAllTabs: jest.fn(async () => undefined),
   restoreStyles: jest.fn(async () => undefined),
+  setStyleOption: jest.fn(async () => undefined),
 }));
 
 const TAB_ID = 7;
@@ -80,6 +85,21 @@ describe('gallery preview', () => {
       { name: 'ShowGalleryPreview', preview, replacedUrl: 'github.com' },
       expect.any(Function)
     );
+  });
+
+  it('carries the color scheme a style declares by default', async () => {
+    styleResponse(dedent`
+      /**
+       * ==Stylebot==
+       * @option scheme select [system, light, dark] dark
+       * ==/Stylebot==
+       */
+      a { color: red; }
+    `);
+
+    await startGalleryPreview(TAB_ID, style.id);
+
+    expect(await getGalleryPreview(TAB_ID)).toMatchObject({ scheme: 'dark' });
   });
 
   it('tells the tab to replace the style it was installed in before', async () => {
@@ -156,6 +176,52 @@ describe('gallery preview', () => {
     await endGalleryPreviewOffSite(TAB_ID, 'https://example.com/');
     expect(await getGalleryPreview(TAB_ID)).toBeNull();
     expect(store.galleryPreviewSites).toEqual([]);
+  });
+
+  describe('with a color scheme', () => {
+    const declares = (fallback: string) => dedent`
+      /**
+       * ==Stylebot==
+       * @option scheme select [system, light, dark] ${fallback}
+       * ==/Stylebot==
+       */
+      a {}
+    `;
+
+    const install = async (fallback: string) => {
+      (getAll as jest.Mock).mockResolvedValue({
+        'github.com': { css: '', enabled: true },
+      });
+      styleResponse(declares(fallback));
+      await startGalleryPreview(TAB_ID, style.id);
+      fetchMock.mockResponseOnce(
+        JSON.stringify({ ...style, css: declares(fallback) })
+      );
+    };
+
+    it('keeps the scheme picked in the preview, and installs with it', async () => {
+      await install('system');
+      await setGalleryPreviewScheme(TAB_ID, 'dark');
+
+      expect(await getGalleryPreview(TAB_ID)).toMatchObject({ scheme: 'dark' });
+
+      await installGalleryPreview(TAB_ID);
+
+      expect(setStyleOption).toHaveBeenCalledWith(
+        'github.com',
+        'default',
+        'scheme',
+        'dark'
+      );
+    });
+
+    it("doesn't store a pick that is the declared default", async () => {
+      await install('dark');
+      await setGalleryPreviewScheme(TAB_ID, 'dark');
+      await installGalleryPreview(TAB_ID);
+
+      expect(setStyleOption).not.toHaveBeenCalled();
+    });
   });
 
   it("installs the preview as a profile of the page's style and tells the gallery", async () => {

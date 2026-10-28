@@ -1,4 +1,5 @@
 import type {
+  StyleColorScheme,
   StyleMap,
   SupportedStyleOptions,
   StyleOptionName,
@@ -389,6 +390,11 @@ export type EndGalleryPreview = {
   tabId?: number;
 };
 
+export type SetGalleryPreviewScheme = {
+  name: 'SetGalleryPreviewScheme';
+  scheme: StyleColorScheme;
+};
+
 // Sent by the page's preview bar, just after an install.
 export type UndoGalleryInstall = {
   name: 'UndoGalleryInstall';
@@ -404,6 +410,7 @@ type BackgroundPageMessage =
   | GetStylesForPage
   | SetActiveProfile
   | SetStyleOption
+  | SetGalleryPreviewScheme
   | CreateProfile
   | InstallStyle
   | RenameProfile

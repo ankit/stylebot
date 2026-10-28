@@ -4,17 +4,10 @@
 
     <div v-if="scheme" class="profile-option">
       <s-text as="span" class="profile-option-label">{{ t('mode') }}</s-text>
-      <s-segmented-control
-        fit
+      <s-color-scheme-switch
         :value="scheme"
-        :options="schemeOptions"
-        :aria-label="t('mode')"
         @change="$emit('scheme', $event)"
-      >
-        <template #option="{ option }">
-          <component :is="option.icon" :size="14" />
-        </template>
-      </s-segmented-control>
+      />
     </div>
   </div>
 </template>
@@ -22,8 +15,7 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-import { SSegmentedControl, SText } from '@stylebot/components';
-import { MonitorIcon, MoonIcon, SunIcon } from '@stylebot/icons';
+import { SColorSchemeSwitch, SText } from '@stylebot/components';
 import type { StyleColorScheme } from '@stylebot/types';
 
 /**
@@ -34,11 +26,8 @@ export default Vue.extend({
   name: 'ProfileOptions',
 
   components: {
-    SSegmentedControl,
+    SColorSchemeSwitch,
     SText,
-    MonitorIcon,
-    MoonIcon,
-    SunIcon,
   },
 
   props: {
@@ -46,28 +35,6 @@ export default Vue.extend({
     scheme: {
       type: String as PropType<StyleColorScheme | null>,
       default: null,
-    },
-  },
-
-  computed: {
-    schemeOptions(): Array<{
-      value: StyleColorScheme;
-      title: string;
-      icon: string;
-    }> {
-      return [
-        {
-          value: 'system',
-          title: this.t('appearance_system'),
-          icon: 'monitor-icon',
-        },
-        {
-          value: 'light',
-          title: this.t('appearance_light'),
-          icon: 'sun-icon',
-        },
-        { value: 'dark', title: this.t('appearance_dark'), icon: 'moon-icon' },
-      ];
     },
   },
 });

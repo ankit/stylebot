@@ -1,4 +1,8 @@
-import { injectStylesheet, removeStylesheet } from '@stylebot/stylesheets';
+import {
+  injectStylesheet,
+  removeStylesheet,
+  setSchemeAttribute,
+} from '@stylebot/stylesheets';
 import type { GalleryPreview } from '@stylebot/types';
 
 import { style } from '../../features/gallery/gallery.fixtures';
@@ -14,6 +18,7 @@ import { getCompiledStyles } from './saved-styles';
 jest.mock('@stylebot/stylesheets', () => ({
   injectStylesheet: jest.fn(),
   removeStylesheet: jest.fn(),
+  setSchemeAttribute: jest.fn(),
 }));
 jest.mock('./page-state', () => ({
   applyPageState: jest.fn(),
@@ -70,8 +75,48 @@ describe('gallery preview on the page', () => {
       'b {}',
       []
     );
-    expect(mount).toHaveBeenCalledWith(preview.style, expect.any(Object));
+    expect(mount).toHaveBeenCalledWith(
+      preview.style,
+      expect.any(Object),
+      undefined
+    );
     expect(isPreviewingGalleryStyle()).toBe(true);
+  });
+
+  it('shows a gallery style in the color scheme it declares by default', async () => {
+    await showGalleryPreview({ ...preview, scheme: 'dark' }, 'example.com');
+
+    expect(setSchemeAttribute).toHaveBeenCalledWith('dark');
+  });
+
+  it('shows the scheme picked in its controls, keeps it while comparing, and tells the background', async () => {
+    await showGalleryPreview({ ...preview, scheme: 'system' }, 'example.com');
+    const [, handlers] = mount.mock.calls[0] as unknown as [
+      unknown,
+      { setScheme: (scheme: string) => void; compare: (on: boolean) => void }
+    ];
+
+    handlers.setScheme('dark');
+    await Promise.resolve();
+
+    expect(setSchemeAttribute).toHaveBeenLastCalledWith('dark');
+    expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+      name: 'SetGalleryPreviewScheme',
+      scheme: 'dark',
+    });
+
+    handlers.compare(true);
+    await new Promise(resolve => setTimeout(resolve));
+    handlers.compare(false);
+    await new Promise(resolve => setTimeout(resolve));
+
+    expect(setSchemeAttribute).toHaveBeenLastCalledWith('dark');
+  });
+
+  it("clears the page's color scheme for a gallery style without one", async () => {
+    await showGalleryPreview(preview, 'example.com');
+
+    expect(setSchemeAttribute).toHaveBeenCalledWith(undefined);
   });
 
   it("puts the page's own styles back when it's hidden", async () => {
@@ -101,7 +146,11 @@ describe('gallery preview on the page', () => {
     expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
       name: 'GetGalleryPreview',
     });
-    expect(mount).toHaveBeenCalledWith(preview.style, expect.any(Object));
+    expect(mount).toHaveBeenCalledWith(
+      preview.style,
+      expect.any(Object),
+      undefined
+    );
     expect(removeStylesheet).toHaveBeenCalledWith('example.com');
   });
 });

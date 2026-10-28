@@ -1,6 +1,7 @@
 import type {
   GalleryStyle,
   InstallGalleryPreviewResponse,
+  StyleColorScheme,
   UndoGalleryInstallResponse,
 } from '@stylebot/types';
 
@@ -18,6 +19,7 @@ export type GalleryPreviewHandlers = {
   undo: () => Promise<UndoGalleryInstallResponse>;
   cancel: () => void;
   compare: (on: boolean) => void;
+  setScheme: (scheme: StyleColorScheme) => void;
 };
 
 /**
@@ -27,7 +29,8 @@ export type GalleryPreviewAppWindow = Window & {
   stylebotGalleryPreviewApp?: {
     mount: (
       style: GalleryStyle,
-      handlers: GalleryPreviewHandlers
+      handlers: GalleryPreviewHandlers,
+      scheme?: StyleColorScheme
     ) => (installed?: boolean) => void;
   };
 };

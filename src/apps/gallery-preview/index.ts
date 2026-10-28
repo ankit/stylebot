@@ -9,7 +9,11 @@ import type {
 } from '@stylebot/gallery';
 import { t } from '@stylebot/i18n';
 import { injectFontFaces } from '@stylebot/utils';
-import type { GalleryStyle, StylebotAppearance } from '@stylebot/types';
+import type {
+  GalleryStyle,
+  StyleColorScheme,
+  StylebotAppearance,
+} from '@stylebot/types';
 
 import GalleryPreview from './components/GalleryPreview.vue';
 
@@ -68,7 +72,8 @@ const getAppearance = async (): Promise<StylebotAppearance> => {
  */
 const mount = (
   style: GalleryStyle,
-  handlers: GalleryPreviewHandlers
+  handlers: GalleryPreviewHandlers,
+  scheme?: StyleColorScheme
 ): ((installed?: boolean) => void) => {
   const host = document.createElement('stylebot-gallery-preview');
   const root = host.attachShadow({ mode: 'closed' });
@@ -111,6 +116,7 @@ const mount = (
             styleData: style,
             handlers,
             appearance,
+            scheme,
             installed: state.installed,
           },
           on: { done: remove },
