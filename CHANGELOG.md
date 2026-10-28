@@ -1,19 +1,15 @@
 ## Version 4.1.0 (October 2026)
 
-- Gallery: find popular styles for the site you're on in the popup, preview them on the page (hold C to compare), and install them in one click, with undo
-- Gallery: publish your styles to gallery.stylebot.dev from the popup or the editor, including styles for a URL pattern
-- Gallery: styles you installed update to their latest version daily until you edit them; the editor and Options say when an install is edited, with View and Revert to its Gallery version
-- Gallery: only ask the Gallery about public sites it lists, with an Options toggle to turn suggestions off
-- Styles can declare a light/dark mode switch, shown as Mode in the popup; Gallery previews show it too and keep your pick on install
-- Create, rename, edit and delete profiles from the popup; profiles are listed in the order they were added
+- Gallery: find, preview and install styles for the site you're on from the popup, and publish your own to gallery.stylebot.dev
+- Styles installed from the Gallery stay up to date until you edit them
+- Styles can offer a light/dark mode switch in the popup
+- Create, rename and delete profiles from the popup
 - Add a font weight control to the editor's Basic tab (#1241)
-- Code editor: folding, sticky scroll and a restyled search and colour picker (#1236)
+- Code editor: folding and sticky scroll (#1236)
 - `stylebot` CLI: read and set a style's options
-- Fix signing in to the wrong Google account for sync, and stop nagging about sync (#1244)
+- Fix signing in to the wrong Google account for sync (#1244)
 - Fix the page's text styles leaking into Stylebot's panels
-- Fix the editor remembering the selected selector after the panel closes
-- Fix field dropdown menus in the editor using the wrong text size (#1239)
-- Fix a stray scrollbar beside the style editor's profile tabs in Options (#1222)
+- Fix smaller issues in the editor and Options (#1222, #1239)
 
 ## Version 4.0.5 (October 2026)
 
