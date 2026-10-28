@@ -94,6 +94,12 @@ test("a profile's Publish to Gallery in the popup hands it to the gallery site, 
     chrome.tabs.onCreated.addListener(tab =>
       worker.openedUrls.push(tab.pendingUrl || tab.url || '')
     );
+    // Firefox creates the tab on about:blank and only reports its url later.
+    chrome.tabs.onUpdated.addListener((_tabId, { url }) => {
+      if (url) {
+        worker.openedUrls.push(url);
+      }
+    });
   });
   await row
     .locator('[role="menuitem"]', { hasText: 'Publish to Gallery' })
