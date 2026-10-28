@@ -121,7 +121,7 @@ Hover's events are synthetic: the page's own handlers run, but CSS `:hover` does
 
 ```bash
 stylebot css get news.ycombinator.com
-stylebot css set news.ycombinator.com < hn.css
+stylebot css set 54432929 < hn.css
 ```
 
 - `styles` lists saved styles.
@@ -129,12 +129,13 @@ stylebot css set news.ycombinator.com < hn.css
 - `css set` saves css from stdin or `--file` and applies it to open tabs right away. Empty css deletes the style.
 
   - It refuses css that doesn't parse, saying at which line, and adds Google Fonts imports for the families the css names. It also saves a selector's partly generated class names by their stable part, and says which it changed.
-  - When the profile it saves is the one in use and an open tab shows the site (the tab named, else an active one), it checks the page; otherwise it says why it didn't. The report lists how many elements each added or changed rule matched, the rules removed, and what went wrong: text made hard to read, surfaces a theme change missed, and selectors built on class names the site generates. Unchanged rules get one summary line; the first save, or `--verbose`, lists them all:
+  - When the profile it saves is the one in use and an open tab shows the site, it checks the page; otherwise it says why it didn't. Given a tab id, it saves the style that applies on that tab and checks that tab. Given a site, it checks the active tab of the CLI's own window if it shows the site, else any tab that does, and names the other tabs showing the site in one line.
 
     ```text
     $ stylebot css set news.ycombinator.com --file hn.css
     Saved news.ycombinator.com
     Checked on tab 1234.
+    Also shown on tab 1240: name a tab id instead of the site to check that tab.
     Elements each added or changed rule matched:
     - .titleline a: 30 elements
     Removed rules:

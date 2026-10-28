@@ -16,6 +16,7 @@ const describeSave = ({
   fonts,
   swappedSelectors,
   checkedTab,
+  otherTabs,
   check,
   fragileSelectors,
 }) => {
@@ -53,6 +54,16 @@ const describeSave = ({
   }
 
   lines.push(`Checked on tab ${checkedTab}.`);
+
+  // An older extension leaves it out.
+  if (otherTabs?.length) {
+    const tabWord = otherTabs.length === 1 ? 'tab' : 'tabs';
+    lines.push(
+      `Also shown on ${tabWord} ${otherTabs.join(
+        ', '
+      )}: name a tab id instead of the site to check that tab.`
+    );
+  }
 
   if (check) {
     lines.push(check);
@@ -126,6 +137,7 @@ export const addStyleCommands = program => {
       '$ stylebot css get news.ycombinator.com',
       '$ stylebot css set news.ycombinator.com < hn.css',
       '$ stylebot css set news.ycombinator.com --file hn.css --profile Dark',
+      '$ stylebot css set 1234 --file hn.css',
     ],
   });
 
@@ -147,7 +159,7 @@ export const addStyleCommands = program => {
     .description(
       'Save css from stdin, apply it and check the page; empty css deletes the style'
     )
-    .argument('<target>', 'A tab id or site')
+    .argument('<target>', 'A tab id, to check that tab, or a site')
     .option('-f, --file <path>', 'Read the css from a file instead')
     .option('-p, --profile <name>', 'A profile other than the active one')
     .option(

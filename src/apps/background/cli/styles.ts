@@ -45,24 +45,26 @@ const addFontImports = async (
 
 /**
  * Notes the page before the edits apply, on a tab showing a page the style
- * applies to, and resolves to that tab's id; null when no tab shows one or
- * its page can't be asked.
+ * applies to, and resolves to that tab's id and the other tabs showing one;
+ * a null id when no tab shows one or its page can't be asked.
  */
 const startCheck = async (
   url: string,
   target: unknown,
   edits: Array<CssEdit>
-): Promise<number | null> => {
-  const tabId = (await findTabShowing(url, target))?.id;
+): Promise<{ tabId: number | null; others: Array<number> }> => {
+  const { tab, others } = await findTabShowing(url, target);
 
-  if (tabId === undefined) {
-    return null;
+  if (tab?.id === undefined) {
+    return { tabId: null, others };
   }
 
-  return inspectTab(tabId, { kind: 'startCheck', edits }).then(
-    () => tabId,
+  const tabId = await inspectTab(tab.id, { kind: 'startCheck', edits }).then(
+    () => tab.id as number,
     () => null
   );
+
+  return { tabId, others };
 };
 
 /**
@@ -153,10 +155,10 @@ export const styleCommands: CliCommands = {
     const changes = verbose ? null : compareRules(before, after);
 
     // Only the profile in use shows on the page, so only it can be checked.
-    const tabId =
+    const { tabId, others } =
       id === active && selectors.length
         ? await startCheck(url, target, edits)
-        : null;
+        : { tabId: null, others: [] };
 
     await save(next);
 
@@ -169,6 +171,7 @@ export const styleCommands: CliCommands = {
       fonts,
       swappedSelectors,
       checkedTab: report ? tabId : null,
+      otherTabs: report ? others : [],
       selectors,
       matchCounts: report?.matchCounts ?? null,
       styleProblems: report?.styleProblems ?? null,

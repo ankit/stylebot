@@ -3,6 +3,7 @@ import type { InspectPage, PageInspection } from '@stylebot/types';
 
 import { restoreTab } from '../restore-tabs';
 import { getAll } from '../styles';
+import { getCliWindowId } from './cli-window';
 
 /**
  * The tab a request names by id, or the focused window's active tab.
@@ -88,14 +89,16 @@ export const inspectTab = async <T>(
 };
 
 /**
- * A tab showing a page the style for a url pattern applies to, to check it
- * on: the one the target names, else an active one, else any.
+ * The tab to check the style for a url pattern on, and the other tabs that
+ * show a page it applies to: the tab the target names, else the active tab
+ * of the CLI's own window, where `stylebot open` shows pages, else any.
  */
 export const findTabShowing = async (
   url: string,
   target: unknown
-): Promise<chrome.tabs.Tab | undefined> => {
+): Promise<{ tab?: chrome.tabs.Tab; others: Array<number> }> => {
   const tabId = /^\d+$/.test(String(target)) ? Number(target) : undefined;
+  const cliWindowId = await getCliWindowId();
   const showing = (await chrome.tabs.query({})).filter(
     tab =>
       tab.url &&
@@ -104,8 +107,15 @@ export const findTabShowing = async (
   );
 
   if (tabId !== undefined) {
-    return showing.find(tab => tab.id === tabId);
+    return { tab: showing.find(tab => tab.id === tabId), others: [] };
   }
 
-  return showing.find(tab => tab.active) ?? showing[0];
+  const tab =
+    showing.find(tab => tab.active && tab.windowId === cliWindowId) ??
+    showing[0];
+
+  return {
+    tab,
+    others: showing.filter(other => other !== tab).map(other => other.id!),
+  };
 };
