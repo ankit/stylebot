@@ -3,72 +3,20 @@ import * as postcss from 'postcss';
 import { getStableSelector } from '@stylebot/css';
 import type { CssEdit } from '@stylebot/types';
 
+import {
+  type StyleRule,
+  diffDeclarations,
+  listStyleRules,
+  matchRules,
+  walkStyleRules,
+} from './stylesheet';
+
 export type RuleChanges = {
   changed: Array<{ index: number; context: string }>;
   removed: Array<{ selector: string; context: string }>;
 };
 
-type StyleRule = { selector: string; context: string; declarations: string };
-
-const KEYFRAMES = /keyframes$/i;
 const GOOGLE_FONT_FAMILY = /fonts\.googleapis\.com\/css2\?family=([^:&"')]+)/;
-
-/**
- * Visits each style rule in the css with the at-rules it sits in, skipping
- * keyframes, whose steps aren't selectors.
- */
-const walkStyleRules = (
-  root: postcss.Root,
-  visit: (rule: postcss.Rule, context: string) => void
-): void =>
-  root.walkRules(rule => {
-    const context: Array<string> = [];
-    let node = rule.parent;
-
-    while (node && node.type !== 'root') {
-      if (node.type === 'atrule') {
-        const atRule = node as postcss.AtRule;
-
-        if (KEYFRAMES.test(atRule.name)) {
-          return;
-        }
-
-        context.unshift(`@${atRule.name} ${atRule.params}`);
-      }
-
-      node = node.parent;
-    }
-
-    visit(rule, context.join(' '));
-  });
-
-/**
- * Parses css, throwing an error that says where it stops parsing.
- */
-export const parseCss = (css: string): postcss.Root => {
-  try {
-    return postcss.parse(css);
-  } catch (e) {
-    const error = e as postcss.CssSyntaxError;
-    const where = error.line ? ` at line ${error.line}` : '';
-
-    throw new Error(
-      `The css doesn't parse${where}: ${error.reason ?? error.message}`
-    );
-  }
-};
-
-/**
- * Parses css saved earlier, which the editor may have saved mid-edit, as
- * empty when it doesn't parse.
- */
-export const parseSavedCss = (css: string): postcss.Root => {
-  try {
-    return postcss.parse(css);
-  } catch {
-    return postcss.root();
-  }
-};
 
 /**
  * The declarations `after` adds or changes over `before`, as edits by
@@ -115,39 +63,12 @@ export const allDeclarations = (root: postcss.Root): Array<CssEdit> =>
   changedDeclarations(postcss.root(), root);
 
 /**
- * The css's style rules in order, each with its at-rule context and its
- * declarations written out, so two rules compare as strings.
+ * Whether a rule lost or gained a declaration since its old version.
  */
-const listStyleRules = (root: postcss.Root): Array<StyleRule> => {
-  const rules: Array<StyleRule> = [];
-
-  walkStyleRules(root, (rule, context) =>
-    rules.push({
-      selector: rule.selector,
-      context,
-      declarations: (rule.nodes ?? [])
-        .filter((node): node is postcss.Declaration => node.type === 'decl')
-        .map(decl => `${decl.prop}:${decl.value}${decl.important ? '!' : ''}`)
-        .join(';'),
-    })
-  );
-
-  return rules;
+const hasChanged = (old: StyleRule, rule: StyleRule): boolean => {
+  const { removed, added } = diffDeclarations(old, rule);
+  return removed.length > 0 || added.length > 0;
 };
-
-/**
- * Which rule it is: its selector in its at-rule context, the same before and
- * after its declarations change.
- */
-const getRuleIdentity = ({ selector, context }: StyleRule) =>
-  `${context}|${selector}`;
-
-/**
- * The rule with its declarations, which differs from before when any of
- * them is added, removed or changed.
- */
-const getRuleFingerprint = (rule: StyleRule) =>
-  `${getRuleIdentity(rule)}|${rule.declarations}`;
 
 /**
  * Compares two stylesheets rule by rule: the rules in `after` that are new or
@@ -158,27 +79,20 @@ export const compareRules = (
   before: postcss.Root,
   after: postcss.Root
 ): RuleChanges | null => {
-  const previous = listStyleRules(before);
+  const rulesBefore = listStyleRules(before);
 
-  if (!previous.length) {
+  if (!rulesBefore.length) {
     return null;
   }
 
-  const current = listStyleRules(after);
-  const previousFingerprints = new Set(previous.map(getRuleFingerprint));
-  const currentIdentities = new Set(current.map(getRuleIdentity));
+  const { matches, removed } = matchRules(rulesBefore, listStyleRules(after));
+  const changed: RuleChanges['changed'] = [];
 
-  const isNewOrChanged = (rule: StyleRule) =>
-    !previousFingerprints.has(getRuleFingerprint(rule));
-  const isRemoved = (rule: StyleRule) =>
-    !currentIdentities.has(getRuleIdentity(rule));
-
-  const changed = current.flatMap((rule, index) =>
-    isNewOrChanged(rule) ? [{ index, context: rule.context }] : []
-  );
-  const removed = previous
-    .filter(isRemoved)
-    .map(({ selector, context }) => ({ selector, context }));
+  matches.forEach(({ rule, old }, index) => {
+    if (!old || hasChanged(old, rule)) {
+      changed.push({ index, context: rule.context });
+    }
+  });
 
   return { changed, removed };
 };

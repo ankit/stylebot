@@ -408,6 +408,77 @@ test('profiles switch which css the page gets', async () => {
   );
 });
 
+test('css rule edits one rule in place, and creates one that is missing', async () => {
+  const page = cliPage()!;
+
+  const report = await ok([
+    'css',
+    'rule',
+    'localhost',
+    'h1',
+    '--set',
+    `color=${BLUE}`,
+  ]);
+
+  await expect(page.locator('h1')).toHaveCSS('color', BLUE);
+  expect(report).toContain('Saved localhost');
+  expect(report).toContain('- h1: 1 element');
+  expect(await ok(['css', 'get', 'localhost'])).toBe(
+    `h1 { color: ${BLUE}; }\n`
+  );
+
+  const created = await ok([
+    'css',
+    'rule',
+    'localhost',
+    'h2',
+    '--set',
+    'color=red',
+  ]);
+  expect(created).toContain('Created a rule for h2 at the end');
+  expect(created).toContain('- h2: 0 elements');
+  expect(created).toContain('1 unchanged rule not listed');
+});
+
+test('css rule finds a rule it saved by a generated class name', async () => {
+  const hashed = ['css', 'rule', 'localhost', '.Title_main__a1B2c'];
+
+  await ok([...hashed, '--set', 'color=red']);
+  const again = await ok([...hashed, '--set', 'margin=0']);
+  expect(again).not.toContain('Created a rule');
+
+  const saved = await ok(['css', 'get', 'localhost', '--grep', 'Title_main']);
+  expect(saved.match(/\{/g)).toHaveLength(1);
+  expect(saved).toContain('margin: 0');
+
+  await ok([...hashed, '--delete']);
+  expect(await ok(['css', 'get', 'localhost', '--grep', 'Title_main'])).toBe(
+    'No rules in localhost match "Title_main"\n'
+  );
+});
+
+test('css add appends rules, naming selectors that already had one', async () => {
+  const page = cliPage()!;
+  const file = path.join(home, 'more.css');
+  fs.writeFileSync(file, 'h1 { font-size: 40px; }\n');
+
+  const diff = await ok(['css', 'diff', 'localhost', '--file', file]);
+  expect(diff).toContain('- h2 {');
+  expect(diff).toContain('Nothing saved.');
+  await expect(page.locator('h1')).not.toHaveCSS('font-size', '40px');
+
+  const report = await ok(['css', 'add', 'localhost', '--file', file]);
+
+  await expect(page.locator('h1')).toHaveCSS('font-size', '40px');
+  await expect(page.locator('h1')).toHaveCSS('color', BLUE);
+  expect(report).toContain('Added after rules with the same selector');
+  expect(report).toContain('- h1: 1 element');
+
+  expect(await ok(['css', 'get', 'localhost', '--grep', '40PX'])).toBe(
+    'h1 { font-size: 40px; }\n'
+  );
+});
+
 /**
  * A PNG's width and height, from its header.
  */

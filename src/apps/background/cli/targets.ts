@@ -110,12 +110,11 @@ export const findTabShowing = async (
     return { tab: showing.find(tab => tab.id === tabId), others: [] };
   }
 
-  const tab =
-    showing.find(tab => tab.active && tab.windowId === cliWindowId) ??
-    showing[0];
+  const activeInCliWindow = showing.find(
+    tab => tab.active && tab.windowId === cliWindowId
+  );
+  const tab = activeInCliWindow ?? showing[0];
+  const others = showing.filter(other => other !== tab).map(other => other.id!);
 
-  return {
-    tab,
-    others: showing.filter(other => other !== tab).map(other => other.id!),
-  };
+  return { tab, others };
 };
