@@ -3,6 +3,13 @@ import * as postcss from 'postcss';
 import { getStableSelector } from '@stylebot/css';
 import type { CssEdit } from '@stylebot/types';
 
+export type RuleChanges = {
+  changed: Array<{ index: number; context: string }>;
+  removed: Array<{ selector: string; context: string }>;
+};
+
+type StyleRule = { selector: string; context: string; declarations: string };
+
 const KEYFRAMES = /keyframes$/i;
 const GOOGLE_FONT_FAMILY = /fonts\.googleapis\.com\/css2\?family=([^:&"')]+)/;
 
@@ -106,6 +113,75 @@ export const changedDeclarations = (
  */
 export const allDeclarations = (root: postcss.Root): Array<CssEdit> =>
   changedDeclarations(postcss.root(), root);
+
+/**
+ * The css's style rules in order, each with its at-rule context and its
+ * declarations written out, so two rules compare as strings.
+ */
+const listStyleRules = (root: postcss.Root): Array<StyleRule> => {
+  const rules: Array<StyleRule> = [];
+
+  walkStyleRules(root, (rule, context) =>
+    rules.push({
+      selector: rule.selector,
+      context,
+      declarations: (rule.nodes ?? [])
+        .filter((node): node is postcss.Declaration => node.type === 'decl')
+        .map(decl => `${decl.prop}:${decl.value}${decl.important ? '!' : ''}`)
+        .join(';'),
+    })
+  );
+
+  return rules;
+};
+
+/**
+ * Which rule it is: its selector in its at-rule context, the same before and
+ * after its declarations change.
+ */
+const getRuleIdentity = ({ selector, context }: StyleRule) =>
+  `${context}|${selector}`;
+
+/**
+ * The rule with its declarations, which differs from before when any of
+ * them is added, removed or changed.
+ */
+const getRuleFingerprint = (rule: StyleRule) =>
+  `${getRuleIdentity(rule)}|${rule.declarations}`;
+
+/**
+ * Compares two stylesheets rule by rule: the rules in `after` that are new or
+ * changed, by their index there, and the rules in `before` that are gone.
+ * Null when `before` has no rules, as on a style's first save.
+ */
+export const compareRules = (
+  before: postcss.Root,
+  after: postcss.Root
+): RuleChanges | null => {
+  const previous = listStyleRules(before);
+
+  if (!previous.length) {
+    return null;
+  }
+
+  const current = listStyleRules(after);
+  const previousFingerprints = new Set(previous.map(getRuleFingerprint));
+  const currentIdentities = new Set(current.map(getRuleIdentity));
+
+  const isNewOrChanged = (rule: StyleRule) =>
+    !previousFingerprints.has(getRuleFingerprint(rule));
+  const isRemoved = (rule: StyleRule) =>
+    !currentIdentities.has(getRuleIdentity(rule));
+
+  const changed = current.flatMap((rule, index) =>
+    isNewOrChanged(rule) ? [{ index, context: rule.context }] : []
+  );
+  const removed = previous
+    .filter(isRemoved)
+    .map(({ selector, context }) => ({ selector, context }));
+
+  return { changed, removed };
+};
 
 /**
  * Every style rule's selector in the css, in order.

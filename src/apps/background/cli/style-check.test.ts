@@ -1,6 +1,7 @@
 import {
   allDeclarations,
   changedDeclarations,
+  compareRules,
   googleFontImports,
   parseCss,
   parseSavedCss,
@@ -39,6 +40,52 @@ describe('changedDeclarations', () => {
     const after = parseCss('@keyframes fade { from { opacity: 0; } }');
 
     expect(changedDeclarations(parseCss(''), after)).toEqual([]);
+  });
+});
+
+describe('compareRules', () => {
+  it('lists the rules added or changed by index, and those removed', () => {
+    const before = parseCss(
+      'a { color: red; } p { color: blue; } .gone { margin: 0; }'
+    );
+    const after = parseCss(
+      'a { color: red; } p { color: green; } h1 { font-size: 2em; }'
+    );
+
+    expect(compareRules(before, after)).toEqual({
+      changed: [
+        { index: 1, context: '' },
+        { index: 2, context: '' },
+      ],
+      removed: [{ selector: '.gone', context: '' }],
+    });
+  });
+
+  it('tells a rule inside a media query from the same rule outside it', () => {
+    const before = parseCss(
+      'a { color: red; } @media (max-width: 600px) { a { color: red; } }'
+    );
+    const after = parseCss('@media (max-width: 600px) { a { color: blue; } }');
+
+    expect(compareRules(before, after)).toEqual({
+      changed: [{ index: 0, context: '@media (max-width: 600px)' }],
+      removed: [{ selector: 'a', context: '' }],
+    });
+  });
+
+  it('counts a rule as changed when only !important changes', () => {
+    const before = parseCss('a { color: red; }');
+    const after = parseCss('a { color: red !important; }');
+
+    expect(compareRules(before, after)?.changed).toEqual([
+      { index: 0, context: '' },
+    ]);
+  });
+
+  it('is null when there was no css before', () => {
+    expect(compareRules(parseSavedCss(''), parseCss('a { color: red; }'))).toBe(
+      null
+    );
   });
 });
 

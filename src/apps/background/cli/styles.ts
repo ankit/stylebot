@@ -6,8 +6,10 @@ import { applyStylesToAllTabs, getAll, set } from '../styles';
 import { describeStyleCheck } from './style-report';
 import { EMPTY_STYLE, activeCss, resolveProfileId } from './profiles';
 import {
+  type RuleChanges,
   allDeclarations,
   changedDeclarations,
+  compareRules,
   googleFontImports,
   parseCss,
   parseSavedCss,
@@ -65,12 +67,18 @@ const startCheck = async (
 
 /**
  * What the check started on a tab found once the style has applied, with
- * its wording for the terminal; null when the page can't say.
+ * its wording for the terminal; null when no check started or the page
+ * can't say.
  */
 const finishCheck = async (
-  tabId: number,
-  selectors: Array<string>
+  tabId: number | null,
+  selectors: Array<string>,
+  changes: RuleChanges | null
 ): Promise<(StyleCheckReport & { check: string }) | null> => {
+  if (tabId === null) {
+    return null;
+  }
+
   const report = await inspectTab<StyleCheckReport>(tabId, {
     kind: 'finishCheck',
     selectors,
@@ -86,7 +94,8 @@ const finishCheck = async (
     check: describeStyleCheck(
       selectors.map(selector => selector.replace(/\s*\n\s*/g, ' ')),
       report.matchCounts,
-      report.styleProblems
+      report.styleProblems,
+      changes
     ),
   };
 };
@@ -114,7 +123,7 @@ export const styleCommands: CliCommands = {
     return { url, css: expandProfiles(style ?? EMPTY_STYLE).sheets[id].css };
   },
 
-  async setCss({ target, css, profile }) {
+  async setCss({ target, css, profile, verbose }) {
     requireNamed(target, 'site or tab');
     const url = await resolveStyleUrl(target);
     const style = (await getAll())[url];
@@ -139,10 +148,9 @@ export const styleCommands: CliCommands = {
     const { fonts } = withFonts;
     const next = swappedSelectors.length ? after.toString() : withFonts.css;
     const selectors = ruleSelectors(after);
-    const edits = changedDeclarations(
-      parseSavedCss(sheets[id]?.css ?? ''),
-      after
-    );
+    const before = parseSavedCss(sheets[id]?.css ?? '');
+    const edits = changedDeclarations(before, after);
+    const changes = verbose ? null : compareRules(before, after);
 
     // Only the profile in use shows on the page, so only it can be checked.
     const tabId =
@@ -152,7 +160,7 @@ export const styleCommands: CliCommands = {
 
     await save(next);
 
-    const report = tabId === null ? null : await finishCheck(tabId, selectors);
+    const report = await finishCheck(tabId, selectors, changes);
 
     return {
       url,

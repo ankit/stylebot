@@ -13,6 +13,72 @@ describe('describeStyleCheck', () => {
     );
   });
 
+  it('lists only the rules changed since the last save', () => {
+    expect(
+      describeStyleCheck(
+        ['body', '.card', '.missing', 'a'],
+        [1, 3, 0, 12],
+        [],
+        {
+          changed: [
+            { index: 1, context: '' },
+            { index: 2, context: '@media (max-width: 600px)' },
+          ],
+          removed: [{ selector: '.old', context: '' }],
+        }
+      )
+    ).toBe(
+      [
+        'Elements each added or changed rule matched:',
+        '- .card: 3 elements',
+        '- .missing (in @media (max-width: 600px)): 0 elements',
+        'Edits whose selector matched nothing changed nothing.',
+        'Removed rules:',
+        '- .old',
+        '2 unchanged rules not listed',
+      ].join('\n')
+    );
+  });
+
+  it('leaves out the miss hint when only unchanged rules matched nothing', () => {
+    expect(
+      describeStyleCheck(['.missing', 'a'], [0, 2], [], {
+        changed: [{ index: 1, context: '' }],
+        removed: [],
+      })
+    ).toBe(
+      [
+        'Elements each added or changed rule matched:',
+        '- a: 2 elements',
+        '1 unchanged rule not listed',
+      ].join('\n')
+    );
+  });
+
+  it('says so in one line when no rule changed, still listing problems', () => {
+    expect(
+      describeStyleCheck(
+        ['a'],
+        [0],
+        [
+          {
+            type: 'overridden-declaration',
+            selector: 'a',
+            property: 'width',
+            value: '80px',
+          },
+        ],
+        { changed: [], removed: [] }
+      )
+    ).toBe(
+      [
+        'No rules changed since the last save.',
+        'Problems the page check found:',
+        '- No effect: width: 80px on a, overridden by the page or not applicable to that element',
+      ].join('\n')
+    );
+  });
+
   it('says nothing when nothing was checked', () => {
     expect(describeStyleCheck(['.card'])).toBe('');
   });
