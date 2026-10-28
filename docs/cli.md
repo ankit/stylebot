@@ -55,7 +55,7 @@ The Claude Code skill relays these messages to you as they are.
 
 ## Commands
 
-`yarn stylebot --help` lists every command, and `yarn stylebot <command> --help` describes one.
+`stylebot --help` lists every command, and `stylebot <command> --help` describes one.
 
 ### Naming the target
 
@@ -68,10 +68,10 @@ Commands that only read default to the active tab, or take `--tab` when their ar
 ### Pages
 
 ```bash
-yarn stylebot open news.ycombinator.com
-yarn stylebot outline 54432929
-yarn stylebot screenshot 54432929 -o page.png
-yarn stylebot done
+stylebot open news.ycombinator.com
+stylebot outline 54432929
+stylebot screenshot 54432929 -o page.png
+stylebot done
 ```
 
 - `open` shows the page in the CLI's own window, which opens behind yours without taking focus, so an agent never switches your tabs. It reuses that window's tab for the page (any page on the site, for a bare site); `--new` always opens another.
@@ -83,11 +83,11 @@ yarn stylebot done
 ### Inspecting a page
 
 ```bash
-yarn stylebot suggestions 54432929
-yarn stylebot css-variables 54432929
-yarn stylebot page-rules '.titleline > a' --tab 54432929
-yarn stylebot computed-styles body color font-size --tab 54432929
-yarn stylebot match-count '.titleline > a' '.subline' --tab 54432929
+stylebot suggestions 54432929
+stylebot css-variables 54432929
+stylebot page-rules '.titleline > a' --tab 54432929
+stylebot computed-styles body color font-size --tab 54432929
+stylebot match-count '.titleline > a' '.subline' --tab 54432929
 ```
 
 These read the page so an agent can look at a page before styling it without another browser tool.
@@ -101,8 +101,8 @@ These read the page so an agent can look at a page before styling it without ano
 ### Pointer
 
 ```bash
-yarn stylebot hover 54432929 '#nav .menu'
-yarn stylebot inspect 54432929 120,340
+stylebot hover 54432929 '#nav .menu'
+stylebot inspect 54432929 120,340
 ```
 
 These point at the page, so an agent can open what only shows on hover, and find the selector for an element it sees in a screenshot. Neither clicks anything or draws on the page, so screenshots stay clean. Each needs the tab named.
@@ -115,21 +115,35 @@ Hover's events are synthetic: the page's own handlers run, but CSS `:hover` does
 ### Styles
 
 ```bash
-yarn stylebot css get news.ycombinator.com
-yarn stylebot css set news.ycombinator.com < hn.css
+stylebot css get news.ycombinator.com
+stylebot css set news.ycombinator.com < hn.css
 ```
 
 - `styles` lists saved styles.
 - `css get` prints a style's css.
 - `css set` saves css from stdin or `--file` and applies it to open tabs right away. Empty css deletes the style.
+
   - It refuses css that doesn't parse, saying at which line, and adds Google Fonts imports for the families the css names. It also saves a selector's partly generated class names by their stable part, and says which it changed.
-  - When the profile it saves is the one in use and an open tab shows the site (the tab named, else an active one), it checks the page and reports back: how many elements each selector matched, text the change made hard to read, and surfaces a theme change missed. It also flags selectors still built on class names the site generates, which have no stable part. With no such tab, or when the profile isn't in use, it says the style wasn't checked and why.
+  - When the profile it saves is the one in use and an open tab shows the site (the tab named, else an active one), it checks the page; otherwise it says why it didn't. The report lists how many elements each added or changed rule matched, the rules removed, and what went wrong: text made hard to read, surfaces a theme change missed, and selectors built on class names the site generates. Unchanged rules get one summary line; the first save, or `--verbose`, lists them all:
+
+    ```text
+    $ stylebot css set news.ycombinator.com --file hn.css
+    Saved news.ycombinator.com
+    Checked on tab 1234.
+    Elements each added or changed rule matched:
+    - .titleline a: 30 elements
+    Removed rules:
+    - .old-banner
+    5 unchanged rules not listed
+    Problems the page check found:
+    - Hard to read: .subtext (30 elements), text #828282 on #1d1f21, contrast 3.1:1
+    ```
 
 ### Profiles
 
 ```bash
-yarn stylebot profile create Dark news.ycombinator.com --use
-yarn stylebot css set news.ycombinator.com --profile Dark < dark.css
+stylebot profile create Dark news.ycombinator.com --use
+stylebot css set news.ycombinator.com --profile Dark < dark.css
 ```
 
 - `profiles` lists a style's profiles, starring the one in use.
@@ -139,8 +153,8 @@ yarn stylebot css set news.ycombinator.com --profile Dark < dark.css
 ### Style options
 
 ```bash
-yarn stylebot options news.ycombinator.com
-yarn stylebot option set scheme dark news.ycombinator.com
+stylebot options news.ycombinator.com
+stylebot option set scheme dark news.ycombinator.com
 ```
 
 - `options` lists the options a profile's css declares (see [Style options](style-options.md)), each with its value, the values it takes and its default.
@@ -183,7 +197,7 @@ A test, or a second worktree, can run its own dev browser beside yours without t
 STYLEBOT_PROFILE_DIR=.chrome-dev-profile-test STYLEBOT_SOCKET=~/.stylebot/test.sock yarn start:chrome
 ```
 
-Run `yarn stylebot install` once the profile folder exists, so it's registered there too, and run the CLI with the same `STYLEBOT_SOCKET` to drive that browser.
+Run `stylebot install` once the profile folder exists, so it's registered there too, and run the CLI with the same `STYLEBOT_SOCKET` to drive that browser.
 
 To try the CLI against a release-like build, run `yarn preview:chrome` instead of `yarn start:chrome`. It carries the store's key, so it gets the extension id the host allows.
 

@@ -306,6 +306,36 @@ test('css set applies the css to the page and reports what the page check found'
   expect(report).toMatch(/- Hard to read: .*\bp \(1 element\), text #f4f4f4/);
 });
 
+test('css set reports only the rules a save changed, unless --verbose', async () => {
+  const file = path.join(home, 'pink.css');
+  fs.writeFileSync(
+    file,
+    [`h1 { color: ${PINK}; }`, 'p { color: #333333; }'].join('\n')
+  );
+
+  const report = await ok(['css', 'set', 'localhost', '--file', file]);
+
+  expect(report).toContain('- p: 1 element');
+  expect(report).not.toContain('- h1:');
+  expect(report).toContain('Removed rules:\n- .not-on-the-page');
+  expect(report).toContain('1 unchanged rule not listed');
+
+  expect(await ok(['css', 'set', 'localhost', '--file', file])).toContain(
+    'No rules changed since the last save.'
+  );
+
+  const verbose = await ok([
+    'css',
+    'set',
+    'localhost',
+    '--file',
+    file,
+    '--verbose',
+  ]);
+  expect(verbose).toContain('- h1: 1 element');
+  expect(verbose).toContain('- p: 1 element');
+});
+
 test('a write that names no site or tab is refused', async () => {
   const file = path.join(home, 'pink.css');
 

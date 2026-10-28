@@ -150,6 +150,10 @@ export const addStyleCommands = program => {
     .argument('<target>', 'A tab id or site')
     .option('-f, --file <path>', 'Read the css from a file instead')
     .option('-p, --profile <name>', 'A profile other than the active one')
+    .option(
+      '--verbose',
+      "Report every selector's match count, not only the changed rules'"
+    )
     .action(async (target, options) => {
       const text = options.file
         ? fs.readFileSync(options.file, 'utf8')
@@ -160,6 +164,7 @@ export const addStyleCommands = program => {
           target,
           css: text,
           profile: options.profile,
+          verbose: Boolean(options.verbose),
         }),
         describeSave
       );
