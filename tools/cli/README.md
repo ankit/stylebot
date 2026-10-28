@@ -29,9 +29,9 @@ stylebot screenshot 1234 -o page.png
 
 `stylebot --help` lists every command.
 
-## Claude Code
+## Coding agents
 
-The Stylebot plugin for Claude Code restyles sites with this CLI. Ask for a look, such as "give Hacker News a dark theme", and it writes the CSS, checks the page and looks at a screenshot.
+The Stylebot skill lets coding agents such as Claude Code, Codex, Copilot and Cursor restyle sites with this CLI. Ask for a look, such as "give Hacker News a dark theme", and it writes the CSS, checks the page and looks at a screenshot.
 
 ## Privacy
 

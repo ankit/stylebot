@@ -29,7 +29,7 @@ npm install -g @stylebot/cli
 stylebot install
 ```
 
-It works on Chrome, Edge and other Chromium browsers. See [docs/cli.md](docs/cli.md) for commands and the Claude Code plugin.
+It works on Chrome, Edge and other Chromium browsers. See [docs/cli.md](docs/cli.md) for commands and setting it up in coding agents.
 
 ## Contributing
 
