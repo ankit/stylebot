@@ -1,7 +1,30 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { createPrinter, request } from '../request.mjs';
+import { addHelpSections } from '../help.mjs';
+import { createPrinter, fail, request } from '../request.mjs';
+
+/**
+ * Where a screenshot went, its size and scale, so points read off it map to
+ * css pixels, and whether its element or clip was cut to the viewport.
+ */
+const formatScreenshot = ({
+  path: out,
+  width,
+  height,
+  scale,
+  viewport,
+  cutOff,
+}) =>
+  [
+    out,
+    `${width}×${height}, scale ${scale} (${scale} image px = 1 CSS px)`,
+    ...(cutOff
+      ? [
+          `Cut off: only the part inside the ${viewport.width}×${viewport.height} viewport shows`,
+        ]
+      : []),
+  ].join('\n');
 
 /**
  * Adds the commands that open, read and capture pages.
@@ -47,19 +70,53 @@ export const addPageCommands = program => {
       print(await request('outline', { tab }), outline => outline)
     );
 
-  program
+  const screenshot = program
     .command('screenshot')
-    .description('Save a PNG of a tab')
+    .description('Save a PNG of a tab, or of one element or region of it')
     .argument('<tab>', 'A tab id')
     .option('-o, --out <path>', 'Where to save it')
+    .option(
+      '--selector <selector>',
+      'Only the first visible element it matches, scrolled to if needed'
+    )
+    .option(
+      '--clip <x,y,w,h>',
+      'Only this region, in css pixels of the viewport'
+    )
+    .option(
+      '--scale <n>',
+      'Image pixels per css pixel; 2 for full resolution on a 2× screen',
+      '1'
+    )
     .action(async (tab, options) => {
-      const dataUrl = await request('screenshot', { tab });
+      if (options.selector !== undefined && options.clip !== undefined) {
+        fail('Pass --selector or --clip, not both');
+      }
+
+      const { dataUrl, ...shot } = await request('screenshot', {
+        tab,
+        selector: options.selector,
+        clip: options.clip,
+        scale: options.scale,
+      });
       const out = path.resolve(options.out ?? `stylebot-${Date.now()}.png`);
 
       fs.mkdirSync(path.dirname(out), { recursive: true });
       fs.writeFileSync(out, Buffer.from(dataUrl.split(',')[1], 'base64'));
-      console.log(out);
+      print({ path: out, ...shot }, formatScreenshot);
     });
+
+  addHelpSections(screenshot, {
+    Notes: [
+      'At the default scale 1, a point in the image is the css pixel that',
+      'hover and inspect take, for a full screenshot. --selector scrolls back',
+      'afterwards; an element bigger than the viewport is cut to what fits.',
+    ],
+    Examples: [
+      "$ stylebot screenshot 1234 --selector '#nav .menu' -o menu.png",
+      '$ stylebot screenshot 1234 --clip 0,0,600,400 --scale 2',
+    ],
+  });
 
   program
     .command('done')
