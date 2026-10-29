@@ -335,18 +335,27 @@ export const WINDOW = {
 };
 
 /**
- * Renders a screen as a listing slide: the title above, and the part of the
- * screen from `crop` on enlarged into a window below it, so the UI still reads
- * at the size the store shows its images. `*word*` in the title is marked.
+ * Renders a screen as a listing slide: the title above, the screen from `crop`
+ * on enlarged into a window below, or with `whole`, all of it scaled to fit.
+ * `*word*` in the title is marked.
  */
 export const slide = (
   context,
   { image, width },
   file,
-  { title, accent, crop = {}, scale }
+  { title, accent, crop = {}, whole, scale }
 ) => {
-  const { x = 0, y = 0 } = crop;
-  const zoom = WINDOW.width / (crop.width ?? width - x);
+  const { x = 0, y = 0 } = whole ? {} : crop;
+  const zoom = whole
+    ? (WINDOW.height - WINDOW.top / 2) / HEIGHT
+    : WINDOW.width / (crop.width ?? width - x);
+  const frame = whole
+    ? {
+        left: (WIDTH - width * zoom) / 2,
+        width: width * zoom,
+        height: HEIGHT * zoom - WINDOW.radius,
+      }
+    : { left: WINDOW.side, width: WINDOW.width, height: WINDOW.height };
   const color = ACCENTS[accent];
   // Punctuation after the mark tucks in against its padding.
   const heading = title.replace(
@@ -362,9 +371,9 @@ export const slide = (
     `<body style="margin:0;height:${HEIGHT}px;overflow:hidden;background:#f6f3ee;font-family:-apple-system,system-ui,sans-serif">
       <h1 style="margin:0;padding-top:56px;text-align:center;font-size:56px;line-height:1.1;font-weight:700;letter-spacing:-0.03em;color:#16171a">${heading}</h1>
       <div style="position:absolute;top:${WINDOW.top}px;left:${
-      WINDOW.side
-    }px;width:${WINDOW.width}px;height:${
-      WINDOW.height + WINDOW.radius
+      frame.left
+    }px;width:${frame.width}px;height:${
+      frame.height + WINDOW.radius
     }px;overflow:hidden;border-radius:${
       WINDOW.radius
     }px;box-shadow:0 0 0 1px #0000001f,0 20px 60px #00000033">

@@ -280,8 +280,8 @@ export const SHOTS = [
   },
   {
     name: '6-profiles',
-    about: 'Profiles: Hacker News in Newspaper Dark',
-    appearance: 'dark',
+    about: 'Profiles: Wikipedia in Parchment',
+    appearance: 'light',
     slide: {
       title: 'Switch *looks* in a click.',
       accent: 'yellow',
@@ -290,19 +290,29 @@ export const SHOTS = [
     phone: { pageWidth: 400 },
     run: async (browser, file, options) => {
       await seed(browser, {
-        styles: { 'news.ycombinator.com': hackerNews('Newspaper Dark') },
+        styles: {
+          'en.wikipedia.org': {
+            ...profiles(
+              { name: 'Slate', css: gallery('wikipedia', 'slate') },
+              { name: 'Parchment', css: gallery('wikipedia', 'parchment') }
+            ),
+            css: gallery('wikipedia', 'parchment'),
+            activeProfile: 'profile-1',
+          },
+        },
       });
       const page = await openSite(
         browser.context,
-        'https://news.ycombinator.com/',
+        'https://en.wikipedia.org/wiki/Bonsai',
         { space: pageWidth(options) }
       );
+      await page.addStyleTag({ content: '#centralNotice { display: none; }' });
       const panel = await openPanelFor(browser, page, options);
       await showTab(panel);
       await panel.getByRole('button', { name: 'Switch profile' }).click();
       await wait(600);
       await capture(browser.context, file, page, panel, {
-        appearance: 'dark',
+        appearance: 'light',
         ...options,
       });
     },

@@ -4,7 +4,7 @@
 //   yarn capture:store [--safari | --phone] [--only <name>...] [--out <dir>] [--no-build]
 //
 // With --safari, the Mac App Store's set goes into store/safari/ instead, at
-// 2560×1600 and without the CLI. With --phone, the same screens are cut out,
+// 2560×1600, without the CLI, each slide showing the whole window. With --phone, the same screens are cut out,
 // without their headlines, for the tour on stylebot.dev's phone layout, into
 // captures/tour/.
 
@@ -17,7 +17,8 @@ import { capturesDir, shownPath, takeOutput } from './output.mjs';
 
 const USAGE = `usage: yarn capture:store [--safari | --phone] [--only <name>...] [--out <dir>] [--no-build]
 
-  --safari    take the Mac App Store's set, at 2560×1600, into store/safari/
+  --safari    take the Mac App Store's set, at 2560×1600 with whole
+              windows, into store/safari/
   --phone     cut the screens out for stylebot.dev's phone tour, into
               captures/tour/
   --out       save into this directory instead
@@ -79,7 +80,16 @@ for (const shot of shots) {
   try {
     const shotOptions = phone
       ? { phone: shot.phone }
-      : { ...options, slide: shot.slide };
+      : {
+          ...options,
+          slide: safari
+            ? {
+                title: shot.slide.title,
+                accent: shot.slide.accent,
+                whole: true,
+              }
+            : shot.slide,
+        };
     await (shot.standalone
       ? shot.run(file, shotOptions)
       : shot.run(browser, file, shotOptions));
