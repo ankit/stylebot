@@ -23,6 +23,18 @@ const safariAppScript = path.join(
   'safari/Stylebot/Stylebot/Resources/Script.js'
 );
 const manifestPath = path.join(rootDir, 'src/assets/manifest/manifest.json');
+// The App Store lists the languages the Safari app declares here.
+const safariAppInfoPlist = path.join(
+  rootDir,
+  'safari/Stylebot/Stylebot/Info.plist'
+);
+
+// Extension locales whose Apple language ID isn't the locale with a hyphen.
+const APPLE_LANGUAGE_IDS = {
+  en_US: 'en',
+  zh_CN: 'zh-Hans',
+  zh_TW: 'zh-Hant',
+};
 
 const KEY_PATTERN = /^[a-z][a-z0-9_]*$/;
 
@@ -392,6 +404,24 @@ function main() {
       }
     }
   }
+
+  const safariLanguages = new Set(
+    [
+      ...readFileSync(safariAppInfoPlist, 'utf8')
+        .split('<key>CFBundleLocalizations</key>')[1]
+        .split('</array>')[0]
+        .matchAll(/<string>([^<]+)<\/string>/g),
+    ].map(m => m[1])
+  );
+
+  Object.keys(parsedByLocale)
+    .map(locale => APPLE_LANGUAGE_IDS[locale] ?? locale.replace('_', '-'))
+    .filter(language => !safariLanguages.has(language))
+    .forEach(language =>
+      errors.push(
+        `Safari app Info.plist: CFBundleLocalizations is missing "${language}"`
+      )
+    );
 
   if (dynamicCalls.length > 0) {
     console.log(
