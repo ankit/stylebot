@@ -236,7 +236,7 @@ claude plugin marketplace add ankit/stylebot
 claude plugin install stylebot@stylebot
 ```
 
-Use `./` in place of `ankit/stylebot` to install this checkout's plugin, or try it in one session with `claude --plugin-dir tools/claude-plugin`. Invoke it with `/stylebot <site> <what to change>`. It runs without permission prompts: the skill pre-approves `stylebot` commands and reading and writing files in `~/.stylebot/work/`.
+Use `./` in place of `ankit/stylebot` to install this checkout's plugin, or try it in one session with `claude --plugin-dir tools/agent-plugin`. Invoke it with `/stylebot <site> <what to change>`. It runs without permission prompts: the skill pre-approves `stylebot` commands and reading and writing files in `~/.stylebot/work/`.
 
 ### Codex CLI
 
@@ -277,7 +277,7 @@ From this checkout, copy the skill folder into the agent's personal skills folde
 | Antigravity CLI   | `~/.gemini/antigravity-cli/skills/` | `.agents/skills/`     |
 
 ```bash
-cp -R tools/claude-plugin/skills/stylebot ~/.cursor/skills/
+cp -R tools/agent-plugin/skills/stylebot ~/.cursor/skills/
 ```
 
 Copilot CLI reads `~/.copilot/skills/` too, and Cursor also reads `~/.claude/skills/`. Ask for a look, or type `/stylebot`.

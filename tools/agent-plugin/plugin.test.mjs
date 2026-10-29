@@ -8,7 +8,7 @@ const read = file => fs.readFileSync(path.join(root, file), 'utf8');
 describe('stylebot skill', () => {
   it('has front matter that parses as strict YAML', () => {
     const [, frontMatter] = read(
-      'tools/claude-plugin/skills/stylebot/SKILL.md'
+      'tools/agent-plugin/skills/stylebot/SKILL.md'
     ).match(/^---\n([\s\S]*?)\n---\n/);
     const fields = yaml.safeLoad(frontMatter);
 
@@ -22,7 +22,7 @@ describe('stylebot skill', () => {
 describe('stylebot plugin manifests', () => {
   it.each([
     '.claude-plugin/marketplace.json',
-    'tools/claude-plugin/.claude-plugin/plugin.json',
+    'tools/agent-plugin/.claude-plugin/plugin.json',
   ])('%s parses as JSON', file => {
     expect(() => JSON.parse(read(file))).not.toThrow();
   });

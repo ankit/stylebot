@@ -10,8 +10,9 @@ const esbuild = require('esbuild');
 const TIERS = ['apps', 'features', 'ui', 'core'];
 const RENAMED_PACKAGES = { 'inject-css': 'apps/content' };
 const CLI = 'tools/cli/lib/cli.mjs';
-const PLUGIN = 'tools/claude-plugin';
-const SKILL = `${PLUGIN}/skills/stylebot/SKILL.md`;
+// Where a checkout keeps the agent plugin, newest first.
+const PLUGINS = ['tools/agent-plugin', 'tools/claude-plugin'];
+const SKILL = 'skills/stylebot/SKILL.md';
 // Where a checkout keeps the page check, newest first.
 const STYLE_CHECKS = [
   'src/features/page-bridge/page-reading/style-check',
@@ -22,6 +23,12 @@ const git = (cwd, args) =>
   execFileSync('git', args, { cwd, maxBuffer: 1 << 28 });
 
 const exists = (root, file) => fs.existsSync(path.join(root, file));
+
+/**
+ * The checkout's agent plugin folder, relative to root.
+ */
+const pluginOf = root =>
+  PLUGINS.find(dir => exists(root, `${dir}/${SKILL}`)) ?? PLUGINS[0];
 
 /**
  * Every @stylebot/ package of the checkout at root, as esbuild aliases.
@@ -95,7 +102,9 @@ export const checkoutRef = (repo, cacheDir, ref) => {
     checkout = { root, label: `${ref} (${sha.slice(0, 8)})`, key: sha };
   }
 
-  const missing = [CLI, SKILL].filter(file => !exists(checkout.root, file));
+  const missing = [CLI, `${pluginOf(checkout.root)}/${SKILL}`].filter(
+    file => !exists(checkout.root, file)
+  );
   if (missing.length) {
     throw new Error(
       `${
@@ -167,11 +176,11 @@ export const buildExtension = (repo, cacheDir, checkout) => {
 };
 
 /**
- * The checkout's CLI entry point and Claude Code plugin folder.
+ * The checkout's CLI entry point and agent plugin folder.
  */
 export const toolsOf = root => ({
   cli: path.join(root, CLI),
-  plugin: path.join(root, PLUGIN),
+  plugin: path.join(root, pluginOf(root)),
 });
 
 /**
