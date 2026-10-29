@@ -1,7 +1,7 @@
-// Fills in the Mac App Store version that's being prepared: its version
-// number, every language's listing from store/safari/listing/ (run
-// `yarn store:safari-text` first), the screenshots in store/safari/, and the
-// newest processed build of package.json's version. Signs with the API key
+// Fills in the Mac App Store version that's being prepared, adding one when
+// there's none: its version number, every language's listing from
+// store/safari/listing/ (run `yarn store:safari-text` first), the screenshots
+// in store/safari/, and the newest processed build of package.json's version. Signs with the API key
 // that APP_STORE_CONNECT_KEY_PATH, _KEY_ID and _ISSUER_ID point to.
 //
 //   yarn upload:safari-listing
@@ -103,6 +103,31 @@ const findEditable = async (pathname, label) => {
     );
   }
   return editable;
+};
+
+/**
+ * The macOS version being prepared, created for package.json's version when
+ * there's none, as after a release.
+ */
+const findOrCreateVersion = async appId => {
+  const pathname = `/v1/apps/${appId}/appStoreVersions?filter[platform]=MAC_OS`;
+  const versions = await getAll(pathname);
+  const editable = versions.some(item =>
+    EDITABLE_STATES.includes(item.attributes.appStoreState)
+  );
+
+  if (!editable) {
+    await request('POST', '/v1/appStoreVersions', {
+      data: {
+        type: 'appStoreVersions',
+        attributes: { platform: 'MAC_OS', versionString: version },
+        relationships: { app: { data: { type: 'apps', id: appId } } },
+      },
+    });
+    console.log(`✓ created version ${version}`);
+  }
+
+  return findEditable(pathname, 'macOS version');
 };
 
 const updateVersion = async versionId => {
@@ -302,10 +327,7 @@ const attachBuild = async (appId, versionId) => {
 };
 
 const app = await findApp();
-const appVersion = await findEditable(
-  `/v1/apps/${app.id}/appStoreVersions?filter[platform]=MAC_OS`,
-  'macOS version'
-);
+const appVersion = await findOrCreateVersion(app.id);
 const appInfo = await findEditable(`/v1/apps/${app.id}/appInfos`, 'app info');
 
 await request('PATCH', `/v1/apps/${app.id}`, {
