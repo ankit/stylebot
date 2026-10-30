@@ -233,7 +233,7 @@ claude plugin marketplace add ankit/stylebot
 ```
 
 ```bash
-claude plugin install stylebot@stylebot
+claude plugin install stylebot
 ```
 
 Use `./` in place of `ankit/stylebot` to install this checkout's plugin, or try it in one session with `claude --plugin-dir tools/agent-plugin`. Invoke it with `/stylebot <site> <what to change>`. It runs without permission prompts: the skill pre-approves `stylebot` commands and reading and writing files in `~/.stylebot/work/`.
