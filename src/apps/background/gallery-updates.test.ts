@@ -97,17 +97,31 @@ describe('gallery updates', () => {
     expect(applyStylesToAllTabs).not.toHaveBeenCalled();
   });
 
-  it('drops the listings of a style the gallery no longer has', async () => {
+  it('drops the listings of a style the gallery deleted', async () => {
     installed(1, 'a {}', 'a { color: red; }');
-    fetchMock.mockResponseOnce(JSON.stringify({ error: 'Not found' }), {
-      status: 404,
-    });
+    fetchMock.mockResponseOnce(
+      JSON.stringify({ error: 'No such style', code: 'style_deleted' }),
+      { status: 404 }
+    );
 
     await updateGalleryInstalls();
 
     expect(removeStyleGalleryListings).toHaveBeenCalledWith(style.id);
     expect(updateGalleryProfile).not.toHaveBeenCalled();
     expect(applyStylesToAllTabs).not.toHaveBeenCalled();
+  });
+
+  it('keeps the listings of a hidden or unpublished style without updating it', async () => {
+    installed(1, 'a {}', 'a {}');
+    fetchMock.mockResponseOnce(JSON.stringify({ error: 'No such style' }), {
+      status: 404,
+    });
+
+    await updateGalleryInstalls();
+
+    expect(removeStyleGalleryListings).not.toHaveBeenCalled();
+    expect(updateGalleryProfile).not.toHaveBeenCalled();
+    expect(setGalleryListing).not.toHaveBeenCalled();
   });
 
   it('drops the listings when the gallery has an older version, so the id names another style', async () => {

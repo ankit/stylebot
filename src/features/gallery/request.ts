@@ -1,9 +1,10 @@
 import { GALLERY_API_URL } from './config';
 
 /**
- * status is the HTTP status, or 0 when the request never got an answer.
+ * status is the HTTP status, or 0 when the request never got an answer. code
+ * is the server's, for errors that share a status.
  */
-export type GalleryApiError = Error & { status: number };
+export type GalleryApiError = Error & { status: number; code?: string };
 
 /**
  * A factory rather than an Error subclass: tsconfig sets no `target`, so
@@ -11,11 +12,19 @@ export type GalleryApiError = Error & { status: number };
  */
 export const galleryApiError = (
   message: string,
-  status: number
-): GalleryApiError => Object.assign(new Error(message), { status });
+  status: number,
+  code?: string
+): GalleryApiError => Object.assign(new Error(message), { status, code });
 
 export const isGalleryApiError = (e: unknown): e is GalleryApiError =>
   e instanceof Error && typeof (e as GalleryApiError).status === 'number';
+
+/**
+ * Whether the gallery says a style was deleted for good. Any other 404 may
+ * be a hidden or unpublished style that can come back.
+ */
+export const isGalleryStyleDeleted = (e: unknown): boolean =>
+  isGalleryApiError(e) && e.status === 404 && e.code === 'style_deleted';
 
 type RequestOptions = {
   method?: string;
@@ -57,7 +66,8 @@ export const request = async <T>(
   if (!response.ok) {
     throw galleryApiError(
       body?.error ?? `Gallery request failed (${response.status})`,
-      response.status
+      response.status,
+      body?.code
     );
   }
 
