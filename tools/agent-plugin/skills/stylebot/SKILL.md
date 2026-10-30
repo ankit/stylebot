@@ -1,7 +1,7 @@
 ---
 name: stylebot
 description: Restyle websites in the user's browser with the Stylebot extension's `stylebot` CLI — dark modes, themes, fonts, bigger text, hiding clutter, fixing a layout, or editing and managing the CSS and profiles Stylebot has saved for a site. Use when the user wants to change how a website looks, or asks about their Stylebot styles.
-argument-hint: [site] [what to change]
+argument-hint: '[site] [what to change]'
 allowed-tools: Bash(stylebot *) Read(~/.stylebot/work/**) Edit(~/.stylebot/work/**)
 ---
 
@@ -13,8 +13,8 @@ Read and check pages only through `stylebot`, never another browser tool (browse
 
 ## Running commands
 
-- Run one `stylebot` command per Bash call, exactly as written here: no `cd`, `&&`, `;`, pipes, `$(...)`, `<` or heredocs. Those need the user's approval each time; a plain `stylebot` command doesn't.
-- Keep every file in `~/.stylebot/work/`: CSS as `~/.stylebot/work/<site>.css`, screenshots as `~/.stylebot/work/<site>-1.png`, `-2.png` and so on. You can read and write there without asking. Write files with your file-writing tool, never the shell.
+- Run one `stylebot` command per shell command, exactly as written here: no `cd`, `&&`, `;`, pipes, `$(...)`, `<` or heredocs. Those need the user's approval each time, while the user can allow plain `stylebot` commands once.
+- Keep every file in `~/.stylebot/work/`: CSS as `~/.stylebot/work/<site>.css`, screenshots as `~/.stylebot/work/<site>-1.png`, `-2.png` and so on, where the user can allow reading and writing once. Write files with your file-writing tool, never the shell.
 
 ## Setup
 
@@ -30,7 +30,7 @@ If `stylebot` isn't found, the CLI isn't installed: tell the user to install it 
 2. **If the user hasn't said what to change**, or asks for ideas, run `stylebot suggestions <tab>`: up to two requests chosen from what's on the page, plus a creative look. Offer their names as choices, with your tool for asking the user a question if you have one, and an option for something else. Carry out the chosen suggestion's full request text.
 3. **Pick the profile to work in**: run `stylebot profiles <tab>` to list the profiles of the page's style, with the one in use starred.
    - When the user names a profile to update ("update my Dark profile", "tweak Compact"), work in that one: switch to it with `stylebot profile use "<profile>" <tab>` if it isn't starred, so the page shows your changes. Don't create a new one. If no profile matches the name, ask which they meant.
-   - Otherwise start your own: `stylebot profile create "Claude: <look>" <tab> --from <profile in use> --use`, naming the look in a word or two ("Claude: Dark", "Claude: Compact"). Your changes go there, and the user's own style stays one `stylebot profile use <profile> <tab>` away. If that profile already exists from an earlier session, reuse it with `stylebot profile use`.
+   - Otherwise start your own: `stylebot profile create "<your name>: <look>" <tab> --from <profile in use> --use`, with your own short name and the look in a word or two ("Claude: Dark", "Codex: Compact"). Your changes go there, and the user's own style stays one `stylebot profile use <profile> <tab>` away. If that profile already exists from an earlier session, reuse it with `stylebot profile use`.
    - From here on, pass `--profile "<profile>"` to every `css get`, `css rule`, `css add`, `css diff` and `css set`, naming the profile you picked, never relying on the profile in use: the user can switch profiles while you work, and without it you'd read or overwrite a different style.
 4. **Read the page**: `stylebot outline <tab>` prints its visible elements and how each looks. `stylebot css-variables <tab>` prints its CSS variables. `stylebot css get <tab> --profile "<profile>"` prints the CSS already saved; build on it rather than starting over unless the user asks for a fresh start. Once you know what's there, read only the part you need with `--grep <text>`, such as a selector or a color, which prints just the rules whose selector or declarations contain it, rather than the whole stylesheet again.
    - To style something that only shows on hover (a menu, a tooltip), open it first with `stylebot hover <tab> <selector>`, then read the outline again. A point works in place of a selector, as `x,y` in the pixels of a full screenshot of the tab at the default scale. Hovering doesn't apply the page's CSS `:hover`, so check hover styles by reading the CSS, not a screenshot.
@@ -47,7 +47,7 @@ If `stylebot` isn't found, the CLI isn't installed: tell the user to install it 
    - When it says your profile isn't the one in use, the user switched profiles while you worked: your CSS is saved but the page doesn't show it, so ask before switching back with `stylebot profile use`.
 7. **Look at it**: to check one fix, shoot just that element with `stylebot screenshot <tab> --selector '<selector>' -o ~/.stylebot/work/<site>-<n>.png` (or a region with `--clip x,y,w,h`); it's quicker and smaller than the whole page. Take a full `stylebot screenshot <tab> -o ~/.stylebot/work/<site>-<n>.png` for the final look. Open each image and look at it; never report a change you haven't seen. Run `stylebot outline <tab>` again too: it shows the colors and sizes as they are now, so it confirms a selector took effect and catches dark text on a dark background. Fix what's off and repeat.
 8. **Close up**: run `stylebot done` to close Stylebot's window.
-9. **Tell the user** in a sentence or two what changed and which profile it's saved in. When you made a new "Claude: <look>" profile, add that `stylebot profile use <their profile> <site>` (or the profile menu in Stylebot) switches back. Don't paste the CSS unless they ask.
+9. **Tell the user** in a sentence or two what changed and which profile it's saved in. When you made a new "<your name>: <look>" profile, add that `stylebot profile use <their profile> <site>` (or the profile menu in Stylebot) switches back. Don't paste the CSS unless they ask.
 
 Empty CSS deletes the site's style. Confirm with the user before deleting a style or a profile they made themselves.
 

@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "stylebot",
-      "source": "./tools/claude-plugin",
+      "source": "./tools/agent-plugin",
       "description": "Restyle any website in your browser through the Stylebot extension"
     }
   ]
