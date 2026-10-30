@@ -140,6 +140,7 @@
 				BC9E61013067731000A7D161 /* Sources */,
 				BC9E61023067731000A7D161 /* Frameworks */,
 				BC9E61033067731000A7D161 /* Resources */,
+				BC9E61553067731200A7D161 /* Add localizations */,
 				BC9E612D3067731200A7D161 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
@@ -254,6 +255,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "SRC=\"${SRCROOT}/../../safari-dist/\"\nif [ ! -f \"${SRC}manifest.json\" ]; then\n  echo \"error: safari-dist/ is missing; run yarn build:safari first\"\n  exit 1\nfi\nrsync -a --delete --exclude .build-complete \"$SRC\" \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
+		};
+		BC9E61553067731200A7D161 /* Add localizations */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Add localizations";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "SRC=\"${SRCROOT}/../../safari-dist/_locales\"\nif [ ! -d \"$SRC\" ]; then\n  echo \"error: safari-dist/ is missing; run yarn build:safari first\"\n  exit 1\nfi\nfor dir in \"$SRC\"/*/; do\n  locale=$(basename \"$dir\")\n  case \"$locale\" in\n    zh_CN) lproj=zh-Hans ;;\n    zh_TW) lproj=zh-Hant ;;\n    *) lproj=$(echo \"$locale\" | tr _ -) ;;\n  esac\n  out=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/${lproj}.lproj\"\n  mkdir -p \"$out\"\n  printf '\"CFBundleDisplayName\" = \"Stylebot\";\\n' > \"$out/InfoPlist.strings\"\ndone\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -505,6 +525,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Stylebot/Info.plist;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_KEY_CFBundleDisplayName = Stylebot;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
@@ -547,6 +568,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Stylebot/Info.plist;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_KEY_CFBundleDisplayName = Stylebot;
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
