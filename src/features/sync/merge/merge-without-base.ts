@@ -7,6 +7,8 @@ import {
   keepLocalProfileOptions,
 } from '@stylebot/saved-styles';
 
+import { fillGalleryListings } from './gallery-listings';
+
 /**
  * Returns 0 for an unparseable timestamp on either side, so the caller's
  * `> 0` test falls through to keeping the local style rather than comparing
@@ -24,10 +26,10 @@ const compareModifiedTime = (t1?: string, t2?: string) => {
 };
 
 /**
- * The winning copy of a style with any profiles only the losing copy has
- * added, so a profile made on one device before its first sync survives.
+ * The winning copy of a style with any profiles and gallery listings only the
+ * losing copy has.
  */
-const withMissingProfiles = (
+const fillProfiles = (
   winner: StyleWithoutUrl,
   loser?: StyleWithoutUrl
 ): StyleWithoutUrl => {
@@ -35,12 +37,13 @@ const withMissingProfiles = (
     return winner;
   }
 
-  const won = expandProfiles(winner);
+  const listed = fillGalleryListings(winner, loser) ?? winner;
+  const won = expandProfiles(listed);
   const lost = expandProfiles(loser);
   const missing = Object.keys(lost.sheets).filter(id => !(id in won.sheets));
 
   if (missing.length === 0) {
-    return winner;
+    return listed;
   }
 
   const sheets = { ...won.sheets };
@@ -48,7 +51,7 @@ const withMissingProfiles = (
     sheets[id] = lost.sheets[id];
   });
 
-  return collapseProfiles(winner, { active: won.active, sheets });
+  return collapseProfiles(listed, { active: won.active, sheets });
 };
 
 /**
@@ -70,13 +73,13 @@ export const mergeWithoutBase = (
     ) {
       styles[url] = keepLocalProfileOptions(
         activateProfile(
-          withMissingProfiles(remote[url], local[url]),
+          fillProfiles(remote[url], local[url]),
           expandProfiles(local[url]).active
         ),
         local[url]
       );
     } else {
-      styles[url] = withMissingProfiles(local[url], remote[url]);
+      styles[url] = fillProfiles(local[url], remote[url]);
     }
   });
 

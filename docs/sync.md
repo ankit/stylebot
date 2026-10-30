@@ -26,6 +26,8 @@ The base is a second copy of the style map: the one both sides agreed on at the 
 
 Without a base — first sync, reinstall, or a profile that synced before it was recorded — the run falls back to a newest-wins union per style, once.
 
+Either way, a profile's gallery link is never removed by sync. A copy whose profile lacks the link the other copy has, such as one from a device that never installed or published it, takes it from the other copy. Each device drops links to styles the gallery no longer has on its own, so a link one device dropped can come back from another until that device's own check drops it too.
+
 ## When runs happen
 
 `chrome.alarms`, so the MV3 service worker need not stay alive: every 30 minutes, 30 seconds after the last local edit settles, on browser start, and on **Sync now**. Sync's own writes are marked as such, so a pull does not schedule a push. Overlapping runs coalesce into one.

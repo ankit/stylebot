@@ -493,6 +493,30 @@ describe('mergeThreeWay with profiles', () => {
         listing(3)
       );
     });
+
+    it('keeps a listing when the remote copy arrives without it', () => {
+      const { styles } = merge(
+        { 'a.com': withListing(1, T1) },
+        { 'a.com': withListing(1, T1) },
+        { 'a.com': withListing(undefined, T1) }
+      );
+
+      expect(styles['a.com'].profiles?.dark?.galleryListing).toEqual(
+        listing(1)
+      );
+    });
+
+    it('takes back a listing the local copy lost', () => {
+      const { styles } = merge(
+        { 'a.com': withListing(1, T1) },
+        { 'a.com': withListing(undefined, T2) },
+        { 'a.com': withListing(1, T1) }
+      );
+
+      expect(styles['a.com'].profiles?.dark?.galleryListing).toEqual(
+        listing(1)
+      );
+    });
   });
 
   describe('fields a newer version adds', () => {

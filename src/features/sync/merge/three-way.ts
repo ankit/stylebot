@@ -11,6 +11,7 @@ import {
 } from '@stylebot/saved-styles';
 import type { ExpandedProfiles, ProfileSheet } from '@stylebot/saved-styles';
 
+import { fillGalleryListings } from './gallery-listings';
 import { mergeCss } from './merge-css';
 import { mergeWithoutBase } from './merge-without-base';
 
@@ -222,8 +223,10 @@ export const mergeThreeWay = (
 
   urls.forEach(url => {
     const b = base[url];
-    const l = restoreProfiles(b, local[url]);
-    const r = restoreProfiles(b, remote[url]);
+    const restoredLocal = restoreProfiles(b, local[url]);
+    const restoredRemote = restoreProfiles(b, remote[url]);
+    const l = fillGalleryListings(restoredLocal, restoredRemote);
+    const r = fillGalleryListings(restoredRemote, restoredLocal);
 
     const localChanged = !isEquivalentStyle(b, l, { ignoreActiveProfile });
     const remoteChanged = !isEquivalentStyle(b, r, { ignoreActiveProfile });

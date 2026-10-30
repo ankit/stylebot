@@ -128,4 +128,29 @@ describe('mergeWithoutBase with profiles', () => {
       profiles: { dark: { name: 'Dark', css: 'b {}' } },
     });
   });
+
+  it('keeps a gallery listing only the losing copy has', () => {
+    const galleryListing = {
+      styleId: 14,
+      slug: 'chatgpt-slate',
+      version: 2,
+      cssHash: 'abc',
+      published: true,
+    };
+    const copy = (listed: boolean) => ({
+      css: 'a {}',
+      enabled: true,
+      readability: false,
+      modifiedTime: '2024-01-01T00:00:00.000Z',
+      profiles: {
+        default: { name: 'Slate', ...(listed ? { galleryListing } : {}) },
+      },
+      activeProfile: 'default',
+    });
+
+    expect(
+      mergeStyles({ 'a.com': copy(false) }, { 'a.com': copy(true) })['a.com']
+        .profiles?.default?.galleryListing
+    ).toEqual(galleryListing);
+  });
 });
