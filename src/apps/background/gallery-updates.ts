@@ -3,7 +3,7 @@ import {
   getListedStyleIds,
   getStyle,
   hashCss,
-  isGalleryApiError,
+  isGalleryStyleDeleted,
   type GalleryStyleWithCss,
 } from '@stylebot/gallery';
 
@@ -39,22 +39,23 @@ export const scheduleGalleryUpdates = async (): Promise<void> => {
 };
 
 /**
- * A gallery style's latest version, 'missing' on a 404, or null on any
- * other failure.
+ * A gallery style's latest version, 'deleted' once the gallery deleted it,
+ * or null on any other failure, a hidden or unpublished style among them.
  */
 const getLatestStyle = async (
   id: number
-): Promise<GalleryStyleWithCss | 'missing' | null> => {
+): Promise<GalleryStyleWithCss | 'deleted' | null> => {
   try {
     return await getStyle(id);
   } catch (e) {
-    return isGalleryApiError(e) && e.status === 404 ? 'missing' : null;
+    return isGalleryStyleDeleted(e) ? 'deleted' : null;
   }
 };
 
 /**
  * Updates unedited gallery installs to their latest versions, drops listings
- * of styles the gallery no longer has, and refreshes renamed styles' slugs.
+ * of styles the gallery deleted, and refreshes renamed styles' slugs. Hidden
+ * and unpublished styles keep their listings, as they can come back.
  */
 export const updateGalleryInstalls = async (): Promise<void> => {
   const styles = await getAll();
@@ -70,7 +71,7 @@ export const updateGalleryInstalls = async (): Promise<void> => {
 
     // Versions only grow, so an older one means the id now names another style.
     if (
-      latest === 'missing' ||
+      latest === 'deleted' ||
       latest.version < listed[0].galleryListing.version
     ) {
       await removeStyleGalleryListings(styleId);

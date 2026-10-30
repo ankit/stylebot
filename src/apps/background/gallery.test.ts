@@ -663,10 +663,11 @@ describe('gallery messages', () => {
       expect(applyStylesToAllTabs).toHaveBeenCalled();
     });
 
-    it('fails and drops the listings when the gallery no longer has the style', async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({ error: 'Not found' }), {
-        status: 404,
-      });
+    it('fails and drops the listings when the gallery deleted the style', async () => {
+      fetchMock.mockResponseOnce(
+        JSON.stringify({ error: 'No such style', code: 'style_deleted' }),
+        { status: 404 }
+      );
 
       const response = await reset('p1');
 
@@ -696,6 +697,21 @@ describe('gallery messages', () => {
       });
       expect(resetGalleryProfile).not.toHaveBeenCalled();
       expect(removeStyleGalleryListings).toHaveBeenCalledWith(42);
+    });
+
+    it('fails but keeps the listings of a hidden or unpublished style', async () => {
+      fetchMock.mockResponseOnce(JSON.stringify({ error: 'No such style' }), {
+        status: 404,
+      });
+
+      const response = await reset('p1');
+
+      expect(response).toMatchObject({
+        ok: false,
+        errorKey: 'gallery_error_not_found',
+      });
+      expect(resetGalleryProfile).not.toHaveBeenCalled();
+      expect(removeStyleGalleryListings).not.toHaveBeenCalled();
     });
 
     it('keeps the listings when the gallery can’t be reached', async () => {

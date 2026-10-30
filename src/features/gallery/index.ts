@@ -12,6 +12,7 @@ export {
 export {
   galleryApiError,
   isGalleryApiError,
+  isGalleryStyleDeleted,
   type GalleryApiError,
 } from './request';
 

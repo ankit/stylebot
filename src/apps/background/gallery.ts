@@ -14,7 +14,7 @@ import {
   getPublishedProfile,
   getPublishedStatus,
   hashCss,
-  isGalleryApiError,
+  isGalleryStyleDeleted,
   isGalleryStyleId,
   isPublicSite,
   newGalleryDraftId,
@@ -443,7 +443,7 @@ export const GetPublishedGalleryStyle = async (
 /**
  * Puts the latest version of the gallery style a profile was installed from
  * back in it, and applies it to open tabs. Drops the style's listings when
- * the gallery no longer has it, as the daily update check does.
+ * the gallery deleted it, as the daily update check does.
  */
 export const ResetGalleryProfile = async (
   { url, profileId }: ResetGalleryProfileType,
@@ -458,7 +458,7 @@ export const ResetGalleryProfile = async (
     }
 
     const latest = await getStyle(listing.styleId).catch(async e => {
-      if (isGalleryApiError(e) && e.status === 404) {
+      if (isGalleryStyleDeleted(e)) {
         await removeStyleGalleryListings(listing.styleId);
       }
 

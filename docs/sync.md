@@ -26,7 +26,7 @@ The base is a second copy of the style map: the one both sides agreed on at the 
 
 Without a base — first sync, reinstall, or a profile that synced before it was recorded — the run falls back to a newest-wins union per style, once.
 
-Either way, a profile's gallery link is never removed by sync. A copy whose profile lacks the link the other copy has, such as one from a device that never installed or published it, takes it from the other copy. Each device drops links to styles the gallery no longer has on its own, so a link one device dropped can come back from another until that device's own check drops it too.
+Either way, a profile's gallery link is never removed by sync. A copy whose profile lacks the link the other copy has, such as one from a device that never installed or published it, takes it from the other copy. Each device drops links to styles deleted from the gallery on its own, and keeps links to hidden or unpublished ones, which can come back, so a link one device dropped can come back from another until that device's own check drops it too.
 
 ## When runs happen
 
