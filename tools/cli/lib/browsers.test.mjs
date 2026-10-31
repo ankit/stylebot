@@ -44,6 +44,10 @@ const load = ({
         throw Object.assign(new Error(host), { code: host });
       }
 
+      if (!host) {
+        return { protocol: 1, version: '4.0.0', error: 'Unknown command' };
+      }
+
       return { protocol: 1, version: '4.0.0', result: host };
     },
   }));
@@ -131,6 +135,28 @@ describe('describeBrowsers', () => {
       '  chrome  Chrome, showing Hacker News (news.ycombinator.com)',
       '  edge    Edge',
     ]);
+  });
+
+  it("names a page that isn't on the web by its title alone", () => {
+    const { describeBrowsers, addBrowserKeys } = load({});
+    const page = {
+      title: 'Stylebot Options',
+      url: 'chrome-extension://oiaejidbmkiecgbjeifoejpgmdaleoha/options.html',
+    };
+
+    expect(describeBrowsers(addBrowserKeys([{ ...chrome, page }]))).toEqual([
+      '  chrome  Chrome, showing Stylebot Options',
+    ]);
+  });
+
+  it("calls Stylebot that can't say which browser it's in a Browser", async () => {
+    const { describeBrowsers, getConnectedBrowsers } = load({
+      dirs: { [SOCKETS]: ['12.sock'] },
+      hosts: { [`${SOCKETS}/12.sock`]: undefined },
+    });
+    const { browsers } = await getConnectedBrowsers();
+
+    expect(describeBrowsers(browsers)).toEqual(['  browser  Browser']);
   });
 });
 

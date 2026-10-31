@@ -133,25 +133,35 @@ export const findBrowser = (browsers, name) => {
   );
 };
 
+const MAX_TITLE_LENGTH = 48;
+
+/**
+ * The page a browser shows, by its title and, for a web page, its site.
+ */
+const describePage = ({ title, url }) => {
+  const { protocol, host } = new URL(url ?? 'about:blank');
+  const site = /^https?:$/.test(protocol) ? host : '';
+  let shortTitle = title;
+
+  if (title?.length > MAX_TITLE_LENGTH) {
+    shortTitle = `${title.slice(0, MAX_TITLE_LENGTH - 1)}…`;
+  }
+
+  return [shortTitle, site && `(${site})`].filter(Boolean).join(' ');
+};
+
 /**
  * One line per browser: its key, then its name and the page it shows.
  */
 export const describeBrowsers = (browsers, { numbered = false } = {}) => {
   const width = Math.max(...browsers.map(({ key }) => key.length));
 
-  return browsers.map(({ key, name, page }, index) => {
-    const host = page?.url ? new URL(page.url).host : '';
-    const title =
-      page?.title && page.title.length > 48
-        ? `${page.title.slice(0, 47)}…`
-        : page?.title;
-    const showing = page
-      ? `, showing ${[title, host && `(${host})`].filter(Boolean).join(' ')}`
-      : '';
+  return browsers.map((browser, index) => {
+    const number = numbered ? `${index + 1}  ` : '';
+    const page = browser.page && describePage(browser.page);
+    const showing = page ? `, showing ${page}` : '';
 
-    return `  ${numbered ? `${index + 1}  ` : ''}${key.padEnd(
-      width
-    )}  ${name}${showing}`;
+    return `  ${number}${browser.key.padEnd(width)}  ${browser.name}${showing}`;
   });
 };
 
