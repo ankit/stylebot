@@ -12,6 +12,7 @@ import {
 } from './browsers.mjs';
 import { addForceCommands } from './commands/force.mjs';
 import { addInspectCommands } from './commands/inspect.mjs';
+import { addModeCommands } from './commands/mode.mjs';
 import { addOptionCommands } from './commands/options.mjs';
 import { addPageCommands } from './commands/pages.mjs';
 import { addPointerCommands } from './commands/pointer.mjs';
@@ -59,6 +60,7 @@ addPageCommands(program);
 addInspectCommands(program);
 addPointerCommands(program);
 addForceCommands(program);
+addModeCommands(program);
 addStyleCommands(program);
 addProfileCommands(program);
 addOptionCommands(program);

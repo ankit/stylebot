@@ -6,6 +6,7 @@ import { reloadForGrant, resumeAfterGrantReload } from '../grant-reload';
 import { browserCommands } from './browser';
 import { pseudoStateCommands } from './pseudo-states';
 import { inspectCommands } from './inspect';
+import { modeCommands, noteCliActivity } from './mode';
 import { optionCommands } from './options';
 import { pageCommands } from './pages';
 import { pointerCommands } from './pointer';
@@ -30,6 +31,7 @@ const commands: CliCommands = {
   ...styleCommands,
   ...profileCommands,
   ...optionCommands,
+  ...modeCommands,
 };
 
 // Requests still running, by id, to stop when the CLI goes away.
@@ -115,6 +117,9 @@ const connect = (): void => {
       }
 
       const args = request.args ?? {};
+
+      noteCliActivity(request.command, args).catch(() => undefined);
+
       const { signal } = controller;
       const emit = (event: unknown): void => post({ id: request.id, event });
       let result: unknown;
@@ -148,6 +153,16 @@ const disconnect = (): void => {
   setCliConnected(false);
 };
 
+/**
+ * Whether the CLI setting is on and its permissions are granted.
+ */
+export const isCliAllowed = async (): Promise<boolean> => {
+  const option = await getOption('cliAccess');
+  const granted = await hasCliPermissions();
+
+  return option === true && granted;
+};
+
 let pendingUpdate = Promise.resolve();
 let startedAfterGrantReload = Promise.resolve(false);
 
@@ -158,8 +173,7 @@ let startedAfterGrantReload = Promise.resolve(false);
 export const updateCliBridge = (): Promise<void> => {
   pendingUpdate = pendingUpdate
     .then(async () => {
-      const allowed =
-        (await getOption('cliAccess')) === true && (await hasCliPermissions());
+      const allowed = await isCliAllowed();
 
       if (allowed && !port) {
         if (typeof chrome.runtime.connectNative === 'function') {
@@ -207,3 +221,5 @@ export const initCliBridge = (): void => {
   startedAfterGrantReload = resumeAfterGrantReload(RELOADED_FOR_CLI_KEY);
   updateCliBridge();
 };
+
+export { initCliMode } from './mode';

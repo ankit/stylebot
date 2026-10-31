@@ -1,3 +1,4 @@
+import type { CliModeEvent } from './cli-mode';
 import type {
   StyleColorScheme,
   StyleMap,
@@ -465,6 +466,7 @@ type BackgroundPageMessage =
   | EndGalleryPreview
   | UndoGalleryInstall
   | GetGalleryInstallStatus
-  | PublishGalleryStyleUpdate;
+  | PublishGalleryStyleUpdate
+  | CliModeEvent;
 
 export default BackgroundPageMessage;

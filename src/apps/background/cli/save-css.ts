@@ -7,6 +7,7 @@ import type {
 } from '@stylebot/types';
 
 import { applyStylesToAllTabs, getAll, set } from '../styles';
+import { onCliSave } from './mode';
 import { EMPTY_STYLE, resolveProfileId } from './profiles';
 import {
   type RuleChanges,
@@ -184,6 +185,12 @@ const writeStylesheet = async (
 
   await set(sheet.url, css, readability, undefined, sheet.profileId);
   await applyStylesToAllTabs();
+  await onCliSave({
+    url: sheet.url,
+    profileId: sheet.profileId,
+    readability,
+    before: sheet.css,
+  });
 };
 
 /**

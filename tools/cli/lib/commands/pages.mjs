@@ -18,11 +18,17 @@ const formatScreenshot = ({
   cutOff,
   state,
   on,
+  cliTerminal,
 }) =>
   [
     out,
     `${width}×${height}, scale ${scale} (${scale} image px = 1 CSS px)`,
     ...(state ? [`With ${state} forced on ${on}`] : []),
+    ...(cliTerminal
+      ? [
+          `Stylebot's CLI mode terminal covers ${cliTerminal.x},${cliTerminal.y} ${cliTerminal.width}×${cliTerminal.height} of the image; it isn't part of the page`,
+        ]
+      : []),
     ...(cutOff
       ? [
           `Cut off: only the part inside the ${viewport.width}×${viewport.height} viewport shows`,
@@ -46,7 +52,10 @@ export const addPageCommands = program => {
     .action(async (url, options) =>
       print(
         await request('open', { url, forceNew: options.new }),
-        tab => `${tab.created ? 'Opened' : 'Found'} ${tab.id} ${tab.url}`
+        tab =>
+          `${tab.created ? 'Opened' : 'Found'} ${tab.id} ${tab.url}${
+            tab.cliMode ? " (the user's tab, in CLI mode)" : ''
+          }`
       )
     );
 
@@ -60,7 +69,7 @@ export const addPageCommands = program => {
             tab =>
               `${tab.active ? '*' : ' '} ${String(tab.id).padEnd(10)} ${
                 tab.url
-              }\n             ${tab.title}`
+              }${tab.cliMode ? '  [CLI mode]' : ''}\n             ${tab.title}`
           )
           .join('\n')
       )

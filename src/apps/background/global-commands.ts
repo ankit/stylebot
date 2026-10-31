@@ -6,7 +6,10 @@ import {
   isEditorSidePanelOpen,
 } from '@stylebot/side-panel';
 
+import { isCliAllowed } from './cli';
+import { toggleCliMode } from './cli/mode';
 import * as editorWindow from './editor-window';
+import { openOptionsTab } from './options-tab';
 import { restoreTab } from './restore-tabs';
 import { applyStylesToAllTabs, toggleForPage } from './styles';
 import {
@@ -14,6 +17,28 @@ import {
   openEditorSidePanelWithFallback,
   opensEditorInSidePanel,
 } from './side-panel';
+
+/**
+ * Connects or disconnects the tab for the CLI mode shortcut, or, with command
+ * line access off, shows the setting that turns it on instead of a terminal no
+ * agent can hear.
+ */
+const toggleCliModeIfAllowed = async (tabId: number): Promise<void> => {
+  const allowed = await isCliAllowed();
+
+  if (allowed) {
+    await toggleCliMode(tabId);
+  } else {
+    await openOptionsTab('/basics');
+  }
+};
+
+/**
+ * Whether a shortcut is CLI mode's, in builds that carry the CLI.
+ */
+const isCliModeCommand = (command: string): boolean =>
+  // supportsCLI() inlined, so builds without the CLI drop it.
+  process.env.STYLEBOT_CLI === 'true' && command === 'cli-mode';
 
 const isCommandName = (command: string): command is StylebotCommandName =>
   COMMAND_NAMES.includes(command as StylebotCommandName);
@@ -107,6 +132,14 @@ export const handleCommand = (
   tab: chrome.tabs.Tab | undefined
 ): void => {
   const target = getTarget(tab);
+
+  if (isCliModeCommand(command)) {
+    if (target && !target.fromEditorWindow) {
+      toggleCliModeIfAllowed(target.tabId).catch(() => undefined);
+    }
+
+    return;
+  }
 
   if (!target || !isCommandName(command)) {
     return;

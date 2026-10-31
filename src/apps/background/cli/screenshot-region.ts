@@ -150,3 +150,35 @@ export const planCrop = (
     },
   };
 };
+
+/**
+ * A box in the viewport as it lands in an image of a region of it, clipped to
+ * the image, in image pixels; undefined when it's outside the image.
+ */
+export const toImageRect = (
+  box: ViewportRect,
+  region: ViewportRect | undefined,
+  scale: number
+): ViewportRect | undefined => {
+  const { x, y, width, height } = region ?? {
+    x: 0,
+    y: 0,
+    width: Infinity,
+    height: Infinity,
+  };
+  const left = Math.max(box.x, x);
+  const top = Math.max(box.y, y);
+  const right = Math.min(box.x + box.width, x + width);
+  const bottom = Math.min(box.y + box.height, y + height);
+
+  if (right <= left || bottom <= top) {
+    return undefined;
+  }
+
+  return {
+    x: Math.round((left - x) * scale),
+    y: Math.round((top - y) * scale),
+    width: Math.round((right - left) * scale),
+    height: Math.round((bottom - top) * scale),
+  };
+};

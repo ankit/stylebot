@@ -57,9 +57,15 @@ const TEXT_ATTRIBUTES = new Set([
 const TEXT_PROPERTY =
   /\b(?:label|title|text|placeholder|tooltip|ariaLabel)\s*:\s*'([A-Z][^']*)'/g;
 
-// Literals that read the same in every language: the name, a typography
-// glyph, an example domain and a CSS keyword.
-const UNTRANSLATED_TEXT = new Set(['Stylebot', 'Aa', 'example.com', 'none']);
+// Literals that read the same in every language: the name, the CLI's
+// command, a typography glyph, an example domain and a CSS keyword.
+const UNTRANSLATED_TEXT = new Set([
+  'Stylebot',
+  'stylebot',
+  'Aa',
+  'example.com',
+  'none',
+]);
 
 const isText = value =>
   /[A-Za-z]{2,}/.test(value) && !UNTRANSLATED_TEXT.has(value.trim());
@@ -157,11 +163,16 @@ function collectUsedKeys() {
     patterns.push(...templatePatterns(text));
   }
 
-  const manifest = readFileSync(manifestPath, 'utf8');
+  // The base manifest and the modules that extend it per browser.
+  const manifestDir = path.dirname(manifestPath);
 
-  [...manifest.matchAll(/__MSG_([a-zA-Z0-9_]+)__/g)].forEach(m =>
-    usedKeys.add(m[1])
-  );
+  readdirSync(manifestDir)
+    .map(name => readFileSync(path.join(manifestDir, name), 'utf8'))
+    .forEach(manifest =>
+      [...manifest.matchAll(/__MSG_([a-zA-Z0-9_]+)__/g)].forEach(m =>
+        usedKeys.add(m[1])
+      )
+    );
 
   const isReferenced = key =>
     usedKeys.has(key) ||

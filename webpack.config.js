@@ -394,9 +394,10 @@ const clientConfig = {
     'monaco-editor/iframe/options-index':
       './apps/monaco-iframe/options-index.ts',
     'readability/reader': './apps/reader/reader.ts',
-    // The CLI's page inspector, loaded on demand.
+    // The CLI's page inspector and CLI mode's bar, loaded on demand.
     ...(isCLISupported && {
       'cli-inspector/index': './apps/cli-inspector/index.ts',
+      'cli-mode/index': './apps/cli-mode/index.ts',
     }),
   },
   // Webpack's `global` shim falls back to `new Function` in the bundles loaded
