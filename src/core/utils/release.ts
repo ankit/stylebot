@@ -1,6 +1,9 @@
 import type { NotificationId } from './notification';
 import { getSiteUrl } from './site-url';
 
+// Releases with a page on stylebot.dev; add one here when its page goes up.
+const RELEASES_WITH_PAGES = ['3.1', '3.2', '4.0', '4.1'];
+
 export const getExtensionVersion = (): string =>
   chrome.runtime.getManifest().version;
 
@@ -13,9 +16,6 @@ export const getReleaseNotificationId = (): NotificationId =>
 
 export const getReleaseUrl = (): string =>
   getSiteUrl(`/releases/${getReleaseVersion()}`);
-
-// Releases with a page on stylebot.dev; add one here when its page goes up.
-const RELEASES_WITH_PAGES = ['3.1', '3.2', '4.0', '4.1'];
 
 /**
  * Whether the running release has a page on stylebot.dev to announce it with.
