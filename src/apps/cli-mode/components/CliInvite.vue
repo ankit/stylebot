@@ -68,7 +68,7 @@ export default Vue.extend({
   display: flex;
   flex: 0 1 auto;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   min-width: 0;
   max-width: 260px;
   padding: 0 8px 0 6px;
@@ -81,8 +81,10 @@ export default Vue.extend({
 
 .dot {
   flex: none;
+  width: var(--term-gutter);
   color: var(--term-accent);
   font-size: 10px;
+  text-align: center;
 }
 
 .invite-text {
