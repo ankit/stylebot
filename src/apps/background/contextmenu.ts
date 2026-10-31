@@ -23,6 +23,10 @@ export const ContextMenu = {
   shown: undefined as boolean | undefined,
 
   init(): void {
+    if (!chrome.contextMenus) {
+      return;
+    }
+
     this.sync();
 
     chrome.storage.onChanged.addListener((changes, area) => {
@@ -98,7 +102,7 @@ export const ContextMenu = {
   },
 
   async update(tab: chrome.tabs.Tab): Promise<void> {
-    if (!tab) {
+    if (!tab || !chrome.contextMenus) {
       return;
     }
 

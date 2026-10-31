@@ -150,7 +150,8 @@ export const initListeners = (): void => {
     }
   );
 
-  chrome.commands.onCommand.addListener(handleCommand);
+  // Firefox for Android has no commands, windows or contextMenus.
+  chrome.commands?.onCommand.addListener(handleCommand);
   initSidePanelTabs();
   initSidePanel();
 
@@ -207,7 +208,7 @@ export const initListeners = (): void => {
     forgetGalleryInstall(tabId);
   });
 
-  chrome.windows.onRemoved.addListener(windowId => {
+  chrome.windows?.onRemoved.addListener(windowId => {
     editorWindow.forgetWindow(windowId);
   });
 
@@ -484,5 +485,5 @@ export const initListeners = (): void => {
     }
   );
 
-  chrome.contextMenus.onClicked.addListener(handleContextMenuClick);
+  chrome.contextMenus?.onClicked.addListener(handleContextMenuClick);
 };

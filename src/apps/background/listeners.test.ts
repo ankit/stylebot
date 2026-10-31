@@ -49,9 +49,10 @@ type OnInstalled = (details: InstalledDetails) => Promise<void>;
 
 /**
  * Stands in for Chrome at the given extension version, keeping the
- * onInstalled listener so a test can fire it.
+ * onInstalled listener so a test can fire it. `without` leaves out APIs a
+ * browser lacks, as Firefox for Android does.
  */
-const makeChrome = (version: string) => {
+const makeChrome = (version: string, without: Array<string> = []) => {
   let onInstalled: OnInstalled | undefined;
   const event = () => ({ addListener: jest.fn() });
 
@@ -89,6 +90,7 @@ const makeChrome = (version: string) => {
     i18n: { getMessage: () => 'en' },
   };
 
+  without.forEach(name => delete (api as Record<string, unknown>)[name]);
   global.chrome = api as unknown as typeof chrome;
   initListeners();
 
@@ -97,6 +99,19 @@ const makeChrome = (version: string) => {
     fireInstalled: (details: InstalledDetails) => onInstalled?.(details),
   };
 };
+
+describe('initListeners', () => {
+  it('still listens for messages where commands, windows and context menus are missing', () => {
+    const { api } = makeChrome('4.0.0', [
+      'commands',
+      'windows',
+      'contextMenus',
+    ]);
+
+    expect(api.runtime.onMessage.addListener).toBeCalled();
+    expect(api.tabs.onActivated.addListener).toBeCalled();
+  });
+});
 
 describe('onInstalled', () => {
   beforeEach(() => jest.clearAllMocks());
