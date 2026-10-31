@@ -29,6 +29,19 @@ stylebot screenshot 1234 -o page.png
 
 `stylebot --help` lists every command.
 
+## CLI mode
+
+Connect a tab to your agent and work with it from the page: mark areas by dragging over them and write notes about them in a small terminal, which shows what the agent does there, with an undo for each save.
+
+```bash
+stylebot watch
+stylebot selection 1234
+stylebot say 1234 'Made the header sticky.'
+stylebot mode 1234 --off
+```
+
+`watch` follows what you do as it happens, `selection` lists the notes and marks sent since the agent last looked, and `say` answers your note in the terminal.
+
 ## Coding agents
 
 The Stylebot skill lets coding agents such as Claude Code, Codex, Copilot and Cursor restyle sites with this CLI. Ask for a look, such as "give Hacker News a dark theme", and it writes the CSS, checks the page and looks at a screenshot.

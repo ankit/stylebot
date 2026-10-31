@@ -250,11 +250,34 @@ stylebot option set scheme dark news.ycombinator.com
 
 Every command takes `--json` to print the raw response instead of text.
 
+## CLI mode
+
+CLI mode lets you work with your agent from the page. A small terminal on a connected tab shows each command the agent runs there and each save, with an undo. You mark areas of the page and write notes about them; the agent makes the change and answers in the terminal.
+
+- **Connect**: ask your agent to watch, then click **[connect]** on the tab you're looking at, or let the agent connect one with `mode <tab>`. One tab is connected at a time; others offer **[move here]**. The terminal's close button or `mode <tab> --off` disconnects it.
+- **Mark**: drag over part of the page. Click a mark's numbered badge to remove it.
+- **Note**: type in the terminal and press Enter (Shift+Enter for a new line). The agent gets the note with a screenshot of your marks, and shows as thinking until it answers.
+
+Keys, anywhere on the page but a field: `.` open or minimize, `/` write a note, `Z` undo the last save, `X` clear the marks.
+
+The agent follows along with `watch`, which prints a line for each event (the tab attaching, each mark and note, navigations, edits outside the CLI), or `selection`, which lists the notes and marks sent since it last looked, with the elements inside each mark; `--wait` waits for the next one. `say` answers your note. A session might go:
+
+```text
+$ stylebot watch
+waiting for a tab: ask the user to connect the tab to work on with the connect button Stylebot shows on it, or run: stylebot mode <tab>
+attached tab 54432929 https://news.ycombinator.com/
+mark ① area 640×48
+note "keep this bar on screen when I scroll" about ① (screenshot /Users/you/.stylebot/work/stylebot-note-54432929-1.png)
+
+$ stylebot css rule 54432929 '#hnmain > tbody > tr:first-child' --set position=sticky --set top=0 --profile Default
+$ stylebot say 54432929 'The top bar now stays at the top as you scroll.'
+```
+
 ## Coding agents
 
 The Stylebot skill teaches a coding agent to restyle pages with the CLI: open the page, read its outline, write CSS, fix what the page check reports, then look at a screenshot. It works in any agent with a shell and a file-writing tool, running on the same machine as the browser, once the [setup](#setup) above is done. Ask for a look, such as "give Hacker News a dark theme", and the agent picks the skill up on its own; or invoke it by name. Without saying what to change, it offers suggestions for the page.
 
-The skill keeps its CSS and screenshots in `~/.stylebot/work/`. When you name a profile, it updates that one; otherwise its changes go into a new profile named after the agent and the look, such as "Claude: Dark", so switching back to your own style is one profile change.
+The skill keeps its CSS and screenshots in `~/.stylebot/work/`. When you name a profile, it updates that one, and in [CLI mode](#cli-mode) the one you're using; otherwise its changes go into a new profile named after the agent and the look, such as "Claude: Dark", so switching back to your own style is one profile change.
 
 Agents with plugin marketplaces install it from this repo's, as a plugin whose `stylebot` command runs the CLI on your `PATH`, or the published one through `npx` when there's none. The others copy the skill's folder, and need the CLI installed with `npm install -g @stylebot/cli`.
 
