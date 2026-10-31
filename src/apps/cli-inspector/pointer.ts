@@ -1,5 +1,5 @@
-import { getExistingSelector, getSelector } from '@stylebot/css';
-import { countMatches, getSelectorAlternatives } from '@stylebot/page-bridge';
+import { getSelector } from '@stylebot/css';
+import { inspectElement } from '@stylebot/page-bridge';
 import { queryWithShadowRoots } from '@stylebot/stylesheets';
 import type { PointerAction, PointerResult } from '@stylebot/types';
 
@@ -141,32 +141,6 @@ const hover = (el: Element, x: number, y: number): void => {
   fire(el, 'pointermove', x, y);
   fire(el, 'mousemove', x, y);
   hovered = el;
-};
-
-/**
- * The selector the inspector would pick for an element, preferring one the
- * style's css has, with the alternatives the editor's selector menu offers.
- */
-const inspectElement = (
-  el: HTMLElement,
-  css: string
-): Pick<PointerResult, 'selector' | 'matches' | 'alternatives'> => {
-  const selector = getExistingSelector(el, css) ?? getSelector(el);
-  const { existing, candidates } = getSelectorAlternatives(el, selector, css);
-  const others = Array.from(new Set([...existing, ...candidates])).filter(
-    other => other !== selector
-  );
-  const [matches, ...counts] = countMatches([selector, ...others]);
-
-  return {
-    selector,
-    matches,
-    alternatives: others.map((other, i) => ({
-      selector: other,
-      matches: counts[i],
-      saved: existing.includes(other),
-    })),
-  };
 };
 
 /**

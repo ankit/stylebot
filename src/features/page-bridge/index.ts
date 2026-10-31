@@ -28,6 +28,7 @@ export {
 } from './page-reading';
 export { getComputedStyles } from './computed-styles';
 export { getSelectorAlternatives } from './selector-alternatives';
+export { inspectElement } from './inspect-element';
 export type {
   PageBridge,
   PageBridgeEvents,

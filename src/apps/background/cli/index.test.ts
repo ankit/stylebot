@@ -3,6 +3,7 @@ import { get as getOption } from '../options';
 import { restoreOpenTabs } from '../restore-tabs';
 import { initCliBridge, updateCliBridge } from './index';
 import { pageCommands } from './pages';
+import { streamCommands } from './streams';
 
 jest.mock('../options-tab', () => ({ openOptionsTab: jest.fn() }));
 jest.mock('../options', () => ({ get: jest.fn() }));
@@ -16,6 +17,21 @@ jest.mock('./profiles', () => ({ profileCommands: {} }));
 jest.mock('../restore-tabs', () => ({
   findOpenEditors: jest.fn(async () => ({ 7: 'window' })),
   restoreOpenTabs: jest.fn(),
+}));
+jest.mock('./streams', () => ({
+  streamCommands: {
+    count: jest.fn(async (_args, emit) => {
+      emit(1);
+      emit(2);
+      return 'counted';
+    }),
+    wait: jest.fn(
+      (_args, _emit, signal: AbortSignal) =>
+        new Promise((_resolve, reject) =>
+          signal.addEventListener('abort', () => reject(new Error('Stopped')))
+        )
+    ),
+  },
 }));
 jest.mock('./styles', () => ({ styleCommands: {} }));
 
@@ -312,5 +328,46 @@ describe('CLI requests', () => {
 
   it('runs a request from before the handshake', async () => {
     expect(await send({})).toMatchObject({ protocol: 1, result: ['tab'] });
+  });
+
+  it('passes a plain command the signal that stops it', async () => {
+    await send({});
+
+    expect(pageCommands.tabs).toBeCalledWith({}, expect.any(AbortSignal));
+  });
+
+  it("posts a stream's events before its result", async () => {
+    await send({ command: 'count' });
+
+    expect(port.postMessage.mock.calls.map(([message]) => message)).toEqual([
+      { id: 7, event: 1 },
+      { id: 7, event: 2 },
+      { id: 7, protocol: 1, version: '4.0.0', result: 'counted' },
+    ]);
+  });
+
+  it('stops a stream when the CLI cancels it', async () => {
+    await changeOption(false, true);
+    const running = listeners.portMessage({ id: 7, command: 'wait', args: {} });
+    const [, , signal] = (streamCommands.wait as jest.Mock).mock.calls[0];
+
+    listeners.portMessage({ id: 7, cancel: true });
+    await running;
+
+    expect(signal.aborted).toBe(true);
+    expect(port.postMessage).toBeCalledWith(
+      expect.objectContaining({ id: 7, error: 'Stopped' })
+    );
+  });
+
+  it('stops a stream when the host goes away', async () => {
+    await changeOption(false, true);
+    const running = listeners.portMessage({ id: 7, command: 'wait', args: {} });
+    const [, , signal] = (streamCommands.wait as jest.Mock).mock.calls[0];
+
+    listeners.portDisconnected();
+    await running;
+
+    expect(signal.aborted).toBe(true);
   });
 });

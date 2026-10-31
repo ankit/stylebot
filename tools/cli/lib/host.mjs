@@ -1,7 +1,8 @@
 /**
  * The native messaging host the browser starts for Stylebot. Relays each
  * request from the `stylebot` CLI, which arrives on a Unix socket (a named
- * pipe on Windows), to the extension over stdio, and its response back.
+ * pipe on Windows), to the extension over stdio, and its response back. A
+ * streaming command gets events first, each written as its own line.
  * Each browser profile running Stylebot starts its own host, on its own socket.
  */
 import fs from 'node:fs';
@@ -47,6 +48,12 @@ process.stdin.on('data', chunk => {
     buffered = buffered.subarray(4 + length);
 
     const client = pending.get(message.id);
+
+    if ('event' in message) {
+      client?.write(`${JSON.stringify(message)}\n`);
+      continue;
+    }
+
     pending.delete(message.id);
     client?.end(`${JSON.stringify(message)}\n`);
   }
@@ -73,6 +80,8 @@ const server = net.createServer(client => {
     for (const [id, waiting] of pending) {
       if (waiting === client) {
         pending.delete(id);
+        // Ends a stream, or a wait, the CLI gave up on.
+        send({ id, cancel: true });
       }
     }
   });
