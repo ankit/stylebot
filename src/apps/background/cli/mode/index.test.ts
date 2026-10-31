@@ -1005,18 +1005,33 @@ describe('watch', () => {
     expect(lastState()?.thread).toEqual([]);
   });
 
-  it('counts the agent as working on a note while it watches', async () => {
+  it('counts the agent as working on a note it watches for 3 minutes', async () => {
     await mode.modeCommands.mode({ tab: String(TAB) });
     const { controller, done } = watch();
 
     await flush();
     await fromTerminal(TAB, { type: 'note', text: 'bigger', marks: [] });
-    await jest.advanceTimersByTimeAsync(10 * 60_000);
+    await jest.advanceTimersByTimeAsync(3 * 60_000 - 1);
     expect(lastState()?.thinking).toBe(true);
+
+    await jest.advanceTimersByTimeAsync(1);
+    expect(lastState()?.thinking).toBe(false);
 
     controller.abort();
     await done;
+  });
+
+  it('stops counting the agent as working once it answers while it watches', async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+    const { controller, done } = watch();
+
+    await flush();
+    await fromTerminal(TAB, { type: 'note', text: 'bigger', marks: [] });
+    await mode.modeCommands.say({ message: 'done' });
     expect(lastState()?.thinking).toBe(false);
+
+    controller.abort();
+    await done;
   });
 
   describe('style edits', () => {

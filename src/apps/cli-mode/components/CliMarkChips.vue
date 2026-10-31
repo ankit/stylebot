@@ -1,6 +1,6 @@
 <template>
-  <div class="mark-chips">
-    <ul v-if="marks.length" class="chips">
+  <div v-if="marks.length" class="mark-chips">
+    <ul class="chips">
       <li
         v-for="mark in marks"
         :key="mark.n"
@@ -8,7 +8,7 @@
         @mouseenter="$emit('highlight', mark.n)"
         @mouseleave="$emit('highlight', null)"
       >
-        <span class="n">{{ mark.n }}</span>
+        <cli-mark-number :n="mark.n" />
         <span class="size">{{ formatSize(mark.area) }}</span>
         <button
           type="button"
@@ -21,7 +21,6 @@
         </button>
       </li>
     </ul>
-    <p v-else class="hint"># {{ t('drag_on_the_page_to_mark_an_area') }}</p>
   </div>
 </template>
 
@@ -31,6 +30,7 @@ import Vue from 'vue';
 
 import { formatSize } from '../areas';
 import type { PageMark } from '../state';
+import CliMarkNumber from './CliMarkNumber.vue';
 
 /**
  * The areas marked on the page, as chips with their number and size.
@@ -39,6 +39,8 @@ import type { PageMark } from '../state';
  */
 export default Vue.extend({
   name: 'CliMarkChips',
+
+  components: { CliMarkNumber },
 
   props: {
     marks: {
@@ -53,8 +55,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .mark-chips {
-  padding: 8px 14px;
-  border-top: 1px solid var(--term-border);
+  padding: 8px 14px 0;
 }
 
 .chips {
@@ -82,24 +83,14 @@ export default Vue.extend({
   }
 }
 
-.n {
-  flex: none;
-  box-sizing: border-box;
-  min-width: 18px;
-  padding: 0 4px;
-  border-radius: 3px;
-  background: var(--term-accent);
-  color: var(--term-bg);
-  font-weight: 700;
-  text-align: center;
-}
-
 .remove {
   @include button-reset;
 
   padding: 0 4px;
   border-radius: 3px;
   color: var(--term-faint);
+  font-size: 16px;
+  line-height: 18px;
   cursor: pointer;
 
   &:hover {
@@ -110,11 +101,5 @@ export default Vue.extend({
     outline: 1px solid var(--term-accent);
     outline-offset: 0;
   }
-}
-
-.hint {
-  margin: 0;
-  color: var(--term-faint);
-  font-size: 12px;
 }
 </style>

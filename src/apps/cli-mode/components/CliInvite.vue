@@ -8,9 +8,7 @@
       <span class="dot">●</span>
       <span class="invite-text">
         {{
-          connectedTo
-            ? t('agent_on_host', [connectedTo])
-            : t('your_agent_is_waiting_for_a_tab')
+          connectedTo ? t('agent_on_host', [connectedTo]) : t('agent_waiting')
         }}
       </span>
     </span>
@@ -26,7 +24,7 @@
       :title="t('hide_on_this_page')"
       @click="$emit('dismiss')"
     >
-      <x-icon :size="16" />
+      <x-icon :size="14" />
     </cli-window-button>
   </div>
 </template>

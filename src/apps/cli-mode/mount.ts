@@ -28,6 +28,8 @@ const HOST_CSS = `
 
 // Where the user last dragged the terminal, the same on every site.
 const POSITION_KEY = 'cli-mode-terminal-position';
+// The size the user last resized the open terminal to.
+const SIZE_KEY = 'cli-mode-terminal-size';
 
 export type Terminal = {
   state: TerminalState;
@@ -56,15 +58,20 @@ const getCss = (): Promise<string> => {
   return css;
 };
 
-const getPosition = async (): Promise<
-  TerminalState['position'] | undefined
+const getPlacement = async (): Promise<
+  Partial<Pick<TerminalState, 'position' | 'size'>>
 > => {
-  const stored = await chrome.storage.local.get(POSITION_KEY);
-  return stored[POSITION_KEY];
+  const stored = await chrome.storage.local.get([POSITION_KEY, SIZE_KEY]);
+  return { position: stored[POSITION_KEY], size: stored[SIZE_KEY] };
 };
 
-const savePosition = (position: TerminalState['position']): void => {
-  chrome.storage.local.set({ [POSITION_KEY]: position }).catch(() => undefined);
+const savePlacement = ({
+  position,
+  size,
+}: Pick<TerminalState, 'position' | 'size'>): void => {
+  chrome.storage.local
+    .set({ [POSITION_KEY]: position, [SIZE_KEY]: size })
+    .catch(() => undefined);
 };
 
 /**
@@ -86,13 +93,20 @@ export const mountTerminal = async (
   document.documentElement.append(host);
   injectFontFaces().catch(() => undefined);
 
-  const [text, position] = await Promise.all([getCss(), getPosition()]);
+  const [text, { position, size }] = await Promise.all([
+    getCss(),
+    getPlacement(),
+  ]);
   const sheet = document.createElement('style');
   const marksEl = document.createElement('div');
   const el = document.createElement('div');
 
   if (position) {
     state.position = position;
+  }
+
+  if (size) {
+    state.size = size;
   }
 
   sheet.textContent = text;
@@ -187,7 +201,10 @@ export const mountTerminal = async (
           place: (placed: TerminalState['position']) => {
             state.position = placed;
           },
-          move: savePosition,
+          resize: (size: TerminalState['size']) => {
+            state.size = size;
+          },
+          move: () => savePlacement(state),
           close: () => sendTerminalEvent({ type: 'off' }),
         },
       }),

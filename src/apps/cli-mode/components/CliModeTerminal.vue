@@ -2,15 +2,18 @@
   <s-theme-provider
     ref="root"
     class="root"
+    :class="{ dragging: !!cursor }"
     mode="dark"
     :style="{
       right: `${state.position.right}px`,
       bottom: `${state.position.bottom}px`,
+      '--drag-cursor': cursor,
     }"
   >
     <section
       class="term"
       :class="{ expanded: state.expanded }"
+      :style="panelSize"
       role="region"
       :aria-label="t('stylebot_cli_mode')"
     >
@@ -36,22 +39,19 @@
           :thinking="state.thinking"
           @undo="$emit('undo', $event)"
         />
-        <cli-mark-chips
+        <cli-composer
+          ref="composer"
           :marks="state.marks"
           @highlight="$emit('highlight', $event)"
           @unmark="$emit('unmark', $event)"
-        />
-        <cli-note-field
-          ref="note"
-          :marks="state.marks"
           @note="$emit('note', $event)"
         />
-        <footer class="footer">
-          <cli-status
-            v-if="!state.activity && !state.thinking"
-            :agent="state.agent"
-          />
-        </footer>
+        <cli-footer
+          :agent="state.agent"
+          :thread="state.thread"
+          :marked="state.marks.length > 0"
+        />
+        <cli-resize-handles @grab="startResize" />
       </template>
 
       <cli-pill
@@ -73,18 +73,16 @@ import type { PropType } from 'vue';
 import Vue from 'vue';
 import { SThemeProvider } from '@stylebot/components';
 
+import { EDGE, followPointer, resizeFrom } from '../resize';
 import type { TerminalState } from '../state';
 import { threadSteps } from '../thread';
-import CliMarkChips from './CliMarkChips.vue';
+import CliComposer from './CliComposer.vue';
+import CliFooter from './CliFooter.vue';
 import CliInvite from './CliInvite.vue';
-import CliNoteField from './CliNoteField.vue';
 import CliPill from './CliPill.vue';
-import CliStatus from './CliStatus.vue';
+import CliResizeHandles from './CliResizeHandles.vue';
 import CliThread from './CliThread.vue';
 import CliTitleBar from './CliTitleBar.vue';
-
-// The closest the terminal comes to the viewport's edges.
-const EDGE = 8;
 
 /**
  * CLI mode's floating mini terminal: a pill, the open thread, or an invite.
@@ -94,11 +92,11 @@ export default Vue.extend({
   name: 'CliModeTerminal',
 
   components: {
-    CliMarkChips,
+    CliComposer,
+    CliFooter,
     CliInvite,
-    CliNoteField,
     CliPill,
-    CliStatus,
+    CliResizeHandles,
     CliThread,
     CliTitleBar,
     SThemeProvider,
@@ -112,7 +110,8 @@ export default Vue.extend({
   },
 
   data() {
-    return { seen: 0 };
+    // The cursor while the user moves or resizes the terminal.
+    return { seen: 0, cursor: null as string | null };
   },
 
   computed: {
@@ -127,6 +126,14 @@ export default Vue.extend({
         threadSteps(this.state.thread).filter(step => step.kind === 'save')
           .length
       );
+    },
+
+    panelSize(): Record<string, string> {
+      const { size, expanded } = this.state;
+
+      return size && expanded
+        ? { width: `${size.width}px`, height: `${size.height}px` }
+        : {};
     },
 
     // Replies and saves that came while the terminal was collapsed.
@@ -179,36 +186,63 @@ export default Vue.extend({
   methods: {
     /**
      * Moves the terminal with the pointer from a press on its title bar or
-     * pill, then tells the page where it ended up, to remember.
+     * pill.
      */
     startDrag(event: PointerEvent): void {
       if ((event.target as Element).closest('button') || event.button !== 0) {
         return;
       }
 
-      const handle = event.currentTarget as HTMLElement;
-      const start = { x: event.clientX, y: event.clientY };
       const from = { ...this.state.position };
 
-      const move = (moved: PointerEvent): void => {
-        this.place(
-          from.right - (moved.clientX - start.x),
-          from.bottom - (moved.clientY - start.y)
-        );
-      };
+      this.follow(event, 'grabbing', delta =>
+        this.place(from.right - delta.x, from.bottom - delta.y)
+      );
+    },
 
-      const end = (): void => {
-        handle.removeEventListener('pointermove', move);
-        handle.removeEventListener('pointerup', end);
-        handle.removeEventListener('pointercancel', end);
+    /**
+     * Resizes the open terminal with the pointer from one of its edges or
+     * corners.
+     */
+    startResize(event: PointerEvent, edge: string): void {
+      if (event.button !== 0) {
+        return;
+      }
+
+      const { width, height } = (
+        this.$refs.root as Vue
+      ).$el.getBoundingClientRect();
+      const from = {
+        size: { width, height },
+        position: { ...this.state.position },
+      };
+      const cursor = getComputedStyle(event.currentTarget as Element).cursor;
+
+      this.follow(event, cursor, delta => {
+        const resized = resizeFrom(edge, from, delta, {
+          width: innerWidth,
+          height: innerHeight,
+        });
+
+        this.$emit('resize', resized.size);
+        this.$emit('place', resized.position);
+      });
+    },
+
+    /**
+     * Follows the pointer with `move`, showing `cursor` everywhere on the
+     * terminal, then tells the page where it ended up, to remember.
+     */
+    follow(
+      event: PointerEvent,
+      cursor: string,
+      move: (delta: { x: number; y: number }) => void
+    ): void {
+      this.cursor = cursor;
+      followPointer(event, move, () => {
+        this.cursor = null;
         this.$emit('move', { ...this.state.position });
-      };
-
-      event.preventDefault();
-      handle.setPointerCapture(event.pointerId);
-      handle.addEventListener('pointermove', move);
-      handle.addEventListener('pointerup', end);
-      handle.addEventListener('pointercancel', end);
+      });
     },
 
     /**
@@ -239,7 +273,9 @@ export default Vue.extend({
      * Puts the keyboard in the note field, once the terminal is open.
      */
     focusNote(): void {
-      (this.$refs.note as (Vue & { focus: () => void }) | undefined)?.focus();
+      (
+        this.$refs.composer as (Vue & { focus: () => void }) | undefined
+      )?.focus();
     },
 
     scrollThread(): void {
@@ -259,14 +295,15 @@ export default Vue.extend({
   --term-text: #bcb6aa;
   --term-dim: #8c867b;
   --term-faint: #6c675e;
-  --term-accent: #4fb6b0;
+  --term-accent: #3fb4d9;
+  --term-gutter: 11px;
   --term-green: #8fbf7f;
 
   position: fixed;
   background: none;
   font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 12px;
+  line-height: 18px;
   pointer-events: auto;
 }
 
@@ -281,10 +318,12 @@ export default Vue.extend({
   animation: rise 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
 
   &.expanded {
+    position: relative;
     display: flex;
     flex-direction: column;
     width: 440px;
     height: min(420px, calc(100vh - 16px));
+    max-height: calc(100vh - 16px);
     overflow: hidden;
   }
 
@@ -297,13 +336,8 @@ export default Vue.extend({
   flex: 1;
 }
 
-.footer {
-  display: flex;
-  align-items: center;
-  min-height: 28px;
-  padding: 4px 14px;
-  border-top: 1px solid var(--term-border);
-  background: var(--term-raised);
+.root.dragging ::v-deep * {
+  cursor: var(--drag-cursor);
 }
 
 @keyframes rise {

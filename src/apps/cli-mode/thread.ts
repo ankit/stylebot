@@ -39,9 +39,3 @@ export const threadSteps = (
   thread: Array<CliThreadEntry>
 ): Array<CliTurnStep> =>
   thread.flatMap(entry => (entry.kind === 'turn' ? entry.steps : []));
-
-/**
- * A mark's number as a note shows it: ① to ⑳, then (21).
- */
-export const circled = (n: number): string =>
-  n >= 1 && n <= 20 ? String.fromCodePoint(0x2460 + n - 1) : `(${n})`;

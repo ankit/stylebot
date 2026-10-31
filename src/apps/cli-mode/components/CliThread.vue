@@ -22,12 +22,13 @@
                 isLive(index) ? `stylebot ${activity}` : summarizeTurn(entry)
               }}
             </span>
+            <span v-if="isLive(index)" class="elapsed">· {{ elapsed }}</span>
           </button>
           <button
             v-if="!open.includes(entry.id) && lastUndoableSave(entry.steps)"
             type="button"
             class="undo"
-            :title="t('label_with_key', [t('undo_the_last_save'), 'Z'])"
+            :title="t('undo_the_last_save')"
             @click="$emit('undo', lastUndoableSave(entry.steps).id)"
           >
             {{ t('undo_bracketed') }}
@@ -69,7 +70,7 @@
         <span class="message">
           <span class="body">{{ entry.text }}</span>
           <span v-if="entry.marks.length" class="refs">
-            {{ entry.marks.map(circled).join('') }}
+            <cli-mark-number v-for="n in entry.marks" :key="n" :n="n" small />
           </span>
         </span>
       </li>
@@ -85,6 +86,7 @@
         <span class="turn-text">
           {{ activity ? `stylebot ${activity}` : t('thinking') }}
         </span>
+        <span class="elapsed">· {{ elapsed }}</span>
       </span>
     </li>
   </ol>
@@ -95,7 +97,9 @@ import type { PropType } from 'vue';
 import Vue from 'vue';
 import type { CliThreadEntry } from '@stylebot/types';
 
-import { circled, lastUndoableSave, summarizeTurn } from '../thread';
+import { formatElapsed } from '../elapsed';
+import { lastUndoableSave, summarizeTurn } from '../thread';
+import CliMarkNumber from './CliMarkNumber.vue';
 import CliSpinner from './CliSpinner.vue';
 
 /**
@@ -106,7 +110,7 @@ import CliSpinner from './CliSpinner.vue';
 export default Vue.extend({
   name: 'CliThread',
 
-  components: { CliSpinner },
+  components: { CliMarkNumber, CliSpinner },
 
   props: {
     thread: {
@@ -128,21 +132,54 @@ export default Vue.extend({
   },
 
   data() {
-    return { open: [] as Array<number> };
+    return {
+      open: [] as Array<number>,
+      // When the agent started what it's doing now, and the clock counting it.
+      since: Date.now(),
+      now: Date.now(),
+      clock: 0,
+    };
   },
 
   computed: {
+    busy(): boolean {
+      return this.thinking || !!this.activity;
+    },
+
+    elapsed(): string {
+      return formatElapsed(this.now - this.since, this.t('language_code'));
+    },
+
     // The agent works with no live turn to show it, so a line of its own does.
     working(): boolean {
-      return (
-        (this.thinking || !!this.activity) &&
-        !this.isLive(this.thread.length - 1)
-      );
+      return this.busy && !this.isLive(this.thread.length - 1);
     },
   },
 
+  watch: {
+    // Counts from when the agent got to work, across its commands and the
+    // thinking between them, until it goes quiet.
+    busy: {
+      handler(busy: boolean): void {
+        clearInterval(this.clock);
+
+        if (busy) {
+          this.since = Date.now();
+          this.now = this.since;
+          this.clock = window.setInterval(() => {
+            this.now = Date.now();
+          }, 1000);
+        }
+      },
+      immediate: true,
+    },
+  },
+
+  beforeDestroy() {
+    clearInterval(this.clock);
+  },
+
   methods: {
-    circled,
     summarizeTurn,
     lastUndoableSave,
 
@@ -201,7 +238,7 @@ export default Vue.extend({
 }
 
 .reply {
-  padding-left: 16px;
+  padding-left: calc(var(--term-gutter) + 8px);
   color: var(--term-text);
 }
 
@@ -215,9 +252,10 @@ export default Vue.extend({
 }
 
 .refs {
-  margin-left: 4px;
-  color: var(--term-accent);
-  letter-spacing: 1px;
+  display: inline-flex;
+  gap: 3px;
+  margin-left: 6px;
+  vertical-align: 2px;
 }
 
 .turn-head {
@@ -263,13 +301,21 @@ export default Vue.extend({
 
 .sigil {
   flex: none;
+  width: var(--term-gutter);
+  text-align: center;
   color: var(--term-accent);
   font-weight: 600;
 }
 
 .caret {
   flex: none;
-  width: 9px;
+  width: var(--term-gutter);
+  text-align: center;
+}
+
+.elapsed {
+  flex: none;
+  color: var(--term-faint);
 }
 
 .turn-text,
@@ -283,7 +329,7 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   gap: 2px;
-  margin: 0 0 0 17px;
+  margin: 0 0 0 calc(var(--term-gutter) + 8px);
   padding: 0;
   list-style: none;
 }

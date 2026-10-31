@@ -106,12 +106,13 @@ export default Vue.extend({
   align-items: flex-start;
   gap: 8px;
   padding: 8px 14px;
-  border-top: 1px solid var(--term-border);
   cursor: text;
 }
 
 .sigil {
   flex: none;
+  width: var(--term-gutter);
+  text-align: center;
   color: var(--term-accent);
   font-weight: 600;
 }
