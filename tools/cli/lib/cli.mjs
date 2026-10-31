@@ -6,7 +6,7 @@
 import { Command } from 'commander';
 
 import {
-  connectedBrowsers,
+  getConnectedBrowsers,
   describeBrowsers,
   useBrowser,
 } from './browsers.mjs';
@@ -77,7 +77,7 @@ program
   .command('browsers')
   .description('List the browsers running Stylebot, to name with --browser')
   .action(async () => {
-    const { browsers } = await connectedBrowsers();
+    const { browsers } = await getConnectedBrowsers();
 
     createPrinter(program)(
       browsers.map(({ key, name, page }) => ({ key, name, page })),

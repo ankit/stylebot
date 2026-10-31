@@ -36,8 +36,8 @@ const load = ({
     },
     rmSync: jest.fn(),
   }));
-  jest.doMock('./exchange.mjs', () => ({
-    exchange: async socket => {
+  jest.doMock('./socket.mjs', () => ({
+    sendToHost: async socket => {
       const host = hosts[socket];
 
       if (typeof host === 'string') {
@@ -101,23 +101,21 @@ describe('findSockets', () => {
   });
 });
 
-describe('nameBrowsers', () => {
+describe('addBrowserKeys', () => {
   it('names a browser by its name, or with its instance when shared', () => {
-    const { nameBrowsers } = load({});
+    const { addBrowserKeys } = load({});
     const other = { name: 'Chrome', instance: 'zz99' };
 
-    expect(nameBrowsers([chrome, edge, other]).map(({ key }) => key)).toEqual([
-      'chrome-k3f9',
-      'edge',
-      'chrome-zz99',
-    ]);
+    expect(addBrowserKeys([chrome, edge, other]).map(({ key }) => key)).toEqual(
+      ['chrome-k3f9', 'edge', 'chrome-zz99']
+    );
   });
 });
 
 describe('findBrowser', () => {
   it('finds a browser by its key or its full name, in any case', () => {
-    const { findBrowser, nameBrowsers } = load({});
-    const browsers = nameBrowsers([chrome, edge]);
+    const { findBrowser, addBrowserKeys } = load({});
+    const browsers = addBrowserKeys([chrome, edge]);
 
     expect(findBrowser(browsers, 'Edge')?.name).toBe('Edge');
     expect(findBrowser(browsers, 'chrome-k3f9')?.name).toBe('Chrome');
@@ -127,9 +125,9 @@ describe('findBrowser', () => {
 
 describe('describeBrowsers', () => {
   it('lines up each key with its browser and page', () => {
-    const { describeBrowsers, nameBrowsers } = load({});
+    const { describeBrowsers, addBrowserKeys } = load({});
 
-    expect(describeBrowsers(nameBrowsers([chrome, edge]))).toEqual([
+    expect(describeBrowsers(addBrowserKeys([chrome, edge]))).toEqual([
       '  chrome  Chrome, showing Hacker News (news.ycombinator.com)',
       '  edge    Edge',
     ]);

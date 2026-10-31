@@ -196,14 +196,14 @@ const launchBrowser = async (userDataDir: string, headless: boolean) => {
   const engine = new ChromiumEngine();
 
   // The host the browser starts inherits HOME, so it listens in the test HOME too.
-  const launched = await engine.launch(userDataDir, {
+  const context = await engine.launch(userDataDir, {
     headless,
     viewport: null,
     colorScheme: null,
     env,
   });
 
-  launched.on('page', page =>
+  context.on('page', page =>
     page.once('framenavigated', () => {
       if (/^https:\/\/stylebot\.dev\/welcome/.test(page.url())) {
         page.close().catch(() => {});
@@ -213,15 +213,15 @@ const launchBrowser = async (userDataDir: string, headless: boolean) => {
 
   // Chrome keeps a permission granted when the next version makes it optional.
   await engine.loadExtension(
-    launched,
+    context,
     copyBuild('granted', grantCliPermissions)
   );
   const { id } = await engine.loadExtension(
-    launched,
+    context,
     copyBuild('stylebot', () => {})
   );
 
-  return { context: launched, extensionId: id };
+  return { context, extensionId: id };
 };
 
 /**

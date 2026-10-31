@@ -7,7 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import readline from 'node:readline/promises';
 
-import { exchange } from './exchange.mjs';
+import { sendToHost } from './socket.mjs';
 import {
   HOST_PIPE,
   IS_WINDOWS,
@@ -71,7 +71,12 @@ export const findSockets = () => {
  */
 const describe = async socket => {
   try {
-    const response = await exchange(socket, 'browser', {}, DESCRIBE_TIMEOUT_MS);
+    const response = await sendToHost(
+      socket,
+      'browser',
+      {},
+      DESCRIBE_TIMEOUT_MS
+    );
 
     if ('result' in response) {
       return { socket, ...response.result };
@@ -96,18 +101,18 @@ const describe = async socket => {
   }
 };
 
-const slugOf = name => name.toLowerCase().replace(/[^a-z\d]+/g, '-');
+const slugify = name => name.toLowerCase().replace(/[^a-z\d]+/g, '-');
 
 /**
  * Gives each browser a key to name it by: its name, such as `chrome`, or
  * with its instance id too, such as `chrome-k3f9`, when another profile of
  * the same browser runs Stylebot.
  */
-export const nameBrowsers = browsers =>
+export const addBrowserKeys = browsers =>
   browsers.map(browser => {
-    const slug = slugOf(browser.name);
+    const slug = slugify(browser.name);
     const alone =
-      browsers.filter(other => slugOf(other.name) === slug).length === 1;
+      browsers.filter(other => slugify(other.name) === slug).length === 1;
 
     return {
       ...browser,
@@ -154,11 +159,11 @@ export const describeBrowsers = (browsers, { numbered = false } = {}) => {
  * The browsers running Stylebot, named for --browser, and whether a socket
  * refused, for the CLI to explain why when there are none.
  */
-export const connectedBrowsers = async () => {
+export const getConnectedBrowsers = async () => {
   const described = await Promise.all(findSockets().map(describe));
 
   return {
-    browsers: nameBrowsers(described.filter(({ error }) => !error)),
+    browsers: addBrowserKeys(described.filter(({ error }) => !error)),
     refused: described.some(({ error }) => error?.code === 'ECONNREFUSED'),
   };
 };
@@ -166,7 +171,7 @@ export const connectedBrowsers = async () => {
 /**
  * Asks on the terminal which browser to use.
  */
-const ask = async browsers => {
+const askWhichBrowser = async browsers => {
   const color = isStyled(process.stderr);
   const prompt = readline.createInterface({
     input: process.stdin,
@@ -217,7 +222,7 @@ export const chooseSocket = async () => {
     return sockets[0];
   }
 
-  const { browsers, refused } = await connectedBrowsers();
+  const { browsers, refused } = await getConnectedBrowsers();
 
   if (!browsers.length) {
     throw unreachable(refused ? 'ECONNREFUSED' : 'ENOENT');
@@ -248,7 +253,7 @@ export const chooseSocket = async () => {
   }
 
   if (process.stdin.isTTY && process.stderr.isTTY) {
-    return (await ask(browsers)).socket;
+    return (await askWhichBrowser(browsers)).socket;
   }
 
   throw new Error(

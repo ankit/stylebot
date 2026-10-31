@@ -32,9 +32,12 @@ const socketPath = custom => {
 export const SOCKET_OVERRIDE = process.env.STYLEBOT_SOCKET
   ? socketPath(process.env.STYLEBOT_SOCKET)
   : undefined;
+
 // The one socket every browser's host shared before each got its own.
 export const SHARED_SOCKET_PATH = socketPath();
+
 export const SOCKETS_DIR = join(STATE_DIR, 'browsers');
+
 // Matches a host's own pipe, as hostSocketPath names it on Windows.
 export const HOST_PIPE = new RegExp(
   `^stylebot-browser-\\d+-${USER.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`

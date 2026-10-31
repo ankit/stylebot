@@ -7,7 +7,7 @@ import { cliStamp } from './protocol.mjs';
  * extension's response as it came. Rejects with the socket's error, whose
  * code says when no host listens there.
  */
-export const exchange = (socketPath, command, args = {}, timeout = 0) =>
+export const sendToHost = (socketPath, command, args = {}, timeout = 0) =>
   new Promise((resolve, reject) => {
     const socket = net.connect(socketPath);
     let output = '';

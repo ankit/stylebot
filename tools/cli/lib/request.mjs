@@ -1,6 +1,6 @@
 import { chooseSocket } from './browsers.mjs';
 import { diagnoseConnection } from './diagnose.mjs';
-import { exchange } from './exchange.mjs';
+import { sendToHost } from './socket.mjs';
 import { prepareHost } from './install.mjs';
 import { incompatibility } from './protocol.mjs';
 import { isStyled, linkify } from './style.mjs';
@@ -21,7 +21,8 @@ export const request = async (command, args = {}) => {
   let response;
 
   try {
-    response = await exchange(await chooseSocket(), command, args);
+    const socket = await chooseSocket();
+    response = await sendToHost(socket, command, args);
   } catch (error) {
     if (error.code === 'ENOENT' || error.code === 'ECONNREFUSED') {
       throw new Error(diagnoseConnection({ code: error.code, repinned }));

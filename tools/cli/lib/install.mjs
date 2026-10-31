@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { connectedBrowsers } from './browsers.mjs';
+import { getConnectedBrowsers } from './browsers.mjs';
 import { CLI_VERSION, LIB_DIR } from './package.mjs';
 import { HOST_DIR, HOST_VERSION_PATH } from './paths.mjs';
 import {
@@ -79,18 +79,20 @@ export const checklist = ({ browsers, stylebot, connected }) => {
     });
   }
 
-  steps.push(
-    connected.length
-      ? {
-          done: true,
-          text: `Connected to Stylebot in ${sentence([...new Set(connected)])}`,
-        }
-      : {
-          done: false,
-          text: 'Turn on "Allow command line access" in Stylebot\'s settings',
-          hint: 'Already on? Reload Stylebot. Stuck? stylebot.dev/cli',
-        }
-  );
+  if (connected.length) {
+    const names = [...new Set(connected)];
+
+    steps.push({
+      done: true,
+      text: `Connected to Stylebot in ${sentence(names)}`,
+    });
+  } else {
+    steps.push({
+      done: false,
+      text: 'Turn on "Allow command line access" in Stylebot\'s settings',
+      hint: 'Already on? Reload Stylebot. Stuck? stylebot.dev/cli',
+    });
+  }
 
   return steps;
 };
@@ -133,12 +135,13 @@ export const install = async () => {
   copyHost();
 
   const registrations = registerHost();
+  const { browsers: connected } = await getConnectedBrowsers();
 
   printChecklist(
     checklist({
       browsers: registrations.map(({ browser }) => browser),
       stylebot: findStylebot(),
-      connected: (await connectedBrowsers()).browsers.map(({ name }) => name),
+      connected: connected.map(({ name }) => name),
     })
   );
 };
