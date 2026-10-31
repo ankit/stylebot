@@ -147,38 +147,29 @@ describe('mode', () => {
 });
 
 describe('the session', () => {
-  it('toggles for the shortcut', async () => {
-    await mode.toggleCliMode(TAB);
-    expect(mode.isInCliMode(TAB)).toBe(true);
-    expect(chrome.tabs.update).not.toHaveBeenCalled();
-
-    await mode.toggleCliMode(TAB);
-    expect(mode.isInCliMode(TAB)).toBe(false);
-  });
-
   it("ends when the terminal's close is pressed", async () => {
-    await mode.toggleCliMode(TAB);
+    await mode.modeCommands.mode({ tab: String(TAB) });
     await fromTerminal(TAB, { type: 'off' });
 
     expect(mode.isInCliMode(TAB)).toBe(false);
   });
 
   it('ignores events from a tab that is not connected', async () => {
-    await mode.toggleCliMode(TAB);
+    await mode.modeCommands.mode({ tab: String(TAB) });
     await fromTerminal(OTHER_TAB, { type: 'off' });
 
     expect(mode.isInCliMode(TAB)).toBe(true);
   });
 
   it('ends when its tab closes', async () => {
-    await mode.toggleCliMode(TAB);
+    await mode.modeCommands.mode({ tab: String(TAB) });
     listeners.removed(TAB);
 
     expect(mode.isInCliMode(TAB)).toBe(false);
   });
 
   it('shows the terminal again once its tab has loaded', async () => {
-    await mode.toggleCliMode(TAB);
+    await mode.modeCommands.mode({ tab: String(TAB) });
     (sendToTerminal as jest.Mock).mockClear();
 
     listeners.updated(TAB, { status: 'loading' });
@@ -196,7 +187,7 @@ describe('the session', () => {
 
 describe('agent activity', () => {
   beforeEach(async () => {
-    await mode.toggleCliMode(TAB);
+    await mode.modeCommands.mode({ tab: String(TAB) });
   });
 
   it('folds the commands the agent runs in one go into one turn', async () => {
@@ -261,7 +252,7 @@ describe('saves', () => {
     (getAll as jest.Mock).mockResolvedValue({
       'example.com': { css: '', enabled: true, readability: false },
     });
-    await mode.toggleCliMode(TAB);
+    await mode.modeCommands.mode({ tab: String(TAB) });
     await mode.noteCliActivity('setCss', { target: 'example.com' });
   });
 

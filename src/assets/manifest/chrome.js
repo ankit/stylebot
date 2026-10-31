@@ -7,14 +7,6 @@ module.exports = {
 
   side_panel: { default_path: 'side-panel-default/index.html' },
 
-  commands: {
-    ...base.commands,
-    'cli-mode': {
-      suggested_key: { default: 'Alt+Shift+K' },
-      description: '__MSG_connect_this_tab_to_your_coding_agent_cli_mode__',
-    },
-  },
-
   permissions: [
     ...base.permissions,
     'identity',

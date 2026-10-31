@@ -27,9 +27,8 @@ export const addModeCommands = program => {
     Notes: [
       'Brings the tab to the front with its terminal open, which lists each',
       'command you run on the tab and each save, with an undo. Connecting',
-      'another tab moves CLI mode there. The user can also connect a tab',
-      'with Alt+Shift+K; tabs marks it [CLI mode], and open returns it',
-      'rather than opening a copy.',
+      'another tab moves CLI mode there. tabs marks the connected tab',
+      '[CLI mode], and open returns it rather than opening a copy.',
     ],
   });
 };

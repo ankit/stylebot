@@ -13,8 +13,8 @@ export type SavedVersion = {
 
 /*
  * CLI mode's one session: the tab connected to the agent and what the agent
- * did there. The user connects a tab with the shortcut, or the agent with
- * `stylebot mode`; connecting another tab moves the session there.
+ * did there. The agent connects a tab with `stylebot mode`; connecting
+ * another tab moves the session there.
  */
 export type Session = {
   tabId: number;

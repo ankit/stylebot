@@ -163,16 +163,11 @@ function collectUsedKeys() {
     patterns.push(...templatePatterns(text));
   }
 
-  // The base manifest and the modules that extend it per browser.
-  const manifestDir = path.dirname(manifestPath);
+  const manifest = readFileSync(manifestPath, 'utf8');
 
-  readdirSync(manifestDir)
-    .map(name => readFileSync(path.join(manifestDir, name), 'utf8'))
-    .forEach(manifest =>
-      [...manifest.matchAll(/__MSG_([a-zA-Z0-9_]+)__/g)].forEach(m =>
-        usedKeys.add(m[1])
-      )
-    );
+  [...manifest.matchAll(/__MSG_([a-zA-Z0-9_]+)__/g)].forEach(m =>
+    usedKeys.add(m[1])
+  );
 
   const isReferenced = key =>
     usedKeys.has(key) ||

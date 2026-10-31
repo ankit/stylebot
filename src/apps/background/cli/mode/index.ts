@@ -17,17 +17,6 @@ import {
 export { ACTIVITY_MS, noteCliActivity, onCliSave } from './activity';
 export { getCliModeTab, isInCliMode } from './session';
 
-/**
- * Connects a tab to CLI mode, or disconnects it if it is, for the shortcut.
- */
-export const toggleCliMode = async (tabId: number): Promise<void> => {
-  if (isInCliMode(tabId)) {
-    disconnect();
-  } else {
-    await connectTab(tabId, { open: true });
-  }
-};
-
 const handlePageEvent = async (
   tabId: number,
   event: CliModePageEvent

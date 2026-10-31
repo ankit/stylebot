@@ -153,16 +153,6 @@ const disconnect = (): void => {
   setCliConnected(false);
 };
 
-/**
- * Whether the CLI setting is on and its permissions are granted.
- */
-export const isCliAllowed = async (): Promise<boolean> => {
-  const option = await getOption('cliAccess');
-  const granted = await hasCliPermissions();
-
-  return option === true && granted;
-};
-
 let pendingUpdate = Promise.resolve();
 let startedAfterGrantReload = Promise.resolve(false);
 
@@ -173,7 +163,8 @@ let startedAfterGrantReload = Promise.resolve(false);
 export const updateCliBridge = (): Promise<void> => {
   pendingUpdate = pendingUpdate
     .then(async () => {
-      const allowed = await isCliAllowed();
+      const allowed =
+        (await getOption('cliAccess')) === true && (await hasCliPermissions());
 
       if (allowed && !port) {
         if (typeof chrome.runtime.connectNative === 'function') {
