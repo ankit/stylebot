@@ -102,7 +102,7 @@ export const mountTerminal = async (
     ? createMarks({
         host,
         state,
-        onMark: n => sendTerminalEvent({ type: 'mark', n }),
+        onMark: ({ n, area }) => sendTerminalEvent({ type: 'mark', n, area }),
         onUnmark: n => sendTerminalEvent({ type: 'unmark', n }),
       })
     : null;

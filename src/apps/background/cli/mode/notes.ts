@@ -5,16 +5,18 @@ import { getSavedCss } from '../pointer';
 import { getViewport, renderCapture } from '../screenshot';
 import type { Size } from '../screenshot-region';
 import type { CliCommands } from '../types';
-import { hasWaiters, tellWaiters } from './marks';
+import { tellWaiters } from './marks';
 import {
   type Session,
   checkTab,
   getSession,
+  isAgentAround,
   pushState,
   scheduleThinkingEnd,
   takeId,
 } from './session';
 import { sendToTerminal } from './terminal';
+import { sendToWatchers } from './watchers';
 
 // Room around the marks in a note's screenshot, which holds their badges.
 const NOTE_IMAGE_PADDING = 24;
@@ -114,8 +116,8 @@ export const onNote = async (
   numbers.forEach(n => session.unreadMarks.delete(n));
   session.awaitingReply = true;
 
-  // An agent waiting for the user gets to work on the note right away.
-  if (hasWaiters()) {
+  // An agent watching or waiting for the user gets to work on it right away.
+  if (isAgentAround()) {
     session.lastCommandAt = Date.now();
   }
 
@@ -126,6 +128,20 @@ export const onNote = async (
 
   session.unreadNotes.push({ id, text, marks, image });
   tellWaiters('note');
+
+  // What a watch prints counts as read.
+  const printed = sendToWatchers({
+    type: 'note',
+    tab: session.tabId,
+    id,
+    text,
+    marks: numbers,
+    image,
+  });
+
+  if (printed) {
+    session.unreadNotes = session.unreadNotes.filter(note => note.id !== id);
+  }
 };
 
 export const noteCommands: CliCommands = {
@@ -146,6 +162,7 @@ export const noteCommands: CliCommands = {
 
     session.thread.push({ kind: 'reply', id: takeId(), text });
     session.agentSeen = true;
+    session.agentLeft = false;
     session.awaitingReply = false;
     clearTimeout(session.thinkingTimer);
     pushState();

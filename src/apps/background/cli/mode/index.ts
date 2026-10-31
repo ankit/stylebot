@@ -1,5 +1,10 @@
 import { isWebPageUrl } from '@stylebot/utils';
-import type { CliModeEvent, CliModePageEvent } from '@stylebot/types';
+import type {
+  CliModeEvent,
+  CliModePageEvent,
+  SetAllStyles,
+  SetStyle,
+} from '@stylebot/types';
 
 import { requireNamed, resolveTab } from '../targets';
 import type { CliCommands } from '../types';
@@ -8,10 +13,12 @@ import { forgetInvite, refreshInvites } from './invites';
 import { onMark, onUnmark } from './marks';
 import { noteCommands, onNote } from './notes';
 import { selectionCommands } from './selection';
+import { followStyleSave } from './watch';
+import { sendToWatchers } from './watchers';
 import {
   connectTab,
   disconnect,
-  endSession,
+  disconnectTab,
   followCliConnection,
   getSession,
   isInCliMode,
@@ -21,6 +28,7 @@ import {
 export { ACTIVITY_MS, noteCliActivity, onCliSave } from './activity';
 export { getUnreadNotice } from './marks';
 export { getCliModeTab, isInCliMode } from './session';
+export { STYLE_EDITED_MS, watchStreams } from './watch';
 
 const handlePageEvent = async (
   tabId: number,
@@ -45,7 +53,7 @@ const handlePageEvent = async (
 
   switch (event.type) {
     case 'off':
-      endSession();
+      disconnectTab('off');
       refreshInvites();
       return;
 
@@ -54,7 +62,7 @@ const handlePageEvent = async (
       return;
 
     case 'mark':
-      onMark(event.n);
+      onMark(event.n, event.area);
       return;
 
     case 'unmark':
@@ -99,17 +107,21 @@ export const modeCommands: CliCommands = {
 };
 
 /**
- * Follows the connected tab: shows the terminal again after it loads, and
- * ends the session when it closes. Keeps invites on the active tabs while
- * an agent waits. Call it synchronously at service worker start.
+ * Follows the connected tab and keeps invites on the active tabs. Call it
+ * synchronously at service worker start.
  */
 export const initCliMode = (): void => {
   chrome.runtime.onMessage.addListener(
     (
-      message: CliModeEvent,
+      message: CliModeEvent | SetStyle | SetAllStyles,
       sender: chrome.runtime.MessageSender,
       sendResponse: (response: null) => void
     ) => {
+      if (message?.name === 'SetStyle' || message?.name === 'SetAllStyles') {
+        followStyleSave(message);
+        return false;
+      }
+
       if (message?.name !== 'CliModeEvent' || sender.tab?.id === undefined) {
         return false;
       }
@@ -124,9 +136,20 @@ export const initCliMode = (): void => {
   );
 
   chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    // The marks go with the page they were on.
-    if (changeInfo.status === 'loading' && isInCliMode(tabId)) {
-      getSession()?.unreadMarks.clear();
+    if (isInCliMode(tabId)) {
+      // The marks go with the page they were on.
+      if (changeInfo.status === 'loading') {
+        getSession()?.unreadMarks.clear();
+      }
+
+      // A load may report its url again while loading; in-page url changes
+      // come on their own.
+      if (
+        changeInfo.status === 'loading' ||
+        (changeInfo.url && tab.status !== 'loading')
+      ) {
+        sendToWatchers({ type: 'navigated', url: tab.url ?? '' });
+      }
     }
 
     if (changeInfo.status === 'complete') {
@@ -145,7 +168,7 @@ export const initCliMode = (): void => {
     forgetInvite(tabId);
 
     if (isInCliMode(tabId)) {
-      endSession();
+      disconnectTab('closed');
       refreshInvites();
     }
   });

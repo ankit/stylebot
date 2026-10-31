@@ -62,6 +62,23 @@ export const PillOpens: StoryObj = {
   },
 };
 
+export const AgentStatus: StoryObj = {
+  ...cliTerminal({ agent: 'left', thread: TURNS, expanded: true }),
+  name: 'the status says when the agent stops watching and comes back',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await shows(canvas.getByText('agent disconnected'));
+
+    await user.click(canvas.getByTitle('Minimize (.)'));
+    await shows(canvas.getByText('agent left'));
+
+    shown.state.agent = 'connected';
+    await shows(await canvas.findByText('agent connected'));
+    await expect(canvas.queryByText('agent left')).toBeNull();
+  },
+};
+
 export const TurnExpands: StoryObj = {
   ...cliTerminal({ agent: 'connected', thread: TURNS, expanded: true }),
   name: 'a turn opens to list each command and save',

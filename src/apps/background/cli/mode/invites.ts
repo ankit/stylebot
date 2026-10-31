@@ -2,6 +2,7 @@ import { isWebPageUrl } from '@stylebot/utils';
 
 import { hasWaiters } from './marks';
 import { getSession } from './session';
+import { isWatching } from './watchers';
 import { sendToTerminal } from './terminal';
 
 // Tabs showing an invite, to update or take it away from.
@@ -20,7 +21,9 @@ const getConnectedHost = async (): Promise<string | null> => {
 };
 
 const takeAwayInvites = async (): Promise<void> => {
-  const tabs = Array.from(invited);
+  const connectedTab = getSession()?.tabId;
+  // An invited tab the user connected shows the terminal now.
+  const tabs = Array.from(invited).filter(tabId => tabId !== connectedTab);
 
   invited.clear();
   await Promise.all(
@@ -62,12 +65,14 @@ const showInvites = async (): Promise<void> => {
 };
 
 /**
- * While an agent waits for the user, shows an invite on the active tab of
- * each window but the connected one, to connect it or move CLI mode there.
- * Takes the invites away once no agent waits.
+ * While an agent waits for the user, or watches with no tab to follow, shows
+ * an invite on the active tab of each window but the connected one, to
+ * connect it or move CLI mode there. Takes the invites away after.
  */
 export const refreshInvites = (): void => {
-  (hasWaiters() ? showInvites() : takeAwayInvites()).catch(e =>
+  const agentWaiting = hasWaiters() || (isWatching() && !getSession());
+
+  (agentWaiting ? showInvites() : takeAwayInvites()).catch(e =>
     console.error('Stylebot CLI:', e)
   );
 };

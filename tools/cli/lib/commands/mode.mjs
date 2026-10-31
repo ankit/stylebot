@@ -107,6 +107,59 @@ export const formatSelection = ({ tab, waiting, notes = [], marks }) => {
 };
 
 /**
+ * A mark's number as its badge shows it.
+ */
+const circled = n =>
+  n >= 1 && n <= 20 ? String.fromCodePoint(0x2460 + n - 1) : `(${n})`;
+
+/**
+ * One line of what `watch` prints, for an event in CLI mode.
+ */
+export const formatEvent = event => {
+  switch (event.type) {
+    case 'waiting':
+      return 'waiting for a tab: ask the user to connect the tab to work on with the connect button Stylebot shows on it, or run: stylebot mode <tab>';
+    case 'attached':
+      return `attached tab ${event.tab} ${event.url}`;
+    case 'mark':
+      return `mark ${circled(event.n)} area ${event.width}×${event.height}`;
+    case 'unmark':
+      return `unmark ${circled(event.n)}`;
+    case 'note':
+      return `note ${JSON.stringify(event.text)}${
+        event.marks.length ? ` about ${event.marks.map(circled).join('')}` : ''
+      }${event.image ? ` (screenshot ${event.image})` : ''}`;
+    case 'navigated':
+      return `navigated ${event.url}`;
+    case 'style-edited':
+      return `style-edited ${event.url}`;
+    case 'off':
+      return 'mode off';
+    case 'closed':
+      return 'tab closed';
+    default:
+      return event.type;
+  }
+};
+
+/**
+ * Saves a note's screenshot from a `watch` event under dir, putting its
+ * path in its place.
+ */
+export const saveNoteImage = (event, dir) => {
+  if (event.type === 'note' && event.image) {
+    event.image = savePng(
+      event.image,
+      path.join(dir, `stylebot-note-${event.tab}-${event.id}.png`)
+    );
+  }
+
+  return event;
+};
+
+const expandHome = dir => dir.replace(/^~(?=$|[/\\])/, os.homedir());
+
+/**
  * The tab and the message in what `say` was given: a leading tab id is
  * optional, and the rest is the message.
  */
@@ -149,8 +202,9 @@ export const addModeCommands = program => {
       'another tab moves CLI mode there. tabs marks the connected tab',
       '[CLI mode], and open returns it rather than opening a copy.',
       'The user marks areas of the page by dragging over them and writes',
-      'notes about them; read both with selection, and answer with say.',
-      'Commands end with a line while some are unread.',
+      'notes about them; read both with selection, or follow them as they',
+      'come with watch, and answer with say. Commands end with a line while',
+      'some are unread.',
       'Keys on the page: . open or minimize, / write a note, Z undo the',
       'last save, X clear the marks.',
     ],
@@ -185,7 +239,7 @@ export const addModeCommands = program => {
         wait: Boolean(options.wait),
         timeout: options.wait ? timeout : undefined,
       });
-      const dir = options.out.replace(/^~(?=$|[/\\])/, os.homedir());
+      const dir = expandHome(options.out);
 
       for (const note of result.notes) {
         if (note.image) {
@@ -224,6 +278,35 @@ export const addModeCommands = program => {
       '$ stylebot selection --crop',
       '$ stylebot selection --wait --timeout 2m',
     ],
+  });
+
+  const watch = program
+    .command('watch')
+    .description('Follow what the user does in CLI mode, a line an event')
+    .argument('[tab]', 'Connect this tab, and stop once it disconnects')
+    .option(
+      '-o, --out <dir>',
+      'Where note screenshots are saved',
+      WORK_DIR.replace(os.homedir(), '~')
+    )
+    .action(async (tab, options) => {
+      const dir = expandHome(options.out);
+      const { json } = program.opts();
+
+      await request('watch', { tab }, event => {
+        saveNoteImage(event, dir);
+        console.log(json ? JSON.stringify(event) : formatEvent(event));
+      });
+    });
+
+  addHelpSections(watch, {
+    Notes: [
+      'Runs until stopped, following whichever tab the user connects.',
+      'Prints a line per event: attached, mark, unmark, note, navigated,',
+      'style-edited (changed outside the CLI), mode off, tab closed.',
+      'What it prints counts as read.',
+    ],
+    Examples: ['$ stylebot watch', '$ stylebot watch --json'],
   });
 
   const say = program

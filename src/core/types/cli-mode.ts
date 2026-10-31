@@ -32,8 +32,10 @@ export type CliThreadEntry = CliTurn | CliNote | CliReply;
 export type CliAgentStatus =
   // None has run a command on the tab since it was connected.
   | 'awaited'
+  // One is watching or waiting for the user, or has run commands since.
   | 'connected'
-  // One was, and the CLI's connection to Stylebot has since gone.
+  // One was, and has since stopped watching and waiting, or the CLI's
+  // connection to Stylebot went away.
   | 'left';
 
 // What the terminal shows, which the background keeps for the CLI mode session.
@@ -98,7 +100,8 @@ export type CliModeMessage = {
 export type CliModePageEvent =
   | { type: 'undo'; id: number }
   | { type: 'off' }
-  | { type: 'mark'; n: number }
+  // The area is in css pixels of the page.
+  | { type: 'mark'; n: number; area: ViewportRect }
   | { type: 'unmark'; n: number }
   // Answered once the background has read the note's marks off the page,
   // which keeps them until then.

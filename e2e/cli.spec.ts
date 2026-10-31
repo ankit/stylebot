@@ -1,5 +1,5 @@
 import type { BrowserContext, Page } from '@playwright/test';
-import { execFile } from 'node:child_process';
+import { execFile, spawn } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -135,6 +135,34 @@ const cli = (args: Array<string>, cliDir = CLI_DIR): Promise<CliResult> =>
         })
     )
   );
+
+/**
+ * Starts a long-running CLI command, such as watch, collecting the lines it
+ * prints until it's stopped.
+ */
+const startCli = (args: Array<string>) => {
+  const child = spawn(
+    process.execPath,
+    [path.join(CLI_DIR, 'lib', 'cli.mjs'), ...args],
+    { cwd: home, env }
+  );
+  const lines: Array<string> = [];
+  let partial = '';
+
+  child.stdout.on('data', chunk => {
+    const text = partial + String(chunk);
+    const parts = text.split('\n');
+
+    partial = parts.pop() ?? '';
+    lines.push(...parts);
+  });
+
+  const exited = new Promise<number | null>(resolve =>
+    child.on('exit', code => resolve(code))
+  );
+
+  return { child, lines, exited };
+};
 
 /**
  * Runs a CLI command that must succeed, returning its output.
@@ -1082,6 +1110,90 @@ test('while the agent waits for a tab, the active tab invites the user to connec
 
   await ok(['mode', String(tab.id), '--off']);
   await expect.poll(() => terminalText(yours)).toBeNull();
+  await yours.close();
+});
+
+test('watch prints what the user does in CLI mode as it happens', async () => {
+  test.setTimeout(90_000);
+
+  const yours = await context.newPage();
+  await yours.goto(`${baseUrl}/marks`);
+  await yours.bringToFront();
+
+  const tab = (await json<Array<Tab>>(['tabs'])).find(
+    entry => entry.url === `${baseUrl}/marks`
+  )!;
+  const id = String(tab.id);
+  const watch = startCli(['watch']);
+
+  try {
+    await expect
+      .poll(() => watch.lines)
+      .toEqual([expect.stringMatching(/^waiting for a tab: /)]);
+    await expect
+      .poll(() => terminalText(yours))
+      .toContain('your agent is waiting for a tab');
+
+    await clickInTerminal(yours, 'title', 'Connect this tab to your agent');
+    await expect
+      .poll(() => watch.lines.slice(1))
+      .toEqual([`attached tab ${id} ${baseUrl}/marks`]);
+    await expect.poll(() => terminalText(yours)).toContain('agent connected');
+
+    await drag(yours, [10, 10], [240, 150]);
+    await expect.poll(() => watch.lines.at(-1)).toBe('mark ① area 230×140');
+    // What watch printed counts as read.
+    expect(await ok(['outline', id])).not.toContain('new mark');
+
+    await yours.keyboard.press('/');
+    await yours.keyboard.type('fix the box.');
+    await yours.keyboard.press('Enter');
+    await expect
+      .poll(() => watch.lines.at(-1))
+      .toMatch(/^note "fix the box\." about ① \(screenshot .+\)$/);
+
+    const file = /\(screenshot (.+)\)$/.exec(watch.lines.at(-1)!)![1];
+    expect(path.dirname(file)).toBe(path.join(home, '.stylebot', 'work'));
+    expect(pngSize(file)).toEqual({ width: 264, height: 174 });
+    // While the agent watches, it counts as working on the note.
+    await expect.poll(() => terminalText(yours)).toContain('thinking');
+
+    // The editor saves through the background, outside the CLI.
+    const editor = await context.newPage();
+    await editor.goto(`chrome-extension://${extensionId}/options.html`);
+    for (const color of ['red', 'blue']) {
+      await editor.evaluate(
+        css =>
+          chrome.runtime
+            .sendMessage({
+              name: 'SetStyle',
+              url: 'localhost',
+              css,
+              readability: false,
+            })
+            .catch(() => undefined),
+        `body { color: ${color}; }`
+      );
+    }
+    await editor.close();
+    await expect.poll(() => watch.lines.at(-1)).toBe('style-edited localhost');
+    expect(
+      watch.lines.filter(line => line.startsWith('style-edited'))
+    ).toHaveLength(1);
+
+    await ok(['mode', id, '--off']);
+    await expect
+      .poll(() => watch.lines.slice(-2))
+      .toEqual(['mode off', expect.stringMatching(/^waiting for a tab: /)]);
+
+    watch.child.kill('SIGINT');
+    await watch.exited;
+    // With no agent around and no tab connected, the invites go.
+    await expect.poll(() => terminalText(yours)).toBeNull();
+  } finally {
+    watch.child.kill();
+  }
+
   await yours.close();
 });
 

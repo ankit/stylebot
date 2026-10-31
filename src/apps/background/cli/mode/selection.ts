@@ -11,7 +11,13 @@ import { type Size, getElementRegion } from '../screenshot-region';
 import type { CliCommands } from '../types';
 import { refreshInvites } from './invites';
 import { listenForUser } from './marks';
-import { type NoteRead, type Session, checkTab, getSession } from './session';
+import {
+  type NoteRead,
+  type Session,
+  checkTab,
+  getSession,
+  joinAgent,
+} from './session';
 import { captureWithTerminal, sendToTerminal } from './terminal';
 
 // After a mark, how long `selection --wait` waits for more before it answers.
@@ -42,11 +48,13 @@ export type Selection = {
 const waitForUser = (timeout: number, signal?: AbortSignal): Promise<boolean> =>
   new Promise(resolve => {
     let pause: ReturnType<typeof setTimeout> | undefined;
+    const leave = joinAgent();
 
     const finish = (arrived: boolean): void => {
       clearTimeout(pause);
       clearTimeout(timer);
       stop();
+      leave();
       signal?.removeEventListener('abort', onAbort);
       refreshInvites();
       resolve(arrived);

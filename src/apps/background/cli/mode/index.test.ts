@@ -3,6 +3,7 @@ import type {
   CliModeState,
   CliThreadEntry,
   CliTurn,
+  StyleMap,
 } from '@stylebot/types';
 
 import { applyStylesToAllTabs, getAll, set } from '../../styles';
@@ -770,5 +771,359 @@ describe('thinking', () => {
       'note',
       'turn',
     ]);
+  });
+});
+
+describe('watch', () => {
+  const AREA = { x: 0, y: 0, width: 200, height: 40 };
+
+  /**
+   * Opens a watch, collecting the events it prints.
+   */
+  const watch = (args: Record<string, unknown> = {}) => {
+    const events: Array<unknown> = [];
+    const controller = new AbortController();
+    const state = { ended: false };
+    const done = mode.watchStreams
+      .watch(args, event => events.push(event), controller.signal)
+      .then(result => {
+        state.ended = true;
+        return result;
+      });
+
+    return { events, controller, done, state };
+  };
+
+  const flush = () => jest.advanceTimersByTimeAsync(0);
+
+  it('waits for a tab, inviting the user to connect one, then follows it', async () => {
+    const { events } = watch();
+
+    await flush();
+    expect(events).toEqual([{ type: 'waiting' }]);
+    expect(sendToTerminal).toHaveBeenCalledWith(TAB, {
+      kind: 'invite',
+      connectedTo: null,
+    });
+
+    await fromTerminal(TAB, { type: 'connect' });
+    await flush();
+
+    expect(events).toEqual([
+      { type: 'waiting' },
+      { type: 'attached', tab: TAB, url: URL },
+    ]);
+    expect(lastState()?.agent).toBe('connected');
+    // With a tab to follow, the watch doesn't invite others.
+    expect(sendToTerminal).toHaveBeenLastCalledWith(TAB, {
+      kind: 'on',
+      open: true,
+      state: expect.anything(),
+    });
+  });
+
+  it('follows the tab connected now, and the next one the user moves to', async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+    const { events } = watch();
+
+    await flush();
+    expect(events).toEqual([{ type: 'attached', tab: TAB, url: URL }]);
+
+    await fromTerminal(OTHER_TAB, { type: 'connect' });
+    expect(events).toEqual([
+      { type: 'attached', tab: TAB, url: URL },
+      { type: 'attached', tab: OTHER_TAB, url: URL },
+    ]);
+  });
+
+  it('prints what the user does on the tab, and where it goes', async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+    answerWithMarks();
+    const { events } = watch();
+
+    await flush();
+    events.length = 0;
+
+    await fromTerminal(TAB, { type: 'mark', n: 1, area: AREA });
+    await fromTerminal(TAB, { type: 'unmark', n: 1 });
+    await fromTerminal(TAB, { type: 'note', text: 'bigger', marks: [1] });
+    listeners.updated(
+      TAB,
+      { status: 'loading', url: 'https://example.com/next' },
+      { id: TAB, status: 'loading', url: 'https://example.com/next' }
+    );
+    // The url coming again while the page loads isn't another navigation.
+    listeners.updated(
+      TAB,
+      { url: 'https://example.com/next' },
+      { id: TAB, status: 'loading', url: 'https://example.com/next' }
+    );
+    listeners.updated(
+      TAB,
+      { url: 'https://example.com/next#top' },
+      { id: TAB, status: 'complete', url: 'https://example.com/next#top' }
+    );
+    listeners.updated(OTHER_TAB, { status: 'loading' }, { id: OTHER_TAB });
+
+    expect(events).toEqual([
+      { type: 'mark', n: 1, width: 200, height: 40 },
+      { type: 'unmark', n: 1 },
+      {
+        type: 'note',
+        tab: TAB,
+        id: expect.any(Number),
+        text: 'bigger',
+        marks: [1],
+        image: 'data:image/png;base64,crop',
+      },
+      { type: 'navigated', url: 'https://example.com/next' },
+      { type: 'navigated', url: 'https://example.com/next#top' },
+    ]);
+  });
+
+  it('keeps running across disconnects, waiting for the next tab', async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+    const { events, state } = watch();
+
+    await flush();
+    await fromTerminal(TAB, { type: 'off' });
+    await mode.modeCommands.mode({ tab: String(OTHER_TAB) });
+    listeners.removed(OTHER_TAB);
+
+    expect(events).toEqual([
+      { type: 'attached', tab: TAB, url: URL },
+      { type: 'off' },
+      { type: 'waiting' },
+      { type: 'attached', tab: OTHER_TAB, url: URL },
+      { type: 'closed' },
+      { type: 'waiting' },
+    ]);
+    expect(state.ended).toBe(false);
+  });
+
+  it('connects the tab it names, and ends once that tab disconnects', async () => {
+    const { events, done } = watch({ tab: String(TAB) });
+
+    await flush();
+    expect(mode.isInCliMode(TAB)).toBe(true);
+    expect(events).toEqual([{ type: 'attached', tab: TAB, url: URL }]);
+
+    await mode.modeCommands.mode({ tab: String(TAB), on: false });
+
+    expect(await done).toEqual({ tab: TAB });
+    expect(events).toEqual([
+      { type: 'attached', tab: TAB, url: URL },
+      { type: 'off' },
+    ]);
+  });
+
+  it('ends a watch that named a tab once CLI mode moves to another', async () => {
+    const pinned = watch({ tab: String(TAB) });
+
+    await flush();
+    const following = watch();
+
+    await flush();
+    await mode.modeCommands.mode({ tab: String(OTHER_TAB) });
+
+    expect(await pinned.done).toEqual({ tab: TAB });
+    expect(pinned.events).toEqual([
+      { type: 'attached', tab: TAB, url: URL },
+      { type: 'off' },
+    ]);
+    expect(following.state.ended).toBe(false);
+    expect(following.events).toEqual([
+      { type: 'attached', tab: TAB, url: URL },
+      { type: 'attached', tab: OTHER_TAB, url: URL },
+    ]);
+  });
+
+  it('stops when the CLI goes away, and the terminal shows the agent left', async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+    const { controller, done } = watch();
+
+    await flush();
+    expect(lastState()?.agent).toBe('connected');
+
+    controller.abort();
+    expect(await done).toEqual({ tab: null });
+    expect(lastState()?.agent).toBe('left');
+
+    // An agent that runs a command again is back.
+    await mode.noteCliActivity('outline', { tab: String(TAB) });
+    expect(lastState()?.agent).toBe('connected');
+  });
+
+  it("leaves out the unmarks of a note's marks, which went with it", async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+    answerWithMarks();
+    const { events } = watch();
+
+    await flush();
+    await fromTerminal(TAB, { type: 'mark', n: 1, area: AREA });
+    await fromTerminal(TAB, { type: 'note', text: 'bigger', marks: [1] });
+    await fromTerminal(TAB, { type: 'unmark', n: 1 });
+
+    expect(events.map(event => (event as { type: string }).type)).toEqual([
+      'attached',
+      'mark',
+      'note',
+    ]);
+  });
+
+  it('counts what it prints as read', async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+    answerWithMarks();
+    watch();
+    await flush();
+
+    await fromTerminal(TAB, { type: 'mark', n: 1, area: AREA });
+    await fromTerminal(TAB, { type: 'note', text: 'bigger', marks: [] });
+
+    expect(mode.getUnreadNotice()).toBeUndefined();
+    expect(
+      ((await mode.modeCommands.selection({})) as { notes: [] }).notes
+    ).toEqual([]);
+  });
+
+  it('keeps the session for the next tab while it runs, and ends it after', async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+    await mode.modeCommands.say({ message: 'hello' });
+    const { controller, done } = watch();
+
+    await flush();
+    await fromTerminal(TAB, { type: 'off' });
+    await mode.modeCommands.mode({ tab: String(OTHER_TAB) });
+
+    expect(lastState(OTHER_TAB)?.thread).toHaveLength(1);
+
+    await fromTerminal(OTHER_TAB, { type: 'off' });
+    controller.abort();
+    await done;
+    await mode.modeCommands.mode({ tab: String(TAB) });
+
+    expect(lastState()?.thread).toEqual([]);
+  });
+
+  it('counts the agent as working on a note while it watches', async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+    const { controller, done } = watch();
+
+    await flush();
+    await fromTerminal(TAB, { type: 'note', text: 'bigger', marks: [] });
+    await jest.advanceTimersByTimeAsync(10 * 60_000);
+    expect(lastState()?.thinking).toBe(true);
+
+    controller.abort();
+    await done;
+    expect(lastState()?.thinking).toBe(false);
+  });
+
+  describe('style edits', () => {
+    const style = (css: string) =>
+      ({ css, enabled: true, readability: false } as StyleMap[string]);
+
+    beforeEach(async () => {
+      (getAll as jest.Mock).mockResolvedValue({
+        'example.com': style('a {}'),
+      });
+      await mode.modeCommands.mode({ tab: String(TAB) });
+    });
+
+    /**
+     * Sends a save as the editor or Options does, answering whether CLI
+     * mode's listener answered it.
+     */
+    const save = async (message: unknown) => {
+      const answers = listeners.message(message, {}, () => undefined);
+
+      await flush();
+      return answers;
+    };
+
+    const setStyle = (url: string) =>
+      save({ name: 'SetStyle', url, css: 'a {}', readability: false });
+
+    it('does nothing while no watch is open, and leaves saves unanswered', async () => {
+      (getAll as jest.Mock).mockClear();
+
+      expect(await setStyle('example.com')).toBe(false);
+      expect(
+        await save({
+          name: 'SetAllStyles',
+          styles: { 'example.com': style('b {}') },
+        })
+      ).toBe(false);
+      expect(getAll).not.toHaveBeenCalled();
+    });
+
+    it("prints a style's first save", async () => {
+      (getAll as jest.Mock).mockResolvedValue({});
+      const { events } = watch();
+
+      await flush();
+      events.length = 0;
+
+      await setStyle('example.com');
+      await jest.advanceTimersByTimeAsync(mode.STYLE_EDITED_MS);
+      expect(events).toEqual([{ type: 'style-edited', url: 'example.com' }]);
+    });
+
+    it("prints one line for a burst of saves to the tab's style", async () => {
+      const { events } = watch();
+
+      await flush();
+      events.length = 0;
+
+      await setStyle('example.com');
+      await jest.advanceTimersByTimeAsync(mode.STYLE_EDITED_MS - 1);
+      await setStyle('example.com');
+      await setStyle('other.com');
+      await jest.advanceTimersByTimeAsync(mode.STYLE_EDITED_MS - 1);
+      expect(events).toEqual([]);
+
+      await jest.advanceTimersByTimeAsync(1);
+      expect(events).toEqual([{ type: 'style-edited', url: 'example.com' }]);
+    });
+
+    it("prints when Options changes the tab's style, and not other styles", async () => {
+      const { events } = watch();
+
+      await flush();
+      events.length = 0;
+
+      await save({
+        name: 'SetAllStyles',
+        styles: { 'example.com': style('a {}'), 'other.com': style('b {}') },
+      });
+      await jest.advanceTimersByTimeAsync(mode.STYLE_EDITED_MS);
+      expect(events).toEqual([]);
+
+      await save({
+        name: 'SetAllStyles',
+        styles: { 'example.com': style('a { color: red }') },
+      });
+      await jest.advanceTimersByTimeAsync(mode.STYLE_EDITED_MS);
+      expect(events).toEqual([{ type: 'style-edited', url: 'example.com' }]);
+    });
+
+    it('prints an undo from the terminal', async () => {
+      await mode.noteCliActivity('setCss', { target: 'example.com' });
+      await mode.onCliSave({
+        url: 'example.com',
+        readability: false,
+        before: '',
+      });
+      const { events } = watch();
+
+      await flush();
+      events.length = 0;
+
+      const step = turnAt(lastState()?.thread, 0).steps[1];
+      await fromTerminal(TAB, { type: 'undo', id: step.id });
+      await jest.advanceTimersByTimeAsync(mode.STYLE_EDITED_MS);
+
+      expect(events).toEqual([{ type: 'style-edited', url: 'example.com' }]);
+    });
   });
 });

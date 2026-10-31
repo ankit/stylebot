@@ -1,6 +1,27 @@
 jest.mock('../package.mjs', () => ({ CLI_VERSION: '0.2.0', LIB_DIR: '/lib' }));
+jest.mock('../request.mjs', () => ({
+  createPrinter: jest.fn(() => jest.fn()),
+  fail: jest.fn(),
+  request: jest.fn(),
+}));
 
-const { formatSelection, parseDuration, parseSay } = require('./mode.mjs');
+const fs = require('node:fs');
+const os = require('node:os');
+const path = require('node:path');
+const { Command } = require('commander');
+
+const { request } = require('../request.mjs');
+const {
+  addModeCommands,
+  formatEvent,
+  formatSelection,
+  parseDuration,
+  parseSay,
+} = require('./mode.mjs');
+
+// A 1×1 PNG.
+const PNG =
+  'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
 
 const RECT = { x: 40, y: 120, width: 320, height: 180 };
 
@@ -123,5 +144,115 @@ describe('parseSay', () => {
       message: 'made it bigger',
     });
     expect(parseSay(['42'])).toEqual({ tab: undefined, message: '42' });
+  });
+});
+
+describe('formatEvent', () => {
+  it('prints one line for each thing the user does', () => {
+    expect(
+      [
+        { type: 'attached', tab: 7, url: 'https://example.com/' },
+        { type: 'mark', n: 1, width: 200, height: 40 },
+        { type: 'unmark', n: 1 },
+        {
+          type: 'note',
+          tab: 7,
+          id: 4,
+          text: 'make "this" bigger',
+          marks: [1, 2],
+          image: '/home/me/.stylebot/work/stylebot-note-7-4.png',
+        },
+        { type: 'note', tab: 7, id: 5, text: 'hide the ads', marks: [] },
+        { type: 'navigated', url: 'https://example.com/next' },
+        { type: 'style-edited', url: 'example.com' },
+        { type: 'off' },
+        { type: 'closed' },
+      ].map(formatEvent)
+    ).toEqual([
+      'attached tab 7 https://example.com/',
+      'mark ① area 200×40',
+      'unmark ①',
+      'note "make \\"this\\" bigger" about ①② (screenshot /home/me/.stylebot/work/stylebot-note-7-4.png)',
+      'note "hide the ads"',
+      'navigated https://example.com/next',
+      'style-edited example.com',
+      'mode off',
+      'tab closed',
+    ]);
+  });
+
+  it('says how the user connects a tab while it waits for one', () => {
+    expect(formatEvent({ type: 'waiting' })).toMatch(
+      /^waiting for a tab: ask the user .* or run: stylebot mode <tab>$/
+    );
+  });
+});
+
+describe('watch', () => {
+  let lines;
+  let dir;
+
+  /**
+   * Runs `stylebot watch` with the extension sending events, collecting the
+   * lines it prints.
+   */
+  const runWatch = async (args, events) => {
+    const program = new Command('stylebot').option('--json');
+
+    request.mockImplementation(async (_command, _args, onEvent) => {
+      events.forEach(event => onEvent({ ...event }));
+      return { tab: null };
+    });
+    addModeCommands(program);
+    await program.parseAsync(['node', 'stylebot', ...args]);
+  };
+
+  const EVENTS = [
+    { type: 'waiting' },
+    { type: 'attached', tab: 7, url: 'https://example.com/' },
+    { type: 'note', tab: 7, id: 4, text: 'bigger', marks: [1], image: PNG },
+  ];
+
+  beforeEach(() => {
+    lines = [];
+    dir = fs.mkdtempSync(path.join(os.tmpdir(), 'stylebot-watch-'));
+    jest.spyOn(console, 'log').mockImplementation(line => lines.push(line));
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
+    fs.rmSync(dir, { recursive: true, force: true });
+  });
+
+  it("streams the extension's events a line each, saving note screenshots", async () => {
+    await runWatch(['watch', '-o', dir], EVENTS);
+
+    const file = path.join(dir, 'stylebot-note-7-4.png');
+
+    expect(request).toHaveBeenCalledWith(
+      'watch',
+      { tab: undefined },
+      expect.any(Function)
+    );
+    expect(lines.slice(1)).toEqual([
+      'attached tab 7 https://example.com/',
+      `note "bigger" about ① (screenshot ${file})`,
+    ]);
+    expect(fs.existsSync(file)).toBe(true);
+  });
+
+  it('prints an object a line with --json', async () => {
+    await runWatch(['watch', '12', '--json', '-o', dir], EVENTS);
+
+    expect(request).toHaveBeenCalledWith(
+      'watch',
+      { tab: '12' },
+      expect.any(Function)
+    );
+    expect(lines.map(line => JSON.parse(line))).toEqual([
+      EVENTS[0],
+      EVENTS[1],
+      { ...EVENTS[2], image: path.join(dir, 'stylebot-note-7-4.png') },
+    ]);
   });
 });

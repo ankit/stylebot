@@ -70,7 +70,7 @@ describe('createMarks', () => {
       { n: 1, area: { x: 40, y: 350, width: 60, height: 100 } },
     ]);
     expect(state.drag).toBeNull();
-    expect(onMark).toHaveBeenCalledWith(1);
+    expect(onMark).toHaveBeenCalledWith({ n: 1, area: expect.any(Object) });
   });
 
   it('leaves an area in view where it is for a capture', () => {

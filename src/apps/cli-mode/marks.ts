@@ -12,7 +12,7 @@ import {
   toViewportRect,
 } from './areas';
 import { describeArea } from './contained';
-import type { TerminalState } from './state';
+import type { PageMark, TerminalState } from './state';
 
 export type Marks = {
   unmark: (n: number) => void;
@@ -70,7 +70,7 @@ export const createMarks = ({
 }: {
   host: HTMLElement;
   state: TerminalState;
-  onMark: (n: number) => void;
+  onMark: (mark: PageMark) => void;
   onUnmark: (n: number) => void;
 }): Marks => {
   let next = 1;
@@ -101,12 +101,14 @@ export const createMarks = ({
   const addMark = (box: ViewportRect): void => {
     const n = Math.max(next, state.nextMark);
 
-    next = n + 1;
-    state.marks.push({
+    const mark = {
       n,
       area: roundRect(toPageArea(box, { x: scrollX, y: scrollY })),
-    });
-    onMark(n);
+    };
+
+    next = n + 1;
+    state.marks.push(mark);
+    onMark(mark);
   };
 
   const onPointerDown = (event: PointerEvent): void => {

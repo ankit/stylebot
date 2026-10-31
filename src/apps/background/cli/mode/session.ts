@@ -7,6 +7,7 @@ import type {
 } from '@stylebot/types';
 
 import { sendToTerminal } from './terminal';
+import { endWatchersOf, sendToWatchers } from './watchers';
 
 // The style as it was before a save the agent made, which undo restores.
 export type SavedVersion = {
@@ -41,6 +42,8 @@ export type Session = {
   saves: Map<number, SavedVersion>;
   // An agent has run a command on the tab since it was connected.
   agentSeen: boolean;
+  // Every agent watching or waiting for the user has stopped since.
+  agentLeft: boolean;
   activity: string | null;
   activityTimer?: ReturnType<typeof setTimeout>;
   // Marks on the tab the agent hasn't read with `stylebot selection`.
@@ -57,8 +60,13 @@ export type Session = {
 };
 
 let session: Session | null = null;
+// The session while no tab is connected and an agent is still around, kept
+// for the next tab the user connects.
+let parked: Session | null = null;
 let nextId = 1;
 let hostConnected = false;
+// Open watches and `selection --wait` calls.
+let agentsAround = 0;
 
 export const getSession = (): Session | null => session;
 
@@ -67,7 +75,20 @@ export const getSession = (): Session | null => session;
  */
 export const takeId = (): number => nextId++;
 
+/**
+ * Whether an agent is watching or waiting for the user.
+ */
+export const isAgentAround = (): boolean => agentsAround > 0;
+
 const getAgentStatus = (current: Session): CliAgentStatus => {
+  if (isAgentAround()) {
+    return 'connected';
+  }
+
+  if (current.agentLeft) {
+    return 'left';
+  }
+
   if (!current.agentSeen) {
     return 'awaited';
   }
@@ -77,10 +98,11 @@ const getAgentStatus = (current: Session): CliAgentStatus => {
 
 /**
  * Whether the agent is working on the user's note: it hasn't answered, and
- * ran a command lately.
+ * is around or ran a command lately.
  */
 const isThinking = (current: Session): boolean =>
-  current.awaitingReply && Date.now() - current.lastCommandAt < THINKING_MS;
+  current.awaitingReply &&
+  (isAgentAround() || Date.now() - current.lastCommandAt < THINKING_MS);
 
 export const getState = (current: Session): CliModeState => ({
   thread: current.thread,
@@ -109,12 +131,48 @@ export const pushState = (): void => {
 export const scheduleThinkingEnd = (current: Session): void => {
   clearTimeout(current.thinkingTimer);
 
-  if (isThinking(current)) {
+  if (isThinking(current) && !isAgentAround()) {
     current.thinkingTimer = setTimeout(
       pushState,
       current.lastCommandAt + THINKING_MS - Date.now()
     );
   }
+};
+
+/**
+ * Counts an agent as around until the function it returns is called. The
+ * session ends once no agent is around and no tab is connected.
+ */
+export const joinAgent = (): (() => void) => {
+  let joined = true;
+
+  agentsAround++;
+
+  if (session) {
+    session.agentLeft = false;
+    pushState();
+  }
+
+  return () => {
+    if (!joined) {
+      return;
+    }
+
+    joined = false;
+    agentsAround--;
+
+    if (isAgentAround()) {
+      return;
+    }
+
+    parked = null;
+
+    if (session) {
+      session.agentLeft = true;
+      scheduleThinkingEnd(session);
+      pushState();
+    }
+  };
 };
 
 /**
@@ -129,12 +187,26 @@ const bringToFront = async (tabId: number): Promise<void> => {
 };
 
 /**
- * Ends the session, once its tab's terminal is gone or going.
+ * Takes the session off its tab, once the tab's terminal is gone or going:
+ * the user or the agent turned CLI mode off, or the tab closed. Watches
+ * that connected the tab end, and the others wait for the next one.
  */
-export const endSession = (): void => {
-  clearTimeout(session?.activityTimer);
-  clearTimeout(session?.thinkingTimer);
+export const disconnectTab = (reason: 'off' | 'closed'): void => {
+  const left = session;
+
+  if (!left) {
+    return;
+  }
+
+  clearTimeout(left.activityTimer);
+  clearTimeout(left.thinkingTimer);
+  left.activity = null;
   session = null;
+  parked = isAgentAround() ? left : null;
+
+  endWatchersOf(left.tabId, { type: reason });
+  sendToWatchers({ type: reason });
+  sendToWatchers({ type: 'waiting' });
 };
 
 /**
@@ -146,6 +218,11 @@ export const connectTab = async (
   { open = false, front = false } = {}
 ): Promise<void> => {
   const previous = session?.tabId;
+
+  if (!session && parked) {
+    session = parked;
+    parked = null;
+  }
 
   if (session) {
     session.tabId = tabId;
@@ -160,6 +237,7 @@ export const connectTab = async (
       thread: [],
       saves: new Map(),
       agentSeen: false,
+      agentLeft: false,
       activity: null,
       unreadMarks: new Set(),
       nextMark: 1,
@@ -169,24 +247,33 @@ export const connectTab = async (
     };
   }
 
+  const current = session;
+
   if (previous !== undefined && previous !== tabId) {
+    endWatchersOf(previous, { type: 'off' });
     await sendToTerminal(previous, { kind: 'off' }).catch(() => undefined);
+  }
+
+  if (previous !== tabId) {
+    const tab = await chrome.tabs.get(tabId).catch(() => undefined);
+
+    sendToWatchers({ type: 'attached', tab: tabId, url: tab?.url ?? '' });
   }
 
   if (front) {
     await bringToFront(tabId);
   }
 
-  await sendToTerminal(tabId, { kind: 'on', state: getState(session), open });
+  await sendToTerminal(tabId, { kind: 'on', state: getState(current), open });
 };
 
 /**
- * Disconnects the session's tab: the user or the agent turned CLI mode off.
+ * Disconnects the session's tab: the agent turned CLI mode off.
  */
 export const disconnect = (): void => {
   const tabId = session?.tabId;
 
-  endSession();
+  disconnectTab('off');
 
   if (tabId !== undefined) {
     sendToTerminal(tabId, { kind: 'off' }).catch(() => undefined);

@@ -13,6 +13,7 @@ import {
   scheduleThinkingEnd,
   takeId,
 } from './session';
+import { onStyleEdited } from './watch';
 
 // How long after its last command the agent counts as still running; a
 // command after that starts a new turn in the thread.
@@ -85,6 +86,7 @@ export const noteCliActivity = async (
 
   addStep(session, { kind: 'command', id: takeId(), text });
   session.agentSeen = true;
+  session.agentLeft = false;
   session.activity = text;
   session.lastCommandAt = Date.now();
   scheduleThinkingEnd(session);
@@ -148,4 +150,5 @@ export const undoSave = async (session: Session, id: number): Promise<void> => {
     })
   );
   pushState();
+  await onStyleEdited(saved.url);
 };

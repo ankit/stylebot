@@ -1,4 +1,7 @@
+import type { ViewportRect } from '@stylebot/types';
+
 import { getSession } from './session';
+import { sendToWatchers } from './watchers';
 
 // What the user did that a waiting `selection --wait` hears of.
 export type UserEvent = 'mark' | 'unmark' | 'note';
@@ -29,7 +32,7 @@ export const tellWaiters = (event: UserEvent): void =>
  * Notes a mark the user made on the connected tab, unread until the agent
  * runs `stylebot selection`.
  */
-export const onMark = (n: number): void => {
+export const onMark = (n: number, area: ViewportRect): void => {
   const session = getSession();
 
   if (session) {
@@ -38,11 +41,33 @@ export const onMark = (n: number): void => {
   }
 
   tellWaiters('mark');
+
+  // What a watch prints counts as read.
+  const printed = sendToWatchers({
+    type: 'mark',
+    n,
+    width: area.width,
+    height: area.height,
+  });
+
+  if (printed) {
+    session?.unreadMarks.delete(n);
+  }
 };
 
 export const onUnmark = (n: number): void => {
-  getSession()?.unreadMarks.delete(n);
+  const session = getSession();
+  // The page takes a note's marks away once it's sent, with the note.
+  const noted = session?.thread.some(
+    entry => entry.kind === 'note' && entry.marks.includes(n)
+  );
+
+  session?.unreadMarks.delete(n);
   tellWaiters('unmark');
+
+  if (!noted) {
+    sendToWatchers({ type: 'unmark', n });
+  }
 };
 
 const count = (n: number, noun: string): string =>
