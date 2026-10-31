@@ -14,6 +14,15 @@ export const getReleaseNotificationId = (): NotificationId =>
 export const getReleaseUrl = (): string =>
   getSiteUrl(`/releases/${getReleaseVersion()}`);
 
+// Releases with a page on stylebot.dev; add one here when its page goes up.
+const RELEASES_WITH_PAGES = ['3.1', '3.2', '4.0', '4.1'];
+
+/**
+ * Whether the running release has a page on stylebot.dev to announce it with.
+ */
+export const hasReleasePage = (): boolean =>
+  RELEASES_WITH_PAGES.includes(getReleaseVersion());
+
 export const getGoodbyeUrl = (): string =>
   getSiteUrl(`/goodbye?version=${getExtensionVersion()}`);
 
