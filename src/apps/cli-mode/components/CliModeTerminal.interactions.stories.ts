@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, waitFor, within } from '@storybook/test';
 
 import {
+  MARKS,
   TURNS,
   cliTerminal,
   save,
@@ -26,6 +27,12 @@ export default meta;
  */
 const shows = (element: HTMLElement) =>
   waitFor(() => expect(element).toBeVisible());
+
+/**
+ * The chip for a marked area, by the size it shows.
+ */
+const chip = (canvasElement: HTMLElement, size: string) =>
+  within(canvasElement).getByText(size).closest('li') as HTMLElement;
 
 export const PillOpens: StoryObj = {
   ...cliTerminal({ agent: 'connected', thread: TURNS }),
@@ -117,5 +124,63 @@ export const Close: StoryObj = {
     await shows(canvas.getByText('queued'));
     await user.click(canvas.getByTitle('Turn off CLI mode'));
     await waitFor(() => expect(shown.events).toEqual([{ name: 'close' }]));
+  },
+};
+
+export const MarkChips: StoryObj = {
+  ...cliTerminal({ agent: 'connected', marks: MARKS, expanded: true }),
+  name: 'mark chips outline their area while hovered, and remove it',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step('Hover a chip', async () => {
+      await shows(canvas.getByText('320×180'));
+      await user.hover(chip(canvasElement, '320×180'));
+      await waitFor(() => expect(shown.state.highlighted).toBe(1));
+      await user.unhover(chip(canvasElement, '320×180'));
+      await waitFor(() => expect(shown.state.highlighted).toBeNull());
+    });
+
+    await step('Remove the hovered chip', async () => {
+      await user.hover(chip(canvasElement, '96×40'));
+      await waitFor(() => expect(shown.state.highlighted).toBe(3));
+      await user.click(canvas.getByRole('button', { name: 'Remove mark 3' }));
+      await expect(shown.events).toEqual([{ name: 'unmark', value: 3 }]);
+      await expect(canvas.queryByText('96×40')).toBeNull();
+      await expect(shown.state.highlighted).toBeNull();
+    });
+
+    await step('Remove the last chip', async () => {
+      await user.click(canvas.getByRole('button', { name: 'Remove mark 1' }));
+      await shows(canvas.getByText('# drag on the page to mark an area'));
+    });
+  },
+};
+
+export const InviteConnects: StoryObj = {
+  ...cliTerminal({ invite: { connectedTo: null } }),
+  name: 'an invite connects the tab, or hides on this page',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await shows(canvas.getByText('your agent is waiting for a tab'));
+    await user.click(canvas.getByRole('button', { name: '[connect]' }));
+    await user.click(canvas.getByTitle('Hide on this page'));
+    await expect(shown.events).toEqual([
+      { name: 'connect' },
+      { name: 'dismiss' },
+    ]);
+  },
+};
+
+export const InviteMovesHere: StoryObj = {
+  ...cliTerminal({ invite: { connectedTo: 'news.ycombinator.com' } }),
+  name: 'with another tab connected, an invite moves CLI mode here',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await shows(canvas.getByText('agent on news.ycombinator.com'));
+    await user.click(canvas.getByRole('button', { name: '[move here]' }));
+    await expect(shown.events).toEqual([{ name: 'connect' }]);
   },
 };

@@ -25,6 +25,10 @@ export type Session = {
   agentSeen: boolean;
   activity: string | null;
   activityTimer?: ReturnType<typeof setTimeout>;
+  // Marks on the tab the agent hasn't read with `stylebot selection`.
+  unreadMarks: Set<number>;
+  // The number the next mark takes, kept across reloads of the tab.
+  nextMark: number;
 };
 
 let session: Session | null = null;
@@ -50,6 +54,7 @@ export const getState = (current: Session): CliModeState => ({
   thread: current.thread,
   agent: getAgentStatus(current),
   activity: current.activity,
+  nextMark: current.nextMark,
 });
 
 /**
@@ -95,6 +100,11 @@ export const connectTab = async (
 
   if (session) {
     session.tabId = tabId;
+
+    // The marks stay on the tab the session left.
+    if (previous !== tabId) {
+      session.unreadMarks.clear();
+    }
   } else {
     session = {
       tabId,
@@ -102,6 +112,8 @@ export const connectTab = async (
       saves: new Map(),
       agentSeen: false,
       activity: null,
+      unreadMarks: new Set(),
+      nextMark: 1,
     };
   }
 

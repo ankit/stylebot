@@ -1,5 +1,12 @@
 import type { TerminalState } from './state';
 
+// What the keys do besides opening and closing the terminal. Clearing
+// answers whether there were marks to clear.
+export type KeyActions = {
+  undo: () => void;
+  clearMarks: () => boolean;
+};
+
 const isTyping = (target: EventTarget | null): boolean =>
   target instanceof HTMLElement &&
   (target.isContentEditable ||
@@ -11,7 +18,7 @@ const isTyping = (target: EventTarget | null): boolean =>
 export const runKey = (
   key: string,
   state: TerminalState,
-  undo: () => void
+  { undo, clearMarks }: KeyActions
 ): boolean => {
   switch (key) {
     case '.':
@@ -22,6 +29,10 @@ export const runKey = (
     case 'Z':
       undo();
       return true;
+
+    case 'x':
+    case 'X':
+      return clearMarks();
 
     case 'Escape':
       if (!state.expanded) {
@@ -43,7 +54,7 @@ export const runKey = (
  */
 export const listenForKeys = (
   state: TerminalState,
-  undo: () => void
+  actions: KeyActions
 ): (() => void) => {
   const onKey = (event: KeyboardEvent): void => {
     if (
@@ -56,7 +67,7 @@ export const listenForKeys = (
       return;
     }
 
-    if (runKey(event.key, state, undo)) {
+    if (runKey(event.key, state, actions)) {
       event.preventDefault();
       event.stopImmediatePropagation();
     }

@@ -2,7 +2,11 @@ import type { StoryObj } from '@storybook/vue';
 import type { CliTurn, CliTurnStep } from '@stylebot/types';
 
 import CliModeTerminal from '@/apps/cli-mode/components/CliModeTerminal.vue';
-import { createTerminalState, type TerminalState } from '@/apps/cli-mode/state';
+import {
+  createTerminalState,
+  type PageMark,
+  type TerminalState,
+} from '@/apps/cli-mode/state';
 
 export const command = (id: number, text: string): CliTurnStep => ({
   kind: 'command',
@@ -39,6 +43,14 @@ export const TURNS: Array<CliTurn> = [
   ]),
 ];
 
+export const mark = (n: number, width: number, height: number): PageMark => ({
+  n,
+  area: { x: 40 * n, y: 120, width, height },
+});
+
+// Two areas the user marked, the second after removing one.
+export const MARKS: Array<PageMark> = [mark(1, 320, 180), mark(3, 96, 40)];
+
 export type TerminalEvent = { name: string; value?: unknown };
 
 // The terminal on screen: its state, and what it told the page.
@@ -70,9 +82,27 @@ export const cliTerminal = (
           @expand="state.expanded = $event"
           @place="state.position = $event"
           @undo="events.push({ name: 'undo', value: $event })"
+          @highlight="state.highlighted = $event"
+          @unmark="unmark"
+          @connect="events.push({ name: 'connect' })"
+          @dismiss="events.push({ name: 'dismiss' })"
           @move="events.push({ name: 'move', value: $event })"
           @close="events.push({ name: 'close' })"
         />`,
+      methods: {
+        /**
+         * Removes a mark, as the page does, and records it.
+         */
+        unmark(n: number): void {
+          state.marks = state.marks.filter(entry => entry.n !== n);
+
+          if (state.highlighted === n) {
+            state.highlighted = null;
+          }
+
+          events.push({ name: 'unmark', value: n });
+        },
+      },
     };
   },
 });

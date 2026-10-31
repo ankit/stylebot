@@ -81,6 +81,27 @@ const statesPageHtml = (crossOrigin: string) => `
   </html>
 `;
 
+// Two cards, then a link, at known places for marking areas by dragging.
+const MARKS_PAGE_HTML = `
+  <!doctype html>
+  <html>
+    <head>
+      <title>Marks</title>
+      <style>
+        body { margin: 0; font: 16px sans-serif; }
+        .card { width: 200px; height: 120px; margin: 20px; background: #eee; }
+        a { display: block; width: 300px; padding: 20px; margin: 20px; }
+      </style>
+    </head>
+    <body>
+      <div class="card" id="first">First</div>
+      <div class="card">Second</div>
+      <a href="#followed">A link to drag across</a>
+      <div style="height: 2000px"></div>
+    </body>
+  </html>
+`;
+
 const OTHER_PAGE_HTML = `
   <!doctype html>
   <html><head><title>Your page</title></head><body>Yours</body></html>
@@ -248,11 +269,70 @@ const cliPage = (): Page | undefined =>
   context.pages().find(page => page.url() === `${baseUrl}/`);
 
 type DomNode = {
+  nodeId: number;
   nodeType: number;
   nodeName: string;
   nodeValue: string;
+  attributes?: Array<string>;
   children?: Array<DomNode>;
   shadowRoots?: Array<DomNode>;
+};
+
+/**
+ * Clicks an element of CLI mode's terminal by one of its attributes, at
+ * its box as CDP reads it, since a closed shadow root hides it from locators.
+ */
+const clickInTerminal = async (page: Page, name: string, value: string) => {
+  const session = await context.newCDPSession(page);
+  let center: { x: number; y: number };
+
+  try {
+    const { root } = (await session.send('DOM.getDocument', {
+      depth: -1,
+      pierce: true,
+    })) as { root: DomNode };
+
+    const find = (node: DomNode): DomNode | undefined => {
+      const attributes = node.attributes ?? [];
+
+      for (let i = 0; i < attributes.length; i += 2) {
+        if (attributes[i] === name && attributes[i + 1] === value) {
+          return node;
+        }
+      }
+
+      return [...(node.children ?? []), ...(node.shadowRoots ?? [])]
+        .map(find)
+        .find(Boolean);
+    };
+
+    const { nodeId } = find(root)!;
+    const { model } = (await session.send('DOM.getBoxModel', { nodeId })) as {
+      model: { border: Array<number> };
+    };
+    const [left, top, , , right, bottom] = model.border;
+
+    center = { x: (left + right) / 2, y: (top + bottom) / 2 };
+  } finally {
+    await session.detach();
+  }
+
+  await page.mouse.click(center.x, center.y);
+};
+
+/**
+ * Drags the mouse from one point of the viewport to another, as a user
+ * marking an area does.
+ */
+const drag = async (
+  page: Page,
+  [fromX, fromY]: [number, number],
+  [toX, toY]: [number, number]
+) => {
+  await page.mouse.move(fromX, fromY);
+  await page.mouse.down();
+  await page.mouse.move(toX, toY, { steps: 5 });
+  await page.mouse.up();
 };
 
 /**
@@ -321,6 +401,7 @@ test.beforeAll(async ({}, testInfo) => {
   const routes: Parameters<typeof startTestServer>[0] = {
     '/': PAGE_HTML,
     '/yours': OTHER_PAGE_HTML,
+    '/marks': MARKS_PAGE_HTML,
     '/remote.css': {
       body: `.remote:hover { color: ${GREEN}; }`,
       headers: { 'Content-Type': 'text/css' },
@@ -803,6 +884,134 @@ test("mode connects the user's tab, whose terminal follows what the agent does t
     await ok(['screenshot', id, '-o', path.join(home, 'shots', 'off.png')])
   ).not.toContain('CLI mode terminal');
 
+  await yours.close();
+});
+
+test('the user marks areas by dragging, which selection lists for the agent', async () => {
+  test.setTimeout(90_000);
+
+  const yours = await context.newPage();
+  await yours.goto(`${baseUrl}/marks`);
+
+  const tab = (await json<Array<Tab>>(['tabs'])).find(
+    entry => entry.url === `${baseUrl}/marks`
+  )!;
+  const id = String(tab.id);
+
+  await ok(['mode', id]);
+  await expect
+    .poll(() => terminalText(yours))
+    .toContain('drag on the page to mark an area');
+
+  await yours.bringToFront();
+  await drag(yours, [10, 10], [240, 150]);
+  await expect.poll(() => terminalText(yours)).toContain('1 230×140');
+  expect(await ok(['outline', id])).toMatch(
+    new RegExp(`\\n1 new mark on tab ${id} \\(run stylebot selection\\)\\n$`)
+  );
+
+  // A drag across a link marks it rather than following it.
+  await drag(yours, [40, 320], [300, 360]);
+  await expect.poll(() => terminalText(yours)).toContain('2 260×40');
+  expect(yours.url()).toBe(`${baseUrl}/marks`);
+  expect(await ok(['tabs'])).toContain(`2 new marks on tab ${id}`);
+
+  const selection = await ok(['selection']);
+  expect(selection).toBe(
+    [
+      `2 marks on tab ${id}:`,
+      'mark 1: 230×140 at 10,10, holding:',
+      '      2  div.card  (this one: #first)',
+      'mark 2: 260×40 at 40,320, over part of:',
+      '      1  html body a',
+      '',
+    ].join('\n')
+  );
+  expect(selection).not.toContain('new mark');
+  expect(await ok(['outline', id])).not.toContain('new mark');
+
+  await expect(
+    cli(['selection', String(Number(id) + 1)])
+  ).resolves.toMatchObject({
+    code: 1,
+    stderr: expect.stringContaining(`CLI mode is on in tab ${id}, not tab`),
+  });
+
+  const crops = path.join(home, 'crops');
+  expect(await ok(['selection', id, '--crop', '-o', crops])).toContain(
+    `  saved ${path.join(crops, `stylebot-mark-${id}-1.png`)}`
+  );
+  expect(fs.existsSync(path.join(crops, `stylebot-mark-${id}-2.png`))).toBe(
+    true
+  );
+
+  // A badge removes its mark, and so does its chip.
+  await yours.bringToFront();
+  await yours.mouse.click(40, 320);
+  await expect.poll(() => terminalText(yours)).not.toContain('260×40');
+  await clickInTerminal(yours, 'aria-label', 'Remove mark 1');
+  await expect
+    .poll(() => terminalText(yours))
+    .toContain('drag on the page to mark an area');
+  expect(await ok(['selection'])).toBe(`No marks on tab ${id}.\n`);
+
+  // X clears the marks; numbers keep counting up.
+  await drag(yours, [10, 10], [100, 100]);
+  await expect.poll(() => terminalText(yours)).toContain('3 90×90');
+  await yours.keyboard.press('x');
+  await expect.poll(() => terminalText(yours)).not.toContain('90×90');
+
+  // A plain click still reaches the page.
+  await yours.getByRole('link').click();
+  await expect(yours).toHaveURL(`${baseUrl}/marks#followed`);
+
+  expect(await ok(['selection', '--wait', '--timeout', '1s'])).toBe(
+    `Still waiting: nothing new on tab ${id}. Run it again to keep waiting.\n`
+  );
+
+  const waiting = cli(['selection', '--wait', '--timeout', '30s']);
+  await yours.waitForTimeout(500);
+  await drag(yours, [10, 10], [100, 100]);
+  const waited = await waiting;
+  expect(waited.code).toBe(0);
+  expect(waited.stdout).toMatch(/^1 mark on tab \d+:\nmark 4: 90×90 at 10,10/);
+
+  await ok(['mode', id, '--off']);
+  await yours.close();
+});
+
+test('while the agent waits for a tab, the active tab invites the user to connect it', async () => {
+  test.setTimeout(60_000);
+
+  const yours = await context.newPage();
+  await yours.goto(`${baseUrl}/marks`);
+  await yours.bringToFront();
+
+  const tab = (await json<Array<Tab>>(['tabs'])).find(
+    entry => entry.url === `${baseUrl}/marks`
+  )!;
+
+  expect((await cli(['selection'])).stderr).toContain('No tab is in CLI mode');
+
+  const waiting = cli(['selection', '--wait', '--timeout', '30s']);
+  await expect
+    .poll(() => terminalText(yours))
+    .toContain('your agent is waiting for a tab');
+
+  await clickInTerminal(yours, 'title', 'Connect this tab to your agent');
+  await expect
+    .poll(() => terminalText(yours))
+    .toContain('drag on the page to mark an area');
+  expect(await ok(['tabs'])).toContain(`${baseUrl}/marks  [CLI mode]`);
+
+  await drag(yours, [10, 10], [240, 150]);
+  const waited = await waiting;
+  expect(waited.stdout).toMatch(
+    new RegExp(`^1 mark on tab ${tab.id}:\\nmark 1: 230×140 at 10,10`)
+  );
+
+  await ok(['mode', String(tab.id), '--off']);
+  await expect.poll(() => terminalText(yours)).toBeNull();
   await yours.close();
 });
 

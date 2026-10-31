@@ -16,7 +16,7 @@ import {
 import { inspectTab, requireNamed, resolveTab } from './targets';
 
 // The compositor's next frame after a scroll, before an active tab is captured.
-const SCROLL_PAINT_DELAY_MS = 100;
+export const SCROLL_PAINT_DELAY_MS = 100;
 
 export type Screenshot = {
   dataUrl: string;
@@ -40,7 +40,7 @@ type Capture = {
 /**
  * A tab's viewport in css pixels: its size divided by its page zoom.
  */
-const getViewport = async (tab: chrome.tabs.Tab): Promise<Size> => {
+export const getViewport = async (tab: chrome.tabs.Tab): Promise<Size> => {
   const zoom = await chrome.tabs.getZoom(tab.id as number);
 
   return {
@@ -61,7 +61,7 @@ const blobToDataUrl = (blob: Blob): Promise<string> =>
  * Crops a capture to a region of the viewport and resizes it to a scale,
  * leaving it as it is when neither changes it.
  */
-const renderCapture = async (
+export const renderCapture = async (
   dataUrl: string,
   viewport: Size,
   region: ViewportRect | undefined,

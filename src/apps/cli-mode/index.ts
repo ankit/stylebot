@@ -1,7 +1,7 @@
 /**
  * CLI mode's terminal: where the user follows what their coding agent does on
- * the page through the `stylebot` CLI. Loaded on demand by the page's
- * Stylebot script.
+ * the page through the `stylebot` CLI, and marks areas of it for the agent.
+ * Loaded on demand by the page's Stylebot script.
  */
 import Vue from 'vue';
 import { t } from '@stylebot/i18n';
@@ -12,14 +12,19 @@ import type {
   CliModePageEvent,
 } from '@stylebot/types';
 
+import type { Marks } from './marks';
 import { mountTerminal, type Terminal } from './mount';
 
-let terminal: Promise<Terminal> | null = null;
+type Mounted = { connected: boolean; terminal: Promise<Terminal> };
+
+let mounted: Mounted | null = null;
+// The user hid the invite on this page; it stays away until the page reloads.
+let dismissed = false;
 
 const removeTerminal = (): void => {
-  const removing = terminal;
+  const removing = mounted?.terminal;
 
-  terminal = null;
+  mounted = null;
   removing?.then(({ remove }) => remove()).catch(() => undefined);
 };
 
@@ -29,7 +34,11 @@ const removeTerminal = (): void => {
 const sendTerminalEvent = (event: CliModePageEvent): void => {
   const message: CliModeEvent = { name: 'CliModeEvent', event };
 
-  if (event.type === 'off') {
+  if (event.type === 'dismiss') {
+    dismissed = true;
+  }
+
+  if (event.type === 'off' || event.type === 'dismiss') {
     removeTerminal();
   }
 
@@ -37,17 +46,47 @@ const sendTerminalEvent = (event: CliModePageEvent): void => {
 };
 
 /**
+ * The terminal, mounted for the connected tab or for an invite, swapping the
+ * one on the page when it was mounted for the other.
+ */
+const getTerminal = (connected: boolean): Promise<Terminal> => {
+  if (mounted && mounted.connected !== connected) {
+    removeTerminal();
+  }
+
+  if (!mounted) {
+    const terminal = mountTerminal(sendTerminalEvent, { connected }).catch(
+      (e: unknown) => {
+        mounted = null;
+        throw e;
+      }
+    );
+
+    mounted = { connected, terminal };
+  }
+
+  return mounted.terminal;
+};
+
+/**
+ * The connected tab's terminal, if the page shows it.
+ */
+const getConnected = (): Promise<Terminal> | null =>
+  mounted?.connected ? mounted.terminal : null;
+
+/**
+ * The connected tab's marks, if the page shows its terminal.
+ */
+const getMarks = async (): Promise<Marks | null> =>
+  (await getConnected())?.marks ?? null;
+
+/**
  * Answers what the background asks of the terminal.
  */
 const handleCliModeAction = async (action: CliModeAction): Promise<unknown> => {
   switch (action.kind) {
     case 'on': {
-      terminal ??= mountTerminal(sendTerminalEvent).catch((e: unknown) => {
-        terminal = null;
-        throw e;
-      });
-
-      const { state } = await terminal;
+      const { state } = await getTerminal(true);
 
       Object.assign(state, action.state);
 
@@ -58,9 +97,22 @@ const handleCliModeAction = async (action: CliModeAction): Promise<unknown> => {
       return null;
     }
 
+    case 'invite': {
+      if (dismissed || getConnected()) {
+        return null;
+      }
+
+      const { state } = await getTerminal(false);
+
+      state.invite = { connectedTo: action.connectedTo };
+      return null;
+    }
+
     case 'state': {
-      if (terminal) {
-        Object.assign((await terminal).state, action.state);
+      const connected = getConnected();
+
+      if (connected) {
+        Object.assign((await connected).state, action.state);
       }
 
       return null;
@@ -70,8 +122,30 @@ const handleCliModeAction = async (action: CliModeAction): Promise<unknown> => {
       removeTerminal();
       return null;
 
-    case 'locate':
-      return terminal ? (await terminal).locate() : null;
+    case 'startCapture': {
+      if (!mounted) {
+        return null;
+      }
+
+      const terminal = await mounted.terminal;
+
+      await terminal.marks?.hide();
+      return terminal.locate();
+    }
+
+    case 'endCapture':
+      (await getMarks())?.show();
+      return null;
+
+    case 'selection':
+      return (await getMarks())?.describe(action.css) ?? [];
+
+    case 'frameMark':
+      return (await getMarks())?.frame(action.n) ?? null;
+
+    case 'restoreScroll':
+      (await getMarks())?.restoreScroll();
+      return null;
   }
 };
 

@@ -3,8 +3,10 @@ import { t } from '@stylebot/i18n';
 import { injectFontFaces } from '@stylebot/utils';
 import type { CliModePageEvent, ViewportRect } from '@stylebot/types';
 
+import CliMarks from './components/CliMarks.vue';
 import CliModeTerminal from './components/CliModeTerminal.vue';
 import { listenForKeys } from './keys';
+import { createMarks, type Marks } from './marks';
 import { createTerminalState, type TerminalState } from './state';
 import { lastUndoableSave } from './thread';
 
@@ -25,6 +27,8 @@ const POSITION_KEY = 'cli-mode-terminal-position';
 
 export type Terminal = {
   state: TerminalState;
+  // The connected tab's marks; a tab that only shows an invite has none.
+  marks: Marks | null;
   // Where the terminal covers the viewport.
   locate: () => ViewportRect;
   remove: () => void;
@@ -62,10 +66,12 @@ const savePosition = (position: TerminalState['position']): void => {
 /**
  * Puts the terminal in a closed shadow root on the root element rather than the
  * body, where the page check and outline don't look, and hands what the
- * user does with it to `sendTerminalEvent`.
+ * user does with it to `sendTerminalEvent`. On the connected tab, the user
+ * marks areas and the keys work; elsewhere it only shows an invite.
  */
 export const mountTerminal = async (
-  sendTerminalEvent: (event: CliModePageEvent) => void
+  sendTerminalEvent: (event: CliModePageEvent) => void,
+  { connected }: { connected: boolean }
 ): Promise<Terminal> => {
   const host = document.createElement('stylebot-cli-mode');
   const root = host.attachShadow({ mode: 'closed' });
@@ -78,6 +84,7 @@ export const mountTerminal = async (
 
   const [text, position] = await Promise.all([getCss(), getPosition()]);
   const sheet = document.createElement('style');
+  const marksEl = document.createElement('div');
   const el = document.createElement('div');
 
   if (position) {
@@ -85,15 +92,45 @@ export const mountTerminal = async (
   }
 
   sheet.textContent = text;
-  root.append(sheet, el);
+  root.append(sheet, marksEl, el);
 
-  const stopKeys = listenForKeys(state, () => {
-    const save = lastUndoableSave(state.thread.flatMap(turn => turn.steps));
+  const marks = connected
+    ? createMarks({
+        host,
+        state,
+        onMark: n => sendTerminalEvent({ type: 'mark', n }),
+        onUnmark: n => sendTerminalEvent({ type: 'unmark', n }),
+      })
+    : null;
+
+  const undoLastSave = (): void => {
+    const steps = state.thread.flatMap(turn => turn.steps);
+    const save = lastUndoableSave(steps);
 
     if (save) {
       sendTerminalEvent({ type: 'undo', id: save.id });
     }
-  });
+  };
+
+  let stopKeys = (): void => undefined;
+
+  if (marks) {
+    stopKeys = listenForKeys(state, {
+      undo: undoLastSave,
+      clearMarks: marks.clear,
+    });
+  }
+
+  const marksApp =
+    marks &&
+    new Vue({
+      el: marksEl,
+      render: h =>
+        h(CliMarks, {
+          props: { state },
+          on: { unmark: marks.unmark },
+        }),
+    });
 
   const app = new Vue({
     el,
@@ -105,6 +142,12 @@ export const mountTerminal = async (
             state.expanded = expanded;
           },
           undo: (id: number) => sendTerminalEvent({ type: 'undo', id }),
+          highlight: (n: number | null) => {
+            state.highlighted = n;
+          },
+          unmark: (n: number) => marks?.unmark(n),
+          connect: () => sendTerminalEvent({ type: 'connect' }),
+          dismiss: () => sendTerminalEvent({ type: 'dismiss' }),
           place: (placed: TerminalState['position']) => {
             state.position = placed;
           },
@@ -116,6 +159,7 @@ export const mountTerminal = async (
 
   return {
     state,
+    marks,
     locate: () => {
       const { left, top, width, height } = app.$el.getBoundingClientRect();
 
@@ -128,6 +172,8 @@ export const mountTerminal = async (
     },
     remove: () => {
       stopKeys();
+      marks?.destroy();
+      marksApp?.$destroy();
       app.$destroy();
       host.remove();
     },

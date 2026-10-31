@@ -26,6 +26,7 @@ export {
   validateSelector,
   getBodyChildSelectors,
   getSelectorCandidates,
+  getUniqueSelector,
   dedupeByMatches,
   byReach,
 } from './selector';

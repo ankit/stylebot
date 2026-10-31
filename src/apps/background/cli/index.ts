@@ -6,7 +6,7 @@ import { reloadForGrant, resumeAfterGrantReload } from '../grant-reload';
 import { browserCommands } from './browser';
 import { pseudoStateCommands } from './pseudo-states';
 import { inspectCommands } from './inspect';
-import { modeCommands, noteCliActivity } from './mode';
+import { getUnreadNotice, modeCommands, noteCliActivity } from './mode';
 import { optionCommands } from './options';
 import { pageCommands } from './pages';
 import { pointerCommands } from './pointer';
@@ -130,7 +130,9 @@ const connect = (): void => {
         result = await run(args, signal);
       }
 
-      response = { ...stamp, result };
+      const notice = getUnreadNotice();
+
+      response = { ...stamp, result, ...(notice && { notice }) };
     } catch (e) {
       response = {
         ...stamp,

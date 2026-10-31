@@ -14,7 +14,15 @@
       role="region"
       :aria-label="t('stylebot_cli_mode')"
     >
-      <template v-if="state.expanded">
+      <cli-invite
+        v-if="state.invite"
+        :connected-to="state.invite.connectedTo"
+        @drag="startDrag"
+        @connect="$emit('connect')"
+        @dismiss="$emit('dismiss')"
+      />
+
+      <template v-else-if="state.expanded">
         <cli-title-bar
           @drag="startDrag"
           @minimize="$emit('expand', false)"
@@ -26,6 +34,11 @@
           :thread="state.thread"
           :activity="state.activity"
           @undo="$emit('undo', $event)"
+        />
+        <cli-mark-chips
+          :marks="state.marks"
+          @highlight="$emit('highlight', $event)"
+          @unmark="$emit('unmark', $event)"
         />
         <footer class="footer">
           <cli-status v-if="!state.activity" :agent="state.agent" />
@@ -51,6 +64,8 @@ import Vue from 'vue';
 import { SThemeProvider } from '@stylebot/components';
 
 import type { TerminalState } from '../state';
+import CliMarkChips from './CliMarkChips.vue';
+import CliInvite from './CliInvite.vue';
 import CliPill from './CliPill.vue';
 import CliStatus from './CliStatus.vue';
 import CliThread from './CliThread.vue';
@@ -60,14 +75,15 @@ import CliTitleBar from './CliTitleBar.vue';
 const EDGE = 8;
 
 /**
- * CLI mode's floating mini terminal. Collapsed, a pill with the agent's
- * status; open, what the agent did on the tab. Drag it by its title bar or
- * pill. Emits `expand`, `undo`, `place`, `move` and `close`.
+ * CLI mode's floating mini terminal: a pill, the open thread with the marks,
+ * or an invite on other tabs while an agent waits. Drag it to move it.
  */
 export default Vue.extend({
   name: 'CliModeTerminal',
 
   components: {
+    CliMarkChips,
+    CliInvite,
     CliPill,
     CliStatus,
     CliThread,

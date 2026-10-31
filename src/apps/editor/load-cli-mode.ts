@@ -1,11 +1,18 @@
-import type { CliModeApp, CliModeAppWindow } from '@stylebot/types';
+import type {
+  CliModeAction,
+  CliModeApp,
+  CliModeAppWindow,
+} from '@stylebot/types';
 
 let loading: Promise<CliModeApp> | null = null;
 
 /**
- * Whether the CLI mode terminal has been asked for yet.
+ * Whether an action needs the CLI mode terminal: one that shows it, or any
+ * once it's loaded. Screenshots ask every page where the terminal is, and
+ * most never loaded it.
  */
-export const isCliModeLoading = (): boolean => loading !== null;
+export const needsCliMode = ({ kind }: CliModeAction): boolean =>
+  kind === 'on' || kind === 'invite' || loading !== null;
 
 /**
  * Loads the CLI mode terminal's bundle on its first request. A failed load is

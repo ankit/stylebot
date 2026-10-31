@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 
-import { TURNS, cliTerminal } from '@stylebot/storybook/fixtures/cli-terminal';
+import {
+  MARKS,
+  TURNS,
+  cliTerminal,
+} from '@stylebot/storybook/fixtures/cli-terminal';
 
 import CliModeTerminal from './CliModeTerminal.vue';
 
@@ -42,4 +46,19 @@ export const OpenWhileRunning: StoryObj = cliTerminal({
   thread: TURNS,
   activity: "css rule '.titleline > a' --set color=#4fb6b0",
   expanded: true,
+});
+
+export const OpenWithMarks: StoryObj = cliTerminal({
+  agent: 'connected',
+  thread: TURNS,
+  marks: MARKS,
+  expanded: true,
+});
+
+export const Invite: StoryObj = cliTerminal({
+  invite: { connectedTo: null },
+});
+
+export const InviteToMoveHere: StoryObj = cliTerminal({
+  invite: { connectedTo: 'news.ycombinator.com' },
 });

@@ -39,16 +39,22 @@ export const sendToTerminal = async <T>(
 
 /**
  * Runs a capture of a tab, which keeps CLI mode's terminal rather than flashing
- * it away, and resolves to the capture and where the terminal covers the
- * viewport, if the tab shows one.
+ * it away but hides the marks, and resolves to the capture and where the
+ * terminal covers the viewport, if the tab shows one.
  */
 export const captureWithTerminal = async <T>(
   tabId: number,
   capture: () => Promise<T>
 ): Promise<{ capture: T; covered: ViewportRect | null }> => {
   const covered = await sendToTerminal<ViewportRect | null>(tabId, {
-    kind: 'locate',
+    kind: 'startCapture',
   }).catch(() => null);
 
-  return { capture: await capture(), covered };
+  try {
+    return { capture: await capture(), covered };
+  } finally {
+    if (covered) {
+      sendToTerminal(tabId, { kind: 'endCapture' }).catch(() => undefined);
+    }
+  }
 };

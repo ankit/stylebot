@@ -1,7 +1,8 @@
 import type { CliModeAction, CliModeState } from '@stylebot/types';
 
 import { applyStylesToAllTabs, getAll, set } from '../../styles';
-import { sendToTerminal } from './terminal';
+import { renderCapture } from '../screenshot';
+import { captureWithTerminal, sendToTerminal } from './terminal';
 
 jest.mock('../../styles', () => ({
   applyStylesToAllTabs: jest.fn(async () => undefined),
@@ -10,6 +11,23 @@ jest.mock('../../styles', () => ({
 }));
 jest.mock('./terminal', () => ({
   sendToTerminal: jest.fn(async () => null),
+  captureWithTerminal: jest.fn(async (_tabId, capture) => ({
+    capture: await capture(),
+    covered: null,
+  })),
+}));
+jest.mock('../pointer', () => ({ getSavedCss: jest.fn(async () => '') }));
+jest.mock('../../capture-tab', () => ({
+  captureTab: jest.fn(async () => 'data:image/png;base64,shot'),
+}));
+jest.mock('../screenshot', () => ({
+  SCROLL_PAINT_DELAY_MS: 0,
+  getViewport: jest.fn(async () => ({ width: 1000, height: 800 })),
+  renderCapture: jest.fn(async () => ({
+    dataUrl: 'data:image/png;base64,crop',
+    width: 1,
+    height: 1,
+  })),
 }));
 jest.mock('@stylebot/settings', () => ({
   getCliConnected: jest.fn(async () => true),
@@ -82,6 +100,7 @@ beforeEach(() => {
       update: jest.fn(async (id: number) => ({ id, windowId: 1 })),
       onUpdated: listen('updated'),
       onRemoved: listen('removed'),
+      onActivated: listen('activated'),
     },
     windows: { update: jest.fn(async () => undefined) },
   } as unknown as typeof chrome;
@@ -109,7 +128,7 @@ describe('mode', () => {
     expect(sendToTerminal).toHaveBeenCalledWith(TAB, {
       kind: 'on',
       open: true,
-      state: { thread: [], agent: 'awaited', activity: null },
+      state: { thread: [], agent: 'awaited', activity: null, nextMark: 1 },
     });
   });
 
@@ -172,15 +191,15 @@ describe('the session', () => {
     await mode.modeCommands.mode({ tab: String(TAB) });
     (sendToTerminal as jest.Mock).mockClear();
 
-    listeners.updated(TAB, { status: 'loading' });
+    listeners.updated(TAB, { status: 'loading' }, { id: TAB });
     expect(sendToTerminal).not.toHaveBeenCalled();
 
-    listeners.updated(TAB, { status: 'complete' });
-    listeners.updated(OTHER_TAB, { status: 'complete' });
+    listeners.updated(TAB, { status: 'complete' }, { id: TAB });
+    listeners.updated(OTHER_TAB, { status: 'complete' }, { id: OTHER_TAB });
     expect(sendToTerminal).toHaveBeenCalledTimes(1);
     expect(sendToTerminal).toHaveBeenCalledWith(TAB, {
       kind: 'on',
-      state: { thread: [], agent: 'awaited', activity: null },
+      state: { thread: [], agent: 'awaited', activity: null, nextMark: 1 },
     });
   });
 });
@@ -200,6 +219,7 @@ describe('agent activity', () => {
     expect(lastState()).toEqual({
       agent: 'connected',
       activity: 'page-rules h1',
+      nextMark: 1,
       thread: [
         {
           kind: 'turn',
@@ -237,6 +257,7 @@ describe('agent activity', () => {
       thread: [],
       agent: 'awaited',
       activity: null,
+      nextMark: 1,
     });
   });
 });
@@ -294,5 +315,222 @@ describe('saves', () => {
     (set as jest.Mock).mockClear();
     await fromTerminal(TAB, { type: 'undo', id: save.id });
     expect(set).not.toHaveBeenCalled();
+  });
+});
+
+const MARK = {
+  n: 1,
+  rect: { x: 10, y: 20, width: 300, height: 100 },
+  elements: [{ selector: '.card', matches: 1 }],
+  whole: true,
+  more: 0,
+};
+
+/**
+ * Answers the terminal's actions as a page with one mark would.
+ */
+const answerWithMarks = () =>
+  (sendToTerminal as jest.Mock).mockImplementation(
+    async (_tabId: number, action: CliModeAction) => {
+      switch (action.kind) {
+        case 'selection':
+          return [MARK];
+        case 'frameMark':
+          return { rect: MARK.rect, scrolled: true };
+        default:
+          return null;
+      }
+    }
+  );
+
+const actionsSent = (kind: string) =>
+  (sendToTerminal as jest.Mock).mock.calls.filter(
+    ([, action]) => action.kind === kind
+  );
+
+describe('marks', () => {
+  beforeEach(async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+  });
+
+  it('counts marks as unread until selection reads them', async () => {
+    expect(mode.getUnreadNotice()).toBeUndefined();
+
+    await fromTerminal(TAB, { type: 'mark', n: 1 });
+    expect(mode.getUnreadNotice()).toBe(
+      '1 new mark on tab 7 (run stylebot selection)'
+    );
+
+    await fromTerminal(TAB, { type: 'mark', n: 2 });
+    await fromTerminal(TAB, { type: 'mark', n: 3 });
+    await fromTerminal(TAB, { type: 'unmark', n: 3 });
+    expect(mode.getUnreadNotice()).toBe(
+      '2 new marks on tab 7 (run stylebot selection)'
+    );
+
+    answerWithMarks();
+    await mode.modeCommands.selection({});
+    expect(mode.getUnreadNotice()).toBeUndefined();
+  });
+
+  it('ignores marks from a tab that is not connected', async () => {
+    await fromTerminal(OTHER_TAB, { type: 'mark', n: 1 });
+    expect(mode.getUnreadNotice()).toBeUndefined();
+  });
+
+  it('forgets unread marks once the page reloads, but not their numbers', async () => {
+    await fromTerminal(TAB, { type: 'mark', n: 4 });
+    listeners.updated(TAB, { status: 'loading' }, { id: TAB });
+
+    expect(mode.getUnreadNotice()).toBeUndefined();
+
+    await mode.noteCliActivity('outline', { tab: String(TAB) });
+    expect(lastState()?.nextMark).toBe(5);
+  });
+});
+
+describe('selection', () => {
+  it('lists the marks the page has, with the saved css to prefer', async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+    answerWithMarks();
+
+    expect(await mode.modeCommands.selection({})).toEqual({
+      tab: TAB,
+      waiting: false,
+      marks: [MARK],
+    });
+    expect(sendToTerminal).toHaveBeenCalledWith(TAB, {
+      kind: 'selection',
+      css: '',
+    });
+  });
+
+  it('names the connected tab when another is named', async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+
+    await expect(
+      mode.modeCommands.selection({ tab: String(OTHER_TAB) })
+    ).rejects.toThrow('CLI mode is on in tab 7, not tab 8');
+  });
+
+  it('says how to connect a tab when none is', async () => {
+    await expect(mode.modeCommands.selection({})).rejects.toThrow(
+      'No tab is in CLI mode'
+    );
+  });
+
+  it('crops each area, with the marks there hidden, and scrolls back', async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+    answerWithMarks();
+
+    const { marks } = (await mode.modeCommands.selection({
+      crop: true,
+    })) as { marks: Array<{ dataUrl?: string }> };
+
+    expect(marks[0].dataUrl).toBe('data:image/png;base64,crop');
+    expect(sendToTerminal).toHaveBeenCalledWith(TAB, {
+      kind: 'frameMark',
+      n: 1,
+    });
+    expect(captureWithTerminal).toHaveBeenCalledTimes(1);
+    expect(renderCapture).toHaveBeenCalledWith(
+      'data:image/png;base64,shot',
+      { width: 1000, height: 800 },
+      { x: 6, y: 16, width: 308, height: 108 },
+      1
+    );
+    expect(actionsSent('restoreScroll')).toHaveLength(1);
+  });
+});
+
+describe('selection --wait', () => {
+  const waitFor = (args: Record<string, unknown> = {}) =>
+    mode.modeCommands.selection({ wait: true, timeout: 60_000, ...args });
+
+  it('answers a moment after the user stops marking', async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+    answerWithMarks();
+
+    let result: unknown;
+    const waiting = waitFor().then(value => (result = value));
+
+    await fromTerminal(TAB, { type: 'mark', n: 1 });
+    await jest.advanceTimersByTimeAsync(2000);
+    await fromTerminal(TAB, { type: 'mark', n: 2 });
+    await jest.advanceTimersByTimeAsync(2000);
+    expect(result).toBeUndefined();
+
+    await jest.advanceTimersByTimeAsync(1000);
+    await waiting;
+    expect(result).toMatchObject({ tab: TAB, waiting: false });
+    expect(mode.getUnreadNotice()).toBeUndefined();
+  });
+
+  it('answers at once while marks are unread', async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+    await fromTerminal(TAB, { type: 'mark', n: 1 });
+    answerWithMarks();
+
+    expect(await waitFor()).toMatchObject({ waiting: false, marks: [MARK] });
+  });
+
+  it('says it is still waiting once the timeout passes', async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+
+    const waiting = waitFor({ timeout: 5000 });
+
+    await jest.advanceTimersByTimeAsync(5000);
+    expect(await waiting).toEqual({ tab: TAB, waiting: true, marks: [] });
+  });
+
+  it('stops when the CLI goes away', async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+    const controller = new AbortController();
+    const waiting = mode.modeCommands.selection(
+      { wait: true },
+      controller.signal
+    );
+
+    controller.abort();
+    expect(await waiting).toMatchObject({ waiting: true });
+  });
+
+  it('invites the user to connect a tab while none is, then waits for marks', async () => {
+    const waiting = waitFor();
+
+    await jest.advanceTimersByTimeAsync(0);
+    expect(sendToTerminal).toHaveBeenCalledWith(TAB, {
+      kind: 'invite',
+      connectedTo: null,
+    });
+
+    await fromTerminal(TAB, { type: 'connect' });
+    expect(mode.isInCliMode(TAB)).toBe(true);
+
+    answerWithMarks();
+    await fromTerminal(TAB, { type: 'mark', n: 1 });
+    await jest.advanceTimersByTimeAsync(3000);
+
+    expect(await waiting).toMatchObject({ tab: TAB, waiting: false });
+    // No agent waits now, so the invites go.
+    expect(lastState(OTHER_TAB)).toBeUndefined();
+  });
+
+  it('invites the active tab to take CLI mode from the connected one', async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+    activeTab = OTHER_TAB;
+
+    const waiting = waitFor({ timeout: 5000 });
+
+    await jest.advanceTimersByTimeAsync(0);
+    expect(sendToTerminal).toHaveBeenCalledWith(OTHER_TAB, {
+      kind: 'invite',
+      connectedTo: 'example.com',
+    });
+    expect(actionsSent('invite').map(([tabId]) => tabId)).not.toContain(TAB);
+
+    await jest.advanceTimersByTimeAsync(5000);
+    await waiting;
+    expect(sendToTerminal).toHaveBeenCalledWith(OTHER_TAB, { kind: 'off' });
   });
 });

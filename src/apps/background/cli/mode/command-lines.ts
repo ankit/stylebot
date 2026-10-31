@@ -71,6 +71,8 @@ const COMMAND_LINES: Record<string, (args: Args) => string> = {
   useProfile: args => line('profile use', quote(args.profile)),
   options: () => 'options',
   setOption: args => line('option set', String(args.option), quote(args.value)),
+  selection: args =>
+    line('selection', args.crop ? ['--crop'] : [], args.wait ? ['--wait'] : []),
 };
 
 /**

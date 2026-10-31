@@ -22,7 +22,7 @@ const getTarget = ({
 /**
  * The css saved for a page, whose selectors an inspect prefers.
  */
-const getSavedCss = async (url: string | undefined): Promise<string> => {
+export const getSavedCss = async (url: string | undefined): Promise<string> => {
   if (!url) {
     return '';
   }

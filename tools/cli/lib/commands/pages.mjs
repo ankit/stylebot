@@ -1,7 +1,5 @@
-import fs from 'node:fs';
-import path from 'node:path';
-
 import { addHelpSections } from '../help.mjs';
+import { savePng } from '../png.mjs';
 import { STATES } from './force.mjs';
 import { createPrinter, fail, request } from '../request.mjs';
 
@@ -125,10 +123,7 @@ export const addPageCommands = program => {
         state: options.state,
         on: options.on,
       });
-      const out = path.resolve(options.out ?? `stylebot-${Date.now()}.png`);
-
-      fs.mkdirSync(path.dirname(out), { recursive: true });
-      fs.writeFileSync(out, Buffer.from(dataUrl.split(',')[1], 'base64'));
+      const out = savePng(dataUrl, options.out ?? `stylebot-${Date.now()}.png`);
       print(
         { path: out, ...shot, state: options.state, on: options.on },
         formatScreenshot
