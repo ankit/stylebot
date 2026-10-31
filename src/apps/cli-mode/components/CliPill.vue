@@ -4,6 +4,7 @@
       class="handle"
       :agent="agent"
       :activity="activity"
+      :thinking="thinking"
       short
       :title="t('drag_to_move')"
       @pointerdown.native="$emit('drag', $event)"
@@ -34,7 +35,7 @@ import CliWindowButton from './CliWindowButton.vue';
 
 /**
  * The collapsed terminal: the agent's status, which moves it, and a button
- * that opens it, counting saves made since it was last open. Emits `drag`
+ * that opens it, counting replies and saves since it was last open. Emits `drag`
  * with the press, `open` and `close`.
  */
 export default Vue.extend({
@@ -51,6 +52,11 @@ export default Vue.extend({
     activity: {
       type: String as PropType<string | null>,
       default: null,
+    },
+
+    thinking: {
+      type: Boolean,
+      default: false,
     },
 
     unseen: {

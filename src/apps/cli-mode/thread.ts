@@ -1,5 +1,5 @@
 import { t } from '@stylebot/i18n';
-import type { CliTurnStep, CliTurn } from '@stylebot/types';
+import type { CliThreadEntry, CliTurn, CliTurnStep } from '@stylebot/types';
 
 type Save = Extract<CliTurnStep, { kind: 'save' }>;
 
@@ -31,3 +31,17 @@ export const lastUndoableSave = (steps: Array<CliTurnStep>): Save | undefined =>
   steps
     .filter((step): step is Save => step.kind === 'save' && !step.undone)
     .pop();
+
+/**
+ * Every step of every turn in a thread, in order.
+ */
+export const threadSteps = (
+  thread: Array<CliThreadEntry>
+): Array<CliTurnStep> =>
+  thread.flatMap(entry => (entry.kind === 'turn' ? entry.steps : []));
+
+/**
+ * A mark's number as a note shows it: ① to ⑳, then (21).
+ */
+export const circled = (n: number): string =>
+  n >= 1 && n <= 20 ? String.fromCodePoint(0x2460 + n - 1) : `(${n})`;

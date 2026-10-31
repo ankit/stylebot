@@ -1,8 +1,12 @@
 <template>
-  <span class="status" :class="activity ? 'busy' : agent">
+  <span class="status" :class="activity || thinking ? 'busy' : agent">
     <template v-if="activity">
       <cli-spinner />
       <span class="status-text">stylebot {{ activity }}</span>
+    </template>
+    <template v-else-if="thinking">
+      <cli-spinner />
+      <span class="status-text">{{ t('thinking') }}</span>
     </template>
     <template v-else>
       <span class="dot">●</span>
@@ -31,7 +35,8 @@ const SHORT_STATUS_KEYS: Record<CliAgentStatus, string> = {
 };
 
 /**
- * Whether an agent has been at work on the tab, or the command it's running.
+ * Whether an agent has been at work on the tab, or the command it's running,
+ * or that it's working on the user's note.
  */
 export default Vue.extend({
   name: 'CliStatus',
@@ -47,6 +52,11 @@ export default Vue.extend({
     activity: {
       type: String as PropType<string | null>,
       default: null,
+    },
+
+    thinking: {
+      type: Boolean,
+      default: false,
     },
 
     // Worded to fit the collapsed pill.

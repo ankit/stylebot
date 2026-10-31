@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 
 import {
+  CONVERSATION,
   MARKS,
   TURNS,
   cliTerminal,
@@ -53,6 +54,26 @@ export const OpenWithMarks: StoryObj = cliTerminal({
   thread: TURNS,
   marks: MARKS,
   expanded: true,
+});
+
+export const OpenWithNotes: StoryObj = cliTerminal({
+  agent: 'connected',
+  thread: CONVERSATION,
+  marks: MARKS,
+  expanded: true,
+});
+
+export const OpenWhileThinking: StoryObj = cliTerminal({
+  agent: 'connected',
+  thread: CONVERSATION,
+  thinking: true,
+  expanded: true,
+});
+
+export const Thinking: StoryObj = cliTerminal({
+  agent: 'connected',
+  thread: CONVERSATION,
+  thinking: true,
 });
 
 export const Invite: StoryObj = cliTerminal({

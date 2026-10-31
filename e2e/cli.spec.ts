@@ -953,7 +953,7 @@ test('the user marks areas by dragging, which selection lists for the agent', as
   await expect
     .poll(() => terminalText(yours))
     .toContain('drag on the page to mark an area');
-  expect(await ok(['selection'])).toBe(`No marks on tab ${id}.\n`);
+  expect(await ok(['selection'])).toBe(`No marks or notes on tab ${id}.\n`);
 
   // X clears the marks; numbers keep counting up.
   await drag(yours, [10, 10], [100, 100]);
@@ -975,6 +975,76 @@ test('the user marks areas by dragging, which selection lists for the agent', as
   const waited = await waiting;
   expect(waited.code).toBe(0);
   expect(waited.stdout).toMatch(/^1 mark on tab \d+:\nmark 4: 90×90 at 10,10/);
+
+  await ok(['mode', id, '--off']);
+  await yours.close();
+});
+
+test('the user writes a note about their marks, which selection hands on with a screenshot, and say answers', async () => {
+  test.setTimeout(90_000);
+
+  const yours = await context.newPage();
+  await yours.goto(`${baseUrl}/marks`);
+
+  const tab = (await json<Array<Tab>>(['tabs'])).find(
+    entry => entry.url === `${baseUrl}/marks`
+  )!;
+  const id = String(tab.id);
+
+  await ok(['mode', id]);
+  await ok(['outline', id]);
+  await yours.bringToFront();
+  await drag(yours, [10, 10], [240, 150]);
+  await expect.poll(() => terminalText(yours)).toContain('1 230×140');
+
+  // / focuses the note field, where the terminal's keys are only typed.
+  await yours.keyboard.press('/');
+  await yours.keyboard.type('fix the box.');
+  await expect.poll(() => terminalText(yours)).toContain('1 230×140');
+  await yours.keyboard.press('Enter');
+
+  await expect.poll(() => terminalText(yours)).toContain('fix the box. ①');
+  await expect.poll(() => terminalText(yours)).not.toContain('230×140');
+  await expect.poll(() => terminalText(yours)).toContain('thinking');
+  expect(await ok(['outline', id])).toMatch(
+    new RegExp(`\\n1 new note on tab ${id} \\(run stylebot selection\\)\\n$`)
+  );
+
+  const work = path.join(home, 'notes');
+  const selection = await ok(['selection', '-o', work]);
+  const file = /^ {2}screenshot of the marked area: (.+)$/m.exec(
+    selection
+  )?.[1];
+
+  expect(selection.replace(file ?? '', '<png>')).toBe(
+    [
+      `1 note on tab ${id}:`,
+      '> fix the box.',
+      '  screenshot of the marked area: <png>',
+      '  mark 1: 230×140 at 10,10, holding:',
+      '        2  div.card  (this one: #first)',
+      '',
+    ].join('\n')
+  );
+  expect(path.dirname(file!)).toBe(work);
+  expect(pngSize(file!)).toEqual({ width: 264, height: 174 });
+  expect(await ok(['selection'])).toBe(`No marks or notes on tab ${id}.\n`);
+
+  expect(await ok(['say', 'Made', 'it', 'bigger.'])).toBe(
+    `Said on tab ${id}.\n`
+  );
+  await expect.poll(() => terminalText(yours)).toContain('Made it bigger.');
+  await expect.poll(() => terminalText(yours)).not.toContain('thinking');
+  await expect(
+    cli(['say', String(Number(id) + 1), 'hi'])
+  ).resolves.toMatchObject({
+    code: 1,
+    stderr: expect.stringContaining(`CLI mode is on in tab ${id}, not tab`),
+  });
+
+  // Numbers keep counting up after a note.
+  await drag(yours, [10, 10], [100, 100]);
+  await expect.poll(() => terminalText(yours)).toContain('2 90×90');
 
   await ok(['mode', id, '--off']);
   await yours.close();

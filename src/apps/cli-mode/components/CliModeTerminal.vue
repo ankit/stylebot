@@ -33,6 +33,7 @@
           class="thread"
           :thread="state.thread"
           :activity="state.activity"
+          :thinking="state.thinking"
           @undo="$emit('undo', $event)"
         />
         <cli-mark-chips
@@ -40,8 +41,16 @@
           @highlight="$emit('highlight', $event)"
           @unmark="$emit('unmark', $event)"
         />
+        <cli-note-field
+          ref="note"
+          :marks="state.marks"
+          @note="$emit('note', $event)"
+        />
         <footer class="footer">
-          <cli-status v-if="!state.activity" :agent="state.agent" />
+          <cli-status
+            v-if="!state.activity && !state.thinking"
+            :agent="state.agent"
+          />
         </footer>
       </template>
 
@@ -49,6 +58,7 @@
         v-else
         :agent="state.agent"
         :activity="state.activity"
+        :thinking="state.thinking"
         :unseen="unseen"
         @drag="startDrag"
         @open="$emit('expand', true)"
@@ -64,8 +74,10 @@ import Vue from 'vue';
 import { SThemeProvider } from '@stylebot/components';
 
 import type { TerminalState } from '../state';
+import { threadSteps } from '../thread';
 import CliMarkChips from './CliMarkChips.vue';
 import CliInvite from './CliInvite.vue';
+import CliNoteField from './CliNoteField.vue';
 import CliPill from './CliPill.vue';
 import CliStatus from './CliStatus.vue';
 import CliThread from './CliThread.vue';
@@ -75,8 +87,8 @@ import CliTitleBar from './CliTitleBar.vue';
 const EDGE = 8;
 
 /**
- * CLI mode's floating mini terminal: a pill, the open thread with the marks,
- * or an invite on other tabs while an agent waits. Drag it to move it.
+ * CLI mode's floating mini terminal: a pill, the open thread, or an invite.
+ * Drag it to move it; a reply opens it.
  */
 export default Vue.extend({
   name: 'CliModeTerminal',
@@ -84,6 +96,7 @@ export default Vue.extend({
   components: {
     CliMarkChips,
     CliInvite,
+    CliNoteField,
     CliPill,
     CliStatus,
     CliThread,
@@ -99,26 +112,39 @@ export default Vue.extend({
   },
 
   data() {
-    return { seenSaves: 0 };
+    return { seen: 0 };
   },
 
   computed: {
-    saves(): number {
-      return this.state.thread
-        .flatMap(turn => turn.steps)
-        .filter(step => step.kind === 'save').length;
+    replies(): number {
+      return this.state.thread.filter(entry => entry.kind === 'reply').length;
     },
 
-    // Saves the agent made while the terminal was collapsed.
+    // The agent's replies and saves, which the pill counts.
+    news(): number {
+      return (
+        this.replies +
+        threadSteps(this.state.thread).filter(step => step.kind === 'save')
+          .length
+      );
+    },
+
+    // Replies and saves that came while the terminal was collapsed.
     unseen(): number {
-      return this.saves - this.seenSaves;
+      return this.news - this.seen;
     },
   },
 
   watch: {
+    replies(count: number, before: number): void {
+      if (count > before && !this.state.expanded && !this.state.invite) {
+        this.$emit('expand', true);
+      }
+    },
+
     async 'state.thread'(): Promise<void> {
       if (this.state.expanded) {
-        this.seenSaves = this.saves;
+        this.seen = this.news;
         await this.$nextTick();
         this.scrollThread();
       }
@@ -126,7 +152,7 @@ export default Vue.extend({
 
     async 'state.expanded'(expanded: boolean): Promise<void> {
       if (expanded) {
-        this.seenSaves = this.saves;
+        this.seen = this.news;
       }
 
       // The panel is taller than the pill, so it may need moving into view.
@@ -139,7 +165,7 @@ export default Vue.extend({
   },
 
   created() {
-    this.seenSaves = this.saves;
+    this.seen = this.news;
   },
 
   mounted() {
@@ -207,6 +233,13 @@ export default Vue.extend({
     async keepInView(): Promise<void> {
       await this.$nextTick();
       this.place(this.state.position.right, this.state.position.bottom);
+    },
+
+    /**
+     * Puts the keyboard in the note field, once the terminal is open.
+     */
+    focusNote(): void {
+      (this.$refs.note as (Vue & { focus: () => void }) | undefined)?.focus();
     },
 
     scrollThread(): void {

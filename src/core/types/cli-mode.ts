@@ -14,6 +14,20 @@ export type CliTurn = {
   steps: Array<CliTurnStep>;
 };
 
+// A note the user sent the agent from the terminal, with the numbers of the
+// marks it was about.
+export type CliNote = {
+  kind: 'note';
+  id: number;
+  text: string;
+  marks: Array<number>;
+};
+
+// The agent's answer, from `stylebot say`.
+export type CliReply = { kind: 'reply'; id: number; text: string };
+
+export type CliThreadEntry = CliTurn | CliNote | CliReply;
+
 // Whether an agent has been at work on the connected tab.
 export type CliAgentStatus =
   // None has run a command on the tab since it was connected.
@@ -24,8 +38,10 @@ export type CliAgentStatus =
 
 // What the terminal shows, which the background keeps for the CLI mode session.
 export type CliModeState = {
-  thread: Array<CliTurn>;
+  thread: Array<CliThreadEntry>;
   agent: CliAgentStatus;
+  // The agent is working on the user's last note, between its commands.
+  thinking: boolean;
   // The command the agent is running on the tab now, if any.
   activity: string | null;
   // The number the next mark takes, so numbers aren't reused after a reload.
@@ -84,6 +100,9 @@ export type CliModePageEvent =
   | { type: 'off' }
   | { type: 'mark'; n: number }
   | { type: 'unmark'; n: number }
+  // Answered once the background has read the note's marks off the page,
+  // which keeps them until then.
+  | { type: 'note'; text: string; marks: Array<number> }
   // From a tab's invite: connect the tab, or hide the invite.
   | { type: 'connect' }
   | { type: 'dismiss' };

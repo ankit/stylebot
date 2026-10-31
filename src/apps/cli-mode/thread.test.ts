@@ -1,6 +1,11 @@
-import type { CliTurn } from '@stylebot/types';
+import type { CliThreadEntry, CliTurn } from '@stylebot/types';
 
-import { lastUndoableSave, summarizeTurn } from './thread';
+import {
+  circled,
+  lastUndoableSave,
+  summarizeTurn,
+  threadSteps,
+} from './thread';
 
 const MESSAGES: Record<string, string> = {
   ran_count_one: 'ran $1 command',
@@ -56,5 +61,25 @@ describe('lastUndoableSave', () => {
   it('is the last save not yet undone', () => {
     expect(lastUndoableSave([save(1), save(2), save(3, true)])?.id).toBe(2);
     expect(lastUndoableSave([command(1), save(2, true)])).toBeUndefined();
+  });
+});
+
+describe('threadSteps', () => {
+  it("lists every turn's steps, past notes and replies", () => {
+    const thread: Array<CliThreadEntry> = [
+      turn([command(1)]),
+      { kind: 'note', id: 2, text: 'bigger', marks: [1] },
+      { kind: 'reply', id: 3, text: 'done' },
+      turn([save(4)]),
+    ];
+
+    expect(threadSteps(thread).map(step => step.id)).toEqual([1, 4]);
+  });
+});
+
+describe('circled', () => {
+  it('circles numbers up to 20', () => {
+    expect([1, 2, 20].map(circled).join('')).toBe('①②⑳');
+    expect(circled(21)).toBe('(21)');
   });
 });

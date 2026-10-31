@@ -6,6 +6,7 @@ import type { CliCommands } from '../types';
 import { undoSave } from './activity';
 import { forgetInvite, refreshInvites } from './invites';
 import { onMark, onUnmark } from './marks';
+import { noteCommands, onNote } from './notes';
 import { selectionCommands } from './selection';
 import {
   connectTab,
@@ -59,6 +60,10 @@ const handlePageEvent = async (
     case 'unmark':
       onUnmark(event.n);
       return;
+
+    case 'note':
+      await onNote(session, event.text, event.marks);
+      return;
   }
 };
 
@@ -90,6 +95,7 @@ export const modeCommands: CliCommands = {
   },
 
   ...selectionCommands,
+  ...noteCommands,
 };
 
 /**
@@ -108,6 +114,8 @@ export const initCliMode = (): void => {
         return false;
       }
 
+      // Answered once handled, so the terminal keeps a note's marks on the
+      // page until they're read and captured.
       handlePageEvent(sender.tab.id, message.event)
         .catch(e => console.error('Stylebot CLI:', e))
         .finally(() => sendResponse(null));

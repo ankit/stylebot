@@ -4,61 +4,88 @@
       # {{ t('what_your_agent_does_on_this_tab_shows_here') }}
     </li>
 
-    <li v-for="(turn, index) in thread" :key="turn.id" class="turn">
-      <div class="turn-head">
-        <button
-          type="button"
-          class="turn-toggle"
-          :aria-expanded="String(open.includes(turn.id))"
-          @click="toggle(turn.id)"
-        >
-          <cli-spinner v-if="isLive(index)" class="sigil" />
-          <span v-else class="caret">
-            {{ open.includes(turn.id) ? '▾' : '▸' }}
-          </span>
-          <span class="turn-text">
-            {{ isLive(index) ? `stylebot ${activity}` : summarizeTurn(turn) }}
-          </span>
-        </button>
-        <button
-          v-if="!open.includes(turn.id) && lastUndoableSave(turn.steps)"
-          type="button"
-          class="undo"
-          :title="t('label_with_key', [t('undo_the_last_save'), 'Z'])"
-          @click="$emit('undo', lastUndoableSave(turn.steps).id)"
-        >
-          {{ t('undo_bracketed') }}
-        </button>
-      </div>
-
-      <ol v-if="open.includes(turn.id)" class="steps">
-        <li
-          v-for="step in turn.steps"
-          :key="step.id"
-          class="step"
-          :class="step.kind"
-        >
-          <template v-if="step.kind === 'command'">
-            <span class="sigil">$</span>
-            <span class="step-text">stylebot {{ step.text }}</span>
-          </template>
-          <template v-else>
-            <span class="check">✓</span>
-            <span class="step-text">
-              {{ t('saved_the_style_for_url', [step.url]) }}
+    <template v-for="(entry, index) in thread">
+      <li v-if="entry.kind === 'turn'" :key="entry.id" class="turn">
+        <div class="turn-head">
+          <button
+            type="button"
+            class="turn-toggle"
+            :aria-expanded="String(open.includes(entry.id))"
+            @click="toggle(entry.id)"
+          >
+            <cli-spinner v-if="isLive(index)" class="sigil" />
+            <span v-else class="caret">
+              {{ open.includes(entry.id) ? '▾' : '▸' }}
             </span>
-            <span v-if="step.undone" class="undone">{{ t('undone') }}</span>
-            <button
-              v-else
-              type="button"
-              class="undo"
-              @click="$emit('undo', step.id)"
-            >
-              {{ t('undo_bracketed') }}
-            </button>
-          </template>
-        </li>
-      </ol>
+            <span class="turn-text">
+              {{
+                isLive(index) ? `stylebot ${activity}` : summarizeTurn(entry)
+              }}
+            </span>
+          </button>
+          <button
+            v-if="!open.includes(entry.id) && lastUndoableSave(entry.steps)"
+            type="button"
+            class="undo"
+            :title="t('label_with_key', [t('undo_the_last_save'), 'Z'])"
+            @click="$emit('undo', lastUndoableSave(entry.steps).id)"
+          >
+            {{ t('undo_bracketed') }}
+          </button>
+        </div>
+
+        <ol v-if="open.includes(entry.id)" class="steps">
+          <li
+            v-for="step in entry.steps"
+            :key="step.id"
+            class="step"
+            :class="step.kind"
+          >
+            <template v-if="step.kind === 'command'">
+              <span class="sigil">$</span>
+              <span class="step-text">stylebot {{ step.text }}</span>
+            </template>
+            <template v-else>
+              <span class="check">✓</span>
+              <span class="step-text">
+                {{ t('saved_the_style_for_url', [step.url]) }}
+              </span>
+              <span v-if="step.undone" class="undone">{{ t('undone') }}</span>
+              <button
+                v-else
+                type="button"
+                class="undo"
+                @click="$emit('undo', step.id)"
+              >
+                {{ t('undo_bracketed') }}
+              </button>
+            </template>
+          </li>
+        </ol>
+      </li>
+
+      <li v-else-if="entry.kind === 'note'" :key="entry.id" class="note">
+        <span class="sigil">›</span>
+        <span class="message">
+          <span class="body">{{ entry.text }}</span>
+          <span v-if="entry.marks.length" class="refs">
+            {{ entry.marks.map(circled).join('') }}
+          </span>
+        </span>
+      </li>
+
+      <li v-else :key="entry.id" class="reply">
+        <span class="message body">{{ entry.text }}</span>
+      </li>
+    </template>
+
+    <li v-if="working" class="turn">
+      <span class="turn-toggle live">
+        <cli-spinner class="sigil" />
+        <span class="turn-text">
+          {{ activity ? `stylebot ${activity}` : t('thinking') }}
+        </span>
+      </span>
     </li>
   </ol>
 </template>
@@ -66,13 +93,14 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-import type { CliTurn } from '@stylebot/types';
+import type { CliThreadEntry } from '@stylebot/types';
 
-import { lastUndoableSave, summarizeTurn } from '../thread';
+import { circled, lastUndoableSave, summarizeTurn } from '../thread';
 import CliSpinner from './CliSpinner.vue';
 
 /**
- * What the agent did on the tab, as a terminal: each turn of commands folded
+ * CLI mode's thread, as a terminal: the user's notes as prompts with the
+ * agent's replies under them, and each turn of commands between them folded
  * into one line, opened to list each command and save. Emits `undo`.
  */
 export default Vue.extend({
@@ -82,7 +110,7 @@ export default Vue.extend({
 
   props: {
     thread: {
-      type: Array as PropType<Array<CliTurn>>,
+      type: Array as PropType<Array<CliThreadEntry>>,
       required: true,
     },
 
@@ -91,18 +119,39 @@ export default Vue.extend({
       type: String as PropType<string | null>,
       default: null,
     },
+
+    // The agent is working on the user's note between its commands.
+    thinking: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   data() {
     return { open: [] as Array<number> };
   },
 
+  computed: {
+    // The agent works with no live turn to show it, so a line of its own does.
+    working(): boolean {
+      return (
+        (this.thinking || !!this.activity) &&
+        !this.isLive(this.thread.length - 1)
+      );
+    },
+  },
+
   methods: {
+    circled,
     summarizeTurn,
     lastUndoableSave,
 
     isLive(index: number): boolean {
-      return !!this.activity && index === this.thread.length - 1;
+      return (
+        !!this.activity &&
+        index === this.thread.length - 1 &&
+        this.thread[index]?.kind === 'turn'
+      );
     },
 
     toggle(id: number): void {
@@ -140,6 +189,37 @@ export default Vue.extend({
   overflow-wrap: anywhere;
 }
 
+.note,
+.reply {
+  display: flex;
+  gap: 8px;
+  overflow-wrap: anywhere;
+}
+
+.note {
+  color: var(--term-bright);
+}
+
+.reply {
+  padding-left: 16px;
+  color: var(--term-text);
+}
+
+.message {
+  flex: 1;
+  min-width: 0;
+}
+
+.body {
+  white-space: pre-wrap;
+}
+
+.refs {
+  margin-left: 4px;
+  color: var(--term-accent);
+  letter-spacing: 1px;
+}
+
 .turn-head {
   display: flex;
   align-items: center;
@@ -174,6 +254,10 @@ export default Vue.extend({
 
   &:hover {
     color: var(--term-text);
+  }
+
+  &.live {
+    cursor: default;
   }
 }
 

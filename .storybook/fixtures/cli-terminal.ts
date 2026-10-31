@@ -1,5 +1,11 @@
 import type { StoryObj } from '@storybook/vue';
-import type { CliTurn, CliTurnStep } from '@stylebot/types';
+import type {
+  CliNote,
+  CliReply,
+  CliThreadEntry,
+  CliTurn,
+  CliTurnStep,
+} from '@stylebot/types';
 
 import CliModeTerminal from '@/apps/cli-mode/components/CliModeTerminal.vue';
 import {
@@ -43,6 +49,31 @@ export const TURNS: Array<CliTurn> = [
   ]),
 ];
 
+export const note = (
+  id: number,
+  text: string,
+  marks: Array<number> = []
+): CliNote => ({ kind: 'note', id, text, marks });
+
+export const reply = (id: number, text: string): CliReply => ({
+  kind: 'reply',
+  id,
+  text,
+});
+
+// The user asks about two marks, and the agent restyles and answers.
+export const CONVERSATION: Array<CliThreadEntry> = [
+  note(1, 'make these titles stand out more', [1, 2]),
+  turn(2, [
+    command(3, 'selection'),
+    command(4, "page-rules '.titleline > a'"),
+    command(5, 'css set'),
+    save(6),
+  ]),
+  reply(7, 'Made the titles bolder and teal, with more room between rows.'),
+  note(8, 'and hide the footer'),
+];
+
 export const mark = (n: number, width: number, height: number): PageMark => ({
   n,
   area: { x: 40 * n, y: 120, width, height },
@@ -82,6 +113,7 @@ export const cliTerminal = (
           @expand="state.expanded = $event"
           @place="state.position = $event"
           @undo="events.push({ name: 'undo', value: $event })"
+          @note="events.push({ name: 'note', value: $event })"
           @highlight="state.highlighted = $event"
           @unmark="unmark"
           @connect="events.push({ name: 'connect' })"

@@ -10,6 +10,7 @@ import type {
   CliModeAppWindow,
   CliModeEvent,
   CliModePageEvent,
+  CliModeState,
 } from '@stylebot/types';
 
 import type { Marks } from './marks';
@@ -29,9 +30,10 @@ const removeTerminal = (): void => {
 };
 
 /**
- * Tells the background what the user did with the terminal.
+ * Tells the background what the user did with the terminal, resolving once
+ * it has handled it.
  */
-const sendTerminalEvent = (event: CliModePageEvent): void => {
+const sendTerminalEvent = async (event: CliModePageEvent): Promise<void> => {
   const message: CliModeEvent = { name: 'CliModeEvent', event };
 
   if (event.type === 'dismiss') {
@@ -42,25 +44,30 @@ const sendTerminalEvent = (event: CliModePageEvent): void => {
     removeTerminal();
   }
 
-  chrome.runtime.sendMessage(message).catch(() => undefined);
+  await chrome.runtime.sendMessage(message).catch(() => undefined);
 };
 
 /**
  * The terminal, mounted for the connected tab or for an invite, swapping the
- * one on the page when it was mounted for the other.
+ * one on the page when it was mounted for the other. A new one starts from
+ * the state given, so what it holds already doesn't count as news.
  */
-const getTerminal = (connected: boolean): Promise<Terminal> => {
+const getTerminal = (
+  connected: boolean,
+  initial?: CliModeState
+): Promise<Terminal> => {
   if (mounted && mounted.connected !== connected) {
     removeTerminal();
   }
 
   if (!mounted) {
-    const terminal = mountTerminal(sendTerminalEvent, { connected }).catch(
-      (e: unknown) => {
-        mounted = null;
-        throw e;
-      }
-    );
+    const terminal = mountTerminal(sendTerminalEvent, {
+      connected,
+      initial,
+    }).catch((e: unknown) => {
+      mounted = null;
+      throw e;
+    });
 
     mounted = { connected, terminal };
   }
@@ -86,7 +93,7 @@ const getMarks = async (): Promise<Marks | null> =>
 const handleCliModeAction = async (action: CliModeAction): Promise<unknown> => {
   switch (action.kind) {
     case 'on': {
-      const { state } = await getTerminal(true);
+      const { state } = await getTerminal(true, action.state);
 
       Object.assign(state, action.state);
 

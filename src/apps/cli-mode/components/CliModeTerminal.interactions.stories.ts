@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, waitFor, within } from '@storybook/test';
 
 import {
+  CONVERSATION,
   MARKS,
   TURNS,
   cliTerminal,
@@ -9,6 +10,8 @@ import {
   shown,
   turn,
   command,
+  note,
+  reply,
 } from '@stylebot/storybook/fixtures/cli-terminal';
 import { user } from '@stylebot/storybook/story-helpers';
 
@@ -182,5 +185,132 @@ export const InviteMovesHere: StoryObj = {
     await shows(canvas.getByText('agent on news.ycombinator.com'));
     await user.click(canvas.getByRole('button', { name: '[move here]' }));
     await expect(shown.events).toEqual([{ name: 'connect' }]);
+  },
+};
+
+export const NoteField: StoryObj = {
+  ...cliTerminal({ agent: 'connected', marks: MARKS, expanded: true }),
+  name: 'the note field names the marks, sends on Enter and keeps its keys',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const field = canvas.getByRole('textbox', { name: 'Note to your agent' });
+    const heard: Array<string> = [];
+    const listen = (event: KeyboardEvent) => heard.push(event.key);
+
+    await shows(field);
+    await expect(field).toHaveAttribute(
+      'placeholder',
+      'what should change about 1, 3?'
+    );
+
+    await step('Write two lines and send them', async () => {
+      document.addEventListener('keydown', listen);
+      await user.type(field, 'bigger{Shift>}{Enter}{/Shift}and blue{Enter}');
+      document.removeEventListener('keydown', listen);
+
+      await expect(shown.events).toEqual([
+        { name: 'note', value: 'bigger\nand blue' },
+      ]);
+      await expect(field).toHaveValue('');
+      await expect(heard).toEqual([]);
+    });
+
+    await step('Esc hands the keyboard back to the page', async () => {
+      await user.keyboard('{Escape}');
+      await expect(field).not.toHaveFocus();
+    });
+
+    await step('An empty note is not sent', async () => {
+      await user.type(field, '   {Enter}');
+      await expect(shown.events).toHaveLength(1);
+    });
+
+    await step('Without marks, it asks what to change', async () => {
+      shown.state.marks = [];
+      await waitFor(() =>
+        expect(field).toHaveAttribute(
+          'placeholder',
+          'tell your agent what to change'
+        )
+      );
+    });
+  },
+};
+
+export const NotesAndReplies: StoryObj = {
+  ...cliTerminal({ agent: 'connected', thread: CONVERSATION, expanded: true }),
+  name: "notes show as prompts with their marks, and the agent's replies under them",
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await shows(canvas.getByText('make these titles stand out more'));
+    await expect(canvas.getByText('①②')).toBeVisible();
+    await expect(
+      canvas.getByText(
+        'Made the titles bolder and teal, with more room between rows.'
+      )
+    ).toBeVisible();
+    await expect(
+      canvas.getByText('ran 3 commands · saved 1 time')
+    ).toBeVisible();
+    await expect(canvas.getByText('and hide the footer')).toBeVisible();
+  },
+};
+
+export const ThinkingLine: StoryObj = {
+  ...cliTerminal({
+    agent: 'connected',
+    thread: CONVERSATION,
+    thinking: true,
+    expanded: true,
+  }),
+  name: 'while the agent works on a note, the thread says thinking and the footer nothing',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await shows(canvas.getByText('thinking'));
+    await expect(canvas.queryByText('agent connected')).toBeNull();
+
+    shown.state.activity = 'outline';
+    shown.state.thread = [...CONVERSATION, turn(9, [command(10, 'outline')])];
+    await shows(await canvas.findByText('stylebot outline'));
+    await expect(canvas.queryByText('thinking')).toBeNull();
+
+    shown.state.thinking = false;
+    shown.state.activity = null;
+    await shows(await canvas.findByText('agent connected'));
+  },
+};
+
+export const ReplyOpens: StoryObj = {
+  ...cliTerminal({
+    agent: 'connected',
+    thread: [note(1, 'make it bigger')],
+    thinking: true,
+  }),
+  name: 'the pill shows the agent thinking, and a reply opens the terminal',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await shows(canvas.getByText('thinking'));
+
+    shown.state.thinking = false;
+    shown.state.thread = [note(1, 'make it bigger'), reply(2, 'Done.')];
+    await shows(await canvas.findByText('Done.'));
+    await expect(shown.state.expanded).toBe(true);
+
+    await user.click(canvas.getByTitle('Minimize (.)'));
+    shown.state.thread = [
+      ...shown.state.thread,
+      turn(3, [command(4, 'css add'), save(5)]),
+      reply(6, 'Also fixed the footer.'),
+    ];
+    await waitFor(() => expect(shown.state.expanded).toBe(true));
+    await user.click(canvas.getByTitle('Minimize (.)'));
+    shown.state.thread = [
+      ...shown.state.thread,
+      turn(7, [command(8, 'css add'), save(9)]),
+    ];
+    await shows(await canvas.findByRole('button', { name: '[1 new]' }));
   },
 };

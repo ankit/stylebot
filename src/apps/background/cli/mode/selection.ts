@@ -10,8 +10,8 @@ import {
 import { type Size, getElementRegion } from '../screenshot-region';
 import type { CliCommands } from '../types';
 import { refreshInvites } from './invites';
-import { listenForMarks } from './marks';
-import { type Session, getSession } from './session';
+import { listenForUser } from './marks';
+import { type NoteRead, type Session, checkTab, getSession } from './session';
 import { captureWithTerminal, sendToTerminal } from './terminal';
 
 // After a mark, how long `selection --wait` waits for more before it answers.
@@ -29,29 +29,17 @@ export type Selection = {
   tab: number | null;
   // --wait timed out with nothing new.
   waiting: boolean;
+  // Notes the user sent since the agent last looked, oldest first.
+  notes: Array<NoteRead>;
+  // Marks not sent with a note yet.
   marks: Array<CroppedMark>;
 };
 
 /**
- * Rejects a tab a command named that isn't the connected one.
+ * Resolves to true once a note comes or the user stops marking, false on
+ * timeout or abort. Tabs show invites meanwhile.
  */
-const checkTab = (session: Session, named: unknown): void => {
-  if (named !== undefined && named !== '' && Number(named) !== session.tabId) {
-    throw new Error(
-      `CLI mode is on in tab ${session.tabId}, not tab ${named}. Use tab ${session.tabId}, or run: stylebot mode ${named}`
-    );
-  }
-};
-
-/**
- * Resolves to true a moment after the user stops marking, or false once the
- * timeout passes or the CLI goes away. While it waits, tabs show invites to
- * connect them, for when no tab is connected or the user wants another.
- */
-const waitForMarks = (
-  timeout: number,
-  signal?: AbortSignal
-): Promise<boolean> =>
+const waitForUser = (timeout: number, signal?: AbortSignal): Promise<boolean> =>
   new Promise(resolve => {
     let pause: ReturnType<typeof setTimeout> | undefined;
 
@@ -64,10 +52,12 @@ const waitForMarks = (
       resolve(arrived);
     };
 
-    const stop = listenForMarks(() => {
+    const stop = listenForUser(event => {
       clearTimeout(pause);
 
-      if (getSession()?.unreadMarks.size) {
+      if (event === 'note') {
+        finish(true);
+      } else if (getSession()?.unreadMarks.size) {
         pause = setTimeout(() => finish(true), MARKS_SETTLE_MS);
       }
     });
@@ -150,13 +140,18 @@ export const selectionCommands: CliCommands = {
       throw new Error(NO_TAB);
     }
 
-    if (wait && !before?.unreadMarks.size) {
+    if (wait && !before?.unreadMarks.size && !before?.unreadNotes.length) {
       const ms = Math.min(Number(timeout) || DEFAULT_WAIT_MS, MAX_WAIT_MS);
-      const arrived = await waitForMarks(ms, signal);
+      const arrived = await waitForUser(ms, signal);
       const after = getSession();
 
       if (!arrived || !after) {
-        return { tab: after?.tabId ?? null, waiting: true, marks: [] };
+        return {
+          tab: after?.tabId ?? null,
+          waiting: true,
+          notes: [],
+          marks: [],
+        };
       }
     }
 
@@ -164,17 +159,27 @@ export const selectionCommands: CliCommands = {
     const target = await chrome.tabs.get(session.tabId);
     const css = await getSavedCss(target.url);
     // A page still loading hasn't got its terminal back yet.
-    const marks =
+    const shown =
       (await sendToTerminal<Array<CliMark> | null>(session.tabId, {
         kind: 'selection',
         css,
       }).catch(() => null)) ?? [];
+    // A note's marks stay on the page until it's captured, and go with it.
+    const noted = new Set(
+      session.thread.flatMap(entry =>
+        entry.kind === 'note' ? entry.marks : []
+      )
+    );
+    const marks = shown.filter(mark => !noted.has(mark.n));
+    const notes = session.unreadNotes;
 
     session.unreadMarks.clear();
+    session.unreadNotes = [];
 
     return {
       tab: session.tabId,
       waiting: false,
+      notes,
       marks: crop ? await cropMarks(target, marks) : marks,
     };
   },

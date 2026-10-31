@@ -50,24 +50,74 @@ const formatMark = ({ n, rect, elements, whole, more, crop }) =>
     ...(crop ? [`  saved ${crop}`] : []),
   ].join('\n');
 
+const indent = text =>
+  text
+    .split('\n')
+    .map(line => `  ${line}`)
+    .join('\n');
+
 /**
- * What `selection` prints: each mark, with the elements in its area.
+ * A note the user sent, then the marks it was about, as they were then.
  */
-export const formatSelection = ({ tab, waiting, marks }) => {
+const formatNote = ({ text, marks, image }) =>
+  [
+    ...text.split('\n').map(line => `> ${line}`),
+    ...(image ? [`  screenshot of the marked area: ${image}`] : []),
+    ...marks.map(mark => indent(formatMark(mark))),
+  ].join('\n');
+
+/**
+ * What `selection` prints: the notes the user sent with their marks, then
+ * the marks not sent with a note yet.
+ */
+export const formatSelection = ({ tab, waiting, notes = [], marks }) => {
   if (waiting) {
     return tab === null
       ? 'Still waiting: no tab is connected yet. Run it again to keep waiting.'
       : `Still waiting: nothing new on tab ${tab}. Run it again to keep waiting.`;
   }
 
-  if (!marks.length) {
-    return `No marks on tab ${tab}.`;
+  if (!notes.length && !marks.length) {
+    return `No marks or notes on tab ${tab}.`;
   }
 
-  return [
-    `${marks.length} mark${marks.length === 1 ? '' : 's'} on tab ${tab}:`,
-    ...marks.map(formatMark),
-  ].join('\n');
+  const lines = [];
+
+  if (notes.length) {
+    lines.push(
+      `${notes.length} note${notes.length === 1 ? '' : 's'} on tab ${tab}:`,
+      ...notes.map(formatNote)
+    );
+  }
+
+  if (notes.length && marks.length) {
+    lines.push('');
+  }
+
+  if (marks.length) {
+    lines.push(
+      `${marks.length} mark${marks.length === 1 ? '' : 's'} on tab ${tab}${
+        notes.length ? ', not sent with a note yet' : ''
+      }:`,
+      ...marks.map(formatMark)
+    );
+  }
+
+  return lines.join('\n');
+};
+
+/**
+ * The tab and the message in what `say` was given: a leading tab id is
+ * optional, and the rest is the message.
+ */
+export const parseSay = words => {
+  const [first, ...rest] = words;
+  const named = rest.length > 0 && /^\d+$/.test(first);
+
+  return {
+    tab: named ? first : undefined,
+    message: (named ? rest : words).join(' '),
+  };
 };
 
 /**
@@ -98,16 +148,19 @@ export const addModeCommands = program => {
       'command you run on the tab and each save, with an undo. Connecting',
       'another tab moves CLI mode there. tabs marks the connected tab',
       '[CLI mode], and open returns it rather than opening a copy.',
-      'The user marks areas of the page by dragging over them; read them',
-      'with selection. Commands end with a line while some are unread.',
-      'Keys on the page: . open or minimize, Z undo the last save,',
-      'X clear the marks.',
+      'The user marks areas of the page by dragging over them and writes',
+      'notes about them; read both with selection, and answer with say.',
+      'Commands end with a line while some are unread.',
+      'Keys on the page: . open or minimize, / write a note, Z undo the',
+      'last save, X clear the marks.',
     ],
   });
 
   const selection = program
     .command('selection')
-    .description('The areas the user marked on the connected tab')
+    .description(
+      'The notes the user sent and the areas they marked on the connected tab'
+    )
     .argument('[tab]', 'The connected tab, to check it is the one you mean')
     .option('--crop', 'Save a screenshot of each area')
     .option(
@@ -115,7 +168,7 @@ export const addModeCommands = program => {
       'Where screenshots are saved',
       WORK_DIR.replace(os.homedir(), '~')
     )
-    .option('--wait', 'Wait for the user to mark something new first')
+    .option('--wait', 'Wait for a new note or mark first')
     .option('--timeout <duration>', 'How long --wait waits', '90s')
     .action(async (tab, options) => {
       const timeout = parseDuration(options.timeout);
@@ -134,6 +187,15 @@ export const addModeCommands = program => {
       });
       const dir = options.out.replace(/^~(?=$|[/\\])/, os.homedir());
 
+      for (const note of result.notes) {
+        if (note.image) {
+          note.image = savePng(
+            note.image,
+            path.join(dir, `stylebot-note-${result.tab}-${note.id}.png`)
+          );
+        }
+      }
+
       for (const mark of result.marks) {
         if (mark.dataUrl) {
           mark.crop = savePng(
@@ -149,15 +211,39 @@ export const addModeCommands = program => {
 
   addHelpSections(selection, {
     Notes: [
-      'Lists each mark, its box in css pixels of the viewport, and the',
-      'elements wholly inside it with match counts (or the one at its',
-      'middle). --wait returns a moment after the user stops marking, and',
-      'with no tab connected, waits for the user to connect one too.',
+      'Lists each note the user sent since you last looked, with the marks',
+      'it was about as they were then and a screenshot of the area around',
+      'them, then the marks not sent with a note yet. Each mark has its box',
+      'in css pixels of the viewport and the elements wholly inside it with',
+      'match counts (or the one at its middle). --wait returns once a note',
+      'comes or a moment after the user stops marking, and with no tab',
+      'connected, waits for the user to connect one too.',
     ],
     Examples: [
       '$ stylebot selection',
       '$ stylebot selection --crop',
       '$ stylebot selection --wait --timeout 2m',
     ],
+  });
+
+  const say = program
+    .command('say')
+    .description("Answer the user's note in the connected tab's terminal")
+    .usage('[tab] <message>')
+    .argument('<words...>', 'The connected tab (optional), then the message')
+    .action(async words =>
+      print(
+        await request('say', parseSay(words)),
+        ({ tab }) => `Said on tab ${tab}.`
+      )
+    );
+
+  addHelpSections(say, {
+    Notes: [
+      "Shows the message under the user's last note, opening the terminal",
+      'if it was collapsed. Until you answer, the terminal shows you working',
+      "on the note while you run commands; say what you did once it's done.",
+    ],
+    Examples: ["$ stylebot say 'Made the header sticky and bigger.'"],
   });
 };

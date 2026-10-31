@@ -1,5 +1,10 @@
 import { getCliConnected, onCliConnectedChange } from '@stylebot/settings';
-import type { CliAgentStatus, CliModeState, CliTurn } from '@stylebot/types';
+import type {
+  CliAgentStatus,
+  CliMark,
+  CliModeState,
+  CliThreadEntry,
+} from '@stylebot/types';
 
 import { sendToTerminal } from './terminal';
 
@@ -11,6 +16,19 @@ export type SavedVersion = {
   before: string;
 };
 
+// How long after its last command the agent stops counting as working on a
+// note it hasn't answered.
+export const THINKING_MS = 3 * 60_000;
+
+// A note as `selection` hands it on: its text, its marks as they were, and a
+// screenshot of the area around them with their badges.
+export type NoteRead = {
+  id: number;
+  text: string;
+  marks: Array<CliMark>;
+  image?: string;
+};
+
 /*
  * CLI mode's one session: the tab connected to the agent and what the agent
  * did there. The agent connects a tab with `stylebot mode`; connecting
@@ -18,7 +36,7 @@ export type SavedVersion = {
  */
 export type Session = {
   tabId: number;
-  thread: Array<CliTurn>;
+  thread: Array<CliThreadEntry>;
   // The agent's saves, by the id of their step in the thread.
   saves: Map<number, SavedVersion>;
   // An agent has run a command on the tab since it was connected.
@@ -29,6 +47,13 @@ export type Session = {
   unreadMarks: Set<number>;
   // The number the next mark takes, kept across reloads of the tab.
   nextMark: number;
+  // Notes the agent hasn't read with `stylebot selection`.
+  unreadNotes: Array<NoteRead>;
+  // The user's last note isn't answered with `stylebot say` yet.
+  awaitingReply: boolean;
+  // When the agent last ran a command on the tab or waited for the user.
+  lastCommandAt: number;
+  thinkingTimer?: ReturnType<typeof setTimeout>;
 };
 
 let session: Session | null = null;
@@ -50,9 +75,17 @@ const getAgentStatus = (current: Session): CliAgentStatus => {
   return hostConnected ? 'connected' : 'left';
 };
 
+/**
+ * Whether the agent is working on the user's note: it hasn't answered, and
+ * ran a command lately.
+ */
+const isThinking = (current: Session): boolean =>
+  current.awaitingReply && Date.now() - current.lastCommandAt < THINKING_MS;
+
 export const getState = (current: Session): CliModeState => ({
   thread: current.thread,
   agent: getAgentStatus(current),
+  thinking: isThinking(current),
   activity: current.activity,
   nextMark: current.nextMark,
 });
@@ -66,6 +99,21 @@ export const pushState = (): void => {
       kind: 'state',
       state: getState(session),
     }).catch(() => undefined);
+  }
+};
+
+/**
+ * Shows the terminal the agent stopped working once it has run no command
+ * for a while, unless it answers first.
+ */
+export const scheduleThinkingEnd = (current: Session): void => {
+  clearTimeout(current.thinkingTimer);
+
+  if (isThinking(current)) {
+    current.thinkingTimer = setTimeout(
+      pushState,
+      current.lastCommandAt + THINKING_MS - Date.now()
+    );
   }
 };
 
@@ -85,6 +133,7 @@ const bringToFront = async (tabId: number): Promise<void> => {
  */
 export const endSession = (): void => {
   clearTimeout(session?.activityTimer);
+  clearTimeout(session?.thinkingTimer);
   session = null;
 };
 
@@ -114,6 +163,9 @@ export const connectTab = async (
       activity: null,
       unreadMarks: new Set(),
       nextMark: 1,
+      unreadNotes: [],
+      awaitingReply: false,
+      lastCommandAt: 0,
     };
   }
 
@@ -138,6 +190,17 @@ export const disconnect = (): void => {
 
   if (tabId !== undefined) {
     sendToTerminal(tabId, { kind: 'off' }).catch(() => undefined);
+  }
+};
+
+/**
+ * Rejects a tab a command named that isn't the connected one.
+ */
+export const checkTab = (session: Session, named: unknown): void => {
+  if (named !== undefined && named !== '' && Number(named) !== session.tabId) {
+    throw new Error(
+      `CLI mode is on in tab ${session.tabId}, not tab ${named}. Use tab ${session.tabId}, or run: stylebot mode ${named}`
+    );
   }
 };
 

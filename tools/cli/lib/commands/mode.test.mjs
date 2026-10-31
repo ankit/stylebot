@@ -1,6 +1,6 @@
 jest.mock('../package.mjs', () => ({ CLI_VERSION: '0.2.0', LIB_DIR: '/lib' }));
 
-const { formatSelection, parseDuration } = require('./mode.mjs');
+const { formatSelection, parseDuration, parseSay } = require('./mode.mjs');
 
 const RECT = { x: 40, y: 120, width: 320, height: 180 };
 
@@ -49,10 +49,51 @@ describe('formatSelection', () => {
     );
   });
 
-  it('says when there are no marks, or it is still waiting', () => {
-    expect(formatSelection({ tab: 7, waiting: false, marks: [] })).toBe(
-      'No marks on tab 7.'
+  it('lists each note with its marks and screenshot, then marks not sent yet', () => {
+    const mark = n => ({
+      n,
+      rect: { x: 0, y: 0, width: 20, height: 10 },
+      elements: [{ selector: 'h1', matches: 1 }],
+      whole: true,
+      more: 0,
+    });
+
+    expect(
+      formatSelection({
+        tab: 7,
+        waiting: false,
+        notes: [
+          {
+            id: 4,
+            text: 'make this bigger\nand blue',
+            marks: [mark(1)],
+            image: '/home/me/.stylebot/work/stylebot-note-7-4.png',
+          },
+          { id: 6, text: 'hide the ads', marks: [] },
+        ],
+        marks: [mark(2)],
+      })
+    ).toBe(
+      [
+        '2 notes on tab 7:',
+        '> make this bigger',
+        '> and blue',
+        '  screenshot of the marked area: /home/me/.stylebot/work/stylebot-note-7-4.png',
+        '  mark 1: 20×10 at 0,0, holding:',
+        '        1  h1',
+        '> hide the ads',
+        '',
+        '1 mark on tab 7, not sent with a note yet:',
+        'mark 2: 20×10 at 0,0, holding:',
+        '      1  h1',
+      ].join('\n')
     );
+  });
+
+  it('says when there are no marks or notes, or it is still waiting', () => {
+    expect(
+      formatSelection({ tab: 7, waiting: false, notes: [], marks: [] })
+    ).toBe('No marks or notes on tab 7.');
     expect(formatSelection({ tab: null, waiting: true, marks: [] })).toMatch(
       /^Still waiting: no tab is connected yet/
     );
@@ -65,5 +106,22 @@ describe('parseDuration', () => {
     expect(parseDuration('2m')).toBe(120_000);
     expect(parseDuration('500ms')).toBe(500);
     expect(parseDuration('soon')).toBeUndefined();
+  });
+});
+
+describe('parseSay', () => {
+  it('takes a leading tab id, and the rest as the message', () => {
+    expect(parseSay(['1234', 'made', 'it', 'bigger'])).toEqual({
+      tab: '1234',
+      message: 'made it bigger',
+    });
+  });
+
+  it('leaves the tab out when only a message is given', () => {
+    expect(parseSay(['made it bigger'])).toEqual({
+      tab: undefined,
+      message: 'made it bigger',
+    });
+    expect(parseSay(['42'])).toEqual({ tab: undefined, message: '42' });
   });
 });

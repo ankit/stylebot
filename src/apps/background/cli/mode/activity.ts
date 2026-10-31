@@ -10,6 +10,7 @@ import {
   getSession,
   isInCliMode,
   pushState,
+  scheduleThinkingEnd,
   takeId,
 } from './session';
 
@@ -24,7 +25,7 @@ export const ACTIVITY_MS = 8000;
 const addStep = (session: Session, step: CliTurnStep): void => {
   const last = session.thread[session.thread.length - 1];
 
-  if (last && session.activity !== null) {
+  if (last?.kind === 'turn' && session.activity !== null) {
     last.steps.push(step);
   } else {
     session.thread.push({ kind: 'turn', id: takeId(), steps: [step] });
@@ -85,6 +86,8 @@ export const noteCliActivity = async (
   addStep(session, { kind: 'command', id: takeId(), text });
   session.agentSeen = true;
   session.activity = text;
+  session.lastCommandAt = Date.now();
+  scheduleThinkingEnd(session);
   clearTimeout(session.activityTimer);
   session.activityTimer = setTimeout(() => {
     session.activity = null;
@@ -137,8 +140,8 @@ export const undoSave = async (session: Session, id: number): Promise<void> => {
   );
   await applyStylesToAllTabs();
 
-  session.thread.forEach(turn =>
-    turn.steps.forEach(step => {
+  session.thread.forEach(entry =>
+    (entry.kind === 'turn' ? entry.steps : []).forEach(step => {
       if (step.kind === 'save' && step.id === id) {
         step.undone = true;
       }

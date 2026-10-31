@@ -1,4 +1,9 @@
-import type { CliModeAction, CliModeState } from '@stylebot/types';
+import type {
+  CliModeAction,
+  CliModeState,
+  CliThreadEntry,
+  CliTurn,
+} from '@stylebot/types';
 
 import { applyStylesToAllTabs, getAll, set } from '../../styles';
 import { renderCapture } from '../screenshot';
@@ -37,6 +42,14 @@ jest.mock('@stylebot/settings', () => ({
 type Mode = typeof import('./index');
 type Listener = (...args: Array<unknown>) => unknown;
 
+const EMPTY_STATE: CliModeState = {
+  thread: [],
+  agent: 'awaited',
+  thinking: false,
+  activity: null,
+  nextMark: 1,
+};
+
 const TAB = 7;
 const OTHER_TAB = 8;
 const URL = 'https://example.com/';
@@ -50,6 +63,12 @@ const listen = (name: string) => ({
 });
 
 new Promise(resolve => jest.requireActual('timers').setImmediate(resolve));
+
+/**
+ * The turn at an index of a thread.
+ */
+const turnAt = (thread: Array<CliThreadEntry> | undefined, index: number) =>
+  thread?.[index] as CliTurn;
 
 /**
  * What the terminal on a tab was last told to show.
@@ -128,7 +147,7 @@ describe('mode', () => {
     expect(sendToTerminal).toHaveBeenCalledWith(TAB, {
       kind: 'on',
       open: true,
-      state: { thread: [], agent: 'awaited', activity: null, nextMark: 1 },
+      state: EMPTY_STATE,
     });
   });
 
@@ -199,7 +218,7 @@ describe('the session', () => {
     expect(sendToTerminal).toHaveBeenCalledTimes(1);
     expect(sendToTerminal).toHaveBeenCalledWith(TAB, {
       kind: 'on',
-      state: { thread: [], agent: 'awaited', activity: null, nextMark: 1 },
+      state: EMPTY_STATE,
     });
   });
 });
@@ -218,6 +237,7 @@ describe('agent activity', () => {
 
     expect(lastState()).toEqual({
       agent: 'connected',
+      thinking: false,
       activity: 'page-rules h1',
       nextMark: 1,
       thread: [
@@ -241,7 +261,9 @@ describe('agent activity', () => {
 
     await mode.noteCliActivity('suggestions', { tab: String(TAB) });
 
-    expect(lastState()?.thread.map(turn => turn.steps.length)).toEqual([1, 1]);
+    expect(
+      lastState()?.thread.map(entry => (entry as CliTurn).steps.length)
+    ).toEqual([1, 1]);
   });
 
   it('counts commands on the active tab when they name none', async () => {
@@ -253,12 +275,7 @@ describe('agent activity', () => {
     await mode.noteCliActivity('outline', { tab: String(OTHER_TAB) });
     await mode.noteCliActivity('tabs', {});
 
-    expect(lastState()).toEqual({
-      thread: [],
-      agent: 'awaited',
-      activity: null,
-      nextMark: 1,
-    });
+    expect(lastState()).toEqual(EMPTY_STATE);
   });
 });
 
@@ -280,7 +297,7 @@ describe('saves', () => {
   it('joins the turn of the command that saved', async () => {
     await mode.onCliSave(saved);
 
-    expect(lastState()?.thread[0].steps).toEqual([
+    expect(turnAt(lastState()?.thread, 0).steps).toEqual([
       { kind: 'command', id: expect.any(Number), text: 'css set' },
       {
         kind: 'save',
@@ -293,12 +310,12 @@ describe('saves', () => {
 
   it("leaves out saves of a style the tab doesn't show", async () => {
     await mode.onCliSave({ ...saved, url: 'other.com' });
-    expect(lastState()?.thread[0].steps).toHaveLength(1);
+    expect(turnAt(lastState()?.thread, 0).steps).toHaveLength(1);
   });
 
   it('restores the version before a save on undo', async () => {
     await mode.onCliSave({ ...saved, profileId: 'dark' });
-    const save = lastState()!.thread[0].steps[1];
+    const save = turnAt(lastState()?.thread, 0).steps[1];
 
     await fromTerminal(TAB, { type: 'undo', id: save.id });
 
@@ -310,7 +327,9 @@ describe('saves', () => {
       'dark'
     );
     expect(applyStylesToAllTabs).toHaveBeenCalled();
-    expect(lastState()?.thread[0].steps[1]).toMatchObject({ undone: true });
+    expect(turnAt(lastState()?.thread, 0).steps[1]).toMatchObject({
+      undone: true,
+    });
 
     (set as jest.Mock).mockClear();
     await fromTerminal(TAB, { type: 'undo', id: save.id });
@@ -397,6 +416,7 @@ describe('selection', () => {
     expect(await mode.modeCommands.selection({})).toEqual({
       tab: TAB,
       waiting: false,
+      notes: [],
       marks: [MARK],
     });
     expect(sendToTerminal).toHaveBeenCalledWith(TAB, {
@@ -480,7 +500,12 @@ describe('selection --wait', () => {
     const waiting = waitFor({ timeout: 5000 });
 
     await jest.advanceTimersByTimeAsync(5000);
-    expect(await waiting).toEqual({ tab: TAB, waiting: true, marks: [] });
+    expect(await waiting).toEqual({
+      tab: TAB,
+      waiting: true,
+      notes: [],
+      marks: [],
+    });
   });
 
   it('stops when the CLI goes away', async () => {
@@ -532,5 +557,218 @@ describe('selection --wait', () => {
     await jest.advanceTimersByTimeAsync(5000);
     await waiting;
     expect(sendToTerminal).toHaveBeenCalledWith(OTHER_TAB, { kind: 'off' });
+  });
+});
+
+describe('notes', () => {
+  const note = (text: string, marks: Array<number>) =>
+    fromTerminal(TAB, { type: 'note', text, marks });
+
+  beforeEach(async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+    answerWithMarks();
+  });
+
+  it('adds a note to the thread with the numbers of its marks', async () => {
+    await note('make it bigger', [1]);
+
+    expect(lastState()?.thread).toEqual([
+      {
+        kind: 'note',
+        id: expect.any(Number),
+        text: 'make it bigger',
+        marks: [1],
+      },
+    ]);
+  });
+
+  it('counts a note as unread, and its marks no longer on their own', async () => {
+    await fromTerminal(TAB, { type: 'mark', n: 1 });
+    await fromTerminal(TAB, { type: 'mark', n: 2 });
+    await note('make it bigger', [1]);
+
+    expect(mode.getUnreadNotice()).toBe(
+      '1 new note and 1 new mark on tab 7 (run stylebot selection)'
+    );
+
+    await fromTerminal(TAB, { type: 'unmark', n: 2 });
+    expect(mode.getUnreadNotice()).toBe(
+      '1 new note on tab 7 (run stylebot selection)'
+    );
+  });
+
+  it('keeps its marks as they were, with a screenshot of the area around them', async () => {
+    await note('make it bigger', [1]);
+
+    expect(renderCapture).toHaveBeenCalledWith(
+      'data:image/png;base64,shot',
+      { width: 1000, height: 800 },
+      { x: 0, y: 0, width: 334, height: 144 },
+      1
+    );
+    // The badges are in the screenshot, so the marks aren't hidden for it.
+    expect(captureWithTerminal).not.toHaveBeenCalled();
+
+    expect(await mode.modeCommands.selection({})).toEqual({
+      tab: TAB,
+      waiting: false,
+      notes: [
+        {
+          id: expect.any(Number),
+          text: 'make it bigger',
+          marks: [MARK],
+          image: 'data:image/png;base64,crop',
+        },
+      ],
+      // Mark 1 is still on the page until the note is captured, but it
+      // went with the note.
+      marks: [],
+    });
+    expect(mode.getUnreadNotice()).toBeUndefined();
+    expect(
+      ((await mode.modeCommands.selection({})) as { notes: [] }).notes
+    ).toEqual([]);
+  });
+
+  it('has no screenshot when none of its marks is in view', async () => {
+    (sendToTerminal as jest.Mock).mockImplementation(async (_tabId, action) =>
+      action.kind === 'selection'
+        ? [{ ...MARK, rect: { x: 10, y: 2000, width: 300, height: 100 } }]
+        : null
+    );
+    await note('make it bigger', [1]);
+
+    const { notes } = (await mode.modeCommands.selection({})) as {
+      notes: Array<{ image?: string }>;
+    };
+
+    expect(renderCapture).not.toHaveBeenCalled();
+    expect(notes[0].image).toBeUndefined();
+  });
+
+  it('answers selection --wait as soon as it comes', async () => {
+    let result: unknown;
+    const waiting = mode.modeCommands
+      .selection({ wait: true, timeout: 60_000 })
+      .then(value => (result = value));
+
+    await note('make it bigger', []);
+    await jest.advanceTimersByTimeAsync(0);
+    await waiting;
+
+    expect(result).toMatchObject({
+      waiting: false,
+      notes: [{ text: 'make it bigger', marks: [] }],
+    });
+  });
+
+  it('answers selection --wait at once while a note is unread', async () => {
+    await note('make it bigger', []);
+
+    expect(
+      await mode.modeCommands.selection({ wait: true, timeout: 60_000 })
+    ).toMatchObject({ waiting: false, notes: [{ text: 'make it bigger' }] });
+  });
+});
+
+describe('say', () => {
+  it("adds the agent's reply to the thread", async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+
+    expect(
+      await mode.modeCommands.say({ message: '  made it bigger ' })
+    ).toEqual({ tab: TAB });
+    expect(lastState()?.thread).toEqual([
+      { kind: 'reply', id: expect.any(Number), text: 'made it bigger' },
+    ]);
+    expect(lastState()?.agent).toBe('connected');
+  });
+
+  it('checks the tab it names is the connected one', async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+
+    await expect(
+      mode.modeCommands.say({ tab: String(OTHER_TAB), message: 'hi' })
+    ).rejects.toThrow('CLI mode is on in tab 7, not tab 8');
+    await expect(
+      mode.modeCommands.say({ tab: String(TAB), message: 'hi' })
+    ).resolves.toEqual({ tab: TAB });
+  });
+
+  it('needs a message and a connected tab', async () => {
+    await expect(mode.modeCommands.say({ message: 'hi' })).rejects.toThrow(
+      'No tab is in CLI mode'
+    );
+
+    await mode.modeCommands.mode({ tab: String(TAB) });
+    await expect(mode.modeCommands.say({ message: ' ' })).rejects.toThrow(
+      'say needs a message'
+    );
+  });
+});
+
+describe('thinking', () => {
+  const note = () =>
+    fromTerminal(TAB, { type: 'note', text: 'make it bigger', marks: [] });
+
+  beforeEach(async () => {
+    await mode.modeCommands.mode({ tab: String(TAB) });
+  });
+
+  it('starts with a note while the agent has run a command lately', async () => {
+    await mode.noteCliActivity('outline', { tab: String(TAB) });
+    expect(lastState()?.thinking).toBe(false);
+
+    await note();
+    expect(lastState()?.thinking).toBe(true);
+  });
+
+  it('waits for a command after a note when the agent has been away', async () => {
+    await note();
+    expect(lastState()?.thinking).toBe(false);
+
+    await mode.noteCliActivity('outline', { tab: String(TAB) });
+    expect(lastState()?.thinking).toBe(true);
+  });
+
+  it('starts with a note while the agent waits for one', async () => {
+    const waiting = mode.modeCommands.selection({ wait: true });
+
+    await note();
+    await waiting;
+    expect(lastState()?.thinking).toBe(true);
+  });
+
+  it('ends once the agent answers with say', async () => {
+    await mode.noteCliActivity('outline', { tab: String(TAB) });
+    await note();
+    await mode.modeCommands.say({ message: 'done' });
+
+    expect(lastState()?.thinking).toBe(false);
+  });
+
+  it('ends once the agent has run no command for 3 minutes', async () => {
+    await note();
+    await mode.noteCliActivity('outline', { tab: String(TAB) });
+    await jest.advanceTimersByTimeAsync(2 * 60_000);
+    await mode.noteCliActivity('outline', { tab: String(TAB) });
+
+    await jest.advanceTimersByTimeAsync(3 * 60_000 - 1);
+    expect(lastState()?.thinking).toBe(true);
+
+    await jest.advanceTimersByTimeAsync(1);
+    expect(lastState()?.thinking).toBe(false);
+  });
+
+  it('starts a new turn for commands after a note', async () => {
+    await mode.noteCliActivity('outline', { tab: String(TAB) });
+    await note();
+    await mode.noteCliActivity('screenshot', { tab: String(TAB) });
+
+    expect(lastState()?.thread.map(entry => entry.kind)).toEqual([
+      'turn',
+      'note',
+      'turn',
+    ]);
   });
 });

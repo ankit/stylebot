@@ -1,14 +1,18 @@
 import Vue from 'vue';
 import { t } from '@stylebot/i18n';
 import { injectFontFaces } from '@stylebot/utils';
-import type { CliModePageEvent, ViewportRect } from '@stylebot/types';
+import type {
+  CliModePageEvent,
+  CliModeState,
+  ViewportRect,
+} from '@stylebot/types';
 
 import CliMarks from './components/CliMarks.vue';
 import CliModeTerminal from './components/CliModeTerminal.vue';
 import { listenForKeys } from './keys';
 import { createMarks, type Marks } from './marks';
 import { createTerminalState, type TerminalState } from './state';
-import { lastUndoableSave } from './thread';
+import { lastUndoableSave, threadSteps } from './thread';
 
 // Inline and important on the host, so no page rule can move or hide it.
 const HOST_CSS = `
@@ -70,12 +74,12 @@ const savePosition = (position: TerminalState['position']): void => {
  * marks areas and the keys work; elsewhere it only shows an invite.
  */
 export const mountTerminal = async (
-  sendTerminalEvent: (event: CliModePageEvent) => void,
-  { connected }: { connected: boolean }
+  sendTerminalEvent: (event: CliModePageEvent) => Promise<void>,
+  { connected, initial }: { connected: boolean; initial?: CliModeState }
 ): Promise<Terminal> => {
   const host = document.createElement('stylebot-cli-mode');
   const root = host.attachShadow({ mode: 'closed' });
-  const state = createTerminalState();
+  const state = Object.assign(createTerminalState(), initial);
 
   host.style.cssText = HOST_CSS;
   host.lang = t('language_code');
@@ -104,21 +108,51 @@ export const mountTerminal = async (
     : null;
 
   const undoLastSave = (): void => {
-    const steps = state.thread.flatMap(turn => turn.steps);
-    const save = lastUndoableSave(steps);
+    const save = lastUndoableSave(threadSteps(state.thread));
 
     if (save) {
       sendTerminalEvent({ type: 'undo', id: save.id });
     }
   };
 
+  // Marks sent with a note whose screenshot isn't taken yet.
+  const sending = new Set<number>();
+
+  /**
+   * Sends a note with the marks on the page, which stay there until the
+   * background has read and captured them.
+   */
+  const sendNote = async (text: string): Promise<void> => {
+    const numbers = state.marks.map(({ n }) => n).filter(n => !sending.has(n));
+
+    numbers.forEach(n => sending.add(n));
+
+    try {
+      await sendTerminalEvent({ type: 'note', text, marks: numbers });
+    } finally {
+      numbers.forEach(n => {
+        sending.delete(n);
+        marks?.unmark(n);
+      });
+    }
+  };
+
   let stopKeys = (): void => undefined;
 
   if (marks) {
-    stopKeys = listenForKeys(state, {
-      undo: undoLastSave,
-      clearMarks: marks.clear,
-    });
+    stopKeys = listenForKeys(
+      state,
+      {
+        undo: undoLastSave,
+        clearMarks: marks.clear,
+        focusNote: async () => {
+          state.expanded = true;
+          await Vue.nextTick();
+          (app.$refs.terminal as Vue & { focusNote: () => void }).focusNote();
+        },
+      },
+      root
+    );
   }
 
   const marksApp =
@@ -136,8 +170,10 @@ export const mountTerminal = async (
     el,
     render: h =>
       h(CliModeTerminal, {
+        ref: 'terminal',
         props: { state },
         on: {
+          note: sendNote,
           expand: (expanded: boolean) => {
             state.expanded = expanded;
           },

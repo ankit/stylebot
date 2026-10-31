@@ -5,6 +5,7 @@ import type { TerminalState } from './state';
 export type KeyActions = {
   undo: () => void;
   clearMarks: () => boolean;
+  focusNote: () => void;
 };
 
 const isTyping = (target: EventTarget | null): boolean =>
@@ -18,9 +19,13 @@ const isTyping = (target: EventTarget | null): boolean =>
 export const runKey = (
   key: string,
   state: TerminalState,
-  { undo, clearMarks }: KeyActions
+  { undo, clearMarks, focusNote }: KeyActions
 ): boolean => {
   switch (key) {
+    case '/':
+      focusNote();
+      return true;
+
     case '.':
       state.expanded = !state.expanded;
       return true;
@@ -49,19 +54,22 @@ export const runKey = (
 
 /**
  * Listens for the terminal's plain-key shortcuts, which work anywhere on
- * the page but its fields, ahead of the page's own listeners. Returns a
- * function that stops listening.
+ * the page but its fields and the terminal's own, ahead of the page's own
+ * listeners. Returns a function that stops listening.
  */
 export const listenForKeys = (
   state: TerminalState,
-  actions: KeyActions
+  actions: KeyActions,
+  root: ShadowRoot
 ): (() => void) => {
   const onKey = (event: KeyboardEvent): void => {
+    // A closed shadow root hides its fields from the event's path.
     if (
       event.metaKey ||
       event.ctrlKey ||
       event.altKey ||
       event.isComposing ||
+      isTyping(root.activeElement) ||
       isTyping(event.composedPath()[0] ?? null)
     ) {
       return;

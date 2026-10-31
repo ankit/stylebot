@@ -29,6 +29,7 @@ export const createTerminalState = (): TerminalState =>
   Vue.observable({
     thread: [],
     agent: 'awaited',
+    thinking: false,
     activity: null,
     nextMark: 1,
     expanded: false,
