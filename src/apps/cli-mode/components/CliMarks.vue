@@ -7,7 +7,8 @@
         type="button"
         class="badge"
         :style="boxStyle(mark.badge)"
-        :title="t('mark_n_click_to_remove', [String(mark.n)])"
+        :title="t('remove')"
+        :aria-label="t('remove_mark_n', [String(mark.n)])"
         @click="$emit('unmark', mark.n)"
       >
         <span class="n">{{ mark.n }}</span>
@@ -108,8 +109,8 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .marks {
-  --mark: #4fb6b0;
-  --mark-ink: #0f1a19;
+  --mark: #3fb4d9;
+  --mark-ink: #0b1a20;
 
   position: fixed;
   inset: 0;
@@ -133,7 +134,7 @@ export default Vue.extend({
 .box {
   border: 2px solid var(--mark);
   border-radius: 2px;
-  background: rgb(79 182 176 / 6%);
+  background: rgb(63 180 217 / 6%);
 }
 
 .badge {

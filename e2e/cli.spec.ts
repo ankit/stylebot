@@ -927,9 +927,7 @@ test('the user marks areas by dragging, which selection lists for the agent', as
   const id = String(tab.id);
 
   await ok(['mode', id]);
-  await expect
-    .poll(() => terminalText(yours))
-    .toContain('drag on the page to mark an area');
+  await expect.poll(() => terminalText(yours)).toContain('[drag]');
 
   await yours.bringToFront();
   await drag(yours, [10, 10], [240, 150]);
@@ -978,9 +976,7 @@ test('the user marks areas by dragging, which selection lists for the agent', as
   await yours.mouse.click(40, 320);
   await expect.poll(() => terminalText(yours)).not.toContain('260×40');
   await clickInTerminal(yours, 'aria-label', 'Remove mark 1');
-  await expect
-    .poll(() => terminalText(yours))
-    .toContain('drag on the page to mark an area');
+  await expect.poll(() => terminalText(yours)).toContain('[drag]');
   expect(await ok(['selection'])).toBe(`No marks or notes on tab ${id}.\n`);
 
   // X clears the marks; numbers keep counting up.
@@ -1031,7 +1027,7 @@ test('the user writes a note about their marks, which selection hands on with a 
   await expect.poll(() => terminalText(yours)).toContain('1 230×140');
   await yours.keyboard.press('Enter');
 
-  await expect.poll(() => terminalText(yours)).toContain('fix the box. ①');
+  await expect.poll(() => terminalText(yours)).toContain('fix the box. 1');
   await expect.poll(() => terminalText(yours)).not.toContain('230×140');
   await expect.poll(() => terminalText(yours)).toContain('thinking');
   expect(await ok(['outline', id])).toMatch(
@@ -1092,14 +1088,10 @@ test('while the agent waits for a tab, the active tab invites the user to connec
   expect((await cli(['selection'])).stderr).toContain('No tab is in CLI mode');
 
   const waiting = cli(['selection', '--wait', '--timeout', '30s']);
-  await expect
-    .poll(() => terminalText(yours))
-    .toContain('your agent is waiting for a tab');
+  await expect.poll(() => terminalText(yours)).toContain('agent waiting');
 
   await clickInTerminal(yours, 'title', 'Connect this tab to your agent');
-  await expect
-    .poll(() => terminalText(yours))
-    .toContain('drag on the page to mark an area');
+  await expect.poll(() => terminalText(yours)).toContain('[drag]');
   expect(await ok(['tabs'])).toContain(`${baseUrl}/marks  [CLI mode]`);
 
   await drag(yours, [10, 10], [240, 150]);
@@ -1130,9 +1122,7 @@ test('watch prints what the user does in CLI mode as it happens', async () => {
     await expect
       .poll(() => watch.lines)
       .toEqual([expect.stringMatching(/^waiting for a tab: /)]);
-    await expect
-      .poll(() => terminalText(yours))
-      .toContain('your agent is waiting for a tab');
+    await expect.poll(() => terminalText(yours)).toContain('agent waiting');
 
     await clickInTerminal(yours, 'title', 'Connect this tab to your agent');
     await expect

@@ -44,21 +44,21 @@ export const PillOpens: StoryObj = {
     const canvas = within(canvasElement);
 
     await shows(canvas.getByText('agent connected'));
-    await shows(canvas.getByRole('button', { name: '[open]' }));
+    await shows(canvas.getByRole('button', { name: '[.] open' }));
 
     shown.state.thread = [
       ...TURNS,
       turn(11, [command(12, 'css add'), save(13)]),
     ];
-    await user.click(await canvas.findByRole('button', { name: '[1 new]' }));
+    await user.click(await canvas.findByRole('button', { name: '[.] 1 new' }));
 
     await shows(canvas.getByText('stylebot'));
     await shows(canvas.getByText('ran 3 commands'));
     await shows(canvas.getByText('ran 3 commands · saved 2 times'));
     await shows(canvas.getByText('ran 1 command · saved 1 time'));
 
-    await user.click(canvas.getByTitle('Minimize (.)'));
-    await shows(canvas.getByRole('button', { name: '[open]' }));
+    await user.click(canvas.getByTitle('Minimize'));
+    await shows(canvas.getByRole('button', { name: '[.] open' }));
   },
 };
 
@@ -70,7 +70,7 @@ export const AgentStatus: StoryObj = {
 
     await shows(canvas.getByText('agent disconnected'));
 
-    await user.click(canvas.getByTitle('Minimize (.)'));
+    await user.click(canvas.getByTitle('Minimize'));
     await shows(canvas.getByText('agent left'));
 
     shown.state.agent = 'connected';
@@ -114,7 +114,7 @@ export const UndoLastSave: StoryObj = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    await user.click(canvas.getByTitle('Undo the last save (Z)'));
+    await user.click(canvas.getByTitle('Undo the last save'));
     await expect(shown.events).toEqual([{ name: 'undo', value: 3 }]);
   },
 };
@@ -126,12 +126,12 @@ export const RunningTurn: StoryObj = {
     thread: TURNS,
     activity: 'screenshot',
   }),
-  name: 'while the agent runs, the turn shows its command and the footer nothing',
+  name: 'while the agent runs, the turn shows its command and the footer still shows the agent',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
     await shows(canvas.getByText('stylebot screenshot'));
-    await expect(canvas.queryByText('agent connected')).toBeNull();
+    await expect(canvas.getByText('agent connected')).toBeVisible();
   },
 };
 
@@ -172,7 +172,7 @@ export const MarkChips: StoryObj = {
 
     await step('Remove the last chip', async () => {
       await user.click(canvas.getByRole('button', { name: 'Remove mark 1' }));
-      await shows(canvas.getByText('# drag on the page to mark an area'));
+      await shows(canvas.getByText('[drag]'));
     });
   },
 };
@@ -183,7 +183,7 @@ export const InviteConnects: StoryObj = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    await shows(canvas.getByText('your agent is waiting for a tab'));
+    await shows(canvas.getByText('agent waiting'));
     await user.click(canvas.getByRole('button', { name: '[connect]' }));
     await user.click(canvas.getByTitle('Hide on this page'));
     await expect(shown.events).toEqual([
@@ -261,7 +261,10 @@ export const NotesAndReplies: StoryObj = {
     const canvas = within(canvasElement);
 
     await shows(canvas.getByText('make these titles stand out more'));
-    await expect(canvas.getByText('①②')).toBeVisible();
+    const refs = canvas.getByText('make these titles stand out more')
+      .nextElementSibling as HTMLElement;
+
+    await expect(refs).toHaveTextContent('12');
     await expect(
       canvas.getByText(
         'Made the titles bolder and teal, with more room between rows.'
@@ -281,12 +284,12 @@ export const ThinkingLine: StoryObj = {
     thinking: true,
     expanded: true,
   }),
-  name: 'while the agent works on a note, the thread says thinking and the footer nothing',
+  name: 'while the agent works on a note, the thread says thinking and the footer still shows the agent',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
     await shows(canvas.getByText('thinking'));
-    await expect(canvas.queryByText('agent connected')).toBeNull();
+    await expect(canvas.getByText('agent connected')).toBeVisible();
 
     shown.state.activity = 'outline';
     shown.state.thread = [...CONVERSATION, turn(9, [command(10, 'outline')])];
@@ -316,18 +319,57 @@ export const ReplyOpens: StoryObj = {
     await shows(await canvas.findByText('Done.'));
     await expect(shown.state.expanded).toBe(true);
 
-    await user.click(canvas.getByTitle('Minimize (.)'));
+    await user.click(canvas.getByTitle('Minimize'));
     shown.state.thread = [
       ...shown.state.thread,
       turn(3, [command(4, 'css add'), save(5)]),
       reply(6, 'Also fixed the footer.'),
     ];
     await waitFor(() => expect(shown.state.expanded).toBe(true));
-    await user.click(canvas.getByTitle('Minimize (.)'));
+    await user.click(canvas.getByTitle('Minimize'));
     shown.state.thread = [
       ...shown.state.thread,
       turn(7, [command(8, 'css add'), save(9)]),
     ];
-    await shows(await canvas.findByRole('button', { name: '[1 new]' }));
+    await shows(await canvas.findByRole('button', { name: '[.] 1 new' }));
+  },
+};
+
+export const Resize: StoryObj = {
+  ...cliTerminal({ agent: 'connected', thread: TURNS, expanded: true }),
+  name: 'dragging a corner resizes the open terminal, which the page remembers',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const panel = canvas.getByRole('region');
+    const corner = panel.querySelector('.handle.nw') as HTMLElement;
+    const { x, y } = corner.getBoundingClientRect();
+
+    await shows(panel);
+    await user.pointer([
+      { keys: '[MouseLeft>]', target: corner, coords: { x, y } },
+      { coords: { x: x - 100, y: y - 50 } },
+    ]);
+    await expect(getComputedStyle(panel).cursor).toBe('nwse-resize');
+
+    await user.pointer({ keys: '[/MouseLeft]' });
+    await expect(shown.state.size).toEqual({ width: 540, height: 470 });
+    await expect(panel.getBoundingClientRect().width).toBe(540);
+    await expect(shown.events.map(event => event.name)).toContain('move');
+  },
+};
+
+export const DragCursor: StoryObj = {
+  ...cliTerminal({ expanded: true }),
+  name: 'the cursor grabs while the user drags the terminal',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const bar = canvas.getByTitle('Drag to move');
+
+    await shows(bar);
+    await user.pointer({ keys: '[MouseLeft>]', target: bar });
+    await expect(getComputedStyle(bar).cursor).toBe('grabbing');
+
+    await user.pointer({ keys: '[/MouseLeft]' });
+    await expect(getComputedStyle(bar).cursor).toBe('grab');
   },
 };

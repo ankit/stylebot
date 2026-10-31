@@ -112,6 +112,7 @@ export const cliTerminal = (
           :state="state"
           @expand="state.expanded = $event"
           @place="state.position = $event"
+          @resize="state.size = $event"
           @undo="events.push({ name: 'undo', value: $event })"
           @note="events.push({ name: 'note', value: $event })"
           @highlight="state.highlighted = $event"

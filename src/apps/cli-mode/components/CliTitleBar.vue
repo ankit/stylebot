@@ -9,17 +9,14 @@
       <span class="dim">~ {{ t('cli_mode') }}</span>
     </span>
     <span class="buttons">
-      <cli-window-button
-        :title="t('label_with_key', [t('minimize'), '.'])"
-        @click="$emit('minimize')"
-      >
-        <minus-icon :size="16" />
+      <cli-window-button :title="t('minimize')" @click="$emit('minimize')">
+        <minus-icon :size="14" />
       </cli-window-button>
       <cli-window-button
         :title="t('turn_off_cli_mode')"
         @click="$emit('close')"
       >
-        <x-icon :size="16" />
+        <x-icon :size="14" />
       </cli-window-button>
     </span>
   </header>
@@ -50,6 +47,7 @@ export default Vue.extend({
   padding: 5px 6px 5px 14px;
   border-bottom: 1px solid var(--term-border);
   background: var(--term-raised);
+  font-size: 13px;
   cursor: grab;
   touch-action: none;
   user-select: none;

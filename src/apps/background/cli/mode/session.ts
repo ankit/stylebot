@@ -98,11 +98,11 @@ const getAgentStatus = (current: Session): CliAgentStatus => {
 
 /**
  * Whether the agent is working on the user's note: it hasn't answered, and
- * is around or ran a command lately.
+ * ran a command or got the note lately. An agent may answer only in its own
+ * chat, so an open watch alone doesn't keep it working.
  */
 const isThinking = (current: Session): boolean =>
-  current.awaitingReply &&
-  (isAgentAround() || Date.now() - current.lastCommandAt < THINKING_MS);
+  current.awaitingReply && Date.now() - current.lastCommandAt < THINKING_MS;
 
 export const getState = (current: Session): CliModeState => ({
   thread: current.thread,
@@ -131,7 +131,7 @@ export const pushState = (): void => {
 export const scheduleThinkingEnd = (current: Session): void => {
   clearTimeout(current.thinkingTimer);
 
-  if (isThinking(current) && !isAgentAround()) {
+  if (isThinking(current)) {
     current.thinkingTimer = setTimeout(
       pushState,
       current.lastCommandAt + THINKING_MS - Date.now()
@@ -169,7 +169,6 @@ export const joinAgent = (): (() => void) => {
 
     if (session) {
       session.agentLeft = true;
-      scheduleThinkingEnd(session);
       pushState();
     }
   };

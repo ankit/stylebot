@@ -11,6 +11,8 @@ export type TerminalState = CliModeState & {
   expanded: boolean;
   // Where the user dragged the terminal, from the viewport's right and bottom.
   position: { right: number; bottom: number };
+  // The open panel's size, once the user resized it.
+  size: { width: number; height: number } | null;
   marks: Array<PageMark>;
   // The mark whose chip the pointer is over, outlined on the page.
   highlighted: number | null;
@@ -34,6 +36,7 @@ export const createTerminalState = (): TerminalState =>
     nextMark: 1,
     expanded: false,
     position: { right: 16, bottom: 16 },
+    size: null,
     marks: [],
     highlighted: null,
     drag: null,

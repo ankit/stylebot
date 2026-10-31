@@ -10,16 +10,18 @@
       @pointerdown.native="$emit('drag', $event)"
     />
     <button type="button" class="open" @click="$emit('open')">
-      {{
-        unseen
-          ? t(unseen === 1 ? 'new_count_one' : 'new_count_other', [
-              String(unseen),
-            ])
-          : t('open_bracketed')
-      }}
+      <cli-key-hint shortcut=".">
+        {{
+          unseen
+            ? t(unseen === 1 ? 'count_new_one' : 'count_new_other', [
+                String(unseen),
+              ])
+            : t('open')
+        }}
+      </cli-key-hint>
     </button>
     <cli-window-button :title="t('turn_off_cli_mode')" @click="$emit('close')">
-      <x-icon :size="16" />
+      <x-icon :size="14" />
     </cli-window-button>
   </div>
 </template>
@@ -30,6 +32,7 @@ import Vue from 'vue';
 import { XIcon } from '@stylebot/icons';
 import type { CliAgentStatus } from '@stylebot/types';
 
+import CliKeyHint from './CliKeyHint.vue';
 import CliStatus from './CliStatus.vue';
 import CliWindowButton from './CliWindowButton.vue';
 
@@ -41,7 +44,7 @@ import CliWindowButton from './CliWindowButton.vue';
 export default Vue.extend({
   name: 'CliPill',
 
-  components: { CliStatus, CliWindowButton, XIcon },
+  components: { CliKeyHint, CliStatus, CliWindowButton, XIcon },
 
   props: {
     agent: {

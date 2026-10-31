@@ -1,11 +1,6 @@
 import type { CliThreadEntry, CliTurn } from '@stylebot/types';
 
-import {
-  circled,
-  lastUndoableSave,
-  summarizeTurn,
-  threadSteps,
-} from './thread';
+import { lastUndoableSave, summarizeTurn, threadSteps } from './thread';
 
 const MESSAGES: Record<string, string> = {
   ran_count_one: 'ran $1 command',
@@ -74,12 +69,5 @@ describe('threadSteps', () => {
     ];
 
     expect(threadSteps(thread).map(step => step.id)).toEqual([1, 4]);
-  });
-});
-
-describe('circled', () => {
-  it('circles numbers up to 20', () => {
-    expect([1, 2, 20].map(circled).join('')).toBe('①②⑳');
-    expect(circled(21)).toBe('(21)');
   });
 });

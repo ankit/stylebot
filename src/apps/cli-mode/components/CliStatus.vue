@@ -78,7 +78,7 @@ export default Vue.extend({
 .status {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   min-width: 0;
   color: var(--term-dim);
   font-size: 12px;
@@ -90,8 +90,10 @@ export default Vue.extend({
 
 .dot {
   flex: none;
+  width: var(--term-gutter);
   color: var(--term-faint);
   font-size: 10px;
+  text-align: center;
 
   .connected & {
     color: var(--term-green);
