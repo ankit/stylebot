@@ -9,6 +9,7 @@ export * from './gallery';
 export * from './page-reading';
 export * from './styles';
 export * from './TabMessage';
+export * from './cli-mode';
 export * from './BackgroundPageMessage';
 export * from './BackgroundPageMessageResponse';
 

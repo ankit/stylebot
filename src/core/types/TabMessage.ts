@@ -1,3 +1,4 @@
+import type { CliModeMessage } from './cli-mode';
 import type { Style } from './styles';
 import type { ReadabilitySettings } from './readability';
 import type { StylebotCommandName } from './commands';
@@ -221,6 +222,7 @@ type TabMessage =
   | InspectPage
   | ShowGalleryPreview
   | HideGalleryPreview
-  | GalleryStyleInstalled;
+  | GalleryStyleInstalled
+  | CliModeMessage;
 
 export default TabMessage;

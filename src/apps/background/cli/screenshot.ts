@@ -1,6 +1,7 @@
 import type { ElementFrame, PseudoState, ViewportRect } from '@stylebot/types';
 
 import { captureTab } from '../capture-tab';
+import { captureWithTerminal } from './mode/terminal';
 import { withPseudoState } from './pseudo-states';
 import {
   getClipRegion,
@@ -8,6 +9,7 @@ import {
   parseClip,
   parseScale,
   planCrop,
+  toImageRect,
   type Region,
   type Size,
 } from './screenshot-region';
@@ -23,10 +25,17 @@ export type Screenshot = {
   scale: number;
   viewport: Size;
   cutOff: boolean;
+  // Where CLI mode's terminal covers the image, in image pixels.
+  cliTerminal?: ViewportRect;
 };
 
-// The tab's capture, and the part of it the screenshot keeps.
-type Capture = { dataUrl: string; region?: Region };
+// The tab's capture, the part of it the screenshot keeps, and where CLI
+// mode's terminal covers the viewport, if it does.
+type Capture = {
+  dataUrl: string;
+  region?: Region;
+  covered?: ViewportRect | null;
+};
 
 /**
  * A tab's viewport in css pixels: its size divided by its page zoom.
@@ -108,7 +117,7 @@ const captureElement = async (
   tab: chrome.tabs.Tab,
   selector: string,
   viewport: Size
-): Promise<Required<Capture>> => {
+): Promise<Capture & { region: Region }> => {
   const tabId = tab.id as number;
   const frame = await inspectTab<ElementFrame>(tabId, {
     kind: 'frameElement',
@@ -122,7 +131,11 @@ const captureElement = async (
       await new Promise(resolve => setTimeout(resolve, SCROLL_PAINT_DELAY_MS));
     }
 
-    return { dataUrl: await captureTab(tab), region };
+    const { capture, covered } = await captureWithTerminal(tabId, () =>
+      captureTab(tab)
+    );
+
+    return { dataUrl: capture, region, covered };
   } finally {
     if (frame.scrolled) {
       await inspectTab(tabId, { kind: 'restoreScroll' });
@@ -164,9 +177,15 @@ export const takeScreenshot = async ({
       return captureElement(target, String(selector), viewport);
     }
 
+    const { capture: dataUrl, covered } = await captureWithTerminal(
+      target.id as number,
+      () => captureTab(target)
+    );
+
     return {
       region: clipRect && getClipRegion(clipRect, viewport),
-      dataUrl: await captureTab(target),
+      dataUrl,
+      covered,
     };
   };
 
@@ -180,12 +199,16 @@ export const takeScreenshot = async ({
     shot = await withPseudoState(tabId, String(on), forced, capture);
   }
 
-  const { dataUrl, region } = shot;
+  const { dataUrl, region, covered } = shot;
+  const cliTerminal = covered
+    ? toImageRect(covered, region?.rect, outputScale)
+    : undefined;
 
   return {
     ...(await renderCapture(dataUrl, viewport, region?.rect, outputScale)),
     scale: outputScale,
     viewport,
     cutOff: region?.cutOff ?? false,
+    ...(cliTerminal && { cliTerminal }),
   };
 };

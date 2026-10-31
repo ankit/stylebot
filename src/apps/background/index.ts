@@ -1,7 +1,7 @@
 import { supportsCLI } from '@stylebot/settings';
 import { getGoodbyeUrl } from '@stylebot/utils';
 
-import { initCliBridge } from './cli';
+import { initCliBridge, initCliMode } from './cli';
 import { ContextMenu } from './contextmenu';
 import { scheduleGalleryUpdates } from './gallery-updates';
 import { initListeners } from './listeners';
@@ -23,4 +23,5 @@ ContextMenu.init();
 
 if (supportsCLI()) {
   initCliBridge();
+  initCliMode();
 }

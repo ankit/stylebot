@@ -6,6 +6,7 @@ import { reloadForGrant, resumeAfterGrantReload } from '../grant-reload';
 import { browserCommands } from './browser';
 import { pseudoStateCommands } from './pseudo-states';
 import { inspectCommands } from './inspect';
+import { modeCommands, noteCliActivity } from './mode';
 import { optionCommands } from './options';
 import { pageCommands } from './pages';
 import { pointerCommands } from './pointer';
@@ -30,6 +31,7 @@ const commands: CliCommands = {
   ...styleCommands,
   ...profileCommands,
   ...optionCommands,
+  ...modeCommands,
 };
 
 // Requests still running, by id, to stop when the CLI goes away.
@@ -115,6 +117,9 @@ const connect = (): void => {
       }
 
       const args = request.args ?? {};
+
+      noteCliActivity(request.command, args).catch(() => undefined);
+
       const { signal } = controller;
       const emit = (event: unknown): void => post({ id: request.id, event });
       let result: unknown;
@@ -207,3 +212,5 @@ export const initCliBridge = (): void => {
   startedAfterGrantReload = resumeAfterGrantReload(RELOADED_FOR_CLI_KEY);
   updateCliBridge();
 };
+
+export { initCliMode } from './mode';

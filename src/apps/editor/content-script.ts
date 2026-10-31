@@ -13,6 +13,7 @@ import { REMOTE_PAGE_BRIDGE_PORT } from '@stylebot/page-bridge';
 import { initPageShortcuts } from './page-shortcuts';
 import type { EditorApp } from './load-editor';
 import { isEditorLoading, loadEditor } from './load-editor';
+import { isCliModeLoading, loadCliMode } from './load-cli-mode';
 import { loadInspector } from './load-inspector';
 import { whenDomReady } from './utils/dom-ready';
 import { getIsEditorWindowOpen, getStylesForPage } from './utils/chrome';
@@ -111,6 +112,21 @@ const listen = (): void => {
             .then(inspectPage =>
               inspectPage(message.inspection, { reapplySavedStyles })
             )
+            .then(sendResponse, error => sendResponse({ error: String(error) }))
+        );
+        return true;
+      }
+
+      if (process.env.STYLEBOT_CLI === 'true' && message.name === 'CliMode') {
+        // Screenshots ask every page where the terminal is; most never loaded it.
+        if (message.action.kind !== 'on' && !isCliModeLoading()) {
+          sendResponse(null);
+          return false;
+        }
+
+        whenDomReady(() =>
+          loadCliMode()
+            .then(handle => handle(message.action))
             .then(sendResponse, error => sendResponse({ error: String(error) }))
         );
         return true;

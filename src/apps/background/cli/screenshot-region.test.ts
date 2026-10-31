@@ -5,6 +5,7 @@ import {
   parseClip,
   parseScale,
   planCrop,
+  toImageRect,
 } from './screenshot-region';
 
 const VIEWPORT = { width: 1280, height: 720 };
@@ -159,5 +160,30 @@ describe('planCrop', () => {
       width: 640,
       height: 360,
     });
+  });
+});
+
+describe('toImageRect', () => {
+  const bar = { x: 900, y: 600, width: 300, height: 80 };
+
+  it('scales a box in the viewport to image pixels', () => {
+    expect(toImageRect(bar, undefined, 2)).toEqual({
+      x: 1800,
+      y: 1200,
+      width: 600,
+      height: 160,
+    });
+  });
+
+  it("clips the box to a region's image, measured from its corner", () => {
+    expect(
+      toImageRect(bar, { x: 800, y: 500, width: 200, height: 150 }, 1)
+    ).toEqual({ x: 100, y: 100, width: 100, height: 50 });
+  });
+
+  it('is undefined for a box outside the region', () => {
+    expect(
+      toImageRect(bar, { x: 0, y: 0, width: 400, height: 300 }, 1)
+    ).toBeUndefined();
   });
 });

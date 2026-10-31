@@ -247,6 +247,56 @@ const turnOnCli = async (browser: BrowserContext, id: string) => {
 const cliPage = (): Page | undefined =>
   context.pages().find(page => page.url() === `${baseUrl}/`);
 
+type DomNode = {
+  nodeType: number;
+  nodeName: string;
+  nodeValue: string;
+  children?: Array<DomNode>;
+  shadowRoots?: Array<DomNode>;
+};
+
+/**
+ * The text CLI mode's terminal shows on a page, read through CDP since it
+ * sits in a closed shadow root; null when the page has no terminal.
+ */
+const terminalText = async (page: Page): Promise<string | null> => {
+  const session = await context.newCDPSession(page);
+
+  try {
+    const { root } = (await session.send('DOM.getDocument', {
+      depth: -1,
+      pierce: true,
+    })) as { root: DomNode };
+
+    const find = (node: DomNode): DomNode | undefined =>
+      node.nodeName === 'STYLEBOT-CLI-MODE'
+        ? node
+        : [...(node.children ?? []), ...(node.shadowRoots ?? [])]
+            .map(find)
+            .find(Boolean);
+
+    const textOf = (node: DomNode): string => {
+      if (node.nodeType === 3) {
+        return node.nodeValue;
+      }
+
+      if (node.nodeName === 'STYLE') {
+        return '';
+      }
+
+      return [...(node.shadowRoots ?? []), ...(node.children ?? [])]
+        .map(textOf)
+        .join(' ');
+    };
+
+    const host = find(root);
+
+    return host ? textOf(host).replace(/\s+/g, ' ').trim() : null;
+  } finally {
+    await session.detach();
+  }
+};
+
 test.skip(
   BROWSER === 'firefox' || !USER_DATA_DIRS[process.platform],
   'The CLI runs on Chrome and Edge, and this spec on macOS and Linux'
@@ -684,6 +734,76 @@ test("force applies the page's state rules, and --clear takes them off", async (
   ]);
   expect(shot).toContain('With hover forced on .row');
   expect(await ok(['force', id])).toBe('Nothing is forced.\n');
+});
+
+test("mode connects the user's tab, whose terminal follows what the agent does there", async () => {
+  test.setTimeout(60_000);
+
+  const yours = await context.newPage();
+  await yours.goto(`${baseUrl}/yours`);
+
+  const yourTab = (await json<Array<Tab>>(['tabs'])).find(
+    tab => tab.url === `${baseUrl}/yours`
+  )!;
+  const id = String(yourTab.id);
+
+  expect(await ok(['mode', id])).toBe(`CLI mode is on in tab ${id}.\n`);
+  await expect
+    .poll(() => terminalText(yours))
+    .toContain('queued until your agent runs stylebot');
+
+  expect(await ok(['tabs'])).toContain(`${baseUrl}/yours  [CLI mode]`);
+  expect(await json(['open', `${baseUrl}/yours`])).toMatchObject({
+    created: false,
+    cliMode: true,
+    id: yourTab.id,
+  });
+
+  const before = await yours.evaluate(
+    () => getComputedStyle(document.body).color
+  );
+
+  await ok(['outline', id]);
+  await ok(['css', 'rule', id, 'body', '--set', 'color=blue']);
+  await expect(yours.locator('body')).toHaveCSS('color', BLUE);
+  await expect
+    .poll(() => terminalText(yours))
+    .toContain('stylebot css rule body --set color=blue');
+
+  // Once the agent pauses, its commands fold into one line.
+  await expect
+    .poll(() => terminalText(yours), { timeout: 15_000 })
+    .toContain('ran 2 commands · saved 1 time [undo]');
+
+  const shot = await ok([
+    'screenshot',
+    id,
+    '-o',
+    path.join(home, 'shots', 'cli-mode.png'),
+  ]);
+  expect(shot).toMatch(
+    /Stylebot's CLI mode terminal covers \d+,\d+ \d+×\d+ of the image/
+  );
+
+  // Z undoes the agent's last save from anywhere on the page.
+  await yours.bringToFront();
+  await yours.keyboard.press('z');
+  await expect(yours.locator('body')).toHaveCSS('color', before);
+
+  // The terminal comes back after a reload.
+  await yours.reload();
+  await expect.poll(() => terminalText(yours)).toContain('agent connected');
+
+  expect(await ok(['mode', id, '--off'])).toBe(
+    `CLI mode is off in tab ${id}.\n`
+  );
+  await expect.poll(() => terminalText(yours)).toBeNull();
+  expect(await ok(['tabs'])).not.toContain('[CLI mode]');
+  expect(
+    await ok(['screenshot', id, '-o', path.join(home, 'shots', 'off.png')])
+  ).not.toContain('CLI mode terminal');
+
+  await yours.close();
 });
 
 test("screenshot saves a png, and done closes the CLI's window", async () => {

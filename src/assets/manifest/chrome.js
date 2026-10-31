@@ -22,6 +22,13 @@ module.exports = {
   web_accessible_resources: [
     ...base.web_accessible_resources,
     signInPage,
-    { resources: ['cli-inspector/index.js'], matches: ['<all_urls>'] },
+    {
+      resources: [
+        'cli-inspector/index.js',
+        'cli-mode/index.js',
+        'cli-mode/index.css',
+      ],
+      matches: ['<all_urls>'],
+    },
   ],
 };

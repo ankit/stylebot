@@ -28,6 +28,7 @@ export { default as KeyboardIcon } from './KeyboardIcon.vue';
 export { default as OptionsIcon } from './OptionsIcon.vue';
 export { default as ToggleIcon } from './ToggleIcon.vue';
 export { default as XIcon } from './XIcon.vue';
+export { default as MinusIcon } from './MinusIcon.vue';
 export { default as DockLeftIcon } from './DockLeftIcon.vue';
 export { default as DockRightIcon } from './DockRightIcon.vue';
 export { default as SidePanelIcon } from './SidePanelIcon.vue';

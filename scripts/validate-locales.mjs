@@ -57,9 +57,15 @@ const TEXT_ATTRIBUTES = new Set([
 const TEXT_PROPERTY =
   /\b(?:label|title|text|placeholder|tooltip|ariaLabel)\s*:\s*'([A-Z][^']*)'/g;
 
-// Literals that read the same in every language: the name, a typography
-// glyph, an example domain and a CSS keyword.
-const UNTRANSLATED_TEXT = new Set(['Stylebot', 'Aa', 'example.com', 'none']);
+// Literals that read the same in every language: the name, the CLI's
+// command, a typography glyph, an example domain and a CSS keyword.
+const UNTRANSLATED_TEXT = new Set([
+  'Stylebot',
+  'stylebot',
+  'Aa',
+  'example.com',
+  'none',
+]);
 
 const isText = value =>
   /[A-Za-z]{2,}/.test(value) && !UNTRANSLATED_TEXT.has(value.trim());
