@@ -3,6 +3,7 @@ import type { StylebotOptions } from '@stylebot/types';
 
 import { get as getOption } from '../options';
 import { reloadForGrant, resumeAfterGrantReload } from '../grant-reload';
+import { browserCommands } from './browser';
 import { pseudoStateCommands } from './pseudo-states';
 import { inspectCommands } from './inspect';
 import { optionCommands } from './options';
@@ -20,6 +21,7 @@ const CONNECTED_AFTER_MS = 500;
 const RELOADED_FOR_CLI_KEY = 'cli-reloaded-for-grant';
 
 const commands: CliCommands = {
+  ...browserCommands,
   ...pageCommands,
   ...pointerCommands,
   ...pseudoStateCommands,

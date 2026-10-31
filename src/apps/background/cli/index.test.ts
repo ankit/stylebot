@@ -6,6 +6,7 @@ import { pageCommands } from './pages';
 
 jest.mock('../options-tab', () => ({ openOptionsTab: jest.fn() }));
 jest.mock('../options', () => ({ get: jest.fn() }));
+jest.mock('./browser', () => ({ browserCommands: {} }));
 jest.mock('./inspect', () => ({ inspectCommands: {} }));
 jest.mock('./pages', () => ({
   pageCommands: { tabs: jest.fn(async () => ['tab']) },

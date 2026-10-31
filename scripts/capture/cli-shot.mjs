@@ -59,7 +59,7 @@ const escape = text => text.replace(/&/g, '&amp;').replace(/</g, '&lt;');
  * does: nothing touches ~/.stylebot or your browsers.
  */
 const startCliBrowser = async () => {
-  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'stylebot-store-cli-'));
+  const home = fs.mkdtempSync(path.join(os.tmpdir(), 'sb-store-'));
   const env = { ...process.env, HOME: home };
   delete env.STYLEBOT_SOCKET;
 

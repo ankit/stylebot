@@ -22,6 +22,8 @@ The first command sets the CLI up with the user's browsers on its own. When a co
 
 To see everything that's left, run `stylebot install`: it prints a checklist. Tell the user each step not yet done (marked ○) as written.
 
+When a command says Stylebot is running in several browsers, it lists them, each with a name and the page it shows. Ask the user which one to change, offering each as a choice by its browser and page, with your tool for asking the user a question if you have one. Then pass `--browser <name>` with the name from the list to every `stylebot` command after, so all your changes go to that browser. Ask again only if a command says that browser is gone.
+
 If `stylebot` isn't found, the CLI isn't installed: tell the user to install it with `npm install -g @stylebot/cli`, as https://stylebot.dev/cli describes.
 
 ## Workflow
