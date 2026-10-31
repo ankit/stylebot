@@ -1,9 +1,9 @@
 ## Version 4.2.0 (November 2026)
 
 - CLI mode: connect a tab to your coding agent, mark areas of the page and write notes, and see each change it makes with an undo (#1254, #1255, #1256)
-- `stylebot` CLI: pick a browser when Stylebot runs in several (#1252)
-- `stylebot` CLI: edit one rule, append rules, diff and grep a style, and report only what `css set` changed
-- `stylebot` CLI: screenshot one element or region, and force hover and focus states
+- CLI: pick a browser when Stylebot runs in several (#1252)
+- CLI: edit one rule, append rules, diff and grep a style, and report only what `css set` changed
+- CLI: screenshot one element or region, and force hover and focus states
 - Set up the Stylebot skill in Codex, Copilot, Cursor and other coding agents (#1250)
 - Fix Gallery links being lost on synced styles, or on styles hidden or unpublished in the Gallery (#1251)
 
