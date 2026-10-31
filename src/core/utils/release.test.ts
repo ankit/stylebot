@@ -1,4 +1,4 @@
-import { getGoodbyeUrl, isMajorUpdate } from './release';
+import { getGoodbyeUrl, hasReleasePage, isMajorUpdate } from './release';
 
 jest.mock('@stylebot/i18n', () => ({ t: () => 'de' }));
 
@@ -35,5 +35,23 @@ describe('isMajorUpdate', () => {
     expect(isMajorUpdate('', '4.0.0')).toBe(false);
     expect(isMajorUpdate('garbage', '4.0.0')).toBe(false);
     expect(isMajorUpdate('v3.2.4', '4.0.0')).toBe(false);
+  });
+});
+
+describe('hasReleasePage', () => {
+  const setVersion = (version: string) => {
+    global.chrome = {
+      runtime: { getManifest: () => ({ version }) },
+    } as unknown as typeof chrome;
+  };
+
+  it('is true for a release with a page on stylebot.dev', () => {
+    setVersion('4.1.0');
+    expect(hasReleasePage()).toBe(true);
+  });
+
+  it('is false for a release without one', () => {
+    setVersion('4.2.0');
+    expect(hasReleasePage()).toBe(false);
   });
 });

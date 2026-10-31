@@ -108,6 +108,7 @@ import {
   getExtensionVersion,
   getReleaseNotificationId,
   getReleaseUrl,
+  hasReleasePage,
   isMajorUpdate,
   recordInstallTime,
   getSiteUrl,
@@ -142,7 +143,10 @@ export const initListeners = (): void => {
         // Before the release page opens, which gets the new content scripts.
         restoreOpenTabs();
 
-        if (isMajorUpdate(previousVersion, getExtensionVersion())) {
+        if (
+          isMajorUpdate(previousVersion, getExtensionVersion()) &&
+          hasReleasePage()
+        ) {
           chrome.tabs.create({ url: getReleaseUrl(), active: false });
           setNotification(getReleaseNotificationId(), true);
         }

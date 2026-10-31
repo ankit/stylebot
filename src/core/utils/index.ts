@@ -32,6 +32,7 @@ export {
   getReleaseVersion,
   getReleaseNotificationId,
   getReleaseUrl,
+  hasReleasePage,
   isMajorUpdate,
 } from './release';
 export { getSiteUrl } from './site-url';

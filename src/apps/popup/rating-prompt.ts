@@ -5,6 +5,7 @@ import {
   getNotification,
   setNotification,
   getReleaseNotificationId,
+  hasReleasePage,
 } from '@stylebot/utils';
 
 export const RATING_PROMPT_ID = 'rating-prompt';
@@ -80,9 +81,9 @@ export const getRatingPromptState = async (): Promise<RatingPromptState> => {
     installTime: items[INSTALL_TIME_KEY],
     savedStyles: Object.values(styles).filter(hasAnyCss).length,
     dismissed: !!(await getNotification(RATING_PROMPT_ID)),
-    releaseNotificationSeen: !!(await getNotification(
-      getReleaseNotificationId()
-    )),
+    releaseNotificationSeen:
+      !hasReleasePage() ||
+      !!(await getNotification(getReleaseNotificationId())),
   };
 };
 

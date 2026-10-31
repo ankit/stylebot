@@ -33,6 +33,7 @@ import {
   getReleaseVersion,
   getReleaseNotificationId,
   getReleaseUrl,
+  hasReleasePage,
 } from '@stylebot/utils';
 
 import { onEnterOrSpace } from '../../utils';
@@ -60,6 +61,12 @@ export default Vue.extend({
   },
 
   async created() {
+    if (!hasReleasePage()) {
+      this.seen = true;
+
+      return;
+    }
+
     this.seen = await getNotification(getReleaseNotificationId());
   },
 
