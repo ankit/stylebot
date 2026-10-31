@@ -11,6 +11,7 @@ import { pageCommands } from './pages';
 import { pointerCommands } from './pointer';
 import { profileCommands } from './profiles';
 import { CLI_PROTOCOL } from './protocol';
+import { streamCommands } from './streams';
 import { styleCommands } from './styles';
 import type { CliCommands, CliRequest, CliResponse } from './types';
 
@@ -31,7 +32,21 @@ const commands: CliCommands = {
   ...optionCommands,
 };
 
+// Requests still running, by id, to stop when the CLI goes away.
+const running = new Map<number, AbortController>();
+
 let port: chrome.runtime.Port | undefined;
+
+/**
+ * Stops every request still running, once their host has gone.
+ */
+const stopRunning = (): void => {
+  for (const controller of running.values()) {
+    controller.abort();
+  }
+
+  running.clear();
+};
 
 /**
  * Connects to the Stylebot CLI's native host, which relays commands from
@@ -53,21 +68,40 @@ const connect = (): void => {
     clearTimeout(settled);
 
     if (port === connected) {
+      stopRunning();
       port = undefined;
       setCliConnected(false);
     }
   });
 
   connected.onMessage.addListener(async (request: CliRequest) => {
+    if (request.cancel) {
+      running.get(request.id)?.abort();
+      running.delete(request.id);
+      return;
+    }
+
     const stamp = {
       id: request.id,
       protocol: CLI_PROTOCOL,
       version: chrome.runtime.getManifest().version,
     };
+
+    const controller = new AbortController();
+    const post = (message: unknown): void => {
+      try {
+        connected.postMessage(message);
+      } catch {
+        // The host went away mid-request.
+      }
+    };
     let response: CliResponse;
+
+    running.set(request.id, controller);
 
     try {
       const run = commands[request.command];
+      const stream = streamCommands[request.command];
 
       // The CLI explains a mismatch, from the protocol on the response.
       if (request.protocol !== undefined && request.protocol !== CLI_PROTOCOL) {
@@ -76,29 +110,41 @@ const connect = (): void => {
         );
       }
 
-      if (!run) {
+      if (!run && !stream) {
         throw new Error(`Unknown command: ${request.command}`);
       }
 
-      response = { ...stamp, result: await run(request.args ?? {}) };
+      const args = request.args ?? {};
+      const { signal } = controller;
+      const emit = (event: unknown): void => post({ id: request.id, event });
+      let result: unknown;
+
+      if (stream) {
+        result = await stream(args, emit, signal);
+      } else {
+        result = await run(args, signal);
+      }
+
+      response = { ...stamp, result };
     } catch (e) {
       response = {
         ...stamp,
         error: e instanceof Error ? e.message : String(e),
       };
+    } finally {
+      if (running.get(request.id) === controller) {
+        running.delete(request.id);
+      }
     }
 
-    try {
-      connected.postMessage(response);
-    } catch {
-      // The host went away mid-request.
-    }
+    post(response);
   });
 };
 
 const disconnect = (): void => {
   port?.disconnect();
   port = undefined;
+  stopRunning();
   setCliConnected(false);
 };
 

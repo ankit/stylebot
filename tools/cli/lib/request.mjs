@@ -13,16 +13,28 @@ export const fail = message => {
 };
 
 /**
- * Sends one command to the extension through the native host of the browser
- * it's meant for, and resolves to its result.
+ * Prints a notice the extension added to a response after the command's own
+ * output, once the CLI exits without an error.
  */
-export const request = async (command, args = {}) => {
+const printNoticeOnExit = notice =>
+  process.on('exit', code => {
+    if (code === 0) {
+      (process.argv.includes('--json') ? console.error : console.log)(notice);
+    }
+  });
+
+/**
+ * Sends one command to the extension through the native host of the browser
+ * it's meant for, and resolves to its result. A streaming command's events
+ * go to onEvent as they come.
+ */
+export const request = async (command, args = {}, onEvent = undefined) => {
   const { repinned } = prepareHost();
   let response;
 
   try {
     const socket = await chooseSocket();
-    response = await sendToHost(socket, command, args);
+    response = await sendToHost(socket, command, args, 0, onEvent);
   } catch (error) {
     if (error.code === 'ENOENT' || error.code === 'ECONNREFUSED') {
       throw new Error(diagnoseConnection({ code: error.code, repinned }));
@@ -39,6 +51,10 @@ export const request = async (command, args = {}) => {
 
   if ('error' in response) {
     throw new Error(response.error);
+  }
+
+  if (response.notice) {
+    printNoticeOnExit(response.notice);
   }
 
   return response.result;
