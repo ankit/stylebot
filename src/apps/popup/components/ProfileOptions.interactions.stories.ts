@@ -42,18 +42,14 @@ const twoProfiles = {
 
 export const SwitchScheme: StoryObj = {
   ...popup({ styles: [themed], defaultStyle: themed }),
-  name: "a style that declares a color scheme shows its switch, and picking one saves it for the style's profile",
+  name: "a style that declares a color scheme shows a Mode dropdown, and picking one saves it for the style's profile",
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const sendMessage = spyOn(chrome.runtime, 'sendMessage');
-    const group = await canvas.findByRole('group', { name: 'Mode' });
-    const segments = within(group);
+    const group = within(await canvas.findByRole('group', { name: 'Mode' }));
 
-    await expect(
-      segments.getByRole('button', { name: 'System' })
-    ).toHaveAttribute('aria-pressed', 'true');
-
-    await user.click(segments.getByRole('button', { name: 'Dark' }));
+    await user.click(group.getByRole('button', { name: 'System' }));
+    await user.click(await canvas.findByRole('menuitem', { name: 'Dark' }));
 
     await expect(sendMessage).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -64,15 +60,13 @@ export const SwitchScheme: StoryObj = {
         value: 'dark',
       })
     );
-    await expect(
-      segments.getByRole('button', { name: 'Dark' })
-    ).toHaveAttribute('aria-pressed', 'true');
+    await expect(group.getByRole('button', { name: 'Dark' })).toBeVisible();
   },
 };
 
 export const OffHidesSwitch: StoryObj = {
   ...popup({ styles: [themed], defaultStyle: themed }),
-  name: 'turning the style off hides its color scheme switch, and turning it on shows it again',
+  name: 'turning the style off hides its Mode dropdown, and turning it on shows it again',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
@@ -92,7 +86,7 @@ export const NoDeclaration: StoryObj = {
     styles: [style('example.com')],
     defaultStyle: style('example.com'),
   }),
-  name: 'a style without the declaration shows no color scheme switch',
+  name: 'a style without the declaration shows no Mode dropdown',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
@@ -103,7 +97,7 @@ export const NoDeclaration: StoryObj = {
 
 export const PerProfile: StoryObj = {
   ...popup({ styles: [twoProfiles], defaultStyle: twoProfiles }),
-  name: 'the switch follows the active profile, showing its stored scheme',
+  name: 'the Mode dropdown follows the active profile, showing its stored scheme',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
@@ -116,7 +110,7 @@ export const PerProfile: StoryObj = {
 
     await expect(
       within(group).getByRole('button', { name: 'Light' })
-    ).toHaveAttribute('aria-pressed', 'true');
+    ).toBeVisible();
 
     await user.click(canvas.getByRole('radio', { name: 'No style' }));
     await expect(canvas.queryByRole('group', { name: 'Mode' })).toBeNull();

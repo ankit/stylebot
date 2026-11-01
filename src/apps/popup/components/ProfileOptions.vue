@@ -3,16 +3,8 @@
     <slot />
 
     <template v-for="option in options">
-      <div v-if="isScheme(option)" :key="option.name" class="profile-option">
-        <s-text as="span" class="profile-option-label">{{ t('mode') }}</s-text>
-        <s-color-scheme-switch
-          :value="option.value"
-          @change="$emit('option', option.name, $event)"
-        />
-      </div>
-
       <s-toggle-switch
-        v-else-if="option.declaration.type === 'checkbox'"
+        v-if="option.declaration.type === 'checkbox'"
         :key="option.name"
         class="profile-option"
         track-end
@@ -20,7 +12,7 @@
         @change="$emit('option', option.name, $event ? '1' : '0')"
       >
         <s-text as="span" class="profile-option-label">
-          {{ option.declaration.label }}
+          {{ optionLabel(option) }}
         </s-text>
       </s-toggle-switch>
 
@@ -29,10 +21,10 @@
         :key="option.name"
         class="profile-option"
         role="group"
-        :aria-label="option.declaration.label"
+        :aria-label="optionLabel(option)"
       >
         <s-text as="span" class="profile-option-label" aria-hidden="true">
-          {{ option.declaration.label }}
+          {{ optionLabel(option) }}
         </s-text>
         <s-select
           class="profile-option-select"
@@ -61,13 +53,7 @@
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-import {
-  SColorSchemeSwitch,
-  SMenuItem,
-  SSelect,
-  SText,
-  SToggleSwitch,
-} from '@stylebot/components';
+import { SMenuItem, SSelect, SText, SToggleSwitch } from '@stylebot/components';
 
 import type { ProfileOption } from '../utils';
 
@@ -80,7 +66,6 @@ export default Vue.extend({
   name: 'ProfileOptions',
 
   components: {
-    SColorSchemeSwitch,
     SMenuItem,
     SSelect,
     SText,
@@ -96,12 +81,24 @@ export default Vue.extend({
   },
 
   methods: {
-    // `@option scheme` has no label of its own, so it gets the Mode switch.
+    // `@option scheme` has no label of its own, so it's named Mode.
     isScheme({ name, declaration }: ProfileOption): boolean {
       return name === 'scheme' && declaration.label === undefined;
     },
 
-    choiceLabel({ declaration }: ProfileOption, value: string): string {
+    optionLabel(option: ProfileOption): string {
+      return this.isScheme(option)
+        ? this.t('mode')
+        : option.declaration.label ?? option.name;
+    },
+
+    choiceLabel(option: ProfileOption, value: string): string {
+      const { declaration } = option;
+
+      if (this.isScheme(option)) {
+        return this.t(`appearance_${value}`);
+      }
+
       return declaration.type === 'select'
         ? declaration.choices?.[value]?.label ?? value
         : value;
@@ -121,7 +118,12 @@ export default Vue.extend({
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 2px 5px 6px 10px;
+  height: 32px;
+  padding: 0 5px 0 10px;
+
+  &:last-child {
+    margin-bottom: 4px;
+  }
 }
 
 .profile-option-label {
