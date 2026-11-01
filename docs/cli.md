@@ -242,7 +242,7 @@ stylebot options news.ycombinator.com
 stylebot option set scheme dark news.ycombinator.com
 ```
 
-- `options` lists the options a profile's css declares (see [Style options](style-options.md)), each with its value, the values it takes and its default.
+- `options` lists the options a profile's css declares (see [Style options](style-options.md)), each with its type, its label when the author gave one, its value, the values it takes and its default. A checkbox takes `0` and `1`.
 - `option set` sets one, applying it to open tabs as the popup does. It refuses an option the profile doesn't declare, or a value it doesn't take.
 - Both take `--profile` to name the profile rather than use the active one. The `/stylebot` skill uses `option set` to check a light/dark style in each variant, then sets it back to the user's choice.
 

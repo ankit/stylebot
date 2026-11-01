@@ -22,9 +22,11 @@ export const addOptionCommands = program => {
             ? declared
                 .map(
                   option =>
-                    `${option.name}: ${option.value} (${option.values.join(
-                      ', '
-                    )}; default ${option.default})`
+                    `${option.name}${
+                      option.label ? ` "${option.label}"` : ''
+                    }: ${option.value} (${option.values.join(', ')}; default ${
+                      option.default
+                    })`
                 )
                 .join('\n')
             : 'No options declared'
@@ -40,7 +42,7 @@ export const addOptionCommands = program => {
   option
     .command('set')
     .description('Set an option, applying it to open tabs')
-    .argument('<option>', 'The option, such as scheme')
+    .argument('<option>', 'The option, such as scheme or accentColor')
     .argument('<value>', 'One of the values it declares')
     .argument('<target>', 'A tab id or site')
     .option(

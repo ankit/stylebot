@@ -31,12 +31,12 @@ import type {
   CompiledStyles,
   GalleryListing,
   StyleMap,
-  SupportedStyleOptions,
-  StyleOptionName,
   StyleWithoutUrl,
   ApplyStylesToTab,
   Timestamp,
 } from '@stylebot/types';
+
+import { parseStyleOptions } from '@stylebot/css';
 
 import { compileStyles } from './compiled-styles';
 import { recordStyleChange } from '@stylebot/history';
@@ -464,19 +464,22 @@ export const setActiveProfile = (url: string, profileId: string) =>
   });
 
 /**
- * Sets the value of an option a profile's css declares. Not stamped as an
- * edit, since like the applied profile it's this device's choice.
+ * Sets the value of an option a profile's css declares, unless the css
+ * doesn't allow it. Not stamped as an edit, since like the applied profile
+ * it's this device's choice.
  */
-export const setStyleOption = <T extends StyleOptionName>(
+export const setStyleOption = (
   url: string,
   profileId: string,
-  name: T,
-  value: SupportedStyleOptions[T]
+  name: string,
+  value: string
 ) =>
   update(styles => {
     const style = styles[url];
+    const sheet = style && expandProfiles(style).sheets[profileId];
+    const declared = sheet && parseStyleOptions(sheet.css);
 
-    if (!style || !(profileId in expandProfiles(style).sheets)) {
+    if (!declared?.[name]?.values.includes(value)) {
       return undefined;
     }
 

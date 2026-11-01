@@ -1,5 +1,5 @@
 import { COMPILED_STYLES_VERSION } from '@stylebot/saved-styles';
-import type { StyleColorScheme } from '@stylebot/types';
+import type { PageStyleOptions } from '@stylebot/types';
 
 // localStorage is readable synchronously (chrome.storage isn't), so the
 // last-applied result is cached here, one entry per origin.
@@ -16,7 +16,7 @@ export type CachedStyle = {
 export type CachedState = {
   styles: Array<CachedStyle>;
   readability: boolean;
-  scheme?: StyleColorScheme;
+  options?: PageStyleOptions;
 };
 
 /**
@@ -36,7 +36,7 @@ export const readCache = (): CachedState | null => {
     return {
       styles: cached.styles,
       readability: cached.readability,
-      ...(cached.scheme && { scheme: cached.scheme }),
+      ...(cached.options && { options: cached.options }),
     };
   } catch {
     return null;

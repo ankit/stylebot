@@ -1,37 +1,29 @@
 import type {
+  PageStyleOptions,
   StyleColorScheme,
-  SupportedStyleOptions,
+  StyleOptionChoices,
   StyleOptionDeclaration,
   StyleOptionDeclarations,
-  StyleOptionName,
   StyleOptionValues,
 } from '@stylebot/types';
 
-const BLOCK = /\/\*[\s*]*==Stylebot==([\s\S]*?)==\/Stylebot==[\s*]*\*\//;
+const BLOCKS =
+  /\/\*[\s*]*==(Stylebot|UserStyle)==([\s\S]*?)==\/\1==[\s*]*\*\//g;
 const OPTION_LINE = /^@option\s+(\S+)\s+(\S+)\s+(.*)$/;
-const OTHER_KEY_LINE = /^@(?!option\b)/;
+const VAR_LINE = /^@var\s+(\S+)\s+(\S+)\s+("[^"]*"|'[^']*'|\S+)\s+([\s\S]+)$/;
+const OTHER_KEY_LINE = /^@(?!option\b|var\b)/;
 const SELECT_ARGS = /^\[([^\]]*)\]\s+(\S+)$/;
+const NAME = /^[\w-]+$/;
 
-type OptionType = StyleOptionDeclaration['type'];
+type Declared = [string, StyleOptionDeclaration];
 
-/**
- * The options Stylebot supports, each with the type and values a style must
- * declare it with. Supporting another option means adding it here.
- */
-const SUPPORTED_OPTIONS: {
-  [name in StyleOptionName]: {
-    type: OptionType;
-    values: Array<SupportedStyleOptions[name]>;
-  };
-} = {
-  scheme: { type: 'select', values: ['system', 'light', 'dark'] },
-};
+const SCHEME_VALUES: Array<StyleColorScheme> = ['system', 'light', 'dark'];
 
 /**
- * Reads what follows a select's type, `[a, b, c] b`, into its values and
- * default, or undefined when it isn't in that shape.
+ * Reads what follows `@option scheme select`, `[a, b, c] b`, into its values
+ * and default, or undefined when it isn't in that shape.
  */
-const parseSelect = (
+const parseSchemeArgs = (
   args: string
 ): { values: Array<string>; default: string } | undefined => {
   const match = args.match(SELECT_ARGS);
@@ -48,17 +40,6 @@ const parseSelect = (
   return { values, default: match[2] };
 };
 
-/**
- * How to read what follows each type. Supporting another type means adding
- * its reader here.
- */
-const PARSE_ARGS: { [type in OptionType]: typeof parseSelect } = {
-  select: parseSelect,
-};
-
-const isSupported = (name: string): name is StyleOptionName =>
-  Object.hasOwn(SUPPORTED_OPTIONS, name);
-
 const hasSameValues = (a: Array<string>, b: Array<string>): boolean =>
   a.length === b.length && a.every(value => b.includes(value));
 
@@ -72,17 +53,10 @@ const ignore = (line: string, reason: string): undefined => {
 };
 
 /**
- * Reads one line of the block into an option's name and declaration, or
- * warns and returns undefined when Stylebot can't use it.
+ * Reads an `@option` line. Only `scheme` exists, a select of exactly
+ * system, light and dark, kept as it shipped before `@var`.
  */
-const parseLine = (
-  line: string
-): [StyleOptionName, StyleOptionDeclaration] | undefined => {
-  // Other keys, such as @author, are left to later versions and other tools.
-  if (OTHER_KEY_LINE.test(line)) {
-    return undefined;
-  }
-
+const parseOptionLine = (line: string): Declared | undefined => {
   const match = line.match(OPTION_LINE);
 
   if (!match) {
@@ -91,66 +65,254 @@ const parseLine = (
 
   const [, name, type, args] = match;
 
-  if (!isSupported(name)) {
+  if (name !== 'scheme') {
     return ignore(line, `unknown option "${name}"`);
   }
 
-  const supported = SUPPORTED_OPTIONS[name];
-
-  if (type !== supported.type) {
-    return ignore(line, `"${name}" must be a ${supported.type}`);
+  if (type !== 'select') {
+    return ignore(line, `"${name}" must be a select`);
   }
 
-  const parsed = PARSE_ARGS[supported.type](args.trim());
+  const parsed = parseSchemeArgs(args.trim());
 
   if (!parsed) {
     return ignore(line, 'expected [values] followed by a default');
   }
 
-  if (!hasSameValues(parsed.values, supported.values)) {
-    return ignore(line, `"${name}" takes ${supported.values.join(', ')}`);
+  if (!hasSameValues(parsed.values, SCHEME_VALUES)) {
+    return ignore(line, `"${name}" takes ${SCHEME_VALUES.join(', ')}`);
   }
 
   if (!parsed.values.includes(parsed.default)) {
     return ignore(line, `default "${parsed.default}" isn't one of its values`);
   }
 
-  return [name, { type: supported.type, ...parsed }];
+  return [name, { type: 'select', ...parsed }];
+};
+
+const unquote = (label: string): string =>
+  /^(["']).*\1$/.test(label) ? label.slice(1, -1) : label;
+
+/**
+ * Splits a select entry, `value:Label*`, into its value, its label (the
+ * value when it has none) and whether the `*` marks it the default.
+ */
+const parseEntry = (
+  entry: string
+): { value: string; label: string; starred: boolean } => {
+  const starred = entry.endsWith('*');
+  const text = starred ? entry.slice(0, -1) : entry;
+  const colon = text.indexOf(':');
+
+  return colon === -1
+    ? { value: text, label: text, starred }
+    : { value: text.slice(0, colon), label: text.slice(colon + 1), starred };
 };
 
 /**
- * The options a style's css declares in its `==Stylebot==` block, keyed by
- * name. Lines Stylebot can't use are skipped with a warning, so bad metadata
- * never stops a style from applying.
+ * Reads a `@var select` default, UserCSS's array of `"value:Label"` entries
+ * or object of `"value:Label": "css"` pairs, with a `*` on the default.
+ * Returns undefined when it's neither or lists no values.
  */
-export const parseStyleOptions = (css: string): StyleOptionDeclarations => {
-  const block = css.includes('==Stylebot==') ? css.match(BLOCK) : null;
-  const options: StyleOptionDeclarations = {};
+const parseSelectArgs = (
+  args: string
+):
+  | { values: Array<string>; default: string; choices: StyleOptionChoices }
+  | undefined => {
+  let parsed: unknown;
 
-  if (!block) {
-    return options;
+  try {
+    parsed = JSON.parse(args);
+  } catch {
+    return undefined;
   }
 
-  const lines = block[1]
+  if (typeof parsed !== 'object' || parsed === null) {
+    return undefined;
+  }
+
+  const pairs: Array<[unknown, unknown]> = Array.isArray(parsed)
+    ? parsed.map(entry => [entry, undefined])
+    : Object.entries(parsed);
+
+  if (pairs.length === 0) {
+    return undefined;
+  }
+
+  const choices: StyleOptionChoices = {};
+  let fallback: string | undefined;
+
+  for (const [key, css] of pairs) {
+    if (
+      typeof key !== 'string' ||
+      !['undefined', 'string'].includes(typeof css)
+    ) {
+      return undefined;
+    }
+
+    const { value, label, starred } = parseEntry(key);
+
+    if (!value || Object.hasOwn(choices, value)) {
+      return undefined;
+    }
+
+    choices[value] = { label, css: typeof css === 'string' ? css : value };
+
+    if (starred && fallback === undefined) {
+      fallback = value;
+    }
+  }
+
+  const values = Object.keys(choices);
+
+  return { values, default: fallback ?? values[0], choices };
+};
+
+/**
+ * Reads a `@var` line, UserCSS's `@var <type> <name> <label> <default>`.
+ * Only `select` and `checkbox` are supported so far.
+ */
+const parseVarLine = (line: string): Declared | undefined => {
+  const match = line.match(VAR_LINE);
+
+  if (!match) {
+    return ignore(line, 'not a valid @var line');
+  }
+
+  const [, type, name, rawLabel, rawArgs] = match;
+  const label = unquote(rawLabel);
+  const args = rawArgs.trim();
+
+  if (!NAME.test(name)) {
+    return ignore(line, `"${name}" isn't a valid name`);
+  }
+
+  if (name === 'scheme') {
+    return ignore(line, 'scheme is declared with @option');
+  }
+
+  if (type === 'checkbox') {
+    if (args !== '0' && args !== '1') {
+      return ignore(line, 'a checkbox defaults to 0 or 1');
+    }
+
+    return [name, { type, label, values: ['0', '1'], default: args }];
+  }
+
+  if (type !== 'select') {
+    return ignore(line, `unsupported type "${type}"`);
+  }
+
+  const parsed = parseSelectArgs(args);
+
+  if (!parsed) {
+    return ignore(line, 'expected an array or object of values');
+  }
+
+  return [name, { type, label, ...parsed }];
+};
+
+/**
+ * How many brackets a line leaves open, outside quoted strings, so a `@var`
+ * whose values span several lines can be read as one.
+ */
+const openBrackets = (text: string): number => {
+  let depth = 0;
+  let quote: string | null = null;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+
+    if (quote) {
+      if (char === '\\') {
+        i++;
+      } else if (char === quote) {
+        quote = null;
+      }
+    } else if (char === '"' || char === "'") {
+      quote = char;
+    } else if (char === '[' || char === '{') {
+      depth++;
+    } else if (char === ']' || char === '}') {
+      depth--;
+    }
+  }
+
+  return depth;
+};
+
+/**
+ * The block's lines without comment decoration, with a `@var` whose values
+ * continue onto the following lines joined back into one.
+ */
+const getLines = (block: string): Array<string> => {
+  const lines = block
     .split('\n')
     .map(line => line.replace(/^\s*\*?\s*/, '').trim())
     .filter(Boolean);
+  const joined: Array<string> = [];
 
-  for (const line of lines) {
-    const option = parseLine(line);
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
 
-    if (!option) {
-      continue;
+    if (line.startsWith('@var')) {
+      while (openBrackets(line) > 0 && i + 1 < lines.length) {
+        line += ` ${lines[++i]}`;
+      }
     }
 
-    const [name, declaration] = option;
+    joined.push(line);
+  }
 
-    if (name in options) {
-      ignore(line, `"${name}" is already declared`);
-      continue;
+  return joined;
+};
+
+/**
+ * Reads one line of a block into an option's name and declaration, or warns
+ * and returns undefined when Stylebot can't use it.
+ */
+const parseLine = (line: string): Declared | undefined => {
+  // Other keys, such as @author, are left to later versions and other tools.
+  if (OTHER_KEY_LINE.test(line)) {
+    return undefined;
+  }
+
+  if (line.startsWith('@var')) {
+    return parseVarLine(line);
+  }
+
+  return parseOptionLine(line);
+};
+
+/**
+ * The options a style's css declares in its `==Stylebot==` or `==UserStyle==`
+ * blocks, keyed by name. Lines Stylebot can't use are skipped with a warning,
+ * so bad metadata never stops a style from applying.
+ */
+export const parseStyleOptions = (css: string): StyleOptionDeclarations => {
+  const options: StyleOptionDeclarations = {};
+
+  if (!css.includes('==Stylebot==') && !css.includes('==UserStyle==')) {
+    return options;
+  }
+
+  for (const block of css.matchAll(BLOCKS)) {
+    for (const line of getLines(block[2])) {
+      const option = parseLine(line);
+
+      if (!option) {
+        continue;
+      }
+
+      const [name, declaration] = option;
+
+      if (Object.hasOwn(options, name)) {
+        ignore(line, `"${name}" is already declared`);
+        continue;
+      }
+
+      options[name] = declaration;
     }
-
-    options[name] = declaration;
   }
 
   return options;
@@ -167,6 +329,33 @@ export const getStyleOptionValue = (
   stored !== undefined && declaration.values.includes(stored)
     ? stored
     : declaration.default;
+
+/**
+ * What the page gets for each option a style's css declares, or undefined
+ * when it declares none.
+ */
+export const getPageStyleOptions = (
+  css: string,
+  values: StyleOptionValues = {}
+): PageStyleOptions | undefined => {
+  const declared = Object.entries(parseStyleOptions(css));
+
+  if (declared.length === 0) {
+    return undefined;
+  }
+
+  return Object.fromEntries(
+    declared.map(([name, declaration]) => {
+      const value = getStyleOptionValue(declaration, values[name]);
+      const choice =
+        declaration.type === 'select'
+          ? declaration.choices?.[value]
+          : undefined;
+
+      return [name, { value, css: choice?.css ?? value }];
+    })
+  );
+};
 
 /**
  * The color scheme a style's css asks the page for, or undefined when it

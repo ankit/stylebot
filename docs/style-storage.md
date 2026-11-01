@@ -62,7 +62,7 @@ A pattern is one of:
 
 Turning a user's CSS into what gets injected means parsing it, taking out `@import`s and, unless the style opts out, marking every declaration `!important`. That's too slow to do as each page loads, so Stylebot keeps two copies ahead of time.
 
-**A compiled copy of the map**, under `styles-compiled`, rebuilt on every write: each style's injectable CSS, import urls, flags and color scheme. It's stamped with the last write's time from `styles-metadata` and a format version, and rebuilt when either doesn't match, so a stale copy is never injected.
+**A compiled copy of the map**, under `styles-compiled`, rebuilt on every write: each style's injectable CSS, import urls, flags and the choices for its options. It's stamped with the last write's time from `styles-metadata` and a format version, and rebuilt when either doesn't match, so a stale copy is never injected.
 
 **A per-site copy for the first paint**, in each site's own `localStorage`. Extension storage isn't readable before the page starts drawing, so a load applies what was applied last time, then patches any difference. A site without one hides for up to 150ms while its styles arrive.
 

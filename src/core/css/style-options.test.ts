@@ -2,6 +2,7 @@ const dedent = require('dedent');
 
 import {
   getColorScheme,
+  getPageStyleOptions,
   getStyleOptionValue,
   parseStyleOptions,
 } from './style-options';
@@ -269,6 +270,152 @@ describe('parseStyleOptions', () => {
     `;
 
     expect(parseStyleOptions(css)).toEqual({});
+  });
+});
+
+describe('parseStyleOptions with @var', () => {
+  let warn: jest.SpyInstance;
+
+  beforeEach(() => {
+    warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+  });
+
+  afterEach(() => {
+    warn.mockRestore();
+  });
+
+  it('reads a select of value:Label entries, with a starred default', () => {
+    const css = dedent`
+      /* ==UserStyle==
+      @name Catppuccin
+      @var select accentColor "Accent" ["rosewater:Rosewater", "mauve:Mauve*", "blue:Blue"]
+      ==/UserStyle== */
+    `;
+
+    expect(parseStyleOptions(css)).toEqual({
+      accentColor: {
+        type: 'select',
+        label: 'Accent',
+        values: ['rosewater', 'mauve', 'blue'],
+        default: 'mauve',
+        choices: {
+          rosewater: { label: 'Rosewater', css: 'rosewater' },
+          mauve: { label: 'Mauve', css: 'mauve' },
+          blue: { label: 'Blue', css: 'blue' },
+        },
+      },
+    });
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it('defaults a select to its first value without a star', () => {
+    const css = dedent`
+      /* ==Stylebot==
+      @var select font Font ["Arial", "Times New Roman"]
+      ==/Stylebot== */
+    `;
+
+    expect(parseStyleOptions(css).font).toMatchObject({
+      label: 'Font',
+      values: ['Arial', 'Times New Roman'],
+      default: 'Arial',
+    });
+  });
+
+  it('reads the object form, whose values are the css', () => {
+    const css = dedent`
+      /* ==UserStyle==
+      @var select bg "Background" {
+        "near_black:Near Black": "#222",
+        "near_white:Near White*": "#ddd"
+      }
+      ==/UserStyle== */
+    `;
+
+    expect(parseStyleOptions(css).bg).toEqual({
+      type: 'select',
+      label: 'Background',
+      values: ['near_black', 'near_white'],
+      default: 'near_white',
+      choices: {
+        near_black: { label: 'Near Black', css: '#222' },
+        near_white: { label: 'Near White', css: '#ddd' },
+      },
+    });
+  });
+
+  it('reads a checkbox', () => {
+    const css = dedent`
+      /* ==Stylebot==
+      @var checkbox rounded 'Rounded corners' 1
+      ==/Stylebot== */
+    `;
+
+    expect(parseStyleOptions(css)).toEqual({
+      rounded: {
+        type: 'checkbox',
+        label: 'Rounded corners',
+        values: ['0', '1'],
+        default: '1',
+      },
+    });
+  });
+
+  it('reads @option and @var together, from both blocks', () => {
+    const css = dedent`
+      /* ==Stylebot==
+      @option scheme select [system, light, dark] system
+      ==/Stylebot== */
+      /* ==UserStyle==
+      @var checkbox rounded "Rounded" 0
+      ==/UserStyle== */
+    `;
+
+    expect(Object.keys(parseStyleOptions(css))).toEqual(['scheme', 'rounded']);
+  });
+
+  it.each([
+    ['an unsupported type', '@var color accent "Accent" #f00'],
+    ['a checkbox default other than 0 or 1', '@var checkbox on "On" yes'],
+    ['a select that is not json', '@var select a "A" [red, blue]'],
+    ['an empty select', '@var select a "A" []'],
+    ['a select with a repeated value', '@var select a "A" ["x", "x:X"]'],
+    ['a line missing its default', '@var checkbox on "On"'],
+    ['scheme', '@var select scheme "Mode" ["light", "dark"]'],
+  ])('ignores %s', (_, line) => {
+    const css = `/* ==Stylebot==\n${line}\n==/Stylebot== */`;
+
+    expect(parseStyleOptions(css)).toEqual({});
+    expect(warn).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('getPageStyleOptions', () => {
+  const css = dedent`
+    /* ==Stylebot==
+    @option scheme select [system, light, dark] system
+    @var select bg "Background" {"black:Black": "#000", "white:White": "#fff"}
+    @var checkbox rounded "Rounded" 1
+    ==/Stylebot== */
+  `;
+
+  it('is undefined for a style without options', () => {
+    expect(getPageStyleOptions('a { color: red; }')).toBeUndefined();
+  });
+
+  it("gives each option's value, and its css for a select's choice", () => {
+    expect(getPageStyleOptions(css, { bg: 'white', rounded: '0' })).toEqual({
+      scheme: { value: 'system', css: 'system' },
+      bg: { value: 'white', css: '#fff' },
+      rounded: { value: '0', css: '0' },
+    });
+  });
+
+  it('falls back to the defaults', () => {
+    expect(getPageStyleOptions(css, { bg: 'red' })).toMatchObject({
+      bg: { value: 'black', css: '#000' },
+      rounded: { value: '1', css: '1' },
+    });
   });
 });
 

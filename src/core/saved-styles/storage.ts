@@ -4,7 +4,7 @@ export const COMPILED_STYLES_KEY = 'styles-compiled';
 
 // Bump whenever compileStyle's output changes, so copies stored by an older
 // version are rebuilt rather than injected as they are.
-export const COMPILED_STYLES_VERSION = 1;
+export const COMPILED_STYLES_VERSION = 2;
 
 /**
  * Whether a stored compiled copy was built by this compiler from the styles

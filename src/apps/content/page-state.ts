@@ -5,22 +5,22 @@ import {
   injectStylesheet,
   pruneImportCache,
   removeStylesheet,
-  setSchemeAttribute,
+  setStyleOptions,
   writeCache,
 } from '@stylebot/stylesheets';
 import type { CompiledStyles } from '@stylebot/types';
 
 /**
  * What this page should have applied: the compiled styles matching its url,
- * whether its default style turns the reader on, and the color scheme that
- * style asks for while it's on.
+ * whether its default style turns the reader on, and the options that style
+ * declares while it's on.
  */
 export const getPageState = (compiled: CompiledStyles): CachedState => {
   const { styles, defaultStyle } = getStylesForPage(
     window.location.href,
     compiled.styles
   );
-  const scheme = defaultStyle?.enabled ? defaultStyle.scheme : undefined;
+  const options = defaultStyle?.enabled ? defaultStyle.options : undefined;
 
   return {
     styles: styles.map(({ url, css, importUrls, enabled }) => ({
@@ -30,7 +30,7 @@ export const getPageState = (compiled: CompiledStyles): CachedState => {
       enabled,
     })),
     readability: Boolean(defaultStyle?.readability),
-    ...(scheme && { scheme }),
+    ...(options && { options }),
   };
 };
 
@@ -56,7 +56,7 @@ export const applyPageState = (
     removeReadability();
   }
 
-  setSchemeAttribute(state.scheme);
+  setStyleOptions(state.options);
 
   const nextUrls = enabledUrls(state);
 

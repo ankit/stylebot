@@ -1,7 +1,7 @@
 import 'jest-fetch-mock';
 import { hashCss } from '@stylebot/gallery';
 import { COMPILED_STYLES_VERSION } from '@stylebot/saved-styles';
-import type { StyleProfiles } from '@stylebot/types';
+import type { StyleMap, StyleProfiles } from '@stylebot/types';
 
 jest.mock('./sync-scheduler', () => ({
   scheduleSyncAfterEdit: jest.fn().mockResolvedValue(undefined),
@@ -316,8 +316,11 @@ describe('style edits', () => {
   });
 
   it('keeps option values per profile, without stamping an edit', async () => {
+    (store.styles as StyleMap)['example.com'].css =
+      '/* ==Stylebot==\n@option scheme select [system, light, dark] system\n==/Stylebot== */';
     const id = await createProfile('example.com', {
       name: 'Dark',
+      sourceProfileId: 'default',
       activate: false,
     });
     const { modifiedTime } = stored('example.com');
@@ -337,6 +340,8 @@ describe('style edits', () => {
     await setStyleOption('example.com', id, 'scheme', 'light');
     await setStyleOption('example.com', 'missing', 'scheme', 'light');
     await setStyleOption('other.com', 'default', 'scheme', 'light');
+    await setStyleOption('example.com', id, 'scheme', 'sepia');
+    await setStyleOption('example.com', id, 'accent', 'blue');
     expect(writes()).toBe(written);
 
     await deleteProfile('example.com', id);

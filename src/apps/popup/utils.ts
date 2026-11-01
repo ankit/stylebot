@@ -9,8 +9,7 @@ import type {
   DisableStyle,
   SetActiveProfile,
   SetStyleOption,
-  SupportedStyleOptions,
-  StyleOptionName,
+  StyleOptionDeclaration,
   RenameProfile,
   DeleteProfile,
   DeleteStyle,
@@ -127,19 +126,28 @@ export const setActiveProfile = (url: string, profileId: string): void => {
   chrome.runtime.sendMessage(message);
 };
 
-export const setStyleOption = <T extends StyleOptionName>(
+/**
+ * An option the applied profile's css declares, with the value in effect.
+ */
+export type ProfileOption = {
+  name: string;
+  declaration: StyleOptionDeclaration;
+  value: string;
+};
+
+export const setStyleOption = (
   url: string,
   profileId: string,
-  option: T,
-  value: SupportedStyleOptions[T]
+  option: string,
+  value: string
 ): void => {
-  const message = {
+  const message: SetStyleOption = {
     name: 'SetStyleOption',
     url,
     profileId,
     option,
     value,
-  } as SetStyleOption;
+  };
 
   chrome.runtime.sendMessage(message);
 };
