@@ -1,6 +1,7 @@
 import { addHelpSections } from '../help.mjs';
 import { savePng } from '../png.mjs';
 import { STATES } from './force.mjs';
+import { unsupportedFeature } from '../protocol.mjs';
 import { createPrinter, fail, request } from '../request.mjs';
 
 /**
@@ -115,7 +116,7 @@ export const addPageCommands = program => {
         );
       }
 
-      const { dataUrl, ...shot } = await request('screenshot', {
+      const reply = await request('screenshot', {
         tab,
         selector: options.selector,
         clip: options.clip,
@@ -123,7 +124,28 @@ export const addPageCommands = program => {
         state: options.state,
         on: options.on,
       });
-      const out = savePng(dataUrl, options.out ?? `stylebot-${Date.now()}.png`);
+
+      const file = options.out ?? `stylebot-${Date.now()}.png`;
+
+      // Stylebot before 4.2.0 sends only the data url of the whole viewport.
+      if (typeof reply === 'string') {
+        const ignored = [
+          options.selector !== undefined && '--selector',
+          options.clip !== undefined && '--clip',
+          options.state !== undefined && '--state',
+          options.scale !== '1' && '--scale',
+        ].filter(Boolean);
+
+        if (ignored.length) {
+          fail(unsupportedFeature(ignored.join(', ')));
+        }
+
+        print({ path: savePng(reply, file) }, ({ path }) => path);
+        return;
+      }
+
+      const { dataUrl, ...shot } = reply;
+      const out = savePng(dataUrl, file);
       print(
         { path: out, ...shot, state: options.state, on: options.on },
         formatScreenshot

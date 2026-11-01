@@ -2,7 +2,7 @@ import { chooseSocket } from './browsers.mjs';
 import { diagnoseConnection } from './diagnose.mjs';
 import { sendToHost } from './socket.mjs';
 import { prepareHost } from './install.mjs';
-import { incompatibility } from './protocol.mjs';
+import { incompatibility, unsupportedFeature } from './protocol.mjs';
 import { isStyled, linkify } from './style.mjs';
 
 export const fail = message => {
@@ -47,6 +47,10 @@ export const request = async (command, args = {}, onEvent = undefined) => {
 
   if (problem) {
     throw new Error(problem);
+  }
+
+  if (response.error === `Unknown command: ${command}`) {
+    throw new Error(unsupportedFeature('this command', response.version));
   }
 
   if ('error' in response) {

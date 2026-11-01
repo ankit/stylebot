@@ -3,7 +3,11 @@ let mockResponse;
 jest.mock('./browsers.mjs', () => ({ chooseSocket: async () => '/host.sock' }));
 jest.mock('./diagnose.mjs', () => ({ diagnoseConnection: () => '' }));
 jest.mock('./install.mjs', () => ({ prepareHost: () => ({}) }));
-jest.mock('./protocol.mjs', () => ({ incompatibility: () => undefined }));
+jest.mock('./protocol.mjs', () => ({
+  incompatibility: () => undefined,
+  unsupportedFeature: (feature, version) =>
+    `too old for ${feature} (${version})`,
+}));
 jest.mock('./socket.mjs', () => ({
   sendToHost: jest.fn(async () => mockResponse),
 }));
@@ -80,6 +84,20 @@ describe('request', () => {
 
     await expect(request('tabs')).rejects.toThrow('No tab');
     expect(onExit).toBeUndefined();
+  });
+
+  it("asks to update a Stylebot that doesn't have the command", async () => {
+    mockResponse = { error: 'Unknown command: watch', version: '4.1.0' };
+
+    await expect(request('watch')).rejects.toThrow(
+      'too old for this command (4.1.0)'
+    );
+  });
+
+  it("passes on another command's unknown command error", async () => {
+    mockResponse = { error: 'Unknown command: other' };
+
+    await expect(request('watch')).rejects.toThrow('Unknown command: other');
   });
 
   it('prints nothing without a notice', async () => {
