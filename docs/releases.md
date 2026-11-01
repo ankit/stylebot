@@ -38,3 +38,10 @@ npm publish --access public
 ```
 
 npm's trusted publishing from GitHub Actions could replace this manual step later.
+
+## Skill
+
+The `/stylebot` skill reaches Claude Code users as a plugin from this repo's marketplace, so merging to `main` publishes it. Claude Code only updates an installed plugin when its version changes, so bump `version` in `tools/agent-plugin/.claude-plugin/plugin.json` with every change to the skill.
+
+- Keep its major version the CLI's, moving it when the CLI's does. The plugin runs the newest CLI from npm, so its minor and patch versions are its own: patch for wording, minor for teaching new commands
+- Merge a skill change that relies on new CLI commands only once that CLI is on npm
