@@ -32,3 +32,13 @@ export const incompatibility = ({ protocol, version }) => {
 
   return `This CLI (${CLI_VERSION}) is too old for your browser's Stylebot (${version}). Update it: npm update -g ${NPM_PACKAGE}`;
 };
+
+/**
+ * Asks to update Stylebot when the extension in the browser doesn't have a
+ * command, or an option of one, that this CLI does.
+ */
+export const unsupportedFeature = (feature, version) => {
+  const stylebot = version ? `Stylebot (${version})` : 'Stylebot';
+
+  return `Your browser's ${stylebot} is too old for ${feature}. Update Stylebot in your browser.`;
+};

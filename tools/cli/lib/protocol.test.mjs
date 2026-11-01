@@ -2,7 +2,12 @@ const { CLI_PROTOCOL } = require('../../../src/apps/background/cli/protocol');
 
 jest.mock('./package.mjs', () => ({ CLI_VERSION: '0.2.0', LIB_DIR: '/lib' }));
 
-const { PROTOCOL, cliStamp, incompatibility } = require('./protocol.mjs');
+const {
+  PROTOCOL,
+  cliStamp,
+  incompatibility,
+  unsupportedFeature,
+} = require('./protocol.mjs');
 
 describe('the protocol', () => {
   it("matches the extension's", () => {
@@ -36,6 +41,17 @@ describe('incompatibility', () => {
   it('asks to update the CLI when the extension is ahead', () => {
     expect(incompatibility({ protocol: PROTOCOL + 1, version: '4.2.0' })).toBe(
       "This CLI (0.2.0) is too old for your browser's Stylebot (4.2.0). Update it: npm update -g @stylebot/cli"
+    );
+  });
+});
+
+describe('unsupportedFeature', () => {
+  it("asks to update Stylebot, naming its version when it's known", () => {
+    expect(unsupportedFeature('this command', '4.1.0')).toBe(
+      "Your browser's Stylebot (4.1.0) is too old for this command. Update Stylebot in your browser."
+    );
+    expect(unsupportedFeature('--clip')).toBe(
+      "Your browser's Stylebot is too old for --clip. Update Stylebot in your browser."
     );
   });
 });
