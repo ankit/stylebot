@@ -476,10 +476,10 @@ export const setStyleOption = (
 ) =>
   update(styles => {
     const style = styles[url];
-    const sheet = style && expandProfiles(style).sheets[profileId];
-    const declared = sheet && parseStyleOptions(sheet.css);
+    const profile = style && expandProfiles(style).sheets[profileId];
+    const declaration = profile && parseStyleOptions(profile.css)[name];
 
-    if (!declared?.[name]?.values.includes(value)) {
+    if (!declaration?.values.includes(value)) {
       return undefined;
     }
 

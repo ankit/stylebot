@@ -2,7 +2,7 @@
 
 A style can declare options in its CSS, and Stylebot shows a control for each one in the popup. The style's CSS decides what each choice means. Stylebot only records the choice and tells the page.
 
-Options use UserCSS's `@var` syntax, the one Stylus and userstyles.world use, so a userstyle's declarations work as they are. `scheme`, a light/dark switch, is Stylebot's own: it lets one style carry both variants of a theme, rather than two profiles that copy most of the same CSS.
+Options use UserCSS's `@var` syntax, so a userstyle's declarations work as they are. `scheme`, a light/dark switch, is Stylebot's own: it lets one style carry both variants of a theme, rather than two profiles that copy most of the same CSS.
 
 This page is the summary; the code comments carry the detail.
 
@@ -47,7 +47,7 @@ Stylebot doesn't act on it. The gallery (gallery.stylebot.dev) reads it to badge
 While a style declaring options is applied, Stylebot gives the page each option's choice two ways:
 
 - **As an attribute** on `<html>`, `data-stylebot-<name>` with the name lowercased: the chosen value, such as `mauve`, or `0`/`1` for a checkbox.
-- **As a variable**, `--<name>` on `:root`, as Stylus does: a select's CSS from the object form, else its value.
+- **As a variable**, `--<name>` on `:root`, as UserCSS has it: a select's CSS from the object form, else its value.
 
 ```css
 h1 {
