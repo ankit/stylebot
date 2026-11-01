@@ -12,7 +12,7 @@ A style declares its options in a metadata comment, normally at the top, marked 
 
 ```css
 /* ==UserStyle==
-@option scheme select [system, light, dark] system
+@var select scheme "Mode" ["system:System*", "light:Light", "dark:Dark"]
 @var select accentColor "Accent" ["rosewater:Rosewater", "mauve:Mauve*", "blue:Blue"]
 @var select background "Background" {"near_black:Near black": "#222", "near_white:Near white*": "#ddd"}
 @var checkbox rounded "Rounded corners" 1
@@ -22,7 +22,8 @@ A style declares its options in a metadata comment, normally at the top, marked 
 - **`@var <type> <name> <label> <default>`**, as UserCSS has it. The name is letters, digits, `_` and `-`; the label needs quotes when it has spaces, and the popup shows it as written.
 - **`select`** lists its values as an array of `"value:Label"` entries (or just `"value"`, which is its own label), or an object of `"value:Label": "css"` pairs when what the page gets differs from the value. A `*` after an entry makes it the default; without one, the first is.
 - **`checkbox`** defaults to `0` or `1`.
-- **`@option scheme select [system, light, dark] <default>`** declares the light/dark switch. It takes exactly those three values, in any order, and has no label: the popup names it Mode, translated, so it reads the same on every site. A `@var` can't be named `scheme`.
+- **`scheme`** is reserved for the light/dark switch. It must be a select of exactly `system`, `light` and `dark`, in any order. Its label is ignored: the popup names it Mode, translated, so it reads the same on every site.
+- **`@option scheme select [system, light, dark] <default>`** is the older syntax for the same switch, from before `@var`, and still works. If a style declares `scheme` both ways, the first wins.
 - The block can go anywhere in the CSS, and either marker works. A JSDoc-style comment works too, with the leading `*`s. A select's values can run over several lines.
 
 UserCSS's other types (`text`, `color`, `number`, `range`, `image`) aren't supported yet. Anything Stylebot can't use is skipped with a warning in the page's console: an unsupported type, a select whose values aren't a JSON array or object, a repeated value, a checkbox default other than `0` or `1`, a second declaration of the same name, or a line that isn't an `@` key. A skipped line never stops the style from applying, it only means no control for it.
@@ -39,7 +40,7 @@ Keys other than `@option` and `@var`, such as `@name`, `@author` or `@preprocess
 ==/Stylebot== */
 ```
 
-Stylebot doesn't act on it. The gallery (gallery.stylebot.dev) reads it to badge the style as "Light and dark", since a style that follows the site's theme can't be told apart from its CSS. A style that declares `@option scheme` doesn't need it: the gallery already treats that as light and dark.
+Stylebot doesn't act on it. The gallery (gallery.stylebot.dev) reads it to badge the style as "Light and dark", since a style that follows the site's theme can't be told apart from its CSS. A style that declares `scheme` doesn't need it: the gallery already treats that as light and dark.
 
 ## What the page gets
 

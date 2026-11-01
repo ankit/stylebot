@@ -374,6 +374,65 @@ describe('parseStyleOptions with @var', () => {
     expect(Object.keys(parseStyleOptions(css))).toEqual(['scheme', 'rounded']);
   });
 
+  const optionScheme = '@option scheme select [system, light, dark] system';
+  const varScheme =
+    '@var select scheme "Mode" ["system:System*", "light:Light", "dark:Dark"]';
+  const block = (marker: string, ...lines: Array<string>) =>
+    `/* ==${marker}==\n${lines.join('\n')}\n==/${marker}== */`;
+
+  it('reads scheme as @var, in either block, as it reads @option scheme', () => {
+    const expected = parseStyleOptions(block('Stylebot', optionScheme));
+
+    expect(expected).toEqual({
+      scheme: {
+        type: 'select',
+        values: ['system', 'light', 'dark'],
+        default: 'system',
+      },
+    });
+    expect(parseStyleOptions(block('Stylebot', varScheme))).toEqual(expected);
+    expect(parseStyleOptions(block('UserStyle', varScheme))).toEqual(expected);
+    expect(warn).not.toHaveBeenCalled();
+  });
+
+  it("takes a @var scheme's starred default, else its first value", () => {
+    expect(
+      parseStyleOptions(
+        block(
+          'UserStyle',
+          '@var select scheme Mode ["light", "dark*", "system"]'
+        )
+      ).scheme?.default
+    ).toBe('dark');
+    expect(
+      parseStyleOptions(
+        block(
+          'UserStyle',
+          '@var select scheme Mode ["light", "dark", "system"]'
+        )
+      ).scheme?.default
+    ).toBe('light');
+  });
+
+  it('keeps the first of @option and @var scheme, warning about the second', () => {
+    const darkVar =
+      '@var select scheme "Mode" ["system:System", "light:Light", "dark:Dark*"]';
+
+    expect(
+      parseStyleOptions(block('Stylebot', optionScheme, darkVar)).scheme
+        ?.default
+    ).toBe('system');
+    expect(warn).toHaveBeenCalledTimes(1);
+    expect(warn.mock.calls[0][0]).toContain('already declared');
+
+    expect(
+      parseStyleOptions(
+        block('UserStyle', darkVar) + block('Stylebot', optionScheme)
+      ).scheme?.default
+    ).toBe('dark');
+    expect(warn).toHaveBeenCalledTimes(2);
+  });
+
   it.each([
     ['an unsupported type', '@var color accent "Accent" #f00'],
     ['a checkbox default other than 0 or 1', '@var checkbox on "On" yes'],
@@ -381,7 +440,12 @@ describe('parseStyleOptions with @var', () => {
     ['an empty select', '@var select a "A" []'],
     ['a select with a repeated value', '@var select a "A" ["x", "x:X"]'],
     ['a line missing its default', '@var checkbox on "On"'],
-    ['scheme', '@var select scheme "Mode" ["light", "dark"]'],
+    ['a scheme missing a value', '@var select scheme "Mode" ["light", "dark"]'],
+    [
+      'a scheme with other values',
+      '@var select scheme "Mode" ["system", "light", "sepia"]',
+    ],
+    ['a scheme that is a checkbox', '@var checkbox scheme "Mode" 1'],
   ])('ignores %s', (_, line) => {
     const css = `/* ==Stylebot==\n${line}\n==/Stylebot== */`;
 

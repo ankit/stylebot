@@ -53,8 +53,27 @@ const ignore = (line: string, reason: string): undefined => {
 };
 
 /**
- * Reads an `@option` line. Only `scheme` exists, a select of exactly
- * system, light and dark, kept as it shipped before `@var`.
+ * The reserved `scheme` option from either syntax: a select of exactly
+ * system, light and dark, with no label of its own, since the popup names it.
+ */
+const toScheme = (
+  line: string,
+  { values, default: fallback }: { values: Array<string>; default: string }
+): Declared | undefined => {
+  if (!hasSameValues(values, SCHEME_VALUES)) {
+    return ignore(line, `"scheme" takes ${SCHEME_VALUES.join(', ')}`);
+  }
+
+  if (!values.includes(fallback)) {
+    return ignore(line, `default "${fallback}" isn't one of its values`);
+  }
+
+  return ['scheme', { type: 'select', values, default: fallback }];
+};
+
+/**
+ * Reads an `@option` line, the older syntax for `scheme`, its only option,
+ * kept as it shipped before `@var`.
  */
 const parseOptionLine = (line: string): Declared | undefined => {
   const match = line.match(OPTION_LINE);
@@ -79,15 +98,7 @@ const parseOptionLine = (line: string): Declared | undefined => {
     return ignore(line, 'expected [values] followed by a default');
   }
 
-  if (!hasSameValues(parsed.values, SCHEME_VALUES)) {
-    return ignore(line, `"${name}" takes ${SCHEME_VALUES.join(', ')}`);
-  }
-
-  if (!parsed.values.includes(parsed.default)) {
-    return ignore(line, `default "${parsed.default}" isn't one of its values`);
-  }
-
-  return [name, { type: 'select', ...parsed }];
+  return toScheme(line, parsed);
 };
 
 const unquote = (label: string): string =>
@@ -187,8 +198,8 @@ const parseVarLine = (line: string): Declared | undefined => {
     return ignore(line, `"${name}" isn't a valid name`);
   }
 
-  if (name === 'scheme') {
-    return ignore(line, 'scheme is declared with @option');
+  if (name === 'scheme' && type !== 'select') {
+    return ignore(line, '"scheme" must be a select');
   }
 
   if (type === 'checkbox') {
@@ -207,6 +218,10 @@ const parseVarLine = (line: string): Declared | undefined => {
 
   if (!parsed) {
     return ignore(line, 'expected an array or object of values');
+  }
+
+  if (name === 'scheme') {
+    return toScheme(line, parsed);
   }
 
   return [name, { type, label, ...parsed }];
