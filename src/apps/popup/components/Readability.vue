@@ -78,7 +78,7 @@ export default Vue.extend({
 }
 
 .shortcut-hint {
-  display: inline-flex;
+  display: var(--popup-shortcut-display, inline-flex);
   color: var(--text-muted);
   opacity: 0;
   transition: opacity 0.12s ease;

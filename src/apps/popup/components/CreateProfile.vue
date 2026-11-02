@@ -83,19 +83,21 @@ export default Vue.extend({
   align-items: center;
   gap: 8px;
   width: 100%;
-  height: 34px;
+  height: var(--popup-row-height, 34px);
   padding: 0 10px;
   border-radius: 7px;
   color: var(--text-secondary);
   cursor: pointer;
 
-  &:hover:not(.editing) {
-    color: var(--text-primary);
-    background: var(--hover-tint);
-  }
-
   &.editing {
     cursor: default;
+  }
+
+  @include hover-capable {
+    &:hover:not(.editing) {
+      color: var(--text-primary);
+      background: var(--hover-tint);
+    }
   }
 
   @include focus-ring;

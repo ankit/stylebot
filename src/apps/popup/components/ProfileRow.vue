@@ -46,6 +46,7 @@
 
       <profile-menu
         v-if="menuOpen"
+        :editing-enabled="editingEnabled"
         :publish-item="publishItem"
         @edit="$emit('edit')"
         @publish="$emit('publish')"
@@ -99,6 +100,12 @@ export default Vue.extend({
       default: true,
     },
 
+    // Whether the popup can open the editor, which iPhone doesn't offer.
+    editingEnabled: {
+      type: Boolean,
+      default: true,
+    },
+
     // The name being typed while renaming.
     value: {
       type: String,
@@ -133,13 +140,18 @@ export default Vue.extend({
   position: relative;
   display: flex;
   align-items: center;
-  height: 34px;
+  height: var(--popup-row-height, 34px);
   border-radius: 7px;
 
-  &:hover:not(.disabled),
   &:focus-within,
   &.menu-open {
     background: var(--hover-tint);
+  }
+
+  @include hover-capable {
+    &:hover:not(.disabled) {
+      background: var(--hover-tint);
+    }
   }
 }
 
@@ -175,10 +187,16 @@ export default Vue.extend({
     color: var(--text-muted);
   }
 
+  .profile-row:has(.row-more) & {
+    margin-right: calc(
+      var(--popup-row-actions-shown, 0) * var(--popup-menu-button-size, 26px)
+    );
+  }
+
   .profile-row:hover &,
   .profile-row:focus-within &,
   .menu-open & {
-    opacity: 0;
+    opacity: var(--popup-row-actions-shown, 0);
   }
 
   .profile-row:not(:has(.row-more)) & {
@@ -201,16 +219,18 @@ export default Vue.extend({
   @include button-reset;
 
   position: absolute;
-  top: 4px;
+  top: calc(
+    (var(--popup-row-height, 34px) - var(--popup-menu-button-size, 26px)) / 2
+  );
   right: 5px;
   display: flex;
-  width: 26px;
-  height: 26px;
+  width: var(--popup-menu-button-size, 26px);
+  height: var(--popup-menu-button-size, 26px);
   align-items: center;
   justify-content: center;
   border-radius: 5px;
   color: var(--text-muted);
-  opacity: 0;
+  opacity: var(--popup-row-actions-shown, 0);
   cursor: pointer;
 
   .profile-row:hover &,
@@ -219,9 +239,14 @@ export default Vue.extend({
     opacity: 1;
   }
 
-  &:hover,
   .menu-open & {
     color: var(--text-primary);
+  }
+
+  @include hover-capable {
+    &:hover {
+      color: var(--text-primary);
+    }
   }
 
   @include focus-ring;

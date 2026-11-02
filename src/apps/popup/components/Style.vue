@@ -45,6 +45,7 @@
           <profile-menu
             v-if="menuOpen"
             deletes-style
+            :editing-enabled="editingEnabled"
             :publish-item="publishItem"
             @click.native.prevent
             @edit="act('edit')"
@@ -155,6 +156,11 @@ export default Vue.extend({
     // A broader style, which the page's editor can't open, edits in Options.
     editable: {
       type: Boolean,
+    },
+    // Whether the popup can open the editor, which iPhone doesn't offer.
+    editingEnabled: {
+      type: Boolean,
+      default: true,
     },
     profiles: {
       type: Array as PropType<Array<ProfileSummary>>,
@@ -347,18 +353,24 @@ export default Vue.extend({
   @include button-reset;
 
   display: flex;
-  width: 24px;
-  height: 24px;
+  width: var(--popup-menu-button-size, 24px);
+  height: var(--popup-menu-button-size, 24px);
+  margin: calc((24px - var(--popup-menu-button-size, 24px)) / 2);
   align-items: center;
   justify-content: center;
   border-radius: 5px;
   color: var(--text-muted);
-  opacity: var(--row-extras-shown, 0);
+  opacity: var(--popup-row-actions-shown, 0);
   cursor: pointer;
 
-  &:hover,
   .menu-open & {
     color: var(--text-primary);
+  }
+
+  @include hover-capable {
+    &:hover {
+      color: var(--text-primary);
+    }
   }
 
   @include focus-ring;
@@ -367,7 +379,7 @@ export default Vue.extend({
 .popup-row:hover,
 .popup-row:has(:focus-visible),
 .popup-row.menu-open {
-  --row-extras-shown: 1;
+  --popup-row-actions-shown: 1;
 }
 
 .popup-row.menu-open {
@@ -375,9 +387,9 @@ export default Vue.extend({
 }
 
 .shortcut-hint {
-  display: inline-flex;
+  display: var(--popup-shortcut-display, inline-flex);
   color: var(--text-muted);
-  opacity: var(--row-extras-shown, 0);
+  opacity: var(--popup-row-actions-shown, 0);
   transition: opacity 0.12s ease;
 }
 </style>

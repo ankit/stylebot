@@ -8,7 +8,9 @@
     @click.native.stop
   >
     <template v-if="!confirming">
-      <s-menu-item @click="$emit('edit')">{{ t('edit') }}</s-menu-item>
+      <s-menu-item v-if="editingEnabled" @click="$emit('edit')">
+        {{ t('edit') }}
+      </s-menu-item>
       <s-menu-item @click="$emit('rename')">{{ t('rename') }}</s-menu-item>
       <s-menu-item v-if="publishItem" @click="$emit('publish')">
         {{ t(publishItem.label) }}
@@ -62,6 +64,12 @@ export default Vue.extend({
   props: {
     // Deleting the style's only profile deletes the style.
     deletesStyle: Boolean,
+
+    // Whether the popup can open the editor, which iPhone doesn't offer.
+    editingEnabled: {
+      type: Boolean,
+      default: true,
+    },
 
     // Publishing to the Gallery, where the profile can be.
     publishItem: {

@@ -21,6 +21,7 @@
         :previewing="galleryPreviewing"
         :publish-items="publishItems"
         :options="siteOptions"
+        :editing-enabled="editingEnabled"
         @pick="pickSiteProfile"
         @option="pickSiteOption"
         @edit="editSiteProfile"
@@ -60,6 +61,7 @@
             :disable-toggle="isOpen || (pageReaderable && readability)"
             :initial-enabled="styles[0].enabled"
             :publish-item="publishItems[siteProfiles[0].id] || null"
+            :editing-enabled="editingEnabled"
             @edit="editSiteProfile(siteProfiles[0].id)"
             @rename="renameSiteProfile(siteProfiles[0].id, $event)"
             @publish="publishSiteProfile(siteProfiles[0].id)"
@@ -69,7 +71,7 @@
         </profile-options>
 
         <create-profile
-          v-if="showSiteStyle"
+          v-if="showSiteStyle && editingEnabled"
           :names="siteProfileNames"
           @create="createSiteProfile"
         />
@@ -103,9 +105,10 @@
         @installed="loadStyles"
       />
 
-      <div class="popup-divider" />
+      <div v-if="showFooter || syncEnabled" class="popup-divider" />
 
       <div
+        v-if="showFooter"
         class="popup-footer"
         :class="{ 'popup-footer--above-sync': syncEnabled }"
       >
@@ -138,7 +141,11 @@
         />
       </div>
 
-      <sync-stylebot v-if="syncEnabled" @synced="loadStyles" />
+      <sync-stylebot
+        v-if="syncEnabled"
+        :standalone="!showFooter"
+        @synced="loadStyles"
+      />
 
       <release-notification />
 
@@ -207,7 +214,7 @@ import type {
   StylebotLayout,
   StylebotDockLocation,
 } from '@stylebot/types';
-import { detectChromiumVariant } from '@stylebot/utils';
+import { detectChromiumVariant, isIPhone } from '@stylebot/utils';
 import type { PageSupport } from '@stylebot/utils';
 
 export default Vue.extend({
@@ -255,6 +262,8 @@ export default Vue.extend({
     galleryInstalling: boolean;
     // Each site profile's way into publishing, once known.
     publishItems: Record<string, GalleryMenuItem | null>;
+    // iPhone has no editor, so nothing here opens it.
+    editingEnabled: boolean;
   } {
     return {
       styles: [],
@@ -274,6 +283,7 @@ export default Vue.extend({
       galleryPreviewing: false,
       galleryInstalling: false,
       publishItems: {},
+      editingEnabled: !isIPhone(),
     };
   },
 
@@ -336,6 +346,11 @@ export default Vue.extend({
         declaration,
         value: getStyleOptionValue(declaration, stored[name]),
       }));
+    },
+
+    // The footer holds the editor's button, and a gallery preview's.
+    showFooter(): boolean {
+      return this.editingEnabled || this.galleryPreviewing;
     },
 
     hasToggleRows(): boolean {
@@ -637,6 +652,18 @@ body {
 
 .popup {
   width: 320px;
+
+  @include touch {
+    --popup-row-height: 40px;
+    --popup-menu-button-size: 32px;
+    --popup-row-actions-shown: 1;
+    --popup-shortcut-display: none;
+
+    @media (max-width: 600px) {
+      width: auto;
+      zoom: 1.125;
+    }
+  }
 }
 
 .popup-header {
@@ -681,8 +708,10 @@ body {
 .popup-footer .popup-preview-stop.pill-btn {
   background: transparent;
 
-  &:hover:not(:disabled) {
-    background: var(--hover-tint);
+  @include hover-capable {
+    &:hover:not(:disabled) {
+      background: var(--hover-tint);
+    }
   }
 }
 

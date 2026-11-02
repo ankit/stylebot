@@ -102,8 +102,10 @@ export default Vue.extend({
   color: var(--accent-text);
   cursor: pointer;
 
-  &:hover {
-    text-decoration: underline;
+  @include hover-capable {
+    &:hover {
+      text-decoration: underline;
+    }
   }
 
   @include focus-ring;
