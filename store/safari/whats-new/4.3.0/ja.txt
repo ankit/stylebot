@@ -1,0 +1,1 @@
+スタイルが独自のオプションを提供できるようになりました。オプションは Stylebot のポップアップから選べます。スタイルの作者は UserCSS の @var select と @var checkbox で宣言します。

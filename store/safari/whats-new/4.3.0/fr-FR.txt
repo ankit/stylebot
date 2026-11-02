@@ -1,0 +1,1 @@
+Les styles peuvent désormais proposer leurs propres options, que vous choisissez dans la fenêtre contextuelle de Stylebot. Les auteurs de styles les déclarent avec @var select et @var checkbox de UserCSS.

@@ -1,0 +1,1 @@
+样式现在可以提供自己的选项，你可以在 Stylebot 的弹出窗口中选择。样式作者使用 UserCSS 的 @var select 和 @var checkbox 来声明这些选项。

@@ -1,6 +1,7 @@
 // Fills in the Mac App Store version that's being prepared, adding one when
 // there's none: its version number, every language's listing from
-// store/safari/listing/ (run `yarn store:safari-text` first), the screenshots
+// store/safari/listing/ (run `yarn store:safari-text` first), its What's New
+// from store/safari/whats-new/<version>/<locale>.txt, the screenshots
 // in store/safari/, and the newest processed build of package.json's version. Signs with the API key
 // that APP_STORE_CONNECT_KEY_PATH, _KEY_ID and _ISSUER_ID point to.
 //
@@ -48,6 +49,7 @@ const rootDir = path.resolve(
   '../..'
 );
 const listingDir = path.join(rootDir, 'store/safari/listing');
+const whatsNewDir = path.join(rootDir, 'store/safari/whats-new');
 const screenshotsDir = path.join(rootDir, 'store/safari');
 const { version } = JSON.parse(
   readFileSync(path.join(rootDir, 'package.json'), 'utf8')
@@ -68,6 +70,12 @@ const readListing = locale => {
     keywords: read('keywords'),
     description: read('description'),
   };
+};
+
+const readWhatsNew = locale => {
+  const file = path.join(whatsNewDir, version, `${locale}.txt`);
+
+  return existsSync(file) ? readFileSync(file, 'utf8').trim() : undefined;
 };
 
 const upsert = async (existing, type, attributes, relationship) => {
@@ -162,6 +170,7 @@ const updateLocalizations = async (appInfoId, versionId) => {
 
   for (const locale of locales) {
     const listing = readListing(locale);
+    const whatsNew = readWhatsNew(locale);
     const sitePrefix = SITE_LOCALES[locale] ?? '';
 
     await upsert(
@@ -188,13 +197,14 @@ const updateLocalizations = async (appInfoId, versionId) => {
         ...(!versionByLocale[locale] && { locale }),
         description: listing.description,
         keywords: listing.keywords,
+        ...(whatsNew && { whatsNew }),
         supportUrl: SUPPORT_URL,
         marketingUrl: `${SITE}/${sitePrefix}`,
       },
       { appStoreVersion: { data: { type: 'appStoreVersions', id: versionId } } }
     );
 
-    console.log(`✓ ${locale}`);
+    console.log(whatsNew ? `✓ ${locale}` : `… ${locale}: no What's New`);
   }
 
   return results;

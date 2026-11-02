@@ -1,0 +1,1 @@
+Gaya kini dapat menawarkan opsinya sendiri, yang Anda pilih dari popup Stylebot. Pembuat gaya mendeklarasikannya dengan @var select dan @var checkbox UserCSS.

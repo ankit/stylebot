@@ -1,0 +1,1 @@
+이제 스타일에서 자체 옵션을 제공할 수 있으며, Stylebot 팝업에서 옵션을 선택할 수 있습니다. 스타일 작성자는 UserCSS의 @var select와 @var checkbox로 옵션을 선언합니다.
