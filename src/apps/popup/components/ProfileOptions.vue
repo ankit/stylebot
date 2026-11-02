@@ -41,7 +41,9 @@
                 close();
               "
             >
-              {{ choiceLabel(option, value) }}
+              <span class="profile-option-choice">
+                {{ choiceLabel(option, value) }}
+              </span>
             </s-menu-item>
           </template>
         </s-select>
@@ -131,6 +133,13 @@ export default Vue.extend({
 
   min-width: 0;
   color: var(--text-secondary);
+}
+
+.profile-option-choice {
+  @include truncate;
+
+  display: block;
+  max-width: 240px;
 }
 
 .profile-option-select {

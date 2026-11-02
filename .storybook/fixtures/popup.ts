@@ -36,6 +36,7 @@ export const optionsStyle = (url: string, enabled = true) => ({
     '/* ==Stylebot==',
     '@option scheme select [system, light, dark] system',
     '@var select accentColor "Accent" ["rosewater:Rosewater", "mauve:Mauve*", "blue:Blue"]',
+    `@var select font "Font" {"inter:Inter*": "'Inter'", "atkinson:Atkinson Hyperlegible": "'Atkinson Hyperlegible'", "plex:IBM Plex Serif": "'IBM Plex Serif'"}`,
     '@var checkbox rounded "Rounded corners" 0',
     '==/Stylebot== */',
     'h1 { color: var(--accentColor); }',
