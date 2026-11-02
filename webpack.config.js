@@ -292,8 +292,8 @@ const config = {
           },
         },
         {
-          from: '../node_modules/requirejs/**/*',
-          to: 'monaco-editor/iframe/requirejs',
+          from: '../node_modules/requirejs/require.js',
+          to: 'monaco-editor/iframe/node_modules/requirejs/require.js',
         },
         {
           from: 'assets/_locales/*.config',

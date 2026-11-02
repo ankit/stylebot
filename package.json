@@ -30,6 +30,7 @@
     "upload:edge": "node scripts/edge/upload.mjs",
     "upload:firefox": "node scripts/firefox/upload.mjs",
     "upload:safari": "node scripts/safari/upload.mjs",
+    "upload:safari-ios": "node scripts/safari/upload.mjs --ios",
     "upload:safari-listing": "node scripts/safari/upload-listing.mjs",
     "start:chrome": "node scripts/launch-chrome.mjs",
     "start:edge": "cross-env STYLEBOT_BROWSER=edge node scripts/launch-chrome.mjs",
