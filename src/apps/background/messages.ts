@@ -292,7 +292,7 @@ export const OpenOptionsPage = (message?: { route?: string }): Promise<void> =>
  * changed. Firefox has its page opened for the extension; the others by URL.
  */
 export const OpenShortcutsPage = (): void => {
-  if (chrome.commands.openShortcutSettings) {
+  if (chrome.commands?.openShortcutSettings) {
     chrome.commands.openShortcutSettings();
     return;
   }

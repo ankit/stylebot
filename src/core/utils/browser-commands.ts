@@ -12,10 +12,11 @@ export const COMMAND_NAMES: Array<StylebotCommandName> = [
 
 /**
  * Reads the global shortcuts from the browser, which owns them. Only
- * extension pages and the background can reach chrome.commands.
+ * extension pages and the background can reach chrome.commands, and
+ * Firefox for Android has none, so every shortcut reads as unset there.
  */
 export const getBrowserCommands = async (): Promise<StylebotCommands> => {
-  const commands = await chrome.commands.getAll();
+  const commands = chrome.commands ? await chrome.commands.getAll() : [];
   const mac = isMac();
 
   return Object.fromEntries(
