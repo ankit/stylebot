@@ -28,6 +28,7 @@
         </s-text>
         <s-select
           class="profile-option-select"
+          menu-size="small"
           :text="choiceLabel(option, option.value)"
           :menu-min-width="140"
         >
