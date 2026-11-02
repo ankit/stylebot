@@ -58,7 +58,7 @@ const escape = text => text.replace(/&/g, '&amp;').replace(/</g, '&lt;');
  * registered there and the extension allowed to talk to it, as the e2e suite
  * does: nothing touches ~/.stylebot or your browsers.
  */
-const startCliBrowser = async () => {
+export const startCliBrowser = async () => {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'sb-store-'));
   const env = { ...process.env, HOME: home };
   delete env.STYLEBOT_SOCKET;
@@ -136,6 +136,7 @@ const startCliBrowser = async () => {
   return {
     context,
     home,
+    env,
     cli,
     close: async () => {
       await context.close();

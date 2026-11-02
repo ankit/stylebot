@@ -60,6 +60,7 @@
     "store:safari-text": "node scripts/safari/store-text.mjs",
     "capture:gallery": "node scripts/capture/gallery.mjs",
     "capture:manual": "node scripts/capture/manual.mjs",
+    "capture:cli-mode": "node scripts/capture/cli-mode.mjs",
     "storybook": "storybook dev -p 6006 --no-open",
     "eval:styling": "node evals/styling/run.mjs",
     "build-storybook": "storybook build --quiet",

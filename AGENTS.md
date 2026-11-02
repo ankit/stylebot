@@ -44,6 +44,7 @@ session is already inside a worktree.
 - `yarn capture:store` — builds the extension and retakes the store screenshots in `store/screenshots/` on live sites, headless; `--only <name>` retakes some. Use the `capture-store` skill, which checks each image.
 - `yarn capture:gallery` — builds the extension and retakes the stylebot.dev gallery's theme screenshots into `captures/gallery/` (or `--out <dir>`), headless, from the themes in a sibling stylebot-site checkout's `src/assets/gallery/` (or `--themes <dir>`); `hn/newspaper` or `hn` retakes some. Use the `capture-gallery` skill, which checks each image.
 - `yarn capture:manual` — builds the extension and retakes the stylebot.dev manual's and 4.0 release page's screenshots into `captures/manual/` (or `--out <dir>`), light and dark, headless; `sync history` retakes some. Check each image before committing.
+- `yarn capture:cli-mode` — builds the extension and takes the stylebot.dev command line page's CLI mode screenshots into `captures/cli/` (or `--out <dir>`): live Hacker News connected, marked and noted, then answered with a change. Check each image before committing.
 - `yarn storybook` — Storybook 7.6 (last line with Vue 2 support) for the shared primitives and popup/options/editor composites, with a light/dark toolbar
 
 ## Validation
