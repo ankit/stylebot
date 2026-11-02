@@ -49,7 +49,8 @@ export const getInstallId = async (): Promise<string> => {
     return synced;
   }
 
-  const installId = (await readInstallId(local)) ?? crypto.randomUUID();
+  const localId = await readInstallId(local);
+  const installId = localId ?? crypto.randomUUID();
   const savedToSync = await writeInstallId(sync, installId);
 
   if (!savedToSync) {
