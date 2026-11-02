@@ -113,16 +113,28 @@ describe('applyPageState', () => {
     );
   });
 
-  it('sets the color scheme along with the css, and removes it once gone', () => {
-    applyPageState({ ...applied, scheme: 'dark' });
+  it('sets the options along with the css, and removes them once gone', () => {
+    applyPageState({
+      ...applied,
+      options: {
+        scheme: { value: 'dark', css: 'dark' },
+        accent: { value: 'blue', css: '#00f' },
+      },
+    });
 
-    expect(document.documentElement.dataset.stylebotScheme).toBe('dark');
+    const root = document.documentElement;
+    const variables = () =>
+      document.getElementById('stylebot-css-:options')?.textContent;
+
+    expect(root.dataset.stylebotScheme).toBe('dark');
+    expect(root.dataset.stylebotAccent).toBe('blue');
+    expect(variables()).toContain('--accent: #00f;');
 
     applyPageState(applied, applied);
 
-    expect(document.documentElement.hasAttribute('data-stylebot-scheme')).toBe(
-      false
-    );
+    expect(root.hasAttribute('data-stylebot-scheme')).toBe(false);
+    expect(root.hasAttribute('data-stylebot-accent')).toBe(false);
+    expect(variables()).toBe('');
   });
 });
 
@@ -148,17 +160,19 @@ describe('getPageState', () => {
     ({ getPageState } = require('./page-state'));
   });
 
-  it("takes the default style's color scheme", () => {
-    expect(getPageState(compiled({ scheme: 'light' })).scheme).toBe('light');
+  const options = { scheme: { value: 'light', css: 'light' } };
+
+  it("takes the default style's options", () => {
+    expect(getPageState(compiled({ options })).options).toEqual(options);
   });
 
-  it('has no color scheme when the default style is off', () => {
-    const state = getPageState(compiled({ scheme: 'light', enabled: false }));
+  it('has no options when the default style is off', () => {
+    const state = getPageState(compiled({ options, enabled: false }));
 
-    expect(state).not.toHaveProperty('scheme');
+    expect(state).not.toHaveProperty('options');
   });
 
-  it('has no color scheme when the default style declares none', () => {
-    expect(getPageState(compiled({}))).not.toHaveProperty('scheme');
+  it('has no options when the default style declares none', () => {
+    expect(getPageState(compiled({}))).not.toHaveProperty('options');
   });
 });

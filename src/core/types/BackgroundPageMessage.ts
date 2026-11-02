@@ -1,10 +1,5 @@
 import type { CliModeEvent } from './cli-mode';
-import type {
-  StyleColorScheme,
-  StyleMap,
-  SupportedStyleOptions,
-  StyleOptionName,
-} from './styles';
+import type { StyleColorScheme, StyleMap } from './styles';
 import type { StylebotOptions } from './options';
 import type { ReadabilitySettings } from './readability';
 import type { StylebotCommandName } from './commands';
@@ -26,15 +21,14 @@ export type SetActiveProfile = {
   profileId: string;
 };
 
+// Ignored unless the value is one the profile's css declares for the option.
 export type SetStyleOption = {
-  [option in StyleOptionName]: {
-    name: 'SetStyleOption';
-    url: string;
-    profileId: string;
-    option: option;
-    value: SupportedStyleOptions[option];
-  };
-}[StyleOptionName];
+  name: 'SetStyleOption';
+  url: string;
+  profileId: string;
+  option: string;
+  value: string;
+};
 
 export type CreateProfile = {
   name: 'CreateProfile';

@@ -49,29 +49,40 @@ export type Style = {
   profileOptions?: { [profileId: string]: StyleOptionValues };
 };
 
-/**
- * An option a style's css declares in its `==Stylebot==` block, which
- * Stylebot shows a control for. Only `select` exists so far.
- */
-export type StyleOptionDeclaration = {
-  type: 'select';
-  values: Array<string>;
-  default: string;
-};
-
 export type StyleColorScheme = 'system' | 'light' | 'dark';
 
 /**
- * Each option Stylebot supports, with the values it can take.
+ * A select option's values, each with the label the popup shows and what the
+ * page's `--<name>` is set to. Only `@var` declares these; `@option scheme`
+ * labels its values itself and sets the value as is.
  */
-export type SupportedStyleOptions = {
-  scheme: StyleColorScheme;
+export type StyleOptionChoices = {
+  [value: string]: { label: string; css: string };
 };
 
-export type StyleOptionName = keyof SupportedStyleOptions;
+/**
+ * An option a style's css declares in its `==Stylebot==` or `==UserStyle==`
+ * block, which Stylebot shows a control for. `values` lists what a choice
+ * can store, `0` and `1` for a checkbox.
+ */
+export type StyleOptionDeclaration =
+  | {
+      type: 'select';
+      // The author's own; `@option scheme` has none, the popup names it.
+      label?: string;
+      values: Array<string>;
+      default: string;
+      choices?: StyleOptionChoices;
+    }
+  | {
+      type: 'checkbox';
+      label: string;
+      values: Array<string>;
+      default: string;
+    };
 
 export type StyleOptionDeclarations = {
-  [name in StyleOptionName]?: StyleOptionDeclaration;
+  [name: string]: StyleOptionDeclaration;
 };
 
 // As stored, so read back loosely: a value may predate a change to the css.
@@ -94,8 +105,16 @@ export type CompiledStyle = {
   importUrls: Array<string>;
   enabled: boolean;
   readability: boolean;
-  // Set when the active profile declares the scheme option.
-  scheme?: StyleColorScheme;
+  // Set when the active profile declares options.
+  options?: PageStyleOptions;
+};
+
+/**
+ * The value in effect for each option a style declares, as the page gets it:
+ * `value` for its `data-stylebot-<name>` attribute, `css` for `--<name>`.
+ */
+export type PageStyleOptions = {
+  [name: string]: { value: string; css: string };
 };
 
 export type CompiledStyleMap = {

@@ -109,11 +109,11 @@ describe('compileStyles', () => {
     expect(next.styles['a.com'].css).toBe('a { color: red; }');
   });
 
-  describe('scheme', () => {
+  describe('options', () => {
     const declared =
-      '/**\n * ==Stylebot==\n * @option scheme select [system, light, dark] system\n * ==/Stylebot==\n */\na { color: red; }';
+      '/**\n * ==Stylebot==\n * @option scheme select [system, light, dark] system\n * @var select bg "Background" {"black:Black": "#000", "white:White*": "#fff"}\n * ==/Stylebot==\n */\na { color: red; }';
 
-    it('is left out for a style that does not declare it', () => {
+    it('are left out for a style that declares none', () => {
       const compiled = compileStyles(
         {
           'a.com': style('a { color: red; }', {
@@ -123,16 +123,19 @@ describe('compileStyles', () => {
         'rev-1'
       );
 
-      expect(compiled.styles['a.com']).not.toHaveProperty('scheme');
+      expect(compiled.styles['a.com']).not.toHaveProperty('options');
     });
 
-    it('is the declared default without a stored value', () => {
+    it('are the declared defaults without stored values', () => {
       const compiled = compileStyles({ 'a.com': style(declared) }, 'rev-1');
 
-      expect(compiled.styles['a.com'].scheme).toBe('system');
+      expect(compiled.styles['a.com'].options).toEqual({
+        scheme: { value: 'system', css: 'system' },
+        bg: { value: 'white', css: '#fff' },
+      });
     });
 
-    it("is the active profile's stored value", () => {
+    it("are the active profile's stored values", () => {
       const compiled = compileStyles(
         {
           'a.com': style(declared, {
@@ -140,14 +143,17 @@ describe('compileStyles', () => {
             profiles: { default: { name: '', css: '' }, p2: { name: 'Two' } },
             profileOptions: {
               default: { scheme: 'light' },
-              p2: { scheme: 'dark' },
+              p2: { scheme: 'dark', bg: 'black' },
             },
           }),
         },
         'rev-1'
       );
 
-      expect(compiled.styles['a.com'].scheme).toBe('dark');
+      expect(compiled.styles['a.com'].options).toEqual({
+        scheme: { value: 'dark', css: 'dark' },
+        bg: { value: 'black', css: '#000' },
+      });
     });
 
     it('follows a new stored value when the css is reused', () => {
@@ -164,7 +170,7 @@ describe('compileStyles', () => {
         { styles, compiled: previous.styles }
       );
 
-      expect(next.styles['a.com'].scheme).toBe('light');
+      expect(next.styles['a.com'].options?.scheme.value).toBe('light');
     });
   });
 });

@@ -78,6 +78,7 @@ export type { Specificity } from './specificity';
 export { mergeShorthands } from './shorthands';
 export {
   getColorScheme,
+  getPageStyleOptions,
   getStyleOptionValue,
   parseStyleOptions,
 } from './style-options';

@@ -27,6 +27,23 @@ export const profiledStyle = (url: string, enabled = true) => ({
 });
 
 /**
+ * A style whose css declares a color scheme, an accent select and a
+ * checkbox, as a UserCSS-style metadata block.
+ */
+export const optionsStyle = (url: string, enabled = true) => ({
+  ...style(url, enabled),
+  css: [
+    '/* ==Stylebot==',
+    '@option scheme select [system, light, dark] system',
+    '@var select accentColor "Accent" ["rosewater:Rosewater", "mauve:Mauve*", "blue:Blue"]',
+    `@var select font "Font" {"inter:Inter*": "'Inter'", "atkinson:Atkinson Hyperlegible": "'Atkinson Hyperlegible'", "plex:IBM Plex Serif": "'IBM Plex Serif'"}`,
+    '@var checkbox rounded "Rounded corners" 0',
+    '==/Stylebot== */',
+    'h1 { color: var(--accentColor); }',
+  ].join('\n'),
+});
+
+/**
  * Renders the whole browser-action popup against a chrome shim seeded
  * with the given state.
  */

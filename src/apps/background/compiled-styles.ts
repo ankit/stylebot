@@ -1,4 +1,4 @@
-import { compileStyle, getColorScheme } from '@stylebot/css';
+import { compileStyle, getPageStyleOptions } from '@stylebot/css';
 import {
   COMPILED_STYLES_VERSION,
   DEFAULT_PROFILE_ID,
@@ -48,7 +48,7 @@ export const compileStyles = (
 
     const { css, importUrls } = reusable || compile(style.css, force);
 
-    const scheme = getColorScheme(
+    const options = getPageStyleOptions(
       style.css,
       getProfileOptions(style, style.activeProfile ?? DEFAULT_PROFILE_ID)
     );
@@ -58,7 +58,7 @@ export const compileStyles = (
       importUrls,
       enabled: style.enabled,
       readability: style.readability,
-      ...(scheme && { scheme }),
+      ...(options && { options }),
     };
   }
 

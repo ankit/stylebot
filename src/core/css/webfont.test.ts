@@ -200,6 +200,67 @@ describe('webfont', () => {
       expect(cleanGoogleWebFonts(css)).toBe(css);
     });
 
+    it("keeps the @import of a var()'s fallback family", () => {
+      const css = `@import url(${fontUrl});\n\na { font-family: var(--font, "Muli", serif); }`;
+
+      expect(cleanGoogleWebFonts(css)).toBe(css);
+    });
+
+    it("keeps the @import of a nested var()'s fallback family", () => {
+      const css = `@import url(${fontUrl});\n\na { font-family: var(--a, var(--b, Muli)); }`;
+
+      expect(cleanGoogleWebFonts(css)).toBe(css);
+    });
+
+    it('removes the @import when a var() has no fallback', () => {
+      const css = `@import url(${fontUrl});\n\na { font-family: var(--font); }`;
+
+      expect(cleanGoogleWebFonts(css)).toBe('a { font-family: var(--font); }');
+    });
+
+    it('keeps the @import of a family in a font custom property', () => {
+      const css = `@import url(${fontUrl});\n\n:root { --font: 'Muli', serif; }`;
+
+      expect(cleanGoogleWebFonts(css)).toBe(css);
+    });
+
+    it("keeps the @imports of the families a select option's css names", () => {
+      const css = [
+        '/* ==UserStyle==',
+        `@var select font "Font" {"muli:Muli*": "'Muli', serif", "playfair:Playfair": "'Playfair Display SC'"}`,
+        '==/UserStyle== */',
+        `@import url(${fontUrl});`,
+        `@import url(${multiWordFontUrl});`,
+        'a { font-family: var(--font); }',
+      ].join('\n');
+
+      expect(cleanGoogleWebFonts(css)).toBe(css);
+    });
+
+    it("keeps the @imports of a select option's plain values", () => {
+      const css = [
+        '/* ==Stylebot==',
+        '@var select font "Font" ["Muli*", "Arial"]',
+        '==/Stylebot== */',
+        `@import url(${fontUrl});`,
+        'a { font-family: var(--font); }',
+      ].join('\n');
+
+      expect(cleanGoogleWebFonts(css)).toBe(css);
+    });
+
+    it('removes the @import of a family no option or declaration names', () => {
+      const css = [
+        '/* ==Stylebot==',
+        '@var select font "Font" ["Arial*", "Georgia"]',
+        '==/Stylebot== */',
+        `@import url(${fontUrl});`,
+        'a { font-family: var(--font); }',
+      ].join('\n');
+
+      expect(cleanGoogleWebFonts(css)).not.toContain('@import');
+    });
+
     it('removes the @import for a family that is only a fallback', () => {
       const css = `@import url(${fontUrl});\n\na { font-family: Helvetica, Muli; }`;
 

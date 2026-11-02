@@ -1,6 +1,7 @@
 import { parse } from 'postcss';
 
 import { getPrimaryFontFamily, isFontFamilyProperty } from './font-family';
+import { parseStyleOptions } from './style-options';
 
 import type {
   GetGoogleWebFontExists,
@@ -35,6 +36,8 @@ const WEIGHTS = [100, 200, 300, 400, 500, 600, 700, 800, 900];
 const AXES = `ital,wght@${[0, 1]
   .flatMap(ital => WEIGHTS.map(weight => `${ital},${weight}`))
   .join(';')}`;
+
+const VAR_FALLBACK = /^var\(\s*--[\w-]+\s*,([\s\S]*)\)$/;
 
 const IMPORT_FAMILY =
   /^url\(["']?https:\/\/fonts\.googleapis\.com\/css2\?family=([^:&"')]+)/;
@@ -137,23 +140,51 @@ export const addGoogleWebFont = async (
     : css;
 
 /**
- * Remove google web font imports that no declaration uses as its first
- * family; fallbacks further down a stack are never loaded. Families match
- * ignoring case, as in CSS, so "sriracha" keeps the import for "Sriracha".
+ * The families a font value loads first: its primary family, and for
+ * `var(--font, "Fira Code")` the fallback's too, since the variable may be
+ * unset.
+ */
+const getLoadedFamilies = (value: string): Array<string> => {
+  const fallback = VAR_FALLBACK.exec(value.trim());
+
+  if (fallback) {
+    return getLoadedFamilies(fallback[1]);
+  }
+
+  const family = getPrimaryFontFamily(value);
+  return family ? [family] : [];
+};
+
+/**
+ * The families a style's select options can put in their variables, read
+ * as font stacks, so a font picked through an option keeps its import.
+ */
+const getOptionFamilies = (css: string): Array<string> =>
+  Object.values(parseStyleOptions(css)).flatMap(declaration =>
+    declaration.type === 'select'
+      ? declaration.values.flatMap(value =>
+          getLoadedFamilies(declaration.choices?.[value]?.css ?? value)
+        )
+      : []
+  );
+
+/**
+ * Remove google web font imports that no declaration or option uses as its
+ * first family; fallbacks further down a stack are never loaded. Families
+ * match ignoring case, as in CSS, so "sriracha" keeps the import for
+ * "Sriracha".
  */
 export const cleanGoogleWebFonts = (css: string): string => {
   const root = parse(css);
-  const fonts = new Set<string>();
+  const fonts = new Set(
+    getOptionFamilies(css).map(family => family.toLowerCase())
+  );
 
   root.walkDecls(decl => {
-    if (!isFontFamilyProperty(decl.prop)) {
-      return;
-    }
-
-    const family = getPrimaryFontFamily(decl.value);
-
-    if (family) {
-      fonts.add(family.toLowerCase());
+    if (isFontFamilyProperty(decl.prop)) {
+      getLoadedFamilies(decl.value).forEach(family =>
+        fonts.add(family.toLowerCase())
+      );
     }
   });
 

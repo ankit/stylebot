@@ -20,9 +20,9 @@
         :joined="hasToggleRows"
         :previewing="galleryPreviewing"
         :publish-items="publishItems"
-        :scheme="siteColorScheme"
+        :options="siteOptions"
         @pick="pickSiteProfile"
-        @scheme="pickSiteColorScheme"
+        @option="pickSiteOption"
         @edit="editSiteProfile"
         @publish="publishSiteProfile"
         @rename="renameSiteProfile"
@@ -49,8 +49,8 @@
       >
         <profile-options
           v-if="showSiteStyle"
-          :scheme="siteColorScheme"
-          @scheme="pickSiteColorScheme"
+          :options="siteOptions"
+          @option="pickSiteOption"
         >
           <style-component
             site
@@ -184,10 +184,11 @@ import {
   getPublishMenuItem,
   publishProfileToGallery,
 } from './utils';
+import type { ProfileOption } from './utils';
 import type { GalleryMenuItem } from '@stylebot/gallery';
 
 import { getGoogleDriveSyncEnabled } from '@stylebot/sync';
-import { getColorScheme } from '@stylebot/css';
+import { getStyleOptionValue, parseStyleOptions } from '@stylebot/css';
 import {
   addProfile,
   expandProfiles,
@@ -200,7 +201,6 @@ import {
 } from '@stylebot/saved-styles';
 import type { ProfileSummary } from '@stylebot/saved-styles';
 import type {
-  StyleColorScheme,
   GetCommandsResponse,
   Style,
   StylebotAppearance,
@@ -318,19 +318,24 @@ export default Vue.extend({
       return this.styles.length > 1 ? this.styles : [];
     },
 
-    // The site's active profile's color scheme, if it declares one and is on.
-    siteColorScheme(): StyleColorScheme | null {
+    // The options the site's active profile declares, while it's on.
+    siteOptions(): Array<ProfileOption> {
       const site = this.styles.find(({ url }) => url === this.defaultStyleUrl);
 
       if (!site || !this.siteEnabled) {
-        return null;
+        return [];
       }
 
       const profileId = this.siteActiveProfile;
       const sheet = expandProfiles(site).sheets[profileId];
-      const options = getProfileOptions(site, profileId);
+      const stored = getProfileOptions(site, profileId);
+      const declared = parseStyleOptions(sheet?.css ?? '');
 
-      return getColorScheme(sheet?.css ?? '', options) ?? null;
+      return Object.entries(declared).map(([name, declaration]) => ({
+        name,
+        declaration,
+        value: getStyleOptionValue(declaration, stored[name]),
+      }));
     },
 
     hasToggleRows(): boolean {
@@ -493,16 +498,12 @@ export default Vue.extend({
       this.siteEnabled = true;
     },
 
-    pickSiteColorScheme(value: StyleColorScheme): void {
+    pickSiteOption(name: string, value: string): void {
       const [site] = this.styles;
       const profileId = this.siteActiveProfile;
 
-      setStyleOption(site.url, profileId, 'scheme', value);
-      this.styles.splice(
-        0,
-        1,
-        setProfileOption(site, profileId, 'scheme', value)
-      );
+      setStyleOption(site.url, profileId, name, value);
+      this.styles.splice(0, 1, setProfileOption(site, profileId, name, value));
     },
 
     stopGalleryPreview(): void {

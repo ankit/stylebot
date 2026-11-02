@@ -23,8 +23,8 @@
         <profile-options
           v-for="profile in profiles"
           :key="profile.id"
-          :scheme="enabled && profile.id === activeProfile ? scheme : null"
-          @scheme="$emit('scheme', $event)"
+          :options="enabled && profile.id === activeProfile ? options : []"
+          @option="(name, value) => $emit('option', name, value)"
         >
           <profile-row
             v-model="draft"
@@ -58,7 +58,6 @@ import Vue from 'vue';
 import { SHeading } from '@stylebot/components';
 import { isProfileNameTaken } from '@stylebot/saved-styles';
 import type { ProfileSummary } from '@stylebot/saved-styles';
-import type { StyleColorScheme } from '@stylebot/types';
 
 import type { GalleryMenuItem } from '@stylebot/gallery';
 
@@ -66,6 +65,7 @@ import OptionsButton from './OptionsButton.vue';
 import ProfileRow from './ProfileRow.vue';
 import CreateProfile from './CreateProfile.vue';
 import ProfileOptions from './ProfileOptions.vue';
+import type { ProfileOption } from '../utils';
 
 export default Vue.extend({
   name: 'SiteProfiles',
@@ -105,9 +105,9 @@ export default Vue.extend({
       default: false,
     },
 
-    scheme: {
-      type: String as PropType<StyleColorScheme | null>,
-      default: null,
+    options: {
+      type: Array as PropType<Array<ProfileOption>>,
+      default: () => [],
     },
 
     publishItems: {
@@ -244,6 +244,9 @@ export default Vue.extend({
 }
 
 .profile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
   padding: 6px;
 
   &.profile-list--joined {
@@ -254,5 +257,6 @@ export default Vue.extend({
 .profile-options {
   display: flex;
   flex-direction: column;
+  gap: 1px;
 }
 </style>

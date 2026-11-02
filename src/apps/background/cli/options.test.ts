@@ -30,6 +30,15 @@ const styles: StyleMap = {
     profiles: {
       default: { name: '' },
       plain: { name: 'Plain', css: 'a { color: red; }' },
+      userstyle: {
+        name: 'UserStyle',
+        css: dedent`
+          /* ==UserStyle==
+          @var select accentColor "Accent" ["blue:Blue", "mauve:Mauve*"]
+          @var checkbox rounded "Rounded" 0
+          ==/UserStyle== */
+        `,
+      },
     },
     profileOptions: { default: { scheme: 'dark' } },
   },
@@ -49,6 +58,7 @@ describe('optionCommands', () => {
       options: [
         {
           name: 'scheme',
+          type: 'select',
           values: ['system', 'light', 'dark'],
           default: 'system',
           value: 'dark',
@@ -102,6 +112,46 @@ describe('optionCommands', () => {
         value: 'dark',
       })
     ).rejects.toThrow("The profile doesn't declare a scheme option");
+  });
+
+  it('lists and sets options a UserStyle block declares with @var', async () => {
+    const result = await optionCommands.options({
+      target: 'example.com',
+      profile: 'UserStyle',
+    });
+
+    expect(result).toHaveProperty('options', [
+      {
+        name: 'accentColor',
+        type: 'select',
+        label: 'Accent',
+        values: ['blue', 'mauve'],
+        default: 'mauve',
+        value: 'mauve',
+      },
+      {
+        name: 'rounded',
+        type: 'checkbox',
+        label: 'Rounded',
+        values: ['0', '1'],
+        default: '0',
+        value: '0',
+      },
+    ]);
+
+    await optionCommands.setOption({
+      target: 'example.com',
+      profile: 'UserStyle',
+      option: 'rounded',
+      value: 1,
+    });
+
+    expect(setStyleOption).toHaveBeenCalledWith(
+      'example.com',
+      'userstyle',
+      'rounded',
+      '1'
+    );
   });
 
   it('needs the site named', async () => {

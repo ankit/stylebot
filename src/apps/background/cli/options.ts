@@ -1,10 +1,6 @@
 import { getStyleOptionValue, parseStyleOptions } from '@stylebot/css';
 import { expandProfiles, getProfileOptions } from '@stylebot/saved-styles';
-import type {
-  StyleOptionName,
-  StyleWithoutUrl,
-  SupportedStyleOptions,
-} from '@stylebot/types';
+import type { StyleWithoutUrl } from '@stylebot/types';
 
 import { applyStylesToAllTabs, getAll, setStyleOption } from '../styles';
 import { EMPTY_STYLE, resolveProfileId } from './profiles';
@@ -26,6 +22,8 @@ const describeOptions = (
 
   const options = Object.entries(declared).map(([name, declaration]) => ({
     name,
+    type: declaration.type,
+    ...(declaration.label !== undefined && { label: declaration.label }),
     values: declaration.values,
     default: declaration.default,
     value: getStyleOptionValue(declaration, stored[name]),
@@ -58,16 +56,9 @@ export const optionCommands: CliCommands = {
       );
     }
 
-    const name = option as StyleOptionName;
-
-    await setStyleOption(
-      url,
-      id,
-      name,
-      value as SupportedStyleOptions[typeof name]
-    );
+    await setStyleOption(url, id, declared.name, String(value));
     await applyStylesToAllTabs();
 
-    return { url, profileId: id, option: name, value };
+    return { url, profileId: id, option: declared.name, value };
   },
 };
