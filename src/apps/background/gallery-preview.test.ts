@@ -38,7 +38,7 @@ const GALLERY_TAB_ID = 3;
 let store: Record<string, unknown>;
 
 /**
- * Session and local storage share one in-memory store; their keys differ.
+ * Session, local and sync storage share one in-memory store; their keys differ.
  */
 const area = () => ({
   get: jest.fn(async (key: string) => ({ [key]: store[key] })),
@@ -56,7 +56,7 @@ beforeEach(() => {
   store = {};
   global.chrome = {
     runtime: { lastError: undefined },
-    storage: { session: area(), local: area() },
+    storage: { session: area(), local: area(), sync: area() },
     tabs: {
       get: jest.fn(async () => ({ id: TAB_ID, url: 'https://github.com/' })),
       create: jest.fn(async () => ({ id: TAB_ID })),
