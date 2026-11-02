@@ -1,0 +1,1 @@
+Os estilos podem agora oferecer opções próprias, que escolhe no pop-up do Stylebot. Quem cria estilos declara-as com @var select e @var checkbox do UserCSS.

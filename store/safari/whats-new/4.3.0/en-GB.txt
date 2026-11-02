@@ -1,0 +1,1 @@
+Styles can now offer their own options, which you pick from Stylebot's popup. Style authors declare them with UserCSS @var select and @var checkbox.

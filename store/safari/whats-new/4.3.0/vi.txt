@@ -1,0 +1,1 @@
+Giờ đây các kiểu có thể cung cấp tùy chọn riêng, bạn chọn chúng từ cửa sổ bật lên của Stylebot. Tác giả kiểu khai báo chúng bằng @var select và @var checkbox của UserCSS.
