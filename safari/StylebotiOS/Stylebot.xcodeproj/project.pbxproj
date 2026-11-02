@@ -59,6 +59,7 @@
 		BC9C94EB3098050C00622417 /* Stylebot Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Stylebot Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC9C94F03098050C00622417 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
 		BC9C94F23098050C00622417 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AA0000000000000000000002 /* Version.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Version.xcconfig; path = ../../safari-dist/Version.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +83,7 @@
 		BC9C94C53098050A00622417 = {
 			isa = PBXGroup;
 			children = (
+				AA0000000000000000000002 /* Version.xcconfig */,
 				BC9C94D03098050A00622417 /* Stylebot */,
 				BC9C94EF3098050C00622417 /* Stylebot Extension */,
 				BC9C94CF3098050A00622417 /* Products */,
@@ -254,7 +256,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "SRC=\"${SRCROOT}/../../safari-dist/\"\nif [ ! -f \"${SRC}manifest.json\" ]; then\n  echo \"error: safari-dist/ is missing; run yarn build:safari first\"\n  exit 1\nfi\nrsync -a --exclude .build-complete --exclude Version.xcconfig \"$SRC\" \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n";
+			shellScript = "SRC=\"${SRCROOT}/../../safari-dist/\"\nif [ ! -f \"${SRC}manifest.json\" ]; then\n  echo \"error: safari-dist/ is missing; run yarn build:safari first\"\n  exit 1\nfi\nDEST=\"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/\"\n# The extension's resources share the bundle root with its Info.plist and\n# binary, so clear only what safari-dist/ provides instead of rsync --delete.\nfor entry in \"$SRC\"*; do\n  rm -rf \"$DEST$(basename \"$entry\")\"\ndone\nrsync -a --exclude .build-complete --exclude Version.xcconfig \"$SRC\" \"$DEST\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -317,6 +319,7 @@
 /* Begin XCBuildConfiguration section */
 		BC9C94F43098050C00622417 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = AA0000000000000000000002 /* Version.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -380,6 +383,7 @@
 		};
 		BC9C94F53098050C00622417 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = AA0000000000000000000002 /* Version.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -438,7 +442,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ME3HC6X3KR;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Stylebot Extension/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Stylebot Extension";
@@ -449,7 +453,6 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -470,7 +473,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ME3HC6X3KR;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Stylebot Extension/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "Stylebot Extension";
@@ -481,7 +484,6 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -504,10 +506,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ME3HC6X3KR;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Stylebot/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Stylebot;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -518,7 +522,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,
@@ -543,10 +546,12 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = ME3HC6X3KR;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Stylebot/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Stylebot;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -557,7 +562,6 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
 				OTHER_LDFLAGS = (
 					"-framework",
 					SafariServices,

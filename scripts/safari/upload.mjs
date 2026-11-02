@@ -1,8 +1,8 @@
-// Builds the Safari extension for release, archives the wrapper app and
-// uploads it to App Store Connect, where it shows up in TestFlight once
-// processed. Signs with the Apple account signed in to Xcode, or with an App
-// Store Connect API key when APP_STORE_CONNECT_KEY_PATH, _KEY_ID and
-// _ISSUER_ID are set.
+// Builds the Safari extension for release, archives the wrapper app (the iOS
+// one with --ios) and uploads it to App Store Connect, where it shows up in
+// TestFlight once processed. Signs with the Apple account signed in to Xcode,
+// or with an App Store Connect API key when APP_STORE_CONNECT_KEY_PATH,
+// _KEY_ID and _ISSUER_ID are set.
 
 import { mkdtempSync, rmSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
@@ -27,7 +27,17 @@ const rootDir = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   '../..'
 );
-const projectPath = path.join(rootDir, 'safari/Stylebot/Stylebot.xcodeproj');
+const projects = {
+  macOS: 'safari/Stylebot/Stylebot.xcodeproj',
+  iOS: 'safari/StylebotiOS/Stylebot.xcodeproj',
+};
+
+let platform = 'macOS';
+if (process.argv.includes('--ios')) {
+  platform = 'iOS';
+}
+
+const projectPath = path.join(rootDir, projects[platform]);
 const exportOptionsPath = path.join(rootDir, 'safari/ExportOptions.plist');
 
 const run = (command, args) => {
@@ -91,7 +101,7 @@ run('xcodebuild', [
   '-configuration',
   'Release',
   '-destination',
-  'generic/platform=macOS',
+  `generic/platform=${platform}`,
   '-archivePath',
   archivePath,
   '-allowProvisioningUpdates',
