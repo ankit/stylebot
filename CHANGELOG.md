@@ -1,3 +1,7 @@
+## Version 4.3.0 (November 2026)
+
+- Styles can offer their own options, picked from the popup, declared with UserCSS `@var select` and `@var checkbox` (#1261)
+
 ## Version 4.2.0 (November 2026)
 
 - CLI mode: connect a tab to your coding agent, mark areas of the page and write notes, and see each change it makes with an undo (#1254, #1255, #1256)
