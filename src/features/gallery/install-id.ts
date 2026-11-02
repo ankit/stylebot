@@ -5,10 +5,10 @@ const INSTALL_ID_KEY = 'gallery-install-id';
  * can't be read.
  */
 const readInstallId = async (
-  area: chrome.storage.StorageArea | undefined
+  storage: chrome.storage.StorageArea | undefined
 ): Promise<string | undefined> => {
   try {
-    const items = await area?.get(INSTALL_ID_KEY);
+    const items = await storage?.get(INSTALL_ID_KEY);
 
     return items?.[INSTALL_ID_KEY];
   } catch {
@@ -20,15 +20,15 @@ const readInstallId = async (
  * Saves the install id to a storage area, saying whether it was saved.
  */
 const writeInstallId = async (
-  area: chrome.storage.StorageArea | undefined,
+  storage: chrome.storage.StorageArea | undefined,
   installId: string
 ): Promise<boolean> => {
-  if (!area) {
+  if (!storage) {
     return false;
   }
 
   try {
-    await area.set({ [INSTALL_ID_KEY]: installId });
+    await storage.set({ [INSTALL_ID_KEY]: installId });
 
     return true;
   } catch {
