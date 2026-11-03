@@ -15,6 +15,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .link-button {
   flex: none;
+  min-height: var(--button-min-height, auto);
   padding: 0;
   border: 0;
   border-radius: 3px;
@@ -26,8 +27,10 @@ export default Vue.extend({
   white-space: nowrap;
   cursor: pointer;
 
-  &:hover {
-    text-decoration: underline;
+  @include hover-capable {
+    &:hover {
+      text-decoration: underline;
+    }
   }
 
   @include focus-ring(2px);
