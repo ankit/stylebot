@@ -1,11 +1,11 @@
 <template>
-  <s-list-item padded>
+  <s-list-item padded wraps>
     <template #title>
       <h3 class="heading">{{ t('theme') }}</h3>
     </template>
     <template #meta>
       <s-text variant="muted" size="large" as="span">
-        {{ t('theme_description') }}
+        {{ t(editingEnabled ? 'theme_description' : 'popup_and_this_page') }}
       </s-text>
     </template>
 
@@ -45,6 +45,14 @@ export default Vue.extend({
     MonitorIcon,
     MoonIcon,
     SunIcon,
+  },
+
+  props: {
+    // iPhone has no editor, so the theme doesn't mention it there.
+    editingEnabled: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   computed: {

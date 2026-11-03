@@ -178,19 +178,24 @@ export default Vue.extend({
   align-items: center;
   gap: 8px;
   max-width: 100%;
-  height: 32px;
+  height: var(--options-field-height, 32px);
   padding: 0 12px;
   border: 1px solid var(--panel-border);
-  border-radius: 16px;
+  border-radius: calc(var(--options-field-height, 32px) / 2);
   box-sizing: border-box;
   font-size: 14px;
   font-weight: 500;
   color: var(--text-primary);
   cursor: pointer;
 
-  &:hover,
   &.open {
     background: var(--hover-tint);
+  }
+
+  @include hover-capable {
+    &:hover {
+      background: var(--hover-tint);
+    }
   }
 
   @include focus-ring;
@@ -214,7 +219,7 @@ export default Vue.extend({
   box-sizing: border-box;
   background: var(--field-surface);
   font: inherit;
-  font-size: 13px;
+  font-size: var(--options-input-font-size, 13px);
   color: var(--text-primary);
 
   &::placeholder {

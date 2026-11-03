@@ -1,6 +1,6 @@
 import type { StyleMap } from '@stylebot/types';
 import { createBackup, getBackupFilename } from '@stylebot/saved-styles';
-import { getCurrentTimestamp } from '@stylebot/utils';
+import { getCurrentTimestamp, isIPhone } from '@stylebot/utils';
 
 /**
  * Asks for a backup file and resolves with its text, or with null when the
@@ -12,9 +12,16 @@ export const pickBackupFile = (): Promise<string | null> => {
     fileInput.type = 'file';
     fileInput.accept = 'application/json,.json';
 
-    fileInput.addEventListener('cancel', () => resolve(null));
+    fileInput.hidden = true;
+
+    fileInput.addEventListener('cancel', () => {
+      fileInput.remove();
+      resolve(null);
+    });
     fileInput.addEventListener('change', () => {
       const file = fileInput.files?.[0];
+
+      fileInput.remove();
 
       if (!file) {
         resolve(null);
@@ -24,10 +31,22 @@ export const pickBackupFile = (): Promise<string | null> => {
       file.text().then(resolve, reject);
     });
 
+    // Safari on iPhone opens no picker for an input already taken out.
     document.body.appendChild(fileInput);
     fileInput.click();
-    fileInput.remove();
   });
+};
+
+/**
+ * Offers the backup to the share sheet, where Save to Files keeps it. Safari
+ * on iPhone opens a download link from an extension page as a broken page.
+ */
+const shareBackup = (blob: Blob): void => {
+  const file = new File([blob], getBackupFilename(new Date()), {
+    type: blob.type,
+  });
+
+  navigator.share({ files: [file] }).catch(() => undefined);
 };
 
 /**
@@ -38,6 +57,12 @@ export const downloadBackup = (styles: StyleMap): void => {
   const blob = new Blob([JSON.stringify(backup, null, 2)], {
     type: 'application/json',
   });
+
+  if (isIPhone()) {
+    shareBackup(blob);
+    return;
+  }
+
   const url = URL.createObjectURL(blob);
 
   const downloadAnchorNode = document.createElement('a');

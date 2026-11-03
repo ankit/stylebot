@@ -61,8 +61,10 @@ a {
   text-decoration: none;
   border-radius: 3px;
 
-  &:hover {
-    color: var(--text-primary);
+  @include hover-capable {
+    &:hover {
+      color: var(--text-primary);
+    }
   }
 
   @include focus-ring(2px);

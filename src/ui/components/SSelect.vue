@@ -132,8 +132,10 @@ export default Vue.extend({
     color: var(--field-placeholder);
   }
 
-  &:hover:not(:disabled):not(.open) {
-    background: var(--field-surface-hover);
+  @include hover-capable {
+    &:hover:not(:disabled):not(.open) {
+      background: var(--field-surface-hover);
+    }
   }
 
   &.open,

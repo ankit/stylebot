@@ -17,6 +17,7 @@
       <router-view
         v-if="stylesLoaded"
         :key="$route.fullPath"
+        :editing-enabled="editingEnabled"
         @edit="editStyle"
         @back="navigate({ name: 'styles' })"
         @save="onSaveStyle"
@@ -31,6 +32,7 @@ import type { RawLocation } from 'vue-router';
 
 import type { StylebotAppearance } from '@stylebot/types';
 import { SThemeProvider } from '@stylebot/components';
+import { isIPhone } from '@stylebot/utils';
 
 import TheNavigation from './components/TheNavigation.vue';
 import TheNavigationFooter from './components/navigation/TheNavigationFooter.vue';
@@ -48,10 +50,13 @@ export default Vue.extend({
   data(): {
     tabs: Array<string>;
     stylesLoaded: boolean;
+    // iPhone has no editor, so nothing here edits a style's CSS or sets it up.
+    editingEnabled: boolean;
   } {
     return {
       tabs: [...TABS],
       stylesLoaded: false,
+      editingEnabled: !isIPhone(),
     };
   },
 
@@ -160,8 +165,10 @@ a {
   color: var(--accent-text);
   text-decoration: none;
 
-  &:hover {
-    text-decoration: underline;
+  @include hover-capable {
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }
 
@@ -169,6 +176,36 @@ a {
   display: grid;
   grid-template-columns: 240px 1fr;
   min-height: 100vh;
+
+  @media (max-width: 600px) {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto 1fr;
+
+    --options-nav-padding: 0 8px;
+    --options-nav-direction: row;
+    --options-nav-border: 0 0 1px;
+    --options-nav-logo-display: none;
+    --options-nav-item-width: auto;
+    --options-nav-item-padding: 0 12px;
+    --options-nav-item-line-height: 44px;
+    --options-nav-item-font-size: 15px;
+    --options-nav-item-white-space: nowrap;
+    --options-tab-padding: 16px 16px 24px;
+    --list-item-wrapped-columns: minmax(0, 1fr);
+    --list-item-meta-wrap: wrap;
+    --options-label-wrap: wrap;
+    --options-label-width: 100%;
+    --options-version-counts-display: none;
+    --options-version-details-indent: 20px;
+  }
+
+  @include touch {
+    --button-min-height: 44px;
+    --icon-button-min-size: 44px;
+    --toggle-switch-min-height: 44px;
+    --options-field-height: 44px;
+    --options-input-font-size: 16px;
+  }
 }
 
 .sidebar {
@@ -179,20 +216,44 @@ a {
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--panel-border);
+
+  @media (max-width: 600px) {
+    display: contents;
+  }
 }
 
 .nav {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+
+  @media (max-width: 600px) {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    grid-column: 1;
+    grid-row: 1;
+  }
 }
 
 .nav-footer {
   flex: none;
   padding: 0 12px 16px;
+
+  @media (max-width: 600px) {
+    grid-column: 1;
+    grid-row: 3;
+    padding: 16px 4px 24px;
+    border-top: 1px solid var(--panel-border);
+  }
 }
 
 .content {
   min-width: 0;
+
+  @media (max-width: 600px) {
+    grid-column: 1;
+    grid-row: 2;
+  }
 }
 </style>

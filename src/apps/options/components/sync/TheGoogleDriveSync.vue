@@ -108,7 +108,11 @@
       <ul class="conflict-list">
         <li v-for="conflict in conflicts" :key="conflict.url" class="conflict">
           <span class="conflict-url">{{ conflict.url }}</span>
-          <s-button variant="ghost" @click="$emit('edit', conflict.url)">
+          <s-button
+            v-if="editingEnabled"
+            variant="ghost"
+            @click="$emit('edit', conflict.url)"
+          >
             {{ t('sync_conflict_review') }}
           </s-button>
           <s-button variant="ghost" @click="dismissConflict(conflict.url)">
@@ -151,6 +155,14 @@ export default Vue.extend({
     ExternalLinkIcon,
     SHeading,
     SText,
+  },
+
+  props: {
+    // Reviewing a conflict opens the style's CSS, which iPhone doesn't offer.
+    editingEnabled: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   data(): {
@@ -293,12 +305,13 @@ export default Vue.extend({
 
 .row {
   display: flex;
+  flex-wrap: var(--options-label-wrap, nowrap);
   align-items: baseline;
-  gap: 16px;
+  gap: 4px 16px;
 
   dt {
     flex: none;
-    width: 110px;
+    width: var(--options-label-width, 110px);
     font-size: 13px;
     color: var(--text-muted);
   }
@@ -331,9 +344,12 @@ export default Vue.extend({
   font-size: 13px;
   color: var(--accent-text);
   text-decoration: none;
+  word-break: break-all;
 
-  &:hover {
-    text-decoration: underline;
+  @include hover-capable {
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }
 

@@ -342,8 +342,10 @@ export default Vue.extend({
   color: color-mix(in srgb, var(--accent) 55%, var(--panel-surface));
   cursor: pointer;
 
-  &:hover {
-    background: color-mix(in srgb, var(--panel-surface) 12%, transparent);
+  @include hover-capable {
+    &:hover {
+      background: color-mix(in srgb, var(--panel-surface) 12%, transparent);
+    }
   }
 
   @include focus-ring;
@@ -351,8 +353,10 @@ export default Vue.extend({
   @include dark-mode {
     color: var(--accent-text);
 
-    &:hover {
-      background: var(--hover-tint);
+    @include hover-capable {
+      &:hover {
+        background: var(--hover-tint);
+      }
     }
   }
 }

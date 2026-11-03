@@ -2,7 +2,14 @@
   <component
     :is="as"
     class="list-item"
-    :class="{ interactive, compact, muted, padded, 'has-icon': hasIcon }"
+    :class="{
+      interactive,
+      compact,
+      muted,
+      padded,
+      wraps,
+      'has-icon': hasIcon,
+    }"
     v-bind="$attrs"
     v-on="$listeners"
   >
@@ -59,6 +66,12 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
+    // Lets wide controls drop below the text where a page narrows the row
+    // with --list-item-wrapped-columns.
+    wraps: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   computed: {
@@ -92,6 +105,10 @@ export default Vue.extend({
   min-height: 48px;
 }
 
+.wraps:not(.has-icon) {
+  grid-template-columns: var(--list-item-wrapped-columns, minmax(0, 1fr) auto);
+}
+
 .padded {
   padding: 20px;
 }
@@ -105,8 +122,10 @@ export default Vue.extend({
 .interactive {
   cursor: pointer;
 
-  &:hover {
-    background: var(--card-surface);
+  @include hover-capable {
+    &:hover {
+      background: var(--card-surface);
+    }
   }
 
   @include focus-ring;
@@ -146,6 +165,7 @@ export default Vue.extend({
 
 .meta {
   display: flex;
+  flex-wrap: var(--list-item-meta-wrap, nowrap);
   align-items: center;
   gap: 6px;
   min-width: 0;

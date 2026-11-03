@@ -50,6 +50,7 @@
       </s-text>
 
       <the-google-drive-sync
+        :editing-enabled="editingEnabled"
         @edit="$emit('edit', $event)"
         @restored="onRestored"
       />
@@ -111,6 +112,13 @@ export default Vue.extend({
     SButton,
     TheGoogleDriveSync,
     ImportBackupDialog,
+  },
+
+  props: {
+    editingEnabled: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   data(): {
@@ -237,7 +245,7 @@ export default Vue.extend({
 
 .sync-tab {
   max-width: 760px;
-  padding: 20px 22px 26px;
+  padding: var(--options-tab-padding, 20px 22px 26px);
 }
 
 .description {
