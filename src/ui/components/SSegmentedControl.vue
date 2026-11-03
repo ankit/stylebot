@@ -268,8 +268,10 @@ export default Vue.extend({
   cursor: pointer;
   transition: color 0.15s ease, background-color 0.15s ease;
 
-  &:hover:not(.active):not(:disabled) {
-    background: color-mix(in srgb, var(--text-primary) 6%, transparent);
+  @include hover-capable {
+    &:hover:not(.active):not(:disabled) {
+      background: color-mix(in srgb, var(--text-primary) 6%, transparent);
+    }
   }
 
   &.active {

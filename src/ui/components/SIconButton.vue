@@ -67,9 +67,9 @@ export default Vue.extend({
 
   computed: {
     sizeStyle(): Record<string, string> | undefined {
-      return this.size
-        ? { width: `${this.size}px`, height: `${this.size}px` }
-        : undefined;
+      const size = `max(var(--icon-button-min-size, 0px), ${this.size}px)`;
+
+      return this.size ? { width: size, height: size } : undefined;
     },
 
     ariaLabel(): string {
@@ -92,8 +92,10 @@ export default Vue.extend({
   color: inherit;
   cursor: pointer;
 
-  &:hover:not(:disabled) {
-    background: var(--hover-tint);
+  @include hover-capable {
+    &:hover:not(:disabled) {
+      background: var(--hover-tint);
+    }
   }
 
   &:disabled {

@@ -30,7 +30,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .history-tab {
   max-width: 860px;
-  padding: 20px 22px 26px;
+  padding: var(--options-tab-padding, 20px 22px 26px);
 }
 
 .description {

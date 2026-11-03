@@ -3,15 +3,15 @@
     <s-heading as="h1" size="xl">{{ t('basics_options') }}</s-heading>
 
     <s-list>
-      <the-theme />
-      <the-position />
-      <the-context-menu />
+      <the-theme :editing-enabled="editingEnabled" />
+      <the-position v-if="editingEnabled" />
+      <the-context-menu v-if="editingEnabled" />
       <the-gallery-suggestions />
     </s-list>
 
     <the-cli-access v-if="showCliAccess" />
 
-    <the-keyboard-shortcuts />
+    <the-keyboard-shortcuts v-if="editingEnabled" />
   </div>
 </template>
 
@@ -41,6 +41,14 @@ export default Vue.extend({
     TheKeyboardShortcuts,
   },
 
+  props: {
+    // iPhone has no editor, so its position, right-click menu and shortcuts go.
+    editingEnabled: {
+      type: Boolean,
+      default: true,
+    },
+  },
+
   computed: {
     showCliAccess(): boolean {
       return supportsCLI();
@@ -59,6 +67,6 @@ export default Vue.extend({
   flex-direction: column;
   gap: 40px;
   max-width: 860px;
-  padding: 20px 22px 26px;
+  padding: var(--options-tab-padding, 20px 22px 26px);
 }
 </style>

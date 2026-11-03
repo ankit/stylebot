@@ -55,8 +55,10 @@ a {
   color: var(--accent-text);
   text-decoration: none;
 
-  &:hover {
-    text-decoration: underline;
+  @include hover-capable {
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }
 </style>
