@@ -100,8 +100,10 @@ export default Vue.extend({
   align-items: center;
   border-radius: 8px;
 
-  &:hover:not(.previewing) {
-    background: var(--hover-tint);
+  @include hover-capable {
+    &:hover:not(.previewing) {
+      background: var(--hover-tint);
+    }
   }
 
   &.previewing {
@@ -119,7 +121,7 @@ export default Vue.extend({
   align-items: center;
   gap: 12px;
   width: 100%;
-  min-height: 36px;
+  min-height: var(--popup-row-height, 36px);
   padding: 8px 10px;
   border-radius: 8px;
   color: inherit;

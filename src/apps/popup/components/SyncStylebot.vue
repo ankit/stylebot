@@ -219,8 +219,10 @@ export default Vue.extend({
   @include focus-ring;
 }
 
-.sync-button:hover:not(:disabled),
-.sync-button:hover:not(:disabled) .sync-button-label {
-  color: var(--text-primary);
+@include hover-capable {
+  .sync-button:hover:not(:disabled),
+  .sync-button:hover:not(:disabled) .sync-button-label {
+    color: var(--text-primary);
+  }
 }
 </style>

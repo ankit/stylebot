@@ -64,8 +64,10 @@ export default Vue.extend({
   &.hover:not(.disabled) {
     cursor: pointer;
 
-    &:hover {
-      background: var(--hover-tint);
+    @include hover-capable {
+      &:hover {
+        background: var(--hover-tint);
+      }
     }
   }
 

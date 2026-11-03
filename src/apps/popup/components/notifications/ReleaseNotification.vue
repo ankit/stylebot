@@ -132,8 +132,10 @@ export default Vue.extend({
   ::v-deep .icon-button {
     padding: 5px;
 
-    &:hover {
-      background: var(--info-border);
+    @include hover-capable {
+      &:hover {
+        background: var(--info-border);
+      }
     }
   }
 }

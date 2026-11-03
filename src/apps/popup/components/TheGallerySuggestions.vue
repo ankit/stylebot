@@ -272,8 +272,10 @@ export default Vue.extend({
   font-weight: 500;
   text-decoration: none;
 
-  &:hover {
-    color: var(--accent-text);
+  @include hover-capable {
+    &:hover {
+      color: var(--accent-text);
+    }
   }
 
   @include focus-ring(2px);
@@ -288,15 +290,17 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 12px;
-  min-height: 36px;
+  min-height: var(--popup-row-height, 36px);
   padding: 8px 10px;
   border-radius: 8px;
   color: var(--text-secondary);
   text-decoration: none;
 
-  &:hover {
-    color: var(--text-primary);
-    background: var(--hover-tint);
+  @include hover-capable {
+    &:hover {
+      color: var(--text-primary);
+      background: var(--hover-tint);
+    }
   }
 
   @include focus-ring;

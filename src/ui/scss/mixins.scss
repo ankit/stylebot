@@ -87,3 +87,19 @@
     @content;
   }
 }
+
+// Touchscreens without hover, e.g. Safari on iPhone and iPad, where controls
+// revealed on hover must always show; put it with the nested rules.
+@mixin touch {
+  @media (hover: none) and (pointer: coarse) {
+    @content;
+  }
+}
+
+// Hover styling only where a pointer can hover, so a tap on a touchscreen
+// doesn't leave it stuck on; put it with the nested rules.
+@mixin hover-capable {
+  @media (hover: hover) {
+    @content;
+  }
+}

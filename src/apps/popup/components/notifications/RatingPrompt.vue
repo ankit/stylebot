@@ -119,10 +119,12 @@ export default Vue.extend({
   padding-right: 24px;
 }
 
-.rating-prompt-card .rating-prompt-rate.button:hover:not(:disabled) {
-  background: var(--inset-button-hover);
-  border-color: var(--inset-button-hover-border);
-  box-shadow: var(--inset-button-hover-shadow);
+@include hover-capable {
+  .rating-prompt-card .rating-prompt-rate.button:hover:not(:disabled) {
+    background: var(--inset-button-hover);
+    border-color: var(--inset-button-hover-border);
+    box-shadow: var(--inset-button-hover-shadow);
+  }
 }
 
 .rating-prompt-dismiss {
@@ -135,9 +137,11 @@ export default Vue.extend({
     border-radius: 7px;
     color: var(--text-muted);
 
-    &:hover {
-      color: var(--text-primary);
-      background: var(--panel-border);
+    @include hover-capable {
+      &:hover {
+        color: var(--text-primary);
+        background: var(--panel-border);
+      }
     }
   }
 }

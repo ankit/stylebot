@@ -34,6 +34,7 @@
             :renaming="renaming === profile.id"
             :error="nameError"
             :publish-item="publishItems[profile.id] || null"
+            :editing-enabled="editingEnabled"
             @pick="$emit('pick', profile.id)"
             @more="toggleMenu(profile.id)"
             @close-menu="menuFor = null"
@@ -47,7 +48,11 @@
         </profile-options>
       </div>
 
-      <create-profile :names="names" @create="$emit('create', $event)" />
+      <create-profile
+        v-if="editingEnabled"
+        :names="names"
+        @create="$emit('create', $event)"
+      />
     </div>
   </div>
 </template>
@@ -125,6 +130,12 @@ export default Vue.extend({
     disableOff: {
       type: Boolean,
       default: false,
+    },
+
+    // Whether the popup can open the editor, which iPhone doesn't offer.
+    editingEnabled: {
+      type: Boolean,
+      default: true,
     },
   },
 

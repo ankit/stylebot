@@ -5,6 +5,7 @@ export { splitCommaList } from './split-comma-list';
 export { isMac } from './is-mac';
 export { isSaveShortcut } from './save-shortcut';
 export { isSafari } from './is-safari';
+export { isIPhone } from './is-iphone';
 export {
   getPageSupport,
   getRestorePendingKey,

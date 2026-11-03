@@ -75,8 +75,10 @@ export default Vue.extend({
 
   position: relative;
 
-  &:hover {
-    --pill-current: var(--pill-hover);
+  @include hover-capable {
+    &:hover {
+      --pill-current: var(--pill-hover);
+    }
   }
 }
 
@@ -84,7 +86,7 @@ export default Vue.extend({
   position: absolute;
   top: 50%;
   right: 4px;
-  display: flex;
+  display: var(--popup-shortcut-display, flex);
   border-radius: 6px;
   background: var(--pill-current);
   box-shadow: -10px 0 8px var(--pill-current);
