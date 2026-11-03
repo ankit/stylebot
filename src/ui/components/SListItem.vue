@@ -93,7 +93,7 @@ export default Vue.extend({
   box-sizing: border-box;
   width: 100%;
   min-height: 64px;
-  padding: 0 20px;
+  padding: var(--list-item-padding-y, 0) 20px;
   text-align: start;
 }
 
