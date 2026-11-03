@@ -196,6 +196,8 @@ a {
     --list-item-padding-y: 10px;
     --options-label-wrap: wrap;
     --options-label-width: 100%;
+    --options-sync-row-basis: 100%;
+    --options-sync-action-grow: 1;
     --options-version-counts-display: none;
     --options-version-details-indent: 20px;
   }
