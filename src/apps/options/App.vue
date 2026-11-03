@@ -193,6 +193,7 @@ a {
     --options-tab-padding: 16px 16px 24px;
     --list-item-wrapped-columns: minmax(0, 1fr);
     --list-item-meta-wrap: wrap;
+    --list-item-padding-y: 10px;
     --options-label-wrap: wrap;
     --options-label-width: 100%;
     --options-version-counts-display: none;
