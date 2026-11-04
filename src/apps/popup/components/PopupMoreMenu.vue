@@ -1,7 +1,7 @@
 <template>
   <s-anchored-menu class="popup-more-menu">
     <template #trigger="{ toggle }">
-      <s-icon-button :size="28" :tooltip="t('more_actions')" @click="toggle">
+      <s-icon-button :size="28" :aria-label="t('more')" @click="toggle">
         <more-icon />
       </s-icon-button>
     </template>

@@ -2,7 +2,7 @@
   <div class="footer">
     <div class="links">
       <a target="_blank" :href="manualUrl">{{ t('help_options') }}</a>
-      <a target="_blank" :href="feedbackUrl">{{ t('feedback') }}</a>
+      <a target="_blank" :href="feedbackUrl">{{ t('send_feedback') }}</a>
       <a target="_blank" href="https://ko-fi.com/stylebot">{{ t('donate') }}</a>
     </div>
 
