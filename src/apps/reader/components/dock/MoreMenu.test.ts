@@ -6,7 +6,7 @@ import MoreMenu from './MoreMenu.vue';
 jest.mock('@stylebot/utils', () => ({
   isMac: () => true,
   openOptionsPage: jest.fn(),
-  openReportIssuePage: jest.fn(),
+  openFeedbackPage: jest.fn(),
   openDonatePage: jest.fn(),
 }));
 

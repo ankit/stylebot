@@ -41,7 +41,6 @@ import { defaultOptions } from '@stylebot/settings';
 import {
   openOptionsPage,
   openFeedbackPage,
-  openReportIssuePage,
   openDonatePage,
   getSiteUrl,
   detectChromiumVariantSync,
@@ -355,11 +354,6 @@ export const openSyncOptions = (): void => {
  */
 export const openExtensionDetails = (): void => {
   chrome.tabs.create({ url: `chrome://extensions/?id=${chrome.runtime.id}` });
-  window.close();
-};
-
-export const reportIssue = (): void => {
-  openReportIssuePage();
   window.close();
 };
 

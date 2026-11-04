@@ -41,7 +41,6 @@ export { getSiteUrl } from './site-url';
 export {
   openOptionsPage,
   openShortcutsPage,
-  openReportIssuePage,
   openFeedbackPage,
   openDonatePage,
 } from './open-page';

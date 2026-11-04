@@ -125,10 +125,6 @@ export type OpenDonatePage = {
   name: 'OpenDonatePage';
 };
 
-export type OpenReportIssuePage = {
-  name: 'OpenReportIssuePage';
-};
-
 export type OpenFeedbackPage = {
   name: 'OpenFeedbackPage';
 };
@@ -421,7 +417,6 @@ type BackgroundPageMessage =
   | OpenOptionsPage
   | OpenShortcutsPage
   | OpenDonatePage
-  | OpenReportIssuePage
   | OpenFeedbackPage
   | SetReadability
   | GetCommands
