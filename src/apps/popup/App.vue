@@ -36,7 +36,7 @@
             <s-heading as="h1" size="md" class="popup-header-domain">
               {{ styles.length ? styles[0].url : domain }}
             </s-heading>
-            <options-button />
+            <popup-more-menu />
           </div>
         </div>
 
@@ -163,7 +163,7 @@ import StyleComponent from './components/Style.vue';
 import SiteProfiles from './components/SiteProfiles.vue';
 import ProfileOptions from './components/ProfileOptions.vue';
 import CreateProfile from './components/CreateProfile.vue';
-import OptionsButton from './components/OptionsButton.vue';
+import PopupMoreMenu from './components/PopupMoreMenu.vue';
 import Readability from './components/Readability.vue';
 import SyncStylebot from './components/SyncStylebot.vue';
 import ToggleStylebot from './components/ToggleStylebot.vue';
@@ -224,7 +224,7 @@ export default Vue.extend({
     SHeading,
     SPillButton,
     SThemeProvider,
-    OptionsButton,
+    PopupMoreMenu,
     StyleComponent,
     SiteProfiles,
     ProfileOptions,

@@ -46,10 +46,8 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .navigation {
-  flex: none;
-  width: var(--options-nav-width, 200px);
   border: 0 solid var(--panel-border);
-  border-width: var(--options-nav-border, 0 1px 0 0);
+  border-width: var(--options-nav-border, 0);
   padding: var(--options-nav-padding, 24px 12px);
   display: flex;
   flex-direction: column;

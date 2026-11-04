@@ -1,11 +1,17 @@
 <template>
   <s-theme-provider class="options-app" :mode="appearance">
-    <the-navigation
-      class="nav"
-      :tabs="tabs"
-      :current-tab="currentTab"
-      @select="selectTab"
-    />
+    <div class="sidebar">
+      <the-navigation
+        class="nav"
+        :tabs="tabs"
+        :current-tab="currentTab"
+        @select="selectTab"
+      />
+
+      <div class="nav-footer">
+        <the-navigation-footer />
+      </div>
+    </div>
 
     <div class="content">
       <router-view
@@ -16,10 +22,6 @@
         @back="navigate({ name: 'styles' })"
         @save="onSaveStyle"
       />
-    </div>
-
-    <div class="nav-footer">
-      <the-navigation-footer />
     </div>
   </s-theme-provider>
 </template>
@@ -172,15 +174,13 @@ a {
 
 .options-app {
   display: grid;
-  grid-template-columns: 200px 1fr;
-  grid-template-rows: 1fr auto;
+  grid-template-columns: 240px 1fr;
   min-height: 100vh;
 
   @media (max-width: 600px) {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto 1fr;
 
-    --options-nav-width: auto;
     --options-nav-padding: 0 8px;
     --options-nav-direction: row;
     --options-nav-border: 0 0 1px;
@@ -211,34 +211,47 @@ a {
   }
 }
 
+.sidebar {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--panel-border);
+
+  @media (max-width: 600px) {
+    display: contents;
+  }
+}
+
 .nav {
-  grid-column: 1;
-  grid-row: 1;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
 
   @media (max-width: 600px) {
     position: sticky;
     top: 0;
     z-index: 1;
+    grid-column: 1;
+    grid-row: 1;
   }
 }
 
 .nav-footer {
-  grid-column: 1;
-  grid-row: 2;
+  flex: none;
   padding: 0 12px 16px;
-  border-right: 1px solid var(--panel-border);
 
   @media (max-width: 600px) {
+    grid-column: 1;
     grid-row: 3;
     padding: 16px 4px 24px;
     border-top: 1px solid var(--panel-border);
-    border-right: 0;
   }
 }
 
 .content {
-  grid-column: 2;
-  grid-row: 1 / -1;
   min-width: 0;
 
   @media (max-width: 600px) {

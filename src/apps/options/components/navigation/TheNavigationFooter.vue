@@ -1,29 +1,38 @@
 <template>
   <div class="footer">
-    <span class="version">v{{ version }}</span>
     <div class="links">
-      <a target="_blank" :href="manualUrl">
-        {{ t('help_options') }}
-      </a>
-      <a target="_blank" href="http://github.com/ankit/stylebot">
-        {{ t('github') }}
-      </a>
+      <a target="_blank" :href="manualUrl">{{ t('help_options') }}</a>
+      <a target="_blank" :href="feedbackUrl">{{ t('send_feedback') }}</a>
       <a target="_blank" href="https://ko-fi.com/stylebot">{{ t('donate') }}</a>
     </div>
+
+    <a
+      class="version"
+      target="_blank"
+      href="https://github.com/ankit/stylebot"
+      :title="t('github')"
+    >
+      v{{ version }}
+    </a>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { getExtensionVersion, getSiteUrl } from '@stylebot/utils';
+import {
+  getExtensionVersion,
+  getFeedbackUrl,
+  getSiteUrl,
+} from '@stylebot/utils';
 
 export default Vue.extend({
   name: 'TheNavigationFooter',
 
-  data(): { version: string; manualUrl: string } {
+  data(): { version: string; manualUrl: string; feedbackUrl: string } {
     return {
       version: getExtensionVersion(),
       manualUrl: getSiteUrl('/manual'),
+      feedbackUrl: getFeedbackUrl(),
     };
   },
 });
@@ -34,31 +43,36 @@ export default Vue.extend({
   padding: 0 12px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   font-weight: 400;
   font-size: 13px;
   line-height: 1.4;
-  color: var(--text-muted);
+  color: var(--text-faint);
 }
 
 .links {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 10px;
+  gap: 4px 12px;
+}
+
+a {
+  color: var(--text-muted);
+  text-decoration: none;
+  border-radius: 3px;
+
+  @include hover-capable {
+    &:hover {
+      color: var(--text-primary);
+    }
+  }
+
+  @include focus-ring(2px);
 }
 
 .version {
   font-family: var(--font-mono);
-}
-
-a {
-  color: var(--accent-text);
-  text-decoration: none;
-
-  @include hover-capable {
-    &:hover {
-      text-decoration: underline;
-    }
-  }
+  font-size: 12px;
+  color: var(--text-faint);
 }
 </style>

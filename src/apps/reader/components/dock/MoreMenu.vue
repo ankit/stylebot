@@ -9,9 +9,9 @@
       <options-icon />
       {{ t('view_options') }}
     </button>
-    <button class="item" @click="reportIssue">
+    <button class="item" @click="sendFeedback">
       <flag-icon />
-      {{ t('report_an_issue') }}
+      {{ t('send_feedback') }}
     </button>
     <button class="item" @click="donate">
       <coffee-icon />
@@ -26,7 +26,7 @@ import Vue from 'vue';
 import { shortcutStore } from './shortcut-store';
 import {
   openOptionsPage,
-  openReportIssuePage,
+  openFeedbackPage,
   openDonatePage,
 } from '@stylebot/utils';
 
@@ -68,9 +68,9 @@ export default Vue.extend({
       openOptionsPage();
     },
 
-    reportIssue(): void {
+    sendFeedback(): void {
       this.$emit('close');
-      openReportIssuePage();
+      openFeedbackPage();
     },
 
     donate(): void {

@@ -19,7 +19,7 @@ import {
   GoogleSignInRedirect,
   syncAfterSignInRedirect,
   OpenDonatePage,
-  OpenReportIssuePage,
+  OpenFeedbackPage,
   SetStyle,
   MoveStyle,
   GetAllStyles,
@@ -301,8 +301,8 @@ export const initListeners = (): void => {
         case 'OpenDonatePage':
           OpenDonatePage();
           break;
-        case 'OpenReportIssuePage':
-          OpenReportIssuePage();
+        case 'OpenFeedbackPage':
+          OpenFeedbackPage();
           break;
 
         case 'SetStyle':

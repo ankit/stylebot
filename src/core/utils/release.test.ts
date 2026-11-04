@@ -1,4 +1,9 @@
-import { getGoodbyeUrl, hasReleasePage, isMajorUpdate } from './release';
+import {
+  getFeedbackUrl,
+  getGoodbyeUrl,
+  hasReleasePage,
+  isMajorUpdate,
+} from './release';
 
 jest.mock('@stylebot/i18n', () => ({ t: () => 'de' }));
 
@@ -10,6 +15,18 @@ describe('getGoodbyeUrl', () => {
 
     expect(getGoodbyeUrl()).toBe(
       'https://stylebot.dev/de/goodbye?version=4.1.0'
+    );
+  });
+});
+
+describe('getFeedbackUrl', () => {
+  it('passes the extension version to the feedback page', () => {
+    global.chrome = {
+      runtime: { getManifest: () => ({ version: '4.1.0' }) },
+    } as unknown as typeof chrome;
+
+    expect(getFeedbackUrl()).toBe(
+      'https://stylebot.dev/de/feedback?version=4.1.0'
     );
   });
 });
