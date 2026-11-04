@@ -47,7 +47,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .navigation {
   flex: none;
-  width: 200px;
+  width: 224px;
   border-right: 1px solid var(--panel-border);
   padding: 24px 12px;
   display: flex;
