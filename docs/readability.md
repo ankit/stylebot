@@ -19,7 +19,7 @@ Ruled out straight away, before the page has loaded:
 - anything that isn't `http:` or `https:`
 - a site's home page (`/`)
 - a single short path segment that reads like a section name rather than an article slug, such as `/tech` or `/news`: under 20 characters with fewer than two hyphens
-- a short list of app-like sites where the reader never helps, such as GitHub, Gmail and YouTube
+- a short list of app-like sites where the reader never helps, such as GitHub, Gmail, YouTube and AI chat apps like Gemini and ChatGPT
 
 This follows the same idea as Firefox's Reader View.
 
