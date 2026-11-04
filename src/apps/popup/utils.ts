@@ -40,6 +40,7 @@ import { defaultOptions } from '@stylebot/settings';
 
 import {
   openOptionsPage,
+  openFeedbackPage,
   openReportIssuePage,
   openDonatePage,
   detectChromiumVariantSync,
@@ -324,6 +325,11 @@ export const getOption = <K extends keyof StylebotOptions>(
 
 export const openOptions = (): void => {
   openOptionsPage();
+  window.close();
+};
+
+export const openFeedback = (): void => {
+  openFeedbackPage();
   window.close();
 };
 

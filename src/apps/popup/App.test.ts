@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 
 import App from './App.vue';
-import OptionsButton from './components/OptionsButton.vue';
+import PopupMoreMenu from './components/PopupMoreMenu.vue';
 import SiteProfiles from './components/SiteProfiles.vue';
 import StyleComponent from './components/Style.vue';
 import ToggleStylebot from './components/ToggleStylebot.vue';
@@ -100,7 +100,7 @@ describe('App.vue', () => {
   it('should show the settings button on the main view', async () => {
     const wrapper = await openPopup('https://news.ycombinator.com');
 
-    expect(wrapper.findComponent(OptionsButton).exists()).toBe(true);
+    expect(wrapper.findComponent(PopupMoreMenu).exists()).toBe(true);
   });
 
   it('should fetch keyboard shortcuts on load', async () => {

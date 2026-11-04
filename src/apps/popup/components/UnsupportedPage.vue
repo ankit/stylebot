@@ -4,7 +4,7 @@
       <s-heading as="h1" size="md" class="popup-header-domain">
         {{ name }}
       </s-heading>
-      <options-button />
+      <popup-more-menu />
     </div>
 
     <button
@@ -28,7 +28,7 @@ import Vue from 'vue';
 import type { PropType } from 'vue';
 import { SHeading, SText } from '@stylebot/components';
 
-import OptionsButton from './OptionsButton.vue';
+import PopupMoreMenu from './PopupMoreMenu.vue';
 import { openExtensionDetails } from '../utils';
 import { describeUnsupportedPage } from '../unsupported-page';
 import type { UnsupportedPage } from '../unsupported-page';
@@ -40,7 +40,7 @@ export default Vue.extend({
   components: {
     SHeading,
     SText,
-    OptionsButton,
+    PopupMoreMenu,
   },
 
   props: {
@@ -92,6 +92,7 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-height: 128px;
   padding: 16px 16px 14px;
 }
 

@@ -2,7 +2,7 @@
   <div class="site-profiles">
     <div class="popup-header site-header">
       <s-heading as="h1" size="md" class="site-domain">{{ url }}</s-heading>
-      <options-button />
+      <popup-more-menu />
     </div>
 
     <div class="popup-divider" />
@@ -66,7 +66,7 @@ import type { ProfileSummary } from '@stylebot/saved-styles';
 
 import type { GalleryMenuItem } from '@stylebot/gallery';
 
-import OptionsButton from './OptionsButton.vue';
+import PopupMoreMenu from './PopupMoreMenu.vue';
 import ProfileRow from './ProfileRow.vue';
 import CreateProfile from './CreateProfile.vue';
 import ProfileOptions from './ProfileOptions.vue';
@@ -77,7 +77,7 @@ export default Vue.extend({
 
   components: {
     SHeading,
-    OptionsButton,
+    PopupMoreMenu,
     ProfileRow,
     CreateProfile,
     ProfileOptions,

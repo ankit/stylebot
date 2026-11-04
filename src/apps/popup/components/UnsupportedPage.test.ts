@@ -1,7 +1,7 @@
 import { mount } from '@vue/test-utils';
 
 import UnsupportedPage from './UnsupportedPage.vue';
-import OptionsButton from './OptionsButton.vue';
+import PopupMoreMenu from './PopupMoreMenu.vue';
 import { openExtensionDetails } from '../utils';
 
 jest.mock('../utils', () => ({
@@ -17,7 +17,7 @@ describe('UnsupportedPage.vue', () => {
 
     expect(wrapper.text()).toContain('browser_settings');
     expect(wrapper.text()).toContain('stylebot_cant_style_browser_pages');
-    expect(wrapper.findComponent(OptionsButton).exists()).toBe(true);
+    expect(wrapper.findComponent(PopupMoreMenu).exists()).toBe(true);
   });
 
   it('names a website file by its host', () => {
