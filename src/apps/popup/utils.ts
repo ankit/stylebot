@@ -43,6 +43,7 @@ import {
   openFeedbackPage,
   openReportIssuePage,
   openDonatePage,
+  getSiteUrl,
   detectChromiumVariantSync,
   doesSidePanelWorkInChromiumVariant,
   getBrowserCommands,
@@ -325,6 +326,11 @@ export const getOption = <K extends keyof StylebotOptions>(
 
 export const openOptions = (): void => {
   openOptionsPage();
+  window.close();
+};
+
+export const openHelp = (): void => {
+  chrome.tabs.create({ url: getSiteUrl('/manual') });
   window.close();
 };
 

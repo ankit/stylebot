@@ -6,6 +6,8 @@ import { openExtensionDetails } from '../utils';
 
 jest.mock('../utils', () => ({
   openExtensionDetails: jest.fn(),
+  openFeedback: jest.fn(),
+  openHelp: jest.fn(),
   openOptions: jest.fn(),
 }));
 

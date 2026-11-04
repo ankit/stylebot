@@ -8,6 +8,7 @@
 
     <s-menu dense size="small" class="more-list">
       <s-menu-item @click="openOptions">{{ t('view_options') }}</s-menu-item>
+      <s-menu-item @click="openHelp">{{ t('help_options') }}</s-menu-item>
 
       <s-menu-item @click="openFeedback">
         {{ t('send_feedback') }}
@@ -27,7 +28,7 @@ import {
   SMenuItem,
 } from '@stylebot/components';
 
-import { openFeedback, openOptions } from '../utils';
+import { openFeedback, openHelp, openOptions } from '../utils';
 
 export default Vue.extend({
   name: 'PopupMoreMenu',
@@ -42,6 +43,7 @@ export default Vue.extend({
 
   methods: {
     openFeedback,
+    openHelp,
     openOptions,
   },
 });
