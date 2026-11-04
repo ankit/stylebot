@@ -1,11 +1,17 @@
 <template>
   <s-theme-provider class="options-app" :mode="appearance">
-    <the-navigation
-      class="nav"
-      :tabs="tabs"
-      :current-tab="currentTab"
-      @select="selectTab"
-    />
+    <div class="sidebar">
+      <the-navigation
+        class="nav"
+        :tabs="tabs"
+        :current-tab="currentTab"
+        @select="selectTab"
+      />
+
+      <div class="nav-footer">
+        <the-navigation-footer />
+      </div>
+    </div>
 
     <div class="content">
       <router-view
@@ -15,10 +21,6 @@
         @back="navigate({ name: 'styles' })"
         @save="onSaveStyle"
       />
-    </div>
-
-    <div class="nav-footer">
-      <the-navigation-footer />
     </div>
   </s-theme-provider>
 </template>
@@ -166,25 +168,31 @@ a {
 .options-app {
   display: grid;
   grid-template-columns: 224px 1fr;
-  grid-template-rows: 1fr auto;
   min-height: 100vh;
 }
 
-.nav {
-  grid-column: 1;
-  grid-row: 1;
-}
-
-.nav-footer {
-  grid-column: 1;
-  grid-row: 2;
-  padding: 0 12px 16px;
+.sidebar {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
   border-right: 1px solid var(--panel-border);
 }
 
+.nav {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.nav-footer {
+  flex: none;
+  padding: 0 12px 16px;
+}
+
 .content {
-  grid-column: 2;
-  grid-row: 1 / -1;
   min-width: 0;
 }
 </style>
