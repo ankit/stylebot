@@ -28,7 +28,7 @@ export const OpeningStopsInspecting: StoryObj = {
 
 export const MenuContents: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'the Options menu offers Position, Theme, Publish to Gallery, Keyboard shortcuts and Options',
+  name: 'the Options menu offers Position, Theme, Publish to Gallery, Keyboard shortcuts, Options and Send feedback',
   play: async ({ canvasElement }) => {
     const menu = within(await openEditorMenu(within(canvasElement), 'Options'));
 
@@ -56,6 +56,7 @@ export const MenuContents: StoryObj = {
       'Publish to Gallery',
       expect.stringMatching(/^Keyboard shortcuts/),
       'Options',
+      'Send feedback',
     ]);
     await expect(menu.queryByRole('checkbox')).toBeNull();
   },

@@ -40,8 +40,9 @@ import { defaultOptions } from '@stylebot/settings';
 
 import {
   openOptionsPage,
-  openReportIssuePage,
+  openFeedbackPage,
   openDonatePage,
+  getSiteUrl,
   detectChromiumVariantSync,
   doesSidePanelWorkInChromiumVariant,
   getBrowserCommands,
@@ -327,6 +328,16 @@ export const openOptions = (): void => {
   window.close();
 };
 
+export const openHelp = (): void => {
+  chrome.tabs.create({ url: getSiteUrl('/manual') });
+  window.close();
+};
+
+export const openFeedback = (): void => {
+  openFeedbackPage();
+  window.close();
+};
+
 export const openStyleInOptions = (url: string): void => {
   openOptionsPage(`/styles/edit?url=${encodeURIComponent(url)}`);
   window.close();
@@ -343,11 +354,6 @@ export const openSyncOptions = (): void => {
  */
 export const openExtensionDetails = (): void => {
   chrome.tabs.create({ url: `chrome://extensions/?id=${chrome.runtime.id}` });
-  window.close();
-};
-
-export const reportIssue = (): void => {
-  openReportIssuePage();
   window.close();
 };
 
