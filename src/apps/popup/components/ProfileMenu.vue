@@ -1,8 +1,8 @@
 <template>
   <s-menu
     dense
+    size="small"
     class="row-menu"
-    :min-width="180"
     :max-height="POPUP_MAX_HEIGHT"
     @keydown.native="onKeydown"
     @click.native.stop

@@ -2,7 +2,7 @@
   <s-anchored-menu class="popup-more-menu">
     <template #trigger="{ toggle }">
       <s-icon-button :size="28" :aria-label="t('more')" @click="toggle">
-        <more-icon />
+        <more-icon :size="16" />
       </s-icon-button>
     </template>
 
