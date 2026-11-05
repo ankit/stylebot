@@ -142,8 +142,17 @@ export default Vue.extend({
   align-items: center;
   height: var(--popup-row-height, 34px);
   border-radius: 7px;
+  --row-check-opacity: 1;
+  --row-more-opacity: var(--popup-row-actions-shown, 0);
 
-  &:focus-within,
+  &:hover,
+  &:has(:focus-visible),
+  &.menu-open {
+    --row-check-opacity: var(--popup-row-actions-shown, 0);
+    --row-more-opacity: 1;
+  }
+
+  &:has(:focus-visible),
   &.menu-open {
     background: var(--hover-tint);
   }
@@ -182,6 +191,7 @@ export default Vue.extend({
   flex: none;
   width: 16px;
   color: var(--accent-text);
+  opacity: var(--row-check-opacity);
 
   .previewing & {
     color: var(--text-muted);
@@ -191,12 +201,6 @@ export default Vue.extend({
     margin-right: calc(
       var(--popup-row-actions-shown, 0) * var(--popup-menu-button-size, 26px)
     );
-  }
-
-  .profile-row:hover &,
-  .profile-row:focus-within &,
-  .menu-open & {
-    opacity: var(--popup-row-actions-shown, 0);
   }
 
   .profile-row:not(:has(.row-more)) & {
@@ -230,14 +234,8 @@ export default Vue.extend({
   justify-content: center;
   border-radius: 5px;
   color: var(--text-muted);
-  opacity: var(--popup-row-actions-shown, 0);
+  opacity: var(--row-more-opacity);
   cursor: pointer;
-
-  .profile-row:hover &,
-  .profile-row:focus-within &,
-  .menu-open & {
-    opacity: 1;
-  }
 
   .menu-open & {
     color: var(--text-primary);

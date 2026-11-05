@@ -94,7 +94,6 @@ export type GetGalleryStyleResponse = GalleryResult<{
 // and how many it has there.
 export type GetGallerySuggestionsResponse = GalleryResult<{
   styles: Array<GalleryStyle>;
-  total: number;
   site: string;
 }>;
 export type PreviewGalleryStyleResponse = GalleryResult;

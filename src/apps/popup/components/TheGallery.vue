@@ -1,27 +1,23 @@
 <template>
-  <div v-if="compact && (previewed || total)">
+  <gallery-browser
+    v-if="browsing"
+    :styles="styles"
+    :browse-url="browseUrl"
+    :preview-id="previewId"
+    :loading="loadingId !== null"
+    :installing="installing"
+    :error="error"
+    @back="back"
+    @preview="preview"
+  />
+
+  <div v-else-if="compact && styles.length">
     <div class="popup-divider" />
 
     <section class="gallery gallery--compact">
-      <gallery-suggestion
-        v-if="previewed"
-        :style-data="previewed"
-        previewing
-        :disabled="installing"
-      />
-      <a
-        v-else
-        class="more"
-        :href="browseUrl"
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        <span class="more-label">{{ t('styles_in_gallery') }}</span>
-        <s-text as="span" size="large" variant="muted" class="more-count">
-          {{ total }}
-          <arrow-up-right-icon :size="14" />
-        </s-text>
-      </a>
+      <gallery-link :count="styles.length" @click="$emit('browse', true)">
+        {{ t('styles_in_gallery') }}
+      </gallery-link>
 
       <s-callout v-if="error" tone="danger">{{ error }}</s-callout>
     </section>
@@ -31,24 +27,15 @@
     <div class="popup-divider" />
 
     <section class="gallery">
-      <div class="gallery-heading">
-        <s-text as="h2" size="caption" variant="muted" medium>
-          {{ t('gallery') }}
-        </s-text>
-        <a
-          v-if="browseUrl"
-          class="browse"
-          :href="browseUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <template v-if="shownStyles.length < total">
-            {{ t('browse_all') }}
-            <span class="browse-count">{{ total }}</span>
-          </template>
-          <template v-else>{{ t('open_gallery') }}</template>
-        </a>
-      </div>
+      <s-text
+        as="h2"
+        size="caption"
+        variant="muted"
+        medium
+        class="gallery-heading"
+      >
+        {{ t('styles_in_gallery') }}
+      </s-text>
 
       <gallery-suggestion
         v-for="style in shownStyles"
@@ -59,6 +46,17 @@
         @preview="preview(style)"
       />
 
+      <gallery-link
+        v-if="canBrowse"
+        :count="styles.length"
+        @click="$emit('browse', true)"
+      >
+        {{ t('browse_all') }}
+      </gallery-link>
+      <gallery-link v-else-if="browseUrl" :href="browseUrl">
+        {{ t('open_gallery') }}
+      </gallery-link>
+
       <s-callout v-if="error" tone="danger">{{ error }}</s-callout>
     </section>
   </div>
@@ -68,10 +66,11 @@
 import type { PropType } from 'vue';
 import Vue from 'vue';
 import { SCallout, SText } from '@stylebot/components';
-import { ArrowUpRightIcon } from '@stylebot/icons';
 import { galleryErrorText, getGallerySiteUrl } from '@stylebot/gallery';
 import type { GalleryStyle } from '@stylebot/types';
 
+import GalleryBrowser from './GalleryBrowser.vue';
+import GalleryLink from './GalleryLink.vue';
 import GallerySuggestion from './GallerySuggestion.vue';
 import {
   endGalleryPreview,
@@ -85,10 +84,10 @@ const SHOWN = 3;
 
 type Data = {
   styles: Array<GalleryStyle>;
-  // How many the site has in the gallery, as its page there lists.
-  total: number;
   site: string | null;
   previewId: number | null;
+  // The picked style, until the tab has it. Stopping sooner would leave it on.
+  loadingId: number | null;
   installing: boolean;
   error: string;
 };
@@ -100,10 +99,11 @@ type Data = {
  * footer or on the page.
  */
 export default Vue.extend({
-  name: 'TheGallerySuggestions',
+  name: 'TheGallery',
 
   components: {
-    ArrowUpRightIcon,
+    GalleryBrowser,
+    GalleryLink,
     GallerySuggestion,
     SCallout,
     SText,
@@ -115,23 +115,31 @@ export default Vue.extend({
       required: true,
     },
 
-    // Just a link to the site's styles in the Gallery, for a site already
-    // styled, or the row of a style the tab is previewing.
+    // Just a row into the site's styles, for a site already styled.
     compact: Boolean,
+
+    // Every style there is to try, in place of the rest of the popup.
+    browsing: Boolean,
   },
 
   data(): Data {
     return {
       styles: [],
-      total: 0,
       site: null,
       previewId: null,
+      loadingId: null,
       installing: false,
       error: '',
     };
   },
 
   computed: {
+    // Installed and published styles aren't listed, so there may be none
+    // left to try, or no more than the popup already shows.
+    canBrowse(): boolean {
+      return this.compact ? this.styles.length > 0 : this.styles.length > SHOWN;
+    },
+
     browseUrl(): string {
       return this.site ? getGallerySiteUrl(this.site) : '';
     },
@@ -160,7 +168,6 @@ export default Vue.extend({
     // A gallery that can't be reached leaves the popup as it always was.
     if (response?.ok) {
       this.styles = response.styles;
-      this.total = response.total;
       this.site = response.site;
     }
 
@@ -172,21 +179,49 @@ export default Vue.extend({
       }
 
       this.previewId = preview.style.id;
-      this.$emit('preview', true);
+      this.$emit('preview', preview.style.name);
+
+      if (this.canBrowse) {
+        this.$emit('browse', true);
+      }
     }
   },
 
   methods: {
+    /**
+     * Returns to the rest of the popup, leaving no preview behind.
+     */
+    back(): void {
+      this.cancel();
+      this.$emit('browse', false);
+    },
+
+    /**
+     * Previews a style, or stops the preview of the one already picked.
+     */
     async preview(style: GalleryStyle): Promise<void> {
       if (this.tab.id === undefined) {
         return;
       }
 
+      if (style.id === this.previewId) {
+        if (style.id !== this.loadingId) {
+          this.cancel();
+        }
+
+        return;
+      }
+
       this.error = '';
       this.previewId = style.id;
-      this.$emit('preview', true);
+      this.loadingId = style.id;
+      this.$emit('preview', style.name);
 
       const response = await previewGalleryStyle(this.tab.id, style.id);
+
+      if (this.loadingId === style.id) {
+        this.loadingId = null;
+      }
 
       // Another style may have been picked while this one loaded.
       if (this.previewId !== style.id) {
@@ -209,7 +244,7 @@ export default Vue.extend({
       }
 
       this.previewId = null;
-      this.$emit('preview', false);
+      this.$emit('preview', null);
     },
 
     /**
@@ -239,7 +274,7 @@ export default Vue.extend({
 
       // Installing ended the preview, and the new profile is applied.
       this.previewId = null;
-      this.$emit('preview', false);
+      this.$emit('preview', null);
       this.styles = this.styles.filter(each => each.id !== style.id);
       this.$emit('installed');
     },
@@ -260,66 +295,6 @@ export default Vue.extend({
 }
 
 .gallery-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   padding: 0 10px 6px;
-}
-
-.gallery-heading .browse {
-  color: var(--text-muted);
-  font-size: 12px;
-  font-weight: 500;
-  text-decoration: none;
-
-  @include hover-capable {
-    &:hover {
-      color: var(--accent-text);
-    }
-  }
-
-  @include focus-ring(2px);
-}
-
-.browse-count {
-  margin-left: 2px;
-  font-variant-numeric: tabular-nums;
-}
-
-.more {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: var(--popup-row-height, 36px);
-  padding: 8px 10px;
-  border-radius: 8px;
-  color: var(--text-secondary);
-  text-decoration: none;
-
-  @include hover-capable {
-    &:hover {
-      color: var(--text-primary);
-      background: var(--hover-tint);
-    }
-  }
-
-  @include focus-ring;
-}
-
-.more-label {
-  @include truncate;
-
-  flex: 1;
-  min-width: 0;
-  font-size: 14px;
-  line-height: 1.45;
-}
-
-.more-count {
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-variant-numeric: tabular-nums;
 }
 </style>

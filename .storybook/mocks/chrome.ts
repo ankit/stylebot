@@ -61,7 +61,6 @@ export type GalleryShimOptions = {
   // The popup's suggestions for the site, how many the site has in all, the
   // one the tab previews already, and what installing a preview answers.
   suggestions?: Array<GalleryStyle>;
-  total?: number;
   previewing?: GalleryStyle;
   install?: InstallGalleryPreviewResponse;
   // The gallery style the profile was installed from.
@@ -244,7 +243,6 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     GetGallerySuggestions: () => ({
       ok: true,
       styles: gallery.suggestions ?? [],
-      total: gallery.total ?? gallery.suggestions?.length ?? 0,
       site: 'example.com',
     }),
     PreviewGalleryStyle: message => {

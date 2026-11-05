@@ -1,5 +1,6 @@
 export { default as ArrowRepeatIcon } from './ArrowRepeatIcon.vue';
 export { default as ChevronLeftIcon } from './ChevronLeftIcon.vue';
+export { default as ChevronRightIcon } from './ChevronRightIcon.vue';
 export { default as ChevronDownIcon } from './ChevronDownIcon.vue';
 export { default as MoreIcon } from './MoreIcon.vue';
 export { default as ExternalLinkIcon } from './ExternalLinkIcon.vue';

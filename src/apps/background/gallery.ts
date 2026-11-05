@@ -524,11 +524,11 @@ export const GetGallerySuggestions = async (
     const allowed = await canAskGalleryAbout(url, site, incognito);
 
     if (!allowed) {
-      sendResponse({ ok: true, styles: [], total: 0, site });
+      sendResponse({ ok: true, styles: [], site });
       return;
     }
 
-    const [{ styles, total }, listed] = await Promise.all([
+    const [{ styles }, listed] = await Promise.all([
       getSiteSuggestions(site, SUGGESTIONS_FETCHED),
       getAll().then(getListedStyleIds),
     ]);
@@ -536,7 +536,6 @@ export const GetGallerySuggestions = async (
     sendResponse({
       ok: true,
       styles: styles.filter(style => !listed.has(style.id)),
-      total,
       site,
     });
   } catch (e) {
