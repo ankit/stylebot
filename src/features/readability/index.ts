@@ -1,4 +1,8 @@
-export { applyReadability, removeReadability } from './lifecycle';
+export {
+  applyReadability,
+  isReaderShowing,
+  removeReadability,
+} from './lifecycle';
 export { isReaderable } from './eligibility';
 export { hasReaderableContent } from './eligibility/has-readerable-content';
 export { cacheDocument } from './lifecycle/document-cache';

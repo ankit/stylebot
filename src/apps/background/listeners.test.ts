@@ -1,3 +1,7 @@
+jest.mock('./badge', () => ({
+  refreshAllBadges: jest.fn(),
+  refreshBadge: jest.fn(),
+}));
 jest.mock('./contextmenu', () => ({
   ContextMenu: { update: jest.fn() },
   handleContextMenuClick: jest.fn(),
