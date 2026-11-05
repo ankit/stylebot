@@ -72,7 +72,7 @@ import {
 import {
   endGalleryPreview,
   getGalleryPreview,
-  getInstallTargetUrl,
+  getPreviewReplacedUrls,
   getLatestVersionListing,
   installGalleryPreview,
   openGalleryPreview,
@@ -629,8 +629,8 @@ export const GetGalleryPreview = async (
     return;
   }
 
-  const replacedUrl = await getInstallTargetUrl(preview.style, pageUrl);
-  sendResponse({ preview, replacedUrl });
+  const replacedUrls = await getPreviewReplacedUrls(preview.style, pageUrl);
+  sendResponse({ preview, replacedUrls });
 };
 
 /**

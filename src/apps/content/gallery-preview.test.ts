@@ -52,7 +52,7 @@ beforeEach(async () => {
     runtime: {
       sendMessage: jest.fn(async () => ({
         preview,
-        replacedUrl: 'example.com',
+        replacedUrls: ['example.com'],
       })),
     },
     storage: {
@@ -66,7 +66,7 @@ beforeEach(async () => {
 
 describe('gallery preview on the page', () => {
   it('shows a gallery style in place of the style it would replace, with its controls', async () => {
-    await showGalleryPreview(preview, 'example.com');
+    await showGalleryPreview(preview, ['example.com']);
 
     expect(removeStylesheet).toHaveBeenCalledWith('example.com');
     expect(removeStylesheet).not.toHaveBeenCalledWith('*');
@@ -83,14 +83,22 @@ describe('gallery preview on the page', () => {
     expect(isPreviewingGalleryStyle()).toBe(true);
   });
 
+  it('removes every style it replaces', async () => {
+    await showGalleryPreview(preview, ['https://example.com/', 'example.com']);
+
+    expect(removeStylesheet).toHaveBeenCalledWith('https://example.com/');
+    expect(removeStylesheet).toHaveBeenCalledWith('example.com');
+    expect(removeStylesheet).not.toHaveBeenCalledWith('*');
+  });
+
   it('shows a gallery style in the color scheme it declares by default', async () => {
-    await showGalleryPreview({ ...preview, scheme: 'dark' }, 'example.com');
+    await showGalleryPreview({ ...preview, scheme: 'dark' }, ['example.com']);
 
     expect(setSchemeAttribute).toHaveBeenCalledWith('dark');
   });
 
   it('shows the scheme picked in its controls, keeps it while comparing, and tells the background', async () => {
-    await showGalleryPreview({ ...preview, scheme: 'system' }, 'example.com');
+    await showGalleryPreview({ ...preview, scheme: 'system' }, ['example.com']);
     const [, handlers] = mount.mock.calls[0] as unknown as [
       unknown,
       { setScheme: (scheme: string) => void; compare: (on: boolean) => void }
@@ -114,13 +122,13 @@ describe('gallery preview on the page', () => {
   });
 
   it("clears the page's color scheme for a gallery style without one", async () => {
-    await showGalleryPreview(preview, 'example.com');
+    await showGalleryPreview(preview, ['example.com']);
 
     expect(setSchemeAttribute).toHaveBeenCalledWith(undefined);
   });
 
   it("puts the page's own styles back when it's hidden", async () => {
-    await showGalleryPreview(preview, 'example.com');
+    await showGalleryPreview(preview, ['example.com']);
     await hideGalleryPreview();
 
     expect(unmount).toHaveBeenCalled();

@@ -16,6 +16,7 @@ import { hashCss } from '@stylebot/gallery';
 import type { GalleryListing, StyleMap } from '@stylebot/types';
 
 import {
+  disable,
   getAll,
   installProfile,
   reinstallProfile,
@@ -24,6 +25,7 @@ import {
 } from './styles';
 
 jest.mock('./styles', () => ({
+  disable: jest.fn(async () => undefined),
   getAll: jest.fn(async () => ({})),
   installProfile: jest.fn(async () => ({ name: 'Tokyo Night', id: 'p1' })),
   reinstallProfile: jest.fn(async () => 'Mine'),
@@ -82,7 +84,7 @@ describe('gallery preview', () => {
     expect(store.galleryPreviewSites).toEqual(['github.com']);
     expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(
       TAB_ID,
-      { name: 'ShowGalleryPreview', preview, replacedUrl: 'github.com' },
+      { name: 'ShowGalleryPreview', preview, replacedUrls: ['github.com'] },
       expect.any(Function)
     );
   });
@@ -131,9 +133,74 @@ describe('gallery preview', () => {
 
     expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(
       TAB_ID,
-      expect.objectContaining({ replacedUrl: 'github.com/*' }),
+      expect.objectContaining({ replacedUrls: ['github.com/*'] }),
       expect.any(Function)
     );
+  });
+
+  describe('on a page several saved styles match', () => {
+    const saved = (css: string, enabled = true) => ({
+      css,
+      enabled,
+      readability: false,
+      modifiedTime: '',
+    });
+
+    it.each([
+      ['a global style', { '*': saved('p {}') }, 'github.com'],
+      [
+        'a less specific style',
+        { 'github.*': saved('p {}', false) },
+        'github.com/*',
+      ],
+    ])(
+      'previews in place of the active style when %s is saved first',
+      async (_, first, expected) => {
+        (getAll as jest.Mock).mockResolvedValue({
+          ...first,
+          [expected]: saved('a {}'),
+        });
+        styleResponse('a {}');
+
+        await startGalleryPreview(TAB_ID, style.id);
+
+        expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(
+          TAB_ID,
+          expect.objectContaining({ replacedUrls: [expected] }),
+          expect.any(Function)
+        );
+      }
+    );
+
+    it("installs in the site's own style, not a global one saved first", async () => {
+      (getAll as jest.Mock).mockResolvedValue({
+        '*': saved('p {}'),
+        'github.com': saved('a {}'),
+      });
+      styleResponse('a {}');
+      await startGalleryPreview(TAB_ID, style.id);
+      fetchMock.mockResponseOnce(JSON.stringify({ ...style, css: 'a {}' }));
+
+      await installGalleryPreview(TAB_ID);
+
+      expect(installProfile).toHaveBeenCalledWith(
+        'github.com',
+        expect.anything()
+      );
+    });
+
+    it('starts a style for the host when only a global style matches', async () => {
+      (getAll as jest.Mock).mockResolvedValue({ '*': saved('p {}') });
+      styleResponse('a {}');
+
+      await startGalleryPreview(TAB_ID, style.id);
+
+      expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(
+        TAB_ID,
+        expect.objectContaining({ replacedUrls: ['github.com'] }),
+        expect.any(Function)
+      );
+    });
   });
 
   it("doesn't tell a tab that isn't on a web page yet", async () => {
@@ -293,7 +360,15 @@ describe('gallery preview', () => {
       return installGalleryPreview(TAB_ID);
     };
 
-    it("previews in place of the pattern's style, keeping the site's own", async () => {
+    it("previews in place of the pattern's style and the site's own", async () => {
+      (getAll as jest.Mock).mockResolvedValue({
+        'github.com': {
+          css: 'p {}',
+          enabled: true,
+          readability: false,
+          modifiedTime: '',
+        },
+      });
       (chrome.tabs.get as jest.Mock).mockResolvedValue({
         id: TAB_ID,
         url: 'https://github.com/',
@@ -304,7 +379,7 @@ describe('gallery preview', () => {
 
       expect(chrome.tabs.sendMessage).toHaveBeenCalledWith(
         TAB_ID,
-        expect.objectContaining({ replacedUrl: PATTERN }),
+        expect.objectContaining({ replacedUrls: [PATTERN, 'github.com'] }),
         expect.any(Function)
       );
     });
@@ -315,6 +390,57 @@ describe('gallery preview', () => {
         PATTERN,
         expect.objectContaining({ name: 'Tokyo Night' })
       );
+    });
+
+    it("turns off the site's own style once installed under the pattern", async () => {
+      (getAll as jest.Mock).mockResolvedValue({
+        'github.com': {
+          css: 'p {}',
+          enabled: true,
+          readability: false,
+          modifiedTime: '',
+        },
+      });
+
+      await install('https://github.com/ankit');
+
+      expect(disable).toHaveBeenCalledWith('github.com');
+    });
+
+    it("turns the site's own style back on when the install is undone", async () => {
+      const site = {
+        css: 'p {}',
+        enabled: true,
+        readability: false,
+        modifiedTime: '',
+      };
+
+      (getAll as jest.Mock).mockResolvedValue({ 'github.com': site });
+      (disable as jest.Mock).mockImplementationOnce(async () => {
+        (getAll as jest.Mock).mockResolvedValue({
+          'github.com': { ...site, enabled: false },
+        });
+      });
+
+      await install('https://github.com/ankit');
+      await undoGalleryInstall(TAB_ID);
+
+      expect(restoreStyles).toHaveBeenCalledWith({ 'github.com': site });
+    });
+
+    it('leaves a global style on once installed under the pattern', async () => {
+      (getAll as jest.Mock).mockResolvedValue({
+        '*': {
+          css: 'p {}',
+          enabled: true,
+          readability: false,
+          modifiedTime: '',
+        },
+      });
+
+      await install('https://github.com/ankit');
+
+      expect(disable).not.toHaveBeenCalled();
     });
 
     it('installs under the pattern from a page it leaves out', async () => {
@@ -368,6 +494,7 @@ describe('gallery preview', () => {
 
       expect(await installGalleryPreview(TAB_ID)).toBe('Mine');
       expect(reinstallProfile).toHaveBeenCalledWith('github.com', 'p0', {});
+      expect(disable).not.toHaveBeenCalled();
       expect(installProfile).not.toHaveBeenCalled();
     });
 
