@@ -1,6 +1,9 @@
 <template>
   <s-theme-provider class="popup" :mode="appearance">
-    <div v-if="tab && pageSupport && pageSupport !== 'supported'">
+    <div
+      v-if="tab && pageSupport && pageSupport !== 'supported'"
+      class="popup-unsupported"
+    >
       <unsupported-page :url="tab.url || ''" :support="pageSupport" />
 
       <template v-if="syncEnabled">
@@ -675,6 +678,10 @@ body {
       zoom: 1.125;
     }
   }
+}
+
+.popup-unsupported:has(.anchored-menu-panel) {
+  min-height: 160px;
 }
 
 .popup-header {
