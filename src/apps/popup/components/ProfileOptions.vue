@@ -114,6 +114,11 @@ export default Vue.extend({
 .profile-options {
   box-shadow: inset 0 0 0 1px var(--panel-border);
   border-radius: 8px;
+
+  > ::v-deep :first-child {
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+  }
 }
 
 .profile-option {
