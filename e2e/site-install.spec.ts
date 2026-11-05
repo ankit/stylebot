@@ -1,6 +1,6 @@
 import type { BrowserContext, Page } from '@playwright/test';
 
-import { test, expect } from './fixtures';
+import { test, expect, type Extension } from './fixtures';
 import { PAGE_URL, seedStyles, servePage } from './helpers';
 
 const SITE_URL = 'https://stylebot.dev/';
@@ -262,6 +262,110 @@ test.describe('install status', () => {
     await other.goto(OTHER_SITE_URL);
 
     expect(await installStatus(other, [7])).toBeNull();
+  });
+});
+
+test.describe('previewing a style', () => {
+  test.skip(
+    ({ engine }) =>
+      !engine.opensExtensionPages || !engine.routesExtensionRequests,
+    "Serves the Gallery's API to the background and previews from an extension page"
+  );
+
+  const BACKGROUND = 'rgb(255, 0, 128)';
+  const NO_BACKGROUND = 'rgba(0, 0, 0, 0)';
+
+  /**
+   * Previews a style published for a url pattern on a page whose saved style
+   * is on, and resolves with the page and a way to message the background.
+   */
+  const preview = async (context: BrowserContext, extension: Extension) => {
+    await serveSites(context);
+    await context.route(`${GALLERY_API}/**`, route =>
+      route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({
+          ...night,
+          css: `body { color: ${PURPLE}; }`,
+          urlPattern: OTHER_SITE_URL,
+        }),
+      })
+    );
+    await seedStyles(extension, {
+      'example.com': {
+        css: `body { background-color: ${BACKGROUND}; }`,
+        enabled: true,
+      },
+    });
+
+    const page = await context.newPage();
+    await page.goto(OTHER_SITE_URL);
+    await expect(page.locator('body')).toHaveCSS(
+      'background-color',
+      BACKGROUND
+    );
+
+    const extensionPage = await context.newPage();
+    await extensionPage.goto(`chrome-extension://${extension.id}/options.html`);
+
+    const send = (name: string) =>
+      extensionPage.evaluate(
+        async ([url, name]) => {
+          const [tab] = await chrome.tabs.query({ url: `${url}*` });
+
+          return chrome.runtime.sendMessage({ name, id: 7, tabId: tab.id });
+        },
+        [OTHER_SITE_URL, name]
+      );
+
+    await send('PreviewGalleryStyle');
+
+    await expect(page.locator('body')).toHaveCSS('color', PURPLE);
+    await expect(page.locator('body')).toHaveCSS(
+      'background-color',
+      NO_BACKGROUND
+    );
+
+    return { page, send };
+  };
+
+  test("a style published for a url pattern replaces the site's active style until it's cancelled", async ({
+    context,
+    extension,
+  }) => {
+    const { page, send } = await preview(context, extension);
+
+    await send('EndGalleryPreview');
+
+    await expect(page.locator('body')).toHaveCSS(
+      'background-color',
+      BACKGROUND
+    );
+  });
+
+  test("installing a style published for a url pattern keeps the site's active style off", async ({
+    context,
+    extension,
+  }) => {
+    const { page, send } = await preview(context, extension);
+
+    await send('InstallGalleryPreview');
+
+    await expect
+      .poll(() =>
+        extension.evaluate(async () => {
+          const { styles } = await chrome.storage.local.get('styles');
+          return styles['example.com'].enabled;
+        })
+      )
+      .toBe(false);
+    await page.reload();
+
+    await expect(page.locator('body')).toHaveCSS('color', PURPLE);
+    await expect(page.locator('body')).toHaveCSS(
+      'background-color',
+      NO_BACKGROUND
+    );
   });
 });
 

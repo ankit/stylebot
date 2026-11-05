@@ -26,6 +26,7 @@ import type {
 
 import {
   applyStylesToAllTabs,
+  disable,
   getAll,
   installProfile,
   reinstallProfile,
@@ -114,8 +115,8 @@ export const setGalleryPreviewScheme = async (
 };
 
 /**
- * Tells a tab on a web page to show its preview, with the saved style that
- * installing it would replace there.
+ * Tells a tab on a web page to show its preview, with the saved styles it
+ * replaces there.
  */
 const showOnTab = async (
   tabId: number,
@@ -127,11 +128,11 @@ const showOnTab = async (
     return;
   }
 
-  const replacedUrl = await getInstallTargetUrl(preview.style, tab.url);
+  const replacedUrls = await getPreviewReplacedUrls(preview.style, tab.url);
   const message: ShowGalleryPreview = {
     name: 'ShowGalleryPreview',
     preview,
-    replacedUrl,
+    replacedUrls,
   };
 
   sendToTab(tabId, message);
@@ -345,11 +346,12 @@ const installLatestVersion = async (
 };
 
 /**
- * The saved style a new profile for a page goes in: the first that matches
- * it, or else one for its host.
+ * The saved style a new profile for a page goes in: its default style, or
+ * else one for its host.
  */
 const getPageStyleUrl = (pageUrl: string, styles: StyleMap): string =>
-  getStylesForPage(pageUrl, styles).styles[0]?.url ?? new URL(pageUrl).hostname;
+  getStylesForPage(pageUrl, styles).defaultStyle?.url ??
+  new URL(pageUrl).hostname;
 
 /**
  * The url to install a gallery style under: the url pattern its author
@@ -363,21 +365,35 @@ const getGalleryInstallUrl = (
 ): string => style.urlPattern ?? getPageStyleUrl(pageUrl, styles);
 
 /**
- * The saved style that installing a gallery style from a page goes in, which
- * a preview there replaces while the page's other styles stay.
+ * The saved style that installing a version of a gallery style from a page
+ * ends up in.
  */
-export const getInstallTargetUrl = async (
+const getInstallTargetUrl = (
+  style: GalleryStyle,
+  version: number,
+  pageUrl: string,
+  styles: StyleMap
+): string => {
+  const plan = planInstall(styles, style.id, version);
+
+  return plan.kind === 'add'
+    ? getGalleryInstallUrl(style, pageUrl, styles)
+    : plan.profile.url;
+};
+
+/**
+ * The saved styles a preview hides on a page: the style it would install
+ * into, and the page's default style when that's a different one, as for a
+ * gallery style published for a url pattern. Other styles stay on.
+ */
+export const getPreviewReplacedUrls = async (
   style: GalleryStyle,
   pageUrl: string
-): Promise<string> => {
+): Promise<Array<string>> => {
   const styles = await getAll();
-  const plan = planInstall(styles, style.id, style.version);
+  const targetUrl = getInstallTargetUrl(style, style.version, pageUrl, styles);
 
-  if (plan.kind === 'add') {
-    return getGalleryInstallUrl(style, pageUrl, styles);
-  }
-
-  return plan.profile.url;
+  return [...new Set([targetUrl, getPageStyleUrl(pageUrl, styles)])];
 };
 
 /**
@@ -453,11 +469,25 @@ export const installGalleryPreview = async (tabId: number): Promise<string> => {
 
   const latest = await recordInstall(preview.style.id, await getInstallId());
   const before = await getAll();
+  const installedUrl = getInstallTargetUrl(
+    preview.style,
+    latest.version,
+    tab.url ?? '',
+    before
+  );
   const profileName = await installLatestVersion(
     preview.style,
     latest,
     targetUrl
   );
+
+  // Installed apart from the page's default style, it replaces it as it did
+  // in the preview. Undoing the install turns it back on.
+  const defaultUrl = getStylesForPage(tab.url ?? '', before).defaultStyle?.url;
+
+  if (defaultUrl && defaultUrl !== installedUrl) {
+    await disable(defaultUrl);
+  }
 
   // Only a scheme picked over the declared default is stored, as from the popup.
   const installed = (await getAll())[targetUrl];
