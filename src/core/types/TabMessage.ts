@@ -189,8 +189,8 @@ export type InspectPage = {
 export type ShowGalleryPreview = {
   name: 'ShowGalleryPreview';
   preview: GalleryPreview;
-  // The saved style installing it would replace, which the preview hides.
-  replacedUrl: string;
+  // The saved styles the preview hides.
+  replacedUrls: Array<string>;
 };
 
 // The tab's gallery preview ended: cancelled, or installed as a profile.

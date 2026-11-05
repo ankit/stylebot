@@ -33,7 +33,7 @@ if (window === window.top) {
       } else if (message.name === 'GetIsPageReaderable') {
         sendResponse(isReaderable());
       } else if (message.name === 'ShowGalleryPreview' && canStyle) {
-        showGalleryPreview(message.preview, message.replacedUrl);
+        showGalleryPreview(message.preview, message.replacedUrls);
       } else if (message.name === 'HideGalleryPreview') {
         hideGalleryPreview(message.installed);
       }
