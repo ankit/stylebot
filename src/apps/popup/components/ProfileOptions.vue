@@ -19,7 +19,7 @@
       <div
         v-else
         :key="option.name"
-        class="profile-option"
+        class="profile-option profile-option--select"
         role="group"
         :aria-label="optionLabel(option)"
       >
@@ -113,7 +113,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .profile-options {
   margin-bottom: 2px;
-  padding-bottom: 4px;
+  padding-bottom: 2px;
   box-shadow: inset 0 0 0 1px var(--panel-border);
   border-radius: 8px;
 
@@ -129,7 +129,11 @@ export default Vue.extend({
   justify-content: space-between;
   gap: 12px;
   height: 32px;
-  padding: 0 5px 0 10px;
+  padding: 0 10px;
+}
+
+.profile-option--select:last-child {
+  margin-bottom: 6px;
 }
 
 .profile-option-label {
