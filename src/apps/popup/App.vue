@@ -10,124 +10,128 @@
     </div>
 
     <div v-else-if="tab && tab.id && pageSupport === 'supported'">
-      <site-profiles
-        v-if="showProfileList"
-        :url="styles[0].url"
-        :profiles="siteProfiles"
-        :active-profile="siteActiveProfile"
-        :enabled="siteEnabled"
-        :disable-off="isOpen"
-        :joined="hasToggleRows"
-        :previewing="galleryPreviewing"
-        :publish-items="publishItems"
-        :options="siteOptions"
-        :editing-enabled="editingEnabled"
-        @pick="pickSiteProfile"
-        @option="pickSiteOption"
-        @edit="editSiteProfile"
-        @publish="publishSiteProfile"
-        @rename="renameSiteProfile"
-        @delete="deleteSiteProfile"
-        @create="createSiteProfile"
-      />
-      <template v-else>
-        <div class="popup-header">
-          <div class="popup-header-title">
-            <s-heading as="h1" size="md" class="popup-header-domain">
-              {{ styles.length ? styles[0].url : domain }}
-            </s-heading>
-            <popup-more-menu />
-          </div>
-        </div>
-
-        <div v-if="hasToggleRows" class="popup-divider" />
-      </template>
-
-      <div
-        v-if="hasToggleRows"
-        class="popup-menu"
-        :class="{ 'popup-menu--after-profiles': showProfileList }"
-      >
-        <profile-options
-          v-if="showSiteStyle"
+      <div v-show="!galleryBrowsing">
+        <site-profiles
+          v-if="showProfileList"
+          :url="styles[0].url"
+          :profiles="siteProfiles"
+          :active-profile="siteActiveProfile"
+          :enabled="siteEnabled"
+          :disable-off="isOpen"
+          :joined="hasToggleRows"
+          :previewing="galleryPreviewing"
+          :publish-items="publishItems"
           :options="siteOptions"
+          :editing-enabled="editingEnabled"
+          @pick="pickSiteProfile"
           @option="pickSiteOption"
-        >
-          <style-component
-            site
-            :url="styles[0].url"
-            :name="siteProfiles[0].name"
-            :shortcut="styleShortcut"
-            :disable-toggle="isOpen || (pageReaderable && readability)"
-            :initial-enabled="styles[0].enabled"
-            :publish-item="publishItems[siteProfiles[0].id] || null"
-            :editing-enabled="editingEnabled"
-            @edit="editSiteProfile(siteProfiles[0].id)"
-            @rename="renameSiteProfile(siteProfiles[0].id, $event)"
-            @publish="publishSiteProfile(siteProfiles[0].id)"
-            @delete="deleteSiteStyle"
-            @toggle="siteEnabled = $event"
-          />
-        </profile-options>
-
-        <create-profile
-          v-if="showSiteStyle && editingEnabled"
-          :names="siteProfileNames"
+          @edit="editSiteProfile"
+          @publish="publishSiteProfile"
+          @rename="renameSiteProfile"
+          @delete="deleteSiteProfile"
           @create="createSiteProfile"
         />
+        <template v-else>
+          <div class="popup-header">
+            <div class="popup-header-title">
+              <s-heading as="h1" size="md" class="popup-header-domain">
+                {{ styles.length ? styles[0].url : domain }}
+              </s-heading>
+              <popup-more-menu />
+            </div>
+          </div>
 
-        <style-component
-          v-for="style in rowStyles"
-          :key="style.url"
-          :url="style.url"
-          :disable-toggle="isOpen || (pageReaderable && readability)"
-          :initial-enabled="style.enabled"
-          :profiles="profilesOf(style)"
-          :editable="style.url !== styles[0].url"
-        />
+          <div v-if="hasToggleRows" class="popup-divider" />
+        </template>
 
-        <readability
-          v-if="showReadability"
-          :tab="tab"
-          :initial-readability="readability"
-          :shortcut="readabilityShortcut"
-          @change="readability = $event"
-        />
+        <div
+          v-if="hasToggleRows"
+          class="popup-menu"
+          :class="{ 'popup-menu--after-profiles': showProfileList }"
+        >
+          <profile-options
+            v-if="showSiteStyle"
+            :options="siteOptions"
+            @option="pickSiteOption"
+          >
+            <style-component
+              site
+              :url="styles[0].url"
+              :name="siteProfiles[0].name"
+              :shortcut="styleShortcut"
+              :disable-toggle="isOpen || (pageReaderable && readability)"
+              :initial-enabled="styles[0].enabled"
+              :publish-item="publishItems[siteProfiles[0].id] || null"
+              :editing-enabled="editingEnabled"
+              @edit="editSiteProfile(siteProfiles[0].id)"
+              @rename="renameSiteProfile(siteProfiles[0].id, $event)"
+              @publish="publishSiteProfile(siteProfiles[0].id)"
+              @delete="deleteSiteStyle"
+              @toggle="siteEnabled = $event"
+            />
+          </profile-options>
+
+          <create-profile
+            v-if="showSiteStyle && editingEnabled"
+            :names="siteProfileNames"
+            @create="createSiteProfile"
+          />
+
+          <style-component
+            v-for="style in rowStyles"
+            :key="style.url"
+            :url="style.url"
+            :disable-toggle="isOpen || (pageReaderable && readability)"
+            :initial-enabled="style.enabled"
+            :profiles="profilesOf(style)"
+            :editable="style.url !== styles[0].url"
+          />
+
+          <readability
+            v-if="showReadability"
+            :tab="tab"
+            :initial-readability="readability"
+            :shortcut="readabilityShortcut"
+            @change="readability = $event"
+          />
+        </div>
       </div>
 
-      <the-gallery-suggestions
+      <the-gallery
         v-if="stylesLoaded"
         ref="gallery"
         :tab="tab"
         :compact="styles.length > 0"
-        @preview="galleryPreviewing = $event"
+        :browsing="galleryBrowsing"
+        @browse="galleryBrowsing = $event"
+        @preview="galleryPreviewName = $event"
         @installing="galleryInstalling = $event"
-        @installed="loadStyles"
+        @installed="onGalleryInstalled"
       />
 
-      <div v-if="showFooter || syncEnabled" class="popup-divider" />
+      <div
+        v-if="showFooter || syncEnabled"
+        v-show="footerShown"
+        class="popup-divider"
+      />
 
       <div
         v-if="showFooter"
+        v-show="footerShown"
         class="popup-footer"
-        :class="{ 'popup-footer--above-sync': syncEnabled }"
+        :class="{
+          'popup-footer--above-sync': syncEnabled && !galleryBrowsing,
+        }"
       >
-        <template v-if="galleryPreviewing">
-          <s-pill-button
-            class="popup-preview-stop"
-            :disabled="galleryInstalling"
-            @click="stopGalleryPreview"
-          >
-            {{ t('stop_preview') }}
-          </s-pill-button>
-          <s-pill-button
-            :disabled="galleryInstalling"
-            :aria-busy="galleryInstalling ? 'true' : undefined"
-            @click="installGalleryPreview"
-          >
-            {{ t('install') }}
-          </s-pill-button>
-        </template>
+        <s-pill-button
+          v-if="galleryPreviewing"
+          class="popup-preview-install"
+          :disabled="galleryInstalling"
+          :aria-busy="galleryInstalling ? 'true' : undefined"
+          @click="installGalleryPreview"
+        >
+          {{ t('install_name', [galleryPreviewName]) }}
+        </s-pill-button>
         <!-- Kept in place so editing a profile can still open the editor. -->
         <toggle-stylebot
           v-show="!galleryPreviewing"
@@ -143,6 +147,7 @@
 
       <sync-stylebot
         v-if="syncEnabled"
+        v-show="!galleryBrowsing"
         :standalone="!showFooter"
         @synced="loadStyles"
       />
@@ -170,7 +175,7 @@ import ToggleStylebot from './components/ToggleStylebot.vue';
 import UnsupportedPage from './components/UnsupportedPage.vue';
 import ReleaseNotification from './components/notifications/ReleaseNotification.vue';
 import RatingPrompt from './components/notifications/RatingPrompt.vue';
-import TheGallerySuggestions from './components/TheGallerySuggestions.vue';
+import TheGallery from './components/TheGallery.vue';
 
 import {
   getStyles,
@@ -235,7 +240,7 @@ export default Vue.extend({
     UnsupportedPage,
     ReleaseNotification,
     RatingPrompt,
-    TheGallerySuggestions,
+    TheGallery,
   },
 
   data(): {
@@ -258,8 +263,10 @@ export default Vue.extend({
     appearance: StylebotAppearance;
     dockLocation: StylebotDockLocation | '';
     // A gallery style is shown on the page in place of the site's own.
-    galleryPreviewing: boolean;
+    galleryPreviewName: string | null;
     galleryInstalling: boolean;
+    // The gallery's styles stand in for the rest of the popup.
+    galleryBrowsing: boolean;
     // Each site profile's way into publishing, once known.
     publishItems: Record<string, GalleryMenuItem | null>;
     // iPhone has no editor, so nothing here opens it.
@@ -280,8 +287,9 @@ export default Vue.extend({
       commands: undefined,
       appearance: 'system',
       dockLocation: '',
-      galleryPreviewing: false,
+      galleryPreviewName: null,
       galleryInstalling: false,
+      galleryBrowsing: false,
       publishItems: {},
       editingEnabled: !isIPhone(),
     };
@@ -348,9 +356,17 @@ export default Vue.extend({
       }));
     },
 
+    galleryPreviewing(): boolean {
+      return this.galleryPreviewName !== null;
+    },
+
     // The footer holds the editor's button, and a gallery preview's.
     showFooter(): boolean {
       return this.editingEnabled || this.galleryPreviewing;
+    },
+
+    footerShown(): boolean {
+      return !this.galleryBrowsing || this.galleryPreviewing;
     },
 
     hasToggleRows(): boolean {
@@ -490,9 +506,7 @@ export default Vue.extend({
       const { url } = this.styles[0];
 
       // Picking a profile ends a gallery preview, so the pick shows.
-      (
-        this.$refs.gallery as InstanceType<typeof TheGallerySuggestions>
-      )?.cancel();
+      (this.$refs.gallery as InstanceType<typeof TheGallery>)?.cancel();
 
       if (id === null) {
         if (this.siteEnabled) {
@@ -521,16 +535,13 @@ export default Vue.extend({
       this.styles.splice(0, 1, setProfileOption(site, profileId, name, value));
     },
 
-    stopGalleryPreview(): void {
-      (
-        this.$refs.gallery as InstanceType<typeof TheGallerySuggestions>
-      )?.cancel();
+    installGalleryPreview(): void {
+      (this.$refs.gallery as InstanceType<typeof TheGallery>)?.install();
     },
 
-    installGalleryPreview(): void {
-      (
-        this.$refs.gallery as InstanceType<typeof TheGallerySuggestions>
-      )?.install();
+    onGalleryInstalled(): void {
+      this.galleryBrowsing = false;
+      this.loadStyles();
     },
 
     /**
@@ -705,14 +716,19 @@ body {
   padding: 10px 16px 12px;
 }
 
-.popup-footer .popup-preview-stop.pill-btn {
-  background: transparent;
+.popup-footer .popup-preview-install.pill-btn {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
 
   @include hover-capable {
     &:hover:not(:disabled) {
-      background: var(--hover-tint);
+      background: var(--accent);
+      filter: brightness(0.92);
     }
   }
+
+  @include focus-ring(2px);
 }
 
 .popup-footer .pill-btn:disabled {

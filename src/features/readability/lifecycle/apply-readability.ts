@@ -7,6 +7,7 @@ import {
 import { showLoader } from '../loading-screen/loader';
 import { cacheUrl, didUrlChange } from './document-cache';
 import { removeReadability } from './remove-readability';
+import { reportChanged } from './report-changed';
 import { nextGeneration, isStaleGeneration, setPendingRetry } from './state';
 import {
   getEligibility,
@@ -59,6 +60,7 @@ const run = async (myGeneration: number, attempt = 0): Promise<void> => {
   try {
     await mountReader();
     markEligible(window.location.href);
+    reportChanged();
   } catch {
     if (isStaleGeneration(myGeneration)) {
       return;
@@ -81,7 +83,7 @@ const run = async (myGeneration: number, attempt = 0): Promise<void> => {
 /**
  * Whether the reader is on the page and not fading out after being closed.
  */
-const isReaderShowing = (): boolean => {
+export const isReaderShowing = (): boolean => {
   const panel = document
     .getElementById('stylebot-reader')
     ?.shadowRoot?.querySelector('.stylebot-reader');

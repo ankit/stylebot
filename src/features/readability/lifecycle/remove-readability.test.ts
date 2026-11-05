@@ -2,12 +2,14 @@ export {};
 
 jest.mock('../loading-screen/loader');
 jest.mock('./document-cache');
+jest.mock('./report-changed');
 jest.mock('./state');
 
 describe('removeReadability()', () => {
   let loaderModule: typeof import('../loading-screen/loader');
   let documentCacheModule: typeof import('./document-cache');
   let stateModule: typeof import('./state');
+  let reportChangedModule: typeof import('./report-changed');
   let removeReadability: typeof import('./remove-readability').removeReadability;
 
   beforeEach(() => {
@@ -19,6 +21,7 @@ describe('removeReadability()', () => {
     loaderModule = require('../loading-screen/loader');
     documentCacheModule = require('./document-cache');
     stateModule = require('./state');
+    reportChangedModule = require('./report-changed');
 
     ({ removeReadability } = require('./remove-readability'));
   });
@@ -59,6 +62,7 @@ describe('removeReadability()', () => {
     removeReadability();
 
     expect(panel.classList.contains('closing')).toBe(true);
+    expect(reportChangedModule.reportChanged).toBeCalledTimes(1);
     expect(document.getElementById('stylebot-reader')).not.toBeNull();
 
     jest.runOnlyPendingTimers();

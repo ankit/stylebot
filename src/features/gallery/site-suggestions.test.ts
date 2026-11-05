@@ -6,11 +6,10 @@ import { getSiteSuggestions } from './site-suggestions';
 const HOUR = 60 * 60 * 1000;
 const DAY = 24 * HOUR;
 
-const page = (names: Array<string>, total?: number) =>
+const page = (names: Array<string>) =>
   JSON.stringify({
     styles: names.map((name, id) => ({ ...galleryStyle, id, name })),
     nextOffset: null,
-    total,
   });
 
 const names = (styles: Array<{ name: string }>) =>
@@ -67,18 +66,6 @@ describe('getSiteSuggestions', () => {
     expect(
       names((await getSiteSuggestions('github.com', 12, 7 * DAY)).styles)
     ).toEqual(['New']);
-  });
-
-  it("answers with the site's total, or else the styles fetched", async () => {
-    mockStorage();
-    fetchMock.mockResponseOnce(page(['Tokyo Night'], 14));
-
-    expect((await getSiteSuggestions('github.com', 12, 0)).total).toBe(14);
-
-    fetchMock.mockResponseOnce(page(['Paper', 'Ink']));
-
-    expect((await getSiteSuggestions('example.com', 12, 0)).total).toBe(2);
-    expect((await getSiteSuggestions('github.com', 12, 1)).total).toBe(14);
   });
 
   it('keeps stale styles when the gallery cannot be reached', async () => {

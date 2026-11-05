@@ -753,7 +753,7 @@ describe('gallery messages', () => {
     });
   });
 
-  it("suggests the site's styles that are neither installed nor published here, with the site's total", async () => {
+  it("suggests the site's styles that are neither installed nor published here", async () => {
     const other = { ...style, id: 10, slug: 'other' };
     const installed = { ...style, id: 9, slug: 'installed' };
     mockStyles = {
@@ -772,7 +772,6 @@ describe('gallery messages', () => {
       JSON.stringify({
         styles: [style, installed, other],
         nextOffset: null,
-        total: 14,
       })
     );
 
@@ -793,7 +792,6 @@ describe('gallery messages', () => {
     expect(response).toEqual({
       ok: true,
       styles: [other],
-      total: 14,
       site: 'github.com',
     });
   });

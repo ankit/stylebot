@@ -33,6 +33,7 @@ export const defaultOptions: StylebotOptions = {
   lastColorSet: 'neutrals',
   cliAccess: false,
   gallerySuggestions: true,
+  activeStyleBadge: false,
 };
 
 export const defaultCommands: StylebotCommands = {

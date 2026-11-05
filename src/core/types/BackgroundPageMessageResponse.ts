@@ -94,14 +94,13 @@ export type GetGalleryStyleResponse = GalleryResult<{
 // and how many it has there.
 export type GetGallerySuggestionsResponse = GalleryResult<{
   styles: Array<GalleryStyle>;
-  total: number;
   site: string;
 }>;
 export type PreviewGalleryStyleResponse = GalleryResult;
-// replacedUrl is only for the tab's own page, as in ShowGalleryPreview.
+// replacedUrls is only for the tab's own page, as in ShowGalleryPreview.
 export type GetGalleryPreviewResponse = {
   preview: GalleryPreview | null;
-  replacedUrl?: string;
+  replacedUrls?: Array<string>;
 };
 // The profile name each requested gallery style is installed as, and for the
 // gallery, which were published from here, by their ids.

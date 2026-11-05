@@ -53,6 +53,11 @@ export type GetIsPageReaderable = {
   name: 'GetIsPageReaderable';
 };
 
+// A site's stored preference doesn't say the reader mounted: this asks the page.
+export type GetIsReaderShowing = {
+  name: 'GetIsReaderShowing';
+};
+
 export type UpdateReader = {
   name: 'UpdateReader';
   value: ReadabilitySettings;
@@ -189,8 +194,8 @@ export type InspectPage = {
 export type ShowGalleryPreview = {
   name: 'ShowGalleryPreview';
   preview: GalleryPreview;
-  // The saved style installing it would replace, which the preview hides.
-  replacedUrl: string;
+  // The saved styles the preview hides.
+  replacedUrls: Array<string>;
 };
 
 // The tab's gallery preview ended: cancelled, or installed as a profile.
@@ -217,6 +222,7 @@ type TabMessage =
   | GetIsStylebotOpen
   | GetCanStylePage
   | GetIsPageReaderable
+  | GetIsReaderShowing
   | UpdateReader
   | ReadabilityStateChanged
   | InspectPage

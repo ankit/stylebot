@@ -1,3 +1,4 @@
+import { refreshAllBadges, refreshBadge } from './badge';
 import { ContextMenu, handleContextMenuClick } from './contextmenu';
 import { handleCommand } from './global-commands';
 import { configureSidePanelTabs, initSidePanelTabs } from './side-panel-tabs';
@@ -124,6 +125,7 @@ export const initListeners = (): void => {
     async ({ reason, previousVersion }) => {
       configureSidePanelTabs();
       syncGalleryPreviewSites();
+      refreshAllBadges();
       detectChromiumVariant().catch(() => undefined);
 
       if (reason === 'install' || reason === 'update') {
@@ -180,9 +182,8 @@ export const initListeners = (): void => {
     });
   }
 
-  // The enabled flag is flipped from the options page; the alarms and the
-  // badge that follow it are owned here so they stay in step no matter which
-  // page changed it.
+  // The sync flag, styles and options change from several pages; the alarms
+  // and badges that follow them are owned here so they stay in step.
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== 'local') {
       return;
@@ -190,6 +191,15 @@ export const initListeners = (): void => {
 
     if (changes['google-drive-sync-enabled']) {
       updatePeriodicSync();
+    }
+
+    const { options, styles } = changes;
+    const badgeOptionChanged =
+      !!options?.oldValue?.activeStyleBadge !==
+      !!options?.newValue?.activeStyleBadge;
+
+    if (styles || badgeOptionChanged) {
+      refreshAllBadges();
     }
   });
 
@@ -222,6 +232,14 @@ export const initListeners = (): void => {
 
     if (url) {
       endGalleryPreviewOffSite(tabId, url);
+    }
+  });
+
+  // Navigating clears a tab's badge, sometimes after the new url is reported,
+  // so it's set again when the page finishes loading.
+  chrome.tabs.onUpdated.addListener((_tabId, { status, url }, tab) => {
+    if (url || status === 'complete') {
+      refreshBadge(tab);
     }
   });
 
@@ -350,6 +368,11 @@ export const initListeners = (): void => {
 
         case 'SetReadability':
           SetReadability(message, sender);
+          break;
+        case 'ReadabilityActiveChanged':
+          if (sender.tab) {
+            refreshBadge(sender.tab);
+          }
           break;
         case 'GetReadabilitySettings':
           GetReadabilitySettings(sendResponse);

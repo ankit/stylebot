@@ -6,13 +6,28 @@
         class="pick"
         :disabled="disabled"
         :aria-pressed="previewing ? 'true' : 'false'"
-        @click="!previewing && $emit('preview')"
+        @click="$emit('preview')"
       >
         <s-text as="span" size="large" class="name">
           {{ styleData.name }}
         </s-text>
         <s-text
-          v-if="styleData.installs"
+          v-if="previewing"
+          as="span"
+          size="caption"
+          variant="muted"
+          class="status"
+        >
+          <eye-icon
+            class="status-previewing"
+            role="img"
+            :size="14"
+            :aria-label="t('previewing')"
+          />
+          <span class="status-stop">{{ t('stop') }}</span>
+        </s-text>
+        <s-text
+          v-else-if="styleData.installs"
           as="span"
           size="caption"
           variant="muted"
@@ -30,20 +45,21 @@
 import type { PropType } from 'vue';
 import Vue from 'vue';
 import { SText, STooltip } from '@stylebot/components';
-import { DownloadIcon } from '@stylebot/icons';
+import { DownloadIcon, EyeIcon } from '@stylebot/icons';
 import { getGalleryByline } from '@stylebot/gallery';
 import type { GalleryStyle } from '@stylebot/types';
 
 /**
  * A suggested gallery style, with its installs, as a button that emits
- * `preview`, highlighted while it previews. Its tooltip has the author and
- * exact installs.
+ * `preview`, on a click either to start or stop one, labelled while it
+ * previews, as Stop once that's what a click does. Its tooltip has the author and exact installs.
  */
 export default Vue.extend({
   name: 'GallerySuggestion',
 
   components: {
     DownloadIcon,
+    EyeIcon,
     SText,
     STooltip,
   },
@@ -86,6 +102,54 @@ export default Vue.extend({
 
   flex: 1;
   min-width: 0;
+
+  .previewing & {
+    font-weight: 600;
+  }
+}
+
+.status {
+  display: grid;
+  flex: none;
+  align-items: center;
+  justify-items: end;
+}
+
+.status-previewing,
+.status-stop {
+  grid-area: 1 / 1;
+}
+
+.status-stop {
+  visibility: hidden;
+  color: var(--text-primary);
+  font-size: 13px;
+}
+
+@mixin show-stop {
+  .status-previewing {
+    visibility: hidden;
+  }
+
+  .status-stop {
+    visibility: visible;
+  }
+}
+
+@include hover-capable {
+  .pick:hover:not(:disabled) {
+    @include show-stop;
+  }
+}
+
+.pick:focus-visible {
+  @include show-stop;
+}
+
+@include touch {
+  .pick:not(:disabled) {
+    @include show-stop;
+  }
 }
 
 .installs {
@@ -101,16 +165,9 @@ export default Vue.extend({
   border-radius: 8px;
 
   @include hover-capable {
-    &:hover:not(.previewing) {
+    &:hover {
       background: var(--hover-tint);
     }
-  }
-
-  &.previewing {
-    margin: 0 -6px;
-    padding: 0 6px;
-    border-radius: 0;
-    background: var(--hover-tint);
   }
 }
 
@@ -128,7 +185,6 @@ export default Vue.extend({
   text-align: start;
   cursor: pointer;
 
-  .previewing &,
   &:disabled {
     cursor: default;
   }

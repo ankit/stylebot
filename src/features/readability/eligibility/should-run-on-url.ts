@@ -22,8 +22,16 @@ const looksLikeSectionPath = (pathname: string): boolean => {
 export const shouldRunOnUrl = (): boolean => {
   const blockedHosts = [
     'amazon.com',
+    'chat.deepseek.com',
+    'chat.openai.com',
+    'chatgpt.com',
+    'claude.ai',
+    'copilot.microsoft.com',
+    'gemini.google.com',
     'github.com',
+    'grok.com',
     'mail.google.com',
+    'perplexity.ai',
     'pinterest.com',
     'reddit.com',
     'twitter.com',

@@ -31,7 +31,7 @@ const PREVIEW_KEY = 'stylebot:gallery-preview';
 type PreviewWindow = GalleryPreviewAppWindow & {
   stylebotGalleryPreview?: {
     preview: GalleryPreview;
-    replacedUrl: string;
+    replacedUrls: Array<string>;
     unmount?: (installed?: boolean) => void;
   };
 };
@@ -49,15 +49,14 @@ const applyOwnStyles = async (): Promise<void> =>
   applyPageState(getPageState(await getCompiledStyles()));
 
 /**
- * Shows a gallery style in place of the saved style installing it replaces,
- * keeping the page's other styles as they'd stay once it's installed, and in
- * the color scheme it declares by default.
+ * Shows a gallery style in place of the saved styles it replaces, keeping the
+ * page's others, and in the color scheme it declares by default.
  */
 const applyPreview = (
   { css, importUrls, scheme }: GalleryPreview,
-  replacedUrl: string
+  replacedUrls: Array<string>
 ): void => {
-  removeStylesheet(replacedUrl);
+  replacedUrls.forEach(url => removeStylesheet(url));
   setSchemeAttribute(scheme);
   injectStylesheet(PREVIEW_KEY, css, importUrls);
 };
@@ -168,7 +167,7 @@ const compare = (on: boolean): void => {
       removeStylesheet(PREVIEW_KEY);
       await applyOwnStyles();
     } else {
-      applyPreview(current.preview, current.replacedUrl);
+      applyPreview(current.preview, current.replacedUrls);
     }
   });
 };
@@ -180,13 +179,13 @@ const compare = (on: boolean): void => {
  */
 export const showGalleryPreview = async (
   preview: GalleryPreview,
-  replacedUrl: string,
+  replacedUrls: Array<string>,
   { animate = true } = {}
 ): Promise<void> => {
   const current = shared.stylebotGalleryPreview;
 
   current?.unmount?.();
-  shared.stylebotGalleryPreview = { preview, replacedUrl };
+  shared.stylebotGalleryPreview = { preview, replacedUrls };
 
   // An earlier preview may have replaced another style, so put them back first.
   const update = async () => {
@@ -195,7 +194,7 @@ export const showGalleryPreview = async (
       await applyOwnStyles();
     }
 
-    applyPreview(preview, replacedUrl);
+    applyPreview(preview, replacedUrls);
   };
 
   if (animate) {
@@ -250,12 +249,12 @@ export const resumeGalleryPreview = async (): Promise<void> => {
   }
 
   const message: GetGalleryPreview = { name: 'GetGalleryPreview' };
-  const { preview, replacedUrl } = await chrome.runtime.sendMessage<
+  const { preview, replacedUrls } = await chrome.runtime.sendMessage<
     GetGalleryPreview,
     GetGalleryPreviewResponse
   >(message);
 
-  if (preview && replacedUrl) {
-    await showGalleryPreview(preview, replacedUrl, { animate: false });
+  if (preview && replacedUrls) {
+    await showGalleryPreview(preview, replacedUrls, { animate: false });
   }
 };

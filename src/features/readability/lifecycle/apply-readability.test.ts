@@ -8,6 +8,7 @@ jest.mock('../eligibility/is-blocked-after-load');
 jest.mock('../loading-screen/loader');
 jest.mock('./document-cache');
 jest.mock('./eligibility-cache');
+jest.mock('./report-changed');
 
 const flushPromises = () => new Promise(resolve => setImmediate(resolve));
 

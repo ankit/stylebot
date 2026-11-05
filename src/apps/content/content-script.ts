@@ -3,7 +3,7 @@
  * localStorage cache (cache.ts) immediately if there is one, otherwise hides
  * the page (hide-page.ts) until chrome.storage.local.get resolves.
  */
-import { isReaderable } from '@stylebot/readability';
+import { isReaderShowing, isReaderable } from '@stylebot/readability';
 import { isStylableDocument } from '@stylebot/saved-styles';
 import { readCache } from '@stylebot/stylesheets';
 import type { TabMessage } from '@stylebot/types';
@@ -32,8 +32,10 @@ if (window === window.top) {
         sendResponse(canStyle);
       } else if (message.name === 'GetIsPageReaderable') {
         sendResponse(isReaderable());
+      } else if (message.name === 'GetIsReaderShowing') {
+        sendResponse(isReaderShowing());
       } else if (message.name === 'ShowGalleryPreview' && canStyle) {
-        showGalleryPreview(message.preview, message.replacedUrl);
+        showGalleryPreview(message.preview, message.replacedUrls);
       } else if (message.name === 'HideGalleryPreview') {
         hideGalleryPreview(message.installed);
       }

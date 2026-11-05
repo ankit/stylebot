@@ -6,6 +6,7 @@
       <the-theme :editing-enabled="editingEnabled" />
       <the-position v-if="editingEnabled" />
       <the-context-menu v-if="editingEnabled" />
+      <the-active-style-badge v-if="showActiveStyleBadge" />
       <the-gallery-suggestions />
     </s-list>
 
@@ -20,9 +21,11 @@ import Vue from 'vue';
 
 import { SHeading, SList } from '@stylebot/components';
 import { supportsCLI } from '@stylebot/settings';
+import { isSafari } from '@stylebot/utils';
 import TheTheme from './basics/TheTheme.vue';
 import ThePosition from './basics/ThePosition.vue';
 import TheContextMenu from './basics/TheContextMenu.vue';
+import TheActiveStyleBadge from './basics/TheActiveStyleBadge.vue';
 import TheGallerySuggestions from './basics/TheGallerySuggestions.vue';
 import TheCliAccess from './basics/TheCliAccess.vue';
 import TheKeyboardShortcuts from './basics/TheKeyboardShortcuts.vue';
@@ -36,6 +39,7 @@ export default Vue.extend({
     TheTheme,
     ThePosition,
     TheContextMenu,
+    TheActiveStyleBadge,
     TheGallerySuggestions,
     TheCliAccess,
     TheKeyboardShortcuts,
@@ -52,6 +56,10 @@ export default Vue.extend({
   computed: {
     showCliAccess(): boolean {
       return supportsCLI();
+    },
+
+    showActiveStyleBadge(): boolean {
+      return !isSafari();
     },
 
     optionsLoaded(): boolean {

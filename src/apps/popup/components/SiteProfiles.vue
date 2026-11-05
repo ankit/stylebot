@@ -257,7 +257,7 @@ export default Vue.extend({
 .profile-list {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
   padding: 6px;
 
   &.profile-list--joined {
@@ -268,6 +268,6 @@ export default Vue.extend({
 .profile-options {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
 }
 </style>
