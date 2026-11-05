@@ -53,6 +53,11 @@ export type GetIsPageReaderable = {
   name: 'GetIsPageReaderable';
 };
 
+// A site's stored preference doesn't say the reader mounted: this asks the page.
+export type GetIsReaderShowing = {
+  name: 'GetIsReaderShowing';
+};
+
 export type UpdateReader = {
   name: 'UpdateReader';
   value: ReadabilitySettings;
@@ -217,6 +222,7 @@ type TabMessage =
   | GetIsStylebotOpen
   | GetCanStylePage
   | GetIsPageReaderable
+  | GetIsReaderShowing
   | UpdateReader
   | ReadabilityStateChanged
   | InspectPage

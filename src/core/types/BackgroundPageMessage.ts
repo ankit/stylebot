@@ -157,6 +157,10 @@ export type GetCompiledStyles = {
   name: 'GetCompiledStyles';
 };
 
+export type ReadabilityActiveChanged = {
+  name: 'ReadabilityActiveChanged';
+};
+
 export type GetGoogleWebFontExists = {
   name: 'GetGoogleWebFontExists';
   url: string;
@@ -424,6 +428,7 @@ type BackgroundPageMessage =
   | SetReadabilitySettings
   | GetImportCss
   | GetCompiledStyles
+  | ReadabilityActiveChanged
   | GetGoogleWebFontExists
   | GetGoogleFontFile
   | RunGoogleDriveSync

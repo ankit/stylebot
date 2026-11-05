@@ -41,4 +41,6 @@ export type StylebotOptions = {
   cliAccess: boolean;
   // Shows popular gallery styles for the site in the popup.
   gallerySuggestions: boolean;
+  // Shows the number of styles active on the page on the toolbar icon.
+  activeStyleBadge: boolean;
 };
