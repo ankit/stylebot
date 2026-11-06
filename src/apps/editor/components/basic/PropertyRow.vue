@@ -70,9 +70,10 @@ export default Vue.extend({
 
 .property-row-main {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   min-height: 28px;
-  gap: 12px;
+  gap: 4px 6px;
 }
 
 .property-row-heading {
