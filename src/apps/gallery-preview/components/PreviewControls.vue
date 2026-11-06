@@ -1,64 +1,85 @@
 <template>
-  <span class="preview-controls">
-    <preview-summary
-      :title="styleData.name"
-      :href="styleUrl"
-      :status="held ? t('showing_original_page') : byline"
-      :dimmed="held"
-    />
+  <div class="preview-controls">
+    <div class="header">
+      <preview-summary
+        :title="styleData.name"
+        :href="styleUrl"
+        :status="byline"
+        :dimmed="original"
+      />
+      <s-icon-button
+        class="action"
+        :size="32"
+        :tooltip="t('stop_preview')"
+        tooltip-shortcut="esc"
+        :aria-label="t('stop_preview')"
+        :disabled="installing"
+        @click="$emit('cancel')"
+      >
+        <x-icon :size="14" />
+      </s-icon-button>
+    </div>
 
-    <s-color-scheme-switch
-      v-if="scheme"
-      :value="scheme"
-      :class="{ dimmed: held }"
-      @change="$emit('scheme', $event)"
-    />
-    <hold-to-compare-button :disabled="installing" @change="compare" />
-    <install-button
-      :class="{ dimmed: held }"
-      :installing="installing"
-      @install="$emit('install')"
-      @filled="$emit('filled')"
-    />
-    <s-icon-button
-      class="close"
-      :size="33"
-      :tooltip="t('stop_preview')"
-      tooltip-shortcut="esc"
-      :disabled="installing"
-      @click="$emit('cancel')"
+    <div
+      v-if="styleOptions.length"
+      class="options"
+      :class="{ dimmed: original || switching }"
     >
-      <x-icon :size="14" />
-    </s-icon-button>
-  </span>
+      <s-style-options
+        :options="styleOptions"
+        @option="(option, value) => $emit('option', option, value)"
+      />
+    </div>
+
+    <div class="footer">
+      <preview-compare
+        :original="original"
+        :disabled="installing"
+        @change="compare"
+      />
+      <install-button
+        class="install-button"
+        :class="{ dimmed: original }"
+        :installing="installing"
+        :disabled="switching"
+        @install="install"
+        @filled="$emit('filled')"
+      />
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
 import type { PropType } from 'vue';
 import Vue from 'vue';
-import { SColorSchemeSwitch, SIconButton } from '@stylebot/components';
+import { SIconButton, SStyleOptions } from '@stylebot/components';
 import { XIcon } from '@stylebot/icons';
 import { getGalleryByline, getGalleryStyleUrl } from '@stylebot/gallery';
-import type { GalleryStyle, StyleColorScheme } from '@stylebot/types';
+import type {
+  GalleryStyle,
+  StyleOption,
+  StyleOptionDeclarations,
+  StyleOptionValues,
+} from '@stylebot/types';
 
-import HoldToCompareButton from './HoldToCompareButton.vue';
 import InstallButton from './InstallButton.vue';
+import PreviewCompare from './PreviewCompare.vue';
 import PreviewSummary from './PreviewSummary.vue';
 
 /**
- * The bar while it previews a style: its color scheme when it declares one,
- * hold to compare, Install, and cancel.
- * Emits `scheme`, `compare`, `install`, `filled` and `cancel`.
+ * The card while it previews a style: its name, the options it declares,
+ * compare, Install, and cancel.
+ * Emits `option`, `compare`, `install`, `filled` and `cancel`.
  */
 export default Vue.extend({
   name: 'PreviewControls',
 
   components: {
-    HoldToCompareButton,
     InstallButton,
+    PreviewCompare,
     PreviewSummary,
-    SColorSchemeSwitch,
     SIconButton,
+    SStyleOptions,
     XIcon,
   },
 
@@ -73,20 +94,39 @@ export default Vue.extend({
       default: false,
     },
 
-    // The color scheme shown, when the style declares one.
-    scheme: {
-      type: String as PropType<StyleColorScheme | undefined>,
+    // Waiting for another of the site's styles to replace this one.
+    switching: {
+      type: Boolean,
+      default: false,
+    },
+
+    // The options the style declares, if any, and the values shown.
+    options: {
+      type: Object as PropType<StyleOptionDeclarations | undefined>,
       default: undefined,
+    },
+
+    values: {
+      type: Object as PropType<StyleOptionValues>,
+      default: () => ({}),
     },
   },
 
   data() {
     return {
-      held: false,
+      original: false,
     };
   },
 
   computed: {
+    styleOptions(): Array<StyleOption> {
+      return Object.entries(this.options ?? {}).map(([name, declaration]) => ({
+        name,
+        declaration,
+        value: this.values[name],
+      }));
+    },
+
     styleUrl(): string {
       return getGalleryStyleUrl(this.styleData);
     },
@@ -96,26 +136,59 @@ export default Vue.extend({
     },
   },
 
+  watch: {
+    'styleData.id'(): void {
+      this.original = false;
+    },
+  },
+
   methods: {
-    compare(held: boolean): void {
-      this.held = held;
-      this.$emit('compare', held);
+    compare(original: boolean): void {
+      this.original = original;
+      this.$emit('compare', original);
+    },
+
+    install(event: MouseEvent): void {
+      if (this.original) {
+        this.compare(false);
+      }
+
+      this.$emit('install', event);
     },
   },
 });
 </script>
 
 <style lang="scss" scoped>
-.preview-controls {
-  display: contents;
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 14px 4px 12px 16px;
 }
 
-.close {
+.action {
+  flex: none;
+  margin-top: -6px;
   color: var(--icon-color);
 }
 
+.options {
+  padding: 6px;
+  border-top: 1px solid var(--panel-border);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--panel-border);
+}
+
 .dimmed {
-  opacity: 0.5;
-  transition: opacity 0.12s ease;
+  opacity: 0.35;
+  transition: opacity 0.14s ease;
 }
 </style>

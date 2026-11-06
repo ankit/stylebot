@@ -85,6 +85,15 @@ export type StyleOptionDeclarations = {
   [name: string]: StyleOptionDeclaration;
 };
 
+/**
+ * An option a style declares, with the value in effect.
+ */
+export type StyleOption = {
+  name: string;
+  declaration: StyleOptionDeclaration;
+  value: string;
+};
+
 // As stored, so read back loosely: a value may predate a change to the css.
 export type StyleOptionValues = {
   [name: string]: string;

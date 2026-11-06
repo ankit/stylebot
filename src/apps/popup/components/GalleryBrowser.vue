@@ -5,7 +5,7 @@
         type="button"
         class="back"
         :aria-label="t('back')"
-        :disabled="installing || loading"
+        :disabled="loading"
         @click="$emit('back')"
       >
         <chevron-left-icon class="back-icon" :size="16" />
@@ -23,7 +23,6 @@
         :key="style.id"
         :style-data="style"
         :previewing="style.id === previewId"
-        :disabled="installing"
         @preview="$emit('preview', style)"
       />
 
@@ -81,7 +80,6 @@ export default Vue.extend({
 
     // The tab is still getting the picked style.
     loading: Boolean,
-    installing: Boolean,
 
     error: {
       type: String,

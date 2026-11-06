@@ -73,9 +73,9 @@ export const ListsSuggestions: StoryObj = {
   },
 };
 
-export const PreviewsThenInstalls: StoryObj = {
+export const Previews: StoryObj = {
   ...withSuggestions,
-  name: 'clicking a suggestion previews it on the tab, swapping the footer for an Install button named after it, which adds it as a profile',
+  name: 'clicking a suggestion previews it on the tab, hiding the footer',
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
     const sent = spyOn(chrome.runtime, 'sendMessage');
@@ -91,9 +91,7 @@ export const PreviewsThenInstalls: StoryObj = {
 
       await user.unhover(pick);
       pick.blur();
-      await expect(
-        await canvas.findByRole('img', { name: 'Previewing' })
-      ).toBeVisible();
+      await expect(await canvas.findByText('Stop')).toBeVisible();
       await expect(
         canvas.queryByRole('button', { name: /Style this page/ })
       ).toBeNull();
@@ -104,29 +102,12 @@ export const PreviewsThenInstalls: StoryObj = {
         })
       );
     });
-
-    await step('install', async () => {
-      await user.click(
-        canvas.getByRole('button', { name: 'Install Tokyo Night' })
-      );
-
-      await waitFor(() =>
-        expect(sent).toHaveBeenCalledWith(
-          expect.objectContaining({ name: 'InstallGalleryPreview' })
-        )
-      );
-      await waitFor(() =>
-        expect(
-          canvas.queryByRole('button', { name: 'Install Tokyo Night' })
-        ).toBeNull()
-      );
-    });
   },
 };
 
 export const StopEndsThePreview: StoryObj = {
   ...withSuggestions,
-  name: 'the previewing style offers Stop on hover, and clicking it ends the preview and brings the footer back',
+  name: 'the previewing style always shows Stop, and clicking it ends the preview and brings the footer back',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const sent = spyOn(chrome.runtime, 'sendMessage');
@@ -177,8 +158,8 @@ export const ShowsTheTabsPreview: StoryObj = {
       )
     );
     await expect(
-      canvas.getByRole('button', { name: 'Install Paper' })
-    ).toBeVisible();
+      canvas.queryByRole('button', { name: /Style this page/ })
+    ).toBeNull();
   },
 };
 
@@ -244,7 +225,6 @@ export const BackStopsThePreview: StoryObj = {
 
     await browse(canvas);
     await preview(canvas, 'Paper');
-    await canvas.findByRole('button', { name: 'Install Paper' });
 
     const back = canvas.getByRole('button', { name: 'Back' });
 
@@ -257,9 +237,6 @@ export const BackStopsThePreview: StoryObj = {
       )
     );
     await expect(await canvas.findByText('Create profile')).toBeVisible();
-    await expect(
-      canvas.queryByRole('button', { name: 'Install Paper' })
-    ).toBeNull();
   },
 };
 

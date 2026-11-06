@@ -8,7 +8,7 @@ import {
   getGalleryPreview,
   installGalleryPreview,
   openGalleryPreview,
-  setGalleryPreviewScheme,
+  setGalleryPreviewOption,
   startGalleryPreview,
   undoGalleryInstall,
 } from './gallery-preview';
@@ -89,7 +89,7 @@ describe('gallery preview', () => {
     );
   });
 
-  it('carries the color scheme a style declares by default', async () => {
+  it('carries the options a style declares, at their defaults', async () => {
     styleResponse(dedent`
       /**
        * ==Stylebot==
@@ -101,7 +101,10 @@ describe('gallery preview', () => {
 
     await startGalleryPreview(TAB_ID, style.id);
 
-    expect(await getGalleryPreview(TAB_ID)).toMatchObject({ scheme: 'dark' });
+    expect(await getGalleryPreview(TAB_ID)).toMatchObject({
+      options: { scheme: { type: 'select', default: 'dark' } },
+      values: { scheme: 'dark' },
+    });
   });
 
   it('tells the tab to replace the style it was installed in before', async () => {
@@ -245,11 +248,12 @@ describe('gallery preview', () => {
     expect(store.galleryPreviewSites).toEqual([]);
   });
 
-  describe('with a color scheme', () => {
+  describe('with options', () => {
     const declares = (fallback: string) => dedent`
       /**
        * ==Stylebot==
        * @option scheme select [system, light, dark] ${fallback}
+       * @var checkbox rounded "Rounded" 0
        * ==/Stylebot==
        */
       a {}
@@ -266,11 +270,14 @@ describe('gallery preview', () => {
       );
     };
 
-    it('keeps the scheme picked in the preview, and installs with it', async () => {
+    it('keeps the values picked in the preview, and installs with them', async () => {
       await install('system');
-      await setGalleryPreviewScheme(TAB_ID, 'dark');
+      await setGalleryPreviewOption(TAB_ID, 'scheme', 'dark');
+      await setGalleryPreviewOption(TAB_ID, 'rounded', '1');
 
-      expect(await getGalleryPreview(TAB_ID)).toMatchObject({ scheme: 'dark' });
+      expect(await getGalleryPreview(TAB_ID)).toMatchObject({
+        values: { scheme: 'dark', rounded: '1' },
+      });
 
       await installGalleryPreview(TAB_ID);
 
@@ -280,11 +287,26 @@ describe('gallery preview', () => {
         'scheme',
         'dark'
       );
+      expect(setStyleOption).toHaveBeenCalledWith(
+        'github.com',
+        'default',
+        'rounded',
+        '1'
+      );
+    });
+
+    it('ignores a value the option does not declare', async () => {
+      await install('system');
+      await setGalleryPreviewOption(TAB_ID, 'scheme', 'sepia');
+
+      expect(await getGalleryPreview(TAB_ID)).toMatchObject({
+        values: { scheme: 'system' },
+      });
     });
 
     it("doesn't store a pick that is the declared default", async () => {
       await install('dark');
-      await setGalleryPreviewScheme(TAB_ID, 'dark');
+      await setGalleryPreviewOption(TAB_ID, 'scheme', 'dark');
       await installGalleryPreview(TAB_ID);
 
       expect(setStyleOption).not.toHaveBeenCalled();

@@ -102,14 +102,11 @@
 
       <the-gallery
         v-if="stylesLoaded"
-        ref="gallery"
         :tab="tab"
         :compact="styles.length > 0"
         :browsing="galleryBrowsing"
         @browse="galleryBrowsing = $event"
         @preview="galleryPreviewName = $event"
-        @installing="galleryInstalling = $event"
-        @installed="onGalleryInstalled"
       />
 
       <div
@@ -126,18 +123,7 @@
           'popup-footer--above-sync': syncEnabled && !galleryBrowsing,
         }"
       >
-        <s-pill-button
-          v-if="galleryPreviewing"
-          class="popup-preview-install"
-          :disabled="galleryInstalling"
-          :aria-busy="galleryInstalling ? 'true' : undefined"
-          @click="installGalleryPreview"
-        >
-          {{ t('install_name', [galleryPreviewName]) }}
-        </s-pill-button>
-        <!-- Kept in place so editing a profile can still open the editor. -->
         <toggle-stylebot
-          v-show="!galleryPreviewing"
           ref="toggle"
           :is-open="isOpen"
           :tab="tab"
@@ -165,7 +151,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SHeading, SPillButton, SThemeProvider } from '@stylebot/components';
+import { SHeading, SThemeProvider } from '@stylebot/components';
 
 import StyleComponent from './components/Style.vue';
 import SiteProfiles from './components/SiteProfiles.vue';
@@ -199,7 +185,7 @@ import {
   getPublishMenuItem,
   publishProfileToGallery,
 } from './utils';
-import type { ProfileOption } from './utils';
+import type { StyleOption } from '@stylebot/types';
 import type { GalleryMenuItem } from '@stylebot/gallery';
 
 import { getGoogleDriveSyncEnabled } from '@stylebot/sync';
@@ -230,7 +216,6 @@ export default Vue.extend({
 
   components: {
     SHeading,
-    SPillButton,
     SThemeProvider,
     PopupMoreMenu,
     StyleComponent,
@@ -267,7 +252,6 @@ export default Vue.extend({
     dockLocation: StylebotDockLocation | '';
     // A gallery style is shown on the page in place of the site's own.
     galleryPreviewName: string | null;
-    galleryInstalling: boolean;
     // The gallery's styles stand in for the rest of the popup.
     galleryBrowsing: boolean;
     // Each site profile's way into publishing, once known.
@@ -291,7 +275,6 @@ export default Vue.extend({
       appearance: 'system',
       dockLocation: '',
       galleryPreviewName: null,
-      galleryInstalling: false,
       galleryBrowsing: false,
       publishItems: {},
       editingEnabled: !isIPhone(),
@@ -340,7 +323,7 @@ export default Vue.extend({
     },
 
     // The options the site's active profile declares, while it's on.
-    siteOptions(): Array<ProfileOption> {
+    siteOptions(): Array<StyleOption> {
       const site = this.styles.find(({ url }) => url === this.defaultStyleUrl);
 
       if (!site || !this.siteEnabled) {
@@ -363,13 +346,13 @@ export default Vue.extend({
       return this.galleryPreviewName !== null;
     },
 
-    // The footer holds the editor's button, and a gallery preview's.
     showFooter(): boolean {
-      return this.editingEnabled || this.galleryPreviewing;
+      return this.editingEnabled;
     },
 
+    // Kept in place while hidden, so editing a profile can still open the editor.
     footerShown(): boolean {
-      return !this.galleryBrowsing || this.galleryPreviewing;
+      return !this.galleryBrowsing && !this.galleryPreviewing;
     },
 
     hasToggleRows(): boolean {
@@ -536,15 +519,6 @@ export default Vue.extend({
 
       setStyleOption(site.url, profileId, name, value);
       this.styles.splice(0, 1, setProfileOption(site, profileId, name, value));
-    },
-
-    installGalleryPreview(): void {
-      (this.$refs.gallery as InstanceType<typeof TheGallery>)?.install();
-    },
-
-    onGalleryInstalled(): void {
-      this.galleryBrowsing = false;
-      this.loadStyles();
     },
 
     /**
@@ -721,21 +695,6 @@ body {
   display: flex;
   gap: 8px;
   padding: 10px 16px 12px;
-}
-
-.popup-footer .popup-preview-install.pill-btn {
-  border-color: var(--accent);
-  background: var(--accent);
-  color: var(--accent-ink);
-
-  @include hover-capable {
-    &:hover:not(:disabled) {
-      background: var(--accent);
-      filter: brightness(0.92);
-    }
-  }
-
-  @include focus-ring(2px);
 }
 
 .popup-footer .pill-btn:disabled {

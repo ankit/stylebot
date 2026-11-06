@@ -59,6 +59,8 @@ export {
 } from './profile-listings';
 export {
   GALLERY_PREVIEW_SITES_KEY,
+  getPreviewPageOptions,
+  type GalleryPreviewControls,
   type GalleryPreviewHandlers,
   type GalleryPreviewAppWindow,
 } from './preview';

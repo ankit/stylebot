@@ -3,9 +3,9 @@
     variant="primary"
     class="install"
     :class="{ installing }"
-    :disabled="installing"
+    :disabled="installing || disabled"
     :aria-busy="installing ? 'true' : undefined"
-    @click="$emit('install')"
+    @click="$emit('install', $event)"
     @animationend.native="$emit('filled')"
   >
     {{ t('install') }}
@@ -32,14 +32,23 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
+
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
   },
 });
 </script>
 
 <style lang="scss" scoped>
-.install {
+.button.install {
   position: relative;
+  flex: none;
   overflow: hidden;
+  width: 84px;
+  height: 32px;
+  padding: 0;
 }
 
 .button.install.installing:disabled {

@@ -1,7 +1,7 @@
 import {
   injectStylesheet,
   removeStylesheet,
-  setSchemeAttribute,
+  setStyleOptions,
 } from '@stylebot/stylesheets';
 import type { GalleryPreview } from '@stylebot/types';
 
@@ -18,7 +18,7 @@ import { getCompiledStyles } from './saved-styles';
 jest.mock('@stylebot/stylesheets', () => ({
   injectStylesheet: jest.fn(),
   removeStylesheet: jest.fn(),
-  setSchemeAttribute: jest.fn(),
+  setStyleOptions: jest.fn(),
 }));
 jest.mock('./page-state', () => ({
   applyPageState: jest.fn(),
@@ -38,8 +38,9 @@ const preview: GalleryPreview = {
   importUrls: [],
 };
 
-const unmount = jest.fn();
-const mount = jest.fn(() => unmount);
+const remove = jest.fn();
+const show = jest.fn();
+const mount = jest.fn(() => ({ remove, show }));
 
 beforeEach(async () => {
   jest.clearAllMocks();
@@ -75,11 +76,7 @@ describe('gallery preview on the page', () => {
       'b {}',
       []
     );
-    expect(mount).toHaveBeenCalledWith(
-      preview.style,
-      expect.any(Object),
-      undefined
-    );
+    expect(mount).toHaveBeenCalledWith(preview, expect.any(Object));
     expect(isPreviewingGalleryStyle()).toBe(true);
   });
 
@@ -91,47 +88,82 @@ describe('gallery preview on the page', () => {
     expect(removeStylesheet).not.toHaveBeenCalledWith('*');
   });
 
-  it('shows a gallery style in the color scheme it declares by default', async () => {
-    await showGalleryPreview({ ...preview, scheme: 'dark' }, ['example.com']);
+  describe('with options', () => {
+    const withOptions: GalleryPreview = {
+      ...preview,
+      options: {
+        scheme: {
+          type: 'select',
+          values: ['system', 'light', 'dark'],
+          default: 'system',
+        },
+        accent: {
+          type: 'select',
+          label: 'Accent',
+          values: ['mauve', 'blue'],
+          default: 'mauve',
+          choices: {
+            mauve: { label: 'Mauve', css: '#cba6f7' },
+            blue: { label: 'Blue', css: '#89b4fa' },
+          },
+        },
+      },
+      values: { scheme: 'dark', accent: 'mauve' },
+    };
 
-    expect(setSchemeAttribute).toHaveBeenCalledWith('dark');
-  });
+    it('shows a gallery style with the values its preview has', async () => {
+      await showGalleryPreview(withOptions, ['example.com']);
 
-  it('shows the scheme picked in its controls, keeps it while comparing, and tells the background', async () => {
-    await showGalleryPreview({ ...preview, scheme: 'system' }, ['example.com']);
-    const [, handlers] = mount.mock.calls[0] as unknown as [
-      unknown,
-      { setScheme: (scheme: string) => void; compare: (on: boolean) => void }
-    ];
-
-    handlers.setScheme('dark');
-    await Promise.resolve();
-
-    expect(setSchemeAttribute).toHaveBeenLastCalledWith('dark');
-    expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
-      name: 'SetGalleryPreviewScheme',
-      scheme: 'dark',
+      expect(setStyleOptions).toHaveBeenCalledWith({
+        scheme: { value: 'dark', css: 'dark' },
+        accent: { value: 'mauve', css: '#cba6f7' },
+      });
     });
 
-    handlers.compare(true);
-    await new Promise(resolve => setTimeout(resolve));
-    handlers.compare(false);
-    await new Promise(resolve => setTimeout(resolve));
+    it('shows a value picked in its controls, keeps it while comparing, and tells the background', async () => {
+      await showGalleryPreview(withOptions, ['example.com']);
+      const [, handlers] = mount.mock.calls[0] as unknown as [
+        unknown,
+        {
+          setOption: (option: string, value: string) => void;
+          compare: (on: boolean) => void;
+        }
+      ];
+      const picked = {
+        scheme: { value: 'dark', css: 'dark' },
+        accent: { value: 'blue', css: '#89b4fa' },
+      };
 
-    expect(setSchemeAttribute).toHaveBeenLastCalledWith('dark');
+      handlers.setOption('accent', 'blue');
+      await Promise.resolve();
+
+      expect(setStyleOptions).toHaveBeenLastCalledWith(picked);
+      expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+        name: 'SetGalleryPreviewOption',
+        option: 'accent',
+        value: 'blue',
+      });
+
+      handlers.compare(true);
+      await new Promise(resolve => setTimeout(resolve));
+      handlers.compare(false);
+      await new Promise(resolve => setTimeout(resolve));
+
+      expect(setStyleOptions).toHaveBeenLastCalledWith(picked);
+    });
   });
 
-  it("clears the page's color scheme for a gallery style without one", async () => {
+  it("clears the page's options for a gallery style without any", async () => {
     await showGalleryPreview(preview, ['example.com']);
 
-    expect(setSchemeAttribute).toHaveBeenCalledWith(undefined);
+    expect(setStyleOptions).toHaveBeenCalledWith(undefined);
   });
 
   it("puts the page's own styles back when it's hidden", async () => {
     await showGalleryPreview(preview, ['example.com']);
     await hideGalleryPreview();
 
-    expect(unmount).toHaveBeenCalled();
+    expect(remove).toHaveBeenCalled();
     expect(removeStylesheet).toHaveBeenCalledWith('stylebot:gallery-preview');
     expect(applyPageState).toHaveBeenCalled();
     expect(isPreviewingGalleryStyle()).toBe(false);
@@ -154,11 +186,7 @@ describe('gallery preview on the page', () => {
     expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
       name: 'GetGalleryPreview',
     });
-    expect(mount).toHaveBeenCalledWith(
-      preview.style,
-      expect.any(Object),
-      undefined
-    );
+    expect(mount).toHaveBeenCalledWith(preview, expect.any(Object));
     expect(removeStylesheet).toHaveBeenCalledWith('example.com');
   });
 });

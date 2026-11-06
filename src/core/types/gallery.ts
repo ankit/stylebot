@@ -1,4 +1,4 @@
-import type { StyleColorScheme } from './styles';
+import type { StyleOptionDeclarations, StyleOptionValues } from './styles';
 
 /**
  * Who publishes styles to the gallery, by an id and a unique username, as a
@@ -41,8 +41,9 @@ export type GalleryPreview = {
   importUrls: Array<string>;
   // The gallery page it was opened from, told when it's installed.
   galleryTabId?: number;
-  // The default of the color scheme its css declares, if it declares one.
-  scheme?: StyleColorScheme;
+  // The options its css declares, if any, with the value picked for each.
+  options?: StyleOptionDeclarations;
+  values?: StyleOptionValues;
 };
 
 /**

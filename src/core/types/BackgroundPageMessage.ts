@@ -1,5 +1,5 @@
 import type { CliModeEvent } from './cli-mode';
-import type { StyleColorScheme, StyleMap } from './styles';
+import type { StyleMap } from './styles';
 import type { StylebotOptions } from './options';
 import type { ReadabilitySettings } from './readability';
 import type { StylebotCommandName } from './commands';
@@ -389,9 +389,10 @@ export type EndGalleryPreview = {
   tabId?: number;
 };
 
-export type SetGalleryPreviewScheme = {
-  name: 'SetGalleryPreviewScheme';
-  scheme: StyleColorScheme;
+export type SetGalleryPreviewOption = {
+  name: 'SetGalleryPreviewOption';
+  option: string;
+  value: string;
 };
 
 // Sent by the page's preview bar, just after an install.
@@ -409,7 +410,7 @@ type BackgroundPageMessage =
   | GetStylesForPage
   | SetActiveProfile
   | SetStyleOption
-  | SetGalleryPreviewScheme
+  | SetGalleryPreviewOption
   | CreateProfile
   | InstallStyle
   | RenameProfile

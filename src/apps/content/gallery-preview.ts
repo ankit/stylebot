@@ -1,22 +1,28 @@
 import {
   GALLERY_PREVIEW_SITES_KEY,
+  getPreviewPageOptions,
   toGallerySite,
   type GalleryPreviewAppWindow,
+  type GalleryPreviewControls,
 } from '@stylebot/gallery';
 import {
   injectStylesheet,
   removeStylesheet,
-  setSchemeAttribute,
+  setStyleOptions,
 } from '@stylebot/stylesheets';
 import type {
   EndGalleryPreview,
   GalleryPreview,
+  GalleryStyle,
   GetGalleryPreview,
   GetGalleryPreviewResponse,
+  GetGallerySuggestions,
+  GetGallerySuggestionsResponse,
   InstallGalleryPreview,
   InstallGalleryPreviewResponse,
-  SetGalleryPreviewScheme,
-  StyleColorScheme,
+  PreviewGalleryStyle,
+  PreviewGalleryStyleResponse,
+  SetGalleryPreviewOption,
   UndoGalleryInstall,
   UndoGalleryInstallResponse,
 } from '@stylebot/types';
@@ -32,7 +38,7 @@ type PreviewWindow = GalleryPreviewAppWindow & {
   stylebotGalleryPreview?: {
     preview: GalleryPreview;
     replacedUrls: Array<string>;
-    unmount?: (installed?: boolean) => void;
+    controls?: GalleryPreviewControls;
   };
 };
 
@@ -50,15 +56,15 @@ const applyOwnStyles = async (): Promise<void> =>
 
 /**
  * Shows a gallery style in place of the saved styles it replaces, keeping the
- * page's others, and in the color scheme it declares by default.
+ * page's others, and with the values picked for the options it declares.
  */
 const applyPreview = (
-  { css, importUrls, scheme }: GalleryPreview,
+  preview: GalleryPreview,
   replacedUrls: Array<string>
 ): void => {
   replacedUrls.forEach(url => removeStylesheet(url));
-  setSchemeAttribute(scheme);
-  injectStylesheet(PREVIEW_KEY, css, importUrls);
+  setStyleOptions(getPreviewPageOptions(preview));
+  injectStylesheet(PREVIEW_KEY, preview.css, preview.importUrls);
 };
 
 const CROSSFADE_ID = 'stylebot-gallery-preview-crossfade';
@@ -73,6 +79,7 @@ const CROSSFADE_CSS = `
 
 type TransitionDocument = Document & {
   startViewTransition?: (update: () => Promise<void>) => {
+    ready: Promise<void>;
     updateCallbackDone: Promise<void>;
   };
 };
@@ -100,7 +107,11 @@ const crossfade = async (update: () => Promise<void>): Promise<void> => {
     (document.head || document.documentElement).append(style);
   }
 
-  await doc.startViewTransition(update).updateCallbackDone;
+  const transition = doc.startViewTransition(update);
+
+  // Rejects when a quick next change skips this crossfade.
+  transition.ready.catch(() => undefined);
+  await transition.updateCallbackDone;
 };
 
 const load = async () => {
@@ -138,21 +149,53 @@ const cancel = (): void => {
   chrome.runtime.sendMessage(message);
 };
 
-const setScheme = (scheme: StyleColorScheme): void => {
+const setOption = (option: string, value: string): void => {
   const current = shared.stylebotGalleryPreview;
 
   if (!current) {
     return;
   }
 
-  current.preview = { ...current.preview, scheme };
-  crossfade(async () => setSchemeAttribute(scheme));
+  const preview: GalleryPreview = {
+    ...current.preview,
+    values: { ...current.preview.values, [option]: value },
+  };
 
-  const message: SetGalleryPreviewScheme = {
-    name: 'SetGalleryPreviewScheme',
-    scheme,
+  current.preview = preview;
+  crossfade(async () => setStyleOptions(getPreviewPageOptions(preview)));
+
+  const message: SetGalleryPreviewOption = {
+    name: 'SetGalleryPreviewOption',
+    option,
+    value,
   };
   chrome.runtime.sendMessage(message);
+};
+
+/**
+ * The gallery's styles for the page's site, for moving between them.
+ */
+const getSiteStyles = async (): Promise<Array<GalleryStyle>> => {
+  const message: GetGallerySuggestions = {
+    name: 'GetGallerySuggestions',
+    pageUrl: window.location.href,
+    incognito: chrome.extension.inIncognitoContext,
+  };
+  const response = await chrome.runtime.sendMessage<
+    GetGallerySuggestions,
+    GetGallerySuggestionsResponse
+  >(message);
+
+  return response.ok ? response.styles : [];
+};
+
+const previewStyle = (id: number): Promise<PreviewGalleryStyleResponse> => {
+  const message: PreviewGalleryStyle = { name: 'PreviewGalleryStyle', id };
+
+  return chrome.runtime.sendMessage<
+    PreviewGalleryStyle,
+    PreviewGalleryStyleResponse
+  >(message);
 };
 
 const compare = (on: boolean): void => {
@@ -174,8 +217,8 @@ const compare = (on: boolean): void => {
 
 /**
  * Shows a gallery style in place of the page's own styles, with controls to
- * install it, cancel, or hold to compare. Crossfades to it unless the page
- * is only now loading.
+ * install it, cancel, or compare, moving the controls already on the page
+ * across. Crossfades to it unless the page is only now loading.
  */
 export const showGalleryPreview = async (
   preview: GalleryPreview,
@@ -184,8 +227,9 @@ export const showGalleryPreview = async (
 ): Promise<void> => {
   const current = shared.stylebotGalleryPreview;
 
-  current?.unmount?.();
-  shared.stylebotGalleryPreview = { preview, replacedUrls };
+  const controls = current?.controls;
+
+  shared.stylebotGalleryPreview = { preview, replacedUrls, controls };
 
   // An earlier preview may have replaced another style, so put them back first.
   const update = async () => {
@@ -203,17 +247,30 @@ export const showGalleryPreview = async (
     await update();
   }
 
+  if (shared.stylebotGalleryPreview?.preview !== preview) {
+    return;
+  }
+
+  if (controls) {
+    controls.show(preview);
+    return;
+  }
+
   const app = await load();
 
   if (shared.stylebotGalleryPreview?.preview !== preview) {
     return;
   }
 
-  shared.stylebotGalleryPreview.unmount = app?.mount(
-    preview.style,
-    { install, undo, cancel, compare, setScheme },
-    preview.scheme
-  );
+  shared.stylebotGalleryPreview.controls = app?.mount(preview, {
+    install,
+    undo,
+    cancel,
+    compare,
+    setOption,
+    getSiteStyles,
+    preview: previewStyle,
+  });
 };
 
 /**
@@ -228,7 +285,7 @@ export const hideGalleryPreview = async (installed = false): Promise<void> => {
   }
 
   shared.stylebotGalleryPreview = undefined;
-  current.unmount?.(installed);
+  current.controls?.remove(installed);
 
   await crossfade(async () => {
     removeStylesheet(PREVIEW_KEY);

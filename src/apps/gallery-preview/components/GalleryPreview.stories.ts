@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/vue';
 import type { GalleryPreviewHandlers } from '@stylebot/gallery';
-import type { GalleryStyle, StyleColorScheme } from '@stylebot/types';
+import type {
+  GalleryStyle,
+  StyleOptionDeclarations,
+  StyleOptionValues,
+} from '@stylebot/types';
 
 import GalleryPreview from './GalleryPreview.vue';
 
@@ -30,16 +34,75 @@ const handlers: GalleryPreviewHandlers = {
   undo: async () => ({ ok: true }),
   cancel: () => undefined,
   compare: () => undefined,
-  setScheme: () => undefined,
+  setOption: () => undefined,
+  getSiteStyles: async () => [],
+  preview: async () => ({ ok: true }),
 };
 
-const bar = (scheme?: StyleColorScheme): StoryObj => ({
+const SITE_STYLES: Array<GalleryStyle> = [
+  style,
+  { ...style, id: 43, slug: 'ink', name: 'Ink' },
+  { ...style, id: 44, slug: 'paper', name: 'Paper' },
+];
+
+const SCHEME: StyleOptionDeclarations = {
+  scheme: {
+    type: 'select',
+    values: ['system', 'light', 'dark'],
+    default: 'system',
+  },
+};
+
+const OPTIONS: StyleOptionDeclarations = {
+  ...SCHEME,
+  accent: {
+    type: 'select',
+    label: 'Accent',
+    values: ['orange', 'mauve', 'blue'],
+    default: 'orange',
+    choices: {
+      orange: { label: 'Orange', css: '#ff6600' },
+      mauve: { label: 'Mauve', css: '#cba6f7' },
+      blue: { label: 'Blue', css: '#89b4fa' },
+    },
+  },
+  density: {
+    type: 'select',
+    label: 'Density',
+    values: ['compact', 'comfortable'],
+    default: 'comfortable',
+    choices: {
+      compact: { label: 'Compact', css: 'compact' },
+      comfortable: { label: 'Comfortable', css: 'comfortable' },
+    },
+  },
+  serif: {
+    type: 'checkbox',
+    label: 'Serif headlines',
+    values: ['0', '1'],
+    default: '1',
+  },
+};
+
+const defaults = (options?: StyleOptionDeclarations): StyleOptionValues =>
+  Object.fromEntries(
+    Object.entries(options ?? {}).map(([name, { default: value }]) => [
+      name,
+      value,
+    ])
+  );
+
+const bar = (
+  options?: StyleOptionDeclarations,
+  siteStyles: Array<GalleryStyle> = []
+): StoryObj => ({
   render: (_args, { globals }) => ({
     components: { GalleryPreview },
     data: () => ({
       styleData: style,
-      handlers,
-      scheme,
+      handlers: { ...handlers, getSiteStyles: async () => siteStyles },
+      options,
+      values: defaults(options),
       appearance: globals.theme === 'dark' ? 'dark' : 'light',
     }),
     template: `
@@ -47,11 +110,16 @@ const bar = (scheme?: StyleColorScheme): StoryObj => ({
         :style-data="styleData"
         :handlers="handlers"
         :appearance="appearance"
-        :scheme="scheme"
+        :options="options"
+        :values="values"
       />`,
   }),
 });
 
 export const Default = bar();
 
-export const WithColorScheme = bar('system');
+export const WithColorScheme = bar(SCHEME);
+
+export const WithOptions = bar(OPTIONS);
+
+export const WithSiteStyles = bar(OPTIONS, SITE_STYLES);

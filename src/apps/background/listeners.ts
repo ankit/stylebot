@@ -85,7 +85,7 @@ import {
   GetGalleryPreview,
   InstallGalleryPreview,
   EndGalleryPreview,
-  SetGalleryPreviewScheme,
+  SetGalleryPreviewOption,
   UndoGalleryInstall,
   GetGalleryInstallStatus,
   PublishGalleryStyleUpdate,
@@ -493,8 +493,8 @@ export const initListeners = (): void => {
         case 'EndGalleryPreview':
           EndGalleryPreview(message, sender);
           break;
-        case 'SetGalleryPreviewScheme':
-          SetGalleryPreviewScheme(message, sender);
+        case 'SetGalleryPreviewOption':
+          SetGalleryPreviewOption(message, sender);
           break;
         case 'UndoGalleryInstall':
           UndoGalleryInstall(message, sender, sendResponse);

@@ -81,15 +81,13 @@ export default Vue.extend({
   align-items: center;
   gap: 12px;
   min-width: 0;
-  padding: 0 16px 0 6px;
+  padding-right: 6px;
 }
 
 .details {
   display: flex;
   flex-direction: column;
-  gap: 4px;
   min-width: 0;
-  max-width: 300px;
 }
 
 .details.confirming {
@@ -105,6 +103,9 @@ export default Vue.extend({
 
   align-self: flex-start;
   max-width: 100%;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
   text-decoration: none;
 
   @include focus-ring;
@@ -112,6 +113,9 @@ export default Vue.extend({
 
 .status {
   @include truncate;
+
+  font-size: 12.5px;
+  line-height: 18px;
 }
 
 .dimmed .name {

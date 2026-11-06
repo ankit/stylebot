@@ -9,7 +9,6 @@ import type {
   DisableStyle,
   SetActiveProfile,
   SetStyleOption,
-  StyleOptionDeclaration,
   RenameProfile,
   DeleteProfile,
   DeleteStyle,
@@ -26,8 +25,6 @@ import type {
   PreviewGalleryStyleResponse,
   GetGalleryPreview,
   GetGalleryPreviewResponse,
-  InstallGalleryPreview,
-  InstallGalleryPreviewResponse,
   EndGalleryPreview,
   GetPublishedGalleryStyle,
   GetPublishedGalleryStyleResponse,
@@ -125,15 +122,6 @@ export const setActiveProfile = (url: string, profileId: string): void => {
   };
 
   chrome.runtime.sendMessage(message);
-};
-
-/**
- * An option the applied profile's css declares, with the value in effect.
- */
-export type ProfileOption = {
-  name: string;
-  declaration: StyleOptionDeclaration;
-  value: string;
 };
 
 export const setStyleOption = (
@@ -419,14 +407,6 @@ export const getGalleryPreview = (
     name: 'GetGalleryPreview',
     tabId,
   });
-
-export const installGalleryPreview = (
-  tabId: number
-): Promise<InstallGalleryPreviewResponse> =>
-  chrome.runtime.sendMessage<
-    InstallGalleryPreview,
-    InstallGalleryPreviewResponse
-  >({ name: 'InstallGalleryPreview', tabId });
 
 export const endGalleryPreview = (tabId: number): Promise<void> =>
   chrome.runtime.sendMessage<EndGalleryPreview>({

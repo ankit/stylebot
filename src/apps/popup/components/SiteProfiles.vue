@@ -70,7 +70,7 @@ import PopupMoreMenu from './PopupMoreMenu.vue';
 import ProfileRow from './ProfileRow.vue';
 import CreateProfile from './CreateProfile.vue';
 import ProfileOptions from './ProfileOptions.vue';
-import type { ProfileOption } from '../utils';
+import type { StyleOption } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'SiteProfiles',
@@ -111,7 +111,7 @@ export default Vue.extend({
     },
 
     options: {
-      type: Array as PropType<Array<ProfileOption>>,
+      type: Array as PropType<Array<StyleOption>>,
       default: () => [],
     },
 
