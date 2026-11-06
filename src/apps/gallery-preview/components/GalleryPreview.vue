@@ -41,7 +41,7 @@
         :index="position"
         :total="siteStyles.length"
         :disabled="installing"
-        @go="go"
+        @switch="switchStyle"
       />
     </div>
   </s-theme-provider>
@@ -208,7 +208,7 @@ export default Vue.extend({
         : [styleData, ...styles];
     },
 
-    async go(position: number): Promise<void> {
+    async switchStyle(position: number): Promise<void> {
       const { id } = this.siteStyles[position];
 
       this.error = '';

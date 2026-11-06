@@ -11,7 +11,7 @@
         tooltip-shortcut="["
         :aria-label="t('previous_style')"
         :disabled="disabled || index === 0"
-        @click="go(index - 1)"
+        @click="switchTo(index - 1)"
       >
         <chevron-left-icon :size="14" />
       </s-icon-button>
@@ -22,7 +22,7 @@
         tooltip-shortcut="]"
         :aria-label="t('next_style')"
         :disabled="disabled || index === total - 1"
-        @click="go(index + 1)"
+        @click="switchTo(index + 1)"
       >
         <chevron-right-icon :size="14" />
       </s-icon-button>
@@ -44,7 +44,7 @@ const KEYS: Array<[string, number]> = [
 
 /**
  * Where a style sits among the site's, with arrows, or [ and ] anywhere on
- * the page, to the ones either side. Emits `go` with the index to show.
+ * the page, to the ones either side. Emits `switch` with the index to show.
  */
 export default Vue.extend({
   name: 'PreviewStyleSwitcher',
@@ -83,9 +83,9 @@ export default Vue.extend({
   },
 
   methods: {
-    go(index: number): void {
+    switchTo(index: number): void {
       if (!this.disabled && index >= 0 && index < this.total) {
-        this.$emit('go', index);
+        this.$emit('switch', index);
       }
     },
 
@@ -95,7 +95,7 @@ export default Vue.extend({
       if (step) {
         event.preventDefault();
         event.stopImmediatePropagation();
-        this.go(this.index + step);
+        this.switchTo(this.index + step);
       }
     },
   },
