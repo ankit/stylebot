@@ -39,18 +39,6 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .profile-options {
-  margin-bottom: 2px;
-  padding-bottom: 2px;
-  box-shadow: inset 0 0 0 1px var(--panel-border);
-  border-radius: 8px;
-
-  > ::v-deep :first-child {
-    border-end-start-radius: 0;
-    border-end-end-radius: 0;
-  }
-
-  ::v-deep .style-option--select:last-child {
-    margin-bottom: 6px;
-  }
+  margin-bottom: 6px;
 }
 </style>
