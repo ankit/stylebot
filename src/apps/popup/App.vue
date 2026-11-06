@@ -208,8 +208,10 @@ import type {
   StylebotLayout,
   StylebotDockLocation,
 } from '@stylebot/types';
-import { detectChromiumVariant, isIPhone } from '@stylebot/utils';
+import { detectChromiumVariant, isIPhone, isWebPageUrl } from '@stylebot/utils';
 import type { PageSupport } from '@stylebot/utils';
+
+const PAGE_ANSWER_WAIT_MS = 100;
 
 export default Vue.extend({
   name: 'App',
@@ -398,23 +400,9 @@ export default Vue.extend({
   created() {
     detectChromiumVariant();
 
-    getCurrentTab(async tab => {
+    getCurrentTab(tab => {
       this.tab = tab;
-      this.pageSupport = await getRestoredPageSupport(tab);
-
-      if (this.pageSupport !== 'supported') {
-        return;
-      }
-
-      getIsStylebotOpen(this.tab, isOpen => {
-        this.isOpen = isOpen;
-      });
-
-      getIsPageReaderable(this.tab, isReaderable => {
-        this.pageReaderable = isReaderable;
-      });
-
-      this.loadStyles();
+      this.loadPageSupport(tab);
     });
 
     getGoogleDriveSyncEnabled().then(enabled => {
@@ -435,6 +423,49 @@ export default Vue.extend({
   },
 
   methods: {
+    /**
+     * Shows a web page as supported if it hasn't answered shortly. It answers
+     * from its own main thread, which a heavy page can tie up for seconds
+     * while it loads; a late answer still corrects the view.
+     */
+    async loadPageSupport(tab: chrome.tabs.Tab): Promise<void> {
+      const showSupported = () => this.showPageSupport('supported');
+      let timeout: ReturnType<typeof setTimeout> | undefined;
+
+      if (isWebPageUrl(tab.url ?? '')) {
+        timeout = setTimeout(showSupported, PAGE_ANSWER_WAIT_MS);
+      }
+
+      const support = await getRestoredPageSupport(tab);
+
+      clearTimeout(timeout);
+      this.showPageSupport(support);
+    },
+
+    /**
+     * Shows what Stylebot can do on the tab, loading the page's state the
+     * first time it's known to be supported.
+     */
+    showPageSupport(support: PageSupport): void {
+      const loaded = this.pageSupport === 'supported';
+
+      this.pageSupport = support;
+
+      if (support !== 'supported' || loaded || !this.tab) {
+        return;
+      }
+
+      getIsStylebotOpen(this.tab, isOpen => {
+        this.isOpen = isOpen;
+      });
+
+      getIsPageReaderable(this.tab, isReaderable => {
+        this.pageReaderable = isReaderable;
+      });
+
+      this.loadStyles();
+    },
+
     /**
      * Reads the tab's styles; again after a sync, which may have brought in
      * styles or profiles edited on another device.

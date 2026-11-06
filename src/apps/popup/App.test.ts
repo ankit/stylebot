@@ -9,6 +9,7 @@ import SyncStylebot from './components/SyncStylebot.vue';
 import UnsupportedPage from './components/UnsupportedPage.vue';
 import {
   getCurrentTab,
+  getIsStylebotOpen,
   getStyles,
   getCommands,
   getRestoredPageSupport,
@@ -55,10 +56,89 @@ const openPopup = async (url: string, support: PageSupport = 'supported') => {
   return wrapper;
 };
 
+/**
+ * Opens the popup on a tab whose page script hasn't answered yet, returning
+ * the way to answer for it.
+ */
+const openPopupOnBusyPage = (url: string) => {
+  let answer: (support: PageSupport) => void = () => undefined;
+
+  (getCurrentTab as jest.Mock).mockImplementation(cb =>
+    cb({ id: 1, url } as chrome.tabs.Tab)
+  );
+  (getRestoredPageSupport as jest.Mock).mockReturnValue(
+    new Promise<PageSupport>(resolve => {
+      answer = resolve;
+    })
+  );
+
+  return { wrapper: shallowMount(App), answer };
+};
+
 describe('App.vue', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     syncStatus(false);
+  });
+
+  describe('on a page too busy to answer', () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    const settle = async () => {
+      for (let i = 0; i < 5; i++) {
+        await Promise.resolve();
+      }
+    };
+
+    it('should show the usual view without waiting for it', async () => {
+      const { wrapper } = openPopupOnBusyPage('https://www.reddit.com/');
+
+      expect(wrapper.findComponent(ToggleStylebot).exists()).toBe(false);
+
+      jest.advanceTimersByTime(100);
+      await settle();
+
+      expect(wrapper.findComponent(ToggleStylebot).exists()).toBe(true);
+    });
+
+    it('should load the page once when it answers late', async () => {
+      const { answer } = openPopupOnBusyPage('https://www.reddit.com/');
+
+      jest.advanceTimersByTime(100);
+      answer('supported');
+      await settle();
+
+      expect(getIsStylebotOpen).toHaveBeenCalledTimes(1);
+      expect(getStyles).toHaveBeenCalledTimes(1);
+    });
+
+    it('should correct the view when it answers late that it cannot be styled', async () => {
+      const { wrapper, answer } = openPopupOnBusyPage(
+        'https://example.com/report.pdf'
+      );
+
+      jest.advanceTimersByTime(100);
+      await settle();
+      answer('unsupported');
+      await settle();
+
+      expect(wrapper.findComponent(UnsupportedPage).exists()).toBe(true);
+    });
+
+    it('should not stand in for a browser page', async () => {
+      const { wrapper } = openPopupOnBusyPage('chrome://extensions');
+
+      jest.advanceTimersByTime(100);
+      await settle();
+
+      expect(wrapper.findComponent(ToggleStylebot).exists()).toBe(false);
+    });
   });
 
   it('should show the restricted view for a browser page', async () => {
