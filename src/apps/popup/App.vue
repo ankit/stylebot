@@ -429,12 +429,13 @@ export default Vue.extend({
      * while it loads; a late answer still corrects the view.
      */
     async loadPageSupport(tab: chrome.tabs.Tab): Promise<void> {
-      const timeout = isWebPageUrl(tab.url ?? '')
-        ? setTimeout(
-            () => this.showPageSupport('supported'),
-            PAGE_ANSWER_WAIT_MS
-          )
-        : undefined;
+      const showSupported = () => this.showPageSupport('supported');
+      let timeout: ReturnType<typeof setTimeout> | undefined;
+
+      if (isWebPageUrl(tab.url ?? '')) {
+        timeout = setTimeout(showSupported, PAGE_ANSWER_WAIT_MS);
+      }
+
       const support = await getRestoredPageSupport(tab);
 
       clearTimeout(timeout);
