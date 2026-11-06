@@ -7,9 +7,10 @@
 [![Webstore Rating](https://img.shields.io/chrome-web-store/stars/oiaejidbmkiecgbjeifoejpgmdaleoha)](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha)
 [![Firefox Add-on Version](https://img.shields.io/amo/v/stylebot-web)](https://addons.mozilla.org/firefox/addon/stylebot-web/)
 [![Firefox Users](https://img.shields.io/amo/users/stylebot-web)](https://addons.mozilla.org/firefox/addon/stylebot-web/)
+[![App Store Version](https://img.shields.io/itunes/v/6821400927)](https://apps.apple.com/app/id6821400927)
 ![License](https://img.shields.io/github/license/ankit/stylebot)
 
-Change the appearance of any website. Available for [Chrome](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha), [Firefox](https://addons.mozilla.org/firefox/addon/stylebot-web/) and [Edge](https://microsoftedge.microsoft.com/addons/detail/stylebot/mjolbpfednnbebfapicajpifliopnnai).
+Change the appearance of any website. Available for [Chrome](https://chrome.google.com/webstore/detail/stylebot/oiaejidbmkiecgbjeifoejpgmdaleoha), [Firefox](https://addons.mozilla.org/firefox/addon/stylebot-web/), [Edge](https://microsoftedge.microsoft.com/addons/detail/stylebot/mjolbpfednnbebfapicajpifliopnnai) and [Safari](https://apps.apple.com/app/id6821400927).
 
 ![Stylebot's editor in the side panel, picking an element on Hacker News styled with Dracula](docs/images/editor.webp)
 
