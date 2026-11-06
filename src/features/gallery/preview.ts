@@ -1,7 +1,9 @@
 import type {
+  GalleryPreview,
   GalleryStyle,
   InstallGalleryPreviewResponse,
-  StyleColorScheme,
+  PageStyleOptions,
+  PreviewGalleryStyleResponse,
   UndoGalleryInstallResponse,
 } from '@stylebot/types';
 
@@ -19,7 +21,43 @@ export type GalleryPreviewHandlers = {
   undo: () => Promise<UndoGalleryInstallResponse>;
   cancel: () => void;
   compare: (on: boolean) => void;
-  setScheme: (scheme: StyleColorScheme) => void;
+  setOption: (option: string, value: string) => void;
+  getSiteStyles: () => Promise<Array<GalleryStyle>>;
+  preview: (id: number) => Promise<PreviewGalleryStyleResponse>;
+};
+
+/**
+ * What a page holds of its mounted preview controls: `show` moves them to
+ * another preview, `remove` ends them, or leaves them to confirm an install.
+ */
+export type GalleryPreviewControls = {
+  show: (preview: GalleryPreview) => void;
+  remove: (installed?: boolean) => void;
+};
+
+/**
+ * What the page gets for each option a preview's style declares, with the
+ * values picked in its controls, or undefined when it declares none.
+ */
+export const getPreviewPageOptions = ({
+  options,
+  values = {},
+}: GalleryPreview): PageStyleOptions | undefined => {
+  if (!options) {
+    return undefined;
+  }
+
+  return Object.fromEntries(
+    Object.entries(options).map(([name, declaration]) => {
+      const value = values[name] ?? declaration.default;
+      const choice =
+        declaration.type === 'select'
+          ? declaration.choices?.[value]
+          : undefined;
+
+      return [name, { value, css: choice?.css ?? value }];
+    })
+  );
 };
 
 /**
@@ -28,9 +66,8 @@ export type GalleryPreviewHandlers = {
 export type GalleryPreviewAppWindow = Window & {
   stylebotGalleryPreviewApp?: {
     mount: (
-      style: GalleryStyle,
-      handlers: GalleryPreviewHandlers,
-      scheme?: StyleColorScheme
-    ) => (installed?: boolean) => void;
+      preview: GalleryPreview,
+      handlers: GalleryPreviewHandlers
+    ) => GalleryPreviewControls;
   };
 };

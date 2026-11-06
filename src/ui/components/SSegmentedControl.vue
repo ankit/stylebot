@@ -90,9 +90,10 @@ export default Vue.extend({
       default: false,
     },
 
-    // Large is for a setting on its own page, at the size of a button.
+    // Large is for a setting on its own page, at the size of a button, and
+    // medium sits beside a button in a compact row.
     size: {
-      type: String as PropType<'default' | 'large'>,
+      type: String as PropType<'default' | 'medium' | 'large'>,
       default: 'default',
     },
 
@@ -206,6 +207,22 @@ export default Vue.extend({
     padding: 0 8px;
     border-radius: 5px;
     font-size: 13px;
+  }
+}
+
+.segmented.medium {
+  border-radius: 9px;
+
+  .segment {
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 7px;
+    font-size: 12.5px;
+    font-weight: 500;
+  }
+
+  .segment-indicator {
+    border-radius: 7px;
   }
 }
 

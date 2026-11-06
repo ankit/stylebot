@@ -5,7 +5,6 @@
     :browse-url="browseUrl"
     :preview-id="previewId"
     :loading="loadingId !== null"
-    :installing="installing"
     :error="error"
     @back="back"
     @preview="preview"
@@ -42,7 +41,6 @@
         :key="style.id"
         :style-data="style"
         :previewing="style.id === previewId"
-        :disabled="installing"
         @preview="preview(style)"
       />
 
@@ -76,7 +74,6 @@ import {
   endGalleryPreview,
   getGalleryPreview,
   getGallerySuggestions,
-  installGalleryPreview,
   previewGalleryStyle,
 } from '../utils';
 
@@ -88,7 +85,6 @@ type Data = {
   previewId: number | null;
   // The picked style, until the tab has it. Stopping sooner would leave it on.
   loadingId: number | null;
-  installing: boolean;
   error: string;
 };
 
@@ -128,7 +124,6 @@ export default Vue.extend({
       site: null,
       previewId: null,
       loadingId: null,
-      installing: false,
       error: '',
     };
   },
@@ -245,38 +240,6 @@ export default Vue.extend({
 
       this.previewId = null;
       this.$emit('preview', null);
-    },
-
-    /**
-     * Installs the previewed style as a new profile; the popup's footer
-     * offers it while a style previews.
-     */
-    async install(): Promise<void> {
-      const style = this.previewed;
-
-      if (!style || this.tab.id === undefined) {
-        return;
-      }
-
-      this.installing = true;
-      this.$emit('installing', true);
-      this.error = '';
-
-      const response = await installGalleryPreview(this.tab.id);
-
-      this.installing = false;
-      this.$emit('installing', false);
-
-      if (!response.ok) {
-        this.error = galleryErrorText(response);
-        return;
-      }
-
-      // Installing ended the preview, and the new profile is applied.
-      this.previewId = null;
-      this.$emit('preview', null);
-      this.styles = this.styles.filter(each => each.id !== style.id);
-      this.$emit('installed');
     },
   },
 });

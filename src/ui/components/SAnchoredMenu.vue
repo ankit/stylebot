@@ -1,7 +1,12 @@
 <template>
   <!-- blur, captured: a trigger that re-renders on blur (chips ↔ input)
        has detached the field by the time focusout would bubble here. -->
-  <div ref="root" class="anchored-menu" @blur.capture="onFocusOut">
+  <div
+    ref="root"
+    class="anchored-menu"
+    @blur.capture="onFocusOut"
+    @mousedown.capture="pressedInside = true"
+  >
     <slot
       name="trigger"
       :toggle="toggleOpen"
@@ -94,6 +99,8 @@ export default Vue.extend({
     // (e.g. Tab) — restoring focus to the trigger there would fight it.
     skipRestoreFocus: boolean;
     keyboardNav: boolean;
+    // A closed shadow root hides a press in here from composedPath at document.
+    pressedInside: boolean;
   } {
     return {
       open: false,
@@ -107,6 +114,7 @@ export default Vue.extend({
       // Safari leaves focus moved by the arrow keys out of :focus-visible
       // after a click opened the menu, so rows highlight on this instead.
       keyboardNav: false,
+      pressedInside: false,
     };
   },
 
@@ -276,10 +284,12 @@ export default Vue.extend({
     // re-rendered on this very mousedown (e.g. chips → input) still counts
     // as inside.
     onDocMousedown(event: MouseEvent): void {
-      if (!event.composedPath().includes(this.$el)) {
+      if (!this.pressedInside && !event.composedPath().includes(this.$el)) {
         this.$emit('cancel', 'outside');
         this.close();
       }
+
+      this.pressedInside = false;
     },
 
     activeElement(): HTMLElement | null {

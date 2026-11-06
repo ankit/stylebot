@@ -4,14 +4,14 @@
  */
 import Vue from 'vue';
 import type {
-  GalleryPreviewHandlers,
   GalleryPreviewAppWindow,
+  GalleryPreviewControls,
+  GalleryPreviewHandlers,
 } from '@stylebot/gallery';
 import { t } from '@stylebot/i18n';
 import { injectFontFaces } from '@stylebot/utils';
 import type {
-  GalleryStyle,
-  StyleColorScheme,
+  GalleryPreview as Preview,
   StylebotAppearance,
 } from '@stylebot/types';
 
@@ -21,12 +21,11 @@ import GalleryPreview from './components/GalleryPreview.vue';
 const HOST_CSS = `
   all: initial !important;
   position: fixed !important;
-  inset: auto 0 20px 0 !important;
+  inset: auto 20px 20px auto !important;
   z-index: 2147483647 !important;
-  display: flex !important;
-  justify-content: center !important;
+  display: block !important;
   margin: 0 !important;
-  padding: 0 20px !important;
+  padding: 0 !important;
   border: 0 !important;
   background: none !important;
   transform: none !important;
@@ -66,18 +65,17 @@ const getAppearance = async (): Promise<StylebotAppearance> => {
 };
 
 /**
- * Mounts the preview's controls in a closed shadow root at the bottom of the
- * page, and returns a function that takes them away, or, once the style is
- * installed, leaves them to confirm it and go by themselves.
+ * Mounts the preview's controls in a closed shadow root in the page's bottom
+ * right corner. What it returns moves them to another preview, or takes them
+ * away, or, once the style is installed, leaves them to confirm it and go.
  */
 const mount = (
-  style: GalleryStyle,
-  handlers: GalleryPreviewHandlers,
-  scheme?: StyleColorScheme
-): ((installed?: boolean) => void) => {
+  preview: Preview,
+  handlers: GalleryPreviewHandlers
+): GalleryPreviewControls => {
   const host = document.createElement('stylebot-gallery-preview');
   const root = host.attachShadow({ mode: 'closed' });
-  const state = Vue.observable({ installed: false });
+  const state = Vue.observable({ preview, installed: false });
   let app: Vue | null = null;
   let removed = false;
 
@@ -113,10 +111,11 @@ const mount = (
       render: h =>
         h(GalleryPreview, {
           props: {
-            styleData: style,
+            styleData: state.preview.style,
             handlers,
             appearance,
-            scheme,
+            options: state.preview.options,
+            values: state.preview.values,
             installed: state.installed,
           },
           on: { done: remove },
@@ -124,15 +123,21 @@ const mount = (
     });
   });
 
-  return installed => {
-    removed = true;
+  return {
+    show: next => {
+      state.preview = next;
+    },
 
-    if (installed && app) {
-      leaving = remove;
-      state.installed = true;
-    } else {
-      remove();
-    }
+    remove: installed => {
+      removed = true;
+
+      if (installed && app) {
+        leaving = remove;
+        state.installed = true;
+      } else {
+        remove();
+      }
+    },
   };
 };
 

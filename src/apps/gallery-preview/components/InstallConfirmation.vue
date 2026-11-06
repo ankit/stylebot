@@ -1,12 +1,12 @@
 <template>
-  <span class="install-confirmation">
+  <div class="install-confirmation">
     <preview-summary
       :title="t('style_installed', [styleData.name])"
-      :status="t('applied_to_site', [styleData.site])"
+      :status="styleData.site"
       confirming
     >
       <template #icon>
-        <check-icon class="tick" :size="18" />
+        <span class="tick"><check-icon :size="14" /></span>
       </template>
     </preview-summary>
 
@@ -22,7 +22,7 @@
     >
       <x-icon :size="14" />
     </s-icon-button>
-  </span>
+  </div>
 </template>
 
 <script lang="ts">
@@ -35,7 +35,7 @@ import type { GalleryStyle } from '@stylebot/types';
 import PreviewSummary from './PreviewSummary.vue';
 
 /**
- * The bar once a style is installed, with a check, where it applies, Undo
+ * The card once a style is installed, with a check, where it applies, Undo
  * and dismiss. Emits `undo` and `dismiss`.
  */
 export default Vue.extend({
@@ -65,16 +65,25 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .install-confirmation {
-  display: contents;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 10px 12px 16px;
 }
 
 .close {
+  flex: none;
   color: var(--icon-color);
 }
 
 .tick {
+  display: grid;
   flex: none;
-  margin-right: 4px;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--success-background);
   color: var(--success);
 }
 </style>

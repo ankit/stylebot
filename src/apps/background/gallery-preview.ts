@@ -9,7 +9,7 @@ import {
   type GalleryStyleToInstall,
   type ListedProfile,
 } from '@stylebot/gallery';
-import { compileStyle, getColorScheme } from '@stylebot/css';
+import { compileStyle, parseStyleOptions } from '@stylebot/css';
 import { expandProfiles, getStylesForPage } from '@stylebot/saved-styles';
 import type {
   GalleryPreview,
@@ -18,7 +18,6 @@ import type {
   HideGalleryPreview,
   GalleryListing,
   ShowGalleryPreview,
-  StyleColorScheme,
   StyleMap,
   StyleWithoutUrl,
   TabMessage,
@@ -96,21 +95,26 @@ export const getGalleryPreview = async (
 ): Promise<GalleryPreview | null> => (await readPreviews())[tabId] ?? null;
 
 /**
- * Records the color scheme a tab's preview is showing, so it stays as the
+ * Records a value picked for an option of a tab's preview, so it stays as the
  * preview moves to the site's other pages, and is kept once it's installed.
  */
-export const setGalleryPreviewScheme = async (
+export const setGalleryPreviewOption = async (
   tabId: number,
-  scheme: StyleColorScheme
+  option: string,
+  value: string
 ): Promise<void> => {
   const previews = await readPreviews();
   const preview = previews[tabId];
+  const declaration = preview?.options?.[option];
 
-  if (!preview?.scheme) {
+  if (!declaration?.values.includes(value)) {
     return;
   }
 
-  previews[tabId] = { ...preview, scheme };
+  previews[tabId] = {
+    ...preview,
+    values: { ...preview.values, [option]: value },
+  };
   await writePreviews(previews);
 };
 
@@ -173,13 +177,19 @@ export const startGalleryPreview = async (
     return null;
   }
 
-  const scheme = getColorScheme(source);
+  const options = parseStyleOptions(source);
+  const declared = Object.entries(options);
   const preview: GalleryPreview = {
     style,
     css,
     importUrls,
     galleryTabId,
-    ...(scheme && { scheme }),
+    ...(declared.length > 0 && {
+      options,
+      values: Object.fromEntries(
+        declared.map(([name, declaration]) => [name, declaration.default])
+      ),
+    }),
   };
 
   await showPreview(tabId, preview);
@@ -489,17 +499,18 @@ export const installGalleryPreview = async (tabId: number): Promise<string> => {
     await disable(defaultUrl);
   }
 
-  // Only a scheme picked over the declared default is stored, as from the popup.
+  // Only values picked over the declared defaults are stored, as from the popup.
   const installed = (await getAll())[targetUrl];
+  const picked = Object.entries(preview.values ?? {}).filter(
+    ([name, value]) => value !== preview.options?.[name]?.default
+  );
 
-  if (
-    installed &&
-    preview.scheme &&
-    preview.scheme !== getColorScheme(preview.css)
-  ) {
+  if (installed && picked.length > 0) {
     const { active } = expandProfiles(installed);
 
-    await setStyleOption(targetUrl, active, 'scheme', preview.scheme);
+    for (const [name, value] of picked) {
+      await setStyleOption(targetUrl, active, name, value);
+    }
   }
 
   await rememberInstall(tabId, preview, before, await getAll());

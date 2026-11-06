@@ -1,6 +1,6 @@
 import { mount, type Wrapper } from '@vue/test-utils';
 
-import HoldToCompareButton from './HoldToCompareButton.vue';
+import PreviewCompare from './PreviewCompare.vue';
 
 type Listener = (event: Partial<KeyboardEvent>) => void;
 
@@ -30,13 +30,17 @@ const press = (
   return event;
 };
 
-describe('HoldToCompareButton.vue', () => {
+describe('PreviewCompare.vue', () => {
   let wrapper: Wrapper<Vue>;
 
   const mountButton = (disabled = false) => {
-    wrapper = mount(HoldToCompareButton, {
+    wrapper = mount(PreviewCompare, {
       propsData: { disabled },
       mocks: { t: (key: string) => key },
+      stubs: { SSegmentedControl: true },
+      listeners: {
+        change: (original: boolean) => wrapper.setProps({ original }),
+      },
     });
   };
 
@@ -53,15 +57,26 @@ describe('HoldToCompareButton.vue', () => {
     jest.restoreAllMocks();
   });
 
-  it('compares while C is held, and keeps it from the page', () => {
+  it('switches when C is tapped, and keeps it from the page', () => {
     mountButton();
+    jest.spyOn(Date, 'now').mockReturnValueOnce(1000).mockReturnValueOnce(1100);
 
     const down = press('keydown');
     expect(down.preventDefault).toHaveBeenCalled();
     expect(down.stopImmediatePropagation).toHaveBeenCalled();
-    expect(wrapper.emitted('change')).toEqual([[true]]);
 
     press('keyup');
+    expect(wrapper.emitted('change')).toEqual([[true]]);
+  });
+
+  it('goes back when C is let go after a hold', () => {
+    mountButton();
+    jest.spyOn(Date, 'now').mockReturnValueOnce(1000).mockReturnValueOnce(1300);
+
+    press('keydown');
+    press('keydown');
+    press('keyup');
+
     expect(wrapper.emitted('change')).toEqual([[true], [false]]);
   });
 
