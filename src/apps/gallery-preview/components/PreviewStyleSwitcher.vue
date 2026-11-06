@@ -108,7 +108,7 @@ export default Vue.extend({
   align-items: center;
   justify-content: space-between;
   height: 34px;
-  padding: 0 8px 0 16px;
+  padding: 0 5px 0 16px;
   border-top: 1px solid var(--panel-border);
 }
 

@@ -68,7 +68,7 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 12px 10px 12px 16px;
+  padding: 12px 4px 12px 16px;
 }
 
 .close {

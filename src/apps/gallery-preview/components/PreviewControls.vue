@@ -164,7 +164,7 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 2px;
-  padding: 14px 10px 12px 16px;
+  padding: 14px 4px 12px 16px;
 }
 
 .action {
@@ -182,7 +182,7 @@ export default Vue.extend({
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 12px;
+  padding: 12px 16px;
   border-top: 1px solid var(--panel-border);
 }
 
