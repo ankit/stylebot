@@ -162,13 +162,14 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 2px;
   padding: 14px 4px 12px 16px;
 }
 
 .action {
   flex: none;
+  margin-top: -6px;
   color: var(--icon-color);
 }
 
