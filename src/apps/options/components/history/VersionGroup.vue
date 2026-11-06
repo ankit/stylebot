@@ -477,7 +477,7 @@ export default Vue.extend({
 }
 
 .counts {
-  display: flex;
+  display: var(--options-version-counts-display, flex);
   overflow: hidden;
   border-radius: 5px;
   font-family: var(--font-mono);
@@ -513,7 +513,7 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 4px 20px 20px 62px;
+  padding: 4px 20px 20px var(--options-version-details-indent, 62px);
 }
 
 .compact .details {

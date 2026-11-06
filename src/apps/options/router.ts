@@ -2,6 +2,8 @@ import Vue from 'vue';
 import type { Route, RouteConfig } from 'vue-router';
 import VueRouter from 'vue-router';
 
+import { isIPhone } from '@stylebot/utils';
+
 import TheBasicsTab from './components/TheBasicsTab.vue';
 import TheStylesTab from './components/TheStylesTab.vue';
 import TheHistoryTab from './components/TheHistoryTab.vue';
@@ -34,6 +36,9 @@ export const routes: Array<RouteConfig> = [
     name: 'style-edit',
     component: TheStyleEditorPage,
     meta: { tab: 'styles' },
+    // iPhone has no editor, so a style's CSS isn't edited there either.
+    beforeEnter: (_to, _from, next) =>
+      isIPhone() ? next({ name: 'styles' }) : next(),
     props: route => ({
       initialUrl: queryString(route.query.url),
       justSaved: !!route.params.justSaved,

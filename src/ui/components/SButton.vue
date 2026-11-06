@@ -49,6 +49,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .button {
   display: inline-flex;
+  min-height: var(--button-min-height, auto);
   align-items: center;
   justify-content: center;
   gap: 6px;
@@ -86,8 +87,10 @@ export default Vue.extend({
   background: var(--panel-surface);
   border-color: var(--field-border);
 
-  &:hover:not(:disabled) {
-    background: var(--hover-tint);
+  @include hover-capable {
+    &:hover:not(:disabled) {
+      background: var(--hover-tint);
+    }
   }
 }
 
@@ -96,16 +99,20 @@ export default Vue.extend({
   border-color: var(--accent);
   color: var(--accent-ink);
 
-  &:hover:not(:disabled) {
-    filter: brightness(0.92);
+  @include hover-capable {
+    &:hover:not(:disabled) {
+      filter: brightness(0.92);
+    }
   }
 
   @include focus-ring(2px);
 }
 
 .button.ghost {
-  &:hover:not(:disabled) {
-    background: var(--hover-tint);
+  @include hover-capable {
+    &:hover:not(:disabled) {
+      background: var(--hover-tint);
+    }
   }
 }
 
@@ -114,8 +121,10 @@ export default Vue.extend({
   border-color: var(--danger);
   color: var(--panel-surface);
 
-  &:hover:not(:disabled) {
-    filter: brightness(0.92);
+  @include hover-capable {
+    &:hover:not(:disabled) {
+      filter: brightness(0.92);
+    }
   }
 
   @include focus-ring(2px);

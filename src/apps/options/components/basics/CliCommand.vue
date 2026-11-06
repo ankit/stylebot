@@ -104,8 +104,10 @@ export default Vue.extend({
   flex: none;
   color: var(--text-muted);
 
-  &:hover {
-    color: var(--text-primary);
+  @include hover-capable {
+    &:hover {
+      color: var(--text-primary);
+    }
   }
 }
 </style>

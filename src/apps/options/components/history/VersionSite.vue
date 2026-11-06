@@ -95,8 +95,10 @@ export default Vue.extend({
   text-align: start;
   cursor: pointer;
 
-  &:hover {
-    background: var(--card-surface);
+  @include hover-capable {
+    &:hover {
+      background: var(--card-surface);
+    }
   }
 
   @include focus-ring;

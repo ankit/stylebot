@@ -14,7 +14,11 @@
         </s-text>
       </div>
 
-      <s-button variant="primary" @click="$emit('edit', '')">
+      <s-button
+        v-if="editingEnabled"
+        variant="primary"
+        @click="$emit('edit', '')"
+      >
         {{ t('add_a_style') }}
       </s-button>
     </div>
@@ -44,6 +48,7 @@
         :modified-time="style.modifiedTime"
         :enabled="style.enabled"
         :profile-count="profileCount(style)"
+        :editing-enabled="editingEnabled"
         @edit="$emit('edit', $event)"
         @toggle="toggleStyle(style)"
         @delete="deleteStyle(style)"
@@ -98,6 +103,14 @@ export default Vue.extend({
     SearchIcon,
     StyleListRow,
     StylesBulkMenu,
+  },
+
+  props: {
+    // iPhone has no editor, so a style can't be added or have its CSS edited.
+    editingEnabled: {
+      type: Boolean,
+      default: true,
+    },
   },
 
   data(): {
@@ -178,7 +191,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .styles-tab {
   max-width: 860px;
-  padding: 20px 22px 26px;
+  padding: var(--options-tab-padding, 20px 22px 26px);
 }
 
 .header {
@@ -210,7 +223,7 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 8px;
-  height: 36px;
+  height: var(--options-field-height, 36px);
   padding: 0 12px;
   box-sizing: border-box;
   color: var(--text-faint);
@@ -225,7 +238,7 @@ export default Vue.extend({
 
     flex: 1;
     min-width: 0;
-    font-size: 14px;
+    font-size: var(--options-input-font-size, 14px);
     line-height: 1.2;
     color: var(--text-primary);
 
