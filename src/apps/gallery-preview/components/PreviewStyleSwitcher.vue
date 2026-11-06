@@ -1,6 +1,6 @@
 <template>
   <div class="preview-style-switcher">
-    <s-text as="span" variant="muted" class="count">
+    <s-text as="span" size="caption" variant="muted">
       {{ t('position_of_total_styles', [index + 1, total]) }}
     </s-text>
     <span class="arrows">
@@ -110,10 +110,6 @@ export default Vue.extend({
   height: 34px;
   padding: 0 5px 0 16px;
   border-top: 1px solid var(--panel-border);
-}
-
-.count {
-  font-size: 12.5px;
 }
 
 .arrows {

@@ -19,7 +19,7 @@
         >
           {{ title }}
         </s-text>
-        <s-text as="span" variant="muted" class="status">
+        <s-text as="span" size="caption" variant="muted" class="status">
           {{ status }}
         </s-text>
       </span>
@@ -103,9 +103,6 @@ export default Vue.extend({
 
   align-self: flex-start;
   max-width: 100%;
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 20px;
   text-decoration: none;
 
   @include focus-ring;
@@ -113,9 +110,6 @@ export default Vue.extend({
 
 .status {
   @include truncate;
-
-  font-size: 12.5px;
-  line-height: 18px;
 }
 
 .dimmed .name {

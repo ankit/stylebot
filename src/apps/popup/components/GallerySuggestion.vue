@@ -15,7 +15,9 @@
         <s-text as="span" size="large" class="name">
           {{ styleData.name }}
         </s-text>
-        <span v-if="previewing" class="stop">{{ t('stop') }}</span>
+        <s-text v-if="previewing" as="span" size="label" class="stop">
+          {{ t('stop') }}
+        </s-text>
         <s-text
           v-else-if="styleData.installs"
           as="span"
@@ -104,9 +106,6 @@ export default Vue.extend({
   border: 1px solid var(--field-border);
   border-radius: 7px;
   background: var(--panel-surface);
-  font-size: 12.5px;
-  font-weight: 500;
-  line-height: 1.2;
 }
 
 .installs {

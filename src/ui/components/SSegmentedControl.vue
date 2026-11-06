@@ -217,7 +217,6 @@ export default Vue.extend({
     height: 28px;
     padding: 0 10px;
     border-radius: 7px;
-    font-size: 12.5px;
     font-weight: 500;
   }
 
