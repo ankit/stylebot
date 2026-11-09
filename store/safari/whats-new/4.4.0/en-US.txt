@@ -1,0 +1,1 @@
+Try every Gallery style for the site you're on from Stylebot's popup, and preview each one with its options before you install it. You can also show how many styles are active on the toolbar icon, and send feedback from the popup's new menu. The popup now opens right away on busy pages, and Readability no longer runs on AI chat apps.
