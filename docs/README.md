@@ -6,6 +6,7 @@
 - [Releases](releases.md) — cutting a release
 - [Translation](translation.md) — adding or improving a locale
 - [CLI](cli.md) — driving a dev build from the command line or a coding agent
+  - [Commands](cli/commands.md), [styles](cli/styles.md), [forced states](cli/forced-states.md), [CLI mode](cli/cli-mode.md), [coding agents](cli/coding-agents.md), [how it works](cli/how-it-works.md)
 
 ## Testing
 

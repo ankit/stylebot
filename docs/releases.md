@@ -29,7 +29,7 @@ Pull requests target `main`, and the release workflow only runs on pull requests
 The CLI is published to npm as `@stylebot/cli`, from `tools/cli`, with its own version. Publish its first version at the same time as the v4 store release, once that's live in the Chrome Web Store and Edge Add-ons: earlier versions of the extension can't talk to it.
 
 - Bump `version` in `tools/cli/package.json`: patch for fixes, minor for new commands or flags, major for a change that breaks scripts using it. The host in `~/.stylebot/` is copied again whenever the version changes, so bump it for any release that changes the host
-- Bump the protocol, in the CLI and the extension together, only when a command's arguments or result change incompatibly; `docs/cli.md` describes when. A protocol bump means the CLI and the extension release at the same time
+- Bump the protocol, in the CLI and the extension together, only when a command's arguments or result change incompatibly; `docs/cli/how-it-works.md` describes when. A protocol bump means the CLI and the extension release at the same time
 - Check what ships with `npm pack --dry-run` in `tools/cli`
 - Publish from `tools/cli`, signed in to npm as a member of the `stylebot` org, entering the 2FA code when asked:
 
