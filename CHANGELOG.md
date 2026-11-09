@@ -1,3 +1,7 @@
+## Version 4.4.1 (November 2026)
+
+- Fix the Gallery preview card showing "of styles" instead of the style count in Safari (#1285)
+
 ## Version 4.4.0 (November 2026)
 
 - Gallery: try all of a site's Gallery styles from the popup, previewing each in a card with its options (#1272, #1278)
