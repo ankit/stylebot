@@ -2,7 +2,7 @@
 
 CLI mode lets you work with your agent from the page itself. A small terminal on the tab shows each command the agent runs and each save, with an undo. You mark parts of the page and leave notes, and the agent makes the change and replies.
 
-![The CLI mode terminal on a GitHub issue: notes asking to fix three icon buttons and shrink the copy icon, each followed by the commands the agent ran, an undo, and its answer](../images/cli-mode.webp)
+<img src="../images/cli-mode.webp" width="450" alt="The CLI mode terminal on a GitHub issue: notes asking to fix three icon buttons and shrink the copy icon, each followed by the commands the agent ran, an undo, and its answer">
 
 ## Using it
 
