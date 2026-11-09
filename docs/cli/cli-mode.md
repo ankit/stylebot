@@ -8,15 +8,6 @@ CLI mode lets you work with your agent from the page. A small terminal on a conn
 
 Keys, anywhere on the page but a field: `.` open or minimize, `/` write a note, `Z` undo the last save, `X` clear the marks.
 
-The agent follows along with `watch`, which prints a line for each event (the tab attaching, each mark and note, navigations, edits outside the CLI), or `selection`, which lists the notes and marks sent since it last looked, with the elements inside each mark; `--wait` waits for the next one. `say` answers your note. A session might go:
+The agent follows along with `watch`, which prints a line for each event (the tab attaching, each mark and note, navigations, edits outside the CLI), or `selection`, which lists the notes and marks sent since it last looked, with the elements inside each mark; `--wait` waits for the next one. `say` answers your note.
 
-```text
-$ stylebot watch
-waiting for a tab: ask the user to connect the tab to work on with the connect button Stylebot shows on it, or run: stylebot mode <tab>
-attached tab 54432929 https://news.ycombinator.com/
-mark ① area 640×48
-note "keep this bar on screen when I scroll" about ① (screenshot /Users/you/.stylebot/work/stylebot-note-54432929-1.png)
-
-$ stylebot css rule 54432929 '#hnmain > tbody > tr:first-child' --set position=sticky --set top=0 --profile Default
-$ stylebot say 54432929 'The top bar now stays at the top as you scroll.'
-```
+![The CLI mode terminal on a GitHub issue: notes asking to fix three icon buttons and shrink the copy icon, each followed by the commands the agent ran, an undo, and its answer](../images/cli-mode.webp)
