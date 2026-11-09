@@ -97,7 +97,10 @@ const getMessage = (key: string, substitutions: Array<string> = []) => {
 
   return entry.message.replace(/\$([^$]+)\$/g, (_: string, name: string) => {
     const index = Number(entry.placeholders?.[name]?.content.slice(1)) - 1;
-    return substitutions[index] ?? '';
+    const substitution = substitutions[index];
+
+    // Safari leaves out substitutions that aren't strings; Chrome and Firefox convert them.
+    return typeof substitution === 'string' ? substitution : '';
   });
 };
 
