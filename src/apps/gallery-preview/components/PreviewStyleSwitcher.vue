@@ -1,7 +1,7 @@
 <template>
   <div class="preview-style-switcher">
     <s-text as="span" variant="muted" class="count">
-      {{ t('position_of_total_styles', [index + 1, total]) }}
+      {{ t('position_of_total_styles', [String(index + 1), String(total)]) }}
     </s-text>
     <span class="arrows">
       <s-icon-button
