@@ -1,23 +1,32 @@
 # Coding agents
 
-The Stylebot skill teaches a coding agent to restyle pages with the CLI: open the page, read its outline, write CSS, fix what the page check reports, then look at a screenshot. It works in any agent with a shell and a file-writing tool, running on the same machine as the browser, once the [setup](../cli.md#setup) is done. Ask for a look, such as "give Hacker News a dark theme", and the agent picks the skill up on its own; or invoke it by name. Without saying what to change, it offers suggestions for the page.
+The Stylebot skill teaches a coding agent to restyle pages with the CLI. It opens the page, reads its outline, writes CSS, fixes what the page check reports, and then checks a screenshot.
 
-The skill keeps its CSS and screenshots in `~/.stylebot/work/`. When you name a profile, it updates that one, and in [CLI mode](cli-mode.md) the one you're using; otherwise its changes go into a new profile named after the agent and the look, such as "Claude: Dark", so switching back to your own style is one profile change.
+```mermaid
+flowchart LR
+  open["Open the page"] --> read["Read its outline"] --> write["Write CSS"] --> check{"Page check<br/>finds problems?"}
+  check -- yes --> write
+  check -- no --> look["Look at a screenshot"]
+```
 
-Agents with plugin marketplaces install it from this repo's, as a plugin whose `stylebot` command runs the CLI on your `PATH`, or the published one through `npx` when there's none. The others copy the skill's folder, and need the CLI installed with `npm install -g @stylebot/cli`.
+It works in any agent that can run shell commands and write files on the same machine as the browser, once the CLI is [set up](../cli.md#setup). Ask for a look ("give Hacker News a dark theme") and the agent picks the skill up, or invoke it by name. With no request, it suggests ideas for the page.
 
-| Agent             | How                     | Checked                                          |
-| ----------------- | ----------------------- | ------------------------------------------------ |
-| Claude Code       | This repo's marketplace | Restyling measured by the styling evals          |
-| Codex CLI         | This repo's marketplace | Installed and its skill listed, Codex 0.163.0    |
-| Copilot CLI       | This repo's marketplace | Installed and its skill loaded, Copilot 1.0.99-2 |
-| Copilot (VS Code) | Copy the skill          | From VS Code's docs only                         |
-| Cursor            | Copy the skill          | From Cursor's docs only                          |
-| Antigravity CLI   | Copy the skill          | From Antigravity's docs only                     |
+Its changes go into a new profile named after the agent and the look, like "Claude: Dark", so your own style stays one click away. If you name a profile, or are in [CLI mode](cli-mode.md), it edits that profile instead. It keeps its working files in `~/.stylebot/work/`.
 
-How well an agent restyles pages is only measured with Claude Code (see [Styling evals](../styling-evals.md)); the others were checked for installing the skill and finding it, by the author of [#1223](https://github.com/ankit/stylebot/issues/1223). Each agent's commands and folders below follow its own docs as of October 2026.
+## Install
 
-## Claude Code
+| Agent             | Install from            | Tested                                               |
+| ----------------- | ----------------------- | ---------------------------------------------------- |
+| Claude Code       | This repo's marketplace | Measured by the [styling evals](../styling-evals.md) |
+| Codex CLI         | This repo's marketplace | Installs and lists the skill (0.163.0)               |
+| Copilot CLI       | This repo's marketplace | Installs and loads the skill (1.0.99-2)              |
+| Copilot (VS Code) | Copy the skill folder   | From its docs only                                   |
+| Cursor            | Copy the skill folder   | From its docs only                                   |
+| Antigravity CLI   | Copy the skill folder   | From its docs only                                   |
+
+Agents installed from the marketplace use the `stylebot` on your `PATH`, or the published one through `npx` if there isn't one. For the others, install the CLI first with `npm install -g @stylebot/cli`. Commands and folders below are as of October 2026.
+
+### Claude Code
 
 ```bash
 claude plugin marketplace add ankit/stylebot
@@ -27,9 +36,9 @@ claude plugin marketplace add ankit/stylebot
 claude plugin install stylebot
 ```
 
-Use `./` in place of `ankit/stylebot` to install this checkout's plugin, or try it in one session with `claude --plugin-dir tools/agent-plugin`. Invoke it with `/stylebot <site> <what to change>`. It runs without permission prompts: the skill pre-approves `stylebot` commands and reading and writing files in `~/.stylebot/work/`.
+Then use `/stylebot <site> <what to change>`. It runs without permission prompts. To try this checkout's plugin, use `./` instead of `ankit/stylebot`, or run `claude --plugin-dir tools/agent-plugin`.
 
-## Codex CLI
+### Codex CLI
 
 ```bash
 codex plugin marketplace add ankit/stylebot
@@ -39,13 +48,13 @@ codex plugin marketplace add ankit/stylebot
 codex plugin add stylebot@stylebot
 ```
 
-In a new session, ask for a look, or pick `stylebot` from `/skills`. To run `stylebot` commands without approving each one, choose to always allow them at the first prompt, or add a rule to `~/.codex/rules/default.rules`:
+In a new session, ask for a look or pick `stylebot` from `/skills`. To skip approving each command, choose "always allow" at the first prompt, or add this to `~/.codex/rules/default.rules`:
 
 ```python
 prefix_rule(pattern = ["stylebot"], decision = "allow")
 ```
 
-## Copilot CLI
+### Copilot CLI
 
 ```bash
 copilot plugin marketplace add ankit/stylebot
@@ -55,26 +64,20 @@ copilot plugin marketplace add ankit/stylebot
 copilot plugin install stylebot@stylebot
 ```
 
-`copilot skill list` shows whether the skill loaded. Copilot doesn't keep command approvals between sessions: approve `stylebot` for the rest of the session at the first prompt, or start it with `copilot --allow-tool='shell(stylebot:*)'`.
+Check it loaded with `copilot skill list`. Copilot forgets approvals between sessions, so approve `stylebot` at the first prompt, or start with `copilot --allow-tool='shell(stylebot:*)'`.
 
-## Copilot in VS Code, Cursor and Antigravity CLI
+### Copilot in VS Code, Cursor and Antigravity CLI
 
-From this checkout, copy the skill folder into the agent's personal skills folder, then restart the agent:
-
-| Agent             | Personal skills folder              | Project skills folder |
-| ----------------- | ----------------------------------- | --------------------- |
-| Copilot (VS Code) | `~/.copilot/skills/`                | `.github/skills/`     |
-| Cursor            | `~/.cursor/skills/`                 | `.cursor/skills/`     |
-| Antigravity CLI   | `~/.gemini/antigravity-cli/skills/` | `.agents/skills/`     |
+Copy the skill folder from this checkout into the agent's skills folder, then restart the agent:
 
 ```bash
 cp -R tools/agent-plugin/skills/stylebot ~/.cursor/skills/
 ```
 
-Copilot CLI reads `~/.copilot/skills/` too, and Cursor also reads `~/.claude/skills/`. Ask for a look, or type `/stylebot`.
+| Agent             | Skills folder                       | Allow `stylebot` without prompts                                                                 |
+| ----------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Copilot (VS Code) | `~/.copilot/skills/`                | `"chat.tools.terminal.autoApprove": { "stylebot": true }` in user settings                       |
+| Cursor            | `~/.cursor/skills/`                 | Add `stylebot` under Settings › Agents › Approvals & Execution › Allowlist                       |
+| Antigravity CLI   | `~/.gemini/antigravity-cli/skills/` | `"permissions": { "allow": ["command(stylebot)"] }` in `~/.gemini/antigravity-cli/settings.json` |
 
-To run `stylebot` commands without a prompt each time:
-
-- **Copilot in VS Code**: add `"chat.tools.terminal.autoApprove": { "stylebot": true }` to your user settings.
-- **Cursor**: pick Allowlist under Cursor Settings > Agents > Approvals & Execution, and add `stylebot` to the allowlist, or put `{ "terminalAllowlist": ["stylebot"] }` in `~/.cursor/permissions.json`, which replaces the allowlist in settings.
-- **Antigravity CLI**: choose to always allow `stylebot` at the first prompt, or add `"permissions": { "allow": ["command(stylebot)"] }` to `~/.gemini/antigravity-cli/settings.json`.
+Then ask for a look, or type `/stylebot`.

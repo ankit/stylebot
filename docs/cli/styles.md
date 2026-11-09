@@ -1,6 +1,6 @@
 # Styles, profiles and options
 
-## Styles
+## Reading and changing CSS
 
 ```bash
 stylebot css get news.ycombinator.com --grep titleline
@@ -9,79 +9,75 @@ stylebot css add 54432929 --file more.css
 stylebot css set 54432929 < hn.css
 ```
 
-- `styles` lists saved styles.
-- `css get` prints a style's css. `--grep <text>` prints only the rules whose selector or declarations contain the text, ignoring case, inside the at-rules they sit in.
-- `css set` saves css from stdin or `--file` in place of the whole stylesheet and applies it to open tabs right away. Empty css deletes the style.
-- `css rule <target> '<selector>'` edits the first top-level rule with exactly that selector, or with `--media '<query>'` the first inside that top-level `@media`. `--set property=value` sets a declaration and `--unset property` removes one, each repeatable; `--delete` removes the rule. Setting creates the rule at the end when none matches, and a rule left empty is removed. Everything else in the stylesheet keeps its formatting and comments.
-- `css add` adds css from stdin or `--file` to the end of the stylesheet, moving any `@import` to the top, and names the rules it added whose selector already has one, which `css rule` could have edited instead.
-- `css diff` shows the rules css from stdin or `--file` would add, change and remove if `css set` saved it, without saving anything.
-- `css rule` and `css add` save the way `css set` does, with the same checks and report:
+| Command    | Does                                                                                                    |
+| ---------- | ------------------------------------------------------------------------------------------------------- |
+| `styles`   | Lists saved styles                                                                                      |
+| `css get`  | Prints a style's CSS; `--grep` keeps only the rules that mention some text                              |
+| `css rule` | Edits one rule: `--set prop=value`, `--unset prop`, or `--delete`; `--media` for a rule inside `@media` |
+| `css add`  | Appends CSS to the end of the style                                                                     |
+| `css set`  | Replaces the whole style; empty CSS deletes it                                                          |
+| `css diff` | Shows what `css set` would change, without saving                                                       |
 
-  - It refuses css that doesn't parse, saying at which line, and adds Google Fonts imports for the families the css names. It also saves a selector's partly generated class names by their stable part, and says which it changed.
-  - When the profile it saves is the one in use and an open tab shows the site, it checks the page; otherwise it says why it didn't. Given a tab id, it saves the style that applies on that tab and checks that tab. Given a site, it checks the active tab of the CLI's own window if it shows the site, else any tab that does, and names the other tabs showing the site in one line.
+`css rule` and `css add` touch only what they're asked to, so the rest of the stylesheet keeps its formatting and comments. CSS comes from stdin or `--file`.
 
-    ```text
-    $ stylebot css set news.ycombinator.com --file hn.css
-    Saved news.ycombinator.com
-    Checked on tab 1234.
-    Also shown on tab 1240: name a tab id instead of the site to check that tab.
-    Elements each added or changed rule matched:
-    - .titleline a: 30 elements
-    Removed rules:
-    - .old-banner
-    5 unchanged rules not listed
-    Problems the page check found:
-    - Hard to read: .subtext (30 elements), text #828282 on #1d1f21, contrast 3.1:1
-    ```
+### What happens on save
 
-  - `css rule` says when it created or removed the rule, and names the properties it was asked to unset that the rule didn't have.
+`css set`, `rule` and `add` all save the same way:
 
-    ```text
-    $ stylebot css rule 1234 '.subtext' --set color=#a8a8a8
-    Saved news.ycombinator.com
-    Checked on tab 1234.
-    Elements each added or changed rule matched:
-    - .subtext: 30 elements
-    5 unchanged rules not listed
-    ```
+```mermaid
+flowchart LR
+  parse["Check the CSS parses"] --> fix["Add Google Fonts imports,<br/>steady generated class names"]
+  fix --> save["Save and apply<br/>to open tabs"]
+  save --> check["Check the page"]
+```
 
-  - `css diff` prints each rule added or removed whole, and for each rule changed only the declarations that differ:
+The page check reports which elements each changed rule matched, and flags problems such as text that's hard to read:
 
-    ```text
-    $ stylebot css diff news.ycombinator.com --file hn.css
-    --- news.ycombinator.com, as saved
-    +++ the css given
+```text
+$ stylebot css set news.ycombinator.com --file hn.css
+Saved news.ycombinator.com
+Checked on tab 1234.
+Elements each added or changed rule matched:
+- .titleline a: 30 elements
+Problems the page check found:
+- Hard to read: .subtext (30 elements), text #828282 on #1d1f21, contrast 3.1:1
+```
 
-      .subtext {
-    -   color: #828282;
-    +   color: #a8a8a8;
-      }
+The check runs when the saved profile is the one in use and a tab shows the site; name a tab id to choose which tab it checks.
 
-    + .comment (in @media (max-width: 750px)) {
-    +   font-size: 15px;
-    + }
+`css diff` prints only what differs:
 
-    Rules: 1 added, 1 changed, 0 removed. Nothing saved.
-    ```
+```text
+$ stylebot css diff news.ycombinator.com --file hn.css
+  .subtext {
+-   color: #828282;
++   color: #a8a8a8;
+  }
+
+Rules: 0 added, 1 changed, 0 removed. Nothing saved.
+```
 
 ## Profiles
+
+A site can have several named [profiles](../profiles.md), one in use at a time.
 
 ```bash
 stylebot profile create Dark news.ycombinator.com --use
 stylebot css set news.ycombinator.com --profile Dark < dark.css
 ```
 
-- `profiles` lists a style's profiles, starring the one in use.
+- `profiles` lists them, starring the one in use.
 - `profile create`, `use`, `rename` and `delete` manage them.
-- `css get`, `rule`, `add`, `set` and `diff` take `--profile` to name the profile rather than use the active one. The `/stylebot` skill always passes it, so a profile switch mid-session can't send its css into your own style.
+- The `css` commands take `--profile` to work on a profile other than the one in use.
 
 ## Style options
+
+[Style options](../style-options.md) are settings a style declares in its CSS, like a light/dark switch.
 
 ```bash
 stylebot options news.ycombinator.com
 stylebot option set scheme dark news.ycombinator.com
 ```
 
-- `options` lists the options a profile's css declares (see [Style options](../style-options.md)), each with its type, its label when the author gave one, its value, the values it takes and its default. A checkbox takes `0` and `1`.
-- `option set` sets one, applying it to open tabs as the popup does. It refuses an option the profile doesn't declare, or a value it doesn't take.
-- Both take `--profile` to name the profile rather than use the active one. The `/stylebot` skill uses `option set` to check a light/dark style in each variant, then sets it back to the user's choice.
+- `options` lists each option with its type, value, allowed values and default.
+- `option set` changes one and applies it to open tabs. It refuses values the option doesn't take.

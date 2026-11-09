@@ -1,28 +1,33 @@
 # Forced states
 
+`force` makes a page's `:hover`, `:active`, `:focus`, `:focus-visible` or `:focus-within` styles apply without a real pointer or focus. An agent can then check a theme's hover and focus colors on the page instead of guessing from the CSS.
+
 ```bash
-stylebot force 54432929 '.athing' hover
-stylebot force 54432929 'input[name=q]' focus-visible
-stylebot force 54432929
+stylebot force 54432929 '.athing' hover                    # first visible match
+stylebot force 54432929 'input[name=q]' focus-visible --all  # every match
+stylebot force 54432929                                    # list what's forced
 stylebot force 54432929 --clear
 ```
-
-`force <tab> '<selector>' <state>` makes the page's CSS for a state apply as if a real pointer or focus were there: `hover`, `active`, `focus`, `focus-visible` or `focus-within`. It goes on the selector's first visible match, or every match with `--all`, and stays until `--clear`. While it's forced, `outline`, `computed-styles`, `page-rules`, `inspect`, the page check after a save and `screenshot` all see the page in that state, so an agent can check a theme's hover and focus colors instead of reading them off the CSS. `force <tab>` lists what's forced.
 
 ```text
 $ stylebot force 1234 '.athing' hover
 Forced hover on .athing (1 element, 6 ancestors).
 ```
 
-It works the way Storybook's pseudo-states addon does, without the browser's debugger, so it needs no extra permission:
+A state stays forced until `--clear`. While it's on, `outline`, `computed-styles`, `page-rules`, `inspect`, `screenshot` and the check after a save all see the page in that state. For a single screenshot, use `screenshot --state hover --on '<selector>'` instead.
 
-- It copies every rule on the page that names one of those states, from the page's stylesheets, its constructed ones and those of open shadow roots, with the state swapped for an attribute of the same specificity, inside the same `@media`, `@supports`, `@layer` and `@container`, `!important` kept. The copies go after the scope's own sheets. A cross-origin stylesheet the page can't read is fetched by the extension, which says when it couldn't fetch one.
-- Hover and active go on the element and every ancestor, across shadow boundaries; a focus state goes on the element, with focus-within on its ancestors. Transitions the change starts jump to their end, so a screenshot shows the state rather than part of the fade.
-- While anything is forced, it copies the rules again when stylesheets are added or change, including Stylebot's own when a save applies, and before every command reads the page.
+## How it works
 
-Its limits:
+It's the same trick Storybook's pseudo-states addon uses, so it needs no debugger and no extra permission:
 
-- Only the top frame is forced, as the CLI only reads that one; iframes keep their real state.
-- A forced state doesn't stop the page's rules for when an element isn't in that state, such as `.button:not(:hover)`, from applying to it too.
-- The copies come after every other rule, so where a state rule and a later rule tie on specificity without `!important`, the state rule wins, where with a real pointer the later one would. Stylebot's own rules carry `!important` unless the site turns that off, so they still win.
-- An element the page replaces, as a framework re-render can, loses its forced state; `force` again.
+1. Copy every page rule that uses the state, with `:hover` swapped for an attribute of the same specificity.
+2. Put that attribute on the element. Hover and active also go on its ancestors, and focus-within on the ancestors of a focused element.
+3. Skip transitions to their end, so screenshots show the final state.
+4. Copy the rules again whenever the page's stylesheets change.
+
+## Limits
+
+- Only the top frame; iframes keep their real state.
+- Rules for when an element _isn't_ in the state, like `.button:not(:hover)`, still apply too.
+- A forced rule wins ties with later rules that a real hover would lose. Stylebot's own rules use `!important`, so they still win.
+- If the page re-renders an element, it loses its forced state. Run `force` again.

@@ -1,13 +1,38 @@
 # CLI mode
 
-CLI mode lets you work with your agent from the page. A small terminal on a connected tab shows each command the agent runs there and each save, with an undo. You mark areas of the page and write notes about them; the agent makes the change and answers in the terminal.
-
-- **Connect**: ask your agent to watch, then click **[connect]** on the tab you're looking at, or let the agent connect one with `mode <tab>`. One tab is connected at a time; others offer **[move here]**. The terminal's close button or `mode <tab> --off` disconnects it.
-- **Mark**: drag over part of the page. Click a mark's numbered badge to remove it.
-- **Note**: type in the terminal and press Enter (Shift+Enter for a new line). The agent gets the note with a screenshot of your marks, and shows as thinking until it answers.
-
-Keys, anywhere on the page but a field: `.` open or minimize, `/` write a note, `Z` undo the last save, `X` clear the marks.
-
-The agent follows along with `watch`, which prints a line for each event (the tab attaching, each mark and note, navigations, edits outside the CLI), or `selection`, which lists the notes and marks sent since it last looked, with the elements inside each mark; `--wait` waits for the next one. `say` answers your note.
+CLI mode lets you work with your agent from the page itself. A small terminal on the tab shows each command the agent runs and each save, with an undo. You mark parts of the page and leave notes, and the agent makes the change and replies.
 
 ![The CLI mode terminal on a GitHub issue: notes asking to fix three icon buttons and shrink the copy icon, each followed by the commands the agent ran, an undo, and its answer](../images/cli-mode.webp)
+
+## Using it
+
+1. **Connect.** Ask your agent to watch, then click **[connect]** on the tab you want to work on. Only one tab is connected at a time; others offer **[move here]**.
+2. **Mark.** Drag over part of the page. Click a mark's number to remove it.
+3. **Note.** Type in the terminal and press Enter (Shift+Enter for a new line). The agent gets your note with a screenshot of the marks.
+
+| Key | Does               |
+| --- | ------------------ |
+| `.` | Open or minimize   |
+| `/` | Write a note       |
+| `Z` | Undo the last save |
+| `X` | Clear the marks    |
+
+The keys work anywhere on the page except in a text field.
+
+## On the agent's side
+
+```mermaid
+sequenceDiagram
+  participant You as You, on the page
+  participant Agent
+  Agent->>You: stylebot mode (or you click connect)
+  You->>Agent: mark ① and a note
+  Note over Agent: stylebot watch / selection
+  Agent->>You: stylebot css rule … (shows in the terminal, with undo)
+  Agent->>You: stylebot say "Done: …"
+```
+
+- `mode <tab>` connects a tab, and `mode <tab> --off` disconnects it.
+- `watch` prints a line for each event: the tab connecting, marks, notes, navigation, and edits made outside the CLI.
+- `selection` lists the notes and marks since it last looked, with the elements inside each mark. `--wait` waits for the next one.
+- `say` answers your note in the terminal.
