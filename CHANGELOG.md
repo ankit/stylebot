@@ -1,3 +1,14 @@
+## Version 4.4.0 (November 2026)
+
+- Gallery: try all of a site's Gallery styles from the popup, previewing each in a card with its options (#1272, #1278)
+- Previewing or installing a Gallery style now replaces the page's active style (#1273)
+- Optionally show how many styles are active on the toolbar icon (#1274)
+- Send feedback from the popup's new ⋯ menu (#1269)
+- The popup opens right away on busy pages (#1281)
+- Readability no longer runs on AI chat apps (#1271)
+- Fix long labels overlapping controls in the editor's Basic tab (#1282)
+- Popup and Options layout fixes (#1270, #1275, #1276, #1277, #1279)
+
 ## Version 4.3.0 (November 2026)
 
 - Styles can offer their own options, picked from the popup, declared with UserCSS `@var select` and `@var checkbox` (#1261)
