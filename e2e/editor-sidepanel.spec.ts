@@ -254,7 +254,10 @@ test('docking in the page from the side panel closes the panel', async ({
   await expect
     .poll(() => panel.evaluate(`!!${byLabel('Dock right in page')}`))
     .toBe(true);
-  await panel.evaluate(`${byLabel('Dock right in page')}.click()`);
+  // The click closes the panel, which Edge does before evaluate can answer.
+  await panel.evaluate(
+    `setTimeout(() => ${byLabel('Dock right in page')}.click())`
+  );
 
   await expect(page.locator('#stylebot .stylebot.right')).toBeVisible();
   await expect.poll(() => isSidePanelOpen(extension)).toBe(false);
