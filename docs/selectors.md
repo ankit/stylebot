@@ -139,29 +139,19 @@ How the shapes are told apart:
 
 ## Other selectors for the element
 
-The selector field also offers other selectors for the picked element, each
-with how many elements it matches. The user's own rules that match it come
-first. Then the generated ones, narrowest first, keeping one per set of
-matched elements and leaving out any that sweep the page:
+The selector field also lists the user's own rules that match the element,
+then generated selectors, narrowest first, one per set of matched elements:
 
-- **Only this element** — its `#id` when that's unique and not generated,
-  otherwise the element and its ancestors, each positioned with
-  `:nth-of-type` where a sibling would also match, climbing until only this
-  element matches or an ancestor has a unique `#id`. Positions shift when a
-  list reorders, so this is the least stable choice.
-- **This item** — elements like it inside the nearest repeated ancestor (a
-  row, list item or card), e.g. `tr.athing:nth-of-type(3) a` for every link
-  in one row.
-- **Every strategy above** that matches the element, including a per-item
-  test id that the ranking passed over.
-- **Each named ancestor, up to 4 levels** — the element scoped by each
-  ancestor with a class, test id or name, keeping its own class when it has
-  one, e.g. `td.subtext a` or `td.title span.sitestr`.
-- **Its bare tag**, for tags that say what an element is (`a`, `li`, `h2`,
-  `button`, …), not `div` or `span`.
+- **Only this element** — its unique `#id`, or its path from the nearest
+  ancestor with one, using `:nth-of-type` where needed. Breaks when a list
+  reorders.
+- **This item** — elements like it in the same row, list item or card, e.g.
+  `tr.athing:nth-of-type(3) a`.
+- **Every strategy above** that matches it.
+- **Each named ancestor, up to 4 levels up**, e.g. `td.subtext a`.
+- **Its bare tag**, for tags like `a`, `li` or `h2`, not `div` or `span`.
 
-A tag chain like `td span a` is offered only when none of the generated
-selectors has a class, id or attribute.
+Tag chains like `td span a` appear only when nothing more readable does.
 
 ## Reusing existing rules
 
