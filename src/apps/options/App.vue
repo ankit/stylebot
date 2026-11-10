@@ -173,11 +173,11 @@ a {
 .options-app {
   display: grid;
   grid-template-columns: 240px 1fr;
-  min-height: 100vh;
+  min-height: 100dvh;
 
   @include phone {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto auto 1fr;
+    display: flex;
+    flex-direction: column;
   }
 }
 
@@ -204,8 +204,7 @@ a {
     position: sticky;
     top: 0;
     z-index: 1;
-    grid-column: 1;
-    grid-row: 1;
+    flex: none;
   }
 }
 
@@ -214,8 +213,7 @@ a {
   padding: 0 12px 16px;
 
   @include phone {
-    grid-column: 1;
-    grid-row: 3;
+    order: 1;
     padding: 16px 4px 24px;
     border-top: 1px solid var(--panel-border);
   }
@@ -225,8 +223,7 @@ a {
   min-width: 0;
 
   @include phone {
-    grid-column: 1;
-    grid-row: 2;
+    flex: 1;
   }
 }
 </style>
