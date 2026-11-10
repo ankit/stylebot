@@ -109,9 +109,6 @@ export const isSweeping = (selector: string): boolean => {
   return matches >= MIN_SWEEP && matches > countMatches(subject) / 2;
 };
 
-export const unlessSweeping = (selector: string | null): string | null =>
-  selector && !isSweeping(selector) ? selector : null;
-
 /**
  * Scopes `el` by each of its nearest ancestors (up to 4 levels) that has a
  * class, test id or name of its own, e.g. `td.subtext a`: each is a step
