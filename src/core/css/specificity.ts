@@ -1,4 +1,4 @@
-import { splitSelectorList } from './selector';
+import { splitSelectorList } from './selector/selector-text';
 
 export type Specificity = [number, number, number, number];
 

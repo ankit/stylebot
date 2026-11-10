@@ -4,7 +4,7 @@ import {
   getCssAfterApplyingFilterEffectToPage,
   getFilterEffectValueForPage,
 } from './filter';
-import { getBodyChildSelectors } from './selector';
+import { getBodyChildSelectors } from './selector/get-selector';
 
 describe('filter', () => {
   describe('getCssAfterApplyingFilterEffectToPage', () => {
