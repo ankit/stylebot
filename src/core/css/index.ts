@@ -8,28 +8,34 @@ export { compileStyle } from './compile';
 
 export { getCssWithExpandedImports } from './import';
 
+export { getSelector, getBodyChildSelectors } from './selector/get-selector';
 export {
-  getSelector,
-  escapeSelectorToken,
   getTestIdBasedSelector,
   getNameBasedSelector,
   getNonHashedClassBasedSelector,
   getStableClassPartsSelector,
   getStableClassMatcher,
-  getStableSelector,
-  getFragileSelector,
   getIdBasedSelector,
   getClassBasedSelector,
+} from './selector/element-selectors';
+export {
   getTagNameBasedSelector,
   getAncestorBasedSelector,
-  splitSelectorList,
-  validateSelector,
-  getBodyChildSelectors,
+} from './selector/ancestor-selectors';
+export {
   getSelectorCandidates,
   getUniqueSelector,
-  dedupeByMatches,
-  byReach,
-} from './selector';
+} from './selector/alternatives';
+export { dedupeByMatches, byReach } from './selector/reach';
+export {
+  getStableSelector,
+  getFragileSelector,
+} from './selector/fragile-selector';
+export {
+  escapeSelectorToken,
+  splitSelectorList,
+  validateSelector,
+} from './selector/selector-text';
 export { looksGeneratedId, looksMinified } from './hashed-class';
 
 export {
