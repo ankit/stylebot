@@ -680,7 +680,7 @@ body {
 
     @media (max-width: 600px) {
       width: auto;
-      zoom: 1.125;
+      zoom: 1.2;
     }
   }
 }
