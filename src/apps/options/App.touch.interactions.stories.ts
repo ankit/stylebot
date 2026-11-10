@@ -65,12 +65,13 @@ export const TabsAcrossTheTop: StoryObj = {
 export const NoEditorSettingsOnIPhone: StoryObj = {
   ...optionsPage('Basics'),
   loaders: onIPhone,
-  name: 'on iPhone Basics leaves out the editor position, right-click menu and keyboard shortcuts',
+  name: 'on iPhone Basics leaves out the theme, editor position, right-click menu and keyboard shortcuts',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
     await canvas.findByText('Gallery suggestions');
 
+    await expect(canvas.queryByText('Theme')).toBeNull();
     await expect(canvas.queryByText('Editor position')).toBeNull();
     await expect(canvas.queryByText('Right-click menu')).toBeNull();
     await expect(canvas.queryByText('Keyboard shortcuts')).toBeNull();

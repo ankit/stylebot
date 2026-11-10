@@ -1,11 +1,11 @@
 <template>
-  <s-list-item padded wraps>
+  <s-list-item padded>
     <template #title>
       <h3 class="heading">{{ t('theme') }}</h3>
     </template>
     <template #meta>
       <s-text variant="muted" size="large" as="span">
-        {{ t(supportsEditor ? 'theme_description' : 'popup_and_this_page') }}
+        {{ t('theme_description') }}
       </s-text>
     </template>
 
@@ -29,12 +29,13 @@
 </template>
 
 <script lang="ts">
+import Vue from 'vue';
+
 import { SListItem, SSegmentedControl, SText } from '@stylebot/components';
 import { MonitorIcon, MoonIcon, SunIcon } from '@stylebot/icons';
 import type { StylebotAppearance } from '@stylebot/types';
-import { OptionsVue } from '../../options-vue';
 
-export default OptionsVue.extend({
+export default Vue.extend({
   name: 'TheTheme',
 
   components: {

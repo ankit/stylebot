@@ -7,7 +7,6 @@
       compact,
       muted,
       padded,
-      wraps,
       'has-icon': hasIcon,
     }"
     v-bind="$attrs"
@@ -66,11 +65,6 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
-    // Lets wide controls drop below the text on a phone.
-    wraps: {
-      type: Boolean,
-      default: false,
-    },
   },
 
   computed: {
@@ -106,12 +100,6 @@ export default Vue.extend({
 
 .compact {
   min-height: 48px;
-}
-
-.wraps:not(.has-icon) {
-  @include phone {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 
 .padded {

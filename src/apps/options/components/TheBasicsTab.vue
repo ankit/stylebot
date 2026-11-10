@@ -5,7 +5,7 @@
     </s-heading>
 
     <s-list>
-      <the-theme />
+      <the-theme v-if="supportsEditor" />
       <the-position v-if="supportsEditor" />
       <the-context-menu v-if="supportsEditor" />
       <the-active-style-badge v-if="showActiveStyleBadge" />
