@@ -178,10 +178,10 @@ export default Vue.extend({
   align-items: center;
   gap: 8px;
   max-width: 100%;
-  height: var(--options-field-height, 32px);
+  height: 32px;
   padding: 0 12px;
   border: 1px solid var(--panel-border);
-  border-radius: calc(var(--options-field-height, 32px) / 2);
+  border-radius: 16px;
   box-sizing: border-box;
   font-size: 14px;
   font-weight: 500;
@@ -190,6 +190,11 @@ export default Vue.extend({
 
   &.open {
     background: var(--hover-tint);
+  }
+
+  @include touch {
+    height: 44px;
+    border-radius: 22px;
   }
 
   @include hover-capable {
@@ -219,7 +224,7 @@ export default Vue.extend({
   box-sizing: border-box;
   background: var(--field-surface);
   font: inherit;
-  font-size: var(--options-input-font-size, 13px);
+  font-size: 13px;
   color: var(--text-primary);
 
   &::placeholder {
@@ -230,6 +235,10 @@ export default Vue.extend({
     @include field-active-border;
 
     outline: none;
+  }
+
+  @include touch {
+    font-size: 16px;
   }
 }
 

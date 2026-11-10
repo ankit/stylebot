@@ -66,8 +66,7 @@ export default Vue.extend({
       type: Boolean,
       default: false,
     },
-    // Lets wide controls drop below the text where a page narrows the row
-    // with --list-item-wrapped-columns.
+    // Lets wide controls drop below the text on a phone.
     wraps: {
       type: Boolean,
       default: false,
@@ -93,8 +92,12 @@ export default Vue.extend({
   box-sizing: border-box;
   width: 100%;
   min-height: 64px;
-  padding: var(--list-item-padding-y, 0) 20px;
+  padding: 0 20px;
   text-align: start;
+
+  @include phone {
+    padding-block: 10px;
+  }
 }
 
 .has-icon {
@@ -106,7 +109,9 @@ export default Vue.extend({
 }
 
 .wraps:not(.has-icon) {
-  grid-template-columns: var(--list-item-wrapped-columns, minmax(0, 1fr) auto);
+  @include phone {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .padded {
@@ -165,10 +170,13 @@ export default Vue.extend({
 
 .meta {
   display: flex;
-  flex-wrap: var(--list-item-meta-wrap, nowrap);
   align-items: center;
   gap: 6px;
   min-width: 0;
+
+  @include phone {
+    flex-wrap: wrap;
+  }
 }
 
 .trailing {

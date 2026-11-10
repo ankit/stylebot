@@ -477,13 +477,17 @@ export default Vue.extend({
 }
 
 .counts {
-  display: var(--options-version-counts-display, flex);
+  display: flex;
   overflow: hidden;
   border-radius: 5px;
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 500;
   line-height: 1;
+
+  @include phone {
+    display: none;
+  }
 }
 
 .counts > span {
@@ -513,7 +517,11 @@ export default Vue.extend({
   display: flex;
   flex-direction: column;
   gap: 16px;
-  padding: 4px 20px 20px var(--options-version-details-indent, 62px);
+  padding: 4px 20px 20px 62px;
+
+  @include phone {
+    padding-left: 20px;
+  }
 }
 
 .compact .details {

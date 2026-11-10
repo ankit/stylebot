@@ -182,7 +182,11 @@ export default OptionsVue.extend({
 <style lang="scss" scoped>
 .styles-tab {
   max-width: 860px;
-  padding: var(--options-tab-padding, 20px 22px 26px);
+  padding: 20px 22px 26px;
+
+  @include phone {
+    padding: 16px 16px 24px;
+  }
 }
 
 .header {
@@ -214,7 +218,7 @@ export default OptionsVue.extend({
   display: flex;
   align-items: center;
   gap: 8px;
-  height: var(--options-field-height, 36px);
+  height: 36px;
   padding: 0 12px;
   box-sizing: border-box;
   color: var(--text-faint);
@@ -224,17 +228,25 @@ export default OptionsVue.extend({
     @include field-active-border;
   }
 
+  @include touch {
+    height: 44px;
+  }
+
   input {
     @include button-reset;
 
     flex: 1;
     min-width: 0;
-    font-size: var(--options-input-font-size, 14px);
+    font-size: 14px;
     line-height: 1.2;
     color: var(--text-primary);
 
     &::placeholder {
       color: var(--field-placeholder);
+    }
+
+    @include touch {
+      font-size: 16px;
     }
   }
 }

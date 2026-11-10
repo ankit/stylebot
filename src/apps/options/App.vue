@@ -175,34 +175,9 @@ a {
   grid-template-columns: 240px 1fr;
   min-height: 100vh;
 
-  @media (max-width: 600px) {
+  @include phone {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto auto 1fr;
-
-    --options-nav-padding: 0 8px;
-    --options-nav-direction: row;
-    --options-nav-border: 0 0 1px;
-    --options-nav-logo-display: none;
-    --options-nav-item-width: auto;
-    --options-nav-item-padding: 0 12px;
-    --options-nav-item-line-height: 44px;
-    --options-nav-item-font-size: 15px;
-    --options-nav-item-white-space: nowrap;
-    --options-tab-padding: 16px 16px 24px;
-    --list-item-wrapped-columns: minmax(0, 1fr);
-    --list-item-meta-wrap: wrap;
-    --list-item-padding-y: 10px;
-    --options-label-wrap: wrap;
-    --options-label-width: 100%;
-    --options-sync-row-basis: 100%;
-    --options-sync-action-grow: 1;
-    --options-version-counts-display: none;
-    --options-version-details-indent: 20px;
-  }
-
-  @include touch {
-    --options-field-height: 44px;
-    --options-input-font-size: 16px;
   }
 }
 
@@ -215,7 +190,7 @@ a {
   flex-direction: column;
   border-right: 1px solid var(--panel-border);
 
-  @media (max-width: 600px) {
+  @include phone {
     display: contents;
   }
 }
@@ -225,7 +200,7 @@ a {
   min-height: 0;
   overflow-y: auto;
 
-  @media (max-width: 600px) {
+  @include phone {
     position: sticky;
     top: 0;
     z-index: 1;
@@ -238,7 +213,7 @@ a {
   flex: none;
   padding: 0 12px 16px;
 
-  @media (max-width: 600px) {
+  @include phone {
     grid-column: 1;
     grid-row: 3;
     padding: 16px 4px 24px;
@@ -249,7 +224,7 @@ a {
 .content {
   min-width: 0;
 
-  @media (max-width: 600px) {
+  @include phone {
     grid-column: 1;
     grid-row: 2;
   }

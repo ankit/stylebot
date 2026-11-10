@@ -232,25 +232,34 @@ export default OptionsVue.extend({
 
 .header {
   display: flex;
-  flex-wrap: var(--options-label-wrap, nowrap);
   align-items: center;
   gap: 14px;
   padding: 14px 18px;
   background: var(--hover-tint);
   border-bottom: 1px solid var(--panel-border);
+
+  @include phone {
+    flex-wrap: wrap;
+  }
 }
 
 .status {
-  flex: 1 1 var(--options-sync-row-basis, 0%);
+  flex: 1 1 0%;
   min-width: 0;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 5px 10px;
+
+  @include phone {
+    flex-basis: 100%;
+  }
 }
 
 .header-action {
-  flex-grow: var(--options-sync-action-grow, 0);
+  @include phone {
+    flex-grow: 1;
+  }
 }
 
 .title {
@@ -305,23 +314,34 @@ export default OptionsVue.extend({
 
 .row {
   display: flex;
-  flex-wrap: var(--options-label-wrap, nowrap);
   align-items: baseline;
   gap: 4px 16px;
 
+  @include phone {
+    flex-wrap: wrap;
+  }
+
   dt {
     flex: none;
-    width: var(--options-label-width, 110px);
+    width: 110px;
     font-size: 13px;
     color: var(--text-muted);
+
+    @include phone {
+      width: 100%;
+    }
   }
 
   dd {
-    flex: 1 1 var(--options-sync-row-basis, 0%);
+    flex: 1 1 0%;
     min-width: 0;
     margin: 0;
     font-size: 14px;
     line-height: 1.45;
+
+    @include phone {
+      flex-basis: 100%;
+    }
   }
 }
 

@@ -236,7 +236,11 @@ export default OptionsVue.extend({
 
 .sync-tab {
   max-width: 760px;
-  padding: var(--options-tab-padding, 20px 22px 26px);
+  padding: 20px 22px 26px;
+
+  @include phone {
+    padding: 16px 16px 24px;
+  }
 }
 
 .description {

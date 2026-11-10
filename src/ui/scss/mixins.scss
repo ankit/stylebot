@@ -88,6 +88,13 @@
   }
 }
 
+// Phone-width viewports; put it with the nested rules.
+@mixin phone {
+  @media (max-width: 600px) {
+    @content;
+  }
+}
+
 // Touchscreens without hover, e.g. Safari on iPhone and iPad, where controls
 // revealed on hover must always show; put it with the nested rules.
 @mixin touch {
