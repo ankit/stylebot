@@ -45,7 +45,6 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
 import { formatDistanceToNow } from 'date-fns';
 
 import {
@@ -57,9 +56,12 @@ import {
 
 import SiteIcon from '../site/SiteIcon.vue';
 import StyleRowMenu from './StyleRowMenu.vue';
+import { VueWithEditing, editingInjection } from '../../editing';
 
-export default Vue.extend({
+export default VueWithEditing.extend({
   name: 'StyleListRow',
+
+  inject: editingInjection,
 
   components: {
     SConfirmDialog,
@@ -89,12 +91,6 @@ export default Vue.extend({
     profileCount: {
       type: Number,
       default: 1,
-    },
-
-    // Whether the row opens the style's CSS, which iPhone doesn't offer.
-    editingEnabled: {
-      type: Boolean,
-      default: true,
     },
   },
 

@@ -3,7 +3,7 @@
     <s-heading as="h1" size="xl">{{ t('basics_options') }}</s-heading>
 
     <s-list>
-      <the-theme :editing-enabled="editingEnabled" />
+      <the-theme />
       <the-position v-if="editingEnabled" />
       <the-context-menu v-if="editingEnabled" />
       <the-active-style-badge v-if="showActiveStyleBadge" />
@@ -17,8 +17,6 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-
 import { SHeading, SList } from '@stylebot/components';
 import { supportsCLI } from '@stylebot/settings';
 import { isSafari } from '@stylebot/utils';
@@ -29,9 +27,12 @@ import TheActiveStyleBadge from './basics/TheActiveStyleBadge.vue';
 import TheGallerySuggestions from './basics/TheGallerySuggestions.vue';
 import TheCliAccess from './basics/TheCliAccess.vue';
 import TheKeyboardShortcuts from './basics/TheKeyboardShortcuts.vue';
+import { VueWithEditing, editingInjection } from '../editing';
 
-export default Vue.extend({
+export default VueWithEditing.extend({
   name: 'TheBasicsTab',
+
+  inject: editingInjection,
 
   components: {
     SHeading,
@@ -43,14 +44,6 @@ export default Vue.extend({
     TheGallerySuggestions,
     TheCliAccess,
     TheKeyboardShortcuts,
-  },
-
-  props: {
-    // iPhone has no editor, so its position, right-click menu and shortcuts go.
-    editingEnabled: {
-      type: Boolean,
-      default: true,
-    },
   },
 
   computed: {

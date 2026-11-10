@@ -17,7 +17,6 @@
       <router-view
         v-if="stylesLoaded"
         :key="$route.fullPath"
-        :editing-enabled="editingEnabled"
         @edit="editStyle"
         @back="navigate({ name: 'styles' })"
         @save="onSaveStyle"
@@ -32,11 +31,11 @@ import type { RawLocation } from 'vue-router';
 
 import type { StylebotAppearance } from '@stylebot/types';
 import { SThemeProvider } from '@stylebot/components';
-import { isIPhone } from '@stylebot/utils';
 
 import TheNavigation from './components/TheNavigation.vue';
 import TheNavigationFooter from './components/navigation/TheNavigationFooter.vue';
 import { TABS } from './router';
+import { editingProvision } from './editing';
 
 export default Vue.extend({
   name: 'App',
@@ -47,16 +46,15 @@ export default Vue.extend({
     SThemeProvider,
   },
 
+  provide: editingProvision,
+
   data(): {
     tabs: Array<string>;
     stylesLoaded: boolean;
-    // iPhone has no editor, so nothing here edits a style's CSS or sets it up.
-    editingEnabled: boolean;
   } {
     return {
       tabs: [...TABS],
       stylesLoaded: false,
-      editingEnabled: !isIPhone(),
     };
   },
 

@@ -29,14 +29,15 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-
 import { SListItem, SSegmentedControl, SText } from '@stylebot/components';
 import { MonitorIcon, MoonIcon, SunIcon } from '@stylebot/icons';
 import type { StylebotAppearance } from '@stylebot/types';
+import { VueWithEditing, editingInjection } from '../../editing';
 
-export default Vue.extend({
+export default VueWithEditing.extend({
   name: 'TheTheme',
+
+  inject: editingInjection,
 
   components: {
     SListItem,
@@ -45,14 +46,6 @@ export default Vue.extend({
     MonitorIcon,
     MoonIcon,
     SunIcon,
-  },
-
-  props: {
-    // iPhone has no editor, so the theme doesn't mention it there.
-    editingEnabled: {
-      type: Boolean,
-      default: true,
-    },
   },
 
   computed: {

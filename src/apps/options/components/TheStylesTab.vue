@@ -48,7 +48,6 @@
         :modified-time="style.modifiedTime"
         :enabled="style.enabled"
         :profile-count="profileCount(style)"
-        :editing-enabled="editingEnabled"
         @edit="$emit('edit', $event)"
         @toggle="toggleStyle(style)"
         @delete="deleteStyle(style)"
@@ -74,7 +73,6 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
 import { compareAsc } from 'date-fns';
 
 import type { Style } from '@stylebot/types';
@@ -90,9 +88,12 @@ import { listProfiles } from '@stylebot/saved-styles';
 
 import StyleListRow from './styles/StyleListRow.vue';
 import StylesBulkMenu from './styles/StylesBulkMenu.vue';
+import { VueWithEditing, editingInjection } from '../editing';
 
-export default Vue.extend({
+export default VueWithEditing.extend({
   name: 'TheStylesTab',
+
+  inject: editingInjection,
 
   components: {
     SHeading,
@@ -103,14 +104,6 @@ export default Vue.extend({
     SearchIcon,
     StyleListRow,
     StylesBulkMenu,
-  },
-
-  props: {
-    // iPhone has no editor, so a style can't be added or have its CSS edited.
-    editingEnabled: {
-      type: Boolean,
-      default: true,
-    },
   },
 
   data(): {

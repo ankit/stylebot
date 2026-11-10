@@ -50,7 +50,6 @@
       </s-text>
 
       <the-google-drive-sync
-        :editing-enabled="editingEnabled"
         @edit="$emit('edit', $event)"
         @restored="onRestored"
       />
@@ -81,8 +80,6 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-
 import { SButton, SCallout, SHeading, SText } from '@stylebot/components';
 import type { ImportPreview } from '@stylebot/saved-styles';
 import {
@@ -96,14 +93,17 @@ import ImportBackupDialog from './sync/ImportBackupDialog.vue';
 
 import { downloadBackup, pickBackupFile } from '../backup';
 import type { SyncStatus } from '../store/index';
+import { VueWithEditing, editingInjection } from '../editing';
 
 type PendingImport = {
   styles: StyleMap;
   preview: ImportPreview;
 };
 
-export default Vue.extend({
+export default VueWithEditing.extend({
   name: 'TheSyncTab',
+
+  inject: editingInjection,
 
   components: {
     SCallout,
@@ -112,13 +112,6 @@ export default Vue.extend({
     SButton,
     TheGoogleDriveSync,
     ImportBackupDialog,
-  },
-
-  props: {
-    editingEnabled: {
-      type: Boolean,
-      default: true,
-    },
   },
 
   data(): {

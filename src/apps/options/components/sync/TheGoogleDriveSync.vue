@@ -127,7 +127,6 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
 import {
   SBadge,
   SButton,
@@ -145,8 +144,12 @@ import {
   formatSyncTime,
 } from '@stylebot/sync';
 
-export default Vue.extend({
+import { VueWithEditing, editingInjection } from '../../editing';
+
+export default VueWithEditing.extend({
   name: 'TheGoogleDriveSync',
+
+  inject: editingInjection,
 
   components: {
     SBadge,
@@ -157,14 +160,6 @@ export default Vue.extend({
     ExternalLinkIcon,
     SHeading,
     SText,
-  },
-
-  props: {
-    // Reviewing a conflict opens the style's CSS, which iPhone doesn't offer.
-    editingEnabled: {
-      type: Boolean,
-      default: true,
-    },
   },
 
   data(): {
