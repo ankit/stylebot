@@ -95,7 +95,7 @@ const MARKS_PAGE_HTML = `
     </head>
     <body>
       <div class="card" id="first">First</div>
-      <div class="card">Second</div>
+      <div class="card" id="second">Second</div>
       <a href="#followed">A link to drag across</a>
       <div style="height: 2000px"></div>
     </body>

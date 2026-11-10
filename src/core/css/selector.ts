@@ -417,11 +417,33 @@ const unlessSweeping = (selector: string | null): string | null =>
   selector && !isSweeping(selector) ? selector : null;
 
 /**
- * #id ranks above a hashed class but below anything genuinely authored,
- * the element's own or an ancestor's. Rather than sweep the page, it falls
- * back to this element alone. See docs/selectors.md.
+ * The element's #id in place of its own class when at most half of the
+ * other elements with that class have ids.
+ */
+const getIdOverSharedClass = (el: HTMLElement): string | null => {
+  const id = getStableIdBasedSelector(el);
+  const ownClass = getNonHashedClassBasedSelector(el);
+  if (!id || !ownClass || countMatches(id) !== 1) {
+    return null;
+  }
+
+  const others = matchesOf(ownClass).filter(match => match !== el);
+  const othersWithIds = others.filter(
+    match => match instanceof HTMLElement && getStableIdBasedSelector(match)
+  );
+  if (others.length === 0 || othersWithIds.length > others.length / 2) {
+    return null;
+  }
+
+  return id;
+};
+
+/**
+ * The most stable selector for the element that doesn't sweep the page.
+ * See docs/selectors.md.
  */
 export const getSelector = (el: HTMLElement): string =>
+  getIdOverSharedClass(el) ??
   getGoodOwnSelector(el) ??
   unlessSweeping(getAncestorScopeWithinOwnClass(el)) ??
   getStableIdBasedSelector(el) ??

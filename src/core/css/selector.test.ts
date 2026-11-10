@@ -557,6 +557,49 @@ describe('selector', () => {
       expect(getSelector(el)).toBe('input[data-testid="email-field"]');
     });
 
+    it('prefers an #id when most others with its class have none', () => {
+      document.body.innerHTML = `
+        <div class="flex" id="sidebar"></div>
+        <div class="flex"></div>
+        <div class="flex"></div>
+      `;
+
+      const el = document.getElementById('sidebar') as HTMLElement;
+      expect(getSelector(el)).toBe('#sidebar');
+    });
+
+    it('prefers an #id when only a few others with its class have one', () => {
+      document.body.innerHTML = `
+        <div class="flex" id="header"></div>
+        <div class="flex" id="sidebar"></div>
+        <div class="flex"></div>
+        <div class="flex"></div>
+        <div class="flex"></div>
+      `;
+
+      const el = document.getElementById('sidebar') as HTMLElement;
+      expect(getSelector(el)).toBe('#sidebar');
+    });
+
+    it('keeps the class when the others with it have ids too', () => {
+      document.body.innerHTML = `
+        <table>
+          <tr class="athing" id="45678"></tr>
+          <tr class="athing" id="45679"></tr>
+        </table>
+      `;
+
+      const el = document.getElementById('45678') as HTMLElement;
+      expect(getSelector(el)).toBe('tr.athing');
+    });
+
+    it('keeps the class when only this element has it', () => {
+      document.body.innerHTML = '<nav class="site-nav" id="nav"></nav>';
+
+      const el = document.getElementById('nav') as HTMLElement;
+      expect(getSelector(el)).toBe('nav.site-nav');
+    });
+
     it('skips an ancestor scope that sweeps most of the page', () => {
       document.body.innerHTML = `
         <div class="app">
