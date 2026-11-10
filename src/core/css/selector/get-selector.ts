@@ -17,7 +17,7 @@ import {
   getAncestorHashedClassSelector,
   getAncestorScopeWithinOwnClass,
   getTagNameBasedSelector,
-  unlessSweeping,
+  isSweeping,
 } from './ancestor-selectors';
 import { getUniqueSelector } from './alternatives';
 
@@ -47,17 +47,28 @@ const getIdOverSharedClass = (el: HTMLElement): string | null => {
  * The most stable selector for the element that doesn't sweep the page.
  * See docs/selectors.md.
  */
-export const getSelector = (el: HTMLElement): string =>
-  getIdOverSharedClass(el) ??
-  getDescriptiveSelector(el) ??
-  unlessSweeping(getAncestorScopeWithinOwnClass(el)) ??
-  getStableIdBasedSelector(el) ??
-  getLabelBasedSelector(el) ??
-  getClassBasedSelector(el) ??
-  unlessSweeping(getAncestorHashedClassSelector(el)) ??
-  unlessSweeping(getTagNameBasedSelector(el)) ??
-  getUniqueSelector(el) ??
-  getTagNameBasedSelector(el);
+export const getSelector = (el: HTMLElement): string => {
+  const strategies: Array<(el: HTMLElement) => string | null> = [
+    getIdOverSharedClass,
+    getDescriptiveSelector,
+    getAncestorScopeWithinOwnClass,
+    getStableIdBasedSelector,
+    getLabelBasedSelector,
+    getClassBasedSelector,
+    getAncestorHashedClassSelector,
+    getTagNameBasedSelector,
+    getUniqueSelector,
+  ];
+
+  for (const strategy of strategies) {
+    const selector = strategy(el);
+    if (selector && !isSweeping(selector)) {
+      return selector;
+    }
+  }
+
+  return getTagNameBasedSelector(el);
+};
 
 /**
  * The selector a body child got before partly hashed classes, newer hash
