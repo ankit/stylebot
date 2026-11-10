@@ -26,15 +26,25 @@ const captureVisible = async (
   }
 };
 
+type FirefoxTabs = {
+  captureTab?: (tabId: number, options: { format: 'png' }) => Promise<string>;
+};
+
 /**
- * Captures what a tab shows as a PNG data URL. Chrome only captures a
- * window's shown tab, so a background tab is shown just for the capture.
+ * Captures what a tab shows as a PNG data URL. Firefox captures any tab;
+ * Chrome only a window's shown one, so a background tab is shown for it.
  */
 export const captureTab = async ({
   id,
   windowId,
   active,
 }: chrome.tabs.Tab): Promise<string> => {
+  const { captureTab: captureAnyTab } = chrome.tabs as FirefoxTabs;
+
+  if (captureAnyTab) {
+    return captureAnyTab(id as number, { format: 'png' });
+  }
+
   if (active) {
     return captureVisible(windowId);
   }

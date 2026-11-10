@@ -6,9 +6,17 @@ type Brands = { brands?: Array<{ brand: string }> };
 
 /**
  * The browser's name, such as Chrome or Edge, from its user agent brands.
- * Browsers that don't brand themselves, such as Vivaldi, read as Chromium.
+ * Firefox has no brands; Chromium browsers without one, such as Vivaldi,
+ * read as Chromium.
  */
-export const getBrowserName = (userAgentData?: Brands): string => {
+export const getBrowserName = (
+  userAgentData?: Brands,
+  userAgent = ''
+): string => {
+  if (!userAgentData && /\bFirefox\//.test(userAgent)) {
+    return 'Firefox';
+  }
+
   const brand = userAgentData?.brands
     ?.map(({ brand }) => brand)
     .find(brand => !/not.?a.?brand|^chromium$/i.test(brand));
@@ -54,7 +62,8 @@ export const browserCommands: CliCommands = {
   async browser() {
     return {
       name: getBrowserName(
-        (navigator as Navigator & { userAgentData?: Brands }).userAgentData
+        (navigator as Navigator & { userAgentData?: Brands }).userAgentData,
+        navigator.userAgent
       ),
       instance: await getInstance(),
       page: await getPage(),

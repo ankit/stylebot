@@ -31,6 +31,9 @@ export class FirefoxEngine implements Engine {
   // Chosen at launch, needed again at loadExtension time.
   private rdpPort = 0;
 
+  // Prefs that replace the defaults below, such as a shorter idle timeout.
+  constructor(private readonly prefs: Record<string, unknown> = {}) {}
+
   async launch(
     userDataDir: string,
     options: LaunchOptions
@@ -56,6 +59,7 @@ export class FirefoxEngine implements Engine {
         // Firefox terminates idle event pages after 30s, which would take
         // the console we run chrome.storage calls through with it.
         'extensions.background.idle.timeout': 3_600_000,
+        ...this.prefs,
       },
     });
   }

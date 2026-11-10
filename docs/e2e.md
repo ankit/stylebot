@@ -120,7 +120,8 @@ shared browser keeps connections alive, so close any test server after the suite
 
 The CLI spec drives the real `stylebot` command, as a child process, through the native
 host to the extension and the page. It's the one spec with its own browser, launched for
-the file and closed after it, on Chrome and Edge only.
+the file and closed after it, on Chrome and Edge. A shorter Firefox spec covers connecting,
+saving CSS, a background tab's screenshot, and staying connected while the event page idles.
 
 It never touches your own setup. The CLI, the browser and the host the browser starts all
 get a temporary `HOME`, and the browser's user data folder sits where that `HOME` says the
@@ -137,3 +138,10 @@ Two things a release build can't do on its own are set up from outside it, in th
   so the Options toggle's request then succeeds without a prompt. Nothing in the extension
   changes for this. As the grant doesn't survive turning the setting off, the spec turns it
   on once.
+
+On Firefox, the spec installs a copy of the build that requires the native messaging
+permission, since headless Firefox can't show the permission prompt. Firefox
+on macOS ignores `HOME` when it looks for native hosts, so the spec points it at the test
+`HOME`'s folder through the parent process, as Firefox's own tests do. Before checking the
+connection survives an idle event page, it closes its DevTools connection, which would keep
+the page awake on its own.

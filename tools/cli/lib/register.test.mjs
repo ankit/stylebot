@@ -121,6 +121,32 @@ describe('registerHost on macOS', () => {
     });
   });
 
+  it("registers with Firefox in Mozilla's folder, allowing its add-on id", async () => {
+    const { registerHost, written } = await load('darwin', {
+      home,
+      cwd: '/tmp',
+      existing: [`${support}/Firefox/profiles.ini`],
+    });
+
+    expect(registerHost()).toEqual([
+      {
+        browser: 'Firefox',
+        location: `${support}/Mozilla/NativeMessagingHosts`,
+      },
+    ]);
+    expect(
+      JSON.parse(
+        written(`${support}/Mozilla/NativeMessagingHosts/dev.stylebot.cli.json`)
+      )
+    ).toEqual({
+      name: 'dev.stylebot.cli',
+      description: 'Stylebot CLI',
+      path: `${home}/.stylebot/native-host`,
+      type: 'stdio',
+      allowed_extensions: ['{52bda3fd-dc48-4b3d-a7b9-58af57879f1e}'],
+    });
+  });
+
   it('registers with no dev profiles outside a checkout', async () => {
     const { registerHost, fs } = await load('darwin', {
       home,
@@ -184,6 +210,40 @@ describe('registerHost on Linux', () => {
   });
 });
 
+describe('registerHost for Firefox on Linux', () => {
+  const home = '/home/ankit';
+
+  it('registers in ~/.mozilla', async () => {
+    const { registerHost } = await load('linux', {
+      home,
+      cwd: '/tmp',
+      existing: [`${home}/.mozilla/firefox/profiles.ini`],
+    });
+
+    expect(registerHost()).toEqual([
+      {
+        browser: 'Firefox',
+        location: `${home}/.mozilla/native-messaging-hosts`,
+      },
+    ]);
+  });
+
+  it('registers in ~/.config/mozilla where newer Firefox keeps its profiles', async () => {
+    const { registerHost } = await load('linux', {
+      home,
+      cwd: '/tmp',
+      existing: [`${home}/.config/mozilla/firefox/profiles.ini`],
+    });
+
+    expect(registerHost()).toEqual([
+      {
+        browser: 'Firefox',
+        location: `${home}/.config/mozilla/native-messaging-hosts`,
+      },
+    ]);
+  });
+});
+
 describe('registerHost on Windows', () => {
   const home = 'C:\\Users\\ankit';
   const local = `${home}\\AppData\\Local`;
@@ -230,6 +290,32 @@ describe('registerHost on Windows', () => {
       `${home}\\.stylebot\\native-host.cmd`
     );
     expect(fs.writeFileSync).toHaveBeenCalledTimes(2);
+  });
+
+  it("registers Firefox's own manifest under Mozilla's key", async () => {
+    const { registerHost, written, childProcess } = await load('win32', {
+      home,
+      cwd: home,
+      existing: [
+        `${local}\\Google\\Chrome\\User Data\\Local State`,
+        `${home}\\AppData\\Roaming\\Mozilla\\Firefox\\profiles.ini`,
+      ],
+    });
+    const firefoxManifest = `${home}\\.stylebot\\firefox\\dev.stylebot.cli.json`;
+    const firefoxKey =
+      'HKCU\\Software\\Mozilla\\NativeMessagingHosts\\dev.stylebot.cli';
+
+    expect(registerHost().map(({ browser }) => browser)).toEqual([
+      'Chrome',
+      'Firefox',
+    ]);
+    expect(
+      childProcess.execFileSync.mock.calls.map(([, args]) => args)
+    ).toContainEqual(['add', firefoxKey, '/ve', '/d', firefoxManifest, '/f']);
+    expect(JSON.parse(written(firefoxManifest)).allowed_extensions).toEqual([
+      '{52bda3fd-dc48-4b3d-a7b9-58af57879f1e}',
+    ]);
+    expect(JSON.parse(written(manifest)).allowed_origins).toHaveLength(2);
   });
 
   it('finds browsers under AppData without LOCALAPPDATA', async () => {
@@ -337,6 +423,7 @@ describe('supportedBrowsers', () => {
       'Brave',
       'Chromium',
       'Vivaldi',
+      'Firefox',
     ]);
   });
 });
@@ -398,6 +485,24 @@ describe('findStylebot', () => {
         },
       })
     ).toEqual(['Dev profile']);
+  });
+
+  it('finds Stylebot in a Firefox profile', async () => {
+    const firefox = `${support}/Firefox`;
+    const profile = `${firefox}/Profiles/abcd.default-release`;
+    const { findStylebot } = await load('darwin', {
+      home,
+      cwd: '/tmp',
+      existing: [`${firefox}/profiles.ini`, `${profile}/prefs.js`],
+      dirs: { [`${firefox}/Profiles`]: ['abcd.default-release'] },
+      contents: {
+        [`${profile}/extensions.json`]: JSON.stringify({
+          addons: [{ id: '{52bda3fd-dc48-4b3d-a7b9-58af57879f1e}' }],
+        }),
+      },
+    });
+
+    expect(findStylebot()).toEqual(['Firefox']);
   });
 
   it("finds Edge's store install in its preferences", async () => {

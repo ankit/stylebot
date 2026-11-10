@@ -21,4 +21,13 @@ describe('getBrowserName', () => {
     expect(getBrowserName(brands('Chromium', 'Not_A Brand'))).toBe('Chromium');
     expect(getBrowserName(undefined)).toBe('Chromium');
   });
+
+  it('names Firefox from its user agent', () => {
+    expect(
+      getBrowserName(
+        undefined,
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:144.0) Gecko/20100101 Firefox/144.0'
+      )
+    ).toBe('Firefox');
+  });
 });
