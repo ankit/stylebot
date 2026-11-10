@@ -2,6 +2,7 @@ import * as postcss from 'postcss';
 import type { CssDeclaration } from '@stylebot/types';
 
 import { getSelector } from './selector/get-selector';
+import { getTagNameBasedSelector } from './selector/ancestor-selectors';
 import { getSubjectCompound } from './get-subject-compound';
 
 /**
@@ -149,7 +150,8 @@ const isBroadSelector = (selector: string): boolean =>
  * Finds an authored selector matching this element via el.matches(), so
  * picking it keeps editing that rule instead of starting an unrelated one.
  * Only a selector that targets the element itself counts: a broad one like
- * `*` or `.card p` would otherwise capture every element it happens to match.
+ * `*` or `.card p` would otherwise capture every element it happens to match,
+ * unless it's the one generated now or the tag chain older versions generated.
  */
 export const getExistingSelector = (
   el: HTMLElement,
@@ -157,7 +159,7 @@ export const getExistingSelector = (
 ): string | null => {
   const root = postcss.parse(css);
   let match: string | null = null;
-  let generatedSelector: string | null = null;
+  let generatedSelectors: Array<string> | null = null;
 
   walkUnnestedRules(root, rule => {
     if (match) {
@@ -170,8 +172,11 @@ export const getExistingSelector = (
       }
 
       if (isBroadSelector(candidate)) {
-        generatedSelector = generatedSelector ?? getSelector(el);
-        if (candidate !== generatedSelector) {
+        generatedSelectors = generatedSelectors ?? [
+          getSelector(el),
+          getTagNameBasedSelector(el),
+        ];
+        if (!generatedSelectors.includes(candidate)) {
           continue;
         }
       }

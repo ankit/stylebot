@@ -2,9 +2,10 @@ import {
   getStableClassParts,
   looksGeneratedId,
   looksHashed,
+  looksMinified,
 } from '../hashed-class';
 import { escapeAttributeValue, escapeSelectorToken } from './selector-text';
-import { countMatches } from './reach';
+import { countMatches, matchesOf } from './reach';
 
 /**
  * Conventions test frameworks/component libraries use for a stable,
@@ -17,6 +18,14 @@ const TEST_ID_ATTRIBUTES = [
   'data-cy',
   'data-qa',
 ];
+
+/**
+ * Whether a test id was made for one item, like `product-48213` or `row-7`,
+ * or generated on each load, rather than shared by every element of its
+ * kind like `sidebar`.
+ */
+const isPerItem = (value: string): boolean =>
+  /\d{3,}|(^|[-_:.])\d+($|[-_:.])/.test(value) || looksGeneratedId(value);
 
 export const getTestIdBasedSelector = (el: HTMLElement): string | null => {
   for (const attribute of TEST_ID_ATTRIBUTES) {
@@ -32,23 +41,14 @@ export const getTestIdBasedSelector = (el: HTMLElement): string | null => {
 };
 
 /**
- * Whether a test id is shared by every element of its kind, like
- * `sidebar` or `product-card`. Ids made for one item, such as
- * `product-48213` or `row-7`, and generated ids don't count.
+ * The element's test id, unless it was made for this one item.
  */
-const isSharedTestId = (value: string): boolean =>
-  !/\d{3,}|(^|[-_:.])\d+($|[-_:.])/.test(value) && !looksGeneratedId(value);
-
-/**
- * A selector from the element's test id, but only when the test id is
- * shared by every element of its kind, not made for this one item.
- */
-const getSharedTestIdBasedSelector = (el: HTMLElement): string | null => {
+export const getSharedTestIdSelector = (el: HTMLElement): string | null => {
   const value = TEST_ID_ATTRIBUTES.map(name => el.getAttribute(name)).find(
     Boolean
   );
 
-  return value && isSharedTestId(value) ? getTestIdBasedSelector(el) : null;
+  return value && !isPerItem(value) ? getTestIdBasedSelector(el) : null;
 };
 
 /**
@@ -85,27 +85,20 @@ const getLinkPath = (el: HTMLElement): string | null => {
 
 /**
  * A link by its address or any element by its aria-label, e.g.
- * `a[href="/section/world"]` or `button[aria-label="Search"]`, for elements
- * with only generated classes. Null while it would match more of the page
- * than the element's own class does.
+ * `a[href="/section/world"]` or `button[aria-label="Search"]`.
  */
 export const getLabelBasedSelector = (el: HTMLElement): string | null => {
   const tag = el.tagName.toLowerCase();
   const path = tag === 'a' ? getLinkPath(el) : null;
-  const ariaLabel = el.getAttribute('aria-label');
-  const label = ariaLabel && isSharedLabel(ariaLabel) ? ariaLabel : null;
-  const candidates = [
-    path && `${tag}[href="${escapeAttributeValue(path)}"]`,
-    label && `${tag}[aria-label="${escapeAttributeValue(label)}"]`,
-  ].filter((selector): selector is string => Boolean(selector));
-  const own = getClassBasedSelector(el);
-  const reach = own ? countMatches(own) : Infinity;
+  if (path) {
+    return `${tag}[href="${escapeAttributeValue(path)}"]`;
+  }
 
-  return (
-    candidates.find(
-      selector => el.matches(selector) && countMatches(selector) <= reach
-    ) ?? null
-  );
+  const label = el.getAttribute('aria-label');
+
+  return label && isSharedLabel(label)
+    ? `${tag}[aria-label="${escapeAttributeValue(label)}"]`
+    : null;
 };
 
 export const getClassNames = (el: HTMLElement): Array<string> =>
@@ -117,20 +110,21 @@ export const classSelector = (el: HTMLElement, className: string | undefined) =>
     : null;
 
 /**
- * The first class that isn't hashed, so a stable but non-first class
- * doesn't lose out to a hashed one earlier in the list.
+ * The element's first authored class, else its first minified one, which
+ * a compiler keeps across the site's releases.
  */
-export const getNonHashedClassBasedSelector = (
-  el: HTMLElement
-): string | null =>
-  classSelector(
+export const getStableClassSelector = (el: HTMLElement): string | null => {
+  const classNames = getClassNames(el);
+
+  return classSelector(
     el,
-    getClassNames(el).find(candidate => !looksHashed(candidate))
+    classNames.find(name => !looksHashed(name)) ??
+      classNames.find(name => looksMinified(name))
   );
+};
 
 /**
- * Just the first class, hashed or not — the fallback once nothing more
- * stable (non-hashed class, test-id, name) is available.
+ * Just the first class, hashed or not.
  */
 export const getClassBasedSelector = (el: HTMLElement): string | null =>
   classSelector(el, getClassNames(el)[0]);
@@ -193,17 +187,39 @@ export const getStableIdBasedSelector = (el: HTMLElement): string | null => {
 };
 
 /**
- * A selector from a name that says what the element is, like `div.card` or
- * `input[name="q"]`. Skips #id, which only points at one element, and
- * hashed classes: an ancestor's name, as in `div.mw-heading h2`, makes a
- * better selector than those.
+ * The element's #id in place of its own class when at most half of the
+ * other elements with that class have ids, like `#sidebar` for
+ * `div.flex#sidebar`.
  */
-export function getDescriptiveSelector(el: HTMLElement): string | null {
-  return (
-    getSharedTestIdBasedSelector(el) ??
-    getNonHashedClassBasedSelector(el) ??
-    getTestIdBasedSelector(el) ??
-    getNameBasedSelector(el) ??
-    getStableClassPartsSelector(el)
+export const getIdOverSharedClass = (el: HTMLElement): string | null => {
+  const id = getStableIdBasedSelector(el);
+  const ownClass = getStableClassSelector(el);
+  if (!id || !ownClass || countMatches(id) !== 1) {
+    return null;
+  }
+
+  const others = matchesOf(ownClass).filter(match => match !== el);
+  const othersWithIds = others.filter(match =>
+    getStableIdBasedSelector(match as HTMLElement)
   );
-}
+
+  return others.length === 0 || othersWithIds.length > others.length / 2
+    ? null
+    : id;
+};
+
+/**
+ * A name that says what the element is, like `div.card` or
+ * `input[name="q"]`, rather than which one it is.
+ */
+export const getKindSelector = (el: HTMLElement): string | null =>
+  getSharedTestIdSelector(el) ??
+  getStableClassSelector(el) ??
+  getNameBasedSelector(el) ??
+  getStableClassPartsSelector(el);
+
+/**
+ * The element's own name: its #id over a shared class, else what it is.
+ */
+export const getOwnNameSelector = (el: HTMLElement): string | null =>
+  getIdOverSharedClass(el) ?? getKindSelector(el);

@@ -1,74 +1,88 @@
 import { looksHashedByShape } from '../hashed-class';
-import { countMatches, matchesOf } from './reach';
 import {
   classSelector,
   getClassBasedSelector,
   getClassNames,
-  getDescriptiveSelector,
   getIdBasedSelector,
+  getIdOverSharedClass,
   getLabelBasedSelector,
   getNameBasedSelector,
-  getNonHashedClassBasedSelector,
+  getSharedTestIdSelector,
+  getStableClassPartsSelector,
+  getStableClassSelector,
   getStableIdBasedSelector,
   getTestIdBasedSelector,
 } from './element-selectors';
 import {
   climbToNearestUsableAncestor,
+  getAncestorBasedSelector,
   getAncestorHashedClassSelector,
-  getAncestorScopeWithinOwnClass,
   getTagNameBasedSelector,
   isSweeping,
 } from './ancestor-selectors';
-import { getUniqueSelector } from './alternatives';
+import { getItemScopedSelector, getUniqueSelector } from './unique-selectors';
+
+type Strategy = (el: HTMLElement) => string | null;
 
 /**
- * The element's #id in place of its own class when at most half of the
- * other elements with that class have ids.
+ * Every way to name an element, most stable first: its own name, an
+ * ancestor's, its id or label, a generated class, then this one element
+ * alone. See docs/selectors.md.
  */
-const getIdOverSharedClass = (el: HTMLElement): string | null => {
-  const id = getStableIdBasedSelector(el);
-  const ownClass = getNonHashedClassBasedSelector(el);
-  if (!id || !ownClass || countMatches(id) !== 1) {
-    return null;
-  }
+const STRATEGIES: Array<Strategy> = [
+  getIdOverSharedClass,
+  getSharedTestIdSelector,
+  getStableClassSelector,
+  getNameBasedSelector,
+  getStableClassPartsSelector,
+  getAncestorBasedSelector,
+  getStableIdBasedSelector,
+  getLabelBasedSelector,
+  getClassBasedSelector,
+  getAncestorHashedClassSelector,
+  getUniqueSelector,
+];
 
-  const others = matchesOf(ownClass).filter(match => match !== el);
-  const othersWithIds = others.filter(
-    match => match instanceof HTMLElement && getStableIdBasedSelector(match)
-  );
-  if (others.length === 0 || othersWithIds.length > others.length / 2) {
-    return null;
+/**
+ * Whether a selector matches `el` without sweeping the page.
+ */
+const isUsable = (
+  el: HTMLElement,
+  selector: string | null
+): selector is string => {
+  try {
+    return (
+      Boolean(selector) &&
+      el.matches(selector as string) &&
+      !isSweeping(selector as string)
+    );
+  } catch {
+    return false;
   }
-
-  return id;
 };
 
 /**
- * The most stable selector for the element that doesn't sweep the page.
- * See docs/selectors.md.
+ * The first selector in the list that suits the element.
  */
 export const getSelector = (el: HTMLElement): string => {
-  const strategies: Array<(el: HTMLElement) => string | null> = [
-    getIdOverSharedClass,
-    getDescriptiveSelector,
-    getAncestorScopeWithinOwnClass,
-    getStableIdBasedSelector,
-    getLabelBasedSelector,
-    getClassBasedSelector,
-    getAncestorHashedClassSelector,
-    getTagNameBasedSelector,
-    getUniqueSelector,
-  ];
-
-  for (const strategy of strategies) {
+  for (const strategy of STRATEGIES) {
     const selector = strategy(el);
-    if (selector && !isSweeping(selector)) {
+    if (isUsable(el, selector)) {
       return selector;
     }
   }
 
-  return getTagNameBasedSelector(el);
+  return el.tagName.toLowerCase();
 };
+
+/**
+ * Every selector in the list that suits the element, plus the elements
+ * like it in the same row or card, for the selector field to offer.
+ */
+export const getSelectorCandidates = (el: HTMLElement): Array<string> =>
+  [...STRATEGIES, getItemScopedSelector]
+    .map(strategy => strategy(el))
+    .filter(selector => isUsable(el, selector));
 
 /**
  * The selector a body child got before partly hashed classes, newer hash

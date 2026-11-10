@@ -1,12 +1,6 @@
 import { getSubjectCompound } from '../get-subject-compound';
-import { looksMinified } from '../hashed-class';
 import { countMatches } from './reach';
-import {
-  classSelector,
-  getClassBasedSelector,
-  getClassNames,
-  getDescriptiveSelector,
-} from './element-selectors';
+import { getClassBasedSelector, getOwnNameSelector } from './element-selectors';
 
 export const getTagNameBasedSelector = (
   el: HTMLElement,
@@ -58,34 +52,18 @@ export function climbToNearestUsableAncestor(
 }
 
 /**
- * Like getTagNameBasedSelector, but stops at the nearest ancestor (within
- * 2 levels) with a real class/test-id/name, e.g. `div.mw-heading h2`.
+ * The element's tag scoped by its nearest ancestor (within 2 levels) that
+ * carries a name, e.g. `div.mw-heading h2`.
  */
 export const getAncestorBasedSelector = (el: HTMLElement): string | null =>
-  climbToNearestUsableAncestor(el, getDescriptiveSelector);
+  climbToNearestUsableAncestor(el, getOwnNameSelector);
 
 /**
- * The ancestor scope, unless it reaches more of the page than the element's
- * own minified class, as `div.ieodic div` does next to Google's `div.VwiC3b`.
+ * The same climb, scoping by an ancestor's first class even when hashed.
  */
-export function getAncestorScopeWithinOwnClass(el: HTMLElement): string | null {
-  const scope = getAncestorBasedSelector(el);
-  const [firstClass] = getClassNames(el);
-  const own =
-    firstClass && looksMinified(firstClass)
-      ? classSelector(el, firstClass)
-      : null;
-
-  return scope && own && countMatches(scope) > countMatches(own) ? null : scope;
-}
-
-/**
- * The same climb as getAncestorBasedSelector, but accepting a hashed
- * class too — only reached once nothing better is available anywhere.
- */
-export function getAncestorHashedClassSelector(el: HTMLElement): string | null {
-  return climbToNearestUsableAncestor(el, getClassBasedSelector);
-}
+export const getAncestorHashedClassSelector = (
+  el: HTMLElement
+): string | null => climbToNearestUsableAncestor(el, getClassBasedSelector);
 
 // Generic containers, whose "most of them" means most of the page; matching
 // most of a page's links or dates is a real choice.
@@ -107,29 +85,4 @@ export const isSweeping = (selector: string): boolean => {
 
   const matches = countMatches(selector);
   return matches >= MIN_SWEEP && matches > countMatches(subject) / 2;
-};
-
-/**
- * Scopes `el` by each of its nearest ancestors (up to 4 levels) that has a
- * class, test id or name of its own, e.g. `td.subtext a`: each is a step
- * wider or narrower than the others. The element keeps its own class if
- * it has one (`td.title span.sitestr`), since its bare tag says little.
- */
-export const getAncestorScopedSelectors = (el: HTMLElement): Array<string> => {
-  const subject = getDescriptiveSelector(el) ?? el.tagName.toLowerCase();
-  const selectors: Array<string> = [];
-  let ancestor = el.parentElement;
-
-  for (let level = 0; ancestor && level < 4; level++) {
-    const own =
-      getDescriptiveSelector(ancestor) ?? getClassBasedSelector(ancestor);
-
-    if (own) {
-      selectors.push(`${own} ${subject}`);
-    }
-
-    ancestor = ancestor.parentElement;
-  }
-
-  return selectors;
 };

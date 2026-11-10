@@ -4,7 +4,7 @@ import {
   getTestIdBasedSelector,
   getNameBasedSelector,
   getLabelBasedSelector,
-  getNonHashedClassBasedSelector,
+  getStableClassSelector,
   getClassBasedSelector,
   getStableClassPartsSelector,
   getIdBasedSelector,
@@ -92,41 +92,39 @@ describe('element-selectors', () => {
     });
   });
 
-  describe('getNonHashedClassBasedSelector', () => {
+  describe('getStableClassSelector', () => {
     it('returns null when the element has no class attribute', () => {
       const el = document.createElement('div');
-      expect(getNonHashedClassBasedSelector(el)).toBeNull();
+      expect(getStableClassSelector(el)).toBeNull();
     });
 
     it('uses only the first class when the element has several', () => {
       const el = document.createElement('div');
       el.setAttribute('class', 'foo bar');
 
-      expect(getNonHashedClassBasedSelector(el)).toBe('div.foo');
+      expect(getStableClassSelector(el)).toBe('div.foo');
     });
 
     it('collapses repeated whitespace before picking the first class', () => {
       const el = document.createElement('div');
       el.setAttribute('class', '   foo    bar');
 
-      expect(getNonHashedClassBasedSelector(el)).toBe('div.foo');
+      expect(getStableClassSelector(el)).toBe('div.foo');
     });
 
     it('escapes tailwind-style colons in the class name (#820)', () => {
       const el = document.createElement('p');
       el.setAttribute('class', 'sm:text-xl text-gray-200');
 
-      expect(getNonHashedClassBasedSelector(el)).toBe('p.sm\\:text-xl');
-      expect(
-        validateSelector(getNonHashedClassBasedSelector(el) as string)
-      ).toBe(true);
+      expect(getStableClassSelector(el)).toBe('p.sm\\:text-xl');
+      expect(validateSelector(getStableClassSelector(el) as string)).toBe(true);
     });
 
     it('escapes other tailwind-style special characters, like slashes and brackets', () => {
       const el = document.createElement('div');
       el.setAttribute('class', 'bg-black/50 top-[10px]');
 
-      const selector = getNonHashedClassBasedSelector(el);
+      const selector = getStableClassSelector(el);
       expect(selector).toBe('div.bg-black\\/50');
       expect(validateSelector(selector as string)).toBe(true);
     });
@@ -138,7 +136,7 @@ describe('element-selectors', () => {
       const el = document.createElement('div');
       el.setAttribute('class', 'sm:text-xl');
 
-      expect(getNonHashedClassBasedSelector(el)).toBe('div.escaped-sm:text-xl');
+      expect(getStableClassSelector(el)).toBe('div.escaped-sm:text-xl');
       expect(escape).toHaveBeenCalledWith('sm:text-xl');
 
       delete (global as any).CSS;
@@ -146,37 +144,37 @@ describe('element-selectors', () => {
 
     it('returns null when the only class looks build-tool-generated', () => {
       const el = document.createElement('a');
-      el.setAttribute('class', 'WwrzSb');
+      el.setAttribute('class', 'css-1q2w3e');
 
-      expect(getNonHashedClassBasedSelector(el)).toBeNull();
+      expect(getStableClassSelector(el)).toBeNull();
     });
 
     it('skips a hashed class and uses the next usable one', () => {
       const el = document.createElement('div');
       el.setAttribute('class', 'XlKvRb primary-nav');
 
-      expect(getNonHashedClassBasedSelector(el)).toBe('div.primary-nav');
+      expect(getStableClassSelector(el)).toBe('div.primary-nav');
     });
 
     it('treats a hex-like hash as build-tool-generated too', () => {
       const el = document.createElement('div');
       el.setAttribute('class', 'a1b2c3');
 
-      expect(getNonHashedClassBasedSelector(el)).toBeNull();
+      expect(getStableClassSelector(el)).toBeNull();
     });
 
     it('treats a common CSS-in-JS prefix as build-tool-generated', () => {
       const el = document.createElement('div');
       el.setAttribute('class', 'css-1a2b3c');
 
-      expect(getNonHashedClassBasedSelector(el)).toBeNull();
+      expect(getStableClassSelector(el)).toBeNull();
     });
 
     it('does not mistake an authored camelCase class for a hash', () => {
       const el = document.createElement('button');
       el.setAttribute('class', 'primaryButton');
 
-      expect(getNonHashedClassBasedSelector(el)).toBe('button.primaryButton');
+      expect(getStableClassSelector(el)).toBe('button.primaryButton');
     });
   });
 
@@ -194,7 +192,7 @@ describe('element-selectors', () => {
       const el = document.createElement('div');
       el.setAttribute('class', 'Card_body__a1B2c card-body');
 
-      expect(getNonHashedClassBasedSelector(el)).toBe('div.card-body');
+      expect(getStableClassSelector(el)).toBe('div.card-body');
     });
 
     it('skips the stable parts when they match more than the full class', () => {
@@ -238,9 +236,9 @@ describe('element-selectors', () => {
 
     it('uses the first class even when it looks build-tool-generated', () => {
       const el = document.createElement('a');
-      el.setAttribute('class', 'WwrzSb');
+      el.setAttribute('class', 'css-1q2w3e');
 
-      expect(getClassBasedSelector(el)).toBe('a.WwrzSb');
+      expect(getClassBasedSelector(el)).toBe('a.css-1q2w3e');
     });
 
     it('escapes special characters in the class name', () => {
@@ -316,16 +314,6 @@ describe('element-selectors', () => {
       expect(getLabelBasedSelector(el)).toBeNull();
       el.setAttribute('aria-label', 'Account ann@example.com');
       expect(getLabelBasedSelector(el)).toBeNull();
-    });
-
-    it('is null while it would match more than the own class does', () => {
-      document.body.innerHTML =
-        '<button class="css-abc12d" aria-label="Next"></button>' +
-        '<button class="css-other1" aria-label="Next"></button>';
-
-      expect(
-        getLabelBasedSelector(document.body.firstElementChild as HTMLElement)
-      ).toBeNull();
     });
   });
 });

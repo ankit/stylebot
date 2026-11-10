@@ -72,7 +72,7 @@ describe('ancestor-selectors', () => {
 
     it("uses an ancestor's test-id over a hashed class", () => {
       document.body.innerHTML = `
-        <section class="WwrzSb" data-testid="card">
+        <section class="css-1q2w3e" data-testid="card">
           <article>
             <span id="target"></span>
           </article>
@@ -87,7 +87,7 @@ describe('ancestor-selectors', () => {
 
     it('returns null when the nearest ancestor only has a hashed class', () => {
       document.body.innerHTML = `
-        <section class="WwrzSb">
+        <section class="css-1q2w3e">
           <article>
             <span id="target"></span>
           </article>

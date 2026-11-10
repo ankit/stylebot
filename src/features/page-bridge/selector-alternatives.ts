@@ -10,13 +10,9 @@ import { getAppliedDeclarations } from './applied-declarations';
 
 const PAGE_WIDE_SELECTOR = /^\s*(\*|html|body|:root)\s*$/i;
 
-// Tags only, two or more deep (td span a): hard to read and brittle.
-const TAG_CHAIN = /^[a-z][\w-]*(\s+[a-z][\w-]*)+$/i;
-
 /**
  * The style's own selectors that match `el`, then generated ones that
  * reach a different set of elements than the current selector and those.
- * Bare tag chains are left out as noise when anything more readable exists.
  */
 export const getSelectorAlternatives = (
   el: HTMLElement,
@@ -31,14 +27,12 @@ export const getSelectorAlternatives = (
     ...matching.filter(s => !PAGE_WIDE_SELECTOR.test(s)),
     ...matching.filter(s => PAGE_WIDE_SELECTOR.test(s) && winning.has(s)),
   ];
-  const generated = getSelectorCandidates(el);
-  const readable = generated.filter(s => !TAG_CHAIN.test(s));
   // The style's rules are all kept, each with its own values; only the
   // generated ones give way to anything that already covers their reach.
   const kept = dedupeByMatches([
     selector,
     ...existing,
-    ...(readable.some(s => /[.#[]/.test(s)) ? readable : generated),
+    ...getSelectorCandidates(el),
   ]);
 
   return {

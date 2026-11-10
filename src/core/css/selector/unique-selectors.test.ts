@@ -1,50 +1,45 @@
 import { dedupeByMatches, byReach } from './reach';
-import {
-  getUniqueSelector,
-  getItemScopedSelector,
-  getSelectorCandidates,
-} from './alternatives';
+import { getUniqueSelector, getItemScopedSelector } from './unique-selectors';
+import { getSelectorCandidates } from './get-selector';
 
 describe('getSelectorCandidates, dedupeByMatches and byReach', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
 
-  it('offers wider and narrower selectors, keeping one per reach', () => {
+  it('offers each strategy that matches, keeping one per reach', () => {
     document.body.innerHTML = `
       <table><tr><td class="subtext">
-        <span class="subline"><span class="age"><a id="first">1</a></span></span>
+        <span class="age"><a class="css-1q2w3e">1</a></span>
       </td></tr></table>
-      <a>other</a>
+      <a class="css-1q2w3e">other</a>
     `;
-    const el = document.getElementById('first') as HTMLElement;
+    const el = document.querySelector('span.age a') as HTMLElement;
     const candidates = getSelectorCandidates(el);
 
     expect(candidates).toEqual(
-      expect.arrayContaining(['span.age a', 'td.subtext a', 'a'])
+      expect.arrayContaining(['span.age a', 'a.css-1q2w3e'])
     );
     candidates.forEach(selector => expect(el.matches(selector)).toBe(true));
 
-    // span span a matches exactly what span.age a does.
-    const kept = dedupeByMatches(['span.age a', ...candidates]);
-    expect(kept).toContain('span.age a');
-    expect(kept).not.toContain('span span a');
-
-    expect(byReach(kept).at(-1)).toBe('a');
+    const kept = dedupeByMatches(candidates);
+    expect(kept).toHaveLength(new Set(kept).size);
+    expect(byReach(kept).at(-1)).toBe('a.css-1q2w3e');
   });
 
-  it("skips bare container tags and scopes by the element's own class", () => {
+  it('leaves out bare tags and tag chains', () => {
     document.body.innerHTML = `
       <table><tr><td class="title">
-        <span class="sitestr" id="site">site</span>
+        <span class="sitestr">site</span>
       </td></tr></table>
     `;
     const candidates = getSelectorCandidates(
-      document.getElementById('site') as HTMLElement
+      document.querySelector('.sitestr') as HTMLElement
     );
 
     expect(candidates).not.toContain('span');
-    expect(candidates).toContain('td.title span.sitestr');
+    expect(candidates).not.toContain('tr td span');
+    expect(candidates).toContain('span.sitestr');
   });
 });
 
