@@ -49,7 +49,6 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .button {
   display: inline-flex;
-  min-height: var(--button-min-height, auto);
   align-items: center;
   justify-content: center;
   gap: 6px;
@@ -70,6 +69,7 @@ export default Vue.extend({
   }
 
   @include focus-ring;
+  @include touch-target;
 }
 
 .button.size-small {

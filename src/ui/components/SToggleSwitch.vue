@@ -71,7 +71,6 @@ export default Vue.extend({
 .switch {
   display: flex;
   align-items: center;
-  min-height: var(--toggle-switch-min-height, auto);
   gap: 12px;
   width: 100%;
   cursor: pointer;
@@ -86,6 +85,8 @@ export default Vue.extend({
   &.disabled {
     cursor: default;
   }
+
+  @include touch-target;
 
   @include dark-mode {
     --track-off: #3d4048;

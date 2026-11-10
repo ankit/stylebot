@@ -201,9 +201,6 @@ a {
   }
 
   @include touch {
-    --button-min-height: 44px;
-    --icon-button-min-size: 44px;
-    --toggle-switch-min-height: 44px;
     --options-field-height: 44px;
     --options-input-font-size: 16px;
   }

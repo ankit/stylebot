@@ -15,7 +15,6 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .link-button {
   flex: none;
-  min-height: var(--button-min-height, auto);
   padding: 0;
   border: 0;
   border-radius: 3px;
@@ -34,5 +33,6 @@ export default Vue.extend({
   }
 
   @include focus-ring(2px);
+  @include touch-target;
 }
 </style>

@@ -67,9 +67,9 @@ export default Vue.extend({
 
   computed: {
     sizeStyle(): Record<string, string> | undefined {
-      const size = `max(var(--icon-button-min-size, 0px), ${this.size}px)`;
-
-      return this.size ? { width: size, height: size } : undefined;
+      return this.size
+        ? { width: `${this.size}px`, height: `${this.size}px` }
+        : undefined;
     },
 
     ariaLabel(): string {
@@ -104,6 +104,7 @@ export default Vue.extend({
   }
 
   @include focus-ring;
+  @include touch-target;
 
   &.bordered {
     width: 46px;

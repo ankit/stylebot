@@ -5,7 +5,11 @@ import {
   optionsPage,
   seededStyles,
 } from '@stylebot/storybook/fixtures/options';
-import { findOpenMenu, user } from '@stylebot/storybook/story-helpers';
+import {
+  findOpenMenu,
+  hasTouchTarget,
+  user,
+} from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
   title: 'Tests/Options/Touch',
@@ -55,9 +59,7 @@ export const TabsAcrossTheTop: StoryObj = {
       name: 'More actions',
     });
 
-    await expect(menu.getBoundingClientRect().height).toBeGreaterThanOrEqual(
-      44
-    );
+    await expect(hasTouchTarget(menu)).toBe(true);
   }),
   name: 'on a phone the sections become a row of tabs above full-width content, with 44pt targets',
 };
@@ -93,9 +95,7 @@ export const NoCssEditingOnIPhone: StoryObj = {
 
     const toggle = rowCanvas.getByRole('checkbox').closest('label');
 
-    await expect(
-      (toggle as HTMLElement).getBoundingClientRect().height
-    ).toBeGreaterThanOrEqual(44);
+    await expect(hasTouchTarget(toggle as HTMLElement)).toBe(true);
 
     await user.click(rowCanvas.getByRole('button', { name: 'More actions' }));
 
