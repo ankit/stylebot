@@ -88,9 +88,9 @@ import { listProfiles } from '@stylebot/saved-styles';
 
 import StyleListRow from './styles/StyleListRow.vue';
 import StylesBulkMenu from './styles/StylesBulkMenu.vue';
-import { SupportsEditorVue, injectSupportsEditor } from '../supports-editor';
+import { OptionsVue, injectSupportsEditor } from '../supports-editor';
 
-export default SupportsEditorVue.extend({
+export default OptionsVue.extend({
   name: 'TheStylesTab',
 
   inject: injectSupportsEditor,

@@ -56,9 +56,9 @@ import {
 
 import SiteIcon from '../site/SiteIcon.vue';
 import StyleRowMenu from './StyleRowMenu.vue';
-import { SupportsEditorVue, injectSupportsEditor } from '../../supports-editor';
+import { OptionsVue, injectSupportsEditor } from '../../supports-editor';
 
-export default SupportsEditorVue.extend({
+export default OptionsVue.extend({
   name: 'StyleListRow',
 
   inject: injectSupportsEditor,

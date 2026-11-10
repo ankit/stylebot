@@ -14,8 +14,8 @@ export const provideSupportsEditor = (): { supportsEditor: boolean } => ({
 export const injectSupportsEditor = { supportsEditor: { default: true } };
 
 /**
- * Vue, typed for a component that injects `supportsEditor`.
+ * Vue for an Options page component, typed with what App provides.
  */
-export const SupportsEditorVue = Vue as VueConstructor<
+export const OptionsVue = Vue as VueConstructor<
   Vue & { supportsEditor: boolean }
 >;

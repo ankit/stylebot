@@ -27,9 +27,9 @@ import TheActiveStyleBadge from './basics/TheActiveStyleBadge.vue';
 import TheGallerySuggestions from './basics/TheGallerySuggestions.vue';
 import TheCliAccess from './basics/TheCliAccess.vue';
 import TheKeyboardShortcuts from './basics/TheKeyboardShortcuts.vue';
-import { SupportsEditorVue, injectSupportsEditor } from '../supports-editor';
+import { OptionsVue, injectSupportsEditor } from '../supports-editor';
 
-export default SupportsEditorVue.extend({
+export default OptionsVue.extend({
   name: 'TheBasicsTab',
 
   inject: injectSupportsEditor,

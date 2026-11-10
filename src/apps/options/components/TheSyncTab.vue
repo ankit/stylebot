@@ -93,14 +93,14 @@ import ImportBackupDialog from './sync/ImportBackupDialog.vue';
 
 import { downloadBackup, pickBackupFile } from '../backup';
 import type { SyncStatus } from '../store/index';
-import { SupportsEditorVue, injectSupportsEditor } from '../supports-editor';
+import { OptionsVue, injectSupportsEditor } from '../supports-editor';
 
 type PendingImport = {
   styles: StyleMap;
   preview: ImportPreview;
 };
 
-export default SupportsEditorVue.extend({
+export default OptionsVue.extend({
   name: 'TheSyncTab',
 
   inject: injectSupportsEditor,

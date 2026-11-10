@@ -144,9 +144,9 @@ import {
   formatSyncTime,
 } from '@stylebot/sync';
 
-import { SupportsEditorVue, injectSupportsEditor } from '../../supports-editor';
+import { OptionsVue, injectSupportsEditor } from '../../supports-editor';
 
-export default SupportsEditorVue.extend({
+export default OptionsVue.extend({
   name: 'TheGoogleDriveSync',
 
   inject: injectSupportsEditor,

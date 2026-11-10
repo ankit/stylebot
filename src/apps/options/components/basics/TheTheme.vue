@@ -32,9 +32,9 @@
 import { SListItem, SSegmentedControl, SText } from '@stylebot/components';
 import { MonitorIcon, MoonIcon, SunIcon } from '@stylebot/icons';
 import type { StylebotAppearance } from '@stylebot/types';
-import { SupportsEditorVue, injectSupportsEditor } from '../../supports-editor';
+import { OptionsVue, injectSupportsEditor } from '../../supports-editor';
 
-export default SupportsEditorVue.extend({
+export default OptionsVue.extend({
   name: 'TheTheme',
 
   inject: injectSupportsEditor,
