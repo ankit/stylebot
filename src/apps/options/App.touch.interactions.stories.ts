@@ -62,19 +62,21 @@ export const TabsAcrossTheTop: StoryObj = {
   name: 'on a phone the sections become a row of tabs above full-width content, with 44pt targets',
 };
 
-export const NoEditorSettingsOnIPhone: StoryObj = {
-  ...optionsPage('Basics'),
+export const NoBasicsOnIPhone: StoryObj = {
+  render: optionsPage('Basics').render,
   loaders: onIPhone,
-  name: 'on iPhone Basics leaves out the theme, editor position, right-click menu and keyboard shortcuts',
+  name: 'on iPhone Options opens on Styles and leaves out the Basics tab',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    const tabs = Array.from(
+      canvasElement.querySelectorAll<HTMLElement>('.nav-item')
+    ).map(tab => tab.textContent?.trim());
 
-    await canvas.findByText('Gallery suggestions');
+    await expect(tabs).toEqual(['Styles', 'Version history', 'Sync']);
 
-    await expect(canvas.queryByText('Theme')).toBeNull();
-    await expect(canvas.queryByText('Editor position')).toBeNull();
-    await expect(canvas.queryByText('Right-click menu')).toBeNull();
-    await expect(canvas.queryByText('Keyboard shortcuts')).toBeNull();
+    const stylesTab = await canvas.findByRole('button', { name: 'Styles' });
+
+    await expect(stylesTab).toHaveClass('active');
   },
 };
 

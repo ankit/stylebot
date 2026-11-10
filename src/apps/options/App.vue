@@ -34,7 +34,7 @@ import { SThemeProvider } from '@stylebot/components';
 
 import TheNavigation from './components/TheNavigation.vue';
 import TheNavigationFooter from './components/navigation/TheNavigationFooter.vue';
-import { TABS } from './router';
+import { visibleTabs } from './router';
 import { provideOptions } from './options-vue';
 
 export default Vue.extend({
@@ -53,7 +53,7 @@ export default Vue.extend({
     stylesLoaded: boolean;
   } {
     return {
-      tabs: [...TABS],
+      tabs: visibleTabs(),
       stylesLoaded: false,
     };
   },

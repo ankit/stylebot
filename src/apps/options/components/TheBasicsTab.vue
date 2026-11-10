@@ -5,20 +5,22 @@
     </s-heading>
 
     <s-list>
-      <the-theme v-if="supportsEditor" />
-      <the-position v-if="supportsEditor" />
-      <the-context-menu v-if="supportsEditor" />
+      <the-theme />
+      <the-position />
+      <the-context-menu />
       <the-active-style-badge v-if="showActiveStyleBadge" />
       <the-gallery-suggestions />
     </s-list>
 
     <the-cli-access v-if="showCliAccess" />
 
-    <the-keyboard-shortcuts v-if="supportsEditor" />
+    <the-keyboard-shortcuts />
   </div>
 </template>
 
 <script lang="ts">
+import Vue from 'vue';
+
 import { SHeading, SList } from '@stylebot/components';
 import { supportsCLI } from '@stylebot/settings';
 import { isSafari } from '@stylebot/utils';
@@ -29,9 +31,8 @@ import TheActiveStyleBadge from './basics/TheActiveStyleBadge.vue';
 import TheGallerySuggestions from './basics/TheGallerySuggestions.vue';
 import TheCliAccess from './basics/TheCliAccess.vue';
 import TheKeyboardShortcuts from './basics/TheKeyboardShortcuts.vue';
-import { OptionsVue } from '../options-vue';
 
-export default OptionsVue.extend({
+export default Vue.extend({
   name: 'TheBasicsTab',
 
   components: {
