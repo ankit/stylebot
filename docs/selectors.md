@@ -16,8 +16,8 @@ name on purpose.
 flowchart TB
     subgraph authored["Authored, on the element"]
         direction LR
-        S1["<b>1 · test id</b><br/><code>button[data-testid='submit']</code><br/><i>also data-test-id, data-test, data-cy,<br/>data-qa; not one per item: row-7;<br/>the #id instead when it wins in 2</i>"]
-        S2["<b>2 · class</b><br/><code>div.card</code><br/><i>first one not hashed: .WwrzSb.card → div.card;<br/>its #id instead when most others<br/>with the class have none: div.flex#sidebar</i>"]
+        S1["<b>1 · test id</b><br/><code>button[data-testid='submit']</code><br/><i>also data-test-id, data-test, data-cy,<br/>data-qa; one per item, like row-7,<br/>only after 2; the #id instead<br/>when it wins in 2</i>"]
+        S2["<b>2 · class</b><br/><code>div.card</code><br/><i>first one not hashed: .WwrzSb.card → div.card;<br/>its unique #id instead when most others<br/>with the class have none: #sidebar</i>"]
         S3["<b>3 · name</b><br/><code>input[name='q']</code>"]
         S4["<b>4 · authored part of a class</b><br/><code>nav[class*='Header_nav__']</code><br/><i>from Header_nav__a1B2c, while it<br/>matches what the full class does</i>"]
         S1 --> S2 --> S3 --> S4
@@ -138,18 +138,29 @@ How the shapes are told apart:
 
 ## Other selectors for the element
 
-The selector field also offers the other strategies' selectors for the picked
-element, narrowest first, keeping one per set of matched elements, each
-with how many elements it matches. The list always starts with:
+The selector field also offers other selectors for the picked element, each
+with how many elements it matches. The user's own rules that match it come
+first. Then the generated ones, narrowest first, keeping one per set of
+matched elements and leaving out any that sweep the page:
 
 - **Only this element** — its `#id` when that's unique and not generated,
   otherwise the element and its ancestors, each positioned with
   `:nth-of-type` where a sibling would also match, climbing until only this
-  element matches or an ancestor has a unique `#id`. Positions shift when a list reorders, so this
-  is the least stable choice.
+  element matches or an ancestor has a unique `#id`. Positions shift when a
+  list reorders, so this is the least stable choice.
 - **This item** — elements like it inside the nearest repeated ancestor (a
   row, list item or card), e.g. `tr.athing:nth-of-type(3) a` for every link
   in one row.
+- **Every strategy above** that matches the element, including a per-item
+  test id that the ranking passed over.
+- **Each named ancestor, up to 4 levels** — the element scoped by each
+  ancestor with a class, test id or name, keeping its own class when it has
+  one, e.g. `td.subtext a` or `td.title span.sitestr`.
+- **Its bare tag**, for tags that say what an element is (`a`, `li`, `h2`,
+  `button`, …), not `div` or `span`.
+
+A tag chain like `td span a` is offered only when none of the generated
+selectors has a class, id or attribute.
 
 ## Reusing existing rules
 
