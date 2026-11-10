@@ -1,6 +1,8 @@
 <template>
   <div class="history-tab">
-    <s-heading as="h1" size="xl">{{ t('history_options') }}</s-heading>
+    <s-heading as="h1" size="xl" class="heading">
+      {{ t('history_options') }}
+    </s-heading>
     <s-text variant="muted" size="large" class="description">
       {{ t('history_tab_description') }}
     </s-text>
@@ -41,5 +43,11 @@ export default Vue.extend({
   display: block;
   margin-top: 8px;
   max-width: 520px;
+}
+
+.heading {
+  @include phone {
+    @include visually-hidden;
+  }
 }
 </style>

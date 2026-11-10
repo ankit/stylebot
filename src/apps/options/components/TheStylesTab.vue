@@ -2,7 +2,9 @@
   <div class="styles-tab">
     <div class="header">
       <div class="title-block">
-        <s-heading as="h1" size="xl">{{ t('styles_options') }}</s-heading>
+        <s-heading as="h1" size="xl" class="heading">
+          {{ t('styles_options') }}
+        </s-heading>
         <s-text variant="muted" size="large" class="subtitle">
           {{
             t(totalCount === 1 ? 'sites_count_one' : 'sites_count_other', [
@@ -258,5 +260,11 @@ export default OptionsVue.extend({
 .empty {
   margin-top: 32px;
   text-align: center;
+}
+
+.heading {
+  @include phone {
+    @include visually-hidden;
+  }
 }
 </style>

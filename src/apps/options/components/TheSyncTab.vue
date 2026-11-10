@@ -44,7 +44,9 @@
     </s-callout>
 
     <div>
-      <s-heading as="h1" size="xl">{{ t('sync_options') }}</s-heading>
+      <s-heading as="h1" size="xl" class="heading">
+        {{ t('sync_options') }}
+      </s-heading>
       <s-text variant="muted" size="large" class="description">
         {{ t('sync_tab_description') }}
       </s-text>
@@ -256,5 +258,11 @@ export default OptionsVue.extend({
   display: flex;
   gap: 8px;
   margin-top: 14px;
+}
+
+.heading {
+  @include phone {
+    @include visually-hidden;
+  }
 }
 </style>

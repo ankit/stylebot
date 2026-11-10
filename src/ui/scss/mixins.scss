@@ -95,6 +95,16 @@
   }
 }
 
+// Hidden from view but still read by screen readers.
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 // Touchscreens without hover, e.g. Safari on iPhone and iPad, where controls
 // revealed on hover must always show; put it with the nested rules.
 @mixin touch {
@@ -104,7 +114,8 @@
 }
 
 // A tap area of at least 44px on touchscreens without resizing the control,
-// for standalone controls; put it with the nested rules.
+// for standalone controls; put it with the nested rules. A control using
+// button-reset needs its own position: relative, as all: unset outranks it.
 @mixin touch-target {
   @include touch {
     @at-root :where(#{&}) {

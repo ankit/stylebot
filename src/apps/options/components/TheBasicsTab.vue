@@ -1,6 +1,8 @@
 <template>
   <div v-if="optionsLoaded" class="basics-tab">
-    <s-heading as="h1" size="xl">{{ t('basics_options') }}</s-heading>
+    <s-heading as="h1" size="xl" class="heading">
+      {{ t('basics_options') }}
+    </s-heading>
 
     <s-list>
       <the-theme />
@@ -70,6 +72,12 @@ export default OptionsVue.extend({
 
   @include phone {
     padding: 16px 16px 24px;
+  }
+}
+
+.heading {
+  @include phone {
+    @include visually-hidden;
   }
 }
 </style>

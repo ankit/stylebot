@@ -43,9 +43,7 @@ export const TabsAcrossTheTop: StoryObj = {
     await expect(tops.size).toBe(1);
 
     for (const tab of tabs) {
-      await expect(tab.getBoundingClientRect().height).toBeGreaterThanOrEqual(
-        44
-      );
+      await expect(hasTouchTarget(tab)).toBe(true);
     }
 
     const content = root.querySelector('.content') as HTMLElement;

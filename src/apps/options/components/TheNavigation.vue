@@ -79,6 +79,7 @@ export default Vue.extend({
 
   @include phone {
     flex-direction: row;
+    padding: 6px 0;
   }
 }
 
@@ -112,11 +113,14 @@ export default Vue.extend({
   }
 
   @include phone {
+    position: relative;
     width: auto;
     padding: 0 12px;
     font-size: 15px;
-    line-height: 44px;
+    line-height: 32px;
     white-space: nowrap;
+
+    @include touch-target;
   }
 }
 </style>
