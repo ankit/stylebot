@@ -16,8 +16,8 @@ name on purpose.
 flowchart TB
     subgraph authored["Authored, on the element"]
         direction LR
-        S1["<b>1 · class</b><br/><code>div.card</code><br/><i>first one not hashed: .WwrzSb.card → div.card;<br/>its #id instead when most others<br/>with the class have none: div.flex#sidebar</i>"]
-        S2["<b>2 · test id</b><br/><code>button[data-testid='submit']</code><br/><i>also data-test-id, data-test,<br/>data-cy, data-qa</i>"]
+        S1["<b>1 · test id</b><br/><code>button[data-testid='submit']</code><br/><i>also data-test-id, data-test, data-cy,<br/>data-qa; not one per item: row-7;<br/>the #id instead when it wins in 2</i>"]
+        S2["<b>2 · class</b><br/><code>div.card</code><br/><i>first one not hashed: .WwrzSb.card → div.card;<br/>its #id instead when most others<br/>with the class have none: div.flex#sidebar</i>"]
         S3["<b>3 · name</b><br/><code>input[name='q']</code>"]
         S4["<b>4 · authored part of a class</b><br/><code>nav[class*='Header_nav__']</code><br/><i>from Header_nav__a1B2c, while it<br/>matches what the full class does</i>"]
         S1 --> S2 --> S3 --> S4
