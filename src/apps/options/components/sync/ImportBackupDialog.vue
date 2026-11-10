@@ -70,8 +70,10 @@ export default Vue.extend({
   white-space: nowrap;
   cursor: pointer;
 
-  &:hover {
-    text-decoration: underline;
+  @include hover-capable {
+    &:hover {
+      text-decoration: underline;
+    }
   }
 
   @include focus-ring(2px);

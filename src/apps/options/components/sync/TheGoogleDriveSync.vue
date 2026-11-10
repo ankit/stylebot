@@ -31,6 +31,7 @@
 
         <s-button
           v-if="googleDriveSyncEnabled && needsAuth && !syncInProgress"
+          class="header-action"
           variant="primary"
           @click="syncWithGoogleDrive"
         >
@@ -38,6 +39,7 @@
         </s-button>
         <s-button
           v-else-if="googleDriveSyncEnabled"
+          class="header-action"
           :disabled="syncInProgress"
           @click="syncWithGoogleDrive"
         >
@@ -108,7 +110,11 @@
       <ul class="conflict-list">
         <li v-for="conflict in conflicts" :key="conflict.url" class="conflict">
           <span class="conflict-url">{{ conflict.url }}</span>
-          <s-button variant="ghost" @click="$emit('edit', conflict.url)">
+          <s-button
+            v-if="supportsEditor"
+            variant="ghost"
+            @click="$emit('edit', conflict.url)"
+          >
             {{ t('sync_conflict_review') }}
           </s-button>
           <s-button variant="ghost" @click="dismissConflict(conflict.url)">
@@ -121,7 +127,6 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
 import {
   SBadge,
   SButton,
@@ -139,7 +144,9 @@ import {
   formatSyncTime,
 } from '@stylebot/sync';
 
-export default Vue.extend({
+import { OptionsVue } from '../../options-vue';
+
+export default OptionsVue.extend({
   name: 'TheGoogleDriveSync',
 
   components: {
@@ -230,15 +237,29 @@ export default Vue.extend({
   padding: 14px 18px;
   background: var(--hover-tint);
   border-bottom: 1px solid var(--panel-border);
+
+  @include phone {
+    flex-wrap: wrap;
+  }
 }
 
 .status {
-  flex: 1;
+  flex: 1 1 0%;
   min-width: 0;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 5px 10px;
+
+  @include phone {
+    flex-basis: 100%;
+  }
+}
+
+.header-action {
+  @include phone {
+    flex-grow: 1;
+  }
 }
 
 .title {
@@ -294,21 +315,33 @@ export default Vue.extend({
 .row {
   display: flex;
   align-items: baseline;
-  gap: 16px;
+  gap: 4px 16px;
+
+  @include phone {
+    flex-wrap: wrap;
+  }
 
   dt {
     flex: none;
     width: 110px;
     font-size: 13px;
     color: var(--text-muted);
+
+    @include phone {
+      width: 100%;
+    }
   }
 
   dd {
-    flex: 1;
+    flex: 1 1 0%;
     min-width: 0;
     margin: 0;
     font-size: 14px;
     line-height: 1.45;
+
+    @include phone {
+      flex-basis: 100%;
+    }
   }
 }
 
@@ -331,9 +364,12 @@ export default Vue.extend({
   font-size: 13px;
   color: var(--accent-text);
   text-decoration: none;
+  overflow-wrap: anywhere;
 
-  &:hover {
-    text-decoration: underline;
+  @include hover-capable {
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }
 

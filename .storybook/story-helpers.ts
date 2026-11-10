@@ -241,6 +241,26 @@ export const pageStyle = (
   ).getPropertyValue(property);
 
 /**
+ * Whether taps 21px out from a control's centre on each side, the edges of
+ * a 44pt square, still land on it.
+ */
+export const hasTouchTarget = (control: HTMLElement): boolean => {
+  const { left, top, width, height } = control.getBoundingClientRect();
+  const x = left + width / 2;
+  const y = top + height / 2;
+  const taps = [
+    [x, y - 21],
+    [x, y + 21],
+    [x - 21, y],
+    [x + 21, y],
+  ];
+
+  return taps.every(([tapX, tapY]) =>
+    control.contains(document.elementFromPoint(tapX, tapY))
+  );
+};
+
+/**
  * The control column of a basic-mode property row, found by its label.
  */
 export const propertyControl = (canvas: Canvas, label: string): HTMLElement =>

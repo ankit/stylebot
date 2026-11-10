@@ -44,7 +44,9 @@
     </s-callout>
 
     <div>
-      <s-heading as="h1" size="xl">{{ t('sync_options') }}</s-heading>
+      <s-heading as="h1" size="xl" class="heading">
+        {{ t('sync_options') }}
+      </s-heading>
       <s-text variant="muted" size="large" class="description">
         {{ t('sync_tab_description') }}
       </s-text>
@@ -80,8 +82,6 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-
 import { SButton, SCallout, SHeading, SText } from '@stylebot/components';
 import type { ImportPreview } from '@stylebot/saved-styles';
 import {
@@ -95,13 +95,14 @@ import ImportBackupDialog from './sync/ImportBackupDialog.vue';
 
 import { downloadBackup, pickBackupFile } from '../backup';
 import type { SyncStatus } from '../store/index';
+import { OptionsVue } from '../options-vue';
 
 type PendingImport = {
   styles: StyleMap;
   preview: ImportPreview;
 };
 
-export default Vue.extend({
+export default OptionsVue.extend({
   name: 'TheSyncTab',
 
   components: {
@@ -238,6 +239,10 @@ export default Vue.extend({
 .sync-tab {
   max-width: 760px;
   padding: 20px 22px 26px;
+
+  @include phone {
+    padding: 16px 16px 24px;
+  }
 }
 
 .description {
@@ -253,5 +258,11 @@ export default Vue.extend({
   display: flex;
   gap: 8px;
   margin-top: 14px;
+}
+
+.heading {
+  @include phone {
+    @include visually-hidden;
+  }
 }
 </style>

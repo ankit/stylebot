@@ -86,6 +86,8 @@ export default Vue.extend({
     cursor: default;
   }
 
+  @include touch-target;
+
   @include dark-mode {
     --track-off: #3d4048;
     --thumb-on: #fff;

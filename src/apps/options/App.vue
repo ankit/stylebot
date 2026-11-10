@@ -34,7 +34,8 @@ import { SThemeProvider } from '@stylebot/components';
 
 import TheNavigation from './components/TheNavigation.vue';
 import TheNavigationFooter from './components/navigation/TheNavigationFooter.vue';
-import { TABS } from './router';
+import { visibleTabs } from './router';
+import { provideOptions } from './options-vue';
 
 export default Vue.extend({
   name: 'App',
@@ -45,12 +46,14 @@ export default Vue.extend({
     SThemeProvider,
   },
 
+  provide: provideOptions,
+
   data(): {
     tabs: Array<string>;
     stylesLoaded: boolean;
   } {
     return {
-      tabs: [...TABS],
+      tabs: visibleTabs(),
       stylesLoaded: false,
     };
   },
@@ -160,15 +163,22 @@ a {
   color: var(--accent-text);
   text-decoration: none;
 
-  &:hover {
-    text-decoration: underline;
+  @include hover-capable {
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }
 
 .options-app {
   display: grid;
   grid-template-columns: 240px 1fr;
-  min-height: 100vh;
+  min-height: 100dvh;
+
+  @include phone {
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 .sidebar {
@@ -179,20 +189,41 @@ a {
   display: flex;
   flex-direction: column;
   border-right: 1px solid var(--panel-border);
+
+  @include phone {
+    display: contents;
+  }
 }
 
 .nav {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+
+  @include phone {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    flex: none;
+  }
 }
 
 .nav-footer {
   flex: none;
   padding: 0 12px 16px;
+
+  @include phone {
+    order: 1;
+    padding: 16px 4px 24px;
+    border-top: 1px solid var(--panel-border);
+  }
 }
 
 .content {
   min-width: 0;
+
+  @include phone {
+    flex: 1;
+  }
 }
 </style>

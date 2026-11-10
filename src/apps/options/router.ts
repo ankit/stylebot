@@ -2,6 +2,8 @@ import Vue from 'vue';
 import type { Route, RouteConfig } from 'vue-router';
 import VueRouter from 'vue-router';
 
+import { isIPhone } from '@stylebot/utils';
+
 import TheBasicsTab from './components/TheBasicsTab.vue';
 import TheStylesTab from './components/TheStylesTab.vue';
 import TheHistoryTab from './components/TheHistoryTab.vue';
@@ -12,16 +14,27 @@ export const TABS = ['basics', 'styles', 'history', 'sync'] as const;
 
 export type Tab = (typeof TABS)[number];
 
+/**
+ * The tabs this device shows. iPhone has no editor, which leaves Basics with
+ * nothing worth a tab, so Options opens on Styles there.
+ */
+export const visibleTabs = (): Array<Tab> =>
+  TABS.filter(tab => tab !== 'basics' || !isIPhone());
+
+const firstTab = (): string => `/${visibleTabs()[0]}`;
+
 const queryString = (value: Route['query'][string]): string =>
   typeof value === 'string' ? value : '';
 
 export const routes: Array<RouteConfig> = [
-  { path: '/', redirect: '/basics' },
+  { path: '/', redirect: firstTab },
   {
     path: '/basics',
     name: 'basics',
     component: TheBasicsTab,
     meta: { tab: 'basics' },
+    beforeEnter: (_to, _from, next) =>
+      isIPhone() ? next({ name: 'styles' }) : next(),
   },
   {
     path: '/styles',
@@ -34,6 +47,9 @@ export const routes: Array<RouteConfig> = [
     name: 'style-edit',
     component: TheStyleEditorPage,
     meta: { tab: 'styles' },
+    // iPhone has no editor, so a style's CSS isn't edited there either.
+    beforeEnter: (_to, _from, next) =>
+      isIPhone() ? next({ name: 'styles' }) : next(),
     props: route => ({
       initialUrl: queryString(route.query.url),
       justSaved: !!route.params.justSaved,
@@ -51,7 +67,7 @@ export const routes: Array<RouteConfig> = [
     component: TheSyncTab,
     meta: { tab: 'sync' },
   },
-  { path: '*', redirect: '/basics' },
+  { path: '*', redirect: firstTab },
 ];
 
 /**

@@ -69,19 +69,29 @@ export default Vue.extend({
   outline: none;
   cursor: pointer;
 
-  &:hover,
   &:focus-visible,
   .keyboard-nav &:focus {
     background: var(--menu-item-hover);
   }
 
+  @include hover-capable {
+    &:hover {
+      background: var(--menu-item-hover);
+    }
+  }
+
   &.danger {
     color: var(--danger);
 
-    &:hover,
     &:focus-visible,
     .keyboard-nav &:focus {
       background: var(--danger-background);
+    }
+
+    @include hover-capable {
+      &:hover {
+        background: var(--danger-background);
+      }
     }
   }
 

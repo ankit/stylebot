@@ -46,9 +46,16 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .navigation {
+  border: 0 solid var(--panel-border);
   padding: 24px 12px;
   display: flex;
   flex-direction: column;
+  background: var(--panel-surface);
+
+  @include phone {
+    border-bottom-width: 1px;
+    padding: 0 8px;
+  }
 }
 
 .logo {
@@ -57,18 +64,30 @@ export default Vue.extend({
   height: 28px;
   padding: 0 12px;
   margin-bottom: 14px;
+
+  @include phone {
+    display: none;
+  }
 }
 
 .nav-list {
   display: flex;
   flex-direction: column;
   gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  @include phone {
+    flex-direction: row;
+    padding: 6px 0;
+  }
 }
 
 .nav-item {
   @include button-reset;
 
   display: block;
+  flex: none;
   width: 100%;
   padding: 8px 12px;
   border-radius: 8px;
@@ -78,9 +97,11 @@ export default Vue.extend({
   color: var(--text-secondary);
   cursor: pointer;
 
-  &:hover {
-    background: var(--hover-tint);
-    color: var(--text-primary);
+  @include hover-capable {
+    &:hover {
+      background: var(--hover-tint);
+      color: var(--text-primary);
+    }
   }
 
   @include focus-ring;
@@ -89,6 +110,17 @@ export default Vue.extend({
     font-weight: 600;
     color: var(--text-primary);
     background: var(--active);
+  }
+
+  @include phone {
+    position: relative;
+    width: auto;
+    padding: 0 12px;
+    font-size: 15px;
+    line-height: 32px;
+    white-space: nowrap;
+
+    @include touch-target;
   }
 }
 </style>

@@ -2,7 +2,9 @@
   <div class="styles-tab">
     <div class="header">
       <div class="title-block">
-        <s-heading as="h1" size="xl">{{ t('styles_options') }}</s-heading>
+        <s-heading as="h1" size="xl" class="heading">
+          {{ t('styles_options') }}
+        </s-heading>
         <s-text variant="muted" size="large" class="subtitle">
           {{
             t(totalCount === 1 ? 'sites_count_one' : 'sites_count_other', [
@@ -14,7 +16,11 @@
         </s-text>
       </div>
 
-      <s-button variant="primary" @click="$emit('edit', '')">
+      <s-button
+        v-if="supportsEditor"
+        variant="primary"
+        @click="$emit('edit', '')"
+      >
         {{ t('add_a_style') }}
       </s-button>
     </div>
@@ -69,7 +75,6 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
 import { compareAsc } from 'date-fns';
 
 import type { Style } from '@stylebot/types';
@@ -85,8 +90,9 @@ import { listProfiles } from '@stylebot/saved-styles';
 
 import StyleListRow from './styles/StyleListRow.vue';
 import StylesBulkMenu from './styles/StylesBulkMenu.vue';
+import { OptionsVue } from '../options-vue';
 
-export default Vue.extend({
+export default OptionsVue.extend({
   name: 'TheStylesTab',
 
   components: {
@@ -179,6 +185,10 @@ export default Vue.extend({
 .styles-tab {
   max-width: 860px;
   padding: 20px 22px 26px;
+
+  @include phone {
+    padding: 16px 16px 24px;
+  }
 }
 
 .header {
@@ -220,6 +230,10 @@ export default Vue.extend({
     @include field-active-border;
   }
 
+  @include touch {
+    height: 44px;
+  }
+
   input {
     @include button-reset;
 
@@ -232,6 +246,10 @@ export default Vue.extend({
     &::placeholder {
       color: var(--field-placeholder);
     }
+
+    @include touch {
+      font-size: 16px;
+    }
   }
 }
 
@@ -242,5 +260,11 @@ export default Vue.extend({
 .empty {
   margin-top: 32px;
   text-align: center;
+}
+
+.heading {
+  @include phone {
+    @include visually-hidden;
+  }
 }
 </style>

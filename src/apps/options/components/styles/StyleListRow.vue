@@ -1,11 +1,9 @@
 <template>
   <s-list-item
-    interactive
+    :interactive="supportsEditor"
     :muted="!enabled"
-    role="link"
-    tabindex="0"
-    @click="$emit('edit', url)"
-    @keydown.enter.self="$emit('edit', url)"
+    v-bind="linkAttrs"
+    v-on="linkListeners"
   >
     <template #icon><site-icon :urls="[url]" /></template>
     <template #title>{{ url }}</template>
@@ -24,7 +22,7 @@
         <style-row-menu
           :url="url"
           :size="28"
-          @edit="$emit('edit', url)"
+          v-on="editListeners"
           @open-site="openSite"
           @delete="showDeleteConfirm = true"
         />
@@ -47,7 +45,6 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
 import { formatDistanceToNow } from 'date-fns';
 
 import {
@@ -59,8 +56,9 @@ import {
 
 import SiteIcon from '../site/SiteIcon.vue';
 import StyleRowMenu from './StyleRowMenu.vue';
+import { OptionsVue } from '../../options-vue';
 
-export default Vue.extend({
+export default OptionsVue.extend({
   name: 'StyleListRow',
 
   components: {
@@ -101,6 +99,20 @@ export default Vue.extend({
   },
 
   computed: {
+    linkAttrs(): Record<string, string> {
+      return this.supportsEditor ? { role: 'link', tabindex: '0' } : {};
+    },
+
+    linkListeners(): Record<string, (event: Event) => void> {
+      return this.supportsEditor
+        ? { click: this.edit, keydown: this.editOnEnter }
+        : {};
+    },
+
+    editListeners(): Record<string, () => void> {
+      return this.supportsEditor ? { edit: this.edit } : {};
+    },
+
     /**
      * How many profiles the style has, when it has more than one, and when
      * it was last edited.
@@ -117,6 +129,19 @@ export default Vue.extend({
   },
 
   methods: {
+    edit(): void {
+      this.$emit('edit', this.url);
+    },
+
+    editOnEnter(event: Event): void {
+      if (
+        (event as KeyboardEvent).key === 'Enter' &&
+        event.target === event.currentTarget
+      ) {
+        this.edit();
+      }
+    },
+
     openSite(): void {
       window.open(`https://${this.url}`, '_blank');
     },

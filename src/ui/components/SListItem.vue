@@ -2,7 +2,13 @@
   <component
     :is="as"
     class="list-item"
-    :class="{ interactive, compact, muted, padded, 'has-icon': hasIcon }"
+    :class="{
+      interactive,
+      compact,
+      muted,
+      padded,
+      'has-icon': hasIcon,
+    }"
     v-bind="$attrs"
     v-on="$listeners"
   >
@@ -82,6 +88,10 @@ export default Vue.extend({
   min-height: 64px;
   padding: 0 20px;
   text-align: start;
+
+  @include phone {
+    padding-block: 10px;
+  }
 }
 
 .has-icon {
@@ -105,8 +115,10 @@ export default Vue.extend({
 .interactive {
   cursor: pointer;
 
-  &:hover {
-    background: var(--card-surface);
+  @include hover-capable {
+    &:hover {
+      background: var(--card-surface);
+    }
   }
 
   @include focus-ring;
@@ -149,6 +161,10 @@ export default Vue.extend({
   align-items: center;
   gap: 6px;
   min-width: 0;
+
+  @include phone {
+    flex-wrap: wrap;
+  }
 }
 
 .trailing {

@@ -92,8 +92,10 @@ export default Vue.extend({
   color: inherit;
   cursor: pointer;
 
-  &:hover:not(:disabled) {
-    background: var(--hover-tint);
+  @include hover-capable {
+    &:hover:not(:disabled) {
+      background: var(--hover-tint);
+    }
   }
 
   &:disabled {
@@ -102,6 +104,7 @@ export default Vue.extend({
   }
 
   @include focus-ring;
+  @include touch-target;
 
   &.bordered {
     width: 46px;

@@ -188,9 +188,19 @@ export default Vue.extend({
   color: var(--text-primary);
   cursor: pointer;
 
-  &:hover,
   &.open {
     background: var(--hover-tint);
+  }
+
+  @include touch {
+    height: 44px;
+    border-radius: 22px;
+  }
+
+  @include hover-capable {
+    &:hover {
+      background: var(--hover-tint);
+    }
   }
 
   @include focus-ring;
@@ -225,6 +235,10 @@ export default Vue.extend({
     @include field-active-border;
 
     outline: none;
+  }
+
+  @include touch {
+    font-size: 16px;
   }
 }
 
