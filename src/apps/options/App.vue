@@ -35,7 +35,7 @@ import { SThemeProvider } from '@stylebot/components';
 import TheNavigation from './components/TheNavigation.vue';
 import TheNavigationFooter from './components/navigation/TheNavigationFooter.vue';
 import { TABS } from './router';
-import { provideSupportsEditor } from './supports-editor';
+import { provideOptions } from './options-vue';
 
 export default Vue.extend({
   name: 'App',
@@ -46,7 +46,7 @@ export default Vue.extend({
     SThemeProvider,
   },
 
-  provide: provideSupportsEditor,
+  provide: provideOptions,
 
   data(): {
     tabs: Array<string>;

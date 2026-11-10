@@ -88,12 +88,10 @@ import { listProfiles } from '@stylebot/saved-styles';
 
 import StyleListRow from './styles/StyleListRow.vue';
 import StylesBulkMenu from './styles/StylesBulkMenu.vue';
-import { OptionsVue, injectSupportsEditor } from '../supports-editor';
+import { OptionsVue } from '../options-vue';
 
 export default OptionsVue.extend({
   name: 'TheStylesTab',
-
-  inject: injectSupportsEditor,
 
   components: {
     SHeading,

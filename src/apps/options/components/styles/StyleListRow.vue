@@ -56,12 +56,10 @@ import {
 
 import SiteIcon from '../site/SiteIcon.vue';
 import StyleRowMenu from './StyleRowMenu.vue';
-import { OptionsVue, injectSupportsEditor } from '../../supports-editor';
+import { OptionsVue } from '../../options-vue';
 
 export default OptionsVue.extend({
   name: 'StyleListRow',
-
-  inject: injectSupportsEditor,
 
   components: {
     SConfirmDialog,

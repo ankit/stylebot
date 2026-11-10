@@ -93,7 +93,7 @@ import ImportBackupDialog from './sync/ImportBackupDialog.vue';
 
 import { downloadBackup, pickBackupFile } from '../backup';
 import type { SyncStatus } from '../store/index';
-import { OptionsVue, injectSupportsEditor } from '../supports-editor';
+import { OptionsVue } from '../options-vue';
 
 type PendingImport = {
   styles: StyleMap;
@@ -102,8 +102,6 @@ type PendingImport = {
 
 export default OptionsVue.extend({
   name: 'TheSyncTab',
-
-  inject: injectSupportsEditor,
 
   components: {
     SCallout,

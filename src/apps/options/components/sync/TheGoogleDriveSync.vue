@@ -144,12 +144,10 @@ import {
   formatSyncTime,
 } from '@stylebot/sync';
 
-import { OptionsVue, injectSupportsEditor } from '../../supports-editor';
+import { OptionsVue } from '../../options-vue';
 
 export default OptionsVue.extend({
   name: 'TheGoogleDriveSync',
-
-  inject: injectSupportsEditor,
 
   components: {
     SBadge,
