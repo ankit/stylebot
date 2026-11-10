@@ -600,6 +600,55 @@ describe('selector', () => {
       expect(getSelector(el)).toBe('nav.site-nav');
     });
 
+    it('prefers a test id over a real class', () => {
+      const el = document.createElement('nav');
+      el.setAttribute('class', 'flex');
+      el.setAttribute('data-testid', 'sidebar');
+
+      expect(getSelector(el)).toBe('nav[data-testid="sidebar"]');
+    });
+
+    it('prefers an #id that beats its class over a test id', () => {
+      document.body.innerHTML = `
+        <div class="flex" id="sidebar" data-testid="sidebar"></div>
+        <div class="flex"></div>
+        <div class="flex"></div>
+      `;
+
+      const el = document.getElementById('sidebar') as HTMLElement;
+      expect(getSelector(el)).toBe('#sidebar');
+    });
+
+    it.each(['product-48213', 'row-7', 'item_3', 'post:12'])(
+      'prefers a real class over the per-item test id %s',
+      value => {
+        const el = document.createElement('div');
+        el.setAttribute('class', 'card');
+        el.setAttribute('data-testid', value);
+
+        expect(getSelector(el)).toBe('div.card');
+      }
+    );
+
+    it('keeps a test id with a digit inside a word', () => {
+      const el = document.createElement('h1');
+      el.setAttribute('class', 'title');
+      el.setAttribute('data-testid', 'h1-title');
+
+      expect(getSelector(el)).toBe('h1[data-testid="h1-title"]');
+    });
+
+    it('prefers a test id when others with its class have test ids of their own', () => {
+      document.body.innerHTML = `
+        <button class="r-5zmot" data-testid="GrokDrawerHeader"></button>
+        <button class="r-5zmot" data-testid="like"></button>
+        <button class="r-5zmot" data-testid="reply"></button>
+      `;
+
+      const el = document.querySelector('button') as HTMLElement;
+      expect(getSelector(el)).toBe('button[data-testid="GrokDrawerHeader"]');
+    });
+
     it('skips an ancestor scope that sweeps most of the page', () => {
       document.body.innerHTML = `
         <div class="app">

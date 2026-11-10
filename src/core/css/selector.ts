@@ -62,6 +62,26 @@ export const getTestIdBasedSelector = (el: HTMLElement): string | null => {
 };
 
 /**
+ * Whether a test id is shared by every element of its kind, like
+ * `sidebar` or `product-card`. Ids made for one item, such as
+ * `product-48213` or `row-7`, and generated ids don't count.
+ */
+const isSharedTestId = (value: string): boolean =>
+  !/\d{3,}|(^|[-_:.])\d+($|[-_:.])/.test(value) && !looksGeneratedId(value);
+
+/**
+ * A selector from the element's test id, but only when the test id is
+ * shared by every element of its kind, not made for this one item.
+ */
+const getSharedTestIdBasedSelector = (el: HTMLElement): string | null => {
+  const value = TEST_ID_ATTRIBUTES.map(name => el.getAttribute(name)).find(
+    Boolean
+  );
+
+  return value && isSharedTestId(value) ? getTestIdBasedSelector(el) : null;
+};
+
+/**
  * `name` predates data-testid but serves the same role on form elements:
  * an identifier, not a human/screen-reader description like aria-label.
  */
@@ -320,11 +340,14 @@ export const getTagNameBasedSelector = (
 };
 
 /**
- * Excludes #id and fully hashed classes on purpose, so a real ancestor match
- * (see getAncestorBasedSelector) still outranks them.
+ * A selector from a name that says what the element is, like `div.card` or
+ * `input[name="q"]`. Skips #id, which only points at one element, and
+ * hashed classes: an ancestor's name, as in `div.mw-heading h2`, makes a
+ * better selector than those.
  */
-function getGoodOwnSelector(el: HTMLElement): string | null {
+function getDescriptiveSelector(el: HTMLElement): string | null {
   return (
+    getSharedTestIdBasedSelector(el) ??
     getNonHashedClassBasedSelector(el) ??
     getTestIdBasedSelector(el) ??
     getNameBasedSelector(el) ??
@@ -366,7 +389,7 @@ function climbToNearestUsableAncestor(
  * 2 levels) with a real class/test-id/name, e.g. `div.mw-heading h2`.
  */
 export const getAncestorBasedSelector = (el: HTMLElement): string | null =>
-  climbToNearestUsableAncestor(el, getGoodOwnSelector);
+  climbToNearestUsableAncestor(el, getDescriptiveSelector);
 
 /**
  * The ancestor scope, unless it reaches more of the page than the element's
@@ -444,7 +467,7 @@ const getIdOverSharedClass = (el: HTMLElement): string | null => {
  */
 export const getSelector = (el: HTMLElement): string =>
   getIdOverSharedClass(el) ??
-  getGoodOwnSelector(el) ??
+  getDescriptiveSelector(el) ??
   unlessSweeping(getAncestorScopeWithinOwnClass(el)) ??
   getStableIdBasedSelector(el) ??
   getLabelBasedSelector(el) ??
@@ -485,12 +508,13 @@ const getLegacyBodyChildSelector = (el: HTMLElement): string => {
  * it has one (`td.title span.sitestr`), since its bare tag says little.
  */
 const getAncestorScopedSelectors = (el: HTMLElement): Array<string> => {
-  const subject = getGoodOwnSelector(el) ?? el.tagName.toLowerCase();
+  const subject = getDescriptiveSelector(el) ?? el.tagName.toLowerCase();
   const selectors: Array<string> = [];
   let ancestor = el.parentElement;
 
   for (let level = 0; ancestor && level < 4; level++) {
-    const own = getGoodOwnSelector(ancestor) ?? getClassBasedSelector(ancestor);
+    const own =
+      getDescriptiveSelector(ancestor) ?? getClassBasedSelector(ancestor);
 
     if (own) {
       selectors.push(`${own} ${subject}`);
@@ -577,7 +601,7 @@ export const dedupeByMatches = (selectors: Array<string>): Array<string> => {
  * tag would match it too, e.g. `tr.athing:nth-of-type(3)`.
  */
 const getPositionedStep = (el: HTMLElement): string => {
-  const own = getGoodOwnSelector(el) ?? el.tagName.toLowerCase();
+  const own = getDescriptiveSelector(el) ?? el.tagName.toLowerCase();
   const siblings = Array.from(el.parentElement?.children ?? []).filter(
     sibling => sibling.tagName === el.tagName
   );
@@ -616,7 +640,7 @@ export const getUniqueSelector = (el: HTMLElement): string | null => {
  * just this element and all of its kind.
  */
 export const getItemScopedSelector = (el: HTMLElement): string | null => {
-  const subject = getGoodOwnSelector(el) ?? el.tagName.toLowerCase();
+  const subject = getDescriptiveSelector(el) ?? el.tagName.toLowerCase();
   let ancestor = el.parentElement;
 
   for (let level = 0; ancestor && level < 6; level++) {
@@ -643,8 +667,8 @@ export const getItemScopedSelector = (el: HTMLElement): string | null => {
  */
 export const getSelectorCandidates = (el: HTMLElement): Array<string> =>
   [
-    getNonHashedClassBasedSelector(el),
     getTestIdBasedSelector(el),
+    getNonHashedClassBasedSelector(el),
     getNameBasedSelector(el),
     getStableClassPartsSelector(el),
     getAncestorBasedSelector(el),
