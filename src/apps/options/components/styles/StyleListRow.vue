@@ -1,6 +1,6 @@
 <template>
   <s-list-item
-    :interactive="editingEnabled"
+    :interactive="supportsEditor"
     :muted="!enabled"
     v-bind="linkAttrs"
     v-on="linkListeners"
@@ -56,12 +56,12 @@ import {
 
 import SiteIcon from '../site/SiteIcon.vue';
 import StyleRowMenu from './StyleRowMenu.vue';
-import { VueWithEditing, editingInjection } from '../../editing';
+import { SupportsEditorVue, injectSupportsEditor } from '../../supports-editor';
 
-export default VueWithEditing.extend({
+export default SupportsEditorVue.extend({
   name: 'StyleListRow',
 
-  inject: editingInjection,
+  inject: injectSupportsEditor,
 
   components: {
     SConfirmDialog,
@@ -102,17 +102,17 @@ export default VueWithEditing.extend({
 
   computed: {
     linkAttrs(): Record<string, string> {
-      return this.editingEnabled ? { role: 'link', tabindex: '0' } : {};
+      return this.supportsEditor ? { role: 'link', tabindex: '0' } : {};
     },
 
     linkListeners(): Record<string, (event: Event) => void> {
-      return this.editingEnabled
+      return this.supportsEditor
         ? { click: this.edit, keydown: this.editOnEnter }
         : {};
     },
 
     editListeners(): Record<string, () => void> {
-      return this.editingEnabled ? { edit: this.edit } : {};
+      return this.supportsEditor ? { edit: this.edit } : {};
     },
 
     /**

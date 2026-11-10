@@ -4,15 +4,15 @@
 
     <s-list>
       <the-theme />
-      <the-position v-if="editingEnabled" />
-      <the-context-menu v-if="editingEnabled" />
+      <the-position v-if="supportsEditor" />
+      <the-context-menu v-if="supportsEditor" />
       <the-active-style-badge v-if="showActiveStyleBadge" />
       <the-gallery-suggestions />
     </s-list>
 
     <the-cli-access v-if="showCliAccess" />
 
-    <the-keyboard-shortcuts v-if="editingEnabled" />
+    <the-keyboard-shortcuts v-if="supportsEditor" />
   </div>
 </template>
 
@@ -27,12 +27,12 @@ import TheActiveStyleBadge from './basics/TheActiveStyleBadge.vue';
 import TheGallerySuggestions from './basics/TheGallerySuggestions.vue';
 import TheCliAccess from './basics/TheCliAccess.vue';
 import TheKeyboardShortcuts from './basics/TheKeyboardShortcuts.vue';
-import { VueWithEditing, editingInjection } from '../editing';
+import { SupportsEditorVue, injectSupportsEditor } from '../supports-editor';
 
-export default VueWithEditing.extend({
+export default SupportsEditorVue.extend({
   name: 'TheBasicsTab',
 
-  inject: editingInjection,
+  inject: injectSupportsEditor,
 
   components: {
     SHeading,

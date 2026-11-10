@@ -111,7 +111,7 @@
         <li v-for="conflict in conflicts" :key="conflict.url" class="conflict">
           <span class="conflict-url">{{ conflict.url }}</span>
           <s-button
-            v-if="editingEnabled"
+            v-if="supportsEditor"
             variant="ghost"
             @click="$emit('edit', conflict.url)"
           >
@@ -144,12 +144,12 @@ import {
   formatSyncTime,
 } from '@stylebot/sync';
 
-import { VueWithEditing, editingInjection } from '../../editing';
+import { SupportsEditorVue, injectSupportsEditor } from '../../supports-editor';
 
-export default VueWithEditing.extend({
+export default SupportsEditorVue.extend({
   name: 'TheGoogleDriveSync',
 
-  inject: editingInjection,
+  inject: injectSupportsEditor,
 
   components: {
     SBadge,

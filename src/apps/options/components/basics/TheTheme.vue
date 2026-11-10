@@ -5,7 +5,7 @@
     </template>
     <template #meta>
       <s-text variant="muted" size="large" as="span">
-        {{ t(editingEnabled ? 'theme_description' : 'popup_and_this_page') }}
+        {{ t(supportsEditor ? 'theme_description' : 'popup_and_this_page') }}
       </s-text>
     </template>
 
@@ -32,12 +32,12 @@
 import { SListItem, SSegmentedControl, SText } from '@stylebot/components';
 import { MonitorIcon, MoonIcon, SunIcon } from '@stylebot/icons';
 import type { StylebotAppearance } from '@stylebot/types';
-import { VueWithEditing, editingInjection } from '../../editing';
+import { SupportsEditorVue, injectSupportsEditor } from '../../supports-editor';
 
-export default VueWithEditing.extend({
+export default SupportsEditorVue.extend({
   name: 'TheTheme',
 
-  inject: editingInjection,
+  inject: injectSupportsEditor,
 
   components: {
     SListItem,

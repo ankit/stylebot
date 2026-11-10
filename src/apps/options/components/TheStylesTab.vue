@@ -15,7 +15,7 @@
       </div>
 
       <s-button
-        v-if="editingEnabled"
+        v-if="supportsEditor"
         variant="primary"
         @click="$emit('edit', '')"
       >
@@ -88,12 +88,12 @@ import { listProfiles } from '@stylebot/saved-styles';
 
 import StyleListRow from './styles/StyleListRow.vue';
 import StylesBulkMenu from './styles/StylesBulkMenu.vue';
-import { VueWithEditing, editingInjection } from '../editing';
+import { SupportsEditorVue, injectSupportsEditor } from '../supports-editor';
 
-export default VueWithEditing.extend({
+export default SupportsEditorVue.extend({
   name: 'TheStylesTab',
 
-  inject: editingInjection,
+  inject: injectSupportsEditor,
 
   components: {
     SHeading,
