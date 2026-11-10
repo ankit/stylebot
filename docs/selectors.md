@@ -16,32 +16,33 @@ name on purpose.
 flowchart TB
     subgraph authored["Authored, on the element"]
         direction LR
-        S1["<b>1 · test id</b><br/><code>button[data-testid='submit']</code><br/><i>also data-test-id, data-test, data-cy,<br/>data-qa; one per item, like row-7,<br/>only after 2; the #id instead<br/>when it wins in 2</i>"]
-        S2["<b>2 · class</b><br/><code>div.card</code><br/><i>first one not hashed: .WwrzSb.card → div.card;<br/>its unique #id instead when most others<br/>with the class have none: #sidebar</i>"]
-        S3["<b>3 · name</b><br/><code>input[name='q']</code>"]
-        S4["<b>4 · authored part of a class</b><br/><code>nav[class*='Header_nav__']</code><br/><i>from Header_nav__a1B2c, while it<br/>matches what the full class does</i>"]
-        S1 --> S2 --> S3 --> S4
+        S0["<b>1 · id over a shared class</b><br/><code>#sidebar</code><br/><i>its unique #id, when most others with its<br/>own class have none: div.flex#sidebar</i>"]
+        S1["<b>2 · test id</b><br/><code>button[data-testid='submit']</code><br/><i>also data-test-id, data-test, data-cy,<br/>data-qa; one per item, like row-7,<br/>only after the class</i>"]
+        S2["<b>3 · class</b><br/><code>div.card</code><br/><i>first one not hashed:<br/>.WwrzSb.card → div.card</i>"]
+        S3["<b>4 · name</b><br/><code>input[name='q']</code>"]
+        S4["<b>5 · authored part of a class</b><br/><code>nav[class*='Header_nav__']</code><br/><i>from Header_nav__a1B2c, while it<br/>matches what the full class does</i>"]
+        S0 --> S1 --> S2 --> S3 --> S4
     end
     subgraph scoped["Authored, on an ancestor"]
         direction LR
-        S5["<b>5 · ancestor with 1–4, up to 2 levels</b><br/><code>div.mw-heading h2</code><br/><i>unless too broad, or wider than<br/>a minified own class: div.VwiC3b</i>"]
+        S5["<b>6 · ancestor with 2–5, up to 2 levels</b><br/><code>div.mw-heading h2</code><br/><i>unless too broad, or wider than<br/>a minified own class: div.VwiC3b</i>"]
     end
     subgraph ids["Identifiers"]
         direction LR
-        S6["<b>6 · id</b><br/><code>#search</code><br/><i>never one generated per load:<br/>tsuid_hsLJaqLJBPu9ruEP7uOYkAo_91</i>"]
-        S7["<b>7 · link address or aria-label</b><br/><code>a[href='/section/world']</code><br/><code>button[aria-label='Search']</code><br/><i>no query, hash, id or date;<br/>no wider than the own class</i>"]
+        S6["<b>7 · id</b><br/><code>#search</code><br/><i>never one generated per load:<br/>tsuid_hsLJaqLJBPu9ruEP7uOYkAo_91</i>"]
+        S7["<b>8 · link address or aria-label</b><br/><code>a[href='/section/world']</code><br/><code>button[aria-label='Search']</code><br/><i>no query, hash, id or date;<br/>no wider than the own class</i>"]
         S6 --> S7
     end
     subgraph hashed["Hashed or minified"]
         direction LR
-        S8["<b>8 · first class, whatever it is</b><br/><code>h3.LC20lb</code>"]
-        S9["<b>9 · ancestor's class</b><br/><code>section.WwrzSb a</code><br/><i>unless too broad</i>"]
+        S8["<b>9 · first class, whatever it is</b><br/><code>h3.LC20lb</code>"]
+        S9["<b>10 · ancestor's class</b><br/><code>section.WwrzSb a</code><br/><i>unless too broad</i>"]
         S8 --> S9
     end
     subgraph last["Last resort"]
         direction LR
-        S10["<b>10 · tag chain</b><br/><code>ul li a</code><br/><i>unless too broad</i>"]
-        S11["<b>11 · only this element</b><br/><code>li:nth-of-type(3) a</code>"]
+        S10["<b>11 · tag chain</b><br/><code>ul li a</code><br/><i>unless too broad</i>"]
+        S11["<b>12 · only this element</b><br/><code>li:nth-of-type(3) a</code>"]
         S10 --> S11
     end
     authored --> scoped --> ids --> hashed --> last
@@ -51,7 +52,7 @@ flowchart TB
     classDef t3 fill:#6fcaa4,stroke:#6fcaa4,color:#08261b
     classDef t4 fill:#cdeee0,stroke:#9fd9c0,color:#08261b
     classDef t5 fill:transparent,stroke:#7a8a84,stroke-dasharray:4 3,color:#7a8a84
-    class S1,S2,S3,S4 t1
+    class S0,S1,S2,S3,S4 t1
     class S5 t2
     class S6,S7 t3
     class S8,S9 t4
