@@ -34,6 +34,14 @@ export const BROWSERS = [
     key: 'Google\\Chrome',
   },
   {
+    name: 'Firefox',
+    firefox: true,
+    darwin: 'Firefox',
+    linux: '.mozilla/firefox',
+    win32: 'Mozilla\\Firefox',
+    key: 'Mozilla',
+  },
+  {
     name: 'Edge',
     darwin: 'Microsoft Edge',
     linux: 'microsoft-edge',
@@ -64,14 +72,6 @@ export const BROWSERS = [
     key: 'Google\\Chrome',
   },
   { name: 'Arc', darwin: 'Arc/User Data' },
-  {
-    name: 'Firefox',
-    firefox: true,
-    darwin: 'Firefox',
-    linux: '.mozilla/firefox',
-    win32: 'Mozilla\\Firefox',
-    key: 'Mozilla',
-  },
 ];
 
 /*
@@ -225,21 +225,23 @@ export const launcherNode = () => {
   return fs.readFileSync(HOST_LAUNCHER_PATH, 'utf8').match(/"([^"]+)"/)?.[1];
 };
 
+// Who may start the host: Chromium names extensions by origin, Firefox by add-on id.
+const CHROMIUM_ALLOWED = {
+  allowed_origins: EXTENSION_IDS.map(id => `chrome-extension://${id}/`),
+};
+const FIREFOX_ALLOWED = { allowed_extensions: [FIREFOX_ID] };
+
 /**
- * Writes the host manifest into a folder, returning its path. Firefox's
- * names the add-on it allows by id, and Chromium's by origin.
+ * Writes the host manifest into a folder, returning its path.
  */
 const writeManifest = (dir, firefox = false) => {
+  const allowed = firefox ? FIREFOX_ALLOWED : CHROMIUM_ALLOWED;
   const manifest = {
     name: HOST_NAME,
     description: 'Stylebot CLI',
     path: HOST_LAUNCHER_PATH,
     type: 'stdio',
-    ...(firefox
-      ? { allowed_extensions: [FIREFOX_ID] }
-      : {
-          allowed_origins: EXTENSION_IDS.map(id => `chrome-extension://${id}/`),
-        }),
+    ...allowed,
   };
   const file = join(dir, `${HOST_NAME}.json`);
 

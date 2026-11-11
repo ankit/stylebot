@@ -419,11 +419,11 @@ describe('supportedBrowsers', () => {
 
     expect(supportedBrowsers()).toEqual([
       'Chrome',
+      'Firefox',
       'Edge',
       'Brave',
       'Chromium',
       'Vivaldi',
-      'Firefox',
     ]);
   });
 });

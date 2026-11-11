@@ -39,7 +39,7 @@ afterEach(() => {
 describe('diagnoseConnection', () => {
   it('asks to install a browser when none has the host registered', () => {
     expect(load({ registered: false })({ code: 'ENOENT' })).toBe(
-      'No supported browser found. Install Chrome, Edge or Firefox, then try again.'
+      'No supported browser found. Install Chrome, Firefox or Edge, then try again.'
     );
   });
 
@@ -71,7 +71,7 @@ describe('diagnoseConnection', () => {
     const diagnose = load({ existing: [`${HOME}/.stylebot/cli.sock.started`] });
 
     expect(diagnose({ code: 'ENOENT' })).toBe(
-      'No browser is running Stylebot. Open Chrome, Edge or Firefox with Stylebot.'
+      'No browser is running Stylebot. Open Chrome, Firefox or Edge with Stylebot.'
     );
   });
 

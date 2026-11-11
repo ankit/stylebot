@@ -4,7 +4,7 @@ Restyle websites in your browser from the command line, through the [Stylebot](h
 
 ## Requirements
 
-- Stylebot 4 or later in Chrome, Edge or Firefox (Brave, Chromium, Vivaldi and Arc work too)
+- Stylebot 4 or later in Chrome, Firefox or Edge (Brave, Chromium, Vivaldi and Arc work too)
 - Node 20 or later
 
 ## Setup

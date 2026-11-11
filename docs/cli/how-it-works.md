@@ -32,12 +32,12 @@ The installed host remembers which CLI version installed it. A different CLI ver
 | Browser  | macOS (`~/Library/Application Support/…`) | Linux                                   | Windows (`HKCU\Software\…`) |
 | -------- | ----------------------------------------- | --------------------------------------- | --------------------------- |
 | Chrome   | `Google/Chrome`                           | `~/.config/google-chrome`               | `Google\Chrome`             |
+| Firefox  | `Mozilla`                                 | `~/.mozilla`, or `~/.config/mozilla`    | `Mozilla`                   |
 | Edge     | `Microsoft Edge`                          | `~/.config/microsoft-edge`              | `Microsoft\Edge`            |
 | Brave    | `Google/Chrome` (shares Chrome's)         | `~/.config/BraveSoftware/Brave-Browser` | `Google\Chrome`             |
 | Chromium | `Chromium`                                | `~/.config/chromium`                    | `Chromium`                  |
 | Vivaldi  | `Vivaldi`                                 | `~/.config/vivaldi`                     | `Google\Chrome`             |
 | Arc      | `Arc/User Data`                           |                                         |                             |
-| Firefox  | `Mozilla`                                 | `~/.mozilla`, or `~/.config/mozilla`    | `Mozilla`                   |
 
 On Linux, Firefox's folder is `native-messaging-hosts`. Firefox counts as installed once it has a `profiles.ini`, and it reads hosts for all its profiles from one place, so `yarn dev:firefox` finds the host `stylebot install` registered for your own Firefox.
 

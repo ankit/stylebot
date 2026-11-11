@@ -60,11 +60,12 @@ const getPage = async () => {
 
 export const browserCommands: CliCommands = {
   async browser() {
+    const { userAgentData, userAgent } = navigator as Navigator & {
+      userAgentData?: Brands;
+    };
+
     return {
-      name: getBrowserName(
-        (navigator as Navigator & { userAgentData?: Brands }).userAgentData,
-        navigator.userAgent
-      ),
+      name: getBrowserName(userAgentData, userAgent),
       instance: await getInstance(),
       page: await getPage(),
     };
