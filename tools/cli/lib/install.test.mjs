@@ -198,7 +198,7 @@ describe('checklist', () => {
       { done: true, text: 'Set up the stylebot command' },
       {
         done: false,
-        text: 'Install Chrome or Edge, then run `stylebot install` again',
+        text: 'Install Chrome, Firefox or Edge, then run `stylebot install` again',
       },
     ]);
   });

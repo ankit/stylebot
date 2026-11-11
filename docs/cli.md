@@ -10,11 +10,12 @@ flowchart LR
   ext <--> page["The page"]
 ```
 
-It runs on macOS, Linux and Windows with these browsers. Firefox and Safari aren't supported yet.
+It runs on macOS, Linux and Windows with these browsers. Safari isn't supported yet.
 
 | Browser  | macOS | Linux | Windows |
 | -------- | :---: | :---: | :-----: |
 | Chrome   |   ✓   |   ✓   |    ✓    |
+| Firefox  |   ✓   |   ✓   |    ✓    |
 | Edge     |   ✓   |   ✓   |    ✓    |
 | Brave    |   ✓   |   ✓   |    ✓    |
 | Chromium |   ✓   |   ✓   |    ✓    |
@@ -58,7 +59,7 @@ The CLI works out what's wrong and prints one fix:
 
 | What's wrong                                   | Fix                                   |
 | ---------------------------------------------- | ------------------------------------- |
-| No browser it can set up                       | Install Chrome or Edge                |
+| No browser it can set up                       | Install Chrome, Firefox or Edge       |
 | No browser profile has Stylebot                | Add Stylebot                          |
 | No browser has ever started the CLI's host     | Turn on **Allow command line access** |
 | A browser started it before, but it's gone now | Open the browser, with Stylebot on    |

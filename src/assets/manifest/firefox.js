@@ -14,4 +14,18 @@ module.exports = {
   },
 
   permissions: [...base.permissions, 'identity'],
+
+  optional_permissions: ['nativeMessaging'],
+
+  web_accessible_resources: [
+    ...base.web_accessible_resources,
+    {
+      resources: [
+        'cli-inspector/index.js',
+        'cli-mode/index.js',
+        'cli-mode/index.css',
+      ],
+      matches: ['<all_urls>'],
+    },
+  ],
 };

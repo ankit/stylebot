@@ -191,6 +191,31 @@ export class FirefoxExtension implements Extension {
   }
 
   /**
+   * Points Firefox at another folder for the user's native manifests, the
+   * one holding NativeMessagingHosts, since macOS Firefox ignores HOME when
+   * it finds them. Firefox may have read the folder already, so it rereads.
+   */
+  async setNativeManifestsDir(dir: string): Promise<void> {
+    const consoleActor = await this.parentConsoleActor();
+
+    await this.evaluateText(
+      consoleActor,
+      `(() => {
+        const dir = Cc['@mozilla.org/file/local;1'].createInstance(Ci.nsIFile);
+        dir.initWithPath(${JSON.stringify(dir)});
+        try {
+          Services.dirsvc.undefine('XREUserNativeManifests');
+        } catch {}
+        Services.dirsvc.set('XREUserNativeManifests', dir);
+        const { NativeManifests } = ChromeUtils.importESModule(
+          'resource://gre/modules/NativeManifests.sys.mjs'
+        );
+        NativeManifests._initializePromise = null;
+      })()`
+    );
+  }
+
+  /**
    * The extension pages open right now, so a caller can tell a page it is
    * about to open apart from an earlier one at the same URL.
    */

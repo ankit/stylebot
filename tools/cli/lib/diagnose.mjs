@@ -9,7 +9,7 @@ import { findStylebot, isHostRegistered } from './register.mjs';
  */
 export const diagnoseConnection = ({ code, repinned }) => {
   if (!isHostRegistered()) {
-    return 'No supported browser found. Install Chrome or Edge, then try again.';
+    return 'No supported browser found. Install Chrome, Firefox or Edge, then try again.';
   }
 
   if (repinned) {
@@ -25,5 +25,5 @@ export const diagnoseConnection = ({ code, repinned }) => {
     return 'Not connected yet. Turn on "Allow command line access" in Stylebot\'s settings — stylebot.dev/cli';
   }
 
-  return 'No browser is running Stylebot. Open Chrome (or Edge) with Stylebot.';
+  return 'No browser is running Stylebot. Open Chrome, Firefox or Edge with Stylebot.';
 };

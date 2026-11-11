@@ -9,7 +9,7 @@ export const CLI_PERMISSIONS: chrome.permissions.Permissions = {
 };
 
 /**
- * Whether this build carries the CLI, which only Chrome and Edge do for now.
+ * Whether this build carries the CLI, which Safari's doesn't.
  */
 export const supportsCLI = (): boolean => process.env.STYLEBOT_CLI === 'true';
 
