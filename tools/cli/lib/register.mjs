@@ -8,32 +8,39 @@ import {
   HOST_LAUNCHER_PATH,
   HOST_NAME,
   IS_WINDOWS,
-  STATE_DIR,
 } from './paths.mjs';
+import { CHROMIUM } from './engines/chromium.mjs';
+import { FIREFOX } from './engines/firefox.mjs';
 
 const { join, dirname } = IS_WINDOWS ? path.win32 : path.posix;
 
-// What each store assigns Stylebot; Chrome's comes from the public key dev builds carry too.
-const EXTENSION_IDS = [
-  'oiaejidbmkiecgbjeifoejpgmdaleoha',
-  'mjolbpfednnbebfapicajpifliopnnai',
-];
+// What differs between Chromium browsers and Firefox lives in their engine.
+const ENGINES = [CHROMIUM, FIREFOX];
 
 /*
- * Each browser's user data folder: under ~/Library/Application Support on
- * macOS, ~/.config on Linux and %LOCALAPPDATA% on Windows, where its native
- * hosts are registered under an HKCU key instead.
+ * Each browser's user data folder per platform, as its engine reads it, and
+ * on Windows the HKCU key it reads native hosts from.
  */
 export const BROWSERS = [
   {
     name: 'Chrome',
+    engine: CHROMIUM,
     darwin: 'Google/Chrome',
     linux: 'google-chrome',
     win32: 'Google\\Chrome\\User Data',
     key: 'Google\\Chrome',
   },
   {
+    name: 'Firefox',
+    engine: FIREFOX,
+    darwin: 'Firefox',
+    linux: '.mozilla/firefox',
+    win32: 'Mozilla\\Firefox',
+    key: 'Mozilla',
+  },
+  {
     name: 'Edge',
+    engine: CHROMIUM,
     darwin: 'Microsoft Edge',
     linux: 'microsoft-edge',
     win32: 'Microsoft\\Edge\\User Data',
@@ -41,6 +48,7 @@ export const BROWSERS = [
   },
   {
     name: 'Brave',
+    engine: CHROMIUM,
     darwin: 'BraveSoftware/Brave-Browser',
     linux: 'BraveSoftware/Brave-Browser',
     win32: 'BraveSoftware\\Brave-Browser\\User Data',
@@ -50,6 +58,7 @@ export const BROWSERS = [
   },
   {
     name: 'Chromium',
+    engine: CHROMIUM,
     darwin: 'Chromium',
     linux: 'chromium',
     win32: 'Chromium\\User Data',
@@ -57,12 +66,13 @@ export const BROWSERS = [
   },
   {
     name: 'Vivaldi',
+    engine: CHROMIUM,
     darwin: 'Vivaldi',
     linux: 'vivaldi',
     win32: 'Vivaldi\\User Data',
     key: 'Google\\Chrome',
   },
-  { name: 'Arc', darwin: 'Arc/User Data' },
+  { name: 'Arc', engine: CHROMIUM, darwin: 'Arc/User Data' },
 ];
 
 /**
@@ -106,33 +116,13 @@ const devProfileDirs = () => {
 };
 
 /**
- * The installed browsers on this platform, with the folder their native
- * hosts go in (or, on Windows, their user data folder). A browser writes
- * Local State on its first run; its folder alone can be just our manifest.
+ * Each installed copy of the browsers on this platform, with its user data
+ * folder and the folder its native hosts go in (unused on Windows).
  */
-const installedBrowsers = () => {
-  const platform = os.platform();
-  const home = os.homedir();
-  const root = {
-    darwin: join(home, 'Library', 'Application Support'),
-    linux: join(home, '.config'),
-    win32: process.env.LOCALAPPDATA || join(home, 'AppData', 'Local'),
-  }[platform];
-
-  return BROWSERS.filter(
-    browser =>
-      root &&
-      browser[platform] &&
-      fs.existsSync(join(root, browser[platform], 'Local State'))
-  ).map(browser => ({
-    ...browser,
-    dataDir: join(root, browser[platform]),
-    dir: join(
-      root,
-      (platform === 'darwin' && browser.darwinHosts) || browser[platform]
-    ),
-  }));
-};
+const installedBrowsers = () =>
+  BROWSERS.filter(browser => browser[os.platform()]).flatMap(browser =>
+    browser.engine.installs(browser).map(dirs => ({ ...browser, ...dirs }))
+  );
 
 /**
  * Writes the launcher the browser starts the host with, pinned to this
@@ -167,15 +157,15 @@ export const launcherNode = () => {
 };
 
 /**
- * Writes the host manifest into a folder, returning its path.
+ * Writes the host manifest for an engine into a folder, returning its path.
  */
-const writeManifest = dir => {
+const writeManifest = (dir, engine) => {
   const manifest = {
     name: HOST_NAME,
     description: 'Stylebot CLI',
     path: HOST_LAUNCHER_PATH,
     type: 'stdio',
-    allowed_origins: EXTENSION_IDS.map(id => `chrome-extension://${id}/`),
+    ...engine.allowed,
   };
   const file = join(dir, `${HOST_NAME}.json`);
 
@@ -186,17 +176,44 @@ const writeManifest = dir => {
 };
 
 /**
- * The folders registerHost writes host manifests to on macOS and Linux,
- * per browser.
+ * The checkout's dev profiles and every installed browser, with the folder
+ * each reads native hosts from on macOS and Linux.
  */
-const manifestFolders = () =>
-  [
-    ...devProfileDirs().map(dir => ({ name: 'Dev profile', dir })),
-    ...installedBrowsers(),
-  ].map(({ name, dir }) => ({
+const registrationTargets = () => [
+  ...devProfileDirs().map(dir => ({
+    name: 'Dev profile',
+    engine: CHROMIUM,
+    dataDir: dir,
+    hostsDir: join(dir, 'NativeMessagingHosts'),
+  })),
+  ...installedBrowsers(),
+];
+
+/**
+ * Registers the host on Windows: one manifest per engine, and the registry
+ * key each browser reads pointing at its engine's manifest.
+ */
+const registerOnWindows = () => {
+  const registrations = installedBrowsers().map(({ name, key, engine }) => ({
     browser: name,
-    location: join(dir, 'NativeMessagingHosts'),
+    location: `HKCU\\Software\\${key}\\NativeMessagingHosts\\${HOST_NAME}`,
+    engine,
   }));
+  const keys = new Map(registrations.map(r => [r.location, r.engine]));
+  const manifests = new Map();
+
+  for (const [key, engine] of keys) {
+    if (!manifests.has(engine)) {
+      manifests.set(engine, writeManifest(engine.windowsManifestDir, engine));
+    }
+
+    const args = ['add', key, '/ve', '/d', manifests.get(engine), '/f'];
+
+    execFileSync('reg', args, { stdio: 'ignore' });
+  }
+
+  return registrations.map(({ browser, location }) => ({ browser, location }));
+};
 
 /**
  * Registers the host copied into HOST_DIR with the checkout's dev profiles
@@ -206,29 +223,14 @@ export const registerHost = () => {
   writeLauncher();
 
   if (IS_WINDOWS) {
-    const manifest = writeManifest(STATE_DIR);
-
-    const registrations = installedBrowsers().map(browser => ({
-      browser: browser.name,
-      location: `HKCU\\Software\\${browser.key}\\NativeMessagingHosts\\${HOST_NAME}`,
-    }));
-
-    for (const key of new Set(registrations.map(r => r.location))) {
-      execFileSync('reg', ['add', key, '/ve', '/d', manifest, '/f'], {
-        stdio: 'ignore',
-      });
-    }
-
-    return registrations;
+    return registerOnWindows();
   }
 
-  const registrations = manifestFolders();
+  return registrationTargets().map(({ name, hostsDir, engine }) => {
+    writeManifest(hostsDir, engine);
 
-  for (const { location } of registrations) {
-    writeManifest(location);
-  }
-
-  return registrations;
+    return { browser: name, location: hostsDir };
+  });
 };
 
 /**
@@ -236,8 +238,8 @@ export const registerHost = () => {
  */
 export const isHostRegistered = () => {
   const folders = IS_WINDOWS
-    ? [STATE_DIR]
-    : manifestFolders().map(({ location }) => location);
+    ? ENGINES.map(({ windowsManifestDir }) => windowsManifestDir)
+    : registrationTargets().map(({ hostsDir }) => hostsDir);
 
   return (
     fs.existsSync(HOST_LAUNCHER_PATH) &&
@@ -254,55 +256,28 @@ export const supportedBrowsers = () =>
   );
 
 /**
- * Whether a browser profile has Stylebot. A store install unpacks into its
- * Extensions folder, and every install, unpacked ones too, keeps settings
- * in its preferences.
- */
-const profileHasStylebot = profile =>
-  EXTENSION_IDS.some(id => fs.existsSync(join(profile, 'Extensions', id))) ||
-  ['Preferences', 'Secure Preferences'].some(file => {
-    try {
-      const { extensions } = JSON.parse(
-        fs.readFileSync(join(profile, file), 'utf8')
-      );
-
-      return EXTENSION_IDS.some(id => id in (extensions?.settings ?? {}));
-    } catch {
-      return false;
-    }
-  });
-
-/**
  * The browsers, and dev profiles, with Stylebot in one of their profiles,
  * or undefined when there was no profile to look in.
  */
 export const findStylebot = () => {
-  const browsers = [
-    ...devProfileDirs().map(dir => ({ name: 'Dev profile', dataDir: dir })),
-    ...installedBrowsers(),
-  ];
   const found = new Set();
-  let profiles = 0;
+  let count = 0;
 
-  for (const { name, dataDir } of browsers) {
-    let entries;
+  for (const { name, dataDir, engine } of registrationTargets()) {
+    let profiles;
 
     try {
-      entries = fs.readdirSync(dataDir);
+      profiles = engine.profiles(dataDir);
     } catch {
       continue;
     }
 
-    for (const profile of entries.map(entry => join(dataDir, entry))) {
-      if (fs.existsSync(join(profile, 'Preferences'))) {
-        profiles++;
+    count += profiles.length;
 
-        if (profileHasStylebot(profile)) {
-          found.add(name);
-        }
-      }
+    if (profiles.some(engine.hasStylebot)) {
+      found.add(name);
     }
   }
 
-  return profiles ? [...found] : undefined;
+  return count ? [...found] : undefined;
 };

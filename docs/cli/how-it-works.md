@@ -7,7 +7,7 @@ flowchart LR
   bg --> page["Page script,<br/>loaded on first use"]
 ```
 
-- **The host.** When Stylebot connects, the browser starts the CLI's native host and keeps it running while connected. Each browser profile gets its own host, listening on its own socket in `~/.stylebot/browsers/` that only you can read. The host just passes messages back and forth.
+- **The host.** When Stylebot connects, the browser starts the CLI's native host and keeps it running while connected. The open connection also keeps Stylebot's background running: Chrome's service worker and Firefox's event page would otherwise stop when idle. Each browser profile gets its own host, listening on its own socket in `~/.stylebot/browsers/` that only you can read. The host just passes messages back and forth.
 - **Finding browsers.** The CLI finds browsers by their sockets. With more than one, it asks each which browser it is and what page it shows. Sockets left behind by a host that crashed are cleaned up.
 - **The page.** The code that reads a page only loads the first time the CLI asks about that page, and only in the top frame.
 - **Permissions.** Stylebot connects only while the setting is on and the browser has granted `nativeMessaging`. Screenshots use `<all_urls>`, which Stylebot already has.
@@ -27,16 +27,19 @@ The installed host remembers which CLI version installed it. A different CLI ver
 
 ## Where browsers find the host
 
-`stylebot install` writes a manifest that points to the host and allows only Stylebot's store ids. On macOS and Linux it goes in each browser's `NativeMessagingHosts` folder; on Windows it's registered under `HKCU\Software\…\NativeMessagingHosts`.
+`stylebot install` writes a manifest that points to the host and allows only Stylebot's store ids, or on Firefox its add-on id. On macOS and Linux it goes in each browser's `NativeMessagingHosts` folder; on Windows it's registered under `HKCU\Software\…\NativeMessagingHosts`.
 
 | Browser  | macOS (`~/Library/Application Support/…`) | Linux                                   | Windows (`HKCU\Software\…`) |
 | -------- | ----------------------------------------- | --------------------------------------- | --------------------------- |
 | Chrome   | `Google/Chrome`                           | `~/.config/google-chrome`               | `Google\Chrome`             |
+| Firefox  | `Mozilla`                                 | `~/.mozilla`, or `~/.config/mozilla`    | `Mozilla`                   |
 | Edge     | `Microsoft Edge`                          | `~/.config/microsoft-edge`              | `Microsoft\Edge`            |
 | Brave    | `Google/Chrome` (shares Chrome's)         | `~/.config/BraveSoftware/Brave-Browser` | `Google\Chrome`             |
 | Chromium | `Chromium`                                | `~/.config/chromium`                    | `Chromium`                  |
 | Vivaldi  | `Vivaldi`                                 | `~/.config/vivaldi`                     | `Google\Chrome`             |
 | Arc      | `Arc/User Data`                           |                                         |                             |
+
+On Linux, Firefox's folder is `native-messaging-hosts`. Firefox counts as installed once it has a `profiles.ini`, and it reads hosts for all its profiles from one place, so `yarn dev:firefox` finds the host `stylebot install` registered for your own Firefox.
 
 The dev profiles from `yarn dev:chrome` get their own registration on macOS and Linux.
 
@@ -54,5 +57,4 @@ On Windows, `STYLEBOT_SOCKET` names a named pipe, and the first browser to conne
 
 ## Not done yet
 
-- Firefox support
 - A visible sign that the CLI is connected, since any local process can use the socket

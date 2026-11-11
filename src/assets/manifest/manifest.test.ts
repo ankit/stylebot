@@ -167,15 +167,19 @@ describe('CLI permissions', () => {
     expect(manifest.optional_permissions).toContain('nativeMessaging');
   });
 
-  it.each(['firefox', 'safari'] as const)(
-    'are left out of the %s manifest',
-    browser => {
-      const manifest = releaseManifest(browser);
+  it('are only optional in the Firefox manifest', () => {
+    const manifest = releaseManifest('firefox');
 
-      expect(manifest).not.toHaveProperty('optional_permissions');
-      expect(manifest).not.toHaveProperty('optional_host_permissions');
-    }
-  );
+    expect(manifest.permissions).not.toContain('nativeMessaging');
+    expect(manifest.optional_permissions).toEqual(['nativeMessaging']);
+  });
+
+  it('are left out of the Safari manifest', () => {
+    const manifest = releaseManifest('safari');
+
+    expect(manifest).not.toHaveProperty('optional_permissions');
+    expect(manifest).not.toHaveProperty('optional_host_permissions');
+  });
 });
 
 /**
