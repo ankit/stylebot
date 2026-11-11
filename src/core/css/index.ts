@@ -8,24 +8,13 @@ export { compileStyle } from './compile';
 
 export { getCssWithExpandedImports } from './import';
 
-export { getSelector, getBodyChildSelectors } from './selector/get-selector';
 export {
-  getTestIdBasedSelector,
-  getNameBasedSelector,
-  getNonHashedClassBasedSelector,
-  getStableClassPartsSelector,
-  getStableClassMatcher,
-  getIdBasedSelector,
-  getClassBasedSelector,
-} from './selector/element-selectors';
-export {
-  getTagNameBasedSelector,
-  getAncestorBasedSelector,
-} from './selector/ancestor-selectors';
-export {
+  getSelector,
   getSelectorCandidates,
-  getUniqueSelector,
-} from './selector/alternatives';
+  getBodyChildSelectors,
+} from './selector/get-selector';
+export { getStableClassMatcher } from './selector/element-selectors';
+export { getUniqueSelector } from './selector/unique-selectors';
 export { dedupeByMatches, byReach } from './selector/reach';
 export {
   getStableSelector,

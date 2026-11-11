@@ -949,7 +949,7 @@ test('the user marks areas by dragging, which selection lists for the agent', as
       'mark 1: 230×140 at 10,10, holding:',
       '      2  div.card  (this one: #first)',
       'mark 2: 260×40 at 40,320, over part of:',
-      '      1  html body a',
+      '      1  a',
       '',
     ].join('\n')
   );

@@ -1,5 +1,8 @@
-import { getSelectorCandidates } from './alternatives';
-import { getSelector, getBodyChildSelectors } from './get-selector';
+import {
+  getSelector,
+  getSelectorCandidates,
+  getBodyChildSelectors,
+} from './get-selector';
 
 describe('get-selector', () => {
   afterEach(() => {
@@ -16,7 +19,8 @@ describe('get-selector', () => {
     });
 
     it('prefers an aria-label over a hashed class', () => {
-      document.body.innerHTML = '<button class="WwrzSb" aria-label="Search">';
+      document.body.innerHTML =
+        '<button class="css-1q2w3e" aria-label="Search">';
 
       expect(getSelector(document.body.firstElementChild as HTMLElement)).toBe(
         'button[aria-label="Search"]'
@@ -33,7 +37,7 @@ describe('get-selector', () => {
 
     it('prefers a test-id over a hashed class', () => {
       const el = document.createElement('button');
-      el.setAttribute('class', 'WwrzSb');
+      el.setAttribute('class', 'css-1q2w3e');
       el.setAttribute('data-testid', 'submit-button');
 
       expect(getSelector(el)).toBe('button[data-testid="submit-button"]');
@@ -41,7 +45,7 @@ describe('get-selector', () => {
 
     it('prefers a name over a hashed class', () => {
       const el = document.createElement('input');
-      el.setAttribute('class', 'WwrzSb');
+      el.setAttribute('class', 'css-1q2w3e');
       el.setAttribute('name', 'email');
 
       expect(getSelector(el)).toBe('input[name="email"]');
@@ -150,13 +154,13 @@ describe('get-selector', () => {
     it('skips an ancestor scope that sweeps most of the page', () => {
       document.body.innerHTML = `
         <div class="app">
-          <div><div class="WwrzSb" data-target></div></div>
+          <div><div class="css-1q2w3e" data-target></div></div>
           ${'<div><div><div></div></div></div>'.repeat(30)}
         </div>
       `;
 
       const el = document.querySelector('[data-target]') as HTMLElement;
-      expect(getSelector(el)).toBe('div.WwrzSb');
+      expect(getSelector(el)).toBe('div.css-1q2w3e');
       expect(getSelectorCandidates(el)).not.toContain('div.app div div');
     });
 
@@ -204,7 +208,7 @@ describe('get-selector', () => {
     it('keeps an ancestor scope on a page too small to sweep', () => {
       document.body.innerHTML = `
         <div class="app">
-          <div><div class="WwrzSb" data-target></div></div>
+          <div><div class="css-1q2w3e" data-target></div></div>
         </div>
       `;
 
@@ -227,7 +231,7 @@ describe('get-selector', () => {
 
     it("prefers its own #id over an ancestor's hashed class", () => {
       document.body.innerHTML = `
-        <section class="WwrzSb">
+        <section class="css-1q2w3e">
           <a id="target"></a>
         </section>
       `;
@@ -238,7 +242,7 @@ describe('get-selector', () => {
 
     it('prefers its own #id over its own hashed class', () => {
       const el = document.createElement('a');
-      el.setAttribute('class', 'WwrzSb');
+      el.setAttribute('class', 'css-1q2w3e');
       el.setAttribute('id', 'target');
 
       expect(getSelector(el)).toBe('#target');
@@ -246,20 +250,20 @@ describe('get-selector', () => {
 
     it('falls back to its own hashed class when there is no id nearby either', () => {
       const el = document.createElement('a');
-      el.setAttribute('class', 'WwrzSb');
+      el.setAttribute('class', 'css-1q2w3e');
 
-      expect(getSelector(el)).toBe('a.WwrzSb');
+      expect(getSelector(el)).toBe('a.css-1q2w3e');
     });
 
     it("falls back to an ancestor's hashed class when there is no id nearby either", () => {
       document.body.innerHTML = `
-        <section class="WwrzSb">
+        <section class="css-1q2w3e">
           <a data-target></a>
         </section>
       `;
 
       const el = document.querySelector('[data-target]') as HTMLElement;
-      expect(getSelector(el)).toBe('section.WwrzSb a');
+      expect(getSelector(el)).toBe('section.css-1q2w3e a');
     });
 
     it('skips an id the page generates on each load', () => {
@@ -270,12 +274,10 @@ describe('get-selector', () => {
       expect(getSelector(el)).toBe('h3.LC20lb');
     });
 
-    it('prefers its own minified class over a wider ancestor scope', () => {
+    it('uses its own minified class over an ancestor scope', () => {
       document.body.innerHTML = `
-        <div class="ieodic">
+        <div class="result">
           <div class="VwiC3b yXK7lf">snippet</div>
-          <div>source</div>
-          <div>date</div>
         </div>
       `;
 
@@ -283,15 +285,28 @@ describe('get-selector', () => {
       expect(getSelector(el)).toBe('div.VwiC3b');
     });
 
-    it('keeps an ancestor scope that matches no more than its own minified class', () => {
+    it('prefers an authored class over a minified one', () => {
+      const el = document.createElement('div');
+      el.setAttribute('class', 'WwrzSb card');
+
+      expect(getSelector(el)).toBe('div.card');
+    });
+
+    it('prefers a minified class over an aria-label', () => {
+      const el = document.createElement('button');
+      el.setAttribute('class', 'WwrzSb');
+      el.setAttribute('aria-label', 'Search');
+
+      expect(getSelector(el)).toBe('button.WwrzSb');
+    });
+
+    it('skips a per-item test id altogether', () => {
       document.body.innerHTML = `
-        <div class="result">
-          <div class="VwiC3b">snippet</div>
-        </div>
+        <ul class="list"><li data-testid="row-7"></li></ul>
       `;
 
-      const el = document.querySelector('.VwiC3b') as HTMLElement;
-      expect(getSelector(el)).toBe('div.result div');
+      const el = document.querySelector('li') as HTMLElement;
+      expect(getSelector(el)).toBe('ul.list li');
     });
 
     it('falls back to an id-based selector when nothing nearby is usable', () => {

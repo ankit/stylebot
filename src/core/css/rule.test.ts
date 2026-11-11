@@ -310,6 +310,12 @@ describe('rule', () => {
         ).toBe('div.mw-heading h2');
       });
 
+      it('reuses the tag chain older versions generated', () => {
+        expect(
+          pick('<h1 id="picked">Hi</h1>', 'html body h1 { color: red; }')
+        ).toBe('html body h1');
+      });
+
       it('reuses a selector whose subject has a class, id, attribute or position', () => {
         const html =
           '<ul class="nav"><li><a id="picked" class="link" href="/x">x</a></li></ul>';
