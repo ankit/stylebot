@@ -24,7 +24,7 @@ const TEST_ID_ATTRIBUTES = [
  * or generated on each load, rather than shared by every element of its
  * kind like `sidebar`.
  */
-const isPerItem = (value: string): boolean =>
+const isPerItemTestId = (value: string): boolean =>
   /\d{3,}|(^|[-_:.])\d+($|[-_:.])/.test(value) || looksGeneratedId(value);
 
 export const getTestIdBasedSelector = (el: HTMLElement): string | null => {
@@ -48,7 +48,7 @@ export const getSharedTestIdSelector = (el: HTMLElement): string | null => {
     Boolean
   );
 
-  return value && !isPerItem(value) ? getTestIdBasedSelector(el) : null;
+  return value && !isPerItemTestId(value) ? getTestIdBasedSelector(el) : null;
 };
 
 /**
