@@ -14,12 +14,7 @@ import { FIREFOX } from './engines/firefox.mjs';
 
 const { join, dirname } = IS_WINDOWS ? path.win32 : path.posix;
 
-/*
- * What differs between Chromium browsers and Firefox lives in their engine:
- * where an install keeps its user data and reads native hosts from, who the
- * host manifest allows, where Windows keeps that manifest, and how to read
- * its profiles.
- */
+// What differs between Chromium browsers and Firefox lives in their engine.
 const ENGINES = [CHROMIUM, FIREFOX];
 
 /*

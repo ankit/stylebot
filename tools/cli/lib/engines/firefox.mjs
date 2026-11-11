@@ -66,8 +66,11 @@ export const FIREFOX = {
       fs.existsSync(join(dataDir, 'profiles.ini'))
     );
   },
+
   allowed: { allowed_extensions: [FIREFOX_ID] },
+
   windowsManifestDir: join(STATE_DIR, 'firefox'),
+
   // Profiles sit in a Profiles folder, except on Linux.
   profiles: dataDir => {
     const dir = os.platform() === 'linux' ? dataDir : join(dataDir, 'Profiles');
@@ -77,5 +80,6 @@ export const FIREFOX = {
       .map(entry => join(dir, entry))
       .filter(profile => fs.existsSync(join(profile, 'prefs.js')));
   },
+
   hasStylebot: firefoxProfileHasStylebot,
 };

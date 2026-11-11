@@ -63,14 +63,18 @@ export const CHROMIUM = {
       },
     ];
   },
+
   allowed: {
     allowed_origins: EXTENSION_IDS.map(id => `chrome-extension://${id}/`),
   },
+
   windowsManifestDir: STATE_DIR,
+
   profiles: dataDir =>
     fs
       .readdirSync(dataDir)
       .map(entry => join(dataDir, entry))
       .filter(profile => fs.existsSync(join(profile, 'Preferences'))),
+
   hasStylebot: chromiumProfileHasStylebot,
 };
