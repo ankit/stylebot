@@ -20,14 +20,150 @@ const EXTENSION_IDS = [
 ];
 const FIREFOX_ID = '{52bda3fd-dc48-4b3d-a7b9-58af57879f1e}';
 
+/**
+ * Whether a Chromium profile has Stylebot. A store install unpacks into its
+ * Extensions folder, and every install, unpacked ones too, keeps settings
+ * in its preferences.
+ */
+const chromiumProfileHasStylebot = profile =>
+  EXTENSION_IDS.some(id => fs.existsSync(join(profile, 'Extensions', id))) ||
+  ['Preferences', 'Secure Preferences'].some(file => {
+    try {
+      const { extensions } = JSON.parse(
+        fs.readFileSync(join(profile, file), 'utf8')
+      );
+
+      return EXTENSION_IDS.some(id => id in (extensions?.settings ?? {}));
+    } catch {
+      return false;
+    }
+  });
+
+/**
+ * Whether a Firefox profile has Stylebot: a store install keeps its package
+ * in the extensions folder, and every install is listed in extensions.json.
+ */
+const firefoxProfileHasStylebot = profile => {
+  if (fs.existsSync(join(profile, 'extensions', `${FIREFOX_ID}.xpi`))) {
+    return true;
+  }
+
+  try {
+    return fs
+      .readFileSync(join(profile, 'extensions.json'), 'utf8')
+      .includes(`"${FIREFOX_ID}"`);
+  } catch {
+    return false;
+  }
+};
+
 /*
- * Each browser's user data folder: under ~/Library/Application Support on
- * macOS, ~/.config on Linux and %LOCALAPPDATA% on Windows, where its native
- * hosts are registered under an HKCU key instead.
+ * What differs between Chromium browsers and Firefox: where an install
+ * keeps its user data and reads native hosts from, who the host manifest
+ * allows, where Windows keeps that manifest, and how to read its profiles.
+ */
+const CHROMIUM = {
+  /**
+   * A browser's user data under ~/Library/Application Support, ~/.config or
+   * %LOCALAPPDATA%, once it has run: it writes Local State on its first run,
+   * and its folder alone can be just our manifest.
+   */
+  installs(browser) {
+    const platform = os.platform();
+    const home = os.homedir();
+    const root = {
+      darwin: join(home, 'Library', 'Application Support'),
+      linux: join(home, '.config'),
+      win32: process.env.LOCALAPPDATA || join(home, 'AppData', 'Local'),
+    }[platform];
+
+    if (!root || !fs.existsSync(join(root, browser[platform], 'Local State'))) {
+      return [];
+    }
+
+    const hostsRoot =
+      (platform === 'darwin' && browser.darwinHosts) || browser[platform];
+
+    return [
+      {
+        dataDir: join(root, browser[platform]),
+        hostsDir: join(root, hostsRoot, 'NativeMessagingHosts'),
+      },
+    ];
+  },
+  allowed: {
+    allowed_origins: EXTENSION_IDS.map(id => `chrome-extension://${id}/`),
+  },
+  windowsManifestDir: STATE_DIR,
+  profiles: dataDir =>
+    fs
+      .readdirSync(dataDir)
+      .map(entry => join(dataDir, entry))
+      .filter(profile => fs.existsSync(join(profile, 'Preferences'))),
+  hasStylebot: chromiumProfileHasStylebot,
+};
+
+const FIREFOX = {
+  /**
+   * Firefox's user data, holding profiles.ini, under ~/Library/Application
+   * Support, home or %APPDATA%. On Linux, newer Firefox may use
+   * ~/.config/mozilla instead of ~/.mozilla.
+   */
+  installs(browser) {
+    const platform = os.platform();
+    const home = os.homedir();
+    let installs;
+
+    if (platform === 'darwin') {
+      const support = join(home, 'Library', 'Application Support');
+
+      installs = [
+        {
+          dataDir: join(support, browser.darwin),
+          hostsDir: join(support, 'Mozilla', 'NativeMessagingHosts'),
+        },
+      ];
+    } else if (platform === 'linux') {
+      installs = [join(home, '.mozilla'), join(home, '.config', 'mozilla')].map(
+        dir => ({
+          dataDir: join(dir, 'firefox'),
+          hostsDir: join(dir, 'native-messaging-hosts'),
+        })
+      );
+    } else {
+      const appData = process.env.APPDATA || join(home, 'AppData', 'Roaming');
+
+      installs = [{ dataDir: join(appData, browser.win32) }];
+    }
+
+    return installs.filter(({ dataDir }) =>
+      fs.existsSync(join(dataDir, 'profiles.ini'))
+    );
+  },
+  allowed: { allowed_extensions: [FIREFOX_ID] },
+  windowsManifestDir: join(STATE_DIR, 'firefox'),
+  // Profiles sit in a Profiles folder, except on Linux.
+  profiles: dataDir => {
+    const dir = os.platform() === 'linux' ? dataDir : join(dataDir, 'Profiles');
+
+    return fs
+      .readdirSync(dir)
+      .map(entry => join(dir, entry))
+      .filter(profile => fs.existsSync(join(profile, 'prefs.js')));
+  },
+  hasStylebot: firefoxProfileHasStylebot,
+};
+
+const ENGINES = [CHROMIUM, FIREFOX];
+
+/*
+ * Each browser's user data folder per platform, as its engine reads it, and
+ * on Windows the HKCU key it reads native hosts from.
  */
 export const BROWSERS = [
   {
     name: 'Chrome',
+    engine: CHROMIUM,
     darwin: 'Google/Chrome',
     linux: 'google-chrome',
     win32: 'Google\\Chrome\\User Data',
@@ -35,7 +171,7 @@ export const BROWSERS = [
   },
   {
     name: 'Firefox',
-    firefox: true,
+    engine: FIREFOX,
     darwin: 'Firefox',
     linux: '.mozilla/firefox',
     win32: 'Mozilla\\Firefox',
@@ -43,6 +179,7 @@ export const BROWSERS = [
   },
   {
     name: 'Edge',
+    engine: CHROMIUM,
     darwin: 'Microsoft Edge',
     linux: 'microsoft-edge',
     win32: 'Microsoft\\Edge\\User Data',
@@ -50,6 +187,7 @@ export const BROWSERS = [
   },
   {
     name: 'Brave',
+    engine: CHROMIUM,
     darwin: 'BraveSoftware/Brave-Browser',
     linux: 'BraveSoftware/Brave-Browser',
     win32: 'BraveSoftware\\Brave-Browser\\User Data',
@@ -59,6 +197,7 @@ export const BROWSERS = [
   },
   {
     name: 'Chromium',
+    engine: CHROMIUM,
     darwin: 'Chromium',
     linux: 'chromium',
     win32: 'Chromium\\User Data',
@@ -66,50 +205,14 @@ export const BROWSERS = [
   },
   {
     name: 'Vivaldi',
+    engine: CHROMIUM,
     darwin: 'Vivaldi',
     linux: 'vivaldi',
     win32: 'Vivaldi\\User Data',
     key: 'Google\\Chrome',
   },
-  { name: 'Arc', darwin: 'Arc/User Data' },
+  { name: 'Arc', engine: CHROMIUM, darwin: 'Arc/User Data' },
 ];
-
-/*
- * Firefox's user data, which holds profiles.ini, and the folders it reads
- * native hosts from: under ~/Library/Application Support on macOS, home on
- * Linux, where newer Firefox may use ~/.config/mozilla, and %APPDATA% on
- * Windows, where they're registered under an HKCU key instead.
- */
-const installedFirefox = browser => {
-  const platform = os.platform();
-  const home = os.homedir();
-
-  if (platform === 'darwin') {
-    const support = join(home, 'Library', 'Application Support');
-
-    return [
-      {
-        dataDir: join(support, browser.darwin),
-        hostsDir: join(support, 'Mozilla', 'NativeMessagingHosts'),
-      },
-    ];
-  }
-
-  if (platform === 'linux') {
-    return [home, join(home, '.config')].map((root, i) => ({
-      dataDir: join(root, i === 0 ? '.mozilla' : 'mozilla', 'firefox'),
-      hostsDir: join(
-        root,
-        i === 0 ? '.mozilla' : 'mozilla',
-        'native-messaging-hosts'
-      ),
-    }));
-  }
-
-  const appData = process.env.APPDATA || join(home, 'AppData', 'Roaming');
-
-  return [{ dataDir: join(appData, browser.win32) }];
-};
 
 /**
  * The Stylebot checkout the current directory is in, whose dev profiles
@@ -152,46 +255,13 @@ const devProfileDirs = () => {
 };
 
 /**
- * The installed browsers on this platform, with the folder their native
- * hosts go in (or, on Windows, their user data folder). A browser writes
- * Local State on its first run; its folder alone can be just our manifest.
+ * Each installed copy of the browsers on this platform, with its user data
+ * folder and the folder its native hosts go in (unused on Windows).
  */
-const installedBrowsers = () => {
-  const platform = os.platform();
-  const home = os.homedir();
-  const root = {
-    darwin: join(home, 'Library', 'Application Support'),
-    linux: join(home, '.config'),
-    win32: process.env.LOCALAPPDATA || join(home, 'AppData', 'Local'),
-  }[platform];
-
-  return BROWSERS.filter(browser => root && browser[platform]).flatMap(
-    browser => {
-      if (browser.firefox) {
-        return installedFirefox(browser)
-          .filter(({ dataDir }) => fs.existsSync(join(dataDir, 'profiles.ini')))
-          .map(dirs => ({ ...browser, ...dirs }));
-      }
-
-      if (!fs.existsSync(join(root, browser[platform], 'Local State'))) {
-        return [];
-      }
-
-      const dir = join(
-        root,
-        (platform === 'darwin' && browser.darwinHosts) || browser[platform]
-      );
-
-      return [
-        {
-          ...browser,
-          dataDir: join(root, browser[platform]),
-          hostsDir: join(dir, 'NativeMessagingHosts'),
-        },
-      ];
-    }
+const installedBrowsers = () =>
+  BROWSERS.filter(browser => browser[os.platform()]).flatMap(browser =>
+    browser.engine.installs(browser).map(dirs => ({ ...browser, ...dirs }))
   );
-};
 
 /**
  * Writes the launcher the browser starts the host with, pinned to this
@@ -225,23 +295,16 @@ export const launcherNode = () => {
   return fs.readFileSync(HOST_LAUNCHER_PATH, 'utf8').match(/"([^"]+)"/)?.[1];
 };
 
-// Who may start the host: Chromium names extensions by origin, Firefox by add-on id.
-const CHROMIUM_ALLOWED = {
-  allowed_origins: EXTENSION_IDS.map(id => `chrome-extension://${id}/`),
-};
-const FIREFOX_ALLOWED = { allowed_extensions: [FIREFOX_ID] };
-
 /**
- * Writes the host manifest into a folder, returning its path.
+ * Writes the host manifest for an engine into a folder, returning its path.
  */
-const writeManifest = (dir, firefox = false) => {
-  const allowed = firefox ? FIREFOX_ALLOWED : CHROMIUM_ALLOWED;
+const writeManifest = (dir, engine) => {
   const manifest = {
     name: HOST_NAME,
     description: 'Stylebot CLI',
     path: HOST_LAUNCHER_PATH,
     type: 'stdio',
-    ...allowed,
+    ...engine.allowed,
   };
   const file = join(dir, `${HOST_NAME}.json`);
 
@@ -251,25 +314,45 @@ const writeManifest = (dir, firefox = false) => {
   return file;
 };
 
-// Where Windows keeps Firefox's manifest, apart from Chromium's.
-const FIREFOX_MANIFEST_DIR = join(STATE_DIR, 'firefox');
+/**
+ * The checkout's dev profiles and every installed browser, with the folder
+ * each reads native hosts from on macOS and Linux.
+ */
+const registrationTargets = () => [
+  ...devProfileDirs().map(dir => ({
+    name: 'Dev profile',
+    engine: CHROMIUM,
+    dataDir: dir,
+    hostsDir: join(dir, 'NativeMessagingHosts'),
+  })),
+  ...installedBrowsers(),
+];
 
 /**
- * The folders registerHost writes host manifests to on macOS and Linux,
- * per browser.
+ * Registers the host on Windows: one manifest per engine, and the registry
+ * key each browser reads pointing at its engine's manifest.
  */
-const manifestFolders = () =>
-  [
-    ...devProfileDirs().map(dir => ({
-      name: 'Dev profile',
-      hostsDir: join(dir, 'NativeMessagingHosts'),
-    })),
-    ...installedBrowsers(),
-  ].map(({ name, hostsDir, firefox = false }) => ({
+const registerOnWindows = () => {
+  const registrations = installedBrowsers().map(({ name, key, engine }) => ({
     browser: name,
-    location: hostsDir,
-    firefox,
+    location: `HKCU\\Software\\${key}\\NativeMessagingHosts\\${HOST_NAME}`,
+    engine,
   }));
+  const keys = new Map(registrations.map(r => [r.location, r.engine]));
+  const manifests = new Map();
+
+  for (const [key, engine] of keys) {
+    if (!manifests.has(engine)) {
+      manifests.set(engine, writeManifest(engine.windowsManifestDir, engine));
+    }
+
+    const args = ['add', key, '/ve', '/d', manifests.get(engine), '/f'];
+
+    execFileSync('reg', args, { stdio: 'ignore' });
+  }
+
+  return registrations.map(({ browser, location }) => ({ browser, location }));
+};
 
 /**
  * Registers the host copied into HOST_DIR with the checkout's dev profiles
@@ -279,42 +362,14 @@ export const registerHost = () => {
   writeLauncher();
 
   if (IS_WINDOWS) {
-    const browsers = installedBrowsers();
-    const manifests = {
-      chromium: browsers.some(({ firefox }) => !firefox)
-        ? writeManifest(STATE_DIR)
-        : undefined,
-      firefox: browsers.some(({ firefox }) => firefox)
-        ? writeManifest(FIREFOX_MANIFEST_DIR, true)
-        : undefined,
-    };
-
-    const registrations = browsers.map(browser => ({
-      browser: browser.name,
-      location: `HKCU\\Software\\${browser.key}\\NativeMessagingHosts\\${HOST_NAME}`,
-      manifest: browser.firefox ? manifests.firefox : manifests.chromium,
-    }));
-    const keys = new Map(registrations.map(r => [r.location, r.manifest]));
-
-    for (const [key, manifest] of keys) {
-      execFileSync('reg', ['add', key, '/ve', '/d', manifest, '/f'], {
-        stdio: 'ignore',
-      });
-    }
-
-    return registrations.map(({ browser, location }) => ({
-      browser,
-      location,
-    }));
+    return registerOnWindows();
   }
 
-  const registrations = manifestFolders();
+  return registrationTargets().map(({ name, hostsDir, engine }) => {
+    writeManifest(hostsDir, engine);
 
-  for (const { location, firefox } of registrations) {
-    writeManifest(location, firefox);
-  }
-
-  return registrations.map(({ browser, location }) => ({ browser, location }));
+    return { browser: name, location: hostsDir };
+  });
 };
 
 /**
@@ -322,8 +377,8 @@ export const registerHost = () => {
  */
 export const isHostRegistered = () => {
   const folders = IS_WINDOWS
-    ? [STATE_DIR, FIREFOX_MANIFEST_DIR]
-    : manifestFolders().map(({ location }) => location);
+    ? ENGINES.map(({ windowsManifestDir }) => windowsManifestDir)
+    : registrationTargets().map(({ hostsDir }) => hostsDir);
 
   return (
     fs.existsSync(HOST_LAUNCHER_PATH) &&
@@ -340,106 +395,28 @@ export const supportedBrowsers = () =>
   );
 
 /**
- * Whether a browser profile has Stylebot. A store install unpacks into its
- * Extensions folder, and every install, unpacked ones too, keeps settings
- * in its preferences.
- */
-const profileHasStylebot = profile =>
-  EXTENSION_IDS.some(id => fs.existsSync(join(profile, 'Extensions', id))) ||
-  ['Preferences', 'Secure Preferences'].some(file => {
-    try {
-      const { extensions } = JSON.parse(
-        fs.readFileSync(join(profile, file), 'utf8')
-      );
-
-      return EXTENSION_IDS.some(id => id in (extensions?.settings ?? {}));
-    } catch {
-      return false;
-    }
-  });
-
-/**
- * Whether a Firefox profile has Stylebot: a store install keeps its package
- * in the extensions folder, and every install is listed in extensions.json.
- */
-const firefoxProfileHasStylebot = profile => {
-  if (fs.existsSync(join(profile, 'extensions', `${FIREFOX_ID}.xpi`))) {
-    return true;
-  }
-
-  try {
-    return fs
-      .readFileSync(join(profile, 'extensions.json'), 'utf8')
-      .includes(`"${FIREFOX_ID}"`);
-  } catch {
-    return false;
-  }
-};
-
-/**
- * Firefox's profile folders, which sit in a Profiles folder except on Linux.
- */
-const firefoxProfiles = dataDir => {
-  const dir =
-    IS_WINDOWS || os.platform() === 'darwin'
-      ? join(dataDir, 'Profiles')
-      : dataDir;
-
-  return fs
-    .readdirSync(dir)
-    .map(entry => join(dir, entry))
-    .filter(profile => fs.existsSync(join(profile, 'prefs.js')));
-};
-
-/**
  * The browsers, and dev profiles, with Stylebot in one of their profiles,
  * or undefined when there was no profile to look in.
  */
 export const findStylebot = () => {
-  const browsers = [
-    ...devProfileDirs().map(dir => ({ name: 'Dev profile', dataDir: dir })),
-    ...installedBrowsers(),
-  ];
   const found = new Set();
-  let profiles = 0;
+  let count = 0;
 
-  for (const { name, dataDir, firefox } of browsers) {
-    if (firefox) {
-      let firefoxes;
-
-      try {
-        firefoxes = firefoxProfiles(dataDir);
-      } catch {
-        continue;
-      }
-
-      profiles += firefoxes.length;
-
-      if (firefoxes.some(firefoxProfileHasStylebot)) {
-        found.add(name);
-      }
-
-      continue;
-    }
-
-    let entries;
+  for (const { name, dataDir, engine } of registrationTargets()) {
+    let profiles;
 
     try {
-      entries = fs.readdirSync(dataDir);
+      profiles = engine.profiles(dataDir);
     } catch {
       continue;
     }
 
-    for (const profile of entries.map(entry => join(dataDir, entry))) {
-      if (fs.existsSync(join(profile, 'Preferences'))) {
-        profiles++;
+    count += profiles.length;
 
-        if (profileHasStylebot(profile)) {
-          found.add(name);
-        }
-      }
+    if (profiles.some(engine.hasStylebot)) {
+      found.add(name);
     }
   }
 
-  return profiles ? [...found] : undefined;
+  return count ? [...found] : undefined;
 };
