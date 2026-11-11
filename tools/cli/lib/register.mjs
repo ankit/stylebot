@@ -8,152 +8,18 @@ import {
   HOST_LAUNCHER_PATH,
   HOST_NAME,
   IS_WINDOWS,
-  STATE_DIR,
 } from './paths.mjs';
+import { CHROMIUM } from './engines/chromium.mjs';
+import { FIREFOX } from './engines/firefox.mjs';
 
 const { join, dirname } = IS_WINDOWS ? path.win32 : path.posix;
 
-// What each store assigns Stylebot; Chrome's comes from the public key dev builds carry too.
-const EXTENSION_IDS = [
-  'oiaejidbmkiecgbjeifoejpgmdaleoha',
-  'mjolbpfednnbebfapicajpifliopnnai',
-];
-const FIREFOX_ID = '{52bda3fd-dc48-4b3d-a7b9-58af57879f1e}';
-
-/**
- * Whether a Chromium profile has Stylebot. A store install unpacks into its
- * Extensions folder, and every install, unpacked ones too, keeps settings
- * in its preferences.
- */
-const chromiumProfileHasStylebot = profile =>
-  EXTENSION_IDS.some(id => fs.existsSync(join(profile, 'Extensions', id))) ||
-  ['Preferences', 'Secure Preferences'].some(file => {
-    try {
-      const { extensions } = JSON.parse(
-        fs.readFileSync(join(profile, file), 'utf8')
-      );
-
-      return EXTENSION_IDS.some(id => id in (extensions?.settings ?? {}));
-    } catch {
-      return false;
-    }
-  });
-
-/**
- * Whether a Firefox profile has Stylebot: a store install keeps its package
- * in the extensions folder, and every install is listed in extensions.json.
- */
-const firefoxProfileHasStylebot = profile => {
-  if (fs.existsSync(join(profile, 'extensions', `${FIREFOX_ID}.xpi`))) {
-    return true;
-  }
-
-  try {
-    return fs
-      .readFileSync(join(profile, 'extensions.json'), 'utf8')
-      .includes(`"${FIREFOX_ID}"`);
-  } catch {
-    return false;
-  }
-};
-
 /*
- * What differs between Chromium browsers and Firefox: where an install
- * keeps its user data and reads native hosts from, who the host manifest
- * allows, where Windows keeps that manifest, and how to read its profiles.
+ * What differs between Chromium browsers and Firefox lives in their engine:
+ * where an install keeps its user data and reads native hosts from, who the
+ * host manifest allows, where Windows keeps that manifest, and how to read
+ * its profiles.
  */
-const CHROMIUM = {
-  /**
-   * A browser's user data under ~/Library/Application Support, ~/.config or
-   * %LOCALAPPDATA%, once it has run: it writes Local State on its first run,
-   * and its folder alone can be just our manifest.
-   */
-  installs(browser) {
-    const platform = os.platform();
-    const home = os.homedir();
-    const root = {
-      darwin: join(home, 'Library', 'Application Support'),
-      linux: join(home, '.config'),
-      win32: process.env.LOCALAPPDATA || join(home, 'AppData', 'Local'),
-    }[platform];
-
-    if (!root || !fs.existsSync(join(root, browser[platform], 'Local State'))) {
-      return [];
-    }
-
-    const hostsRoot =
-      (platform === 'darwin' && browser.darwinHosts) || browser[platform];
-
-    return [
-      {
-        dataDir: join(root, browser[platform]),
-        hostsDir: join(root, hostsRoot, 'NativeMessagingHosts'),
-      },
-    ];
-  },
-  allowed: {
-    allowed_origins: EXTENSION_IDS.map(id => `chrome-extension://${id}/`),
-  },
-  windowsManifestDir: STATE_DIR,
-  profiles: dataDir =>
-    fs
-      .readdirSync(dataDir)
-      .map(entry => join(dataDir, entry))
-      .filter(profile => fs.existsSync(join(profile, 'Preferences'))),
-  hasStylebot: chromiumProfileHasStylebot,
-};
-
-const FIREFOX = {
-  /**
-   * Firefox's user data, holding profiles.ini, under ~/Library/Application
-   * Support, home or %APPDATA%. On Linux, newer Firefox may use
-   * ~/.config/mozilla instead of ~/.mozilla.
-   */
-  installs(browser) {
-    const platform = os.platform();
-    const home = os.homedir();
-    let installs;
-
-    if (platform === 'darwin') {
-      const support = join(home, 'Library', 'Application Support');
-
-      installs = [
-        {
-          dataDir: join(support, browser.darwin),
-          hostsDir: join(support, 'Mozilla', 'NativeMessagingHosts'),
-        },
-      ];
-    } else if (platform === 'linux') {
-      installs = [join(home, '.mozilla'), join(home, '.config', 'mozilla')].map(
-        dir => ({
-          dataDir: join(dir, 'firefox'),
-          hostsDir: join(dir, 'native-messaging-hosts'),
-        })
-      );
-    } else {
-      const appData = process.env.APPDATA || join(home, 'AppData', 'Roaming');
-
-      installs = [{ dataDir: join(appData, browser.win32) }];
-    }
-
-    return installs.filter(({ dataDir }) =>
-      fs.existsSync(join(dataDir, 'profiles.ini'))
-    );
-  },
-  allowed: { allowed_extensions: [FIREFOX_ID] },
-  windowsManifestDir: join(STATE_DIR, 'firefox'),
-  // Profiles sit in a Profiles folder, except on Linux.
-  profiles: dataDir => {
-    const dir = os.platform() === 'linux' ? dataDir : join(dataDir, 'Profiles');
-
-    return fs
-      .readdirSync(dir)
-      .map(entry => join(dir, entry))
-      .filter(profile => fs.existsSync(join(profile, 'prefs.js')));
-  },
-  hasStylebot: firefoxProfileHasStylebot,
-};
-
 const ENGINES = [CHROMIUM, FIREFOX];
 
 /*
