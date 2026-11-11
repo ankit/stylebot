@@ -11,6 +11,7 @@ const EXTENSION_IDS = [
   'oiaejidbmkiecgbjeifoejpgmdaleoha',
   'mjolbpfednnbebfapicajpifliopnnai',
 ];
+
 /**
  * Whether a Chromium profile has Stylebot. A store install unpacks into its
  * Extensions folder, and every install, unpacked ones too, keeps settings
