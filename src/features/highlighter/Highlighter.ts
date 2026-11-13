@@ -354,7 +354,7 @@ class Highlighter {
     event.preventDefault();
     event.stopPropagation();
 
-    this.hoverElement(getComposedTarget(event));
+    this.hoverElement(getComposedTarget(event), event);
   };
 
   /**
@@ -369,7 +369,7 @@ class Highlighter {
     const el = getComposedTarget(event);
 
     if (el !== this.pointerElement) {
-      this.hoverElement(el);
+      this.hoverElement(el, event);
     }
   };
 
@@ -387,15 +387,40 @@ class Highlighter {
     this.hideOverlay();
   };
 
-  hoverElement = (el: HTMLElement): void => {
+  hoverElement = (el: HTMLElement, point?: MouseEvent): void => {
     this.pointerElement = el;
+    const target = point ? this.seeThroughTransparent(el, point) : el;
 
-    if (el !== this.currentElement) {
+    if (target !== this.currentElement) {
       this.drillStack = [];
     }
 
-    this.setCurrentElement(el);
-    this.showOverlay(el);
+    this.setCurrentElement(target);
+    this.showOverlay(target);
+  };
+
+  /**
+   * What the pointer shows when the element on top is fully transparent,
+   * like the invisible checkbox over a menu button: the first visible
+   * element under it, else `el`.
+   */
+  seeThroughTransparent = (el: HTMLElement, point: MouseEvent): HTMLElement => {
+    if (el.checkVisibility({ opacityProperty: true })) {
+      return el;
+    }
+
+    const visible = el.ownerDocument
+      .elementsFromPoint(point.clientX, point.clientY)
+      .find(
+        node =>
+          !this.isStylebotElement(node) &&
+          node.checkVisibility({
+            opacityProperty: true,
+            visibilityProperty: true,
+          })
+      );
+
+    return (visible as HTMLElement | undefined) ?? el;
   };
 
   onPointerUp = (event: MouseEvent): void => {
