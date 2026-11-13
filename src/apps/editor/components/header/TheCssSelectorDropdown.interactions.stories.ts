@@ -355,3 +355,53 @@ export const ClearButtonEmptiesSelector: StoryObj = {
     await expect(within(canvasElement).queryByRole('menu')).toBeNull();
   },
 };
+
+const LONG_SELECTOR =
+  '#skin-client-prefs-vector-feature-custom-font-size div.vector-menu-content ul.vector-menu-content-list li.mw-list-item';
+
+const tooltip = () => document.querySelector('[role="tooltip"]');
+
+// user-event fires mouseenter on the hovered node alone, so hover the
+// tooltip's own anchor.
+const tooltipAnchor = (root: HTMLElement) =>
+  chips(root).querySelector('.s-tooltip') as HTMLElement;
+
+export const LongSelectorOnOneLine: StoryObj = {
+  ...editor({ css: RULE_CSS, activeSelector: LONG_SELECTOR }),
+  name: 'a long selector stays on one line, in full in a tooltip and while editing',
+  play: async ({ canvasElement, step }) => {
+    const text = () =>
+      chips(canvasElement).querySelector('.selector-text') as HTMLElement;
+
+    await step('the field cuts the selector short on one line', async () => {
+      await expect(text().scrollWidth).toBeGreaterThan(text().clientWidth);
+      await expect(text().getClientRects()).toHaveLength(1);
+      await expect(text().offsetHeight).toBeLessThan(24);
+    });
+
+    await step('hovering shows the whole selector', async () => {
+      await user.hover(tooltipAnchor(canvasElement));
+      await waitFor(() => expect(tooltip()).toHaveTextContent(LONG_SELECTOR));
+      await user.unhover(tooltipAnchor(canvasElement));
+    });
+
+    await step('editing shows the whole selector', async () => {
+      await user.click(chips(canvasElement));
+      await waitFor(() => expect(input(canvasElement)).toHaveFocus());
+      await expect(input(canvasElement).value).toBe(LONG_SELECTOR);
+      await expect(input(canvasElement).scrollHeight).toBeLessThanOrEqual(
+        input(canvasElement).clientHeight
+      );
+    });
+  },
+};
+
+export const ShortSelectorWithoutTooltip: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'a selector that fits shows no tooltip on hover',
+  play: async ({ canvasElement }) => {
+    await user.hover(tooltipAnchor(canvasElement));
+    await new Promise(resolve => setTimeout(resolve, 800));
+    await expect(tooltip()).toBeNull();
+  },
+};
