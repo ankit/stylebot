@@ -1,104 +1,135 @@
-import { matchesOf, sameElements } from './reach';
-import { getKindSelector } from './element-selectors';
+import { countMatches } from './reach';
 import { isSimpleSelector } from './selector-text';
-import { getPositionedStep } from './unique-selectors';
+import { getLookAlikes, getPositionedStep } from './unique-selectors';
+import type { LookAlikes } from './unique-selectors';
 
 // Repeated blocks like a tweet sit deeper than a row's cells, so look further.
-const MAX_LEVELS = 12;
+const MAX_LEVELS_UP = 12;
 
 const POSITION = /:nth-of-type\(\d+\)/;
 
 /**
- * Renders steps joined by their combinators, `joins[i]` sitting between
- * `steps[i]` and `steps[i + 1]`.
+ * One step of a path, and how it sits under the step before it: as a
+ * direct child, or anywhere below once the steps between are left out.
  */
-const renderPath = (steps: Array<string>, joins: Array<string>): string =>
-  steps.map((step, i) => (i ? `${joins[i - 1]}${step}` : step)).join('');
+type Step = { compound: string; under: ' > ' | ' ' };
+
+const toSelector = (path: Array<Step>): string =>
+  path
+    .map(({ compound, under }, i) => (i ? `${under}${compound}` : compound))
+    .join('');
 
 /**
- * The element at the end of `steps` under every match of `scope`, with
- * each step in between and each position left out that it still matches
- * the same elements without. Null when it matches fewer than two.
+ * Leaves out each step between the block and the element that the path
+ * matches as many elements without (leaving one out only widens it, so
+ * that means the same elements), e.g.
+ * `tr.athing > td > span.titleline > a` → `tr.athing span.titleline > a`.
  */
-const getPathUnder = (scope: string, steps: Array<string>): string | null => {
-  let path = [scope, ...steps];
-  let joins = steps.map(() => ' > ');
-  const target = matchesOf(renderPath(path, joins));
-  if (target.length < 2) {
-    return null;
-  }
+const dropUnneededSteps = (path: Array<Step>, count: number): Array<Step> => {
+  let kept = path;
 
-  const matchesTarget = (candidate: string) =>
-    sameElements(matchesOf(candidate), target);
+  for (let i = 1; i < kept.length - 1; ) {
+    const without = [
+      ...kept.slice(0, i),
+      { ...kept[i + 1], under: ' ' as const },
+      ...kept.slice(i + 2),
+    ];
 
-  for (let i = 1; i < path.length - 1; ) {
-    const shorterPath = [...path.slice(0, i), ...path.slice(i + 1)];
-    const shorterJoins = [...joins.slice(0, i - 1), ' ', ...joins.slice(i + 1)];
-
-    if (matchesTarget(renderPath(shorterPath, shorterJoins))) {
-      path = shorterPath;
-      joins = shorterJoins;
+    if (countMatches(toSelector(without)) === count) {
+      kept = without;
     } else {
       i++;
     }
   }
 
+  return kept;
+};
+
+/**
+ * Leaves out each `:nth-of-type()` the path matches as many elements
+ * without, e.g. `tr.athing > td:nth-of-type(3) > span.titleline` →
+ * `tr.athing > td > span.titleline` when only that cell has a title.
+ */
+const dropUnneededPositions = (
+  path: Array<Step>,
+  count: number
+): Array<Step> => {
+  let kept = path;
+
   path.forEach((step, i) => {
-    const unpositioned = [...path];
-    unpositioned[i] = step.replace(POSITION, '');
+    const compound = step.compound.replace(POSITION, '');
+    const without = kept.map((other, j) =>
+      j === i ? { ...other, compound } : other
+    );
 
     if (
-      unpositioned[i] !== step &&
-      matchesTarget(renderPath(unpositioned, joins))
+      compound !== step.compound &&
+      countMatches(toSelector(without)) === count
     ) {
-      path = unpositioned;
+      kept = without;
     }
   });
 
-  return renderPath(path, joins);
+  return kept;
 };
 
 /**
- * A repeated ancestor's own name, like a card's class, when its siblings
- * look the same (its step needed a position); null for a bare tag.
+ * The path from every block `block` matches down to the element `steps`
+ * lead to, as short as it gets without matching more. Null when it
+ * matches fewer than two elements, so there's no group to style.
  */
-const getRepeatedBlock = (
-  ancestor: HTMLElement,
-  step: string
+const getPathFromBlock = (
+  block: string,
+  steps: Array<string>
 ): string | null => {
-  if (!step.includes(':nth-of-type(')) {
+  const path = [block, ...steps].map(
+    (compound): Step => ({ compound, under: ' > ' })
+  );
+  const count = countMatches(toSelector(path));
+  if (count < 2) {
     return null;
   }
 
-  return getKindSelector(ancestor);
+  return toSelector(
+    dropUnneededPositions(dropUnneededSteps(path, count), count)
+  );
 };
 
 /**
- * Climbs from `el` building the path down to it, and returns the shortest
- * path under the first ancestor `anchorFor` names that is simple enough to
- * keep working; `anchorFor` gets each ancestor and its positioned step.
+ * The name an ancestor shares with its look-alike siblings, like a card's
+ * class, when it repeats; null when it doesn't, or has only a bare tag.
  */
-const getPathUnderAnchor = (
+const getRepeatedBlockName = (
+  ancestor: HTMLElement,
+  { own, rivals }: LookAlikes
+): string | null =>
+  rivals.length && own !== ancestor.tagName.toLowerCase() ? own : null;
+
+/**
+ * Climbs from `el` to the first ancestor `nameBlock` names whose path down
+ * to `el` stays simple enough to keep working, and returns that path.
+ */
+const findPathFromNearestBlock = (
   el: HTMLElement,
-  anchorFor: (ancestor: HTMLElement, step: string) => string | null
+  nameBlock: (ancestor: HTMLElement, lookAlikes: LookAlikes) => string | null
 ): string | null => {
-  const steps = [getPositionedStep(el)];
+  const steps = [getPositionedStep(getLookAlikes(el))];
   let ancestor = el.parentElement;
 
-  for (let level = 0; ancestor && level < MAX_LEVELS; level++) {
+  for (let level = 0; ancestor && level < MAX_LEVELS_UP; level++) {
     if (ancestor === document.body || ancestor === document.documentElement) {
       return null;
     }
 
-    const step = getPositionedStep(ancestor);
-    const anchor = anchorFor(ancestor, step);
-    const path = anchor && getPathUnder(anchor, steps);
+    const lookAlikes = getLookAlikes(ancestor);
+    const block = nameBlock(ancestor, lookAlikes);
+    const path = block && getPathFromBlock(block, steps);
 
     if (path && isSimpleSelector(path)) {
       return path;
     }
 
-    steps.unshift(step);
+    steps.unshift(getPositionedStep(lookAlikes));
     ancestor = ancestor.parentElement;
   }
 
@@ -112,4 +143,4 @@ const getPathUnderAnchor = (
  * one.
  */
 export const getSameSpotSelector = (el: HTMLElement): string | null =>
-  getPathUnderAnchor(el, getRepeatedBlock);
+  findPathFromNearestBlock(el, getRepeatedBlockName);

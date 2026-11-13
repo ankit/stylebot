@@ -32,13 +32,17 @@ export const sameElements = (a: Array<Element>, b: Array<Element>): boolean =>
 
 /**
  * Keeps the first of any selectors that match exactly the same elements,
- * so a list only offers choices that change what gets styled.
+ * so a list only offers choices that change what gets styled. `matchesFor`
+ * lets a caller that queries the same selectors again cache them.
  */
-export const dedupeByMatches = (selectors: Array<string>): Array<string> => {
+export const dedupeByMatches = (
+  selectors: Array<string>,
+  matchesFor: (selector: string) => Array<Element> = matchesOf
+): Array<string> => {
   const kept: Array<{ selector: string; matches: Array<Element> }> = [];
 
   for (const selector of new Set(selectors)) {
-    const matches = matchesOf(selector);
+    const matches = matchesFor(selector);
     const duplicate = kept.some(other => sameElements(other.matches, matches));
 
     if (!duplicate) {

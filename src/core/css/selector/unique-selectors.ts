@@ -16,7 +16,7 @@ const NAMING_SELECTORS = [
 /**
  * `el`'s own name (or tag), and the siblings of the same tag it also fits.
  */
-const getLookAlikes = (el: HTMLElement) => {
+export const getLookAlikes = (el: HTMLElement) => {
   const own = getKindSelector(el) ?? el.tagName.toLowerCase();
   const siblings = Array.from(el.parentElement?.children ?? []).filter(
     sibling => sibling.tagName === el.tagName
@@ -28,15 +28,18 @@ const getLookAlikes = (el: HTMLElement) => {
   return { own, rivals, position: siblings.indexOf(el) + 1 };
 };
 
-/**
- * `el`'s own name (or tag), with :nth-of-type when a sibling of the same
- * tag would match it too, e.g. `tr.athing:nth-of-type(3)`.
- */
-export const getPositionedStep = (el: HTMLElement): string => {
-  const { own, rivals, position } = getLookAlikes(el);
+export type LookAlikes = ReturnType<typeof getLookAlikes>;
 
-  return rivals.length ? `${own}:nth-of-type(${position})` : own;
-};
+/**
+ * An element's own name (or tag), with :nth-of-type when a sibling of the
+ * same tag would match it too, e.g. `tr.athing:nth-of-type(3)`.
+ */
+export const getPositionedStep = ({
+  own,
+  rivals,
+  position,
+}: LookAlikes): string =>
+  rivals.length ? `${own}:nth-of-type(${position})` : own;
 
 /**
  * `el`'s step told apart from look-alike siblings by what it is before where
@@ -45,7 +48,8 @@ export const getPositionedStep = (el: HTMLElement): string => {
  * `tr.athing:nth-of-type(3)`.
  */
 const getDistinguishedStep = (el: HTMLElement): string => {
-  const { own, rivals, position } = getLookAlikes(el);
+  const lookAlikes = getLookAlikes(el);
+  const { own, rivals } = lookAlikes;
   if (rivals.length === 0) {
     return own;
   }
@@ -55,7 +59,7 @@ const getDistinguishedStep = (el: HTMLElement): string => {
       selector && rivals.every(rival => !elementMatches(rival, selector))
   );
 
-  return named ?? `${own}:nth-of-type(${position})`;
+  return named ?? getPositionedStep(lookAlikes);
 };
 
 /**

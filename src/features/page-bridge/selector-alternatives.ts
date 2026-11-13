@@ -33,28 +33,27 @@ export const getSelectorAlternatives = (
   // The style's rules are all kept, each with its own values; only the
   // generated ones give way to anything that already covers their reach.
   const suggestions = getSelectorSuggestions(el);
-  const kept = dedupeByMatches([
-    selector,
-    ...existing,
-    ...suggestions.map(suggestion => suggestion.selector),
-  ]).map(keptSelector => ({
-    selector: keptSelector,
-    matches: matchesOf(keptSelector),
-  }));
+  const cache = new Map<string, Array<Element>>();
+  const matchesFor = (s: string) =>
+    cache.get(s) ?? cache.set(s, matchesOf(s)).get(s)!;
+  const kept = dedupeByMatches(
+    [selector, ...existing, ...suggestions.map(s => s.selector)],
+    matchesFor
+  );
   const descriptions: Record<string, SelectorDescription> = {};
 
   // A suggestion folded into one that reaches the same elements passes its
   // description on, a similar one over any other, so its pill still shows.
   for (const { selector: suggested, description } of suggestions) {
-    const reaches = matchesOf(suggested);
-    const home = kept.find(other => sameElements(other.matches, reaches));
+    const reaches = matchesFor(suggested);
+    const home = kept.find(other => sameElements(matchesFor(other), reaches));
 
     if (
       home &&
       description &&
-      (!descriptions[home.selector] || description.role === 'similar')
+      (!descriptions[home] || description.role === 'similar')
     ) {
-      descriptions[home.selector] = description;
+      descriptions[home] = description;
     }
   }
 
@@ -63,9 +62,7 @@ export const getSelectorAlternatives = (
     existing,
     // Includes the current selector, so the panel can tell the options
     // still belong to it.
-    candidates: byReach(
-      kept.map(k => k.selector).filter(s => !existing.includes(s))
-    ),
+    candidates: byReach(kept.filter(s => !existing.includes(s))),
     descriptions,
   };
 };

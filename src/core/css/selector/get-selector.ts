@@ -109,12 +109,6 @@ export const getSelectorSuggestions = (el: HTMLElement): Array<Suggestion> => {
 };
 
 /**
- * The same suggestions' selectors alone.
- */
-export const getSelectorCandidates = (el: HTMLElement): Array<string> =>
-  getSelectorSuggestions(el).map(({ selector }) => selector);
-
-/**
  * The selector a body child got before partly hashed classes, newer hash
  * shapes and the sweeping check, since page-wide effects saved against it
  * are found again by its exact text.
