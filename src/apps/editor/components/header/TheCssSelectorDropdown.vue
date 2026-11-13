@@ -292,6 +292,12 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+.selector-autocomplete:not(:hover):not(:focus-within)
+  ::v-deep
+  .autocomplete-clear {
+  visibility: hidden;
+}
+
 .selector-text {
   @include truncate;
 
