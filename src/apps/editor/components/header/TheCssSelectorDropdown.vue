@@ -21,7 +21,17 @@
     @mouseleave.native="onMouseLeave"
   >
     <template #chips="{ parts }">
-      <s-inline-list mono :parts="parts" />
+      <s-tooltip
+        :text="activeSelector"
+        :disabled="!truncated"
+        grow
+        @mouseenter.native="measureTruncation"
+      >
+        <template #text>
+          <span class="selector-tooltip">{{ activeSelector }}</span>
+        </template>
+        <s-inline-list mono :parts="parts" class="selector-text" />
+      </s-tooltip>
     </template>
 
     <template #item="{ item, select }">
@@ -43,7 +53,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import { SAutocomplete, SInlineList } from '@stylebot/components';
+import { SAutocomplete, SInlineList, STooltip } from '@stylebot/components';
 import type { StylebotEditingMode } from '@stylebot/types';
 
 import type { CssSelectorMetadata } from '../../store';
@@ -65,12 +75,14 @@ export default Vue.extend({
   components: {
     SAutocomplete,
     SInlineList,
+    STooltip,
     TheCssSelectorDropdownItem,
   },
 
   data(): {
     focused: boolean;
     hovered: boolean;
+    truncated: boolean;
     openingSelector: string;
     matchCounts: Record<string, number | null>;
   } {
@@ -78,6 +90,7 @@ export default Vue.extend({
       matchCounts: {},
       focused: false,
       hovered: false,
+      truncated: false,
       // The selector as it was when editing began; until it's changed, the
       // suggestions list everything rather than filtering by it.
       openingSelector: '',
@@ -201,6 +214,16 @@ export default Vue.extend({
       this.$store.commit('setActiveSelector', item.value);
     },
 
+    /**
+     * Notes whether the selector is cut short, so its tooltip only shows
+     * when there's more to read.
+     */
+    measureTruncation(): void {
+      const text = this.$el.querySelector('.selector-text');
+
+      this.truncated = !!text && text.scrollWidth > text.clientWidth;
+    },
+
     stopInspecting(): void {
       this.$store.commit('setInspecting', false);
     },
@@ -273,6 +296,17 @@ export default Vue.extend({
   ::v-deep
   .autocomplete-clear {
   visibility: hidden;
+}
+
+.selector-text {
+  @include truncate;
+
+  display: block;
+  contain: inline-size;
+}
+
+.selector-tooltip {
+  font-family: var(--font-mono);
 }
 
 .section-header {
