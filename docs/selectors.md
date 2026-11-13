@@ -32,8 +32,11 @@ a selector for the element; the selector field offers all of them.
 9. **Its hashed class** — `h3.css-1q2w3e`.
 10. **An ancestor's hashed class** — `section.css-1q2w3e a`.
 11. **Only this element** — its path from the nearest ancestor with a
-    unique `#id`, positioned with `:nth-of-type` where a sibling would also
-    match: `#nav li:nth-of-type(2) a`. Breaks when a list reorders.
+    unique `#id`, leaving out steps that don't narrow it. Look-alike
+    siblings are told apart by an attribute, their own or a child's
+    (`label[for="size-2"]`, `div.radio:has(> input[value="2"])`), and only
+    failing that by position (`#nav li:nth-of-type(2) a`), which breaks
+    when a list reorders.
 
 A selector that would sweep the page is skipped: one ending in a bare `div`
 or `span` that matches at least 50 elements and over half of that tag, like

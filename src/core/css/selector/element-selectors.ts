@@ -68,7 +68,7 @@ export const getNameBasedSelector = (el: HTMLElement): string | null => {
  * An aria-label that reads the same for everyone: a single line with no
  * email address, unlike e.g. Google's account button label.
  */
-const isSharedLabel = (label: string): boolean =>
+export const isSharedLabel = (label: string): boolean =>
   !/[\r\n]|\S@\S+\.\S/.test(label);
 
 const MAX_LINK_LENGTH = 80;
@@ -83,7 +83,7 @@ const NAVIGATION =
 /**
  * A link's address, when it's a same-site path of words like `/section/world`.
  */
-const getLinkPath = (el: HTMLElement): string | null => {
+export const getLinkPath = (el: HTMLElement): string | null => {
   const href = el.getAttribute('href');
   if (!href || href.length > MAX_LINK_LENGTH || /[?#]/.test(href)) {
     return null;

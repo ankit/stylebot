@@ -79,7 +79,7 @@ describe('getUniqueSelector and getItemScopedSelector', () => {
 
     expect(document.querySelectorAll(selector)).toHaveLength(1);
     expect(el.matches(selector)).toBe(true);
-    expect(selector).toBe('tr.athing:nth-of-type(2) td.title a:nth-of-type(1)');
+    expect(selector).toBe('tr.athing:nth-of-type(2) a:nth-of-type(1)');
   });
 
   it('anchors at a unique ancestor id', () => {
@@ -90,6 +90,93 @@ describe('getUniqueSelector and getItemScopedSelector', () => {
     const el = document.querySelectorAll('#nav a')[1] as HTMLElement;
 
     expect(getUniqueSelector(el)).toBe('#nav li:nth-of-type(2) a');
+  });
+
+  it('tells a label apart from its siblings by what it is for', () => {
+    document.body.innerHTML = `
+      <fieldset><legend>Size</legend>
+        <input type="radio" id="size-1" />
+        <label for="size-1">Small</label>
+        <input type="radio" id="size-2" />
+        <label for="size-2">Large</label>
+      </fieldset>
+      <fieldset><label>Note</label><label>Other</label></fieldset>
+    `;
+    const el = document.querySelector('[for="size-2"]') as HTMLElement;
+
+    expect(getUniqueSelector(el)).toBe('label[for="size-2"]');
+  });
+
+  it("tells a wrapper apart by a child's value", () => {
+    document.body.innerHTML = `
+      <form>
+        <div class="radio"><input type="radio" value="1" /> One</div>
+        <div class="radio"><input type="radio" value="2" /> Two</div>
+      </form>
+      <form>
+        <div class="radio"><input type="radio" /> Other</div>
+        <div class="radio"><input type="radio" /> Else</div>
+      </form>
+    `;
+    const el = document.querySelectorAll('div.radio')[1] as HTMLElement;
+
+    expect(getUniqueSelector(el)).toBe('div.radio:has(> input[value="2"])');
+  });
+
+  it('passes over an attribute value the page generated', () => {
+    document.body.innerHTML = `
+      <ul class="menu">
+        <li><button name="tsuid_hsLJaqLJBPu9ruEP7uOYkAo_91">one</button></li>
+        <li><button name="tsuid_hsLJaqLJBPu9ruEP7uOYkAo_92">two</button></li>
+      </ul>
+    `;
+    const el = document.querySelectorAll('li')[1] as HTMLElement;
+
+    expect(getUniqueSelector(el)).toBe('li:nth-of-type(2)');
+  });
+
+  it("doesn't tell a content link apart by its address", () => {
+    document.body.innerHTML = `
+      <article>
+        <p><a href="/story/dvy0t3mvh1lg">one</a> <a href="/story/k2j9x8">two</a></p>
+      </article>
+    `;
+    const el = document.querySelectorAll('a')[1] as HTMLElement;
+
+    expect(getUniqueSelector(el)).toBe('a:nth-of-type(2)');
+  });
+
+  it('tells a site link apart by its address', () => {
+    document.body.innerHTML = `
+      <p><a href="/news">news</a> <a href="/newcomments">comments</a></p>
+    `;
+    const el = document.querySelectorAll('a')[1] as HTMLElement;
+
+    expect(getUniqueSelector(el)).toBe('a[href="/newcomments"]');
+  });
+
+  it("leaves out a step that doesn't narrow the match", () => {
+    document.body.innerHTML = `
+      <section class="feed">
+        <div class="list"><p class="lede">one</p><p class="lede">two</p></div>
+      </section>
+      <section class="side">
+        <div class="list"><p class="lede">three</p><p class="lede">four</p></div>
+      </section>
+    `;
+    const el = document.querySelectorAll('p.lede')[1] as HTMLElement;
+
+    expect(getUniqueSelector(el)).toBe('section.feed p.lede:nth-of-type(2)');
+  });
+
+  it('keeps the #id the path is anchored at', () => {
+    document.body.innerHTML = `
+      <div id="menu"><ul><li>one</li><li>two</li></ul></div>
+      <ul><li>three</li><li>four</li></ul>
+    `;
+    const el = document.querySelectorAll('#menu li')[1] as HTMLElement;
+
+    expect(getUniqueSelector(el)).toBe('#menu li:nth-of-type(2)');
   });
 
   it('scopes the element to the repeated item it sits in', () => {
@@ -106,8 +193,6 @@ describe('getUniqueSelector and getItemScopedSelector', () => {
     const candidates = dedupeByMatches(getSelectorCandidates(el));
 
     expect(candidates).toContain('tr.athing:nth-of-type(2) a');
-    expect(candidates).toContain(
-      'tr.athing:nth-of-type(2) td.title a:nth-of-type(1)'
-    );
+    expect(candidates).toContain('tr.athing:nth-of-type(2) a:nth-of-type(1)');
   });
 });
