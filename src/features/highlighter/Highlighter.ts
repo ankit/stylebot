@@ -24,6 +24,15 @@ const getComposedTarget = (event: Event): HTMLElement =>
   (event.composedPath()[0] ?? event.target) as HTMLElement;
 
 /**
+ * Whether the element is, or sits inside, a disabled form control. A disabled
+ * fieldset alone doesn't count: clicks still reach its non-control content.
+ */
+const isInsideDisabledControl = (el: HTMLElement): boolean =>
+  !!el.closest(
+    'button:disabled, input:disabled, select:disabled, textarea:disabled'
+  );
+
+/**
  * The parent to climb to, stepping out of a shadow tree onto its host.
  */
 const getParentElement = (el: HTMLElement): HTMLElement | null => {
@@ -390,9 +399,18 @@ class Highlighter {
   };
 
   onPointerUp = (event: MouseEvent): void => {
-    if (!this.isStylebotElement(event.target)) {
-      event.preventDefault();
-      event.stopPropagation();
+    if (this.isStylebotElement(event.target)) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Browsers fire no click on a disabled control or anything inside one.
+    const target = getComposedTarget(event);
+
+    if (event.button === 0 && isInsideDisabledControl(target)) {
+      this.selectElement(this.currentElement ?? target);
     }
   };
 
