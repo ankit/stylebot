@@ -154,6 +154,7 @@ const GENERATED_CLASS_PATTERNS = [
   /^makeStyles-.+-\d+$/,
 ];
 
+const REACT_NATIVE_WEB_CLASS = /^(r|css)-[0-9a-z]{6,9}$/;
 const STYLEX_CLASS = /^x[0-9a-z]{5,7}$/;
 const STYLEX_PAGE_THRESHOLD = 10;
 
@@ -180,6 +181,17 @@ function pageUsesStyleX(): boolean {
   }
 
   return false;
+}
+
+/**
+ * Whether the page is styled by React Native Web (X), whose atomic classes
+ * are all letters as often as not (`r-sdzlij`), marked by its own stylesheet.
+ */
+function pageUsesReactNativeWeb(): boolean {
+  return (
+    typeof document !== 'undefined' &&
+    !!document.getElementById('react-native-stylesheet')
+  );
 }
 
 /**
@@ -254,6 +266,10 @@ export function looksHashed(className: string): boolean {
     return true;
   }
 
+  if (REACT_NATIVE_WEB_CLASS.test(className) && pageUsesReactNativeWeb()) {
+    return true;
+  }
+
   if (getStableClassParts(className)) {
     return true;
   }
@@ -306,6 +322,11 @@ function hasMinifiedShape(className: string): boolean {
  * `tsuid_hsLJaqLJBPu9ruEP7uOYkAo_91`, which a saved rule never matches again.
  */
 export function looksGeneratedId(id: string): boolean {
+  // React Native Web's ids, as on X: `id__g3bmvlaotyb`.
+  if (/^id__[a-z0-9]{6,}$/.test(id)) {
+    return true;
+  }
+
   return id
     .split(/[-_:.]+/)
     .some(

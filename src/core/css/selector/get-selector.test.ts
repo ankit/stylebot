@@ -6,6 +6,7 @@ import {
 
 describe('get-selector', () => {
   afterEach(() => {
+    document.head.innerHTML = '';
     document.body.innerHTML = '';
   });
 
@@ -272,6 +273,18 @@ describe('get-selector', () => {
       el.setAttribute('id', '_3MTJavGCHNyKptQPt7ejqQI_120');
 
       expect(getSelector(el)).toBe('h3.LC20lb');
+    });
+
+    it("skips React Native Web's generated id and atomic classes", () => {
+      document.head.innerHTML = '<style id="react-native-stylesheet"></style>';
+      document.body.innerHTML = `
+        <nav class="site-nav">
+          <a id="id__g3bmvlaotyb" class="r-sdzlij r-dnmrzs" data-target></a>
+        </nav>
+      `;
+
+      const el = document.querySelector('[data-target]') as HTMLElement;
+      expect(getSelector(el)).toBe('nav.site-nav a');
     });
 
     it('uses its own minified class over an ancestor scope', () => {

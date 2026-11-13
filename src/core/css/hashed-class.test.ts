@@ -151,6 +151,28 @@ describe('hashed-class', () => {
 
       expect(looksHashed('xlarge')).toBe(false);
     });
+
+    it('keeps an all-letter r- class authored on other pages', () => {
+      expect(looksHashed('r-sdzlij')).toBe(false);
+    });
+
+    describe('on a React Native Web page', () => {
+      beforeEach(() => {
+        document.head.innerHTML =
+          '<style id="react-native-stylesheet"></style>';
+      });
+
+      afterEach(() => {
+        document.head.innerHTML = '';
+      });
+
+      it.each(['r-sdzlij', 'r-dnmrzs', 'css-9pa8cd'])(
+        'treats %s as generated',
+        className => {
+          expect(looksHashed(className)).toBe(true);
+        }
+      );
+    });
   });
 
   describe('looksMinified', () => {
@@ -183,6 +205,7 @@ describe('hashed-class', () => {
       '_3MTJavGCHNyKptQPt7ejqQI_120',
       'tsuid_hsLJaqLJBPu9ruEP7uOYkAo_91',
       'atritem-_EIrBapXtL_6gw8cPyM7v4As_64',
+      'id__g3bmvlaotyb',
     ])('treats %s as generated', id => {
       expect(looksGeneratedId(id)).toBe(true);
     });
