@@ -5,6 +5,16 @@ The goal is a selector that is **stable** (survives page rebuilds) and
 **meaningful** (reads like something the site author wrote), while still being
 specific enough to be useful.
 
+## Which element is picked
+
+The pointer often lands on a plain `div` or `span` that only draws part of
+a link or button, like the layers that draw an avatar inside its link. When
+such a wrapper has no test id and its ancestors fill the same box, give or
+take a few pixels per side, the inspector moves up to the nearest one that
+isn't a plain `div` or `span`, whose selector lasts better. Images, videos
+and other media are never moved. Drilling down with the arrow keys still
+reaches each wrapper, down to the one under the pointer.
+
 ## Priority order
 
 One ordered list of strategies. The inspector uses the first one that gives
