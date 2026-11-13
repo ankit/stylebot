@@ -1,6 +1,8 @@
 import {
   getHookScopedSelector,
+  getNamedScopeSelector,
   getSameSpotSelector,
+  getTagInScopeSelector,
 } from './similar-selectors';
 
 const story = (rank: number) => `
@@ -205,5 +207,108 @@ describe('getHookScopedSelector', () => {
     const el = document.querySelectorAll('span')[1] as HTMLElement;
 
     expect(getHookScopedSelector(el)).toBeNull();
+  });
+});
+
+const infobox = `
+  <table class="infobox"><tbody>
+    <tr><th class="infobox-above" colspan="2">Alan Turing</th></tr>
+    <tr><th class="infobox-label">Born</th><td class="infobox-data"><a href="#">London</a></td></tr>
+    <tr><th class="infobox-label">Died</th><td class="infobox-data"><a href="#">Wilmslow</a></td></tr>
+    <tr><th class="infobox-label">Known for</th><td class="infobox-data">Computing</td></tr>
+  </tbody></table>
+`;
+
+describe('getNamedScopeSelector', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('names every label of an infobox whose rows are bare', () => {
+    document.body.innerHTML = `<main>${infobox}<p><a href="#">elsewhere</a></p></main>`;
+    const label = document.querySelectorAll(
+      'th.infobox-label'
+    )[1] as HTMLElement;
+
+    const selector = getNamedScopeSelector(label) as string;
+
+    expect(selector.startsWith('table.infobox')).toBe(true);
+    expect(Array.from(document.querySelectorAll(selector))).toEqual(
+      Array.from(document.querySelectorAll('th.infobox-label'))
+    );
+  });
+
+  it('names the links in every value of the infobox, not the page', () => {
+    document.body.innerHTML = `<main>${infobox}<p><a href="#">elsewhere</a></p></main>`;
+    const link = document.querySelectorAll('td a')[1] as HTMLElement;
+
+    const selector = getNamedScopeSelector(link) as string;
+
+    expect(Array.from(document.querySelectorAll(selector))).toEqual(
+      Array.from(document.querySelectorAll('td a'))
+    );
+  });
+
+  it('finds nothing without a named ancestor', () => {
+    document.body.innerHTML = `
+      <table><tbody>
+        <tr><th>Born</th><td>1912</td></tr>
+        <tr><th>Died</th><td>1954</td></tr>
+      </tbody></table>
+    `;
+    const label = document.querySelectorAll('th')[1] as HTMLElement;
+
+    expect(getNamedScopeSelector(label)).toBeNull();
+  });
+
+  it('gives up when the path down from the area stays complex', () => {
+    const nest = (depth: number, text: string): string =>
+      depth ? `<div>${nest(depth - 1, text)}</div>` : `<em>${text}</em>`;
+    document.body.innerHTML = `
+      <section class="area">
+        ${nest(3, 'a')}${nest(3, 'b')}${nest(2, 'c')}${nest(4, 'd')}
+      </section>
+    `;
+    const el = document.querySelectorAll('em')[1] as HTMLElement;
+
+    expect(getNamedScopeSelector(el)).toBeNull();
+  });
+
+  it('leaves a bare div or span out', () => {
+    document.body.innerHTML = `
+      <section class="area"><p><span>a</span></p><p><span>b</span></p></section>
+    `;
+    const span = document.querySelectorAll('span')[1] as HTMLElement;
+
+    expect(getNamedScopeSelector(span)).toBeNull();
+  });
+});
+
+describe('getTagInScopeSelector', () => {
+  afterEach(() => {
+    document.body.innerHTML = '';
+  });
+
+  it('names every element of the tag in the nearest named area', () => {
+    document.body.innerHTML = `<main>${infobox}<p><a href="#">elsewhere</a></p></main>`;
+    const label = document.querySelectorAll(
+      'th.infobox-label'
+    )[1] as HTMLElement;
+
+    expect(getTagInScopeSelector(label)).toBe('table.infobox th');
+  });
+
+  it('finds nothing outside a named area, or for a bare div', () => {
+    document.body.innerHTML = `
+      <main><p><a href="#">a</a></p></main>
+      <section class="area"><div>b</div></section>
+    `;
+
+    expect(
+      getTagInScopeSelector(document.querySelector('a') as HTMLElement)
+    ).toBeNull();
+    expect(
+      getTagInScopeSelector(document.querySelector('.area div') as HTMLElement)
+    ).toBeNull();
   });
 });

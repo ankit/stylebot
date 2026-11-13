@@ -181,4 +181,130 @@ describe('getScopeSlots', () => {
 
     expect(slots).toEqual({ only: '#avatar', similar: every, all: 'img' });
   });
+
+  it("offers a named area's fallback as Similar when nothing nearer does", () => {
+    const slots = getScopeSlots(
+      {
+        selector: 'th.infobox-label',
+        existing: [],
+        candidates: ['#born', 'th.infobox-label', 'table.infobox th', 'th'],
+        descriptions: {
+          'th.infobox-label': { role: 'similar', fallback: true },
+          'table.infobox th': { role: 'all', fallback: true },
+          th: { role: 'all' },
+        },
+      },
+      { '#born': 1, 'th.infobox-label': 12, 'table.infobox th': 16, th: 40 }
+    );
+
+    expect(slots).toEqual({
+      only: '#born',
+      similar: 'th.infobox-label',
+      all: 'th',
+    });
+  });
+
+  it('ignores a wider fallback when a nearer similar candidate fills Similar', () => {
+    const slots = getScopeSlots(
+      {
+        selector: 'a',
+        existing: [],
+        candidates: [
+          '#story-3',
+          'td.title > span.titleline > a',
+          '#main td a',
+          'a',
+        ],
+        descriptions: {
+          'td.title > span.titleline > a': { role: 'similar' },
+          '#main td a': { role: 'similar', fallback: true },
+          a: { role: 'all' },
+        },
+      },
+      {
+        '#story-3': 1,
+        'td.title > span.titleline > a': 30,
+        '#main td a': 90,
+        a: 200,
+      }
+    );
+
+    expect(slots).toEqual({
+      only: '#story-3',
+      similar: 'td.title > span.titleline > a',
+      all: 'a',
+    });
+  });
+
+  it('offers the fallback as All only when nothing else reaches past Similar', () => {
+    const alternatives = {
+      selector: '#mwOw',
+      existing: [],
+      candidates: [
+        '#mwOw',
+        '#mwLA a',
+        'div.mw-content-ltr > p > a',
+        'div.mw-content-ltr a',
+      ],
+      descriptions: {
+        '#mwLA a': { role: 'all' as const },
+        'div.mw-content-ltr > p > a': {
+          role: 'similar' as const,
+          fallback: true,
+        },
+        'div.mw-content-ltr a': { role: 'all' as const, fallback: true },
+      },
+    };
+    const counts = {
+      '#mwOw': 1,
+      '#mwLA a': 18,
+      'div.mw-content-ltr > p > a': 900,
+      'div.mw-content-ltr a': 1500,
+    };
+
+    expect(getScopeSlots(alternatives, counts)).toEqual({
+      only: '#mwOw',
+      similar: 'div.mw-content-ltr > p > a',
+      all: 'div.mw-content-ltr a',
+    });
+  });
+
+  it('keeps the pick as All over a wider fallback', () => {
+    const slots = getScopeSlots(
+      {
+        selector: '.card a',
+        existing: [],
+        candidates: ['#login', '.card a', 'main a'],
+        descriptions: { 'main a': { role: 'all', fallback: true } },
+      },
+      { '#login': 1, '.card a': 4, 'main a': 20 }
+    );
+
+    expect(slots).toEqual({
+      only: '#login',
+      similar: undefined,
+      all: '.card a',
+    });
+  });
+
+  it('prefers a narrower non-fallback over a wider fallback for All', () => {
+    const slots = getScopeSlots(
+      {
+        selector: '#login',
+        existing: [],
+        candidates: ['#login', '.card a', 'main a'],
+        descriptions: {
+          '.card a': { role: 'all' },
+          'main a': { role: 'all', fallback: true },
+        },
+      },
+      { '#login': 1, '.card a': 4, 'main a': 20 }
+    );
+
+    expect(slots).toEqual({
+      only: '#login',
+      similar: undefined,
+      all: '.card a',
+    });
+  });
 });

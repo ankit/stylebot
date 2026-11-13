@@ -43,15 +43,18 @@ export const getSelectorAlternatives = (
   const descriptions: Record<string, SelectorDescription> = {};
 
   // A suggestion folded into one that reaches the same elements passes its
-  // description on, a similar one over any other, so its pill still shows.
+  // description on, a similar one over any other, so its pill still shows,
+  // and a fallback never over a nearer similar one.
   for (const { selector: suggested, description } of suggestions) {
     const reaches = matchesFor(suggested);
     const home = kept.find(other => sameElements(matchesFor(other), reaches));
+    const current = home ? descriptions[home] : undefined;
+    const nearerSimilar = current?.role === 'similar' && !current.fallback;
 
     if (
       home &&
       description &&
-      (!descriptions[home] || description.role === 'similar')
+      (!current || (description.role === 'similar' && !nearerSimilar))
     ) {
       descriptions[home] = description;
     }
