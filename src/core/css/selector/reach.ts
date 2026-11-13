@@ -8,6 +8,14 @@ export const countMatches = (selector: string): number => {
   }
 };
 
+export const elementMatches = (el: Element, selector: string): boolean => {
+  try {
+    return el.matches(selector);
+  } catch {
+    return false;
+  }
+};
+
 export const matchesOf = (selector: string): Array<Element> => {
   try {
     return queryWithShadowRoots(selector);

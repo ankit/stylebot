@@ -1,38 +1,87 @@
-import { countMatches } from './reach';
-import { getKindSelector, getStableIdBasedSelector } from './element-selectors';
+import { countMatches, elementMatches } from './reach';
+import {
+  getKindSelector,
+  getLabelBasedSelector,
+  getNameBasedSelector,
+  getStableIdBasedSelector,
+  getTestIdBasedSelector,
+} from './element-selectors';
+
+const NAMING_SELECTORS = [
+  getTestIdBasedSelector,
+  getNameBasedSelector,
+  getLabelBasedSelector,
+];
 
 /**
- * `el`'s own name (or tag), with :nth-of-type when a sibling of the same
- * tag would match it too, e.g. `tr.athing:nth-of-type(3)`.
+ * `el`'s own name (or tag), and the siblings of the same tag it also fits.
  */
-const getPositionedStep = (el: HTMLElement): string => {
+const getLookAlikes = (el: HTMLElement) => {
   const own = getKindSelector(el) ?? el.tagName.toLowerCase();
   const siblings = Array.from(el.parentElement?.children ?? []).filter(
     sibling => sibling.tagName === el.tagName
   );
-  const clashes = siblings.some(
-    sibling => sibling !== el && sibling.matches(own)
+  const rivals = siblings.filter(
+    sibling => sibling !== el && elementMatches(sibling, own)
   );
 
-  return clashes ? `${own}:nth-of-type(${siblings.indexOf(el) + 1})` : own;
+  return { own, rivals, position: siblings.indexOf(el) + 1 };
 };
 
 /**
- * A selector matching `el` and nothing else: its positioned step, prefixed
- * by each ancestor's in turn until only `el` matches, stopping at the
- * first ancestor with a unique #id the page didn't generate.
+ * `el`'s step told apart from look-alike siblings by what it is before where
+ * it is: its test id, name, aria-label or site address, like
+ * `input[name="size"]`, and failing those its position, like
+ * `tr.athing:nth-of-type(3)`.
+ */
+const getDistinguishedStep = (el: HTMLElement): string => {
+  const { own, rivals, position } = getLookAlikes(el);
+  if (rivals.length === 0) {
+    return own;
+  }
+
+  const named = NAMING_SELECTORS.map(getNamed => getNamed(el)).find(
+    selector =>
+      selector && rivals.every(rival => !elementMatches(rival, selector))
+  );
+
+  return named ?? `${own}:nth-of-type(${position})`;
+};
+
+/**
+ * Leaves out each ancestor step `el` is still singled out without, keeping
+ * any #id it's anchored at, e.g. `#menu div ul li.item:nth-of-type(3) a` →
+ * `#menu li.item:nth-of-type(3) a`.
+ */
+const dropRedundantSteps = (steps: Array<string>): Array<string> => {
+  let kept = steps;
+
+  for (let i = kept.length - 2; i >= 0; i--) {
+    const without = [...kept.slice(0, i), ...kept.slice(i + 1)];
+
+    if (!kept[i].startsWith('#') && countMatches(without.join(' ')) === 1) {
+      kept = without;
+    }
+  }
+
+  return kept;
+};
+
+/**
+ * A selector matching only `el`: its path up to the nearest unique #id,
+ * leaving out steps that don't narrow it.
  */
 export const getUniqueSelector = (el: HTMLElement): string | null => {
-  let selector = '';
+  const steps: Array<string> = [];
 
   for (let node: HTMLElement | null = el; node; node = node.parentElement) {
     const id = getStableIdBasedSelector(node);
-    const step = id && countMatches(id) === 1 ? id : getPositionedStep(node);
+    const step = id && countMatches(id) === 1 ? id : getDistinguishedStep(node);
 
-    selector = selector ? `${step} ${selector}` : step;
+    steps.unshift(step);
 
-    if (countMatches(selector) === 1) {
-      return selector;
+    if (countMatches(steps.join(' ')) === 1) {
+      return dropRedundantSteps(steps).join(' ');
     }
   }
 
@@ -53,7 +102,7 @@ export const getItemScopedSelector = (el: HTMLElement): string | null => {
       return null;
     }
 
-    if (getPositionedStep(ancestor).includes(':nth-of-type(')) {
+    if (getLookAlikes(ancestor).rivals.length > 0) {
       const item = getUniqueSelector(ancestor);
       return item ? `${item} ${subject}` : null;
     }

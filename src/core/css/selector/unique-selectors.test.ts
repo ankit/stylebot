@@ -79,7 +79,7 @@ describe('getUniqueSelector and getItemScopedSelector', () => {
 
     expect(document.querySelectorAll(selector)).toHaveLength(1);
     expect(el.matches(selector)).toBe(true);
-    expect(selector).toBe('tr.athing:nth-of-type(2) td.title a:nth-of-type(1)');
+    expect(selector).toBe('tr.athing:nth-of-type(2) a:nth-of-type(1)');
   });
 
   it('anchors at a unique ancestor id', () => {
@@ -90,6 +90,82 @@ describe('getUniqueSelector and getItemScopedSelector', () => {
     const el = document.querySelectorAll('#nav a')[1] as HTMLElement;
 
     expect(getUniqueSelector(el)).toBe('#nav li:nth-of-type(2) a');
+  });
+
+  it('tells a sibling apart by its test id', () => {
+    document.body.innerHTML = `
+      <ul><li data-testid="row-1">one</li><li data-testid="row-2">two</li></ul>
+      <ul><li>three</li><li>four</li></ul>
+    `;
+    const el = document.querySelector('[data-testid="row-2"]') as HTMLElement;
+
+    expect(getUniqueSelector(el)).toBe('li[data-testid="row-2"]');
+  });
+
+  it('tells a field apart by its name', () => {
+    document.body.innerHTML = `
+      <form><input name="first" /><input name="last" /></form>
+      <form><input /><input /></form>
+    `;
+    const el = document.querySelector('[name="last"]') as HTMLElement;
+
+    expect(getUniqueSelector(el)).toBe('input[name="last"]');
+  });
+
+  it('tells a button apart by its aria-label', () => {
+    document.body.innerHTML = `
+      <div><button aria-label="Back"></button><button aria-label="Next"></button></div>
+      <div><button></button><button></button></div>
+    `;
+    const el = document.querySelector('[aria-label="Next"]') as HTMLElement;
+
+    expect(getUniqueSelector(el)).toBe('button[aria-label="Next"]');
+  });
+
+  it('tells a navigation link apart by its address', () => {
+    document.body.innerHTML = `
+      <nav><a href="/news">news</a> <a href="/newcomments">comments</a></nav>
+      <p><a>one</a> <a>two</a></p>
+    `;
+    const el = document.querySelectorAll('a')[1] as HTMLElement;
+
+    expect(getUniqueSelector(el)).toBe('a[href="/newcomments"]');
+  });
+
+  it("doesn't tell a content link apart by its address", () => {
+    document.body.innerHTML = `
+      <article>
+        <p><a href="/news">one</a> <a href="/newcomments">two</a></p>
+      </article>
+      <p><a>three</a> <a>four</a></p>
+    `;
+    const el = document.querySelectorAll('a')[1] as HTMLElement;
+
+    expect(getUniqueSelector(el)).toBe('article a:nth-of-type(2)');
+  });
+
+  it("leaves out a step that doesn't narrow the match", () => {
+    document.body.innerHTML = `
+      <section class="feed">
+        <div class="list"><p class="lede">one</p><p class="lede">two</p></div>
+      </section>
+      <section class="side">
+        <div class="list"><p class="lede">three</p><p class="lede">four</p></div>
+      </section>
+    `;
+    const el = document.querySelectorAll('p.lede')[1] as HTMLElement;
+
+    expect(getUniqueSelector(el)).toBe('section.feed p.lede:nth-of-type(2)');
+  });
+
+  it('keeps the #id the path is anchored at', () => {
+    document.body.innerHTML = `
+      <div id="menu"><ul><li>one</li><li>two</li></ul></div>
+      <ul><li>three</li><li>four</li></ul>
+    `;
+    const el = document.querySelectorAll('#menu li')[1] as HTMLElement;
+
+    expect(getUniqueSelector(el)).toBe('#menu li:nth-of-type(2)');
   });
 
   it('scopes the element to the repeated item it sits in', () => {
@@ -106,8 +182,6 @@ describe('getUniqueSelector and getItemScopedSelector', () => {
     const candidates = dedupeByMatches(getSelectorCandidates(el));
 
     expect(candidates).toContain('tr.athing:nth-of-type(2) a');
-    expect(candidates).toContain(
-      'tr.athing:nth-of-type(2) td.title a:nth-of-type(1)'
-    );
+    expect(candidates).toContain('tr.athing:nth-of-type(2) a:nth-of-type(1)');
   });
 });
