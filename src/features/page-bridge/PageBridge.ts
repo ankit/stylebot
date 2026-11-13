@@ -1,4 +1,4 @@
-import type { RoleColorGroups } from '@stylebot/css';
+import type { RoleColorGroups, SelectorDescription } from '@stylebot/css';
 import type { CssDeclaration } from '@stylebot/types';
 import type { AppliedDeclaration } from './applied-declarations';
 
@@ -26,6 +26,8 @@ export type SelectorAlternatives = {
   selector?: string;
   existing: Array<string>;
   candidates: Array<string>;
+  // How much each candidate covers: only the element, similar ones or all.
+  descriptions?: Record<string, SelectorDescription>;
 };
 
 export type PageBridgeEvents = {

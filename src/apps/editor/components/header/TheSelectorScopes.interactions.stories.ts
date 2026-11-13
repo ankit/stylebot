@@ -22,9 +22,9 @@ export default meta;
 const SCOPES_PAGE = `
   <div class="sb-page">
     <ul class="links">
-      <li><a id="home" href="#">Home</a></li>
-      <li><a href="#">About</a></li>
-      <li><a href="#">Contact</a></li>
+      <li class="item"><a id="home" href="#">Home</a> <span><a href="#">edit</a></span></li>
+      <li class="item"><a href="#">About</a> <span><a href="#">edit</a></span></li>
+      <li class="item"><a href="#">Contact</a> <span><a href="#">edit</a></span></li>
     </ul>
   </div>
 `;
@@ -47,19 +47,19 @@ const chips = (root: HTMLElement) =>
   ) as HTMLElement;
 
 /**
- * Picks the Home link, then waits for its Only and All pills.
+ * Picks the Home link, then waits for its Only, Similar and All pills.
  */
 const pickHome = async (root: HTMLElement): Promise<void> => {
   const home = within(root).getByRole('link', { name: 'Home' });
 
   await hoverPage(home);
   await pressKey('Enter');
-  await waitFor(() => expect(pills(root)).toHaveLength(2));
+  await waitFor(() => expect(pills(root)).toHaveLength(3));
 };
 
 export const PillsAfterPick: StoryObj = {
   ...editor({ inspecting: true }, { page: SCOPES_PAGE }),
-  name: 'picking an element offers Only and All with their match counts',
+  name: 'picking an element offers Only, Similar and All with their match counts',
   play: async ({ canvasElement }) => {
     await pickHome(canvasElement);
 
@@ -68,14 +68,17 @@ export const PillsAfterPick: StoryObj = {
     });
     await expect(group).toHaveClass('segmented');
     await expect(pill(canvasElement, 'Only')).toHaveTextContent(/Only\s*1/);
-    await expect(pill(canvasElement, 'All')).toHaveTextContent(/All\s*3/);
+    await expect(pill(canvasElement, 'Similar')).toHaveTextContent(
+      /Similar\s*3/
+    );
+    await expect(pill(canvasElement, 'All')).toHaveTextContent(/All\s*6/);
 
     // Hovering a pill previews its matches; leaving the row clears them.
     // user-event fires mouseleave only on the pill, not its row as a browser would.
     const boxes = () =>
       document.querySelectorAll('#stylebot-overlay .stylebot-overlay-rect');
     await user.hover(pill(canvasElement, 'All'));
-    await waitFor(() => expect(boxes()).toHaveLength(3));
+    await waitFor(() => expect(boxes()).toHaveLength(6));
     await user.hover(within(canvasElement).getByRole('link', { name: 'Home' }));
     await fireEvent.mouseLeave(scopes(canvasElement) as HTMLElement);
     await waitFor(() => expect(boxes()).toHaveLength(0));
@@ -91,9 +94,31 @@ export const ClickingAllSetsField: StoryObj = {
     await pickHome(canvasElement);
     await user.click(pill(canvasElement, 'All'));
     const selector = store.state.activeSelector;
-    await expect(document.querySelectorAll(selector)).toHaveLength(3);
+    await expect(document.querySelectorAll(selector)).toHaveLength(6);
     await waitFor(() =>
       expect(pill(canvasElement, 'All')).toHaveAttribute('aria-pressed', 'true')
+    );
+  },
+};
+
+export const ClickingSimilarSetsField: StoryObj = {
+  ...editor({ inspecting: true }, { page: SCOPES_PAGE }),
+  name: 'clicking Similar puts the same spot in every block in the field',
+  play: async ({ canvasElement }) => {
+    const store = storeOf(canvasElement);
+
+    await pickHome(canvasElement);
+    await user.click(pill(canvasElement, 'Similar'));
+    const selector = store.state.activeSelector;
+    const titles = Array.from(document.querySelectorAll('li.item > a'));
+    await expect(Array.from(document.querySelectorAll(selector))).toEqual(
+      titles
+    );
+    await waitFor(() =>
+      expect(pill(canvasElement, 'Similar')).toHaveAttribute(
+        'aria-pressed',
+        'true'
+      )
     );
   },
 };

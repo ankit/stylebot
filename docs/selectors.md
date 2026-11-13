@@ -112,9 +112,36 @@ How the shapes are told apart:
 ## Other selectors for the element
 
 The selector field lists the user's own rules that match the element, then
-every selector from the list above, plus **this item**: elements like it in
-the same row, list item or card, e.g. `tr.athing:nth-of-type(3) a`. They're
-sorted narrowest first, keeping one per set of matched elements.
+every selector from the list above, plus two more:
+
+- **The same spot**: the element in the same place inside every block like
+  the one it sits in, e.g. every story title on Hacker News,
+  `td.title > span.titleline > a`. The block is the nearest ancestor that
+  repeats among look-alike siblings and has a name of its own (a class, test
+  id or form name, not a bare tag). The path down from it drops each step and
+  position it doesn't need, and if it still has more than three steps or a
+  position, the next repeated block up is tried instead.
+- **This item**: elements like it in the same row, list item or card, e.g.
+  `tr.athing:nth-of-type(3) a`.
+
+They're sorted narrowest first, keeping one per set of matched elements.
+When the same-spot selector reaches the same elements as another, that one
+stands in for it.
+
+## Scope pills
+
+After a pick in Basic mode, pills under the selector field offer three
+scopes, each with how many elements it matches:
+
+- **Only**: a short selector that matches just the picked element.
+- **Similar**: the same spot in every block like the picked one's, at its
+  widest.
+- **All**: the inspector's own pick when it reaches further than Similar,
+  else the widest selector that does.
+
+A pill with nothing to offer is left out, so All only shows when it
+reaches more than Similar. The pills hide once the field holds a selector
+typed by hand.
 
 ## Reusing existing rules
 

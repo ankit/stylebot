@@ -10,12 +10,21 @@ export { getCssWithExpandedImports } from './import';
 
 export {
   getSelector,
-  getSelectorCandidates,
+  getSelectorSuggestions,
   getBodyChildSelectors,
 } from './selector/get-selector';
+export type {
+  SelectorDescription,
+  SelectorRole,
+} from './selector/describe-selector';
 export { getStableClassMatcher } from './selector/element-selectors';
 export { getUniqueSelector } from './selector/unique-selectors';
-export { dedupeByMatches, byReach } from './selector/reach';
+export {
+  dedupeByMatches,
+  byReach,
+  matchesOf,
+  sameElements,
+} from './selector/reach';
 export {
   getStableSelector,
   getFragileSelector,

@@ -14,7 +14,8 @@ export default meta;
 const ALTERNATIVES = {
   selector: '.article-body',
   existing: [],
-  candidates: ['.sb-page > p:first-of-type', '.article-body', 'p'],
+  candidates: ['.sb-page > p:first-of-type', '.article-body', '.sb-page *'],
+  descriptions: { '.article-body': { role: 'similar' as const } },
 };
 
 export const AfterPick: StoryObj = editor({

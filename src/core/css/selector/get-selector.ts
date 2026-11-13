@@ -21,8 +21,24 @@ import {
   isSweeping,
 } from './ancestor-selectors';
 import { getItemScopedSelector, getUniqueSelector } from './unique-selectors';
+import { getSameSpotSelector } from './similar-selectors';
+import { describeSelector } from './describe-selector';
+import type { SelectorDescription, SelectorRole } from './describe-selector';
 
 type Strategy = (el: HTMLElement) => string | null;
+
+/**
+ * A strategy and the scope pill its selectors are offered for, if any.
+ */
+type ScopedStrategy = {
+  strategy: Strategy;
+  role?: Exclude<SelectorRole, 'only'>;
+};
+
+type Suggestion = {
+  selector: string;
+  description?: SelectorDescription;
+};
 
 /**
  * Every way to name an element, most stable first: its own name, an
@@ -76,13 +92,28 @@ export const getSelector = (el: HTMLElement): string => {
 };
 
 /**
- * Every selector in the list that suits the element, plus the elements
- * like it in the same row or card, for the selector field to offer.
+ * Every selector in the list that suits the element, plus the same spot
+ * in every block like its own, and the elements like it in the same row
+ * or card, each described by how much it covers for the scope pills.
  */
-export const getSelectorCandidates = (el: HTMLElement): Array<string> =>
-  [...STRATEGIES, getItemScopedSelector]
-    .map(strategy => strategy(el))
-    .filter(selector => isUsable(el, selector));
+export const getSelectorSuggestions = (el: HTMLElement): Array<Suggestion> => {
+  const scopedStrategies: Array<ScopedStrategy> = [
+    ...STRATEGIES.map(strategy => ({ strategy, role: 'all' as const })),
+    { strategy: getSameSpotSelector, role: 'similar' },
+    { strategy: getItemScopedSelector },
+  ];
+
+  return scopedStrategies.flatMap(({ strategy, role }) => {
+    const selector = strategy(el);
+    if (!isUsable(el, selector)) {
+      return [];
+    }
+
+    const description = role ? describeSelector(selector, role) : undefined;
+
+    return [{ selector, description }];
+  });
+};
 
 /**
  * The selector a body child got before partly hashed classes, newer hash

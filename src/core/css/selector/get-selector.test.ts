@@ -1,6 +1,6 @@
 import {
   getSelector,
-  getSelectorCandidates,
+  getSelectorSuggestions,
   getBodyChildSelectors,
 } from './get-selector';
 
@@ -162,7 +162,9 @@ describe('get-selector', () => {
 
       const el = document.querySelector('[data-target]') as HTMLElement;
       expect(getSelector(el)).toBe('div.css-1q2w3e');
-      expect(getSelectorCandidates(el)).not.toContain('div.app div div');
+      expect(
+        getSelectorSuggestions(el).map(({ selector }) => selector)
+      ).not.toContain('div.app div div');
     });
 
     it('falls back to this element alone rather than a sweeping tag chain', () => {

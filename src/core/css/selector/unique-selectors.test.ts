@@ -1,6 +1,9 @@
 import { dedupeByMatches, byReach } from './reach';
 import { getUniqueSelector, getItemScopedSelector } from './unique-selectors';
-import { getSelectorCandidates } from './get-selector';
+import { getSelectorSuggestions } from './get-selector';
+
+const getSelectorCandidates = (el: HTMLElement) =>
+  getSelectorSuggestions(el).map(({ selector }) => selector);
 
 describe('getSelectorCandidates, dedupeByMatches and byReach', () => {
   afterEach(() => {
