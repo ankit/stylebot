@@ -71,25 +71,45 @@ export const getNameBasedSelector = (el: HTMLElement): string | null => {
 const isSharedLabel = (label: string): boolean =>
   !/[\r\n]|\S@\S+\.\S/.test(label);
 
+const MAX_LINK_LENGTH = 80;
+
+// A path part that reads as a word or words, like `section` or `Valheim`.
+const WORD = /^[a-z][a-z_.-]*$/i;
+
+// Where a site's links name its places rather than its content.
+const NAVIGATION =
+  'nav, header, footer, [role="navigation"], [role="banner"], [role="contentinfo"]';
+
 /**
- * A link's path, when it names a place rather than a page: a relative or
- * absolute address with no query or hash, and no id or date in it.
+ * A link's address, when it's a same-site path of words like `/section/world`.
  */
 const getLinkPath = (el: HTMLElement): string | null => {
   const href = el.getAttribute('href');
+  if (!href || href.length > MAX_LINK_LENGTH || /[?#]/.test(href)) {
+    return null;
+  }
 
-  return href && href !== '/' && !/[?#]|\d{4,}|^[a-z]+:(?!\/\/)/i.test(href)
-    ? href
-    : null;
+  let url: URL;
+  try {
+    url = new URL(href, location.href);
+  } catch {
+    return null;
+  }
+
+  const parts = url.pathname.split('/').filter(Boolean);
+  const named = parts.length > 0 && parts.every(part => WORD.test(part));
+
+  return url.origin === location.origin && named ? href : null;
 };
 
 /**
- * A link by its address or any element by its aria-label, e.g.
+ * A navigation link by its address or any element by its aria-label, e.g.
  * `a[href="/section/world"]` or `button[aria-label="Search"]`.
  */
 export const getLabelBasedSelector = (el: HTMLElement): string | null => {
   const tag = el.tagName.toLowerCase();
-  const path = tag === 'a' ? getLinkPath(el) : null;
+  const inNavigation = tag === 'a' && el.closest(NAVIGATION) !== null;
+  const path = inNavigation ? getLinkPath(el) : null;
   if (path) {
     return `${tag}[href="${escapeAttributeValue(path)}"]`;
   }
