@@ -23,7 +23,8 @@ a selector for the element; the selector field offers all of them.
 6. **An ancestor's name** — the nearest ancestor up to 2 levels up with a
    name from 1–5, then the tags down to the element: `div.mw-heading h2`.
 7. **Its `#id`** — never one generated per load, like
-   `tsuid_hsLJaqLJBPu9ruEP7uOYkAo_91`.
+   `tsuid_hsLJaqLJBPu9ruEP7uOYkAo_91` or React Native Web's
+   `id__g3bmvlaotyb`.
 8. **Its link address or aria-label** — `a[href="/section/world"]`,
    `button[aria-label="Search"]`. An address only for a navigation link to
    a same-site path of words, and no email address or line break in the
@@ -60,7 +61,8 @@ Every class name falls into one of four kinds:
 | :----------------------------- | :---------------------------------------------- | :------------ | :------------------------------------------ |
 | Emotion                        | `css-1q2w3e`                                    | hashed        |                                             |
 | Other CSS-in-JS prefixes       | `sc-bdVaJa`, `jsx-123`, `emotion-0`, `chakra-…` | hashed        |                                             |
-| React Native Web (X)           | `r-1awozwy`                                     | hashed        |                                             |
+| React Native Web (X)           | `r-1awozwy`, `css-175oi2r`                      | hashed        |                                             |
+| React Native Web, all letters  | `r-sdzlij`                                      | hashed        | on a React Native Web page                  |
 | StyleX (Facebook, Instagram)   | `xeuugli`                                       | hashed        | only once the page has 10 such classes      |
 | Google bar                     | `gb_Ra`                                         | hashed        |                                             |
 | Instagram (legacy)             | `_a6hd`                                         | hashed        |                                             |

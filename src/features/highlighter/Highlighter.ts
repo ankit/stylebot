@@ -24,6 +24,15 @@ const getComposedTarget = (event: Event): HTMLElement =>
   (event.composedPath()[0] ?? event.target) as HTMLElement;
 
 /**
+ * Whether the element is, or sits inside, a disabled form control. A disabled
+ * fieldset alone doesn't count: clicks still reach its non-control content.
+ */
+const isInsideDisabledControl = (el: HTMLElement): boolean =>
+  !!el.closest(
+    'button:disabled, input:disabled, select:disabled, textarea:disabled'
+  );
+
+/**
  * The parent to climb to, stepping out of a shadow tree onto its host.
  */
 const getParentElement = (el: HTMLElement): HTMLElement | null => {
@@ -195,11 +204,11 @@ class Highlighter {
     return this.overlay;
   };
 
-  // Elements that aren't rendered (display: none) have nothing to outline
-  // and don't count as matches. Styles reach open shadow roots, so do matches.
+  // Skips unrendered and visibility: hidden elements, but not transparent
+  // ones, which are often a button's click target.
   queryMatches = (selector: string): Array<HTMLElement> => {
     return queryWithShadowRoots<HTMLElement>(selector).filter(el =>
-      el.checkVisibility()
+      el.checkVisibility({ visibilityProperty: true })
     );
   };
 
@@ -208,7 +217,7 @@ class Highlighter {
       return;
     }
 
-    // Tinting a whole-page selector just floods the page.
+    // Boxing a whole-page selector just floods the page.
     this.ensureOverlay().outline(
       isWholePageSelector(selector) ? [] : this.queryMatches(selector)
     );
@@ -345,7 +354,7 @@ class Highlighter {
     event.preventDefault();
     event.stopPropagation();
 
-    this.hoverElement(getComposedTarget(event));
+    this.hoverElement(getComposedTarget(event), event);
   };
 
   /**
@@ -360,7 +369,7 @@ class Highlighter {
     const el = getComposedTarget(event);
 
     if (el !== this.pointerElement) {
-      this.hoverElement(el);
+      this.hoverElement(el, event);
     }
   };
 
@@ -378,21 +387,55 @@ class Highlighter {
     this.hideOverlay();
   };
 
-  hoverElement = (el: HTMLElement): void => {
+  hoverElement = (el: HTMLElement, point?: MouseEvent): void => {
     this.pointerElement = el;
+    const target = point ? this.seeThroughTransparent(el, point) : el;
 
-    if (el !== this.currentElement) {
+    if (target !== this.currentElement) {
       this.drillStack = [];
     }
 
-    this.setCurrentElement(el);
-    this.showOverlay(el);
+    this.setCurrentElement(target);
+    this.showOverlay(target);
+  };
+
+  /**
+   * What the pointer shows when the element on top is fully transparent,
+   * like the invisible checkbox over a menu button: the first visible
+   * element under it, else `el`.
+   */
+  seeThroughTransparent = (el: HTMLElement, point: MouseEvent): HTMLElement => {
+    if (el.checkVisibility({ opacityProperty: true })) {
+      return el;
+    }
+
+    const visible = el.ownerDocument
+      .elementsFromPoint(point.clientX, point.clientY)
+      .find(
+        node =>
+          !this.isStylebotElement(node) &&
+          node.checkVisibility({
+            opacityProperty: true,
+            visibilityProperty: true,
+          })
+      );
+
+    return (visible as HTMLElement | undefined) ?? el;
   };
 
   onPointerUp = (event: MouseEvent): void => {
-    if (!this.isStylebotElement(event.target)) {
-      event.preventDefault();
-      event.stopPropagation();
+    if (this.isStylebotElement(event.target)) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Browsers fire no click on a disabled control or anything inside one.
+    const target = getComposedTarget(event);
+
+    if (event.button === 0 && isInsideDisabledControl(target)) {
+      this.selectElement(this.currentElement ?? target);
     }
   };
 
