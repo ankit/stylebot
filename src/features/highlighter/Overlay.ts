@@ -27,6 +27,10 @@ type PickingOptions = {
 // A safety net against pathological cases, not a design choice.
 const MAX_ELEMENTS = 1000;
 
+// How strongly a previewed selector's matches are boxed, next to a hovered
+// element's full-strength box.
+const MATCHES_OPACITY = '0.6';
+
 const emptyEdges = (): Edges => ({
   top: Number.POSITIVE_INFINITY,
   right: Number.NEGATIVE_INFINITY,
@@ -135,11 +139,15 @@ export default class Overlay {
   }
 
   /**
-   * Tints every match of a selector previewed from the panel, with no card.
+   * Boxes every match of a selector previewed from the panel, with no card,
+   * fainter than a hovered element's so the matches' content shows through.
    */
   outline(nodes: Array<HTMLElement>): void {
-    this.drawRects([]);
-    this.drawHints(nodes.slice(0, MAX_ELEMENTS), true);
+    this.drawHints([]);
+    this.drawRects(nodes.slice(0, MAX_ELEMENTS));
+    this.rects.forEach(rect => {
+      rect.node.style.opacity = MATCHES_OPACITY;
+    });
   }
 
   inspect(
@@ -179,6 +187,9 @@ export default class Overlay {
     }
 
     const { outer, primaryEdges } = this.drawRects(elements, property, primary);
+    this.rects.forEach(rect => {
+      rect.node.style.opacity = '';
+    });
 
     if (property) {
       return;
@@ -222,7 +233,7 @@ export default class Overlay {
    * Tints each element that's in the viewport, reusing existing hints;
    * off-screen matches aren't drawn at all.
    */
-  drawHints(elements: Array<HTMLElement>, strong = false): void {
+  drawHints(elements: Array<HTMLElement>): void {
     const boxes = visibleBoxes(elements);
 
     while (this.hints.length > boxes.length) {
@@ -233,7 +244,7 @@ export default class Overlay {
       this.hints.push(new OverlayHint(window.document, this.container));
     }
 
-    boxes.forEach((box, index) => this.hints[index].update(box, strong));
+    boxes.forEach((box, index) => this.hints[index].update(box));
   }
 
   /**

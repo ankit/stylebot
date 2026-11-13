@@ -3,8 +3,6 @@ import type { Rect } from './utils';
 /**
  * The faint tint drawn over another element the hovered one's selector
  * would also style, lighter than OverlayRect so the hovered fill still leads.
- * Stronger, with an outline, when previewing a selector, where no hovered
- * element leads.
  */
 export default class OverlayHint {
   node: HTMLElement;
@@ -28,10 +26,9 @@ export default class OverlayHint {
     this.node.parentNode?.removeChild(this.node);
   }
 
-  update(box: Rect, strong = false): void {
+  update(box: Rect): void {
     Object.assign(this.node.style, {
-      background: `rgba(80, 145, 205, ${strong ? 0.26 : 0.14})`,
-      outline: strong ? '1px solid rgba(80, 145, 205, 0.7)' : 'none',
+      background: 'rgba(80, 145, 205, 0.14)',
       top: `${box.top}px`,
       left: `${box.left}px`,
       width: `${box.width}px`,
