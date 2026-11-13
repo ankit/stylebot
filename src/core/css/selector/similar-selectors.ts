@@ -1,4 +1,5 @@
-import { countMatches } from './reach';
+import { getTestIdBasedSelector } from './element-selectors';
+import { countMatches, matchesOf } from './reach';
 import { isSimpleSelector } from './selector-text';
 import { getLookAlikes, getPositionedStep } from './unique-selectors';
 import type { LookAlikes } from './unique-selectors';
@@ -144,3 +145,76 @@ const findPathFromNearestBlock = (
  */
 export const getSameSpotSelector = (el: HTMLElement): string | null =>
   findPathFromNearestBlock(el, getRepeatedBlockName);
+
+/**
+ * A test id that includes one item's name, like `avatar-alice`, cut to the
+ * start every item shares (`avatar-`), when everything with that start is
+ * the same component (same tag and classes) and it matches more elements.
+ */
+const generalizeTestId = (el: HTMLElement, selector: string): string => {
+  const parts = selector.match(/^([a-z0-9-]+)\[([a-z-]+)="(.*)"\]$/i);
+  const cut = parts ? parts[3].search(/[-_:][^-_:]+$/) : -1;
+  if (!parts || cut <= 0) {
+    return selector;
+  }
+
+  const [, tag, attribute, value] = parts;
+  const prefix = `${tag}[${attribute}^="${value.slice(0, cut + 1)}"]`;
+  const all = matchesOf(prefix);
+  const sameComponent = all.every(other => other.className === el.className);
+
+  if (!sameComponent || all.length <= countMatches(selector)) {
+    return selector;
+  }
+
+  return prefix;
+};
+
+// Roles that say what an element is, shared by every one of its kind; not
+// the ones that mean "nothing here", like `presentation`.
+const MEANINGFUL_ROLES = new Set([
+  'article',
+  'button',
+  'cell',
+  'columnheader',
+  'dialog',
+  'gridcell',
+  'heading',
+  'link',
+  'listitem',
+  'menuitem',
+  'navigation',
+  'option',
+  'row',
+  'tab',
+  'tablist',
+  'toolbar',
+  'treeitem',
+]);
+
+/**
+ * An element's hook for scoping what's inside it: its test id, widened when
+ * made for one item, else a role that says what it is, like `[role="tab"]`.
+ */
+const getHook = (el: HTMLElement): string | null => {
+  const testId = getTestIdBasedSelector(el);
+  if (testId) {
+    return generalizeTestId(el, testId);
+  }
+
+  const role = el.getAttribute('role');
+
+  if (!role || !MEANINGFUL_ROLES.has(role)) {
+    return null;
+  }
+
+  return `${el.tagName.toLowerCase()}[role="${role}"]`;
+};
+
+/**
+ * The element in its spot inside every ancestor sharing a test id or role,
+ * for blocks named by those rather than a class, e.g. every item's avatar:
+ * `div[role="listitem"] div[data-testid^="avatar-"] img`.
+ */
+export const getHookScopedSelector = (el: HTMLElement): string | null =>
+  findPathFromNearestBlock(el, getHook);
