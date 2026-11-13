@@ -195,11 +195,11 @@ class Highlighter {
     return this.overlay;
   };
 
-  // Elements that aren't rendered (display: none) have nothing to outline
-  // and don't count as matches. Styles reach open shadow roots, so do matches.
+  // Skips unrendered and visibility: hidden elements, but not transparent
+  // ones, which are often a button's click target.
   queryMatches = (selector: string): Array<HTMLElement> => {
     return queryWithShadowRoots<HTMLElement>(selector).filter(el =>
-      el.checkVisibility()
+      el.checkVisibility({ visibilityProperty: true })
     );
   };
 
