@@ -21,8 +21,16 @@ import {
   isSweeping,
 } from './ancestor-selectors';
 import { getItemScopedSelector, getUniqueSelector } from './unique-selectors';
+import { getSameSpotSelector } from './similar-selectors';
+import { describeSelector } from './describe-selector';
+import type { SelectorDescription, SelectorRole } from './describe-selector';
 
 type Strategy = (el: HTMLElement) => string | null;
+
+type Suggestion = {
+  selector: string;
+  description?: SelectorDescription;
+};
 
 /**
  * Every way to name an element, most stable first: its own name, an
@@ -76,13 +84,35 @@ export const getSelector = (el: HTMLElement): string => {
 };
 
 /**
- * Every selector in the list that suits the element, plus the elements
- * like it in the same row or card, for the selector field to offer.
+ * Every selector in the list that suits the element, plus the same spot
+ * in every block like its own, and the elements like it in the same row
+ * or card, each described by how much it covers for the scope pills.
+ */
+export const getSelectorSuggestions = (el: HTMLElement): Array<Suggestion> => {
+  const roled: Array<{ get: Strategy; role?: Exclude<SelectorRole, 'only'> }> =
+    [
+      ...STRATEGIES.map(get => ({ get, role: 'all' as const })),
+      { get: getSameSpotSelector, role: 'similar' },
+      { get: getItemScopedSelector },
+    ];
+
+  return roled.flatMap(({ get, role }) => {
+    const selector = get(el);
+    if (!isUsable(el, selector)) {
+      return [];
+    }
+
+    const description = role ? describeSelector(selector, role) : undefined;
+
+    return [{ selector, description }];
+  });
+};
+
+/**
+ * The same suggestions' selectors alone.
  */
 export const getSelectorCandidates = (el: HTMLElement): Array<string> =>
-  [...STRATEGIES, getItemScopedSelector]
-    .map(strategy => strategy(el))
-    .filter(selector => isUsable(el, selector));
+  getSelectorSuggestions(el).map(({ selector }) => selector);
 
 /**
  * The selector a body child got before partly hashed classes, newer hash

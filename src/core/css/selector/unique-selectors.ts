@@ -29,6 +29,16 @@ const getLookAlikes = (el: HTMLElement) => {
 };
 
 /**
+ * `el`'s own name (or tag), with :nth-of-type when a sibling of the same
+ * tag would match it too, e.g. `tr.athing:nth-of-type(3)`.
+ */
+export const getPositionedStep = (el: HTMLElement): string => {
+  const { own, rivals, position } = getLookAlikes(el);
+
+  return rivals.length ? `${own}:nth-of-type(${position})` : own;
+};
+
+/**
  * `el`'s step told apart from look-alike siblings by what it is before where
  * it is: its test id, name, aria-label or site address, like
  * `input[name="size"]`, and failing those its position, like

@@ -25,6 +25,12 @@ export const matchesOf = (selector: string): Array<Element> => {
 };
 
 /**
+ * Whether two lists of matches hold the same elements in the same order.
+ */
+export const sameElements = (a: Array<Element>, b: Array<Element>): boolean =>
+  a.length === b.length && a.every((match, i) => match === b[i]);
+
+/**
  * Keeps the first of any selectors that match exactly the same elements,
  * so a list only offers choices that change what gets styled.
  */
@@ -33,11 +39,7 @@ export const dedupeByMatches = (selectors: Array<string>): Array<string> => {
 
   for (const selector of new Set(selectors)) {
     const matches = matchesOf(selector);
-    const duplicate = kept.some(
-      other =>
-        other.matches.length === matches.length &&
-        other.matches.every((match, i) => match === matches[i])
-    );
+    const duplicate = kept.some(other => sameElements(other.matches, matches));
 
     if (!duplicate) {
       kept.push({ selector, matches });
