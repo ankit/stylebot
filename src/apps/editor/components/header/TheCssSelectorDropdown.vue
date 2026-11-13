@@ -244,7 +244,7 @@ export default Vue.extend({
     },
 
     /**
-     * Tints the selector's matches while the field is focused or hovered;
+     * Boxes the selector's matches while the field is focused or hovered;
      * the inspector draws its own highlight while picking.
      */
     previewActiveSelector(): void {
