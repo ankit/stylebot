@@ -72,13 +72,13 @@ export const PillsAfterPick: StoryObj = {
 
     // Hovering a pill previews its matches; leaving the row clears them.
     // user-event fires mouseleave only on the pill, not its row as a browser would.
-    const hints = () =>
-      document.querySelectorAll('#stylebot-overlay .stylebot-overlay-hint');
+    const boxes = () =>
+      document.querySelectorAll('#stylebot-overlay .stylebot-overlay-rect');
     await user.hover(pill(canvasElement, 'All'));
-    await waitFor(() => expect(hints()).toHaveLength(3));
+    await waitFor(() => expect(boxes()).toHaveLength(3));
     await user.hover(within(canvasElement).getByRole('link', { name: 'Home' }));
     await fireEvent.mouseLeave(scopes(canvasElement) as HTMLElement);
-    await waitFor(() => expect(hints()).toHaveLength(0));
+    await waitFor(() => expect(boxes()).toHaveLength(0));
   },
 };
 
