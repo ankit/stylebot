@@ -21,7 +21,10 @@ import {
   isSweeping,
 } from './ancestor-selectors';
 import { getItemScopedSelector, getUniqueSelector } from './unique-selectors';
-import { getSameSpotSelector } from './similar-selectors';
+import {
+  getHookScopedSelector,
+  getSameSpotSelector,
+} from './similar-selectors';
 import { describeSelector } from './describe-selector';
 import type { SelectorDescription, SelectorRole } from './describe-selector';
 
@@ -93,13 +96,14 @@ export const getSelector = (el: HTMLElement): string => {
 
 /**
  * Every selector in the list that suits the element, plus the same spot
- * in every block like its own, and the elements like it in the same row
+ * in every block like its own or sharing a test id or role, and the elements like it in the same row
  * or card, each described by how much it covers for the scope pills.
  */
 export const getSelectorSuggestions = (el: HTMLElement): Array<Suggestion> => {
   const scopedStrategies: Array<ScopedStrategy> = [
     ...STRATEGIES.map(strategy => ({ strategy, role: 'all' as const })),
     { strategy: getSameSpotSelector, role: 'similar' },
+    { strategy: getHookScopedSelector, role: 'similar' },
     { strategy: getItemScopedSelector },
   ];
 

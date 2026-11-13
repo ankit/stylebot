@@ -112,7 +112,7 @@ How the shapes are told apart:
 ## Other selectors for the element
 
 The selector field lists the user's own rules that match the element, then
-every selector from the list above, plus two more:
+every selector from the list above, plus three more:
 
 - **The same spot**: the element in the same place inside every block like
   the one it sits in, e.g. every story title on Hacker News,
@@ -121,11 +121,15 @@ every selector from the list above, plus two more:
   id or form name, not a bare tag). The path down from it drops each step and
   position it doesn't need, and if it still has more than three steps or a
   position, the next repeated block up is tried instead.
+- **The same spot by test id or role**: like the same spot, but for blocks
+  that have no usable class, only a test id or a role such as `listitem` or
+  `tab`. When a test id includes one item's name, like `avatar-alice`, only
+  the shared start (`avatar-`) is kept, so the selector matches every item.
 - **This item**: elements like it in the same row, list item or card, e.g.
   `tr.athing:nth-of-type(3) a`.
 
 They're sorted narrowest first, keeping one per set of matched elements.
-When the same-spot selector reaches the same elements as another, that one
+When a same-spot selector reaches the same elements as another, that one
 stands in for it.
 
 ## Scope pills
@@ -135,7 +139,7 @@ scopes, each with how many elements it matches:
 
 - **Only**: a short selector that matches just the picked element.
 - **Similar**: the same spot in every block like the picked one's, at its
-  widest.
+  widest, e.g. every account's avatar rather than one account's.
 - **All**: the inspector's own pick when it reaches further than Similar,
   else the widest selector that does.
 

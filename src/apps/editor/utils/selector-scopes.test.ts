@@ -161,4 +161,24 @@ describe('getScopeSlots', () => {
       all: 'a',
     });
   });
+
+  it("offers every account's avatar as Similar rather than one account's", () => {
+    const one = 'div[data-testid="UserAvatar-Container-nasa"] img';
+    const every = 'div[data-testid^="UserAvatar-Container-"] img';
+    const slots = getScopeSlots(
+      {
+        selector: 'img',
+        existing: [],
+        candidates: ['#avatar', one, every, 'img'],
+        descriptions: {
+          [one]: { role: 'similar' },
+          [every]: { role: 'similar' },
+          img: { role: 'all' },
+        },
+      },
+      { '#avatar': 1, [one]: 4, [every]: 20, img: 60 }
+    );
+
+    expect(slots).toEqual({ only: '#avatar', similar: every, all: 'img' });
+  });
 });
