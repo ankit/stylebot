@@ -31,6 +31,51 @@ export function escapeAttributeValue(value: string): string {
 export const splitSelectorList = (selector: string): Array<string> =>
   splitCommaList(selector);
 
+/**
+ * How many compound steps a selector chains, e.g. 3 for `#menu li > a`,
+ * not counting what sits inside brackets, parentheses or quotes.
+ */
+export const countSelectorSteps = (selector: string): number => {
+  let steps = 0;
+  let depth = 0;
+  let quote = '';
+  let inStep = false;
+
+  for (const char of selector) {
+    if (quote) {
+      quote = char === quote ? '' : quote;
+    } else if (char === '"' || char === "'") {
+      quote = char;
+    } else if (char === '(' || char === '[') {
+      depth++;
+    } else if (char === ')' || char === ']') {
+      depth--;
+    }
+
+    const separates = !quote && depth === 0 && /[\s>+~]/.test(char);
+
+    if (separates) {
+      inStep = false;
+    } else if (!inStep) {
+      inStep = true;
+      steps++;
+    }
+  }
+
+  return steps;
+};
+
+// Beyond this many steps a selector is too tied to the page's structure to
+// keep working as the site changes.
+const MAX_SIMPLE_STEPS = 3;
+
+/**
+ * Whether a selector is simple enough to last: a few steps and no position.
+ */
+export const isSimpleSelector = (selector: string): boolean =>
+  countSelectorSteps(selector) <= MAX_SIMPLE_STEPS &&
+  !selector.includes(':nth-of-type(');
+
 export const validateSelector = (selector: string): boolean => {
   if (!selector) {
     return false;

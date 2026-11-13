@@ -21,7 +21,9 @@ export {
   getFragileSelector,
 } from './selector/fragile-selector';
 export {
+  countSelectorSteps,
   escapeSelectorToken,
+  isSimpleSelector,
   splitSelectorList,
   validateSelector,
 } from './selector/selector-text';
