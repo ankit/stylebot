@@ -36,6 +36,7 @@ export const getSelectorAlternatives = (
   ]);
 
   return {
+    selector,
     existing,
     // Includes the current selector, so the panel can tell the options
     // still belong to it.

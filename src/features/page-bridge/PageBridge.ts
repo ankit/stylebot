@@ -22,6 +22,8 @@ export type PageSnapshot = {
  * same set of elements.
  */
 export type SelectorAlternatives = {
+  // The selector these were found for, the inspector's pick.
+  selector?: string;
   existing: Array<string>;
   candidates: Array<string>;
 };

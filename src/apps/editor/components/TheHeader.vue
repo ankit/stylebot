@@ -12,6 +12,7 @@
       <the-inspector ref="inspector" @select="inspect($event)" />
       <the-css-selector-dropdown />
     </div>
+    <the-selector-scopes class="scopes-row" />
 
     <the-editor-mode-actions ref="modeActions" />
   </div>
@@ -25,6 +26,7 @@ import TheInspector from './header/TheInspector.vue';
 import TheWindowActions from './header/TheWindowActions.vue';
 import TheProfileSwitcher from './header/TheProfileSwitcher.vue';
 import TheCssSelectorDropdown from './header/TheCssSelectorDropdown.vue';
+import TheSelectorScopes from './header/TheSelectorScopes.vue';
 import TheEditorModeActions from './header/TheEditorModeActions.vue';
 import { consumeFieldEscape } from '@stylebot/utils';
 
@@ -40,6 +42,7 @@ export default Vue.extend({
     TheWindowActions,
     TheProfileSwitcher,
     TheCssSelectorDropdown,
+    TheSelectorScopes,
     TheEditorModeActions,
   },
 
@@ -103,5 +106,8 @@ export default Vue.extend({
   align-items: center;
   gap: 8px;
   padding: 4px var(--panel-gutter);
+}
+.scopes-row {
+  padding: 0 var(--panel-gutter) 4px calc(var(--panel-gutter) + 40px);
 }
 </style>
