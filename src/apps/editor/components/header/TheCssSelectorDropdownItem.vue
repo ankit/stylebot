@@ -127,7 +127,7 @@ export default Vue.extend({
   padding: 8px 10px;
   border-radius: 6px;
   font-size: 12px;
-  line-height: 1.45;
+  line-height: 16px;
 
   &:hover,
   &:focus-visible,
@@ -156,8 +156,9 @@ export default Vue.extend({
   font-family: var(--font-mono);
 }
 
-.item-count {
+.item-row .item-count {
   flex: none;
   font-family: var(--font-mono);
+  line-height: 16px;
 }
 </style>

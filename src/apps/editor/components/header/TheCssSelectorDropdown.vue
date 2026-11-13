@@ -269,6 +269,12 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
+.selector-autocomplete:not(:hover):not(:focus-within)
+  ::v-deep
+  .autocomplete-clear {
+  visibility: hidden;
+}
+
 .section-header {
   flex: none;
   padding: 10px 10px 4px;
