@@ -217,7 +217,7 @@ class Highlighter {
       return;
     }
 
-    // Tinting a whole-page selector just floods the page.
+    // Boxing a whole-page selector just floods the page.
     this.ensureOverlay().outline(
       isWholePageSelector(selector) ? [] : this.queryMatches(selector)
     );
