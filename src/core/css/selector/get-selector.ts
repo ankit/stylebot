@@ -27,6 +27,14 @@ import type { SelectorDescription, SelectorRole } from './describe-selector';
 
 type Strategy = (el: HTMLElement) => string | null;
 
+/**
+ * A strategy and the scope pill its selectors are offered for, if any.
+ */
+type ScopedStrategy = {
+  strategy: Strategy;
+  role?: Exclude<SelectorRole, 'only'>;
+};
+
 type Suggestion = {
   selector: string;
   description?: SelectorDescription;
@@ -89,15 +97,14 @@ export const getSelector = (el: HTMLElement): string => {
  * or card, each described by how much it covers for the scope pills.
  */
 export const getSelectorSuggestions = (el: HTMLElement): Array<Suggestion> => {
-  const roled: Array<{ get: Strategy; role?: Exclude<SelectorRole, 'only'> }> =
-    [
-      ...STRATEGIES.map(get => ({ get, role: 'all' as const })),
-      { get: getSameSpotSelector, role: 'similar' },
-      { get: getItemScopedSelector },
-    ];
+  const scopedStrategies: Array<ScopedStrategy> = [
+    ...STRATEGIES.map(strategy => ({ strategy, role: 'all' as const })),
+    { strategy: getSameSpotSelector, role: 'similar' },
+    { strategy: getItemScopedSelector },
+  ];
 
-  return roled.flatMap(({ get, role }) => {
-    const selector = get(el);
+  return scopedStrategies.flatMap(({ strategy, role }) => {
+    const selector = strategy(el);
     if (!isUsable(el, selector)) {
       return [];
     }
