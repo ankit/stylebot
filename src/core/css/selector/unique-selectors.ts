@@ -1,28 +1,17 @@
 import { countMatches, elementMatches } from './reach';
 import {
   getKindSelector,
-  getLinkPath,
+  getLabelBasedSelector,
+  getNameBasedSelector,
   getStableIdBasedSelector,
-  isSharedLabel,
+  getTestIdBasedSelector,
 } from './element-selectors';
-import { escapeAttributeValue } from './selector-text';
-import { looksGeneratedId } from '../hashed-class';
 
-const DISTINGUISHING_ATTRIBUTES = [
-  'for',
-  'name',
-  'value',
-  'href',
-  'aria-label',
-  'title',
-  'alt',
+const NAMING_SELECTORS = [
+  getTestIdBasedSelector,
+  getNameBasedSelector,
+  getLabelBasedSelector,
 ];
-
-// Short values that say what a child is, not a link address or tooltip.
-const CHILD_ATTRIBUTES = ['for', 'name', 'value', 'aria-label', 'alt'];
-
-const MAX_ATTRIBUTE_LENGTH = 80;
-const MAX_CHILDREN = 5;
 
 /**
  * `el`'s own name (or tag), and the siblings of the same tag it also fits.
@@ -40,45 +29,9 @@ const getLookAlikes = (el: HTMLElement) => {
 };
 
 /**
- * `node`'s value for `name`, or null when it's too long or generated. A
- * link's address counts only when it names a place on the site, which
- * already rules out long and generated ones.
- */
-const getUsableValue = (node: Element, name: string): string | null => {
-  if (name === 'href') {
-    return getLinkPath(node as HTMLElement);
-  }
-
-  const value = node.getAttribute(name);
-  if (!value || value.length > MAX_ATTRIBUTE_LENGTH) {
-    return null;
-  }
-
-  if (name === 'aria-label' && !isSharedLabel(value)) {
-    return null;
-  }
-
-  return looksGeneratedId(value) ? null : value;
-};
-
-/**
- * `node`'s attributes as `[name="value"]` tests, in the order they best say
- * what it is.
- */
-const getAttributeTests = (
-  node: Element,
-  attributes: Array<string>
-): Array<string> =>
-  attributes.flatMap(name => {
-    const value = getUsableValue(node, name);
-
-    return value ? [`[${name}="${escapeAttributeValue(value)}"]`] : [];
-  });
-
-/**
  * `el`'s step told apart from look-alike siblings by what it is before where
- * it is: its own attribute, like `label[for="size-2"]`, else a child's, like
- * `div.radio:has(> input[value="2"])`, and failing both its position, like
+ * it is: its test id, name, aria-label or site address, like
+ * `input[name="size"]`, and failing those its position, like
  * `tr.athing:nth-of-type(3)`.
  */
 const getDistinguishedStep = (el: HTMLElement): string => {
@@ -87,23 +40,12 @@ const getDistinguishedStep = (el: HTMLElement): string => {
     return own;
   }
 
-  const ownTests = getAttributeTests(el, DISTINGUISHING_ATTRIBUTES).map(
-    test => `${own}${test}`
+  const named = NAMING_SELECTORS.map(getNamed => getNamed(el)).find(
+    selector =>
+      selector && rivals.every(rival => !elementMatches(rival, selector))
   );
-  const childTests = Array.from(el.children)
-    .slice(0, MAX_CHILDREN)
-    .flatMap(child =>
-      getAttributeTests(child, CHILD_ATTRIBUTES).map(
-        test => `${own}:has(> ${child.tagName.toLowerCase()}${test})`
-      )
-    );
-  const tellsApart = (test: string) =>
-    rivals.every(rival => !elementMatches(rival, test));
 
-  return (
-    [...ownTests, ...childTests].find(tellsApart) ??
-    `${own}:nth-of-type(${position})`
-  );
+  return named ?? `${own}:nth-of-type(${position})`;
 };
 
 /**

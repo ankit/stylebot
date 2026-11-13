@@ -92,67 +92,56 @@ describe('getUniqueSelector and getItemScopedSelector', () => {
     expect(getUniqueSelector(el)).toBe('#nav li:nth-of-type(2) a');
   });
 
-  it('tells a label apart from its siblings by what it is for', () => {
+  it('tells a sibling apart by its test id', () => {
     document.body.innerHTML = `
-      <fieldset><legend>Size</legend>
-        <input type="radio" id="size-1" />
-        <label for="size-1">Small</label>
-        <input type="radio" id="size-2" />
-        <label for="size-2">Large</label>
-      </fieldset>
-      <fieldset><label>Note</label><label>Other</label></fieldset>
+      <ul><li data-testid="row-1">one</li><li data-testid="row-2">two</li></ul>
+      <ul><li>three</li><li>four</li></ul>
     `;
-    const el = document.querySelector('[for="size-2"]') as HTMLElement;
+    const el = document.querySelector('[data-testid="row-2"]') as HTMLElement;
 
-    expect(getUniqueSelector(el)).toBe('label[for="size-2"]');
+    expect(getUniqueSelector(el)).toBe('li[data-testid="row-2"]');
   });
 
-  it("tells a wrapper apart by a child's value", () => {
+  it('tells a field apart by its name', () => {
     document.body.innerHTML = `
-      <form>
-        <div class="radio"><input type="radio" value="1" /> One</div>
-        <div class="radio"><input type="radio" value="2" /> Two</div>
-      </form>
-      <form>
-        <div class="radio"><input type="radio" /> Other</div>
-        <div class="radio"><input type="radio" /> Else</div>
-      </form>
+      <form><input name="first" /><input name="last" /></form>
+      <form><input /><input /></form>
     `;
-    const el = document.querySelectorAll('div.radio')[1] as HTMLElement;
+    const el = document.querySelector('[name="last"]') as HTMLElement;
 
-    expect(getUniqueSelector(el)).toBe('div.radio:has(> input[value="2"])');
+    expect(getUniqueSelector(el)).toBe('input[name="last"]');
   });
 
-  it('passes over an attribute value the page generated', () => {
+  it('tells a button apart by its aria-label', () => {
     document.body.innerHTML = `
-      <ul class="menu">
-        <li><button name="tsuid_hsLJaqLJBPu9ruEP7uOYkAo_91">one</button></li>
-        <li><button name="tsuid_hsLJaqLJBPu9ruEP7uOYkAo_92">two</button></li>
-      </ul>
+      <div><button aria-label="Back"></button><button aria-label="Next"></button></div>
+      <div><button></button><button></button></div>
     `;
-    const el = document.querySelectorAll('li')[1] as HTMLElement;
+    const el = document.querySelector('[aria-label="Next"]') as HTMLElement;
 
-    expect(getUniqueSelector(el)).toBe('li:nth-of-type(2)');
+    expect(getUniqueSelector(el)).toBe('button[aria-label="Next"]');
+  });
+
+  it('tells a navigation link apart by its address', () => {
+    document.body.innerHTML = `
+      <nav><a href="/news">news</a> <a href="/newcomments">comments</a></nav>
+      <p><a>one</a> <a>two</a></p>
+    `;
+    const el = document.querySelectorAll('a')[1] as HTMLElement;
+
+    expect(getUniqueSelector(el)).toBe('a[href="/newcomments"]');
   });
 
   it("doesn't tell a content link apart by its address", () => {
     document.body.innerHTML = `
       <article>
-        <p><a href="/story/dvy0t3mvh1lg">one</a> <a href="/story/k2j9x8">two</a></p>
+        <p><a href="/news">one</a> <a href="/newcomments">two</a></p>
       </article>
+      <p><a>three</a> <a>four</a></p>
     `;
     const el = document.querySelectorAll('a')[1] as HTMLElement;
 
-    expect(getUniqueSelector(el)).toBe('a:nth-of-type(2)');
-  });
-
-  it('tells a site link apart by its address', () => {
-    document.body.innerHTML = `
-      <p><a href="/news">news</a> <a href="/newcomments">comments</a></p>
-    `;
-    const el = document.querySelectorAll('a')[1] as HTMLElement;
-
-    expect(getUniqueSelector(el)).toBe('a[href="/newcomments"]');
+    expect(getUniqueSelector(el)).toBe('article a:nth-of-type(2)');
   });
 
   it("leaves out a step that doesn't narrow the match", () => {
