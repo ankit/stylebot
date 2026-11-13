@@ -25,8 +25,9 @@ a selector for the element; the selector field offers all of them.
 7. **Its `#id`** — never one generated per load, like
    `tsuid_hsLJaqLJBPu9ruEP7uOYkAo_91`.
 8. **Its link address or aria-label** — `a[href="/section/world"]`,
-   `button[aria-label="Search"]`. No query, hash, id or date in the
-   address, and no email address or line break in the label.
+   `button[aria-label="Search"]`. An address only for a navigation link to
+   a same-site path of words, and no email address or line break in the
+   label.
 9. **Its hashed class** — `h3.css-1q2w3e`.
 10. **An ancestor's hashed class** — `section.css-1q2w3e a`.
 11. **Only this element** — its path from the nearest ancestor with a
