@@ -307,4 +307,67 @@ describe('getScopeSlots', () => {
       all: '.card a',
     });
   });
+
+  it('offers the saved rule as Styled, and not again as All', () => {
+    const slots = getScopeSlots(
+      {
+        selector: '.titleline > a',
+        existing: ['.titleline > a'],
+        styled: '.titleline > a',
+        candidates: ['#story-3', '.titleline a', 'a'],
+        descriptions: { '.titleline a': { role: 'similar' } },
+      },
+      { '.titleline > a': 30, '#story-3': 1, '.titleline a': 60, a: 200 }
+    );
+
+    expect(slots).toEqual({
+      styled: '.titleline > a',
+      only: '#story-3',
+      similar: '.titleline a',
+      all: 'a',
+    });
+  });
+
+  it('offers a saved rule as Styled however tied to the structure it is', () => {
+    const saved = 'main > div > ul > li:nth-of-type(2) > a';
+    const slots = getScopeSlots(
+      {
+        selector: saved,
+        existing: [saved],
+        styled: saved,
+        candidates: ['a'],
+      },
+      { [saved]: 1, a: 5 }
+    );
+
+    expect(slots).toEqual({
+      styled: saved,
+      only: undefined,
+      similar: undefined,
+      all: 'a',
+    });
+  });
+
+  it('leaves Similar to the Styled rule when it is the same spot in every block', () => {
+    const slots = getScopeSlots(
+      {
+        selector: 'span.titleline a',
+        existing: ['.titleline > a'],
+        styled: '.titleline > a',
+        candidates: ['span.titleline a'],
+        descriptions: {
+          '.titleline > a': { role: 'similar' },
+          'span.titleline a': { role: 'similar', fallback: true },
+        },
+      },
+      { '.titleline > a': 30, 'span.titleline a': 60 }
+    );
+
+    expect(slots).toEqual({
+      styled: '.titleline > a',
+      only: undefined,
+      similar: undefined,
+      all: 'span.titleline a',
+    });
+  });
 });
