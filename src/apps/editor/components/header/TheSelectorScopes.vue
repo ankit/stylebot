@@ -27,13 +27,12 @@ import { SSegmentedControl } from '@stylebot/components';
 import type { SelectorAlternatives } from '@stylebot/page-bridge';
 import { getPageBridge } from '@stylebot/page-bridge';
 
-import { countSelectorMatches } from '../../utils/selector-matches';
 import { getScopeSlots } from '../../utils/selector-scopes';
 import type { ScopeSlots } from '../../utils/selector-scopes';
 
 type ScopeOption = { value: string; label: string; count: string };
 
-const SLOTS: Array<keyof ScopeSlots> = ['only', 'similar', 'all', 'styled'];
+const SLOTS: Array<keyof ScopeSlots> = ['only', 'similar', 'all'];
 
 export default Vue.extend({
   name: 'TheSelectorScopes',
@@ -42,11 +41,8 @@ export default Vue.extend({
     SSegmentedControl,
   },
 
-  data(): {
-    counts: Record<string, number | null>;
-    previewing: string | null;
-  } {
-    return { counts: {}, previewing: null };
+  data(): { previewing: string | null } {
+    return { previewing: null };
   },
 
   computed: {
@@ -59,21 +55,17 @@ export default Vue.extend({
     },
 
     slots(): ScopeSlots {
-      return getScopeSlots(this.alternatives, this.counts);
+      return getScopeSlots(this.alternatives);
     },
 
     /**
-     * Whether the field holds the inspector's pick or one of the pills',
-     * rather than being cleared or holding a selector typed by hand.
+     * Whether the field holds one of the scopes' selectors, rather than being
+     * cleared or holding a selector typed by hand.
      */
     showing(): boolean {
       const selector = this.activeSelector;
 
-      return (
-        !!selector &&
-        (selector === this.alternatives.selector ||
-          SLOTS.some(slot => this.slots[slot] === selector))
-      );
+      return !!selector && SLOTS.some(slot => this.slots[slot] === selector);
     },
 
     /**
@@ -95,27 +87,10 @@ export default Vue.extend({
           {
             value: selector,
             label: this.t(`selector_scope_${slot}`),
-            count: String(this.counts[selector] ?? ''),
+            count: String(this.alternatives.counts?.[selector] ?? ''),
           },
         ];
       });
-    },
-  },
-
-  watch: {
-    alternatives: {
-      immediate: true,
-      async handler(alternatives: SelectorAlternatives): Promise<void> {
-        const { styled, candidates } = alternatives;
-        const selectors = styled ? [styled, ...candidates] : candidates;
-        const counts = selectors.length
-          ? await countSelectorMatches(selectors)
-          : {};
-
-        if (alternatives === this.alternatives) {
-          this.counts = counts;
-        }
-      },
     },
   },
 

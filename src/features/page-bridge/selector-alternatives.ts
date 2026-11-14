@@ -1,8 +1,8 @@
 import {
-  byReach,
   dedupeByMatches,
   getMatchingSelectors,
   getSelectorSuggestions,
+  isPageWideSelector,
   matchesOf,
   sameElements,
 } from '@stylebot/css';
@@ -10,25 +10,6 @@ import type { SelectorDescription } from '@stylebot/css';
 
 import type { SelectorAlternatives } from './PageBridge';
 import { getAppliedDeclarations } from './applied-declarations';
-
-const PAGE_WIDE_SELECTOR = /^\s*(\*|html|body|:root)\s*$/i;
-
-/**
- * Returns the saved rule the Styled pill offers: the current selector when
- * it's saved, else the saved rule that matches the fewest elements.
- */
-const getStyledSelector = (
-  selector: string,
-  existing: Array<string>
-): string | undefined => {
-  if (existing.includes(selector)) {
-    return selector;
-  }
-
-  const notPageWide = existing.filter(s => !PAGE_WIDE_SELECTOR.test(s));
-
-  return byReach(notPageWide)[0];
-};
 
 type MatchesFor = (selector: string) => Array<Element>;
 
@@ -42,8 +23,8 @@ const getSavedSelectors = (el: HTMLElement, css: string): Array<string> => {
   const winning = new Set(applied);
 
   return [
-    ...matching.filter(s => !PAGE_WIDE_SELECTOR.test(s)),
-    ...matching.filter(s => PAGE_WIDE_SELECTOR.test(s) && winning.has(s)),
+    ...matching.filter(s => !isPageWideSelector(s)),
+    ...matching.filter(s => isPageWideSelector(s) && winning.has(s)),
   ];
 };
 
@@ -88,32 +69,42 @@ const getDescriptions = (
 };
 
 /**
- * Returns the style's own selectors that match `el`, then generated ones
- * that reach a different set of elements than the current selector and those.
+ * Returns the style's selectors that match `el`, and the selectors that
+ * could fill a scope with how many elements each matches, narrowest first.
  */
 export const getSelectorAlternatives = (
   el: HTMLElement,
-  selector: string,
   css: string
 ): SelectorAlternatives => {
   const existing = getSavedSelectors(el, css);
-  const styled = getStyledSelector(selector, existing);
   const suggestions = getSelectorSuggestions(el);
   const matchesFor = createMatchesCache();
 
-  // Of selectors that match the same elements, the earliest is kept: the
-  // Styled rule first, so no suggestion repeats it, then the saved rules.
-  const ordered = [
-    styled,
-    selector,
-    ...existing,
-    ...suggestions.map(s => s.selector),
-  ].filter((s): s is string => !!s);
-  const kept = dedupeByMatches(ordered, matchesFor);
-  // Includes the current selector, so the panel can tell the options still
-  // belong to it.
-  const candidates = byReach(kept.filter(s => !existing.includes(s)));
+  // Of selectors that match the same elements, the earliest is kept, so a
+  // saved rule stands in for a suggestion that reaches what it does.
+  const kept = dedupeByMatches(
+    [...existing, ...suggestions.map(s => s.selector)],
+    matchesFor
+  );
   const descriptions = getDescriptions(suggestions, kept, matchesFor);
+  const countOf = (selector: string) => matchesFor(selector).length;
 
-  return { selector, existing, styled, candidates, descriptions };
+  // A saved rule fills a scope only when it matches just `el`, or exactly
+  // what a suggestion does; the suggestion then lent it its description.
+  const fillsScope = (selector: string) => {
+    if (!existing.includes(selector)) {
+      return true;
+    }
+
+    const exact = !!descriptions[selector] || countOf(selector) === 1;
+
+    return exact && !isPageWideSelector(selector);
+  };
+
+  const candidates = kept
+    .filter(fillsScope)
+    .sort((a, b) => countOf(a) - countOf(b));
+  const counts = Object.fromEntries(candidates.map(s => [s, countOf(s)]));
+
+  return { existing, candidates, descriptions, counts };
 };

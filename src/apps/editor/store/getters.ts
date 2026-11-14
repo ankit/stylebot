@@ -12,12 +12,10 @@ import {
   toHexColors,
   mergeShorthands,
   getFilterEffectValueForPage,
+  isPageWideSelector,
   getAlreadyUsedColors,
   removeEmptyRules,
 } from '@stylebot/css';
-
-// A rule for every element can't be judged by the one that was picked.
-const PAGE_WIDE_SELECTOR = /^\s*(\*|html|body|:root)\s*$/i;
 
 /**
  * Whether css hashes to a gallery version, as typed or as saved: the editor
@@ -68,7 +66,8 @@ export default {
     const { inspectedSelector } = getters;
     const winners: Record<string, OtherSelectorValue> = {};
 
-    if (PAGE_WIDE_SELECTOR.test(inspectedSelector)) {
+    // A rule for every element can't be judged by the one that was picked.
+    if (isPageWideSelector(inspectedSelector)) {
       return winners;
     }
 

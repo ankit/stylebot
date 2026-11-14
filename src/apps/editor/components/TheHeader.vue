@@ -54,8 +54,7 @@ export default Vue.extend({
 
   methods: {
     inspect(selector: string): void {
-      this.$store.commit('setActiveSelector', selector);
-      this.$store.dispatch('loadSelectorAlternatives', selector);
+      this.$store.dispatch('pickSelector', selector);
     },
 
     onSelectorRowEscape(event: KeyboardEvent): void {

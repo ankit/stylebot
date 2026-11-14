@@ -66,6 +66,7 @@ import { getPageBridge } from '@stylebot/page-bridge';
 import type { AppliedDeclaration } from '@stylebot/page-bridge';
 
 import { PLACEHOLDER_PROPERTIES } from '../utils/computed-placeholder';
+import { getDefaultScope } from '../utils/selector-scopes';
 import { loadSidePanelSupport } from '../utils/side-panel';
 import { expandProfiles, isForceImportant } from '@stylebot/saved-styles';
 
@@ -113,6 +114,8 @@ let previewRequest = 0;
 let computedStylesRequest = 0;
 let appliedDeclarationsRequest = 0;
 let pageDeclarationsRequest = 0;
+let pickRequest = 0;
+let pickTimer: ReturnType<typeof setTimeout> | undefined;
 
 export default {
   async initialize({ commit }: { commit: Commit }): Promise<void> {
@@ -622,22 +625,42 @@ export default {
   },
 
   /**
-   * Fetches other selectors for the element just picked, which the
-   * selector dropdown offers under the element.
+   * Puts a picked element in the field as its best scope pill. Waits for
+   * the pills first, so the field doesn't flash the raw pick, and skips the
+   * update if the user changed the field in the meantime.
    */
-  async loadSelectorAlternatives(
-    { commit }: { commit: Commit },
+  async pickSelector(
+    { commit, state }: { commit: Commit; state: State },
     selector: string
   ): Promise<void> {
-    commit('setSelectorAlternatives', { existing: [], candidates: [] });
+    const request = ++pickRequest;
+    const previous = state.activeSelector;
 
-    try {
-      commit(
-        'setSelectorAlternatives',
-        await getPageBridge().getSelectorAlternatives(selector)
-      );
-    } catch {
-      //
+    commit('setSelectorAlternatives', { existing: [], candidates: [] });
+    clearTimeout(pickTimer);
+    // Shows the pick as is if its scopes take longer than this.
+    pickTimer = setTimeout(() => commit('setActiveSelector', selector), 150);
+
+    const alternatives = await getPageBridge()
+      .getSelectorAlternatives(selector)
+      .catch(() => null);
+
+    // A quick second pick can finish first; the older one mustn't win.
+    if (request !== pickRequest) {
+      return;
+    }
+
+    clearTimeout(pickTimer);
+
+    if (alternatives) {
+      commit('setSelectorAlternatives', alternatives);
+    }
+
+    const scope = alternatives ? getDefaultScope(alternatives) : undefined;
+    const current = state.activeSelector;
+
+    if (current === previous || current === selector) {
+      commit('setActiveSelector', scope ?? selector);
     }
   },
 

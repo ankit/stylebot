@@ -76,6 +76,14 @@ export const isSimpleSelector = (selector: string): boolean =>
   countSelectorSteps(selector) <= MAX_SIMPLE_STEPS &&
   !selector.includes(':nth-of-type(');
 
+const PAGE_WIDE_SELECTOR = /^\s*(\*|html|body|:root)\s*$/i;
+
+/**
+ * Whether a selector is for every element on the page, like `*` or `body`.
+ */
+export const isPageWideSelector = (selector: string): boolean =>
+  PAGE_WIDE_SELECTOR.test(selector);
+
 export const validateSelector = (selector: string): boolean => {
   if (!selector) {
     return false;

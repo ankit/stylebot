@@ -16,15 +16,10 @@ export {
 export type {
   SelectorDescription,
   SelectorRole,
-} from './selector/describe-selector';
+} from './selector/get-selector';
 export { getStableClassMatcher } from './selector/element-selectors';
 export { getUniqueSelector } from './selector/unique-selectors';
-export {
-  dedupeByMatches,
-  byReach,
-  matchesOf,
-  sameElements,
-} from './selector/reach';
+export { dedupeByMatches, matchesOf, sameElements } from './selector/reach';
 export {
   getStableSelector,
   getFragileSelector,
@@ -32,6 +27,7 @@ export {
 export {
   countSelectorSteps,
   escapeSelectorToken,
+  isPageWideSelector,
   isSimpleSelector,
   splitSelectorList,
   validateSelector,

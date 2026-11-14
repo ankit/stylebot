@@ -5,105 +5,141 @@ export type ScopeSlots = {
   only?: string;
   similar?: string;
   all?: string;
-  styled?: string;
 };
 
-type Counts = Record<string, number | null>;
+type Descriptions = SelectorAlternatives['descriptions'];
 
-const getMatchCount = (counts: Counts, selector: string): number =>
-  counts[selector] ?? 0;
+const getMatchCount = (
+  { counts = {} }: SelectorAlternatives,
+  selector: string
+): number => counts[selector] ?? 0;
+
+const isFallback = (descriptions: Descriptions = {}, selector: string) =>
+  !!descriptions[selector]?.fallback;
 
 /**
- * Returns the widest selector, the last in a list sorted narrowest first.
- * Fallbacks are skipped unless they're all there is.
+ * Returns the selector that matches the most elements; of those that tie,
+ * the earliest. Fallbacks are skipped unless they're all there is.
  */
 const widest = (
   selectors: Array<string>,
-  descriptions: SelectorAlternatives['descriptions'] = {}
+  alternatives: SelectorAlternatives
 ): string | undefined => {
   const nearer = selectors.filter(
-    selector => !descriptions[selector]?.fallback
+    selector => !isFallback(alternatives.descriptions, selector)
   );
   const pool = nearer.length ? nearer : selectors;
 
-  return pool[pool.length - 1];
+  return pool.reduce<string | undefined>((best, selector) => {
+    const wider =
+      !best ||
+      getMatchCount(alternatives, selector) > getMatchCount(alternatives, best);
+
+    return wider ? selector : best;
+  }, undefined);
 };
 
 /**
- * Returns a short selector that matches just the picked element.
+ * Returns a selector that matches just the picked element: a saved rule
+ * whatever its shape, else a short one.
  */
 const getOnlyScope = (
-  { candidates }: SelectorAlternatives,
-  counts: Counts
-): string | undefined =>
-  candidates.find(
+  alternatives: SelectorAlternatives
+): string | undefined => {
+  const { candidates, existing } = alternatives;
+
+  return candidates.find(
     selector =>
-      getMatchCount(counts, selector) === 1 && isSimpleSelector(selector)
+      getMatchCount(alternatives, selector) === 1 &&
+      (existing.includes(selector) || isSimpleSelector(selector))
   );
+};
 
 /**
  * Returns the selector for elements like the picked one, e.g. every story's
  * title. A saved rule that already does this wins over a suggestion.
  */
 const getSimilarScope = (
-  { styled, candidates, descriptions = {} }: SelectorAlternatives,
-  counts: Counts
+  alternatives: SelectorAlternatives
 ): string | undefined => {
-  const styledDescription = styled ? descriptions[styled] : undefined;
-
-  if (styledDescription?.role === 'similar' && !styledDescription.fallback) {
-    return styled;
-  }
-
+  const { candidates, existing, descriptions = {} } = alternatives;
   const similar = candidates.filter(
     selector =>
       descriptions[selector]?.role === 'similar' &&
-      getMatchCount(counts, selector) > 1
+      getMatchCount(alternatives, selector) > 1
+  );
+  const saved = similar.find(
+    selector =>
+      existing.includes(selector) && !isFallback(descriptions, selector)
   );
 
-  return widest(similar, descriptions);
+  return saved ?? widest(similar, alternatives);
 };
 
 /**
- * Returns the pick when it reaches past the Similar scope, else the widest
- * candidate that does.
+ * Returns the widest candidate that reaches past the Similar scope.
  */
 const getAllScope = (
-  { selector: picked, styled, candidates, descriptions }: SelectorAlternatives,
-  counts: Counts,
+  alternatives: SelectorAlternatives,
   similarScope: string | undefined
 ): string | undefined => {
-  const similarCount = similarScope ? getMatchCount(counts, similarScope) : 0;
+  const similarCount = similarScope
+    ? getMatchCount(alternatives, similarScope)
+    : 0;
   const floor = Math.max(1, similarCount);
-
-  if (picked && picked !== styled && getMatchCount(counts, picked) > floor) {
-    return picked;
-  }
-
-  const wider = candidates.filter(
-    selector => getMatchCount(counts, selector) > floor
+  const wider = alternatives.candidates.filter(
+    selector => getMatchCount(alternatives, selector) > floor
   );
 
-  return widest(wider, descriptions);
+  return widest(wider, alternatives);
 };
 
 /**
- * Picks a selector for each scope pill: Only, Similar and All, then Styled,
- * the style's own rule for the element whatever its shape. Similar is left
- * out when the Styled rule already is that spot.
+ * Picks a selector for each scope: Only, Similar and All. A saved rule
+ * among the candidates fills the scope it matches exactly.
  */
 export const getScopeSlots = (
-  alternatives: SelectorAlternatives,
-  counts: Counts
+  alternatives: SelectorAlternatives
 ): ScopeSlots => {
-  const { styled } = alternatives;
-  const similarScope = getSimilarScope(alternatives, counts);
+  const similar = getSimilarScope(alternatives);
 
-  const only = getOnlyScope(alternatives, counts);
-  const similar = similarScope === styled ? undefined : similarScope;
-  const all = getAllScope(alternatives, counts, similarScope);
-  const styledCounted = !!styled && getMatchCount(counts, styled) > 0;
-  const styledScope = styledCounted ? styled : undefined;
+  return {
+    only: getOnlyScope(alternatives),
+    similar,
+    all: getAllScope(alternatives, similar),
+  };
+};
 
-  return { only, similar, all, styled: styledScope };
+/**
+ * Returns the scope, or nothing when it's a fallback.
+ */
+const unlessFallback = (
+  scope: string | undefined,
+  descriptions: Descriptions
+): string | undefined =>
+  scope && !isFallback(descriptions, scope) ? scope : undefined;
+
+/**
+ * Returns the scope the field starts on after a pick, the first that
+ * exists: the one holding a saved rule, Similar, Only, All, then the Similar
+ * and All fallbacks. Undefined keeps the pick.
+ */
+export const getDefaultScope = (
+  alternatives: SelectorAlternatives
+): string | undefined => {
+  const { existing, descriptions } = alternatives;
+  const { only, similar, all } = getScopeSlots(alternatives);
+  const saved = [only, similar, all].find(
+    scope => scope && existing.includes(scope)
+  );
+  const preferred = [
+    saved,
+    unlessFallback(similar, descriptions),
+    only,
+    unlessFallback(all, descriptions),
+    similar,
+    all,
+  ];
+
+  return preferred.find(Boolean);
 };

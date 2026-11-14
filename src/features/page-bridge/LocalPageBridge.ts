@@ -241,7 +241,7 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
 
     return Promise.resolve(
       el
-        ? getSelectorAlternatives(el, selector, this.getStylebotCss())
+        ? getSelectorAlternatives(el, this.getStylebotCss())
         : { existing: [], candidates: [] }
     );
   }
