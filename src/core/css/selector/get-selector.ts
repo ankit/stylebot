@@ -27,8 +27,18 @@ import {
   getSameSpotSelector,
   getTagInScopeSelector,
 } from './similar-selectors';
-import { describeSelector } from './describe-selector';
-import type { SelectorDescription, SelectorRole } from './describe-selector';
+
+/**
+ * Which scope a suggested selector is offered for: the same kind of element
+ * in every block like the picked one's, or everything broader.
+ */
+export type SelectorRole = 'similar' | 'all';
+
+/**
+ * A suggestion's role, and whether it's a fallback named by something far
+ * off (a whole named area), offered only when nothing nearer fills its scope.
+ */
+export type SelectorDescription = { role: SelectorRole; fallback?: boolean };
 
 type Strategy = (el: HTMLElement) => string | null;
 
@@ -37,7 +47,7 @@ type Strategy = (el: HTMLElement) => string | null;
  */
 type ScopedStrategy = {
   strategy: Strategy;
-  role?: Exclude<SelectorRole, 'only'>;
+  role?: SelectorRole;
   fallback?: boolean;
 };
 
@@ -117,9 +127,7 @@ export const getSelectorSuggestions = (el: HTMLElement): Array<Suggestion> => {
       return [];
     }
 
-    const description = role
-      ? describeSelector(selector, role, fallback)
-      : undefined;
+    const description = role ? { role, fallback } : undefined;
 
     return [{ selector, description }];
   });

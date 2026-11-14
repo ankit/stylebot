@@ -14,130 +14,85 @@ describe('getSelectorAlternatives', () => {
     return document.getElementById('link') as HTMLElement;
   };
 
-  it('keeps the current selector among the candidates', () => {
-    const { candidates } = getSelectorAlternatives(
-      pick(),
-      'span.titleline a',
+  const pickTitles = () => {
+    document.body.innerHTML = `
+      <table>
+        <tr class="athing"><td class="title">
+          <span class="titleline"><a id="link">one</a></span>
+        </td></tr>
+        <tr class="athing"><td class="title">
+          <span class="titleline"><a>two</a></span>
+        </td></tr>
+      </table>
+    `;
+    return document.getElementById('link') as HTMLElement;
+  };
+
+  const similarOf = (el: HTMLElement) => {
+    const { candidates, descriptions } = getSelectorAlternatives(el, '');
+
+    return candidates.find(s => descriptions?.[s]?.role === 'similar');
+  };
+
+  it('counts the elements each candidate matches, narrowest first', () => {
+    const { candidates, counts = {} } = getSelectorAlternatives(
+      pickTitles(),
       ''
     );
+    const reach = candidates.map(s => counts[s]);
 
-    expect(candidates).toContain('span.titleline a');
-  });
-
-  it("keeps the style's rules even when one reaches what the current does", () => {
-    const { existing, candidates } = getSelectorAlternatives(
-      pick(),
-      'span.titleline a',
-      '.athing .titleline a { color: red; }'
+    expect(candidates.length).toBeGreaterThan(1);
+    expect(reach).toEqual(
+      candidates.map(s => document.querySelectorAll(s).length)
     );
-
-    expect(existing).toEqual(['.athing .titleline a']);
-    expect(candidates).not.toContain('.athing .titleline a');
+    expect(reach).toEqual([...reach].sort((a, b) => a - b));
   });
 
   it('skips a page-wide rule that sets nothing on the element', () => {
-    const { existing } = getSelectorAlternatives(
-      pick(),
-      'span.titleline a',
-      ''
-    );
+    const { existing } = getSelectorAlternatives(pick(), '');
 
     expect(existing).not.toContain('*');
   });
 
-  describe('styled', () => {
-    const pickTitles = () => {
-      document.body.innerHTML = `
-        <table>
-          <tr class="athing"><td class="title">
-            <span class="titleline"><a id="link">one</a></span>
-          </td></tr>
-          <tr class="athing"><td class="title">
-            <span class="titleline"><a>two</a></span>
-          </td></tr>
-        </table>
-      `;
-      return document.getElementById('link') as HTMLElement;
-    };
+  it('offers a saved rule in place of the suggestion that matches the same elements', () => {
+    const el = pickTitles();
+    const similar = similarOf(el) as string;
 
-    it('offers the saved rule, leaving out the suggestion that reaches the same elements', () => {
-      const el = pickTitles();
-      const plain = getSelectorAlternatives(el, '#link', '');
-      const similar = plain.candidates.find(
-        s => plain.descriptions?.[s]?.role === 'similar'
-      ) as string;
-      const reached = Array.from(document.querySelectorAll(similar));
+    expect(Array.from(document.querySelectorAll(similar))).toEqual(
+      Array.from(document.querySelectorAll('.titleline > a'))
+    );
 
-      expect(reached).toEqual(
-        Array.from(document.querySelectorAll('.titleline > a'))
-      );
+    const { existing, candidates, descriptions } = getSelectorAlternatives(
+      el,
+      '.titleline > a { color: red; }'
+    );
 
-      const { styled, candidates } = getSelectorAlternatives(
-        el,
-        '.titleline > a',
-        '.titleline > a { color: red; }'
-      );
+    expect(existing).toEqual(['.titleline > a']);
+    expect(candidates).toContain('.titleline > a');
+    expect(candidates).not.toContain(similar);
+    expect(descriptions?.['.titleline > a']?.role).toBe('similar');
+  });
 
-      expect(styled).toBe('.titleline > a');
-      expect(candidates).not.toContain(similar);
-      expect(
-        candidates.filter(s => {
-          const matches = Array.from(document.querySelectorAll(s));
-          return (
-            matches.length === reached.length &&
-            matches.every((m, i) => m === reached[i])
-          );
-        })
-      ).toEqual([]);
-    });
+  it('offers a saved rule that matches just the element', () => {
+    const saved = 'tr:first-child .titleline > a';
+    const { candidates } = getSelectorAlternatives(
+      pickTitles(),
+      `${saved} { color: red; }`
+    );
 
-    it('keeps every suggestion when the saved rule reaches different elements', () => {
-      const el = pickTitles();
-      document.body.insertAdjacentHTML('beforeend', '<a class="more">more</a>');
-      const plain = getSelectorAlternatives(el, '#link', '');
-      const { styled, candidates } = getSelectorAlternatives(
-        el,
-        '#link',
-        ':is(#link, .more) { color: red; }'
-      );
+    expect(candidates).toContain(saved);
+  });
 
-      expect(styled).toBe(':is(#link, .more)');
-      expect(candidates).toEqual(plain.candidates);
-    });
+  it('leaves out a saved rule that matches what no suggestion does', () => {
+    const el = pickTitles();
+    document.body.insertAdjacentHTML('beforeend', '<a class="more">more</a>');
+    const plain = getSelectorAlternatives(el, '');
+    const { existing, candidates } = getSelectorAlternatives(
+      el,
+      ':is(#link, .more) { color: red; }'
+    );
 
-    it('offers the pick when it is one of several saved rules', () => {
-      const el = pickTitles();
-      const { styled } = getSelectorAlternatives(
-        el,
-        '.athing .titleline > a',
-        '.titleline > a { color: red; } .athing .titleline > a { color: blue; }'
-      );
-
-      expect(styled).toBe('.athing .titleline > a');
-    });
-
-    it('offers the closest saved rule when the pick is not saved', () => {
-      const el = pickTitles();
-      document
-        .querySelector('td')
-        ?.insertAdjacentHTML('beforeend', '<a>more</a>');
-      const { styled } = getSelectorAlternatives(
-        el,
-        '#link',
-        'table a { color: red; } .titleline > a { color: blue; }'
-      );
-
-      expect(styled).toBe('.titleline > a');
-    });
-
-    it('offers no saved rule when the style has none for the element', () => {
-      const { styled } = getSelectorAlternatives(
-        pick(),
-        'span.titleline a',
-        ''
-      );
-
-      expect(styled).toBeUndefined();
-    });
+    expect(existing).toEqual([':is(#link, .more)']);
+    expect(candidates).toEqual(plain.candidates);
   });
 });

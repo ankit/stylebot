@@ -52,12 +52,3 @@ export const dedupeByMatches = (
 
   return kept.map(({ selector }) => selector);
 };
-
-/**
- * Sorts selectors narrowest first, by how many elements each matches.
- */
-export const byReach = (selectors: Array<string>): Array<string> =>
-  selectors
-    .map(selector => ({ selector, count: countMatches(selector) }))
-    .sort((a, b) => a.count - b.count)
-    .map(({ selector }) => selector);

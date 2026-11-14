@@ -127,39 +127,57 @@ every selector from the list above, plus four more:
   the shared start (`avatar-`) is kept, so the selector matches every item.
 - **This item**: elements like it in the same row, list item or card, e.g.
   `tr.athing:nth-of-type(3) a`.
-- **The named area**: when blocks have no name, elements like it under the
-  nearest named ancestor, e.g. `table.infobox th.label`, and every element
-  of its tag there.
+- **The enclosing section**: a fallback for pages whose repeated blocks
+  have no name, like a Wikipedia article made of bare `<p>` tags. Stylebot
+  climbs to the nearest ancestor that does have a name, such as the article
+  body or an infobox, and offers elements like the picked one inside it,
+  e.g. `div.mw-content-ltr > p > a` (every link in the article's
+  paragraphs), and every element of its tag there, e.g.
+  `div.mw-content-ltr a`. That section can be large, so these are offered
+  only when nothing nearer is.
 
 They're sorted narrowest first, keeping one per set of matched elements.
 When a same-spot selector reaches the same elements as another, that one
 stands in for it.
 
-## Scope pills
+## Scopes
 
-After a pick in Basic mode, pills under the selector field offer up to
-four scopes, each with how many elements it matches:
+After a pick in Basic mode, the selector field offers up to
+three scopes, each with how many elements it matches:
 
 - **Only**: a short selector that matches just the picked element.
 - **Similar**: the same spot in every block like the picked one's, at its
   widest, e.g. every account's avatar rather than one account's.
-- **All**: the inspector's own pick when it reaches further than Similar,
-  else the widest selector that does.
-- **Styled**: a rule the style already has for the element: the field's
-  selector when it's saved, else the saved rule that reaches the fewest
-  elements. It shows whatever its shape, since it's the user's own.
+- **All**: the widest, most stable selector that reaches more than Similar.
 
-No two pills reach the same elements, so a pill never adds a second rule
+A saved rule that matches exactly what one of these would fills it in place
+of a suggestion. Other saved rules stay in the selector menu.
+
+No two scopes reach the same elements, so a scope never adds a second rule
 for elements a saved rule already styles.
 
-The named area fills Similar or All only when nothing nearer does. A pill
+The enclosing section fills Similar or All only when nothing nearer does. A scope
 with nothing to offer is left out, so All only shows when it reaches more
-than Similar. The pills hide once the field holds a selector
+than Similar. The scopes hide once the field holds a selector
 typed by hand.
+
+## Which scope a pick starts on
+
+The field starts on a scope after every pick, the first of these that the
+element has:
+
+1. **The one holding a saved rule**, so you keep editing that rule.
+2. **Similar**, unless it comes from the enclosing section.
+3. **Only.**
+4. **All**, unless it comes from the enclosing section.
+5. **Similar, then All, from the enclosing section.**
+
+With no scope, the field keeps the inspector's own pick. Similar comes
+before Only because restyling one item of a list is rarely what's wanted.
 
 ## Reusing existing rules
 
 When you pick an element, Stylebot reuses a saved rule if it styles exactly
 the elements the new selector would, so you keep editing that rule. Rules
-that only apply while hovering or focusing are ignored. A rule that reaches
-further, like `*:not(.x)`, is offered in the Styled pill instead.
+that only apply while hovering or focusing are ignored. In the editor, the
+field then moves to a scope as described above.

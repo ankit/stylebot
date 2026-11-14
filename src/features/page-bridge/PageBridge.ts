@@ -22,14 +22,13 @@ export type PageSnapshot = {
  * same set of elements.
  */
 export type SelectorAlternatives = {
-  // The selector these were found for, the inspector's pick.
-  selector?: string;
   existing: Array<string>;
-  // The style's rule for the element that the Styled pill offers.
-  styled?: string;
+  // The selectors that could fill a scope, saved rules among them.
   candidates: Array<string>;
-  // How much each candidate covers: only the element, similar ones or all.
+  // How much each candidate covers: similar elements or all.
   descriptions?: Record<string, SelectorDescription>;
+  // How many elements each candidate matches.
+  counts?: Record<string, number>;
 };
 
 export type PageBridgeEvents = {

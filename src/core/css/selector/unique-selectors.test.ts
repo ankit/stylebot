@@ -1,11 +1,11 @@
-import { dedupeByMatches, byReach } from './reach';
+import { countMatches, dedupeByMatches } from './reach';
 import { getUniqueSelector, getItemScopedSelector } from './unique-selectors';
 import { getSelectorSuggestions } from './get-selector';
 
 const getSelectorCandidates = (el: HTMLElement) =>
   getSelectorSuggestions(el).map(({ selector }) => selector);
 
-describe('getSelectorCandidates, dedupeByMatches and byReach', () => {
+describe('getSelectorCandidates and dedupeByMatches', () => {
   afterEach(() => {
     document.body.innerHTML = '';
   });
@@ -27,7 +27,8 @@ describe('getSelectorCandidates, dedupeByMatches and byReach', () => {
 
     const kept = dedupeByMatches(candidates);
     expect(kept).toHaveLength(new Set(kept).size);
-    expect(byReach(kept).at(-1)).toBe('a.css-1q2w3e');
+    const sorted = [...kept].sort((a, b) => countMatches(a) - countMatches(b));
+    expect(sorted.at(-1)).toBe('a.css-1q2w3e');
   });
 
   it('leaves out bare tags and tag chains', () => {

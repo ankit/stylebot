@@ -1,27 +1,72 @@
-import { getScopeSlots } from './selector-scopes';
+import { getDefaultScope, getScopeSlots } from './selector-scopes';
+import type { SelectorAlternatives } from '@stylebot/page-bridge';
+
+type Counts = Record<string, number>;
+
+/**
+ * Returns the scopes for these alternatives and match counts.
+ */
+const slotsFor = (alternatives: SelectorAlternatives, counts: Counts) =>
+  getScopeSlots({ ...alternatives, counts });
+
+/**
+ * Returns the scope the field starts on for these alternatives and counts.
+ */
+const defaultScope = (alternatives: SelectorAlternatives, counts: Counts) =>
+  getDefaultScope({ ...alternatives, counts });
+
+const TITLES: SelectorAlternatives = {
+  existing: [],
+  candidates: [
+    '#story-3',
+    'tr.athing .titleline > a',
+    'span.titleline a',
+    'td a',
+  ],
+  descriptions: {
+    'tr.athing .titleline > a': { role: 'similar' },
+    'span.titleline a': { role: 'all' },
+    'td a': { role: 'all' },
+  },
+};
+
+const TITLE_COUNTS = {
+  '#story-3': 1,
+  'tr.athing .titleline > a': 30,
+  'span.titleline a': 60,
+  'td a': 120,
+};
+
+/**
+ * Returns the titles' alternatives with `saved` as a saved rule, in place
+ * of the suggestion `replaces` that matches the same elements.
+ */
+const withSaved = (saved: string, replaces: string): SelectorAlternatives => ({
+  existing: [saved],
+  candidates: TITLES.candidates.map(s => (s === replaces ? saved : s)),
+  descriptions: Object.fromEntries(
+    Object.entries(TITLES.descriptions ?? {}).map(([s, description]) => [
+      s === replaces ? saved : s,
+      description,
+    ])
+  ),
+});
+
+/**
+ * Returns the titles' counts with `saved` in place of `replaces`.
+ */
+const countsWithSaved = (saved: string, replaces: string): Counts =>
+  Object.fromEntries(
+    Object.entries(TITLE_COUNTS).map(([s, count]) => [
+      s === replaces ? saved : s,
+      count,
+    ])
+  );
 
 describe('getScopeSlots', () => {
-  it('offers the one-element candidate as Only and the pick as All when it reaches further', () => {
-    const slots = getScopeSlots(
+  it('offers the one-element candidate as Only and the widest as All', () => {
+    const slots = slotsFor(
       {
-        selector: '.card a',
-        existing: [],
-        candidates: ['#login', '.card a', 'a'],
-      },
-      { '#login': 1, '.card a': 4, a: 20 }
-    );
-
-    expect(slots).toEqual({
-      only: '#login',
-      similar: undefined,
-      all: '.card a',
-    });
-  });
-
-  it('offers the widest candidate as All when the pick matches one element', () => {
-    const slots = getScopeSlots(
-      {
-        selector: '#login',
         existing: [],
         candidates: ['#login', '.card a', 'a'],
       },
@@ -32,9 +77,8 @@ describe('getScopeSlots', () => {
   });
 
   it('leaves Only out when the one-element candidate is too tied to the structure', () => {
-    const slots = getScopeSlots(
+    const slots = slotsFor(
       {
-        selector: 'a',
         existing: [],
         candidates: ['main > div > ul > li:nth-of-type(2) > a', 'a'],
       },
@@ -45,19 +89,13 @@ describe('getScopeSlots', () => {
   });
 
   it('leaves All out when nothing reaches more than one element', () => {
-    const slots = getScopeSlots(
-      { selector: 'h1', existing: [], candidates: ['h1'] },
-      { h1: 1 }
-    );
+    const slots = slotsFor({ existing: [], candidates: ['h1'] }, { h1: 1 });
 
     expect(slots).toEqual({ only: 'h1', similar: undefined, all: undefined });
   });
 
   it('offers nothing before the counts arrive', () => {
-    const slots = getScopeSlots(
-      { selector: 'h1', existing: [], candidates: ['h1', 'body h1'] },
-      {}
-    );
+    const slots = slotsFor({ existing: [], candidates: ['h1', 'body h1'] }, {});
 
     expect(slots).toEqual({
       only: undefined,
@@ -66,10 +104,9 @@ describe('getScopeSlots', () => {
     });
   });
 
-  it('offers the widest similar candidate as Similar, and the pick as All when it reaches further', () => {
-    const slots = getScopeSlots(
+  it('offers the widest similar candidate as Similar, and the widest as All', () => {
+    const slots = slotsFor(
       {
-        selector: 'a',
         existing: [],
         candidates: [
           '#story-3',
@@ -98,10 +135,9 @@ describe('getScopeSlots', () => {
     });
   });
 
-  it('offers a wider candidate as All when the pick is the similar one', () => {
-    const slots = getScopeSlots(
+  it('offers a wider candidate as All than the similar one', () => {
+    const slots = slotsFor(
       {
-        selector: 'td.title > span.titleline > a',
         existing: [],
         candidates: [
           '#story-3',
@@ -127,9 +163,8 @@ describe('getScopeSlots', () => {
   });
 
   it('leaves All out when nothing reaches further than Similar', () => {
-    const slots = getScopeSlots(
+    const slots = slotsFor(
       {
-        selector: 'li.item > a',
         existing: [],
         candidates: ['#home', 'li.item > a', 'ul a'],
         descriptions: { 'li.item > a': { role: 'similar' } },
@@ -145,9 +180,8 @@ describe('getScopeSlots', () => {
   });
 
   it('leaves Similar out when its candidate reaches only the picked element', () => {
-    const slots = getScopeSlots(
+    const slots = slotsFor(
       {
-        selector: 'a',
         existing: [],
         candidates: ['li.item > a', 'a'],
         descriptions: { 'li.item > a': { role: 'similar' } },
@@ -165,9 +199,8 @@ describe('getScopeSlots', () => {
   it("offers every account's avatar as Similar rather than one account's", () => {
     const one = 'div[data-testid="UserAvatar-Container-nasa"] img';
     const every = 'div[data-testid^="UserAvatar-Container-"] img';
-    const slots = getScopeSlots(
+    const slots = slotsFor(
       {
-        selector: 'img',
         existing: [],
         candidates: ['#avatar', one, every, 'img'],
         descriptions: {
@@ -183,9 +216,8 @@ describe('getScopeSlots', () => {
   });
 
   it("offers a named area's fallback as Similar when nothing nearer does", () => {
-    const slots = getScopeSlots(
+    const slots = slotsFor(
       {
-        selector: 'th.infobox-label',
         existing: [],
         candidates: ['#born', 'th.infobox-label', 'table.infobox th', 'th'],
         descriptions: {
@@ -205,9 +237,8 @@ describe('getScopeSlots', () => {
   });
 
   it('ignores a wider fallback when a nearer similar candidate fills Similar', () => {
-    const slots = getScopeSlots(
+    const slots = slotsFor(
       {
-        selector: 'a',
         existing: [],
         candidates: [
           '#story-3',
@@ -238,7 +269,6 @@ describe('getScopeSlots', () => {
 
   it('offers the fallback as All only when nothing else reaches past Similar', () => {
     const alternatives = {
-      selector: '#mwOw',
       existing: [],
       candidates: [
         '#mwOw',
@@ -262,35 +292,28 @@ describe('getScopeSlots', () => {
       'div.mw-content-ltr a': 1500,
     };
 
-    expect(getScopeSlots(alternatives, counts)).toEqual({
+    expect(slotsFor(alternatives, counts)).toEqual({
       only: '#mwOw',
       similar: 'div.mw-content-ltr > p > a',
       all: 'div.mw-content-ltr a',
     });
   });
 
-  it('keeps the pick as All over a wider fallback', () => {
-    const slots = getScopeSlots(
+  it('offers the earliest, most stable candidate as All when two reach as far', () => {
+    const slots = slotsFor(
       {
-        selector: '.card a',
         existing: [],
         candidates: ['#login', '.card a', 'main a'],
-        descriptions: { 'main a': { role: 'all', fallback: true } },
       },
-      { '#login': 1, '.card a': 4, 'main a': 20 }
+      { '#login': 1, '.card a': 20, 'main a': 20 }
     );
 
-    expect(slots).toEqual({
-      only: '#login',
-      similar: undefined,
-      all: '.card a',
-    });
+    expect(slots.all).toBe('.card a');
   });
 
   it('prefers a narrower non-fallback over a wider fallback for All', () => {
-    const slots = getScopeSlots(
+    const slots = slotsFor(
       {
-        selector: '#login',
         existing: [],
         candidates: ['#login', '.card a', 'main a'],
         descriptions: {
@@ -308,66 +331,186 @@ describe('getScopeSlots', () => {
     });
   });
 
-  it('offers the saved rule as Styled, and not again as All', () => {
-    const slots = getScopeSlots(
-      {
-        selector: '.titleline > a',
-        existing: ['.titleline > a'],
-        styled: '.titleline > a',
-        candidates: ['#story-3', '.titleline a', 'a'],
-        descriptions: { '.titleline a': { role: 'similar' } },
-      },
-      { '.titleline > a': 30, '#story-3': 1, '.titleline a': 60, a: 200 }
-    );
+  it('offers a saved rule that is the same spot in every block as Similar', () => {
+    const saved = '.titleline > a';
+    const replaces = 'tr.athing .titleline > a';
 
-    expect(slots).toEqual({
-      styled: '.titleline > a',
+    expect(
+      slotsFor(withSaved(saved, replaces), countsWithSaved(saved, replaces))
+    ).toEqual({ only: '#story-3', similar: saved, all: 'td a' });
+  });
+
+  it('offers a saved rule that reaches what All would as All', () => {
+    const saved = 'table a';
+
+    expect(
+      slotsFor(withSaved(saved, 'td a'), countsWithSaved(saved, 'td a'))
+    ).toEqual({
       only: '#story-3',
-      similar: '.titleline a',
-      all: 'a',
+      similar: 'tr.athing .titleline > a',
+      all: saved,
     });
   });
 
-  it('offers a saved rule as Styled however tied to the structure it is', () => {
+  it('offers a saved rule for just the element as Only, however tied to the structure it is', () => {
     const saved = 'main > div > ul > li:nth-of-type(2) > a';
-    const slots = getScopeSlots(
+
+    expect(
+      slotsFor(
+        { existing: [saved], candidates: [saved, 'a'] },
+        { [saved]: 1, a: 5 }
+      )
+    ).toEqual({ only: saved, similar: undefined, all: 'a' });
+  });
+
+  it('offers a saved rule as Similar over a wider similar suggestion', () => {
+    const saved = '.titleline > a';
+
+    expect(
+      slotsFor(
+        {
+          existing: [saved],
+          candidates: [saved, 'span.titleline a'],
+          descriptions: {
+            [saved]: { role: 'similar' },
+            'span.titleline a': { role: 'similar' },
+          },
+        },
+        { [saved]: 30, 'span.titleline a': 60 }
+      ).similar
+    ).toBe(saved);
+  });
+});
+
+describe('getDefaultScope', () => {
+  it('starts on a saved rule that fills Similar', () => {
+    const saved = '.titleline > a';
+    const replaces = 'tr.athing .titleline > a';
+
+    expect(
+      defaultScope(withSaved(saved, replaces), countsWithSaved(saved, replaces))
+    ).toBe(saved);
+  });
+
+  it('starts on a saved rule that fills All, over Similar', () => {
+    const saved = 'table a';
+
+    expect(
+      defaultScope(withSaved(saved, 'td a'), countsWithSaved(saved, 'td a'))
+    ).toBe(saved);
+  });
+
+  it('starts on a saved rule for just the element, in Only', () => {
+    const saved = 'tr:nth-of-type(3) .titleline > a';
+
+    expect(
+      defaultScope(
+        withSaved(saved, '#story-3'),
+        countsWithSaved(saved, '#story-3')
+      )
+    ).toBe(saved);
+  });
+
+  it('starts on Similar when it has one', () => {
+    expect(defaultScope(TITLES, TITLE_COUNTS)).toBe('tr.athing .titleline > a');
+  });
+
+  it('starts on Only over an All that is not a fallback', () => {
+    const scope = defaultScope(
       {
-        selector: saved,
-        existing: [saved],
-        styled: saved,
-        candidates: ['a'],
+        existing: [],
+        candidates: ['#mwOw', '#mwLA a'],
+        descriptions: { '#mwLA a': { role: 'all' } },
       },
-      { [saved]: 1, a: 5 }
+      { '#mwOw': 1, '#mwLA a': 18 }
     );
 
-    expect(slots).toEqual({
-      styled: saved,
-      only: undefined,
-      similar: undefined,
-      all: 'a',
-    });
+    expect(scope).toBe('#mwOw');
   });
 
-  it('leaves Similar to the Styled rule when it is the same spot in every block', () => {
-    const slots = getScopeSlots(
+  it('starts on All when there is no Similar or Only', () => {
+    const scope = defaultScope(
       {
-        selector: 'span.titleline a',
-        existing: ['.titleline > a'],
-        styled: '.titleline > a',
-        candidates: ['span.titleline a'],
+        existing: [],
+        candidates: ['main > div > ul > li:nth-of-type(2) > a', '.nav a'],
+        descriptions: { '.nav a': { role: 'all' } },
+      },
+      { 'main > div > ul > li:nth-of-type(2) > a': 1, '.nav a': 5 }
+    );
+
+    expect(scope).toBe('.nav a');
+  });
+
+  it('starts on Only over Similar and All fallbacks', () => {
+    const scope = defaultScope(
+      {
+        existing: [],
+        candidates: [
+          '#mwOw',
+          'div.mw-content-ltr > p > a',
+          'div.mw-content-ltr a',
+        ],
         descriptions: {
-          '.titleline > a': { role: 'similar' },
-          'span.titleline a': { role: 'similar', fallback: true },
+          'div.mw-content-ltr > p > a': { role: 'similar', fallback: true },
+          'div.mw-content-ltr a': { role: 'all', fallback: true },
         },
       },
-      { '.titleline > a': 30, 'span.titleline a': 60 }
+      {
+        '#mwOw': 1,
+        'div.mw-content-ltr > p > a': 900,
+        'div.mw-content-ltr a': 1500,
+      }
     );
 
-    expect(slots).toEqual({
-      styled: '.titleline > a',
-      only: undefined,
-      similar: undefined,
-      all: 'span.titleline a',
-    });
+    expect(scope).toBe('#mwOw');
+  });
+
+  it('starts on the Similar fallback when Only is hidden', () => {
+    const scope = defaultScope(
+      {
+        existing: [],
+        candidates: [
+          'table > tbody > tr:nth-of-type(4) > th',
+          'table.infobox th.infobox-label',
+          'table.infobox th',
+        ],
+        descriptions: {
+          'table.infobox th.infobox-label': { role: 'similar', fallback: true },
+          'table.infobox th': { role: 'all', fallback: true },
+        },
+      },
+      {
+        'table > tbody > tr:nth-of-type(4) > th': 1,
+        'table.infobox th.infobox-label': 12,
+        'table.infobox th': 16,
+      }
+    );
+
+    expect(scope).toBe('table.infobox th.infobox-label');
+  });
+
+  it('starts on the All fallback when it is the only scope', () => {
+    const scope = defaultScope(
+      {
+        existing: [],
+        candidates: ['table.infobox th'],
+        descriptions: { 'table.infobox th': { role: 'all', fallback: true } },
+      },
+      { 'table.infobox th': 16 }
+    );
+
+    expect(scope).toBe('table.infobox th');
+  });
+
+  it('keeps the pick when there is no scope', () => {
+    const scope = defaultScope(
+      {
+        existing: [],
+        candidates: ['main > div > p:nth-of-type(2)'],
+      },
+      { 'main > div > p:nth-of-type(2)': 1 }
+    );
+
+    expect(scope).toBeUndefined();
   });
 });

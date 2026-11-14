@@ -13,7 +13,7 @@ export const inspectElement = (
   css: string
 ): Pick<PointerResult, 'selector' | 'matches' | 'alternatives'> => {
   const selector = getExistingSelector(el, css) ?? getSelector(el);
-  const { existing, candidates } = getSelectorAlternatives(el, selector, css);
+  const { existing, candidates } = getSelectorAlternatives(el, css);
   const others = Array.from(new Set([...existing, ...candidates])).filter(
     other => other !== selector
   );

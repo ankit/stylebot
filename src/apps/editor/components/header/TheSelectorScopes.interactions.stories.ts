@@ -85,6 +85,31 @@ export const PillsAfterPick: StoryObj = {
   },
 };
 
+export const PickStartsOnSimilar: StoryObj = {
+  ...editor({ inspecting: true }, { page: SCOPES_PAGE }),
+  name: 'picking an element starts the field on its Similar pill',
+  play: async ({ canvasElement }) => {
+    const store = storeOf(canvasElement);
+
+    await pickHome(canvasElement);
+    await waitFor(() =>
+      expect(pill(canvasElement, 'Similar')).toHaveAttribute(
+        'aria-pressed',
+        'true'
+      )
+    );
+
+    const selector = store.state.activeSelector;
+    const titles = Array.from(document.querySelectorAll('li.item > a'));
+    await expect(Array.from(document.querySelectorAll(selector))).toEqual(
+      titles
+    );
+    await waitFor(() =>
+      expect(chips(canvasElement)).toHaveTextContent(selector)
+    );
+  },
+};
+
 export const ClickingAllSetsField: StoryObj = {
   ...editor({ inspecting: true }, { page: SCOPES_PAGE }),
   name: 'clicking All puts its selector in the field',
@@ -123,35 +148,31 @@ export const ClickingSimilarSetsField: StoryObj = {
   },
 };
 
-export const StyledPillForSavedRule: StoryObj = {
+export const SavedRuleFillsSimilar: StoryObj = {
   ...editor(
     { inspecting: true, css: '.item > a { color: red; }' },
     { page: SCOPES_PAGE }
   ),
-  name: 'a saved rule for the element shows as Styled, in place of a suggestion that reaches the same elements',
+  name: 'a saved rule that reaches what Similar would fills Similar, and the field starts on it',
   play: async ({ canvasElement }) => {
     const store = storeOf(canvasElement);
-    const home = within(canvasElement).getByRole('link', { name: 'Home' });
 
-    await hoverPage(home);
-    await pressKey('Enter');
-    await waitFor(() => expect(pills(canvasElement)).toHaveLength(3));
-
-    await expect(pills(canvasElement).at(-1)).toHaveTextContent(/Styled\s*3/);
-    const others = pills(canvasElement).slice(0, -1);
-    await expect(others.map(other => other.textContent)).not.toContainEqual(
-      expect.stringMatching(/\b3\b/)
+    await pickHome(canvasElement);
+    await expect(pill(canvasElement, 'Similar')).toHaveTextContent(
+      /Similar\s*3/
     );
-    await expect(store.state.activeSelector).not.toBe('.item > a');
-
-    await user.click(pill(canvasElement, 'Styled'));
-    await expect(store.state.activeSelector).toBe('.item > a');
     await waitFor(() =>
-      expect(pill(canvasElement, 'Styled')).toHaveAttribute(
+      expect(pill(canvasElement, 'Similar')).toHaveAttribute(
         'aria-pressed',
         'true'
       )
     );
+    await expect(store.state.activeSelector).toBe('.item > a');
+
+    await user.click(pill(canvasElement, 'Only'));
+    await expect(store.state.activeSelector).not.toBe('.item > a');
+    await user.click(pill(canvasElement, 'Similar'));
+    await expect(store.state.activeSelector).toBe('.item > a');
   },
 };
 
