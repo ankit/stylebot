@@ -86,8 +86,7 @@ export default Vue.extend({
       }
 
       const delta = event.clientX - this.press.x;
-      this.latest =
-        this.press.width + (this.side === 'left' ? -delta : delta);
+      this.latest = this.press.width + (this.side === 'left' ? -delta : delta);
       this.$emit('preview', this.latest);
     },
 
@@ -109,7 +108,10 @@ export default Vue.extend({
       event.stopPropagation();
 
       const grows = (event.key === 'ArrowLeft') === (this.side === 'left');
-      this.$emit('change', this.width + (grows ? KEYBOARD_STEP : -KEYBOARD_STEP));
+      this.$emit(
+        'change',
+        this.width + (grows ? KEYBOARD_STEP : -KEYBOARD_STEP)
+      );
     },
   },
 });

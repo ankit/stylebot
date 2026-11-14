@@ -11,7 +11,10 @@
     v-else
     ref="panel"
     class="stylebot stylebot-docked"
-    :class="[placement, { 'stylebot-resizing': busy, 'stylebot-capturing': capturing }]"
+    :class="[
+      placement,
+      { 'stylebot-resizing': busy, 'stylebot-capturing': capturing },
+    ]"
     :style="panelStyle"
   >
     <slot></slot>
@@ -63,11 +66,7 @@ import {
   resizeBounds,
   snapFor,
 } from './panel/floating-bounds';
-import type {
-  ResizeDirection,
-  Snap,
-  Viewport,
-} from './panel/floating-bounds';
+import type { ResizeDirection, Snap, Viewport } from './panel/floating-bounds';
 
 const MAX_WIDTH_RATIO = 0.6;
 
@@ -123,8 +122,7 @@ export default Vue.extend({
 
     floating(): boolean {
       return (
-        Boolean(this.gesture?.bounds) ||
-        this.layout.dockLocation === 'floating'
+        Boolean(this.gesture?.bounds) || this.layout.dockLocation === 'floating'
       );
     },
 
