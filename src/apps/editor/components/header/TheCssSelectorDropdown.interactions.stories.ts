@@ -193,13 +193,8 @@ const WITH_ALTERNATIVES = {
   },
 };
 
-const headers = (root: HTMLElement) =>
-  Array.from(root.querySelectorAll('.section-header'), header =>
-    header.textContent?.trim()
-  );
-
-const dividers = (root: HTMLElement) =>
-  root.querySelectorAll('.section-divider');
+const chevron = (root: HTMLElement) =>
+  field(root).querySelector('.autocomplete-chevron') as HTMLElement | null;
 
 const row = (root: HTMLElement, selector: string) =>
   Array.from(items(root)).find(
@@ -211,85 +206,69 @@ const rowTexts = (root: HTMLElement) =>
     item.querySelector('.item-text')?.textContent?.trim()
   );
 
-const count = (item: HTMLElement) =>
-  item.querySelector('.item-count')?.textContent?.trim();
-
-export const SectionsForTheElementAndPage: StoryObj = {
+export const ListsOnlyTheStylesRules: StoryObj = {
   ...editor(WITH_ALTERNATIVES),
-  name: "the list offers the picked element's selectors, then the page's other rules",
+  name: "after a pick, the list offers only the style's rules",
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
     await user.click(chips(canvasElement));
     await findOpenMenu(canvas);
 
-    await expect(headers(canvasElement)).toEqual([
-      'This element',
-      'Styled on this page',
-    ]);
-    await expect(dividers(canvasElement)).toHaveLength(1);
-    const line = dividers(canvasElement)[0].getBoundingClientRect();
-    await expect(line.height).toBeGreaterThan(0.5);
-    await expect(line.width).toBeGreaterThan(200);
-    await expect(rowTexts(canvasElement)).toEqual([
-      'h1',
-      '*',
-      '.sb-page h1',
-      'div h1',
-      '.article-body',
-    ]);
+    await expect(rowTexts(canvasElement)).toEqual(['h1', '*', '.article-body']);
+    await expect(canvas.getByRole('menu')).not.toHaveTextContent(
+      /This element|Styled on this page/
+    );
+    await expect(canvasElement.querySelector('.item-count')).toBeNull();
 
-    // The active selector leads, highlighted rather than checked.
+    // The active selector is highlighted rather than checked.
     const current = row(canvasElement, 'h1');
     await expect(current).toHaveClass('current');
     await expect(current.querySelector('.menu-item-check')).toBeNull();
-
-    // Each row counts the elements it matches on the page.
-    await waitFor(() =>
-      expect(count(row(canvasElement, 'h1'))).toBe(
-        String(document.querySelectorAll('h1').length)
-      )
-    );
-    await expect(count(row(canvasElement, '.article-body'))).toBe(
-      String(document.querySelectorAll('.article-body').length)
-    );
   },
 };
 
-export const PickAnAlternative: StoryObj = {
+export const ChoosingARuleSetsTheField: StoryObj = {
   ...editor(WITH_ALTERNATIVES),
-  name: "picking one of the element's selectors makes it the active selector",
+  name: 'choosing one of the rules makes it the active selector',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
 
-    await user.click(chips(canvasElement));
+    await user.click(chevron(canvasElement) as HTMLElement);
     await findOpenMenu(canvas);
-    await user.click(row(canvasElement, 'div h1'));
-    await expect(store.state.activeSelector).toBe('div h1');
+    await user.click(row(canvasElement, '*'));
+
+    await expect(store.state.activeSelector).toBe('*');
     await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
-
-    // The element's selectors are still offered, the new one first.
-    await user.click(chips(canvasElement));
-    await findOpenMenu(canvas);
-    await expect(rowTexts(canvasElement).slice(0, 2)).toEqual(['div h1', 'h1']);
-    await expect(row(canvasElement, 'div h1')).toHaveClass('current');
-    await pressKey('Escape');
-
-    // Choosing something unrelated leaves only the page's rules.
-    store.commit('setActiveSelector', '.article-body');
-    await user.click(
-      field(canvasElement).querySelector('.autocomplete-chevron') as Element
-    );
-    await findOpenMenu(canvas);
-    await expect(headers(canvasElement)).toEqual(['Styled on this page']);
-    await expect(dividers(canvasElement)).toHaveLength(0);
+    await waitFor(() => expect(chips(canvasElement)).toHaveTextContent('*'));
   },
 };
 
-export const TypingFiltersBothSections: StoryObj = {
+export const NoArrowWithoutOtherRules: StoryObj = {
+  ...editor({
+    css: 'h1 { color: red; }',
+    activeSelector: 'h1',
+    selectorAlternatives: {
+      existing: ['h1'],
+      candidates: ['h1', '.sb-page h1'],
+    },
+  }),
+  name: 'the arrow is hidden when the style has no other rules',
+  play: async ({ canvasElement }) => {
+    const store = storeOf(canvasElement);
+
+    await expect(chevron(canvasElement)).toBeNull();
+
+    // Moving to a selector the style doesn't have leaves h1 to offer.
+    store.commit('setActiveSelector', '.sb-page h1');
+    await waitFor(() => expect(chevron(canvasElement)).not.toBeNull());
+  },
+};
+
+export const TypingFiltersTheRules: StoryObj = {
   ...editor(WITH_ALTERNATIVES),
-  name: 'typing filters both sections and drops an emptied one with its divider',
+  name: "typing filters the style's rules",
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
@@ -300,20 +279,8 @@ export const TypingFiltersBothSections: StoryObj = {
 
     await findOpenMenu(canvas);
     await waitFor(() =>
-      expect(rowTexts(canvasElement)).toEqual(['.sb-page h1', '.article-body'])
+      expect(rowTexts(canvasElement)).toEqual(['.article-body'])
     );
-    await expect(headers(canvasElement)).toEqual([
-      'This element',
-      'Styled on this page',
-    ]);
-    await expect(dividers(canvasElement)).toHaveLength(1);
-
-    await user.type(input(canvasElement), 'sb');
-    await waitFor(() =>
-      expect(rowTexts(canvasElement)).toEqual(['.sb-page h1'])
-    );
-    await expect(headers(canvasElement)).toEqual(['This element']);
-    await expect(dividers(canvasElement)).toHaveLength(0);
   },
 };
 

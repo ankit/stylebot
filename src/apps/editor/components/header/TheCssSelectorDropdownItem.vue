@@ -22,28 +22,13 @@
         </template>
         <s-inline-list mono :parts="parts" class="item-text" />
       </s-tooltip>
-      <s-text
-        v-if="count"
-        as="span"
-        size="caption"
-        variant="muted"
-        class="item-count"
-        :aria-label="
-          t(count === 1 ? 'matches_count_one' : 'matches_count_other', [
-            String(count),
-          ])
-        "
-      >
-        {{ count }}
-      </s-text>
     </span>
   </s-menu-item>
 </template>
 
 <script lang="ts">
-import type { PropType } from 'vue';
 import Vue from 'vue';
-import { SInlineList, SMenuItem, SText, STooltip } from '@stylebot/components';
+import { SInlineList, SMenuItem, STooltip } from '@stylebot/components';
 import { splitSelectorList } from '@stylebot/css';
 
 import { getPageBridge } from '@stylebot/page-bridge';
@@ -54,7 +39,6 @@ export default Vue.extend({
   components: {
     SInlineList,
     SMenuItem,
-    SText,
     STooltip,
   },
 
@@ -67,12 +51,6 @@ export default Vue.extend({
     current: {
       type: Boolean,
       default: false,
-    },
-
-    // How many of the page's elements the selector matches, once known.
-    count: {
-      type: Number as PropType<number | null>,
-      default: null,
     },
   },
 
@@ -154,11 +132,5 @@ export default Vue.extend({
 
 .selector-tooltip {
   font-family: var(--font-mono);
-}
-
-.item-row .item-count {
-  flex: none;
-  font-family: var(--font-mono);
-  line-height: 16px;
 }
 </style>

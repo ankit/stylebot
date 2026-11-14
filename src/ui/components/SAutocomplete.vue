@@ -68,6 +68,7 @@
         </button>
 
         <button
+          v-if="showChevron"
           type="button"
           class="autocomplete-chevron"
           :class="{ open }"
@@ -211,6 +212,13 @@ export default Vue.extend({
     clearLabel: {
       type: String,
       default: '',
+    },
+
+    // Shows the button that opens the full list; hide it when there's
+    // nothing to list.
+    showChevron: {
+      type: Boolean,
+      default: true,
     },
 
     // Leave the field after a pick or Enter instead of keeping the caret in
