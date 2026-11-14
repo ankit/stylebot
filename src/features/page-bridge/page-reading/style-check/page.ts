@@ -123,7 +123,8 @@ export const selectorOf = (
 
 /**
  * Groups elements under the selector that names them, keeping the first
- * of each group as its example.
+ * of each group as its example. An element a group's selector already
+ * matches joins that group, so only each group's first element is named.
  */
 export const groupBySelector = <T>(
   items: Array<{ element: Element; detail: T }>
@@ -133,9 +134,11 @@ export const groupBySelector = <T>(
     { count: number; element: Element; detail: T }
   >();
   const matchesFor = createMatchesCache();
+  const reachOf = new Map<string, Set<Element>>();
 
   items.forEach(({ element, detail }) => {
-    const selector = selectorOf(element, matchesFor);
+    const joined = Array.from(reachOf).find(([, reach]) => reach.has(element));
+    const selector = joined?.[0] ?? selectorOf(element, matchesFor);
 
     if (!selector) {
       return;
@@ -147,6 +150,7 @@ export const groupBySelector = <T>(
       group.count++;
     } else {
       groups.set(selector, { count: 1, element, detail });
+      reachOf.set(selector, new Set(matchesFor(selector)));
     }
   });
 
