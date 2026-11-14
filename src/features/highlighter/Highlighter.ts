@@ -436,15 +436,10 @@ class Highlighter {
   showOverlay = (el: HTMLElement): void => {
     const selector = this.getSelectorFor(el);
 
-    this.ensureOverlay().inspect(
-      this.queryMatches(selector),
-      describeElement(el),
-      undefined,
-      {
-        primary: el,
-        size: describeSize(el),
-      }
-    );
+    this.ensureOverlay().inspect([el], describeElement(el), undefined, {
+      primary: el,
+      size: describeSize(el),
+    });
 
     this.onHover?.(selector);
   };

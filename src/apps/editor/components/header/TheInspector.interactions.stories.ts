@@ -129,37 +129,20 @@ export const InspectsInCode: StoryObj = {
   },
 };
 
-export const HintsOtherMatches: StoryObj = {
+export const BoxesHoveredElementOnly: StoryObj = {
   ...editor({ inspecting: true }),
-  name: "hovering an element tints the selector's other matches on the page",
+  name: "hovering an element boxes it alone, not the selector's other matches",
   play: async ({ canvasElement }) => {
-    const [first, second] = Array.from(
+    const [first] = Array.from(
       canvasElement.querySelectorAll<HTMLElement>('.article-body')
     );
 
     await hoverPage(first);
     await waitFor(() => expect(hoverLabel()).toBe('p.article-body'));
 
-    const rects = document.querySelectorAll(
-      '#stylebot-overlay .stylebot-overlay-rect'
-    );
-    const hints = document.querySelectorAll<HTMLElement>(
-      '#stylebot-overlay .stylebot-overlay-hint'
-    );
-    await expect(rects).toHaveLength(1);
-    await expect(hints).toHaveLength(1);
-    // Inline styles keep three decimals, so a fractional top rounds.
-    await expect(parseFloat(hints[0].style.top)).toBeCloseTo(
-      second.getBoundingClientRect().top,
-      2
-    );
-
-    await hoverPage(canvasElement.querySelector('h1') as HTMLElement);
-    await waitFor(() =>
-      expect(
-        document.querySelectorAll('#stylebot-overlay .stylebot-overlay-hint')
-      ).toHaveLength(0)
-    );
+    await expect(
+      document.querySelectorAll('#stylebot-overlay .stylebot-overlay-rect')
+    ).toHaveLength(1);
   },
 };
 
