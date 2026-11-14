@@ -127,9 +127,14 @@ every selector from the list above, plus four more:
   the shared start (`avatar-`) is kept, so the selector matches every item.
 - **This item**: elements like it in the same row, list item or card, e.g.
   `tr.athing:nth-of-type(3) a`.
-- **The named area**: when blocks have no name, elements like it under the
-  nearest named ancestor, e.g. `table.infobox th.label`, and every element
-  of its tag there.
+- **The enclosing section**: a fallback for pages whose repeated blocks
+  have no name, like a Wikipedia article made of bare `<p>` tags. Stylebot
+  climbs to the nearest ancestor that does have a name, such as the article
+  body or an infobox, and offers elements like the picked one inside it,
+  e.g. `div.mw-content-ltr > p > a` (every link in the article's
+  paragraphs), and every element of its tag there, e.g.
+  `div.mw-content-ltr a`. That section can be large, so these are offered
+  only when nothing nearer is.
 
 They're sorted narrowest first, keeping one per set of matched elements.
 When a same-spot selector reaches the same elements as another, that one
@@ -151,7 +156,7 @@ of a suggestion. Other saved rules stay in the selector menu.
 No two scopes reach the same elements, so a scope never adds a second rule
 for elements a saved rule already styles.
 
-The named area fills Similar or All only when nothing nearer does. A scope
+The enclosing section fills Similar or All only when nothing nearer does. A scope
 with nothing to offer is left out, so All only shows when it reaches more
 than Similar. The scopes hide once the field holds a selector
 typed by hand.
@@ -162,10 +167,10 @@ The field starts on a scope after every pick, the first of these that the
 element has:
 
 1. **The one holding a saved rule**, so you keep editing that rule.
-2. **Similar**, unless it comes from the named area.
+2. **Similar**, unless it comes from the enclosing section.
 3. **Only.**
-4. **All**, unless it comes from the named area.
-5. **Similar, then All, from the named area.**
+4. **All**, unless it comes from the enclosing section.
+5. **Similar, then All, from the enclosing section.**
 
 With no scope, the field keeps the inspector's own pick. Similar comes
 before Only because restyling one item of a list is rarely what's wanted.
