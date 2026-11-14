@@ -1,4 +1,4 @@
-import { getTestIdBasedSelector } from './element-selectors';
+import { getKindSelector, getTestIdBasedSelector } from './element-selectors';
 import { countMatches, matchesOf } from './reach';
 import { isSimpleSelector } from './selector-text';
 import { getLookAlikes, getPositionedStep } from './unique-selectors';
@@ -218,3 +218,71 @@ const getHook = (el: HTMLElement): string | null => {
  */
 export const getHookScopedSelector = (el: HTMLElement): string | null =>
   findPathFromNearestBlock(el, getHook);
+
+// Bare wrappers say nothing about what they hold.
+const CONTAINER_TAGS = new Set(['div', 'span']);
+
+const kindOrTag = (el: HTMLElement): string =>
+  getKindSelector(el) ?? el.tagName.toLowerCase();
+
+/**
+ * The nearest ancestor below body named for what it is, like
+ * `table.infobox`.
+ */
+const findNamedArea = (
+  el: HTMLElement
+): { node: HTMLElement; selector: string } | null => {
+  for (let node = el.parentElement; node; node = node.parentElement) {
+    if (node === document.body) {
+      return null;
+    }
+
+    const selector = getKindSelector(node);
+    if (selector) {
+      return { node, selector };
+    }
+  }
+
+  return null;
+};
+
+/**
+ * Elements like `el` under the nearest named area, e.g. `article.post p a`,
+ * naming its parent too when that narrows it. A fallback for blocks with no
+ * name of their own.
+ */
+export const getNamedScopeSelector = (el: HTMLElement): string | null => {
+  const area = findNamedArea(el);
+  const own = kindOrTag(el);
+  if (!area || CONTAINER_TAGS.has(own)) {
+    return null;
+  }
+
+  const inArea = `${area.selector} ${own}`;
+  const parent = el.parentElement as HTMLElement;
+  const parentStep = kindOrTag(parent);
+  if (parent === area.node || CONTAINER_TAGS.has(parentStep)) {
+    return inArea;
+  }
+
+  const inParent = `${area.selector} ${parentStep} ${own}`;
+  if (countMatches(inParent) < countMatches(inArea)) {
+    return inParent;
+  }
+
+  return inArea;
+};
+
+/**
+ * Every element of `el`'s tag in its nearest named area, e.g.
+ * `table.infobox th`. None for a bare div or span.
+ */
+export const getTagInScopeSelector = (el: HTMLElement): string | null => {
+  const tag = el.tagName.toLowerCase();
+  const area = findNamedArea(el);
+  if (!area || CONTAINER_TAGS.has(tag)) {
+    return null;
+  }
+
+  return `${area.selector} ${tag}`;
+};

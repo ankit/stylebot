@@ -112,7 +112,7 @@ How the shapes are told apart:
 ## Other selectors for the element
 
 The selector field lists the user's own rules that match the element, then
-every selector from the list above, plus three more:
+every selector from the list above, plus four more:
 
 - **The same spot**: the element in the same place inside every block like
   the one it sits in, e.g. every story title on Hacker News,
@@ -127,6 +127,9 @@ every selector from the list above, plus three more:
   the shared start (`avatar-`) is kept, so the selector matches every item.
 - **This item**: elements like it in the same row, list item or card, e.g.
   `tr.athing:nth-of-type(3) a`.
+- **The named area**: when blocks have no name, elements like it under the
+  nearest named ancestor, e.g. `table.infobox th.label`, and every element
+  of its tag there.
 
 They're sorted narrowest first, keeping one per set of matched elements.
 When a same-spot selector reaches the same elements as another, that one
@@ -143,8 +146,9 @@ scopes, each with how many elements it matches:
 - **All**: the inspector's own pick when it reaches further than Similar,
   else the widest selector that does.
 
-A pill with nothing to offer is left out, so All only shows when it
-reaches more than Similar. The pills hide once the field holds a selector
+The named area fills Similar or All only when nothing nearer does. A pill
+with nothing to offer is left out, so All only shows when it reaches more
+than Similar. The pills hide once the field holds a selector
 typed by hand.
 
 ## Reusing existing rules

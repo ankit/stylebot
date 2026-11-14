@@ -23,7 +23,9 @@ import {
 import { getItemScopedSelector, getUniqueSelector } from './unique-selectors';
 import {
   getHookScopedSelector,
+  getNamedScopeSelector,
   getSameSpotSelector,
+  getTagInScopeSelector,
 } from './similar-selectors';
 import { describeSelector } from './describe-selector';
 import type { SelectorDescription, SelectorRole } from './describe-selector';
@@ -36,6 +38,7 @@ type Strategy = (el: HTMLElement) => string | null;
 type ScopedStrategy = {
   strategy: Strategy;
   role?: Exclude<SelectorRole, 'only'>;
+  fallback?: boolean;
 };
 
 type Suggestion = {
@@ -95,9 +98,8 @@ export const getSelector = (el: HTMLElement): string => {
 };
 
 /**
- * Every selector in the list that suits the element, plus the same spot
- * in every block like its own or sharing a test id or role, and the elements like it in the same row
- * or card, each described by how much it covers for the scope pills.
+ * Every selector in the list that suits the element, plus the scoped
+ * ones, each described by how much it covers for the scope pills.
  */
 export const getSelectorSuggestions = (el: HTMLElement): Array<Suggestion> => {
   const scopedStrategies: Array<ScopedStrategy> = [
@@ -105,15 +107,19 @@ export const getSelectorSuggestions = (el: HTMLElement): Array<Suggestion> => {
     { strategy: getSameSpotSelector, role: 'similar' },
     { strategy: getHookScopedSelector, role: 'similar' },
     { strategy: getItemScopedSelector },
+    { strategy: getNamedScopeSelector, role: 'similar', fallback: true },
+    { strategy: getTagInScopeSelector, role: 'all', fallback: true },
   ];
 
-  return scopedStrategies.flatMap(({ strategy, role }) => {
+  return scopedStrategies.flatMap(({ strategy, role, fallback }) => {
     const selector = strategy(el);
     if (!isUsable(el, selector)) {
       return [];
     }
 
-    const description = role ? describeSelector(selector, role) : undefined;
+    const description = role
+      ? describeSelector(selector, role, fallback)
+      : undefined;
 
     return [{ selector, description }];
   });
