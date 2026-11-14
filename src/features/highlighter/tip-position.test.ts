@@ -1,4 +1,4 @@
-import { findTipPos, leftBesidePanel } from './tip-position';
+import { findArrowLeft, findTipPos, leftBesidePanel } from './tip-position';
 
 describe('findTipPos', () => {
   const bounds = { top: 0, left: 0, width: 1000, height: 800 };
@@ -72,5 +72,31 @@ describe('leftBesidePanel', () => {
     const panel = { left: 0, right: 900 };
 
     expect(leftBesidePanel(panel, 300, 16, viewportWidth)).toEqual(684);
+  });
+});
+
+describe('findArrowLeft', () => {
+  const box = (left: number, width: number) => ({
+    top: 0,
+    left,
+    width,
+    height: 20,
+  });
+
+  it('sits near the tip start when the tip is flush with a wide element', () => {
+    expect(findArrowLeft(box(100, 300), 100, 200)).toBe(12);
+  });
+
+  it('follows the element when the tip shifted left', () => {
+    expect(findArrowLeft(box(500, 300), 400, 200)).toBe(112);
+  });
+
+  it('points at the middle of a narrow element', () => {
+    expect(findArrowLeft(box(500, 20), 300, 300)).toBe(203);
+  });
+
+  it('stays clear of the tip corners', () => {
+    expect(findArrowLeft(box(900, 300), 400, 200)).toBe(174);
+    expect(findArrowLeft(box(0, 300), 100, 200)).toBe(12);
   });
 });

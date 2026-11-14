@@ -1,7 +1,7 @@
 import type Vue from 'vue';
 
 import InspectorCard from './InspectorCard.vue';
-import { findTipPos, leftBesidePanel } from './tip-position';
+import { findArrowLeft, findTipPos, leftBesidePanel } from './tip-position';
 import type { Box, TipPlacement } from './types';
 
 /**
@@ -13,6 +13,7 @@ type InspectorCardInstance = Vue & {
   size: string;
   top: number;
   left: number;
+  arrowLeft: number;
   placement: TipPlacement;
 };
 
@@ -82,6 +83,7 @@ export default class OverlayTip {
 
       this.vm.top = tipPos.top;
       this.vm.left = left;
+      this.vm.arrowLeft = findArrowLeft(dims, left, tipRect.width);
       this.vm.placement = tipPos.placement;
     });
   }

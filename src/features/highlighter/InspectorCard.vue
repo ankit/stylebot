@@ -4,6 +4,7 @@
       v-if="placement"
       class="arrow"
       :class="placement"
+      :style="{ left: `${arrowLeft}px` }"
       viewBox="0 0 14 8"
       width="14"
       height="8"
@@ -44,6 +45,7 @@ export default Vue.extend({
     size: string;
     top: number;
     left: number;
+    arrowLeft: number;
     placement: 'above' | 'below' | null;
   } {
     return {
@@ -51,6 +53,7 @@ export default Vue.extend({
       size: '',
       top: 0,
       left: 0,
+      arrowLeft: 12,
       placement: null,
     };
   },
@@ -67,7 +70,7 @@ export default Vue.extend({
   align-items: center;
   gap: 10px;
   width: max-content;
-  max-width: min(420px, calc(100vw - 16px));
+  max-width: min(480px, calc(100vw - 16px));
   min-height: 17px;
   --card-edge: color-mix(in srgb, var(--text-primary) 18%, var(--menu-surface));
 
@@ -83,7 +86,6 @@ export default Vue.extend({
 
 .arrow {
   position: absolute;
-  left: 12px;
   fill: var(--menu-surface);
   pointer-events: none;
 
@@ -108,6 +110,7 @@ export default Vue.extend({
 .part {
   display: inline-block;
   max-width: 100%;
+  font-family: inherit;
   overflow-wrap: anywhere;
 }
 

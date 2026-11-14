@@ -77,3 +77,24 @@ export function findTipPos(
 
   return { top, left, placement };
 }
+
+const ARROW_WIDTH = 14;
+const ARROW_INSET = 12;
+
+/**
+ * The arrow's left edge within the tip, so it points into the element from
+ * wherever the tip ended up: near the element's left edge, or at its middle
+ * when it's narrow, kept clear of the tip's rounded corners.
+ */
+export function findArrowLeft(
+  anchor: Box,
+  tipLeft: number,
+  tipWidth: number
+): number {
+  const target =
+    anchor.left + Math.min(ARROW_INSET + ARROW_WIDTH / 2, anchor.width / 2);
+  const left = target - ARROW_WIDTH / 2 - tipLeft;
+  const max = Math.max(ARROW_INSET, tipWidth - ARROW_INSET - ARROW_WIDTH);
+
+  return Math.max(ARROW_INSET, Math.min(left, max));
+}
