@@ -13,43 +13,27 @@
     class="stylebot stylebot-docked"
     :class="[placement, { 'stylebot-resizing': busy, 'stylebot-capturing': capturing }]"
     :style="panelStyle"
-    @pointerdown="onMoveStart"
-    @lostpointercapture="onMoveEnd"
   >
     <slot></slot>
 
-    <div
-      v-for="direction in resizeDirections"
-      v-show="floating || dockedResizeDirections.includes(direction)"
-      :key="`resize-${direction}`"
-      class="stylebot-resize-handle"
-      :class="direction"
-      @pointerdown.stop="onResizeStart($event, direction)"
-      @pointermove.stop="onResize"
-      @pointerup.stop="onResizeEnd"
-      @pointercancel.stop="onResizeEnd"
-      @lostpointercapture.stop="onResizeEnd"
-    ></div>
+    <panel-resize-handles
+      :floating="floating"
+      @start="onResizeStart"
+      @resize="onResize"
+      @end="onResizeEnd"
+    />
 
-    <div
+    <panel-width-edge
       v-if="!floating"
-      key="resize-edge"
-      class="stylebot-resize-edge"
-      role="separator"
-      tabindex="0"
-      aria-orientation="vertical"
-      :aria-label="t('resize_the_panel')"
-      :aria-valuenow="width"
-      :aria-valuemin="minWidth"
-      :aria-valuemax="maxWidth"
-      @pointerdown.stop="onPointerDown"
-      @pointermove.stop="onPointerMove"
-      @pointerup.stop="onPointerUp"
-      @pointercancel.stop="onPointerUp"
-      @lostpointercapture.stop="onPointerUp"
-      @dblclick="onReset"
-      @keydown="onKeydown"
-    ></div>
+      :width="width"
+      :min="minWidth"
+      :max="maxWidth"
+      :side="placement === 'right' ? 'left' : 'right'"
+      @start="onWidthStart"
+      @preview="previewWidth = $event"
+      @change="saveWidth"
+      @reset="saveWidth(defaultWidth)"
+    />
 
     <div
       v-if="snapTarget"
@@ -66,107 +50,53 @@ import Vue from 'vue';
 import { defaultOptions } from '@stylebot/settings';
 import type { FloatingPanelBounds, StylebotLayout } from '@stylebot/types';
 
-const MARGIN = 12;
-const MIN_WIDTH = 360;
-const MIN_HEIGHT = 280;
+import PanelResizeHandles from './panel/PanelResizeHandles.vue';
+import PanelWidthEdge from './panel/PanelWidthEdge.vue';
+import { HeaderDrag } from './panel/header-drag';
+import { reservePageSpace } from './panel/page-layout';
+import {
+  MARGIN,
+  MIN_WIDTH,
+  boundsOf,
+  defaultFloatingBounds,
+  fitBounds,
+  resizeBounds,
+  snapTargetAt,
+} from './panel/floating-bounds';
+import type {
+  ResizeDirection,
+  SnapTarget,
+  Viewport,
+} from './panel/floating-bounds';
+
 const MAX_WIDTH_RATIO = 0.6;
-const KEYBOARD_STEP = 16;
-const MOVE_THRESHOLD = 4;
-const SNAP_DISTANCE = 32;
-const CONTROL_MOVE_THRESHOLD = 6;
-const NOT_DRAGGABLE =
-  'input, select, textarea, [contenteditable], [role="menu"], [role="menuitem"], [role="listbox"], [role="option"]';
-const CONTROLS = 'button, a, [role="button"], [role="tab"]';
 
-type Drag = { startX: number; startWidth: number; width: number };
-
-type Move = {
-  pointerId: number;
-  threshold: number;
-  startX: number;
-  startY: number;
+type Gesture = {
   start: FloatingPanelBounds;
   bounds: FloatingPanelBounds | null;
 };
-
-type ResizeDirection = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw';
-
-type Resize = {
-  startX: number;
-  startY: number;
-  direction: ResizeDirection;
-  start: FloatingPanelBounds;
-  bounds: FloatingPanelBounds | null;
-};
-
-const DOCKED_RESIZE_DIRECTIONS: Array<ResizeDirection> = ['n', 's'];
-const RESIZE_DIRECTIONS: Array<ResizeDirection> = [
-  'n',
-  's',
-  'e',
-  'w',
-  'ne',
-  'nw',
-  'se',
-  'sw',
-];
-
-const fit = (value: number, min: number, max: number): number =>
-  Math.round(Math.max(min, Math.min(value, max)));
-
-/**
- * Moves the edges a handle grabs by the pointer's offset, stopping at the
- * minimum size and the viewport margin while the opposite edges stay put.
- */
-const resizeBounds = (
-  start: FloatingPanelBounds,
-  direction: ResizeDirection,
-  dx: number,
-  dy: number
-): FloatingPanelBounds => {
-  let { left, top } = start;
-  let right = left + start.width;
-  let bottom = top + start.height;
-
-  if (direction.includes('e')) {
-    right = fit(right + dx, left + MIN_WIDTH, window.innerWidth - MARGIN);
-  }
-
-  if (direction.includes('w')) {
-    left = fit(left + dx, MARGIN, right - MIN_WIDTH);
-  }
-
-  if (direction.includes('s')) {
-    bottom = fit(bottom + dy, top + MIN_HEIGHT, window.innerHeight - MARGIN);
-  }
-
-  if (direction.includes('n')) {
-    top = fit(top + dy, MARGIN, bottom - MIN_HEIGHT);
-  }
-
-  return { left, top, width: right - left, height: bottom - top };
-};
-
-type SnapTarget = 'left' | 'right' | null;
 
 export default Vue.extend({
   name: 'TheStylebotResizer',
 
+  components: {
+    PanelResizeHandles,
+    PanelWidthEdge,
+  },
+
   data(): {
-    windowWidth: number;
-    windowHeight: number;
-    drag: Drag | null;
-    move: Move | null;
-    resize: Resize | null;
+    viewport: Viewport;
+    previewWidth: number | null;
+    gesture: Gesture | null;
     snapTarget: SnapTarget;
+    headerDrag: HeaderDrag | null;
   } {
     return {
-      windowWidth: window.innerWidth,
-      windowHeight: window.innerHeight,
-      drag: null,
-      move: null,
-      resize: null,
+      viewport: { width: window.innerWidth, height: window.innerHeight },
+      previewWidth: null,
+      gesture: null,
       snapTarget: null,
+      headerDrag: null,
     };
   },
 
@@ -188,42 +118,32 @@ export default Vue.extend({
     },
 
     busy(): boolean {
-      return Boolean(this.drag || this.resize || this.move?.bounds);
+      return this.previewWidth !== null || this.gesture !== null;
     },
 
     floating(): boolean {
       return (
-        Boolean(this.move?.bounds || this.resize?.bounds) ||
+        Boolean(this.gesture?.bounds) ||
         this.layout.dockLocation === 'floating'
       );
     },
 
+    // In the page only as the side panel's fallback, the panel sits on the right.
     placement(): 'floating' | 'left' | 'right' {
       if (this.floating) {
         return 'floating';
       }
 
-      return this.dockedRight ? 'right' : 'left';
+      return this.layout.dockLocation === 'left' ? 'left' : 'right';
     },
 
     floatingBounds(): FloatingPanelBounds {
-      const live = this.move?.bounds ?? this.resize?.bounds;
-      const saved = this.layout.floating ?? {
-        width: this.layout.width,
-        height: this.windowHeight - MARGIN * 2,
-        left: this.windowWidth - this.layout.width - MARGIN,
-        top: MARGIN,
-      };
+      const bounds =
+        this.gesture?.bounds ??
+        this.layout.floating ??
+        defaultFloatingBounds(this.layout.width, this.viewport);
 
-      return this.clampBounds(live ?? saved);
-    },
-
-    resizeDirections(): Array<ResizeDirection> {
-      return RESIZE_DIRECTIONS;
-    },
-
-    dockedResizeDirections(): Array<ResizeDirection> {
-      return DOCKED_RESIZE_DIRECTIONS;
+      return fitBounds(bounds, this.viewport);
     },
 
     panelStyle(): Record<string, string> {
@@ -241,9 +161,8 @@ export default Vue.extend({
       };
     },
 
-    // In the page only as the side panel's fallback, the panel sits on the right.
-    dockedRight(): boolean {
-      return this.layout.dockLocation !== 'left';
+    defaultWidth(): number {
+      return defaultOptions.layout.width;
     },
 
     minWidth(): number {
@@ -253,12 +172,12 @@ export default Vue.extend({
     maxWidth(): number {
       return Math.max(
         MIN_WIDTH,
-        Math.round(this.windowWidth * MAX_WIDTH_RATIO)
+        Math.round(this.viewport.width * MAX_WIDTH_RATIO)
       );
     },
 
     width(): number {
-      return this.clamp(this.drag ? this.drag.width : this.layout.width);
+      return this.clampWidth(this.previewWidth ?? this.layout.width);
     },
   },
 
@@ -285,131 +204,70 @@ export default Vue.extend({
     window.addEventListener('resize', this.onWindowResize);
   },
 
+  mounted() {
+    const panel = this.$refs.panel as HTMLElement | undefined;
+
+    if (panel) {
+      this.headerDrag = new HeaderDrag(panel, {
+        start: this.onMoveStart,
+        move: this.onMove,
+        end: this.onMoveEnd,
+      });
+    }
+  },
+
   destroyed() {
     this.adjustPageLayout();
     window.removeEventListener('resize', this.onWindowResize);
-    this.unlistenMove();
+    this.headerDrag?.destroy();
   },
 
   methods: {
-    clampBounds(bounds: FloatingPanelBounds): FloatingPanelBounds {
-      const maxWidth = this.windowWidth - MARGIN * 2;
-      const maxHeight = this.windowHeight - MARGIN * 2;
-      const width = fit(bounds.width, Math.min(MIN_WIDTH, maxWidth), maxWidth);
-      const height = fit(
-        bounds.height,
-        Math.min(MIN_HEIGHT, maxHeight),
-        maxHeight
-      );
-
-      return {
-        width,
-        height,
-        left: fit(bounds.left, MARGIN, this.windowWidth - width - MARGIN),
-        top: fit(bounds.top, MARGIN, this.windowHeight - height - MARGIN),
-      };
-    },
-
-    snapTargetAt(x: number): SnapTarget {
-      if (x <= SNAP_DISTANCE) {
-        return 'left';
-      }
-
-      if (x >= this.windowWidth - SNAP_DISTANCE) {
-        return 'right';
-      }
-
-      return null;
-    },
-
     /**
-     * Gets ready to move the panel when anything in the header but a field
-     * or menu is pressed. Buttons and tabs still click unless the pointer
-     * travels past a slightly larger threshold first.
+     * Starts a move or resize from where the panel is on screen, docked or not.
      */
-    onMoveStart(event: PointerEvent) {
-      if (event.button !== 0) {
-        return;
-      }
-
-      const target = event.composedPath()[0] as Element;
-      if (
-        !(target instanceof Element) ||
-        !target.closest('.stylebot-drag-handle') ||
-        target.closest(NOT_DRAGGABLE)
-      ) {
-        return;
-      }
-
-      // Not prevented: menus close on the mousedown it would cancel.
-      const onControl = target.closest(CONTROLS) !== null;
-      const rect = (this.$refs.panel as HTMLElement).getBoundingClientRect();
-      this.listenMove();
-      this.move = {
-        pointerId: event.pointerId,
-        threshold: onControl ? CONTROL_MOVE_THRESHOLD : MOVE_THRESHOLD,
-        startX: event.clientX,
-        startY: event.clientY,
-        start: {
-          left: rect.left,
-          top: rect.top,
-          width: rect.width,
-          height: rect.height,
-        },
+    beginGesture(): void {
+      this.$store.commit('setInspecting', false);
+      this.gesture = {
+        start: boundsOf(this.$refs.panel as HTMLElement),
         bounds: null,
       };
     },
 
-    onMove(event: PointerEvent) {
-      const { move } = this;
-      if (move?.pointerId !== event.pointerId) {
-        return;
-      }
-
-      if (!(event.buttons & 1)) {
-        this.onMoveEnd();
-
-        return;
-      }
-
-      const dx = event.clientX - move.startX;
-      const dy = event.clientY - move.startY;
-
-      if (!move.bounds) {
-        if (Math.hypot(dx, dy) < move.threshold) {
-          return;
-        }
-
-        // Captured from here on, so the moves keep coming over iframes and the
-        // release doesn't click the control the drag started on.
-        (this.$refs.panel as HTMLElement).setPointerCapture(event.pointerId);
-        this.$store.commit('setInspecting', false);
-      }
-
-      event.preventDefault();
-      move.bounds = {
-        ...move.start,
-        left: move.start.left + dx,
-        top: move.start.top + dy,
-      };
-      this.snapTarget = this.snapTargetAt(event.clientX);
+    saveFloating(bounds: FloatingPanelBounds): void {
+      this.$store.dispatch('setLayout', {
+        ...this.layout,
+        dockLocation: 'floating',
+        floating: fitBounds(bounds, this.viewport),
+      });
     },
 
-    onMoveEnd() {
-      const { move, snapTarget } = this;
-      this.move = null;
-      this.snapTarget = null;
-      this.unlistenMove();
+    onMoveStart(): void {
+      this.beginGesture();
+    },
 
-      if (!move?.bounds) {
+    onMove(dx: number, dy: number, x: number): void {
+      if (!this.gesture) {
         return;
       }
 
-      window.addEventListener('click', this.swallowClick, true);
-      setTimeout(
-        () => window.removeEventListener('click', this.swallowClick, true),
-        0
-      );
+      const { start } = this.gesture;
+      this.gesture.bounds = {
+        ...start,
+        left: start.left + dx,
+        top: start.top + dy,
+      };
+      this.snapTarget = snapTargetAt(x, this.viewport);
+    },
+
+    onMoveEnd(dragged: boolean): void {
+      const { gesture, snapTarget } = this;
+      this.gesture = null;
+      this.snapTarget = null;
+
+      if (!dragged || !gesture?.bounds) {
+        return;
+      }
 
       if (snapTarget) {
         this.$store.dispatch('setLayout', {
@@ -420,211 +278,71 @@ export default Vue.extend({
         return;
       }
 
-      this.$store.dispatch('setLayout', {
-        ...this.layout,
-        dockLocation: 'floating',
-        floating: this.clampBounds(move.bounds),
-      });
+      this.saveFloating(gesture.bounds);
     },
 
-    listenMove() {
-      window.addEventListener('pointermove', this.onMove, true);
-      window.addEventListener('pointerup', this.onMoveEnd, true);
-      window.addEventListener('pointercancel', this.onMoveEnd, true);
-      window.addEventListener('dragstart', this.swallowClick, true);
-      window.addEventListener('selectstart', this.swallowClick, true);
+    onResizeStart(): void {
+      this.beginGesture();
     },
 
-    unlistenMove() {
-      window.removeEventListener('pointermove', this.onMove, true);
-      window.removeEventListener('pointerup', this.onMoveEnd, true);
-      window.removeEventListener('pointercancel', this.onMoveEnd, true);
-      window.removeEventListener('dragstart', this.swallowClick, true);
-      window.removeEventListener('selectstart', this.swallowClick, true);
-    },
-
-    swallowClick(event: Event) {
-      event.preventDefault();
-      event.stopPropagation();
-    },
-
-    onResizeStart(event: PointerEvent, direction: ResizeDirection) {
-      if (event.button !== 0) {
+    onResize(direction: ResizeDirection, dx: number, dy: number): void {
+      if (!this.gesture) {
         return;
       }
 
-      event.preventDefault();
-      (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
-      this.$store.commit('setInspecting', false);
-
-      const rect = (this.$refs.panel as HTMLElement).getBoundingClientRect();
-      const start = this.floating
-        ? this.floatingBounds
-        : {
-            left: rect.left,
-            top: rect.top,
-            width: rect.width,
-            height: rect.height,
-          };
-
-      this.resize = {
-        startX: event.clientX,
-        startY: event.clientY,
-        direction,
-        start,
-        bounds: null,
-      };
-    },
-
-    onResize(event: PointerEvent) {
-      if (!this.resize) {
-        return;
-      }
-
-      if (!(event.buttons & 1)) {
-        this.onResizeEnd();
-
-        return;
-      }
-
-      const { start, startX, startY, direction } = this.resize;
-      const dx = event.clientX - startX;
-      const dy = event.clientY - startY;
-
-      if (!this.resize.bounds && Math.hypot(dx, dy) < MOVE_THRESHOLD) {
-        return;
-      }
-
-      this.resize.bounds = this.clampBounds(
-        resizeBounds(start, direction, dx, dy)
+      this.gesture.bounds = fitBounds(
+        resizeBounds(this.gesture.start, direction, dx, dy, this.viewport),
+        this.viewport
       );
     },
 
-    onResizeEnd() {
-      if (!this.resize) {
-        return;
+    // Shortening a docked panel undocks it, so there's one resizable box to remember.
+    onResizeEnd(): void {
+      const bounds = this.gesture?.bounds;
+      this.gesture = null;
+
+      if (bounds) {
+        this.saveFloating(bounds);
       }
-
-      const { bounds } = this.resize;
-      this.resize = null;
-
-      if (!bounds) {
-        return;
-      }
-
-      // Shortening a docked panel undocks it, so there's one resizable box to remember.
-      this.$store.dispatch('setLayout', {
-        ...this.layout,
-        dockLocation: 'floating',
-        floating: bounds,
-      });
     },
 
-    clamp(width: number): number {
+    onWidthStart(): void {
+      this.$store.commit('setInspecting', false);
+    },
+
+    clampWidth(width: number): number {
       return Math.min(Math.max(Math.round(width), MIN_WIDTH), this.maxWidth);
     },
 
     saveWidth(width: number): void {
+      this.previewWidth = null;
       this.$store.dispatch('setLayout', {
         ...this.layout,
-        width: this.clamp(width),
+        width: this.clampWidth(width),
       });
     },
 
-    onWindowResize() {
-      this.windowWidth = window.innerWidth;
-      this.windowHeight = window.innerHeight;
+    onWindowResize(): void {
+      this.viewport = { width: window.innerWidth, height: window.innerHeight };
       this.adjustPageLayout();
     },
 
-    onPointerDown(event: PointerEvent) {
-      if (event.button !== 0) {
-        return;
-      }
-
-      event.preventDefault();
-      (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
-      this.$store.commit('setInspecting', false);
-
-      this.drag = {
-        startX: event.clientX,
-        startWidth: this.width,
-        width: this.width,
-      };
-    },
-
-    onPointerMove(event: PointerEvent) {
-      if (!this.drag) {
-        return;
-      }
-
-      if (!(event.buttons & 1)) {
-        this.onPointerUp();
-
-        return;
-      }
-
-      const delta = event.clientX - this.drag.startX;
-      this.drag.width =
-        this.drag.startWidth + (this.dockedRight ? -delta : delta);
-    },
-
-    onPointerUp() {
-      if (!this.drag) {
-        return;
-      }
-
-      const { width } = this.drag;
-      this.drag = null;
-      this.saveWidth(width);
-    },
-
-    onReset() {
-      this.saveWidth(defaultOptions.layout.width);
-    },
-
-    onKeydown(event: KeyboardEvent) {
-      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
-        return;
-      }
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      const grows = (event.key === 'ArrowLeft') === this.dockedRight;
-      this.saveWidth(this.width + (grows ? KEYBOARD_STEP : -KEYBOARD_STEP));
-    },
-
-    adjustPageLayout() {
+    adjustPageLayout(): void {
       if (this.host !== 'page') {
         return;
       }
 
       // todo: this needs a lot of work to be more robust.
-      if (
+      const reserve =
         this.layout.adjustPageLayout &&
         this.visible &&
         !this.capturing &&
-        !this.floating
-      ) {
-        const reserved = this.width + MARGIN;
+        !this.floating;
 
-        if (this.layout.dockLocation === 'left') {
-          document.body.style.width = ``;
-          document.body.style.marginRight = ``;
-          document.body.style.marginLeft = `${reserved}px`;
-        } else {
-          document.body.style.marginLeft = ``;
-          // An RTL page resolves the over-constrained body from its right
-          // edge, so the explicit margin (not just the width) keeps the gap on the right.
-          document.body.style.marginRight = `${reserved}px`;
-          document.body.style.width = `calc(100% - ${reserved}px)`;
-        }
-      } else {
-        document.body.style.width = ``;
-        document.body.style.marginLeft = ``;
-        document.body.style.marginRight = ``;
-      }
+      reservePageSpace(
+        reserve ? (this.placement as 'left' | 'right') : null,
+        this.width + MARGIN
+      );
     },
   },
 });
@@ -701,102 +419,6 @@ export default Vue.extend({
     .stylebot-content {
       pointer-events: none;
     }
-  }
-}
-
-.stylebot-resize-edge {
-  position: absolute;
-  top: 14px;
-  bottom: 14px;
-  width: 8px;
-  cursor: col-resize;
-  touch-action: none;
-  outline: none;
-
-  &::after {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 3px;
-    width: 2px;
-    background: var(--accent);
-    border-radius: 1px;
-    opacity: 0;
-    content: '';
-  }
-
-  &:focus-visible::after {
-    opacity: 1;
-  }
-
-  .right > & {
-    left: -5px;
-  }
-
-  .left > & {
-    right: -5px;
-  }
-}
-.stylebot-resize-handle {
-  position: absolute;
-  touch-action: none;
-
-  &.n,
-  &.s {
-    right: 14px;
-    left: 14px;
-    height: 10px;
-    cursor: ns-resize;
-  }
-
-  &.e,
-  &.w {
-    top: 14px;
-    bottom: 14px;
-    width: 10px;
-    cursor: ew-resize;
-  }
-
-  &.ne,
-  &.nw,
-  &.se,
-  &.sw {
-    width: 18px;
-    height: 18px;
-  }
-
-  &.n,
-  &.ne,
-  &.nw {
-    top: -5px;
-  }
-
-  &.s,
-  &.se,
-  &.sw {
-    bottom: -5px;
-  }
-
-  &.e,
-  &.ne,
-  &.se {
-    right: -5px;
-  }
-
-  &.w,
-  &.nw,
-  &.sw {
-    left: -5px;
-  }
-
-  &.ne,
-  &.sw {
-    cursor: nesw-resize;
-  }
-
-  &.nw,
-  &.se {
-    cursor: nwse-resize;
   }
 }
 
