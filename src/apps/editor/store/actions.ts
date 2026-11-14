@@ -627,12 +627,13 @@ export default {
   /**
    * Puts a picked element in the field as its best scope pill. Waits for
    * the pills first, so the field doesn't flash the raw pick, and skips the
-   * update if the user changed the field in the meantime.
+   * update if the user changed the field in the meantime. Resolves to
+   * whether the pick ended up in the field.
    */
   async pickSelector(
     { commit, state }: { commit: Commit; state: State },
     selector: string
-  ): Promise<void> {
+  ): Promise<boolean> {
     const request = ++pickRequest;
     const previous = state.activeSelector;
 
@@ -647,7 +648,7 @@ export default {
 
     // A quick second pick can finish first; the older one mustn't win.
     if (request !== pickRequest) {
-      return;
+      return false;
     }
 
     clearTimeout(pickTimer);
@@ -659,9 +660,13 @@ export default {
     const scope = alternatives ? getDefaultScope(alternatives) : undefined;
     const current = state.activeSelector;
 
-    if (current === previous || current === selector) {
-      commit('setActiveSelector', scope ?? selector);
+    if (current !== previous && current !== selector) {
+      return false;
     }
+
+    commit('setActiveSelector', scope ?? selector);
+
+    return true;
   },
 
   /**

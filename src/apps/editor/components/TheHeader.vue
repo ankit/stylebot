@@ -10,7 +10,7 @@
 
     <div class="selector-row" @keydown.esc="onSelectorRowEscape">
       <the-inspector ref="inspector" @select="inspect($event)" />
-      <the-css-selector-dropdown />
+      <the-css-selector-dropdown ref="selectorField" />
     </div>
     <the-selector-scopes class="scopes-row" />
 
@@ -32,6 +32,7 @@ import { consumeFieldEscape } from '@stylebot/utils';
 
 type InspectorRef = { focus(): void };
 type ModeActionsRef = { focusModeTab(): void };
+type SelectorFieldRef = { peekMatches(): void };
 
 export default Vue.extend({
   name: 'TheHeader',
@@ -53,8 +54,12 @@ export default Vue.extend({
   },
 
   methods: {
-    inspect(selector: string): void {
-      this.$store.dispatch('pickSelector', selector);
+    async inspect(selector: string): Promise<void> {
+      const picked = await this.$store.dispatch('pickSelector', selector);
+
+      if (picked) {
+        (this.$refs.selectorField as unknown as SelectorFieldRef).peekMatches();
+      }
     },
 
     onSelectorRowEscape(event: KeyboardEvent): void {
