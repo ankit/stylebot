@@ -13,7 +13,8 @@ import { preloadEditorCss } from './utils/init-editor';
 
 const store = createStore('page');
 store.commit('setUrl', document.domain);
-setPageBridge(new LocalPageBridge({ getStylebotCss: () => store.state.css }));
+const bridge = new LocalPageBridge({ getStylebotCss: () => store.state.css });
+setPageBridge(bridge);
 
 preloadEditorCss().catch(() => undefined);
 
@@ -35,7 +36,7 @@ const ready = (async () => {
   return {
     handleMessage: createMessageHandler(store, ready),
     handleCommand: createCommandHandler(store),
-    handleContextMenu: createContextMenuHandler(store),
+    handleContextMenu: createContextMenuHandler(store, bridge),
     handleEditorWindowPort: createEditorWindowHandler(store),
   };
 });

@@ -104,6 +104,14 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
     });
   }
 
+  /**
+   * Remembers an element picked outside the inspector, like a context
+   * menu's target, so its selector's scopes are worked out for it.
+   */
+  setPickedElement(el: HTMLElement): void {
+    this.pickedElement = el;
+  }
+
   getSnapshotSync(): PageSnapshot {
     return {
       domain: document.domain,
