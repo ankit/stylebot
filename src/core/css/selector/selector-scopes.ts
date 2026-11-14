@@ -1,5 +1,20 @@
-import { isSimpleSelector } from '@stylebot/css';
-import type { SelectorAlternatives } from '@stylebot/page-bridge';
+import type { SelectorDescription } from './get-selector';
+import { isSimpleSelector } from './selector-text';
+
+/**
+ * Other ways to select an element: the style's selectors that already
+ * match it, then selectors built for it, narrowest first. No two match the
+ * same set of elements.
+ */
+export type SelectorAlternatives = {
+  existing: Array<string>;
+  // The selectors that could fill a scope, saved rules among them.
+  candidates: Array<string>;
+  // How much each candidate covers: similar elements or all.
+  descriptions?: Record<string, SelectorDescription>;
+  // How many elements each candidate matches.
+  counts?: Record<string, number>;
+};
 
 export type ScopeSlots = {
   only?: string;

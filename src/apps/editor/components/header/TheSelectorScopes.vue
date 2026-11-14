@@ -24,11 +24,10 @@
 <script lang="ts">
 import Vue from 'vue';
 import { SSegmentedControl } from '@stylebot/components';
-import type { SelectorAlternatives } from '@stylebot/page-bridge';
 import { getPageBridge } from '@stylebot/page-bridge';
 
-import { getScopeSlots } from '../../utils/selector-scopes';
-import type { ScopeSlots } from '../../utils/selector-scopes';
+import { getScopeSlots } from '@stylebot/css';
+import type { ScopeSlots, SelectorAlternatives } from '@stylebot/css';
 
 type ScopeOption = { value: string; label: string; count: string };
 

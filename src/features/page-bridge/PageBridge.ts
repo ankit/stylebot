@@ -1,4 +1,4 @@
-import type { RoleColorGroups, SelectorDescription } from '@stylebot/css';
+import type { RoleColorGroups, SelectorAlternatives } from '@stylebot/css';
 import type { CssDeclaration } from '@stylebot/types';
 import type { AppliedDeclaration } from './applied-declarations';
 
@@ -14,21 +14,6 @@ export type PageSnapshot = {
   readerable: boolean;
   // Selectors for body's direct children; the filter presets attach to them.
   bodyChildSelectors: Array<string>;
-};
-
-/**
- * Other ways to select an element: the style's selectors that already
- * match it, then selectors built for it, narrowest first. No two match the
- * same set of elements.
- */
-export type SelectorAlternatives = {
-  existing: Array<string>;
-  // The selectors that could fill a scope, saved rules among them.
-  candidates: Array<string>;
-  // How much each candidate covers: similar elements or all.
-  descriptions?: Record<string, SelectorDescription>;
-  // How many elements each candidate matches.
-  counts?: Record<string, number>;
 };
 
 export type PageBridgeEvents = {

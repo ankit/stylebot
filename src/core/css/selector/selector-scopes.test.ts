@@ -1,5 +1,5 @@
 import { getDefaultScope, getScopeSlots } from './selector-scopes';
-import type { SelectorAlternatives } from '@stylebot/page-bridge';
+import type { SelectorAlternatives } from './selector-scopes';
 
 type Counts = Record<string, number>;
 

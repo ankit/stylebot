@@ -1,12 +1,8 @@
 import type { AppliedDeclaration } from '../applied-declarations';
-import type { RoleColorGroups } from '@stylebot/css';
+import type { RoleColorGroups, SelectorAlternatives } from '@stylebot/css';
 import type { CssDeclaration } from '@stylebot/types';
 
-import type {
-  PageBridge,
-  PageSnapshot,
-  SelectorAlternatives,
-} from '../PageBridge';
+import type { PageBridge, PageSnapshot } from '../PageBridge';
 import { PageBridgeEmitter } from '../PageBridgeEmitter';
 import {
   REMOTE_PAGE_BRIDGE_PORT,
