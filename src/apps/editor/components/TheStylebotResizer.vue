@@ -27,8 +27,8 @@
     <slot></slot>
 
     <div
-      v-if="floating"
-      class="stylebot-resize-corner"
+      key="resize-bottom"
+      :class="floating ? 'stylebot-resize-corner' : 'stylebot-resize-bottom'"
       :aria-label="t('resize_the_panel')"
       @pointerdown.stop="onCornerDown"
       @pointermove.stop="onCornerMove"
@@ -37,7 +37,8 @@
     ></div>
 
     <div
-      v-else
+      v-if="!floating"
+      key="resize-edge"
       class="stylebot-resize-edge"
       role="separator"
       tabindex="0"
@@ -92,8 +93,9 @@ type Move = {
 type CornerDrag = {
   startX: number;
   startY: number;
+  heightOnly: boolean;
   start: FloatingPanelBounds;
-  bounds: FloatingPanelBounds;
+  bounds: FloatingPanelBounds | null;
 };
 
 type SnapTarget = 'left' | 'right' | null;
@@ -145,7 +147,11 @@ export default Vue.extend({
     },
 
     floating(): boolean {
-      return this.moving || this.layout.dockLocation === 'floating';
+      return (
+        this.moving ||
+        Boolean(this.corner?.bounds) ||
+        this.layout.dockLocation === 'floating'
+      );
     },
 
     floatingBounds(): FloatingPanelBounds {
@@ -361,11 +367,22 @@ export default Vue.extend({
       (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
       this.$store.commit('setInspecting', false);
 
+      const rect = (this.$refs.panel as HTMLElement).getBoundingClientRect();
+      const start = this.floating
+        ? this.floatingBounds
+        : {
+            left: rect.left,
+            top: rect.top,
+            width: rect.width,
+            height: rect.height,
+          };
+
       this.corner = {
         startX: event.clientX,
         startY: event.clientY,
-        start: this.floatingBounds,
-        bounds: this.floatingBounds,
+        heightOnly: !this.floating,
+        start,
+        bounds: null,
       };
     },
 
@@ -374,11 +391,18 @@ export default Vue.extend({
         return;
       }
 
-      const { start, startX, startY } = this.corner;
+      const { start, startX, startY, heightOnly } = this.corner;
+      const dx = heightOnly ? 0 : event.clientX - startX;
+      const dy = event.clientY - startY;
+
+      if (!this.corner.bounds && Math.hypot(dx, dy) < MOVE_THRESHOLD) {
+        return;
+      }
+
       this.corner.bounds = this.clampBounds({
         ...start,
-        width: start.width + event.clientX - startX,
-        height: start.height + event.clientY - startY,
+        width: start.width + dx,
+        height: start.height + dy,
       });
     },
 
@@ -389,8 +413,15 @@ export default Vue.extend({
 
       const { bounds } = this.corner;
       this.corner = null;
+
+      if (!bounds) {
+        return;
+      }
+
+      // Shortening a docked panel undocks it, so there's one resizable box to remember.
       this.$store.dispatch('setLayout', {
         ...this.layout,
+        dockLocation: 'floating',
         floating: bounds,
       });
     },
@@ -608,6 +639,16 @@ export default Vue.extend({
   width: 16px;
   height: 16px;
   cursor: nwse-resize;
+  touch-action: none;
+}
+
+.stylebot-resize-bottom {
+  position: absolute;
+  right: 14px;
+  bottom: -5px;
+  left: 14px;
+  height: 8px;
+  cursor: ns-resize;
   touch-action: none;
 }
 
