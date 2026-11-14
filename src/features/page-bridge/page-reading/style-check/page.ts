@@ -1,4 +1,9 @@
-import { getSelector } from '@stylebot/css';
+import {
+  buildSelectorAlternatives,
+  createMatchesCache,
+  getDefaultSelector,
+} from '@stylebot/css';
+import type { MatchesFor } from '@stylebot/css';
 
 import { isDark, parseColor, WHITE } from './colors';
 import type { Rgba } from './colors';
@@ -101,8 +106,20 @@ export const settle = async (): Promise<void> => {
   await Promise.race([Promise.all(transitions), timeout]);
 };
 
-export const selectorOf = (element: Element): string =>
-  element instanceof HTMLElement ? getSelector(element) : '';
+/**
+ * Names an element as the editor's field would when it's picked. Naming
+ * many elements with one `matchesFor` queries each selector once.
+ */
+export const selectorOf = (
+  element: Element,
+  matchesFor: MatchesFor = createMatchesCache()
+): string =>
+  element instanceof HTMLElement
+    ? getDefaultSelector(
+        element,
+        buildSelectorAlternatives(element, [], matchesFor)
+      )
+    : '';
 
 /**
  * Groups elements under the selector that names them, keeping the first
@@ -115,9 +132,10 @@ export const groupBySelector = <T>(
     string,
     { count: number; element: Element; detail: T }
   >();
+  const matchesFor = createMatchesCache();
 
   items.forEach(({ element, detail }) => {
-    const selector = selectorOf(element);
+    const selector = selectorOf(element, matchesFor);
 
     if (!selector) {
       return;

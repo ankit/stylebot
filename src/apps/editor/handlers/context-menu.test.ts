@@ -1,5 +1,5 @@
 jest.mock('@stylebot/css', () => ({
-  getSelector: (el: HTMLElement) => `${el.tagName.toLowerCase()}.picked`,
+  getDefaultSelector: (el: HTMLElement) => `${el.tagName.toLowerCase()}.picked`,
 }));
 
 import { createContextMenuHandler } from './context-menu';

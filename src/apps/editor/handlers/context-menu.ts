@@ -1,5 +1,5 @@
 import type { Commit } from 'vuex';
-import { getSelector } from '@stylebot/css';
+import { getDefaultSelector } from '@stylebot/css';
 import type { LocalPageBridge } from '@stylebot/page-bridge';
 
 /**
@@ -14,6 +14,9 @@ export const createContextMenuHandler =
   (target: EventTarget | null): void => {
     if (target) {
       bridge.setPickedElement(target as HTMLElement);
-      commit('setContextMenuSelector', getSelector(target as HTMLElement));
+      commit(
+        'setContextMenuSelector',
+        getDefaultSelector(target as HTMLElement)
+      );
     }
   };
