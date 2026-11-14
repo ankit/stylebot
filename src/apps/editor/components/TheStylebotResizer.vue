@@ -344,11 +344,8 @@ export default Vue.extend({
         return;
       }
 
+      // Not prevented: menus close on the mousedown it would cancel.
       const onControl = target.closest(CONTROLS) !== null;
-      if (!onControl) {
-        event.preventDefault();
-      }
-
       const rect = (this.$refs.panel as HTMLElement).getBoundingClientRect();
       this.listenMove();
       this.move = {
@@ -438,6 +435,7 @@ export default Vue.extend({
       window.addEventListener('pointerup', this.onMoveEnd, true);
       window.addEventListener('pointercancel', this.onMoveEnd, true);
       window.addEventListener('dragstart', this.swallowClick, true);
+      window.addEventListener('selectstart', this.swallowClick, true);
     },
 
     unlistenMove() {
@@ -445,6 +443,7 @@ export default Vue.extend({
       window.removeEventListener('pointerup', this.onMoveEnd, true);
       window.removeEventListener('pointercancel', this.onMoveEnd, true);
       window.removeEventListener('dragstart', this.swallowClick, true);
+      window.removeEventListener('selectstart', this.swallowClick, true);
     },
 
     swallowClick(event: Event) {
