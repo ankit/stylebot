@@ -38,7 +38,6 @@ export {
   validateSelector,
 } from './selector/selector-text';
 export {
-  getStableClassParts,
   looksGeneratedId,
   looksHashedByShape,
   looksMinified,

@@ -1,24 +1,11 @@
-import {
-  getStableClassParts,
-  looksGeneratedId,
-  looksHashedByShape,
-} from '@stylebot/css';
+import { looksGeneratedId, looksHashedByShape } from '@stylebot/css';
 
 const MAX_CLASSES = 3;
 
 /**
- * A class as the label shows it: a partly hashed one by its authored name,
- * e.g. `Header_nav` for `Header_nav__a1B2c`.
- */
-const showClass = (name: string): string => {
-  const parts = getStableClassParts(name);
-
-  return parts ? parts[0].replace(/^[-_]+|[-_]+$/g, '') : name;
-};
-
-/**
  * Names an element the way dev tools do, e.g. `a#top.storylink`: its tag,
- * id and first few classes, leaving out generated ids and hashed classes.
+ * id and first few classes, leaving out generated ids and wholly hashed
+ * classes like `css-1q2w3e`. A partly hashed class is shown as it is.
  */
 export const describeElement = (el: Element): string => {
   const tag = el.tagName.toLowerCase();
@@ -27,7 +14,7 @@ export const describeElement = (el: Element): string => {
   const classPart = Array.from(el.classList)
     .filter(name => !looksHashedByShape(name))
     .slice(0, MAX_CLASSES)
-    .map(name => `.${showClass(name)}`)
+    .map(name => `.${name}`)
     .join('');
 
   return `${tag}${idPart}${classPart}`;

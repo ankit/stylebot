@@ -24,14 +24,14 @@ describe('describeElement', () => {
     ).toBe('div.card');
   });
 
-  it('shows a partly hashed class by its authored name', () => {
+  it('shows a partly hashed class in full', () => {
     expect(
       describeElement(
         element(
           '<span class="contextCrumbLast__l2P28s prc-Button-Label-pTQ3x"></span>'
         )
       )
-    ).toBe('span.contextCrumbLast.prc-Button-Label');
+    ).toBe('span.contextCrumbLast__l2P28s.prc-Button-Label-pTQ3x');
   });
 
   it('shows the first three classes only', () => {
