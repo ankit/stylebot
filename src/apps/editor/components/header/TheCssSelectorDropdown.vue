@@ -40,7 +40,7 @@
         :selector="item.value"
         :current="item.value === activeSelector"
         @select="select"
-        @preview-end="previewActiveSelector"
+        @preview-end="previewMatches"
       />
     </template>
   </s-autocomplete>
@@ -53,6 +53,11 @@ import type { StylebotEditingMode } from '@stylebot/types';
 
 import type { CssSelectorMetadata } from '../../store';
 import { getPageBridge } from '@stylebot/page-bridge';
+import {
+  peekSelectorMatches,
+  isPeeking,
+  stopPeek,
+} from '../../utils/selector-peek';
 import TheCssSelectorDropdownItem from './TheCssSelectorDropdownItem.vue';
 
 type DropdownEntry = {
@@ -134,12 +139,15 @@ export default Vue.extend({
     // setSelector already updates activeSelector as the user types.
     activeSelector(): void {
       if (this.focused) {
-        this.previewActiveSelector();
+        this.previewMatches();
+      } else {
+        this.peekMatches();
       }
     },
   },
 
   beforeDestroy() {
+    stopPeek();
     getPageBridge().unhighlight();
   },
 
@@ -150,6 +158,7 @@ export default Vue.extend({
 
     pickSelector(item: DropdownEntry): void {
       this.$store.commit('setActiveSelector', item.value);
+      this.peekMatches();
     },
 
     /**
@@ -169,35 +178,49 @@ export default Vue.extend({
     onFocus(): void {
       this.focused = true;
       this.openingSelector = this.activeSelector;
-      this.previewActiveSelector();
+      this.previewMatches();
     },
 
     onBlur(): void {
       this.focused = false;
 
-      if (!this.hovered && !this.disabled) {
+      if (!this.hovered && !this.disabled && !isPeeking()) {
         getPageBridge().unhighlight();
       }
     },
 
     onMouseEnter(): void {
       this.hovered = true;
-      this.previewActiveSelector();
+      this.previewMatches();
     },
 
     onMouseLeave(): void {
       this.hovered = false;
 
-      if (!this.focused && !this.disabled) {
+      if (!this.focused && !this.disabled && !isPeeking()) {
         getPageBridge().unhighlight();
       }
+    },
+
+    /**
+     * Shows what a newly chosen selector matches for a moment, so a change
+     * of scope shows on the page without hovering anything.
+     */
+    peekMatches(): void {
+      const selector = this.activeSelector.trim();
+
+      if (this.disabled || this.$store.state.inspecting || !selector) {
+        return;
+      }
+
+      peekSelectorMatches(selector, () => this.focused || this.hovered);
     },
 
     /**
      * Boxes the selector's matches while the field is focused or hovered;
      * the inspector draws its own highlight while picking.
      */
-    previewActiveSelector(): void {
+    previewMatches(): void {
       if (
         this.disabled ||
         !(this.focused || this.hovered) ||
