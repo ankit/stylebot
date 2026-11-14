@@ -188,6 +188,15 @@ describe('element-selectors', () => {
       );
     });
 
+    it("matches GitHub's module class without its hash", () => {
+      const el = document.createElement('span');
+      el.setAttribute('class', 'SidebarAbout-module_eqNI3a_websiteLink');
+
+      expect(getStableClassPartsSelector(el)).toBe(
+        'span[class*="SidebarAbout-module_"][class*="_websiteLink"]'
+      );
+    });
+
     it('prefers an authored class over a partly hashed one', () => {
       const el = document.createElement('div');
       el.setAttribute('class', 'Card_body__a1B2c card-body');

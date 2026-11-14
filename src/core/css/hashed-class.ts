@@ -65,6 +65,18 @@ function isLeadingHash(head: string): boolean {
 }
 
 /**
+ * Whether the 6 characters between `-module_` and the local name are a hash,
+ * like `eqNI3a` or `iipd_W`: the hash's alphabet includes `_` and `-`, which
+ * can leave a lone character that no authored name would have.
+ */
+function isModuleInfixHash(infix: string): boolean {
+  return (
+    isLeadingHash(infix) ||
+    infix.split(/[-_]/).some(piece => piece.length === 1)
+  );
+}
+
+/**
  * The authored part of a class that starts with a 6-character hash, as the
  * New York Times names them: `_mastheadContainer` from `Wr7_RG_mastheadContainer`.
  */
@@ -96,6 +108,14 @@ export function getStableClassParts(className: string): Array<string> | null {
     /^[a-z]+(?:[A-Z][a-z]+)*$/.test(moduleHash[3]);
   if (moduleHash && !turbopackInfix) {
     return [moduleHash[1]];
+  }
+
+  // GitHub's `File-module_hash_local`, e.g. `SidebarAbout-module_eqNI3a_websiteLink`.
+  const moduleInfix = className.match(
+    /^(.+-module_)([A-Za-z0-9][\w-]{5})_([A-Za-z][\w-]*)$/
+  );
+  if (moduleInfix && isModuleInfixHash(moduleInfix[2])) {
+    return [moduleInfix[1], `_${moduleInfix[3]}`];
   }
 
   // A React useId suffix, e.g. `button-label-_R_93ades_`.
