@@ -17,6 +17,11 @@ export type {
   SelectorDescription,
   SelectorRole,
 } from './selector/get-selector';
+export { getDefaultScope, getScopeSlots } from './selector/selector-scopes';
+export type {
+  ScopeSlots,
+  SelectorAlternatives,
+} from './selector/selector-scopes';
 export { getStableClassMatcher } from './selector/element-selectors';
 export { getUniqueSelector } from './selector/unique-selectors';
 export { dedupeByMatches, matchesOf, sameElements } from './selector/reach';

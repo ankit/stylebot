@@ -1,7 +1,7 @@
-import type { RoleColorGroups } from '@stylebot/css';
+import type { RoleColorGroups, SelectorAlternatives } from '@stylebot/css';
 import type { CssDeclaration } from '@stylebot/types';
 import type { AppliedDeclaration } from '../applied-declarations';
-import type { PageSnapshot, SelectorAlternatives } from '../PageBridge';
+import type { PageSnapshot } from '../PageBridge';
 
 /**
  * The slice of editor state the page owns and the window mirrors.

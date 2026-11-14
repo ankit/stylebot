@@ -19,7 +19,8 @@ import {
 } from '@stylebot/settings';
 
 import { DEFAULT_PROFILE_ID } from '@stylebot/saved-styles';
-import type { PageSnapshot, SelectorAlternatives } from '@stylebot/page-bridge';
+import type { SelectorAlternatives } from '@stylebot/css';
+import type { PageSnapshot } from '@stylebot/page-bridge';
 import type { AppliedDeclaration } from '@stylebot/page-bridge';
 import { emptyPageSnapshot } from '@stylebot/page-bridge';
 
