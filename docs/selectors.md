@@ -81,10 +81,11 @@ Every class name falls into one of four kinds:
 | CSS Modules (Next.js, Primer)  | `NavDropdown-module__button__PEHWX`             | partly hashed | `[class*="NavDropdown-module__button__"]`   |
 | CSS Modules, dash-separated    | `prc-TopicTag-TopicTag-LS-jX`                   | partly hashed | `[class*="prc-TopicTag-TopicTag-"]`         |
 | Turbopack                      | `page-module__E0kJGG__main`                     | partly hashed | `[class*="page-module__"][class*="__main"]` |
-| New York Times                 | `ZcdlOG_nav`, `Wr7_RG_mastheadContainer`        | partly hashed | `[class*="_nav"]`                           |
+| CSS Modules (GitHub)           | `Nav-module_eqNI3a_link`                        | partly hashed | `[class*="Nav-module_"][class*="_link"]`    |
+| Lightning CSS (NYT, Linear)    | `ZcdlOG_nav`, `m-9-4W_timestamp`                | partly hashed | `[class*="_nav"]`                           |
 | styled-components display name | `Header-sc-1x2y3z-0`                            | partly hashed | `[class*="Header-sc-"]`                     |
 | Vite CSS Modules               | `_card_1wfme_1`                                 | partly hashed | `[class*="_card_"]`                         |
-| React id suffix                | `button-label-_R_93ades_`                       | partly hashed | `[class*="button-label-"]`                  |
+| React id suffix                | `button-label-_R_93ades_`                       | partly hashed | `[class*="button-label-_R_"]`               |
 | Tailwind and other utilities   | `bg-red-500`, `md:flex`, `col-md-12`            | authored      |                                             |
 | BEM and other authored names   | `card__title`, `btn--primary`, `isActive`       | authored      |                                             |
 
@@ -105,7 +106,11 @@ How the shapes are told apart:
 - **A partly hashed name's hash** must look like one: letters mixed with
   digits or several capitals (`a1B2c`, but not `item2` or `navBar_item`). A
   dash-separated CSS Modules name also needs a PascalCase component name
-  before its 5-character hash, so `col-md-12` stays authored.
+  before its 5-character hash, so `col-md-12` stays authored. GitHub's
+  6-character hash between `-module_` and the local name, and Lightning
+  CSS's leading one, may hold `_` or `-` (`iipd_W`, `S-XPiW`), so a lone
+  capital or digit among its pieces counts too, while a word like `header`
+  doesn't.
 - **A partly hashed match is used** only while it matches exactly the
   elements the full class does.
 

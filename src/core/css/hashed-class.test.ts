@@ -41,12 +41,32 @@ describe('hashed-class', () => {
         ['DirectoryContent-module__Box_1__'],
       ],
       ['page-module__E0kJGG__navItem', ['page-module__', '__navItem']],
+      [
+        'SidebarAbout-module_eqNI3a_websiteLink',
+        ['SidebarAbout-module_', '_websiteLink'],
+      ],
+      [
+        'CodeViewSidebar-module_6TmlqG_borderGrid',
+        ['CodeViewSidebar-module_', '_borderGrid'],
+      ],
+      [
+        'SidebarSection-module_TOhNLG_sidebarSection',
+        ['SidebarSection-module_', '_sidebarSection'],
+      ],
+      [
+        'styles-module_iipd_W_contextCrumb',
+        ['styles-module_', '_contextCrumb'],
+      ],
       ['_card_1wfme_1', ['_card_']],
-      ['caa-button-label-_R_93adeslcldcpbn6b5ipam_', ['caa-button-label-']],
+      ['caa-button-label-_R_93adeslcldcpbn6b5ipam_', ['caa-button-label-_R_']],
       ['ZcdlOG_nav', ['_nav']],
       ['Wr7_RG_mastheadContainer', ['_mastheadContainer']],
       ['jXhsNG_dividerLeft', ['_dividerLeft']],
       ['_5zuA3W_topDivider', ['_topDivider']],
+      ['m-9-4W_timestamp', ['_timestamp']],
+      ['b-30Va_rootHomepage', ['_rootHomepage']],
+      ['S-XPiW_dotContainer', ['_dotContainer']],
+      ['-Qs3Ha_section', ['_section']],
       ['w7VYaa_topBorder', ['_topBorder']],
     ])('keeps the authored parts of %s', (className, expected) => {
       expect(getStableClassParts(className)).toEqual(expected);
@@ -68,6 +88,12 @@ describe('hashed-class', () => {
       'Header_nav',
       'button_primary',
       'IconButton_label',
+      'Foo-module_header_title',
+      'Foo-module_Header_title',
+      'Foo-module_my_btn_title',
+      'a-list_item',
+      'logged-out',
+      'header-wrapper',
     ])('finds no hash in %s', className => {
       expect(getStableClassParts(className)).toBeNull();
     });
@@ -75,6 +101,8 @@ describe('hashed-class', () => {
 
   describe('looksHashed', () => {
     it.each([
+      'SidebarAbout-module_eqNI3a_websiteLink',
+      'SidebarSection-module_TOhNLG_sidebarSection',
       'WwrzSb',
       'a1b2c3',
       'm5k28',
@@ -123,6 +151,7 @@ describe('hashed-class', () => {
       'svelte-app',
       'css-truncate',
       '_main',
+      'Foo-module_header_title',
     ])('treats %s as authored', className => {
       expect(looksHashed(className)).toBe(false);
     });
