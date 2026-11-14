@@ -1,19 +1,17 @@
 const MAX_CLASSES = 3;
 
 /**
- * Names an element the way dev tools do, e.g. `a#top.storylink`: its tag,
- * id and first few classes, exactly as the page has them.
+ * Names an element the way dev tools do, as the parts of e.g.
+ * `a#top.storylink`: its tag, id and first few classes, exactly as the page
+ * has them.
  */
-export const describeElement = (el: Element): string => {
-  const tag = el.tagName.toLowerCase();
+export const describeElement = (el: Element): Array<string> => {
   const id = el.getAttribute('id');
-  const idPart = id ? `#${id}` : '';
-  const classPart = Array.from(el.classList)
+  const classes = Array.from(el.classList)
     .slice(0, MAX_CLASSES)
-    .map(name => `.${name}`)
-    .join('');
+    .map(name => `.${name}`);
 
-  return `${tag}${idPart}${classPart}`;
+  return [el.tagName.toLowerCase(), ...(id ? [`#${id}`] : []), ...classes];
 };
 
 /**

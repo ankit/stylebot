@@ -13,7 +13,8 @@
     </svg>
 
     <s-text as="span" size="label" class="name">
-      {{ name }}
+      <!-- prettier-ignore -->
+      <span v-for="(part, index) in nameParts" :key="index" class="part">{{ part }}</span>
     </s-text>
     <s-text v-if="size" as="span" size="label" class="size">
       {{ size }}
@@ -39,14 +40,14 @@ export default Vue.extend({
   },
 
   data(): {
-    name: string;
+    nameParts: Array<string>;
     size: string;
     top: number;
     left: number;
     placement: 'above' | 'below' | null;
   } {
     return {
-      name: '',
+      nameParts: [],
       size: '',
       top: 0,
       left: 0,
@@ -65,7 +66,8 @@ export default Vue.extend({
   display: flex;
   align-items: center;
   gap: 10px;
-  max-width: 320px;
+  width: max-content;
+  max-width: min(420px, calc(100vw - 16px));
   min-height: 17px;
   --card-edge: color-mix(in srgb, var(--text-primary) 18%, var(--menu-surface));
 
@@ -97,11 +99,16 @@ export default Vue.extend({
 
 .name {
   min-width: 0;
-  overflow-wrap: anywhere;
-  text-box: trim-both cap alphabetic;
   font-family: var(--font-mono);
   font-size: 12px;
+  line-height: 16px;
   color: var(--field-ink);
+}
+
+.part {
+  display: inline-block;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .size {

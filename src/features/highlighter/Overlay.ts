@@ -119,7 +119,7 @@ export default class Overlay {
 
   inspect(
     nodes: Array<HTMLElement>,
-    label: string,
+    label: Array<string>,
     property?: LayoutProperty,
     picking?: PickingOptions
   ): void {
@@ -149,7 +149,7 @@ export default class Overlay {
     const tip = this.ensureTip();
 
     tip.showSummary({
-      name: label,
+      nameParts: label,
       size: picking?.size ?? '',
     });
 
