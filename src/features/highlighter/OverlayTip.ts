@@ -2,6 +2,7 @@ import type Vue from 'vue';
 
 import InspectorCard from './InspectorCard.vue';
 import { findArrowLeft, findTipPos, leftBesidePanel } from './tip-position';
+import type { NamePart } from './describe-element';
 import type { Box, TipPlacement } from './types';
 
 /**
@@ -9,7 +10,7 @@ import type { Box, TipPlacement } from './types';
  * `.vue` imports generically), for what's driven imperatively here.
  */
 type InspectorCardInstance = Vue & {
-  nameParts: Array<string>;
+  nameParts: Array<NamePart>;
   size: string;
   top: number;
   left: number;
@@ -18,7 +19,7 @@ type InspectorCardInstance = Vue & {
 };
 
 export type TipSummary = {
-  nameParts: Array<string>;
+  nameParts: Array<NamePart>;
   size: string;
 };
 
