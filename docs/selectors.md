@@ -151,7 +151,8 @@ stands in for it.
 After a pick in Basic mode, the selector field offers up to
 three scopes, each with how many elements it matches:
 
-- **Only**: a short selector that matches just the picked element.
+- **Only**: a short selector that matches just the picked element, its id
+  when it has one.
 - **Similar**: the same spot in every block like the picked one's, at its
   widest, e.g. every account's avatar rather than one account's.
 - **All**: the most stable selector that reaches more than Similar, the one
