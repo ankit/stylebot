@@ -334,6 +334,18 @@ describe('rule', () => {
           '.nav li a:first-child'
         );
       });
+
+      it("reuses a rule for every item like the pick, the editor's starting scope", () => {
+        const html = `
+          <tr class="athing"><td><span class="titleline"><a id="picked" class="link">one</a></span></td></tr>
+          <tr class="athing"><td><span class="titleline"><a class="link">two</a></span></td></tr>
+          <tr><td class="footer"><a class="link">more</a></td></tr>
+        `;
+
+        expect(
+          pick(`<table>${html}</table>`, '.titleline > a { color: red; }')
+        ).toBe('.titleline > a');
+      });
     });
   });
 
