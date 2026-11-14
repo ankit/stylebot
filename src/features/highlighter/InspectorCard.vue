@@ -13,7 +13,7 @@
       <path d="M0 8 7 1 14 8z" />
     </svg>
 
-    <s-text as="span" size="label" class="name">
+    <s-text ref="name" as="span" size="label" class="name">
       <!-- prettier-ignore -->
       <span v-for="(part, index) in nameParts" :key="index" class="part">{{ part }}</span>
     </s-text>
@@ -56,6 +56,31 @@ export default Vue.extend({
       arrowLeft: 12,
       placement: null,
     };
+  },
+
+  updated(): void {
+    this.fitName();
+  },
+
+  methods: {
+    /**
+     * Narrows the name to its widest line once it wraps, since a box sized
+     * to its content keeps the width of the unwrapped text.
+     */
+    fitName(): void {
+      const name = (this.$refs.name as Vue).$el as HTMLElement;
+      name.style.width = '';
+
+      const left = name.getBoundingClientRect().left;
+      const widest = Math.max(
+        0,
+        ...Array.from(name.children).map(
+          part => part.getBoundingClientRect().right - left
+        )
+      );
+
+      name.style.width = `${Math.ceil(widest)}px`;
+    },
   },
 });
 </script>
