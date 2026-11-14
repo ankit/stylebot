@@ -35,7 +35,7 @@ type Press = {
 
 /**
  * Edge and corner handles that report how far the pointer has dragged them.
- * Docked, only the top and bottom edges show.
+ * Docked, the side edges are left to the width edge.
  */
 export default Vue.extend({
   name: 'PanelResizeHandles',

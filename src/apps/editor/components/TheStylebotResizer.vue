@@ -294,14 +294,30 @@ export default Vue.extend({
       );
     },
 
-    // Shortening a docked panel undocks it, so there's one resizable box to remember.
+    /**
+     * Shortening a docked panel undocks it, so there's one resizable box to
+     * remember. A docked panel only made wider or narrower stays docked.
+     */
     onResizeEnd(): void {
-      const bounds = this.gesture?.bounds;
+      const { gesture } = this;
       this.gesture = null;
 
-      if (bounds) {
-        this.saveFloating(bounds);
+      if (!gesture?.bounds) {
+        return;
       }
+
+      const { start, bounds } = gesture;
+      const sameHeight =
+        bounds.top === Math.round(start.top) &&
+        bounds.height === Math.round(start.height);
+
+      if (this.layout.dockLocation !== 'floating' && sameHeight) {
+        this.saveWidth(bounds.width);
+
+        return;
+      }
+
+      this.saveFloating(bounds);
     },
 
     onWidthStart(): void {

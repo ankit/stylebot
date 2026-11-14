@@ -22,7 +22,14 @@ export const RESIZE_DIRECTIONS: Array<ResizeDirection> = [
   'sw',
 ];
 
-export const DOCKED_RESIZE_DIRECTIONS: Array<ResizeDirection> = ['n', 's'];
+export const DOCKED_RESIZE_DIRECTIONS: Array<ResizeDirection> = [
+  'n',
+  's',
+  'ne',
+  'nw',
+  'se',
+  'sw',
+];
 
 const fit = (value: number, min: number, max: number): number =>
   Math.round(Math.max(min, Math.min(value, max)));
