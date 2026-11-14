@@ -272,7 +272,7 @@ describe('rule', () => {
       expect(getExistingSelector(el, css)).toBe('.mock-selector-2');
     });
 
-    describe('only reuses a selector that targets the element itself', () => {
+    describe('only reuses a selector that reaches what the pick would', () => {
       const pick = (html: string, css: string): string | null => {
         document.body.innerHTML = html;
         return getExistingSelector(
@@ -281,13 +281,16 @@ describe('rule', () => {
         );
       };
 
-      it('skips `*`, which matches every element on the page', () => {
+      it('skips `*` and a page-wide `*:not(…)`, which match every element', () => {
+        const html = '<h1 id="picked" class="title">Hi</h1><p>There</p>';
+
+        expect(pick(html, '* { color: red; }')).toBeNull();
         expect(
-          pick('<h1 id="picked" class="title">Hi</h1>', '* { color: red; }')
+          pick(html, '*:not(h2.card-title span) { color: red; }')
         ).toBeNull();
       });
 
-      it('skips a bare tag or a descendant ending in one, like `.card p`', () => {
+      it('skips a rule that reaches further than the pick, like `.card p`', () => {
         const css = dedent`
           a { color: red; }
           .card p { color: red; }
@@ -295,13 +298,13 @@ describe('rule', () => {
 
         expect(
           pick(
-            '<div class="card"><p id="picked" class="lede">Hi</p></div>',
+            '<div class="card"><p id="picked" class="lede">Hi</p><p>There</p></div>',
             css
           )
         ).toBeNull();
       });
 
-      it('reuses a tag-only selector when it is what would be generated anyway', () => {
+      it('reuses a tag-only selector when it reaches the same elements', () => {
         expect(
           pick(
             '<div class="mw-heading"><h2 id="picked">Hi</h2></div>',
@@ -316,7 +319,7 @@ describe('rule', () => {
         ).toBe('html body h1');
       });
 
-      it('reuses a selector whose subject has a class, id, attribute or position', () => {
+      it('reuses a class, id, attribute or position that reaches the same elements', () => {
         const html =
           '<ul class="nav"><li><a id="picked" class="link" href="/x">x</a></li></ul>';
 
@@ -327,7 +330,6 @@ describe('rule', () => {
         expect(pick(html, 'ul a[href="/x"] { color: red; }')).toBe(
           'ul a[href="/x"]'
         );
-        expect(pick(html, '.nav li:first-child a { color: red; }')).toBeNull();
         expect(pick(html, '.nav li a:first-child { color: red; }')).toBe(
           '.nav li a:first-child'
         );

@@ -123,6 +123,38 @@ export const ClickingSimilarSetsField: StoryObj = {
   },
 };
 
+export const StyledPillForSavedRule: StoryObj = {
+  ...editor(
+    { inspecting: true, css: '.item > a { color: red; }' },
+    { page: SCOPES_PAGE }
+  ),
+  name: 'a saved rule for the element shows as Styled, in place of a suggestion that reaches the same elements',
+  play: async ({ canvasElement }) => {
+    const store = storeOf(canvasElement);
+    const home = within(canvasElement).getByRole('link', { name: 'Home' });
+
+    await hoverPage(home);
+    await pressKey('Enter');
+    await waitFor(() => expect(pills(canvasElement)).toHaveLength(3));
+
+    await expect(pills(canvasElement).at(-1)).toHaveTextContent(/Styled\s*3/);
+    const others = pills(canvasElement).slice(0, -1);
+    await expect(others.map(other => other.textContent)).not.toContainEqual(
+      expect.stringMatching(/\b3\b/)
+    );
+    await expect(store.state.activeSelector).not.toBe('.item > a');
+
+    await user.click(pill(canvasElement, 'Styled'));
+    await expect(store.state.activeSelector).toBe('.item > a');
+    await waitFor(() =>
+      expect(pill(canvasElement, 'Styled')).toHaveAttribute(
+        'aria-pressed',
+        'true'
+      )
+    );
+  },
+};
+
 export const TypingHidesRow: StoryObj = {
   ...editor({ inspecting: true }, { page: SCOPES_PAGE }),
   name: 'typing a selector of your own hides the pills',

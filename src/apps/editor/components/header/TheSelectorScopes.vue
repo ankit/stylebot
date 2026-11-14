@@ -33,7 +33,7 @@ import type { ScopeSlots } from '../../utils/selector-scopes';
 
 type ScopeOption = { value: string; label: string; count: string };
 
-const SLOTS: Array<keyof ScopeSlots> = ['only', 'similar', 'all'];
+const SLOTS: Array<keyof ScopeSlots> = ['only', 'similar', 'all', 'styled'];
 
 export default Vue.extend({
   name: 'TheSelectorScopes',
@@ -106,9 +106,10 @@ export default Vue.extend({
     alternatives: {
       immediate: true,
       async handler(alternatives: SelectorAlternatives): Promise<void> {
-        const { candidates } = alternatives;
-        const counts = candidates.length
-          ? await countSelectorMatches(candidates)
+        const { styled, candidates } = alternatives;
+        const selectors = styled ? [styled, ...candidates] : candidates;
+        const counts = selectors.length
+          ? await countSelectorMatches(selectors)
           : {};
 
         if (alternatives === this.alternatives) {

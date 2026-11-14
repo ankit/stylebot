@@ -2,8 +2,7 @@ import * as postcss from 'postcss';
 import type { CssDeclaration } from '@stylebot/types';
 
 import { getSelector } from './selector/get-selector';
-import { getTagNameBasedSelector } from './selector/ancestor-selectors';
-import { getSubjectCompound } from './get-subject-compound';
+import { elementMatches, matchesOf, sameElements } from './selector/reach';
 
 /**
  * How many top-level rules a stylesheet has, or null when it doesn't parse.
@@ -137,63 +136,33 @@ export const getDeclarationsForSelector = (
  */
 const STATE_PSEUDO_CLASSES = /:(hover|focus(-visible|-within)?|active)\b/i;
 
-const NARROWING_PARTS = /[#.[]|:(nth-|first-|last-|only-|is\(|where\(|has\()/i;
-
 /**
- * Whether the selector picks its element by tag alone (`*`, `a`, `.card p`)
- * rather than by id, class, attribute or position, so it matches broadly.
- */
-const isBroadSelector = (selector: string): boolean =>
-  !NARROWING_PARTS.test(getSubjectCompound(selector));
-
-/**
- * Finds an authored selector matching this element via el.matches(), so
- * picking it keeps editing that rule instead of starting an unrelated one.
- * Only a selector that targets the element itself counts: a broad one like
- * `*` or `.card p` would otherwise capture every element it happens to match,
- * unless it's the one generated now or the tag chain older versions generated.
+ * Finds a saved selector that reaches exactly what the inspector's own pick
+ * would, so picking keeps editing that rule. A wider one, like `*:not(.x)`,
+ * is left for the user to choose.
  */
 export const getExistingSelector = (
   el: HTMLElement,
   css: string
 ): string | null => {
-  const root = postcss.parse(css);
-  let match: string | null = null;
-  let generatedSelectors: Array<string> | null = null;
+  const saved: Array<string> = [];
+  walkUnnestedRules(postcss.parse(css), rule => saved.push(...rule.selectors));
 
-  walkUnnestedRules(root, rule => {
-    if (match) {
-      return;
-    }
+  const matching = saved.filter(
+    selector =>
+      !STATE_PSEUDO_CLASSES.test(selector) && elementMatches(el, selector)
+  );
 
-    for (const candidate of rule.selectors) {
-      if (STATE_PSEUDO_CLASSES.test(candidate)) {
-        continue;
-      }
+  if (!matching.length) {
+    return null;
+  }
 
-      if (isBroadSelector(candidate)) {
-        generatedSelectors = generatedSelectors ?? [
-          getSelector(el),
-          getTagNameBasedSelector(el),
-        ];
-        if (!generatedSelectors.includes(candidate)) {
-          continue;
-        }
-      }
+  const picked = matchesOf(getSelector(el));
+  const same = matching.find(selector =>
+    sameElements(matchesOf(selector), picked)
+  );
 
-      try {
-        if (el.matches(candidate)) {
-          match = candidate;
-          return;
-        }
-      } catch {
-        // Parsed by postcss but not valid/supported as a live selector —
-        // skip it rather than letting el.matches throw.
-      }
-    }
-  });
-
-  return match;
+  return same ?? null;
 };
 
 /**
