@@ -1,7 +1,7 @@
 import * as postcss from 'postcss';
 import type { CssDeclaration } from '@stylebot/types';
 
-import { getSelector } from './selector/get-selector';
+import { getDefaultSelector } from './selector/selector-alternatives';
 import { elementMatches, matchesOf, sameElements } from './selector/reach';
 
 /**
@@ -137,9 +137,9 @@ export const getDeclarationsForSelector = (
 const STATE_PSEUDO_CLASSES = /:(hover|focus(-visible|-within)?|active)\b/i;
 
 /**
- * Finds a saved selector that reaches exactly what the inspector's own pick
- * would, so picking keeps editing that rule. A wider one, like `*:not(.x)`,
- * is left for the user to choose.
+ * Finds a saved selector that reaches exactly what the editor's default
+ * scope for the element would, so picking keeps editing that rule. A wider
+ * one, like `*:not(.x)`, is left for the user to choose.
  */
 export const getExistingSelector = (
   el: HTMLElement,
@@ -157,7 +157,7 @@ export const getExistingSelector = (
     return null;
   }
 
-  const picked = matchesOf(getSelector(el));
+  const picked = matchesOf(getDefaultSelector(el));
   const same = matching.find(selector =>
     sameElements(matchesOf(selector), picked)
   );

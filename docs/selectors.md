@@ -184,9 +184,14 @@ element has:
 With no scope, the field keeps the inspector's own pick. Similar comes
 before Only because restyling one item of a list is rarely what's wanted.
 
+The command line names an element the same way, so the agent and the editor
+agree: `stylebot inspect` and `hover`, the elements of an area the user
+marks, and the page check after a save.
+
 ## Reusing existing rules
 
 When you pick an element, Stylebot reuses a saved rule if it styles exactly
-the elements the new selector would, so you keep editing that rule. Rules
+the elements the scope the pick starts on would, so you keep editing that
+rule. Rules
 that only apply while hovering or focusing are ignored. In the editor, the
 field then moves to a scope as described above.

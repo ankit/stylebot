@@ -24,7 +24,17 @@ export type {
 } from './selector/selector-scopes';
 export { getStableClassMatcher } from './selector/element-selectors';
 export { getUniqueSelector } from './selector/unique-selectors';
-export { dedupeByMatches, matchesOf, sameElements } from './selector/reach';
+export {
+  buildSelectorAlternatives,
+  getDefaultSelector,
+} from './selector/selector-alternatives';
+export {
+  createMatchesCache,
+  dedupeByMatches,
+  matchesOf,
+  sameElements,
+} from './selector/reach';
+export type { MatchesFor } from './selector/reach';
 export {
   getStableSelector,
   getFragileSelector,

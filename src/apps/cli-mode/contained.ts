@@ -1,9 +1,5 @@
-import {
-  getExistingSelector,
-  getSelector,
-  getUniqueSelector,
-} from '@stylebot/css';
-import { countMatches } from '@stylebot/page-bridge';
+import { getDefaultSelector, getUniqueSelector } from '@stylebot/css';
+import { countMatches, getSelectorAlternatives } from '@stylebot/page-bridge';
 import type { CliMark, CliMarkedElement, ViewportRect } from '@stylebot/types';
 
 import type { Point } from './areas';
@@ -114,14 +110,15 @@ export const findAtMiddle = (
 };
 
 /**
- * An element as a mark lists it: the selector the inspector would pick,
- * preferring one the css has, with how many elements it matches, and one
- * for it alone when that matches others too.
+ * An element as a mark lists it: the selector the editor's field would
+ * start on, preferring one the css has, with how many elements it matches,
+ * and one for it alone when that matches others too.
  */
 const describeElement = (el: Element, css: string): CliMarkedElement => {
-  const selector =
-    getExistingSelector(el as HTMLElement, css) ??
-    getSelector(el as HTMLElement);
+  const selector = getDefaultSelector(
+    el as HTMLElement,
+    getSelectorAlternatives(el as HTMLElement, css)
+  );
   const [matches] = countMatches([selector]);
   const unique = matches === 1 ? null : getUniqueSelector(el as HTMLElement);
 

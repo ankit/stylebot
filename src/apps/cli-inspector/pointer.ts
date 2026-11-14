@@ -1,4 +1,4 @@
-import { getSelector } from '@stylebot/css';
+import { getDefaultSelector } from '@stylebot/css';
 import { inspectElement } from '@stylebot/page-bridge';
 import { queryWithShadowRoots } from '@stylebot/stylesheets';
 import type { PointerAction, PointerResult } from '@stylebot/types';
@@ -157,5 +157,5 @@ export const usePointer = (action: PointerAction): PointerResult => {
   }
 
   hover(el, x, y);
-  return { ...point, selector: getSelector(el as HTMLElement) };
+  return { ...point, selector: getDefaultSelector(el as HTMLElement) };
 };

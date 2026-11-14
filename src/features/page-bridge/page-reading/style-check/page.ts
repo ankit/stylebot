@@ -1,4 +1,9 @@
-import { getSelector } from '@stylebot/css';
+import {
+  buildSelectorAlternatives,
+  createMatchesCache,
+  getDefaultSelector,
+} from '@stylebot/css';
+import type { MatchesFor } from '@stylebot/css';
 
 import { isDark, parseColor, WHITE } from './colors';
 import type { Rgba } from './colors';
@@ -101,12 +106,25 @@ export const settle = async (): Promise<void> => {
   await Promise.race([Promise.all(transitions), timeout]);
 };
 
-export const selectorOf = (element: Element): string =>
-  element instanceof HTMLElement ? getSelector(element) : '';
+/**
+ * Names an element as the editor's field would when it's picked. Naming
+ * many elements with one `matchesFor` queries each selector once.
+ */
+export const selectorOf = (
+  element: Element,
+  matchesFor: MatchesFor = createMatchesCache()
+): string =>
+  element instanceof HTMLElement
+    ? getDefaultSelector(
+        element,
+        buildSelectorAlternatives(element, [], matchesFor)
+      )
+    : '';
 
 /**
  * Groups elements under the selector that names them, keeping the first
- * of each group as its example.
+ * of each group as its example. An element a group's selector already
+ * matches joins that group, so only each group's first element is named.
  */
 export const groupBySelector = <T>(
   items: Array<{ element: Element; detail: T }>
@@ -115,9 +133,12 @@ export const groupBySelector = <T>(
     string,
     { count: number; element: Element; detail: T }
   >();
+  const matchesFor = createMatchesCache();
+  const reachOf = new Map<string, Set<Element>>();
 
   items.forEach(({ element, detail }) => {
-    const selector = selectorOf(element);
+    const joined = Array.from(reachOf).find(([, reach]) => reach.has(element));
+    const selector = joined?.[0] ?? selectorOf(element, matchesFor);
 
     if (!selector) {
       return;
@@ -129,6 +150,7 @@ export const groupBySelector = <T>(
       group.count++;
     } else {
       groups.set(selector, { count: 1, element, detail });
+      reachOf.set(selector, new Set(matchesFor(selector)));
     }
   });
 

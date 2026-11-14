@@ -24,6 +24,20 @@ export const matchesOf = (selector: string): Array<Element> => {
   }
 };
 
+export type MatchesFor = (selector: string) => Array<Element>;
+
+/**
+ * Returns a lookup of each selector's matched elements that queries the
+ * page once per selector.
+ */
+export const createMatchesCache = (): MatchesFor => {
+  const cache = new Map<string, Array<Element>>();
+
+  return selector =>
+    cache.get(selector) ??
+    cache.set(selector, matchesOf(selector)).get(selector)!;
+};
+
 /**
  * Whether two lists of matches hold the same elements in the same order.
  */
@@ -37,7 +51,7 @@ export const sameElements = (a: Array<Element>, b: Array<Element>): boolean =>
  */
 export const dedupeByMatches = (
   selectors: Array<string>,
-  matchesFor: (selector: string) => Array<Element> = matchesOf
+  matchesFor: MatchesFor = matchesOf
 ): Array<string> => {
   const kept: Array<{ selector: string; matches: Array<Element> }> = [];
 

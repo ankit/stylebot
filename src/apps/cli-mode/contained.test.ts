@@ -89,7 +89,7 @@ describe('findAtMiddle', () => {
 });
 
 describe('describeArea', () => {
-  it('lists what an area wholly holds, with match counts and a selector for each alone', () => {
+  it('lists what an area wholly holds as the editor would name each, with match counts', () => {
     const { elements, whole, more } = describeArea(
       { x: 10, y: 110, width: 640, height: 220 },
       ''
@@ -98,8 +98,8 @@ describe('describeArea', () => {
     expect(whole).toBe(true);
     expect(more).toBe(0);
     expect(elements).toEqual([
-      { selector: 'div.card', matches: 2, unique: '#one' },
-      { selector: 'div.card', matches: 2, unique: '#two' },
+      { selector: '#one', matches: 1 },
+      { selector: '#two', matches: 1 },
     ]);
   });
 
