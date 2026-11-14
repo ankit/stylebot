@@ -23,17 +23,21 @@
     @pointermove="onMove"
     @pointerup="onMoveEnd"
     @pointercancel="onMoveEnd"
+    @lostpointercapture="onMoveEnd"
   >
     <slot></slot>
 
     <div
-      key="resize-bottom"
-      :class="floating ? 'stylebot-resize-corner' : 'stylebot-resize-bottom'"
-      :aria-label="t('resize_the_panel')"
-      @pointerdown.stop="onCornerDown"
-      @pointermove.stop="onCornerMove"
-      @pointerup.stop="onCornerUp"
-      @pointercancel.stop="onCornerUp"
+      v-for="direction in resizeDirections"
+      v-show="floating || dockedResizeDirections.includes(direction)"
+      :key="`resize-${direction}`"
+      class="stylebot-resize-handle"
+      :class="direction"
+      @pointerdown.stop="onResizeStart($event, direction)"
+      @pointermove.stop="onResize"
+      @pointerup.stop="onResizeEnd"
+      @pointercancel.stop="onResizeEnd"
+      @lostpointercapture.stop="onResizeEnd"
     ></div>
 
     <div
@@ -51,6 +55,7 @@
       @pointermove.stop="onPointerMove"
       @pointerup.stop="onPointerUp"
       @pointercancel.stop="onPointerUp"
+      @lostpointercapture.stop="onPointerUp"
       @dblclick="onReset"
       @keydown="onKeydown"
     ></div>
@@ -90,12 +95,62 @@ type Move = {
   bounds: FloatingPanelBounds | null;
 };
 
-type CornerDrag = {
+type ResizeDirection = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw';
+
+type Resize = {
   startX: number;
   startY: number;
-  heightOnly: boolean;
+  direction: ResizeDirection;
   start: FloatingPanelBounds;
   bounds: FloatingPanelBounds | null;
+};
+
+const DOCKED_RESIZE_DIRECTIONS: Array<ResizeDirection> = ['n', 's'];
+const RESIZE_DIRECTIONS: Array<ResizeDirection> = [
+  'n',
+  's',
+  'e',
+  'w',
+  'ne',
+  'nw',
+  'se',
+  'sw',
+];
+
+const fit = (value: number, min: number, max: number): number =>
+  Math.round(Math.max(min, Math.min(value, max)));
+
+/**
+ * Moves the edges a handle grabs by the pointer's offset, stopping at the
+ * minimum size and the viewport margin while the opposite edges stay put.
+ */
+const resizeBounds = (
+  start: FloatingPanelBounds,
+  direction: ResizeDirection,
+  dx: number,
+  dy: number
+): FloatingPanelBounds => {
+  let { left, top } = start;
+  let right = left + start.width;
+  let bottom = top + start.height;
+
+  if (direction.includes('e')) {
+    right = fit(right + dx, left + MIN_WIDTH, window.innerWidth - MARGIN);
+  }
+
+  if (direction.includes('w')) {
+    left = fit(left + dx, MARGIN, right - MIN_WIDTH);
+  }
+
+  if (direction.includes('s')) {
+    bottom = fit(bottom + dy, top + MIN_HEIGHT, window.innerHeight - MARGIN);
+  }
+
+  if (direction.includes('n')) {
+    top = fit(top + dy, MARGIN, bottom - MIN_HEIGHT);
+  }
+
+  return { left, top, width: right - left, height: bottom - top };
 };
 
 type SnapTarget = 'left' | 'right' | null;
@@ -108,7 +163,7 @@ export default Vue.extend({
     windowHeight: number;
     drag: Drag | null;
     move: Move | null;
-    corner: CornerDrag | null;
+    resize: Resize | null;
     snapTarget: SnapTarget;
   } {
     return {
@@ -116,7 +171,7 @@ export default Vue.extend({
       windowHeight: window.innerHeight,
       drag: null,
       move: null,
-      corner: null,
+      resize: null,
       snapTarget: null,
     };
   },
@@ -139,7 +194,7 @@ export default Vue.extend({
     },
 
     dragging(): boolean {
-      return this.drag !== null || this.corner !== null;
+      return this.drag !== null || this.resize !== null;
     },
 
     moving(): boolean {
@@ -149,13 +204,13 @@ export default Vue.extend({
     floating(): boolean {
       return (
         this.moving ||
-        Boolean(this.corner?.bounds) ||
+        Boolean(this.resize?.bounds) ||
         this.layout.dockLocation === 'floating'
       );
     },
 
     floatingBounds(): FloatingPanelBounds {
-      const live = this.move?.bounds ?? this.corner?.bounds;
+      const live = this.move?.bounds ?? this.resize?.bounds;
       const saved = this.layout.floating ?? {
         width: this.layout.width,
         height: this.windowHeight - MARGIN * 2,
@@ -164,6 +219,14 @@ export default Vue.extend({
       };
 
       return this.clampBounds(live ?? saved);
+    },
+
+    resizeDirections(): Array<ResizeDirection> {
+      return RESIZE_DIRECTIONS;
+    },
+
+    dockedResizeDirections(): Array<ResizeDirection> {
+      return DOCKED_RESIZE_DIRECTIONS;
     },
 
     panelStyle(): Record<string, string> {
@@ -232,9 +295,6 @@ export default Vue.extend({
 
   methods: {
     clampBounds(bounds: FloatingPanelBounds): FloatingPanelBounds {
-      const fit = (value: number, min: number, max: number) =>
-        Math.round(Math.max(min, Math.min(value, max)));
-
       const maxWidth = this.windowWidth - MARGIN * 2;
       const maxHeight = this.windowHeight - MARGIN * 2;
       const width = fit(bounds.width, Math.min(MIN_WIDTH, maxWidth), maxWidth);
@@ -358,7 +418,7 @@ export default Vue.extend({
       });
     },
 
-    onCornerDown(event: PointerEvent) {
+    onResizeStart(event: PointerEvent, direction: ResizeDirection) {
       if (event.button !== 0) {
         return;
       }
@@ -377,42 +437,46 @@ export default Vue.extend({
             height: rect.height,
           };
 
-      this.corner = {
+      this.resize = {
         startX: event.clientX,
         startY: event.clientY,
-        heightOnly: !this.floating,
+        direction,
         start,
         bounds: null,
       };
     },
 
-    onCornerMove(event: PointerEvent) {
-      if (!this.corner) {
+    onResize(event: PointerEvent) {
+      if (!this.resize) {
         return;
       }
 
-      const { start, startX, startY, heightOnly } = this.corner;
-      const dx = heightOnly ? 0 : event.clientX - startX;
+      if (!(event.buttons & 1)) {
+        this.onResizeEnd();
+
+        return;
+      }
+
+      const { start, startX, startY, direction } = this.resize;
+      const dx = event.clientX - startX;
       const dy = event.clientY - startY;
 
-      if (!this.corner.bounds && Math.hypot(dx, dy) < MOVE_THRESHOLD) {
+      if (!this.resize.bounds && Math.hypot(dx, dy) < MOVE_THRESHOLD) {
         return;
       }
 
-      this.corner.bounds = this.clampBounds({
-        ...start,
-        width: start.width + dx,
-        height: start.height + dy,
-      });
+      this.resize.bounds = this.clampBounds(
+        resizeBounds(start, direction, dx, dy)
+      );
     },
 
-    onCornerUp() {
-      if (!this.corner) {
+    onResizeEnd() {
+      if (!this.resize) {
         return;
       }
 
-      const { bounds } = this.corner;
-      this.corner = null;
+      const { bounds } = this.resize;
+      this.resize = null;
 
       if (!bounds) {
         return;
@@ -461,6 +525,12 @@ export default Vue.extend({
 
     onPointerMove(event: PointerEvent) {
       if (!this.drag) {
+        return;
+      }
+
+      if (!(event.buttons & 1)) {
+        this.onPointerUp();
+
         return;
       }
 
@@ -632,24 +702,67 @@ export default Vue.extend({
     right: -5px;
   }
 }
-.stylebot-resize-corner {
+.stylebot-resize-handle {
   position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 16px;
-  height: 16px;
-  cursor: nwse-resize;
   touch-action: none;
-}
 
-.stylebot-resize-bottom {
-  position: absolute;
-  right: 14px;
-  bottom: -5px;
-  left: 14px;
-  height: 8px;
-  cursor: ns-resize;
-  touch-action: none;
+  &.n,
+  &.s {
+    right: 14px;
+    left: 14px;
+    height: 10px;
+    cursor: ns-resize;
+  }
+
+  &.e,
+  &.w {
+    top: 14px;
+    bottom: 14px;
+    width: 10px;
+    cursor: ew-resize;
+  }
+
+  &.ne,
+  &.nw,
+  &.se,
+  &.sw {
+    width: 18px;
+    height: 18px;
+  }
+
+  &.n,
+  &.ne,
+  &.nw {
+    top: -5px;
+  }
+
+  &.s,
+  &.se,
+  &.sw {
+    bottom: -5px;
+  }
+
+  &.e,
+  &.ne,
+  &.se {
+    right: -5px;
+  }
+
+  &.w,
+  &.nw,
+  &.sw {
+    left: -5px;
+  }
+
+  &.ne,
+  &.sw {
+    cursor: nesw-resize;
+  }
+
+  &.nw,
+  &.se {
+    cursor: nwse-resize;
+  }
 }
 
 .stylebot-snap-preview {
