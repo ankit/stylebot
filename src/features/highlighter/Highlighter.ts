@@ -2,6 +2,7 @@ import Overlay from './Overlay';
 import { getSelector, splitSelectorList } from '@stylebot/css';
 import { queryWithShadowRoots } from '@stylebot/stylesheets';
 import { describeElement, describeSize } from './describe-element';
+import { getParentElement, getPathUpTo, snapPastWrappers } from './snap';
 
 // What the inspector takes from the keyboard: climb, descend and pick.
 export const INSPECT_KEYS = [
@@ -32,19 +33,6 @@ const isInsideDisabledControl = (el: HTMLElement): boolean =>
   !!el.closest(
     'button:disabled, input:disabled, select:disabled, textarea:disabled'
   );
-
-/**
- * The parent to climb to, stepping out of a shadow tree onto its host.
- */
-const getParentElement = (el: HTMLElement): HTMLElement | null => {
-  if (el.parentElement) {
-    return el.parentElement;
-  }
-
-  const root = el.getRootNode();
-
-  return root instanceof ShadowRoot ? (root.host as HTMLElement) : null;
-};
 
 class Highlighter {
   overlay: Overlay | null;
@@ -383,10 +371,12 @@ class Highlighter {
 
   hoverElement = (el: HTMLElement, point?: MouseEvent): void => {
     this.pointerElement = el;
-    const target = point ? this.seeThroughTransparent(el, point) : el;
+    const seen = point ? this.seeThroughTransparent(el, point) : el;
+    const target = snapPastWrappers(seen);
 
-    if (target !== this.currentElement) {
-      this.drillStack = [];
+    // Drilling down from a snapped pick leads back to what's under the pointer.
+    if (target !== this.currentElement || this.drillStack.length === 0) {
+      this.drillStack = getPathUpTo(seen, target);
     }
 
     this.setCurrentElement(target);
