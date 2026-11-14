@@ -116,6 +116,9 @@ describe('hashed-class', () => {
       '_7uluu50',
       '_1e7jslxu',
       '_971sicl',
+      '_a1b2c3d',
+      '_3f9e2ab1c',
+      '_ABC123DEF',
       'gb_Ra',
       'gb_3d',
       'svelte-1abc2de',
@@ -151,6 +154,11 @@ describe('hashed-class', () => {
       'svelte-app',
       'css-truncate',
       '_main',
+      '_nav',
+      '_facade',
+      '_deface',
+      'my_class',
+      '_a1b2c3d_title',
       'Foo-module_header_title',
     ])('treats %s as authored', className => {
       expect(looksHashed(className)).toBe(false);
