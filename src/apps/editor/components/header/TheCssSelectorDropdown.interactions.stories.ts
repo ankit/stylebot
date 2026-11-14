@@ -162,6 +162,43 @@ export const DisabledOutsideBasicMode: StoryObj = {
   },
 };
 
+const MANY_RULES = Array.from(
+  { length: 30 },
+  (_, i) => `.rule-${i} { color: red; }`
+).join('\n\n');
+
+export const ClosingLongListDrawsOnce: StoryObj = {
+  ...editor({
+    css: `${MANY_RULES}\n\np { color: blue; }`,
+    activeSelector: 'p',
+  }),
+  name: 'closing a long list of rules redraws the preview once, not once per rule',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await user.click(chips(canvasElement));
+    await findOpenMenu(canvas);
+    await waitFor(() => expect(items(canvasElement)).toHaveLength(31));
+
+    let draws = 0;
+    const observer = new MutationObserver(records => {
+      draws += records.filter(record =>
+        Array.from(record.addedNodes).some(
+          node => (node as HTMLElement).id === 'stylebot-overlay'
+        )
+      ).length;
+    });
+    observer.observe(document.body, { childList: true });
+
+    await pressKey('Escape');
+    await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
+    await new Promise(resolve => setTimeout(resolve, 100));
+    observer.disconnect();
+
+    await expect(draws).toBeLessThanOrEqual(1);
+  },
+};
+
 const GROUP = ['h1', 'h2', '.title', '.subtitle', '.byline'];
 
 export const SelectorListAsText: StoryObj = {
