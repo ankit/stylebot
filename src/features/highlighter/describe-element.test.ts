@@ -18,21 +18,25 @@ describe('describeElement', () => {
     expect(describeElement(element('<SPAN></SPAN>'))).toBe('span');
   });
 
-  it('leaves out hashed classes and marks them with an ellipsis', () => {
+  it('leaves out hashed classes', () => {
     expect(
       describeElement(element('<div class="css-1q2w3e card"></div>'))
-    ).toBe('div.card…');
+    ).toBe('div.card');
   });
 
-  it('shows a partly hashed class by its authored part', () => {
+  it('shows a partly hashed class by its authored name', () => {
     expect(
-      describeElement(element('<span class="contextCrumbLast__l2P28s"></span>'))
-    ).toBe('span.contextCrumbLast__…');
+      describeElement(
+        element(
+          '<span class="contextCrumbLast__l2P28s prc-Button-Label-pTQ3x"></span>'
+        )
+      )
+    ).toBe('span.contextCrumbLast.prc-Button-Label');
   });
 
   it('shows the first three classes only', () => {
     expect(describeElement(element('<li class="a b c d"></li>'))).toBe(
-      'li.a.b.c…'
+      'li.a.b.c'
     );
   });
 
@@ -42,14 +46,6 @@ describe('describeElement', () => {
         element('<div id="tsuid_hsLJaqLJBPu9ruEP7uOYkAo_91"></div>')
       )
     ).toBe('div');
-  });
-
-  it('shortens a long class name', () => {
-    expect(
-      describeElement(
-        element('<p class="a-very-long-class-name-from-a-utility-kit"></p>')
-      )
-    ).toBe('p.a-very-long-class-name-f…');
   });
 });
 

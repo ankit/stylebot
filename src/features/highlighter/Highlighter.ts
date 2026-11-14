@@ -50,7 +50,6 @@ class Highlighter {
   overlay: Overlay | null;
   onSelect: (selector: string) => void;
   onHover?: (selector: string) => void;
-  countRules?: (selector: string) => number;
   getExistingSelector?: (el: HTMLElement) => string | null;
   getMountRoot?: () => HTMLElement | undefined;
   currentElement: HTMLElement | null;
@@ -72,7 +71,6 @@ class Highlighter {
   constructor({
     onSelect,
     onHover,
-    countRules,
     getExistingSelector,
     getMountRoot,
   }: {
@@ -81,10 +79,6 @@ class Highlighter {
      * Called as the inspector moves onto an element, before it's picked.
      */
     onHover?: (selector: string) => void;
-    /**
-     * How many declarations the user's style has for a selector, for the card.
-     */
-    countRules?: (selector: string) => number;
     getExistingSelector?: (el: HTMLElement) => string | null;
     /**
      * The editor's theme-provider element, for the on-page tip to mount into.
@@ -94,7 +88,6 @@ class Highlighter {
     this.overlay = null;
     this.onSelect = onSelect;
     this.onHover = onHover;
-    this.countRules = countRules;
     this.getExistingSelector = getExistingSelector;
     this.getMountRoot = getMountRoot;
     this.currentElement = null;
@@ -449,7 +442,6 @@ class Highlighter {
       undefined,
       {
         primary: el,
-        ruleCount: this.countRules?.(selector) ?? 0,
         size: describeSize(el),
       }
     );

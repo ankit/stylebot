@@ -21,7 +21,6 @@ type Edges = { top: number; right: number; bottom: number; left: number };
 
 type PickingOptions = {
   primary?: HTMLElement;
-  ruleCount?: number;
   size?: string;
 };
 
@@ -201,7 +200,6 @@ export default class Overlay {
     tip.showSummary({
       name: label,
       size: picking?.size ?? '',
-      ruleCount: picking?.ruleCount ?? 0,
     });
 
     const panelEl =

@@ -18,15 +18,12 @@
     <s-text v-if="size" as="span" size="label" class="size">
       {{ size }}
     </s-text>
-    <s-count-badge v-if="ruleCount > 0" :count="ruleCount">
-      {{ ruleCountLabel }}
-    </s-count-badge>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { SCountBadge, SText } from '@stylebot/components';
+import { SText } from '@stylebot/components';
 
 /**
  * Mounted by OverlayTip (Overlay.ts) into the editor's theme-provider subtree,
@@ -38,14 +35,12 @@ export default Vue.extend({
   name: 'InspectorCard',
 
   components: {
-    SCountBadge,
     SText,
   },
 
   data(): {
     name: string;
     size: string;
-    ruleCount: number;
     top: number;
     left: number;
     placement: 'above' | 'below' | null;
@@ -53,20 +48,10 @@ export default Vue.extend({
     return {
       name: '',
       size: '',
-      ruleCount: 0,
       top: 0,
       left: 0,
       placement: null,
     };
-  },
-
-  computed: {
-    ruleCountLabel(): string {
-      return this.t(
-        this.ruleCount === 1 ? 'rules_count_one' : 'rules_count_other',
-        [String(this.ruleCount)]
-      );
-    },
   },
 });
 </script>
