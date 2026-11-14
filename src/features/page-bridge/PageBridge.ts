@@ -25,6 +25,8 @@ export type SelectorAlternatives = {
   // The selector these were found for, the inspector's pick.
   selector?: string;
   existing: Array<string>;
+  // The style's rule for the element that the Styled pill offers.
+  styled?: string;
   candidates: Array<string>;
   // How much each candidate covers: only the element, similar ones or all.
   descriptions?: Record<string, SelectorDescription>;

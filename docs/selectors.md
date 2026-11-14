@@ -137,14 +137,20 @@ stands in for it.
 
 ## Scope pills
 
-After a pick in Basic mode, pills under the selector field offer three
-scopes, each with how many elements it matches:
+After a pick in Basic mode, pills under the selector field offer up to
+four scopes, each with how many elements it matches:
 
 - **Only**: a short selector that matches just the picked element.
 - **Similar**: the same spot in every block like the picked one's, at its
   widest, e.g. every account's avatar rather than one account's.
 - **All**: the inspector's own pick when it reaches further than Similar,
   else the widest selector that does.
+- **Styled**: a rule the style already has for the element: the field's
+  selector when it's saved, else the saved rule that reaches the fewest
+  elements. It shows whatever its shape, since it's the user's own.
+
+No two pills reach the same elements, so a pill never adds a second rule
+for elements a saved rule already styles.
 
 The named area fills Similar or All only when nothing nearer does. A pill
 with nothing to offer is left out, so All only shows when it reaches more
@@ -153,21 +159,7 @@ typed by hand.
 
 ## Reusing existing rules
 
-Before generating a fresh selector, the inspector checks whether the user's
-CSS already has a selector that matches this element — via the browser's own `el.matches()`, not string
-comparison. That way picking an element already targeted by a hand-written
-selector (a descendant combinator, `:nth-child`, one member of a grouped
-selector, …) continues editing that rule instead of starting a second,
-disconnected one. Interaction pseudo-classes like `:hover` and `:focus` are
-excluded, since matching one of those only means the cursor happens to be on
-the element right now.
-
-Only selectors that target the element itself are reused: the subject (the
-rightmost compound) must carry a class, id, attribute or structural
-pseudo-class (`:nth-child`, `:first-of-type`, …). A broad selector like `*`,
-`a` or `.card p` would otherwise capture every element it matches and keep the
-user from styling the one they picked. A tag-only selector is still reused when
-it's exactly what would be generated for the element anyway (e.g.
-`div.mw-heading h2`), or the tag chain older versions generated for it (e.g.
-`html body h1`), so a saved style keeps getting edited instead of overriding
-the new rule.
+When you pick an element, Stylebot reuses a saved rule if it styles exactly
+the elements the new selector would, so you keep editing that rule. Rules
+that only apply while hovering or focusing are ignored. A rule that reaches
+further, like `*:not(.x)`, is offered in the Styled pill instead.
