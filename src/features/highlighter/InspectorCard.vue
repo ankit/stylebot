@@ -14,8 +14,12 @@
     </svg>
 
     <s-text ref="name" as="span" size="label" class="name">
-      <!-- prettier-ignore -->
-      <span v-for="(part, index) in nameParts" :key="index" class="part">{{ part }}</span>
+      <span
+        v-for="(part, index) in nameParts"
+        :key="index"
+        class="part"
+        v-text="part"
+      />
     </s-text>
     <s-text v-if="size" as="span" size="label" class="size">
       {{ size }}
