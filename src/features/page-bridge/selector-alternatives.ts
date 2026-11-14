@@ -69,7 +69,8 @@ const getDescriptions = (
 
 /**
  * Returns the style's selectors that match `el`, and the selectors that
- * could fill a scope with how many elements each matches, narrowest first.
+ * could fill a scope with how many elements each matches, most stable
+ * first: saved rules, then suggestions in the order they were built.
  */
 export const getSelectorAlternatives = (
   el: HTMLElement,
@@ -100,9 +101,7 @@ export const getSelectorAlternatives = (
     return exact && !isPageWideSelector(selector);
   };
 
-  const candidates = kept
-    .filter(fillsScope)
-    .sort((a, b) => countOf(a) - countOf(b));
+  const candidates = kept.filter(fillsScope);
   const counts = Object.fromEntries(candidates.map(s => [s, countOf(s)]));
 
   return { existing, candidates, descriptions, counts };

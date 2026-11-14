@@ -13,8 +13,13 @@ export const inspectElement = (
   css: string
 ): Pick<PointerResult, 'selector' | 'matches' | 'alternatives'> => {
   const selector = getExistingSelector(el, css) ?? getSelector(el);
-  const { existing, candidates } = getSelectorAlternatives(el, css);
-  const others = Array.from(new Set([...existing, ...candidates])).filter(
+  const {
+    existing,
+    candidates,
+    counts: reach = {},
+  } = getSelectorAlternatives(el, css);
+  const narrowestFirst = [...candidates].sort((a, b) => reach[a] - reach[b]);
+  const others = Array.from(new Set([...existing, ...narrowestFirst])).filter(
     other => other !== selector
   );
   const [matches, ...counts] = countMatches([selector, ...others]);

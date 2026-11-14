@@ -1,3 +1,5 @@
+import { getSelectorSuggestions } from '@stylebot/css';
+
 import { getSelectorAlternatives } from './selector-alternatives';
 
 describe('getSelectorAlternatives', () => {
@@ -34,7 +36,7 @@ describe('getSelectorAlternatives', () => {
     return candidates.find(s => descriptions?.[s]?.role === 'similar');
   };
 
-  it('counts the elements each candidate matches, narrowest first', () => {
+  it('counts the elements each candidate matches', () => {
     const { candidates, counts = {} } = getSelectorAlternatives(
       pickTitles(),
       ''
@@ -45,7 +47,16 @@ describe('getSelectorAlternatives', () => {
     expect(reach).toEqual(
       candidates.map(s => document.querySelectorAll(s).length)
     );
-    expect(reach).toEqual([...reach].sort((a, b) => a - b));
+  });
+
+  it('keeps the candidates most stable first, saved rules ahead', () => {
+    const el = pickTitles();
+    const { candidates } = getSelectorAlternatives(el, 'td a { color: red; }');
+    const suggested = getSelectorSuggestions(el).map(s => s.selector);
+    const order = candidates.slice(1).map(s => suggested.indexOf(s));
+
+    expect(candidates[0]).toBe('td a');
+    expect(order).toEqual([...order].sort((a, b) => a - b));
   });
 
   it('skips a page-wide rule that sets nothing on the element', () => {
