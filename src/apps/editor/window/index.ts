@@ -65,7 +65,7 @@ const start = async (): Promise<void> => {
     },
     onContextMenuSelector: selector => {
       store.commit('setInspecting', false);
-      store.commit('setActiveSelector', selector);
+      store.dispatch('pickSelector', selector);
     },
     onInspectingStopped: () => store.commit('setInspecting', false),
     // Replayed so the panel's own shortcut handling takes it as if typed here.

@@ -43,7 +43,7 @@ export const createMessageHandler = (
     } else if (message.name === 'OpenStylebot') {
       openStylebot(store);
     } else if (message.name === 'OpenStylebotFromContextMenu') {
-      updateSelectorWithContextMenuSelector({ state, commit });
+      updateSelectorWithContextMenuSelector({ state, dispatch });
       // The panel picks up the selector when it connects.
       if (!message.sidePanel) {
         openStylebot(store, false);

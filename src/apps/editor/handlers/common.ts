@@ -1,4 +1,4 @@
-import type { Store, Dispatch, Commit } from 'vuex';
+import type { Store, Dispatch } from 'vuex';
 import type { State } from 'apps/editor/store';
 import { injectCSSIntoDocument } from '@stylebot/css';
 import type { Style } from '@stylebot/types';
@@ -161,10 +161,10 @@ export const applyStyles = (
 
 export const updateSelectorWithContextMenuSelector = ({
   state,
-  commit,
+  dispatch,
 }: {
   state: State;
-  commit: Commit;
+  dispatch: Dispatch;
 }): void => {
-  commit('setActiveSelector', state.contextMenuSelector);
+  dispatch('pickSelector', state.contextMenuSelector);
 };
