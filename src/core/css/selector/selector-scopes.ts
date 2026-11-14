@@ -3,8 +3,8 @@ import { isSimpleSelector } from './selector-text';
 
 /**
  * Other ways to select an element: the style's selectors that already
- * match it, then selectors built for it, narrowest first. No two match the
- * same set of elements.
+ * match it, then selectors built for it, most stable first. No two match
+ * the same set of elements.
  */
 export type SelectorAlternatives = {
   existing: Array<string>;
@@ -92,26 +92,31 @@ const getSimilarScope = (
 };
 
 /**
- * Returns the widest candidate that reaches past the Similar scope.
+ * Returns the most stable candidate that reaches past the Similar scope: a
+ * saved rule, else the earliest suggestion. Fallbacks are skipped unless
+ * they're all there is.
  */
 const getAllScope = (
   alternatives: SelectorAlternatives,
   similarScope: string | undefined
 ): string | undefined => {
+  const { candidates, descriptions } = alternatives;
   const similarCount = similarScope
     ? getMatchCount(alternatives, similarScope)
     : 0;
   const floor = Math.max(1, similarCount);
-  const wider = alternatives.candidates.filter(
+  const wider = candidates.filter(
     selector => getMatchCount(alternatives, selector) > floor
   );
+  const nearer = wider.find(selector => !isFallback(descriptions, selector));
 
-  return widest(wider, alternatives);
+  return nearer ?? wider[0];
 };
 
 /**
- * Picks a selector for each scope: Only, Similar and All. A saved rule
- * among the candidates fills the scope it matches exactly.
+ * Picks a selector for each scope: Only, Similar and All, the most stable
+ * one that reaches past Similar. A saved rule among the candidates fills
+ * the scope it matches exactly.
  */
 export const getScopeSlots = (
   alternatives: SelectorAlternatives

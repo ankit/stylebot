@@ -38,12 +38,13 @@ const TITLE_COUNTS = {
 };
 
 /**
- * Returns the titles' alternatives with `saved` as a saved rule, in place
- * of the suggestion `replaces` that matches the same elements.
+ * Returns the titles' alternatives with `saved` as a saved rule, first as
+ * the page bridge puts it, in place of the suggestion `replaces` that
+ * matches the same elements.
  */
 const withSaved = (saved: string, replaces: string): SelectorAlternatives => ({
   existing: [saved],
-  candidates: TITLES.candidates.map(s => (s === replaces ? saved : s)),
+  candidates: [saved, ...TITLES.candidates.filter(s => s !== replaces)],
   descriptions: Object.fromEntries(
     Object.entries(TITLES.descriptions ?? {}).map(([s, description]) => [
       s === replaces ? saved : s,
@@ -64,7 +65,7 @@ const countsWithSaved = (saved: string, replaces: string): Counts =>
   );
 
 describe('getScopeSlots', () => {
-  it('offers the one-element candidate as Only and the widest as All', () => {
+  it('offers the one-element candidate as Only and the next one as All', () => {
     const slots = slotsFor(
       {
         existing: [],
@@ -73,7 +74,11 @@ describe('getScopeSlots', () => {
       { '#login': 1, '.card a': 4, a: 20 }
     );
 
-    expect(slots).toEqual({ only: '#login', similar: undefined, all: 'a' });
+    expect(slots).toEqual({
+      only: '#login',
+      similar: undefined,
+      all: '.card a',
+    });
   });
 
   it('leaves Only out when the one-element candidate is too tied to the structure', () => {
@@ -104,7 +109,7 @@ describe('getScopeSlots', () => {
     });
   });
 
-  it('offers the widest similar candidate as Similar, and the widest as All', () => {
+  it('offers the widest similar candidate as Similar, and one past it as All', () => {
     const slots = slotsFor(
       {
         existing: [],
@@ -135,7 +140,7 @@ describe('getScopeSlots', () => {
     });
   });
 
-  it('offers a wider candidate as All than the similar one', () => {
+  it('offers the most stable candidate past Similar as All, not the widest', () => {
     const slots = slotsFor(
       {
         existing: [],
@@ -158,8 +163,74 @@ describe('getScopeSlots', () => {
     expect(slots).toEqual({
       only: '#story-3',
       similar: 'td.title > span.titleline > a',
-      all: 'a',
+      all: 'td.title a',
     });
+  });
+
+  it("offers the commit message link's own class as All over a wider ancestor selector", () => {
+    const slots = slotsFor(
+      {
+        existing: [],
+        candidates: [
+          '#folder-row-0 a.Link--secondary',
+          'tr.react-directory-row a.Link--secondary',
+          'a.Link--secondary',
+          'div.react-directory-commit-message a',
+        ],
+        descriptions: {
+          '#folder-row-0 a.Link--secondary': { role: 'all' },
+          'tr.react-directory-row a.Link--secondary': { role: 'similar' },
+          'a.Link--secondary': { role: 'all' },
+          'div.react-directory-commit-message a': { role: 'all' },
+        },
+      },
+      {
+        '#folder-row-0 a.Link--secondary': 1,
+        'tr.react-directory-row a.Link--secondary': 46,
+        'a.Link--secondary': 56,
+        'div.react-directory-commit-message a': 63,
+      }
+    );
+
+    expect(slots).toEqual({
+      only: '#folder-row-0 a.Link--secondary',
+      similar: 'tr.react-directory-row a.Link--secondary',
+      all: 'a.Link--secondary',
+    });
+  });
+
+  it('offers a later candidate as All over an earlier fallback', () => {
+    const slots = slotsFor(
+      {
+        existing: [],
+        candidates: ['#login', 'li.item > a', 'main a', '.card a'],
+        descriptions: {
+          'li.item > a': { role: 'similar' },
+          'main a': { role: 'all', fallback: true },
+          '.card a': { role: 'all' },
+        },
+      },
+      { '#login': 1, 'li.item > a': 3, 'main a': 50, '.card a': 40 }
+    );
+
+    expect(slots.all).toBe('.card a');
+  });
+
+  it('offers the first fallback as All when only fallbacks reach past Similar', () => {
+    const slots = slotsFor(
+      {
+        existing: [],
+        candidates: ['#login', 'li.item > a', 'section a', 'main a'],
+        descriptions: {
+          'li.item > a': { role: 'similar' },
+          'section a': { role: 'all', fallback: true },
+          'main a': { role: 'all', fallback: true },
+        },
+      },
+      { '#login': 1, 'li.item > a': 3, 'section a': 20, 'main a': 50 }
+    );
+
+    expect(slots.all).toBe('section a');
   });
 
   it('leaves All out when nothing reaches further than Similar', () => {
@@ -213,6 +284,24 @@ describe('getScopeSlots', () => {
     );
 
     expect(slots).toEqual({ only: '#avatar', similar: every, all: 'img' });
+  });
+
+  it('offers the widest similar candidate as Similar even when it comes first', () => {
+    const one = 'div[data-testid="UserAvatar-Container-nasa"] img';
+    const every = 'div[data-testid^="UserAvatar-Container-"] img';
+    const slots = slotsFor(
+      {
+        existing: [],
+        candidates: ['#avatar', every, one],
+        descriptions: {
+          [one]: { role: 'similar' },
+          [every]: { role: 'similar' },
+        },
+      },
+      { '#avatar': 1, [every]: 20, [one]: 4 }
+    );
+
+    expect(slots.similar).toBe(every);
   });
 
   it("offers a named area's fallback as Similar when nothing nearer does", () => {
@@ -337,7 +426,7 @@ describe('getScopeSlots', () => {
 
     expect(
       slotsFor(withSaved(saved, replaces), countsWithSaved(saved, replaces))
-    ).toEqual({ only: '#story-3', similar: saved, all: 'td a' });
+    ).toEqual({ only: '#story-3', similar: saved, all: 'span.titleline a' });
   });
 
   it('offers a saved rule that reaches what All would as All', () => {

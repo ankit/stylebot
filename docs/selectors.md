@@ -136,7 +136,8 @@ every selector from the list above, plus four more:
   `div.mw-content-ltr a`. That section can be large, so these are offered
   only when nothing nearer is.
 
-They're sorted narrowest first, keeping one per set of matched elements.
+They come after the selectors above, in this order, keeping the first per
+set of matched elements.
 When a same-spot selector reaches the same elements as another, that one
 stands in for it.
 
@@ -148,7 +149,9 @@ three scopes, each with how many elements it matches:
 - **Only**: a short selector that matches just the picked element.
 - **Similar**: the same spot in every block like the picked one's, at its
   widest, e.g. every account's avatar rather than one account's.
-- **All**: the widest, most stable selector that reaches more than Similar.
+- **All**: the most stable selector that reaches more than Similar, the one
+  the inspector itself would pick when it does, even if a less stable one
+  reaches further.
 
 A saved rule that matches exactly what one of these would fills it in place
 of a suggestion. Other saved rules stay in the selector menu.
