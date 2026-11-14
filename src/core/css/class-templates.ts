@@ -126,14 +126,22 @@ export function compileTemplate(template: NamingTemplate): CompiledTemplate {
   };
 }
 
+export type TemplateSplit = {
+  before: string;
+  hash: string;
+  after: string;
+  keepBefore: boolean;
+  keepAfter: boolean;
+};
+
 /**
- * The authored parts of a class named by the template, trying each place the
- * hash could sit, from the left.
+ * Where the template puts the hash in a class, trying each place it could
+ * sit, from the left.
  */
-export function matchTemplate(
+export function splitByTemplate(
   className: string,
   { before, after, keepBefore, keepAfter, template }: CompiledTemplate
-): Array<string> | null {
+): TemplateSplit | null {
   const [min, max] = template.length;
 
   for (let start = 0; start + min <= className.length; start++) {
@@ -160,16 +168,31 @@ export function matchTemplate(
         continue;
       }
 
-      const parts = [
-        ...(keepBefore && head ? [head] : []),
-        ...(keepAfter && tail ? [tail] : []),
-      ];
-
-      return parts.length ? parts : null;
+      return { before: head, hash, after: tail, keepBefore, keepAfter };
     }
   }
 
   return null;
+}
+
+/**
+ * The authored parts of a class named by the template.
+ */
+export function matchTemplate(
+  className: string,
+  template: CompiledTemplate
+): Array<string> | null {
+  const split = splitByTemplate(className, template);
+  if (!split) {
+    return null;
+  }
+
+  const parts = [
+    ...(split.keepBefore && split.before ? [split.before] : []),
+    ...(split.keepAfter && split.after ? [split.after] : []),
+  ];
+
+  return parts.length ? parts : null;
 }
 
 let compiled: Array<CompiledTemplate> | null = null;
@@ -185,6 +208,22 @@ export function getTemplateParts(className: string): Array<string> | null {
     const parts = matchTemplate(className, template);
     if (parts) {
       return parts;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Where the first of the known build tools' templates that names a class
+ * with an authored part puts its hash.
+ */
+export function getTemplateSplit(className: string): TemplateSplit | null {
+  compiled ??= NAMING_TEMPLATES.map(compileTemplate);
+
+  for (const template of compiled) {
+    if (matchTemplate(className, template)) {
+      return splitByTemplate(className, template);
     }
   }
 

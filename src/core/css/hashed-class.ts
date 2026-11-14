@@ -1,4 +1,4 @@
-import { getTemplateParts } from './class-templates';
+import { getTemplateParts, getTemplateSplit } from './class-templates';
 import { caseTransitionRatio, hasDigitAmongLetters } from './hash-shape';
 
 /**
@@ -8,6 +8,37 @@ import { caseTransitionRatio, hasDigitAmongLetters } from './hash-shape';
  */
 export function getStableClassParts(className: string): Array<string> | null {
   return getTemplateParts(className);
+}
+
+export type ClassNameSpan = { text: string; generated: boolean };
+
+/**
+ * A class split into the names its author wrote and what a build tool
+ * generated, e.g. `Header_nav__` and `a1B2c`, by the build tool's naming
+ * template, or whole when it's all one or the other.
+ */
+export function getClassNameSpans(className: string): Array<ClassNameSpan> {
+  const split = getTemplateSplit(className);
+  if (split) {
+    const spans = [
+      { text: split.before, generated: !split.keepBefore },
+      { text: split.hash, generated: true },
+      { text: split.after, generated: !split.keepAfter },
+    ].filter(span => span.text);
+
+    return spans.reduce<Array<ClassNameSpan>>((merged, span) => {
+      const last = merged[merged.length - 1];
+      if (last?.generated === span.generated) {
+        last.text += span.text;
+      } else {
+        merged.push({ ...span });
+      }
+
+      return merged;
+    }, []);
+  }
+
+  return [{ text: className, generated: looksHashed(className) }];
 }
 
 /**
