@@ -15,7 +15,19 @@ export type EditorWindowBounds = {
   top: number;
 };
 
-export type StylebotDockLocation = 'left' | 'right' | 'window' | 'sidepanel';
+export type FloatingPanelBounds = {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+};
+
+export type StylebotDockLocation =
+  | 'left'
+  | 'right'
+  | 'floating'
+  | 'window'
+  | 'sidepanel';
 
 export type StylebotLayout = {
   width: number;
@@ -23,6 +35,8 @@ export type StylebotLayout = {
   dockLocation: StylebotDockLocation;
   // Where the separate editor window was last left, restored on next open.
   window?: EditorWindowBounds;
+  // Where the in-page panel was last left floating, restored on next open.
+  floating?: FloatingPanelBounds;
 };
 
 export type StylebotFonts = Array<string>;
