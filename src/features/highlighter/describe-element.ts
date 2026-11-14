@@ -1,17 +1,50 @@
+import { getClassNameSpans, looksGeneratedId } from '@stylebot/css';
+import type { ClassNameSpan } from '@stylebot/css';
+
 const MAX_CLASSES = 3;
+
+export type NamePart = Array<ClassNameSpan>;
+
+/**
+ * A class as a part of the name, its `.` generated only when the whole
+ * class is.
+ */
+const describeClass = (spans: NamePart): NamePart => [
+  { text: '.', generated: spans.every(span => span.generated) },
+  ...spans,
+];
+
+/**
+ * The classes worth naming, those with an authored name first, kept in the
+ * page's order.
+ */
+const pickClasses = (el: Element): Array<NamePart> => {
+  const classes = Array.from(el.classList).map(getClassNameSpans);
+  const authored = classes.filter(spans => spans.some(span => !span.generated));
+  const picked = new Set(
+    [...authored, ...classes.filter(spans => !authored.includes(spans))].slice(
+      0,
+      MAX_CLASSES
+    )
+  );
+
+  return classes.filter(spans => picked.has(spans));
+};
 
 /**
  * Names an element the way dev tools do, as the parts of e.g.
- * `a#top.storylink`: its tag, id and first few classes, exactly as the page
- * has them.
+ * `a#top.storylink`: its tag, id and first few classes, marking what a build
+ * tool generated so the authored names stand out.
  */
-export const describeElement = (el: Element): Array<string> => {
+export const describeElement = (el: Element): Array<NamePart> => {
   const id = el.getAttribute('id');
-  const classes = Array.from(el.classList)
-    .slice(0, MAX_CLASSES)
-    .map(name => `.${name}`);
+  const classes = pickClasses(el).map(describeClass);
 
-  return [el.tagName.toLowerCase(), ...(id ? [`#${id}`] : []), ...classes];
+  return [
+    [{ text: el.tagName.toLowerCase(), generated: false }],
+    ...(id ? [[{ text: `#${id}`, generated: looksGeneratedId(id) }]] : []),
+    ...classes,
+  ];
 };
 
 /**

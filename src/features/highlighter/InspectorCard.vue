@@ -14,12 +14,14 @@
     </svg>
 
     <s-text ref="name" as="span" size="label" class="name">
-      <span
-        v-for="(part, index) in nameParts"
-        :key="index"
-        class="part"
-        v-text="part"
-      />
+      <span v-for="(part, index) in nameParts" :key="index" class="part">
+        <span
+          v-for="(span, spanIndex) in part"
+          :key="spanIndex"
+          :class="{ generated: span.generated }"
+          v-text="span.text"
+        />
+      </span>
     </s-text>
     <s-text v-if="size" as="span" size="label" class="size">
       {{ size }}
@@ -31,11 +33,14 @@
 import Vue from 'vue';
 import { SText } from '@stylebot/components';
 
+import type { NamePart } from './describe-element';
+
 /**
  * Mounted by OverlayTip (Overlay.ts) into the editor's theme-provider subtree,
  * which is what gives it the editor's CSS variables and fonts over the page.
  * Names the element under the pointer, as dev tools do; the panel previews
- * it in full.
+ * it in full. Generated names, and the hashes in partly generated ones, are
+ * dimmed so the authored names stand out.
  */
 export default Vue.extend({
   name: 'InspectorCard',
@@ -45,7 +50,7 @@ export default Vue.extend({
   },
 
   data(): {
-    nameParts: Array<string>;
+    nameParts: Array<NamePart>;
     size: string;
     top: number;
     left: number;
@@ -144,6 +149,14 @@ export default Vue.extend({
   max-width: 100%;
   font-family: inherit;
   overflow-wrap: anywhere;
+}
+
+.part > span {
+  font-family: inherit;
+}
+
+.generated {
+  color: var(--text-secondary);
 }
 
 .size {
