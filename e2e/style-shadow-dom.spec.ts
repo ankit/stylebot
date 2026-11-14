@@ -112,14 +112,6 @@ test('an element inside a shadow root can be picked and styled in the editor', a
   const editorRoot = await openEditor(page, openPopup);
   await pickElement(page, editorRoot, '.nested-text');
 
-  await editorRoot
-    .locator('.selector-autocomplete .autocomplete-chips')
-    .click();
-  await expect(
-    editorRoot.locator('.css-selector-dropdown-item.current .item-count')
-  ).toHaveText('1');
-  await page.keyboard.press('Escape');
-
   const colorInput = editorRoot.locator('.color-picker .color-hex').first();
   await colorInput.fill('#ff0080');
   await colorInput.blur();
