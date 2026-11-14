@@ -1,5 +1,5 @@
 import type { SelectorDescription } from './get-selector';
-import { isSimpleSelector } from './selector-text';
+import { countSelectorSteps, isSimpleSelector } from './selector-text';
 
 /**
  * Other ways to select an element: the style's selectors that already
@@ -55,18 +55,27 @@ const widest = (
 };
 
 /**
+ * Whether a selector is a lone id, like `#karma`.
+ */
+const isIdSelector = (selector: string): boolean =>
+  selector.startsWith('#') && countSelectorSteps(selector) === 1;
+
+/**
  * Returns a selector that matches just the picked element: a saved rule
- * whatever its shape, else a short one.
+ * whatever its shape, else the element's id, else a short one.
  */
 const getOnlyScope = (
   alternatives: SelectorAlternatives
 ): string | undefined => {
   const { candidates, existing } = alternatives;
+  const unique = candidates.filter(
+    selector => getMatchCount(alternatives, selector) === 1
+  );
 
-  return candidates.find(
-    selector =>
-      getMatchCount(alternatives, selector) === 1 &&
-      (existing.includes(selector) || isSimpleSelector(selector))
+  return (
+    unique.find(selector => existing.includes(selector)) ??
+    unique.find(isIdSelector) ??
+    unique.find(isSimpleSelector)
   );
 };
 

@@ -81,6 +81,18 @@ describe('getScopeSlots', () => {
     });
   });
 
+  it('offers the element’s id as Only over an earlier scoped candidate', () => {
+    const slots = slotsFor(
+      {
+        existing: [],
+        candidates: ['span.pagetop span', '#karma', 'span'],
+      },
+      { 'span.pagetop span': 1, '#karma': 1, span: 40 }
+    );
+
+    expect(slots.only).toBe('#karma');
+  });
+
   it('leaves Only out when the one-element candidate is too tied to the structure', () => {
     const slots = slotsFor(
       {
