@@ -75,13 +75,16 @@ export default Vue.extend({
       const name = (this.$refs.name as Vue).$el as HTMLElement;
       name.style.width = '';
 
+      // A part that wraps inside itself spans the whole name, so measure its
+      // text's lines rather than its box.
       const left = name.getBoundingClientRect().left;
-      const widest = Math.max(
-        0,
-        ...Array.from(name.children).map(
-          part => part.getBoundingClientRect().right - left
-        )
-      );
+      const range = document.createRange();
+      const rights = Array.from(name.children).flatMap(part => {
+        range.selectNodeContents(part);
+
+        return Array.from(range.getClientRects(), rect => rect.right - left);
+      });
+      const widest = Math.max(0, ...rights);
 
       name.style.width = `${Math.ceil(widest)}px`;
     },
