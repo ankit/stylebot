@@ -54,8 +54,8 @@ export default Vue.extend({
     },
   },
 
-  data(): { truncated: boolean } {
-    return { truncated: false };
+  data(): { truncated: boolean; previewing: boolean } {
+    return { truncated: false, previewing: false };
   },
 
   computed: {
@@ -86,12 +86,18 @@ export default Vue.extend({
     },
 
     preview(): void {
+      this.previewing = true;
       getPageBridge().highlight(this.selector);
     },
 
-    // The preview shares the page's single highlight with the dropdown's
-    // own active-selector preview, so hand it back once the hover ends.
+    // Hands the page's single highlight back to the dropdown's own preview;
+    // only the item showing one does, or closing a long menu redraws per item.
     clearPreview(): void {
+      if (!this.previewing) {
+        return;
+      }
+
+      this.previewing = false;
       getPageBridge().unhighlight();
       this.$emit('preview-end');
     },

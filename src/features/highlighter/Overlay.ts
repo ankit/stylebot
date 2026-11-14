@@ -204,9 +204,15 @@ export default class Overlay {
     const outer = emptyEdges();
     const primaryEdges = primary ? emptyEdges() : null;
 
+    // Measured before any rect moves: reading layout after each write would
+    // lay out the page again for every element.
+    const measures = elements.map(element => ({
+      box: getNestedBoundingClientRect(element, window),
+      dims: getElementDimensions(element),
+    }));
+
     elements.forEach((element, index) => {
-      const box = getNestedBoundingClientRect(element, window);
-      const dims = getElementDimensions(element);
+      const { box, dims } = measures[index];
 
       extend(outer, box, dims);
 
