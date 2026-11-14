@@ -29,12 +29,7 @@ export {
 export { getComputedStyles } from './computed-styles';
 export { getSelectorAlternatives } from './selector-alternatives';
 export { inspectElement } from './inspect-element';
-export type {
-  PageBridge,
-  PageBridgeEvents,
-  PageSnapshot,
-  SelectorAlternatives,
-} from './PageBridge';
+export type { PageBridge, PageBridgeEvents, PageSnapshot } from './PageBridge';
 export type { AppliedDeclaration } from './applied-declarations';
 export { REMOTE_PAGE_BRIDGE_PORT } from './remote-page-bridge/constants';
 export type {

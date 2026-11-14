@@ -12,7 +12,8 @@ import type {
 import { walkUnnestedRules } from '@stylebot/css';
 import type { State, CssSelectorMetadata, EditorProfile, EditorTab } from './';
 import type { UndoStack } from './undo-stack';
-import type { PageSnapshot, SelectorAlternatives } from '@stylebot/page-bridge';
+import type { SelectorAlternatives } from '@stylebot/css';
+import type { PageSnapshot } from '@stylebot/page-bridge';
 import type { AppliedDeclaration } from '@stylebot/page-bridge';
 
 const EDITING_MODES: Array<StylebotEditingMode> = ['basic', 'magic', 'code'];

@@ -1,4 +1,4 @@
-import type { RoleColorGroups } from '@stylebot/css';
+import type { RoleColorGroups, SelectorAlternatives } from '@stylebot/css';
 import {
   compileStyle,
   injectCSSIntoDocument,
@@ -24,11 +24,7 @@ import {
   writeCache,
 } from '@stylebot/stylesheets';
 
-import type {
-  PageBridge,
-  PageSnapshot,
-  SelectorAlternatives,
-} from './PageBridge';
+import type { PageBridge, PageSnapshot } from './PageBridge';
 import { PageBridgeEmitter } from './PageBridgeEmitter';
 import { getPageColors } from './page-colors';
 import { getComputedStyles } from './computed-styles';

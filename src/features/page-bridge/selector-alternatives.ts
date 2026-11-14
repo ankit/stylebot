@@ -6,9 +6,8 @@ import {
   matchesOf,
   sameElements,
 } from '@stylebot/css';
-import type { SelectorDescription } from '@stylebot/css';
+import type { SelectorAlternatives, SelectorDescription } from '@stylebot/css';
 
-import type { SelectorAlternatives } from './PageBridge';
 import { getAppliedDeclarations } from './applied-declarations';
 
 type MatchesFor = (selector: string) => Array<Element>;
