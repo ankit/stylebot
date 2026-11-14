@@ -101,8 +101,6 @@ export default Vue.extend({
 
   methods: {
     pick(selector: string): void {
-      // The field peeks at the new selector, so leaving the pill mustn't clear it.
-      this.previewing = null;
       this.$store.commit('setActiveSelector', selector);
     },
 

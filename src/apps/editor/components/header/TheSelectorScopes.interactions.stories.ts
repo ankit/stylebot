@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, fireEvent, waitFor, within } from '@storybook/test';
 
 import TheSelectorScopes from './TheSelectorScopes.vue';
+import { isPeeking } from '../../utils/selector-peek';
 import { editor } from '@stylebot/storybook/fixtures/editor';
 import {
   hoverPage,
@@ -37,6 +38,8 @@ const pill = (root: HTMLElement, label: string) =>
   pills(root).find(segment =>
     segment.querySelector('.segment-label')?.textContent?.includes(label)
   ) as HTMLElement;
+const boxes = () =>
+  document.querySelectorAll('#stylebot-overlay .stylebot-overlay-rect');
 const input = (root: HTMLElement) =>
   root.querySelector(
     '.selector-autocomplete .autocomplete-input'
@@ -126,24 +129,33 @@ export const ClickingAllSetsField: StoryObj = {
   },
 };
 
-export const ClickingPeeksAtMatches: StoryObj = {
+export const PickingPeeksAtMatches: StoryObj = {
   ...editor({ inspecting: true }, { page: SCOPES_PAGE }),
-  name: 'clicking a pill boxes its matches for a moment, even once the pointer leaves the pills',
+  name: 'picking an element boxes what its scope matches for a moment',
   play: async ({ canvasElement }) => {
-    const boxes = () =>
-      document.querySelectorAll('#stylebot-overlay .stylebot-overlay-rect');
-
+    const picked = Date.now();
     await pickHome(canvasElement);
-    await user.click(pill(canvasElement, 'All'));
-    const clicked = Date.now();
-    await waitFor(() => expect(boxes()).toHaveLength(6));
-
-    await user.hover(within(canvasElement).getByRole('link', { name: 'Home' }));
-    await fireEvent.mouseLeave(scopes(canvasElement) as HTMLElement);
-    await expect(boxes()).toHaveLength(6);
+    await waitFor(() => expect(boxes()).not.toHaveLength(0));
+    await expect(isPeeking()).toBe(true);
 
     await waitFor(() => expect(boxes()).toHaveLength(0), { timeout: 2000 });
-    await expect(Date.now() - clicked).toBeGreaterThanOrEqual(700);
+    await expect(Date.now() - picked).toBeGreaterThanOrEqual(700);
+  },
+};
+
+export const ClickingDoesNotPeek: StoryObj = {
+  ...editor({ inspecting: true }, { page: SCOPES_PAGE }),
+  name: 'clicking a pill keeps its hover preview and clears it on leaving, without a timed peek',
+  play: async ({ canvasElement }) => {
+    await pickHome(canvasElement);
+    await waitFor(() => expect(isPeeking()).toBe(false), { timeout: 2000 });
+
+    await user.click(pill(canvasElement, 'All'));
+    await waitFor(() => expect(boxes()).toHaveLength(6));
+    await expect(isPeeking()).toBe(false);
+
+    await fireEvent.mouseLeave(scopes(canvasElement) as HTMLElement);
+    await expect(boxes()).toHaveLength(0);
   },
 };
 
