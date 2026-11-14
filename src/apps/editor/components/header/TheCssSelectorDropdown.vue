@@ -12,6 +12,7 @@
     :min-width="300"
     :placeholder="t('pick_an_element')"
     :clear-label="t('clear_selector')"
+    :show-chevron="hasOtherRules"
     @input="setSelector"
     @select="pickSelector"
     @click.native="stopInspecting"
@@ -35,15 +36,9 @@
     </template>
 
     <template #item="{ item, select }">
-      <div v-if="item.header" class="section-header" role="presentation">
-        {{ item.header }}
-      </div>
-      <div v-else-if="item.divider" class="section-divider" role="separator" />
       <the-css-selector-dropdown-item
-        v-else
         :selector="item.value"
         :current="item.value === activeSelector"
-        :count="countFor(item.value)"
         @select="select"
         @preview-end="previewActiveSelector"
       />
@@ -57,16 +52,12 @@ import { SAutocomplete, SInlineList, STooltip } from '@stylebot/components';
 import type { StylebotEditingMode } from '@stylebot/types';
 
 import type { CssSelectorMetadata } from '../../store';
-import type { SelectorAlternatives } from '@stylebot/page-bridge';
 import { getPageBridge } from '@stylebot/page-bridge';
 import TheCssSelectorDropdownItem from './TheCssSelectorDropdownItem.vue';
-import { countSelectorMatches } from '../../utils/selector-matches';
 
 type DropdownEntry = {
   id: string;
   value: string;
-  header?: string;
-  divider?: boolean;
 };
 
 export default Vue.extend({
@@ -84,10 +75,8 @@ export default Vue.extend({
     hovered: boolean;
     truncated: boolean;
     openingSelector: string;
-    matchCounts: Record<string, number | null>;
   } {
     return {
-      matchCounts: {},
       focused: false,
       hovered: false,
       truncated: false,
@@ -110,34 +99,16 @@ export default Vue.extend({
       return this.$store.state.selectors;
     },
 
-    alternatives(): SelectorAlternatives {
-      return this.$store.state.selectorAlternatives;
+    // The style's rules, once each even when a selector has several rules.
+    pageSelectors(): Array<string> {
+      return [...new Set(this.selectors.map(s => s.value))];
     },
 
     /**
-     * Selectors for the element last picked, the active one first, while
-     * the field holds (or began editing from) one of them.
+     * Whether the menu would offer anything besides the current selector.
      */
-    elementSelectors(): Array<string> {
-      const { existing, candidates } = this.alternatives;
-      const all = [...existing, ...candidates];
-      const current = all.includes(this.activeSelector)
-        ? [this.activeSelector]
-        : [];
-
-      if (!current.length && !all.includes(this.openingSelector)) {
-        return [];
-      }
-
-      return [...new Set([...current, ...all])];
-    },
-
-    // The style's other rules, once each even when a selector has several
-    // rules; a selector offered for the element isn't repeated here.
-    pageSelectors(): Array<string> {
-      return [...new Set(this.selectors.map(s => s.value))].filter(
-        value => !this.elementSelectors.includes(value)
-      );
+    hasOtherRules(): boolean {
+      return this.pageSelectors.some(value => value !== this.activeSelector);
     },
 
     entries(): Array<DropdownEntry> {
@@ -148,36 +119,9 @@ export default Vue.extend({
         return !filtering || (value.includes(query) && value !== query);
       };
 
-      const element = this.elementSelectors.filter(matches);
-      const page = this.pageSelectors.filter(matches);
-
-      const entries: Array<DropdownEntry> = [];
-
-      if (element.length) {
-        entries.push({
-          id: 'header:element',
-          value: '',
-          header: this.t('this_element'),
-        });
-        element.forEach(value =>
-          entries.push({ id: `element:${value}`, value })
-        );
-      }
-
-      if (page.length) {
-        if (element.length) {
-          entries.push({ id: 'divider', value: '', divider: true });
-        }
-
-        entries.push({
-          id: 'header:page',
-          value: '',
-          header: this.t('styled_on_this_page'),
-        });
-        page.forEach(value => entries.push({ id: `page:${value}`, value }));
-      }
-
-      return entries;
+      return this.pageSelectors
+        .filter(matches)
+        .map(value => ({ id: `page:${value}`, value }));
     },
 
     disabled(): boolean {
@@ -186,12 +130,6 @@ export default Vue.extend({
   },
 
   watch: {
-    entries(): void {
-      if (this.focused) {
-        this.loadMatchCounts();
-      }
-    },
-
     // Re-preview on every keystroke while focused, not just on select —
     // setSelector already updates activeSelector as the user types.
     activeSelector(): void {
@@ -232,17 +170,6 @@ export default Vue.extend({
       this.focused = true;
       this.openingSelector = this.activeSelector;
       this.previewActiveSelector();
-      this.loadMatchCounts();
-    },
-
-    countFor(selector: string): number | null {
-      return this.matchCounts[selector] ?? null;
-    },
-
-    async loadMatchCounts(): Promise<void> {
-      this.matchCounts = await countSelectorMatches(
-        this.entries.map(entry => entry.value)
-      );
     },
 
     onBlur(): void {
@@ -307,22 +234,5 @@ export default Vue.extend({
 
 .selector-tooltip {
   font-family: var(--font-mono);
-}
-
-.section-header {
-  flex: none;
-  padding: 10px 10px 4px;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.3;
-  color: var(--text-muted);
-}
-
-.section-divider {
-  flex: none;
-  align-self: stretch;
-  height: 1px;
-  margin: 4px 2px;
-  background: color-mix(in srgb, var(--text-primary) 14%, transparent);
 }
 </style>
