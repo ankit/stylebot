@@ -58,11 +58,15 @@ describe('hashed-class', () => {
         ['styles-module_', '_contextCrumb'],
       ],
       ['_card_1wfme_1', ['_card_']],
-      ['caa-button-label-_R_93adeslcldcpbn6b5ipam_', ['caa-button-label-']],
+      ['caa-button-label-_R_93adeslcldcpbn6b5ipam_', ['caa-button-label-_R_']],
       ['ZcdlOG_nav', ['_nav']],
       ['Wr7_RG_mastheadContainer', ['_mastheadContainer']],
       ['jXhsNG_dividerLeft', ['_dividerLeft']],
       ['_5zuA3W_topDivider', ['_topDivider']],
+      ['m-9-4W_timestamp', ['_timestamp']],
+      ['b-30Va_rootHomepage', ['_rootHomepage']],
+      ['S-XPiW_dotContainer', ['_dotContainer']],
+      ['-Qs3Ha_section', ['_section']],
       ['w7VYaa_topBorder', ['_topBorder']],
     ])('keeps the authored parts of %s', (className, expected) => {
       expect(getStableClassParts(className)).toEqual(expected);
@@ -87,6 +91,9 @@ describe('hashed-class', () => {
       'Foo-module_header_title',
       'Foo-module_Header_title',
       'Foo-module_my_btn_title',
+      'a-list_item',
+      'logged-out',
+      'header-wrapper',
     ])('finds no hash in %s', className => {
       expect(getStableClassParts(className)).toBeNull();
     });
