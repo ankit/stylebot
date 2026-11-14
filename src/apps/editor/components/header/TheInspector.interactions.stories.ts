@@ -32,8 +32,10 @@ const lastChipText = (root: ParentNode, scope: string) =>
     ''
   ).trim();
 
-const currentChip = () =>
-  (document.querySelector('.inspect-card .selector')?.textContent ?? '').trim();
+const hoverLabel = () =>
+  (document.querySelector('.inspect-card .name')?.textContent ?? '').trim();
+const hoverSize = () =>
+  (document.querySelector('.inspect-card .size')?.textContent ?? '').trim();
 const selectorChip = (root: HTMLElement) =>
   lastChipText(root, '.selector-autocomplete .autocomplete-chips');
 
@@ -86,7 +88,7 @@ export const PickSetsSelector: StoryObj = {
     const store = storeOf(canvasElement);
 
     await hoverPage(canvas.getByRole('heading', { level: 1 }));
-    await waitFor(() => expect(currentChip()).toMatch(/\bh1$/));
+    await waitFor(() => expect(hoverLabel()).toBe('h1'));
 
     await pressKey('Enter');
 
@@ -117,7 +119,7 @@ export const InspectsInCode: StoryObj = {
     const heading = canvas.getByRole('heading', { level: 1 });
     await waitFor(async () => {
       await hoverPage(heading);
-      await expect(currentChip()).toMatch(/\bh1$/);
+      await expect(hoverLabel()).toBe('h1');
     });
     await pressKey('Enter');
 
@@ -136,7 +138,7 @@ export const HintsOtherMatches: StoryObj = {
     );
 
     await hoverPage(first);
-    await waitFor(() => expect(currentChip()).toMatch(/article-body$/));
+    await waitFor(() => expect(hoverLabel()).toBe('p.article-body'));
 
     const rects = document.querySelectorAll(
       '#stylebot-overlay .stylebot-overlay-rect'
@@ -169,17 +171,22 @@ export const ArrowKeysClimbAncestors: StoryObj = {
     const store = storeOf(canvasElement);
     const link = canvas.getByRole('link', { name: 'Learn more' });
 
-    await step('hovering shows the element', async () => {
+    await step('hovering shows the element and its size', async () => {
       await hoverPage(link);
-      await waitFor(() => expect(currentChip()).toMatch(/\ba$/));
+      await waitFor(() => expect(hoverLabel()).toBe('a'));
+
+      const { width, height } = link.getBoundingClientRect();
+      await expect(hoverSize()).toBe(
+        `${Math.round(width)} × ${Math.round(height)}`
+      );
     });
 
     await step('ArrowUp climbs, ArrowDown descends', async () => {
       await pressKey('ArrowUp');
-      await waitFor(() => expect(currentChip()).toMatch(/\bp$/));
+      await waitFor(() => expect(hoverLabel()).toBe('p'));
 
       await pressKey('ArrowDown');
-      await waitFor(() => expect(currentChip()).toMatch(/\ba$/));
+      await waitFor(() => expect(hoverLabel()).toBe('a'));
     });
 
     await step(
@@ -202,13 +209,13 @@ export const ArrowKeysClimbAncestors: StoryObj = {
       // The pointer is still over the link from before; leave and re-enter.
       await user.unhover(link);
       await hoverPage(link);
-      await waitFor(() => expect(currentChip()).toMatch(/\ba$/));
+      await waitFor(() => expect(hoverLabel()).toBe('a'));
 
       for (let i = 0; i < 10; i++) {
         await pressKey('ArrowUp');
       }
 
-      await waitFor(() => expect(currentChip()).toBe('html'));
+      await waitFor(() => expect(hoverLabel()).toBe('html'));
 
       await pressKey('Enter');
       await waitFor(() => expect(selectorChip(canvasElement)).toBe('html'));
@@ -224,7 +231,7 @@ export const ClickOnIframeSelectsIt: StoryObj = {
     const frame = canvasElement.querySelector('iframe') as HTMLElement;
 
     await hoverPage(frame);
-    await waitFor(() => expect(currentChip()).toMatch(/iframe/));
+    await waitFor(() => expect(hoverLabel()).toBe('iframe'));
 
     // The overlay rect shields the frame so the click stays in this
     // document instead of reaching the ad inside.

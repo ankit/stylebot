@@ -37,7 +37,12 @@ export {
   splitSelectorList,
   validateSelector,
 } from './selector/selector-text';
-export { looksGeneratedId, looksMinified } from './hashed-class';
+export {
+  getStableClassParts,
+  looksGeneratedId,
+  looksHashedByShape,
+  looksMinified,
+} from './hashed-class';
 
 export {
   addGoogleWebFont,

@@ -12,8 +12,11 @@
       <path d="M0 8 7 1 14 8z" />
     </svg>
 
-    <s-text as="span" size="label" class="selector">
-      {{ selectorText }}
+    <s-text as="span" size="label" class="name">
+      {{ name }}
+    </s-text>
+    <s-text v-if="size" as="span" size="label" class="size">
+      {{ size }}
     </s-text>
     <s-count-badge v-if="ruleCount > 0" :count="ruleCount">
       {{ ruleCountLabel }}
@@ -24,12 +27,12 @@
 <script lang="ts">
 import Vue from 'vue';
 import { SCountBadge, SText } from '@stylebot/components';
-import { splitSelectorList } from '@stylebot/css';
 
 /**
  * Mounted by OverlayTip (Overlay.ts) into the editor's theme-provider subtree,
  * which is what gives it the editor's CSS variables and fonts over the page.
- * Says what a click would select; the panel previews the element in full.
+ * Names the element under the pointer, as dev tools do; the panel previews
+ * it in full.
  */
 export default Vue.extend({
   name: 'InspectorCard',
@@ -41,6 +44,7 @@ export default Vue.extend({
 
   data(): {
     name: string;
+    size: string;
     ruleCount: number;
     top: number;
     left: number;
@@ -48,6 +52,7 @@ export default Vue.extend({
   } {
     return {
       name: '',
+      size: '',
       ruleCount: 0,
       top: 0,
       left: 0,
@@ -56,10 +61,6 @@ export default Vue.extend({
   },
 
   computed: {
-    selectorText(): string {
-      return splitSelectorList(this.name).join(', ');
-    },
-
     ruleCountLabel(): string {
       return this.t(
         this.ruleCount === 1 ? 'rules_count_one' : 'rules_count_other',
@@ -109,12 +110,21 @@ export default Vue.extend({
   }
 }
 
-.selector {
+.name {
   min-width: 0;
   overflow-wrap: anywhere;
   text-box: trim-both cap alphabetic;
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--field-ink);
+}
+
+.size {
+  flex-shrink: 0;
+  text-box: trim-both cap alphabetic;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
 }
 </style>

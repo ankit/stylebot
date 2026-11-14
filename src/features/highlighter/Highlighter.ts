@@ -1,6 +1,7 @@
 import Overlay from './Overlay';
 import { getSelector, splitSelectorList } from '@stylebot/css';
 import { queryWithShadowRoots } from '@stylebot/stylesheets';
+import { describeElement, describeSize } from './describe-element';
 
 // What the inspector takes from the keyboard: climb, descend and pick.
 export const INSPECT_KEYS = [
@@ -444,11 +445,12 @@ class Highlighter {
 
     this.ensureOverlay().inspect(
       this.queryMatches(selector),
-      selector,
+      describeElement(el),
       undefined,
       {
         primary: el,
         ruleCount: this.countRules?.(selector) ?? 0,
+        size: describeSize(el),
       }
     );
 
