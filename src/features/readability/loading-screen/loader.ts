@@ -10,6 +10,10 @@ const THEME_CACHE_KEY = 'stylebot-reader-theme';
 
 // Skeleton article: an accent title line over paragraph lines of varied width
 // (the last one short, like a paragraph's final line). Widths in %.
+// The page's own inline background longhands on <html>, saved while the loader
+// paints over them; null when the loader hasn't painted.
+let pageBackground: Array<[string, string, string]> | null = null;
+
 const LOADER_LINES: Array<{ width: number; title?: boolean }> = [
   { width: 40, title: true },
   { width: 100 },
@@ -50,13 +54,21 @@ const paintLoader = (
   const foreground =
     (theme && THEME_FOREGROUNDS[theme]) || THEME_FOREGROUNDS.light;
 
+  const rootStyle = document.documentElement.style;
+
+  if (!pageBackground) {
+    pageBackground = Array.from(rootStyle)
+      .filter(property => property.startsWith('background'))
+      .map(property => [
+        property,
+        rootStyle.getPropertyValue(property),
+        rootStyle.getPropertyPriority(property),
+      ]);
+  }
+
   // Set inline (not via <style>) so it commits before any CSSOM parse/recalc,
   // ahead of the browser's first paint.
-  document.documentElement.style.setProperty(
-    'background',
-    background,
-    'important'
-  );
+  rootStyle.setProperty('background', background, 'important');
   style.textContent = loaderCss(
     { background, foreground },
     LOADER_LINES.length
@@ -100,12 +112,21 @@ export const showLoader = (): void => {
 };
 
 /**
- * Removes the loading screen and its inline background override.
+ * Removes the loading screen and puts back the page's own inline background,
+ * leaving <html> untouched when the loader never painted it.
  */
 export const hideLoader = (): void => {
   document.getElementById('stylebot-reader-loading')?.remove();
   document.getElementById(LOADER_ART_ID)?.remove();
-  // Drop the inline background set in showLoader so the original page (on
-  // revert) isn't left with the loader's theme color painted over it.
-  document.documentElement.style.removeProperty('background');
+
+  if (!pageBackground) {
+    return;
+  }
+
+  const rootStyle = document.documentElement.style;
+  rootStyle.removeProperty('background');
+  pageBackground.forEach(([property, value, priority]) =>
+    rootStyle.setProperty(property, value, priority)
+  );
+  pageBackground = null;
 };
