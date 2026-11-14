@@ -1,5 +1,5 @@
 <template>
-  <div class="header">
+  <div class="header stylebot-drag-handle">
     <div class="header-top">
       <div class="style-identity">
         <s-text variant="muted" class="url">{{ url }}</s-text>

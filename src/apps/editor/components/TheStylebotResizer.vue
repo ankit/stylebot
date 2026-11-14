@@ -20,9 +20,6 @@
     ]"
     :style="panelStyle"
     @pointerdown="onMoveStart"
-    @pointermove="onMove"
-    @pointerup="onMoveEnd"
-    @pointercancel="onMoveEnd"
     @lostpointercapture="onMoveEnd"
   >
     <slot></slot>
@@ -82,13 +79,16 @@ const MAX_WIDTH_RATIO = 0.6;
 const KEYBOARD_STEP = 16;
 const MOVE_THRESHOLD = 4;
 const SNAP_DISTANCE = 32;
-const HANDLE_IGNORE =
-  'button, a, input, select, textarea, [role="button"], [role="menu"], [role="menuitem"], [contenteditable]';
+const CONTROL_MOVE_THRESHOLD = 6;
+const NOT_DRAGGABLE =
+  'input, select, textarea, [contenteditable], [role="menu"], [role="menuitem"], [role="listbox"], [role="option"]';
+const CONTROLS = 'button, a, [role="button"], [role="tab"]';
 
 type Drag = { startX: number; startWidth: number; width: number };
 
 type Move = {
   pointerId: number;
+  threshold: number;
   startX: number;
   startY: number;
   start: FloatingPanelBounds;
@@ -291,6 +291,7 @@ export default Vue.extend({
   destroyed() {
     this.adjustPageLayout();
     window.removeEventListener('resize', this.onWindowResize);
+    this.unlistenMove();
   },
 
   methods: {
@@ -325,8 +326,9 @@ export default Vue.extend({
     },
 
     /**
-     * Starts moving the panel when the header's empty space is pressed;
-     * its buttons, menus and fields keep their own clicks.
+     * Gets ready to move the panel when anything in the header but a field
+     * or menu is pressed. Buttons and tabs still click unless the pointer
+     * travels past a slightly larger threshold first.
      */
     onMoveStart(event: PointerEvent) {
       if (event.button !== 0) {
@@ -336,19 +338,22 @@ export default Vue.extend({
       const target = event.composedPath()[0] as Element;
       if (
         !(target instanceof Element) ||
-        !target.closest('.header-top') ||
-        target.closest(HANDLE_IGNORE)
+        !target.closest('.stylebot-drag-handle') ||
+        target.closest(NOT_DRAGGABLE)
       ) {
         return;
       }
 
-      event.preventDefault();
-      const panel = this.$refs.panel as HTMLElement;
-      panel.setPointerCapture(event.pointerId);
+      const onControl = target.closest(CONTROLS) !== null;
+      if (!onControl) {
+        event.preventDefault();
+      }
 
-      const rect = panel.getBoundingClientRect();
+      const rect = (this.$refs.panel as HTMLElement).getBoundingClientRect();
+      this.listenMove();
       this.move = {
         pointerId: event.pointerId,
+        threshold: onControl ? CONTROL_MOVE_THRESHOLD : MOVE_THRESHOLD,
         startX: event.clientX,
         startY: event.clientY,
         start: {
@@ -377,10 +382,13 @@ export default Vue.extend({
       const dy = event.clientY - move.startY;
 
       if (!move.bounds) {
-        if (Math.hypot(dx, dy) < MOVE_THRESHOLD) {
+        if (Math.hypot(dx, dy) < move.threshold) {
           return;
         }
 
+        // Captured from here on, so the moves keep coming over iframes and the
+        // release doesn't click the control the drag started on.
+        (this.$refs.panel as HTMLElement).setPointerCapture(event.pointerId);
         this.$store.commit('setInspecting', false);
       }
 
@@ -397,10 +405,17 @@ export default Vue.extend({
       const { move, snapTarget } = this;
       this.move = null;
       this.snapTarget = null;
+      this.unlistenMove();
 
       if (!move?.bounds) {
         return;
       }
+
+      window.addEventListener('click', this.swallowClick, true);
+      setTimeout(
+        () => window.removeEventListener('click', this.swallowClick, true),
+        0
+      );
 
       if (snapTarget) {
         this.$store.dispatch('setLayout', {
@@ -416,6 +431,25 @@ export default Vue.extend({
         dockLocation: 'floating',
         floating: this.clampBounds(move.bounds),
       });
+    },
+
+    listenMove() {
+      window.addEventListener('pointermove', this.onMove, true);
+      window.addEventListener('pointerup', this.onMoveEnd, true);
+      window.addEventListener('pointercancel', this.onMoveEnd, true);
+      window.addEventListener('dragstart', this.swallowClick, true);
+    },
+
+    unlistenMove() {
+      window.removeEventListener('pointermove', this.onMove, true);
+      window.removeEventListener('pointerup', this.onMoveEnd, true);
+      window.removeEventListener('pointercancel', this.onMoveEnd, true);
+      window.removeEventListener('dragstart', this.swallowClick, true);
+    },
+
+    swallowClick(event: Event) {
+      event.preventDefault();
+      event.stopPropagation();
     },
 
     onResizeStart(event: PointerEvent, direction: ResizeDirection) {
@@ -636,8 +670,13 @@ export default Vue.extend({
       transition: opacity 0.22s ease;
     }
 
-    .header-top {
+    .stylebot-drag-handle {
       cursor: grab;
+
+      input,
+      textarea {
+        cursor: text;
+      }
     }
   }
 
@@ -659,7 +698,7 @@ export default Vue.extend({
   &.stylebot-resizing {
     user-select: none;
 
-    .header-top {
+    .stylebot-drag-handle {
       cursor: grabbing;
     }
 
