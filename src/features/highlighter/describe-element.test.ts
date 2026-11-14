@@ -18,10 +18,10 @@ describe('describeElement', () => {
     expect(describeElement(element('<SPAN></SPAN>'))).toBe('span');
   });
 
-  it('leaves out hashed classes', () => {
+  it('shows hashed classes as they are', () => {
     expect(
       describeElement(element('<div class="css-1q2w3e card"></div>'))
-    ).toBe('div.card');
+    ).toBe('div.css-1q2w3e.card');
   });
 
   it('shows a partly hashed class in full', () => {
@@ -38,14 +38,6 @@ describe('describeElement', () => {
     expect(describeElement(element('<li class="a b c d"></li>'))).toBe(
       'li.a.b.c'
     );
-  });
-
-  it('leaves out an id the page generates', () => {
-    expect(
-      describeElement(
-        element('<div id="tsuid_hsLJaqLJBPu9ruEP7uOYkAo_91"></div>')
-      )
-    ).toBe('div');
   });
 });
 

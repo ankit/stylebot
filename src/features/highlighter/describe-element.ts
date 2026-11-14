@@ -1,18 +1,14 @@
-import { looksGeneratedId, looksHashedByShape } from '@stylebot/css';
-
 const MAX_CLASSES = 3;
 
 /**
  * Names an element the way dev tools do, e.g. `a#top.storylink`: its tag,
- * id and first few classes, leaving out generated ids and wholly hashed
- * classes like `css-1q2w3e`. A partly hashed class is shown as it is.
+ * id and first few classes, exactly as the page has them.
  */
 export const describeElement = (el: Element): string => {
   const tag = el.tagName.toLowerCase();
   const id = el.getAttribute('id');
-  const idPart = id && !looksGeneratedId(id) ? `#${id}` : '';
+  const idPart = id ? `#${id}` : '';
   const classPart = Array.from(el.classList)
-    .filter(name => !looksHashedByShape(name))
     .slice(0, MAX_CLASSES)
     .map(name => `.${name}`)
     .join('');
