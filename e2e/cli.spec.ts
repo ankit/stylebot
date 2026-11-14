@@ -947,7 +947,7 @@ test('the user marks areas by dragging, which selection lists for the agent', as
     [
       `2 marks on tab ${id}:`,
       'mark 1: 230×140 at 10,10, holding:',
-      '      2  div.card  (this one: #first)',
+      '      1  #first',
       'mark 2: 260×40 at 40,320, over part of:',
       '      1  a',
       '',
@@ -1046,7 +1046,7 @@ test('the user writes a note about their marks, which selection hands on with a 
       '> fix the box.',
       '  screenshot of the marked area: <png>',
       '  mark 1: 230×140 at 10,10, holding:',
-      '        2  div.card  (this one: #first)',
+      '        1  #first',
       '',
     ].join('\n')
   );
