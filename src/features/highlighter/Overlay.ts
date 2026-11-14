@@ -14,6 +14,7 @@ import OverlayRect from './OverlayRect';
 import OverlayTip from './OverlayTip';
 import type { Rect, Dimensions } from './utils';
 import { getElementDimensions, getNestedBoundingClientRect } from './utils';
+import type { NamePart } from './describe-element';
 import type { Box, LayoutProperty } from './types';
 
 type Edges = { top: number; right: number; bottom: number; left: number };
@@ -119,7 +120,7 @@ export default class Overlay {
 
   inspect(
     nodes: Array<HTMLElement>,
-    label: Array<string>,
+    label: Array<NamePart>,
     property?: LayoutProperty,
     picking?: PickingOptions
   ): void {
