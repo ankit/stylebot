@@ -50,7 +50,7 @@ export function getClassNameSpans(className: string): Array<ClassNameSpan> {
 const GENERATED_CLASS_PATTERNS = [
   /^css-(?=[a-z]*\d)[0-9a-z]{5,8}(-|$)/,
   /^(sc|jsx|emotion|styled|chakra)-/i,
-  /^r-(?=[a-z]*\d)[0-9a-z]{6,9}$/,
+  /^r-(?=[a-z]*\d)[0-9a-z]{5,7}$/,
   /^_(?=[a-z]*\d)[0-9a-z]{4}$/,
   /^_\d[0-9a-z]{4,9}$/,
   /^gb_[0-9A-Za-z]{1,3}$/,
@@ -61,7 +61,7 @@ const GENERATED_CLASS_PATTERNS = [
   /^makeStyles-.+-\d+$/,
 ];
 
-const REACT_NATIVE_WEB_CLASS = /^(r|css)-[0-9a-z]{6,9}$/;
+const REACT_NATIVE_WEB_CLASS = /^(r|css)-[0-9a-z]{4,7}$/;
 const STYLEX_CLASS = /^x[0-9a-z]{5,7}$/;
 const STYLEX_PAGE_THRESHOLD = 10;
 

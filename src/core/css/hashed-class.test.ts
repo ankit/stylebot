@@ -109,6 +109,8 @@ describe('hashed-class', () => {
       'vr1PYe',
       'tvs3Id',
       'r-1awozwy',
+      'r-5zmot',
+      'r-u8s1d',
       'css-175oi2r',
       'css-1q2w3e-MuiButton-root',
       '_9dls',
@@ -195,7 +197,7 @@ describe('hashed-class', () => {
         document.head.innerHTML = '';
       });
 
-      it.each(['r-sdzlij', 'r-dnmrzs', 'css-9pa8cd'])(
+      it.each(['r-sdzlij', 'r-dnmrzs', 'r-ymtt', 'css-9pa8cd'])(
         'treats %s as generated',
         className => {
           expect(looksHashed(className)).toBe(true);
