@@ -29,6 +29,8 @@ import { getPageBridge } from '@stylebot/page-bridge';
 import { getScopeSlots } from '@stylebot/css';
 import type { ScopeSlots, SelectorAlternatives } from '@stylebot/css';
 
+import { isPeeking, stopPeek } from '../../utils/selector-peek';
+
 type ScopeOption = { value: string; label: string; count: string };
 
 const SLOTS: Array<keyof ScopeSlots> = ['only', 'similar', 'all'];
@@ -99,7 +101,7 @@ export default Vue.extend({
 
   methods: {
     pick(selector: string): void {
-      // The flash that follows ends the preview; let the next move redraw it.
+      // The field peeks at the new selector, so leaving the pill mustn't clear it.
       this.previewing = null;
       this.$store.commit('setActiveSelector', selector);
     },
@@ -116,7 +118,10 @@ export default Vue.extend({
       const option = this.options[segments.indexOf(segment as Element)];
 
       if (option) {
-        if (option.value !== this.previewing) {
+        const peeking = isPeeking() && option.value === this.activeSelector;
+
+        if (option.value !== this.previewing && !peeking) {
+          stopPeek();
           this.previewing = option.value;
           getPageBridge().highlight(option.value);
         }

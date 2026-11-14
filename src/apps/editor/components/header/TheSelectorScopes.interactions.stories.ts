@@ -126,6 +126,27 @@ export const ClickingAllSetsField: StoryObj = {
   },
 };
 
+export const ClickingPeeksAtMatches: StoryObj = {
+  ...editor({ inspecting: true }, { page: SCOPES_PAGE }),
+  name: 'clicking a pill boxes its matches for a moment, even once the pointer leaves the pills',
+  play: async ({ canvasElement }) => {
+    const boxes = () =>
+      document.querySelectorAll('#stylebot-overlay .stylebot-overlay-rect');
+
+    await pickHome(canvasElement);
+    await user.click(pill(canvasElement, 'All'));
+    const clicked = Date.now();
+    await waitFor(() => expect(boxes()).toHaveLength(6));
+
+    await user.hover(within(canvasElement).getByRole('link', { name: 'Home' }));
+    await fireEvent.mouseLeave(scopes(canvasElement) as HTMLElement);
+    await expect(boxes()).toHaveLength(6);
+
+    await waitFor(() => expect(boxes()).toHaveLength(0), { timeout: 2000 });
+    await expect(Date.now() - clicked).toBeGreaterThanOrEqual(700);
+  },
+};
+
 export const ClickingSimilarSetsField: StoryObj = {
   ...editor({ inspecting: true }, { page: SCOPES_PAGE }),
   name: 'clicking Similar puts the same spot in every block in the field',

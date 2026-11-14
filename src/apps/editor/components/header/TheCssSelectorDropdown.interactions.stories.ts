@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue';
 import { expect, waitFor, within } from '@storybook/test';
 
 import TheCssSelectorDropdown from './TheCssSelectorDropdown.vue';
+import { isPeeking } from '../../utils/selector-peek';
 import {
   editor,
   RULE_CSS,
@@ -69,6 +70,24 @@ export const TypingCommitsSelector: StoryObj = {
     await waitFor(() =>
       expect(chips(canvasElement)).toHaveTextContent('.article-body')
     );
+  },
+};
+
+export const TypingDoesNotPeek: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'typing in the field keeps a live preview rather than a timed peek',
+  play: async ({ canvasElement }) => {
+    await user.click(chips(canvasElement));
+    await waitFor(() => expect(input(canvasElement)).toHaveFocus());
+
+    await user.clear(input(canvasElement));
+    await user.type(input(canvasElement), 'p');
+    await waitFor(() =>
+      expect(
+        document.querySelectorAll('#stylebot-overlay .stylebot-overlay-rect')
+      ).not.toHaveLength(0)
+    );
+    await expect(isPeeking()).toBe(false);
   },
 };
 
