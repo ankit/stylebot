@@ -140,8 +140,6 @@ export default Vue.extend({
     activeSelector(): void {
       if (this.focused) {
         this.previewMatches();
-      } else {
-        this.peekMatches();
       }
     },
   },
@@ -158,7 +156,6 @@ export default Vue.extend({
 
     pickSelector(item: DropdownEntry): void {
       this.$store.commit('setActiveSelector', item.value);
-      this.peekMatches();
     },
 
     /**
@@ -203,13 +200,18 @@ export default Vue.extend({
     },
 
     /**
-     * Shows what a newly chosen selector matches for a moment, so a change
-     * of scope shows on the page without hovering anything.
+     * Shows what a picked element's selector matches for a moment, so its
+     * reach shows on the page without hovering anything.
      */
     peekMatches(): void {
       const selector = this.activeSelector.trim();
 
-      if (this.disabled || this.$store.state.inspecting || !selector) {
+      if (
+        this.disabled ||
+        this.focused ||
+        this.$store.state.inspecting ||
+        !selector
+      ) {
         return;
       }
 
