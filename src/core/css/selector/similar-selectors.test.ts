@@ -261,17 +261,15 @@ describe('getNamedScopeSelector', () => {
     expect(getNamedScopeSelector(label)).toBeNull();
   });
 
-  it('gives up when the path down from the area stays complex', () => {
-    const nest = (depth: number, text: string): string =>
-      depth ? `<div>${nest(depth - 1, text)}</div>` : `<em>${text}</em>`;
+  it('keeps the parent when leaving it out would reach more', () => {
     document.body.innerHTML = `
-      <section class="area">
-        ${nest(3, 'a')}${nest(3, 'b')}${nest(2, 'c')}${nest(4, 'd')}
-      </section>
+      <article class="post">
+        <p><a href="#">a</a></p><p><a href="#">b</a></p><ul><li><a href="#">c</a></li></ul>
+      </article>
     `;
-    const el = document.querySelectorAll('em')[1] as HTMLElement;
+    const link = document.querySelectorAll('p a')[1] as HTMLElement;
 
-    expect(getNamedScopeSelector(el)).toBeNull();
+    expect(getNamedScopeSelector(link)).toBe('article.post p a');
   });
 
   it('leaves a bare div or span out', () => {

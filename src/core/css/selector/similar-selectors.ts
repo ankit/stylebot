@@ -15,19 +15,6 @@ const POSITION = /:nth-of-type\(\d+\)/;
  */
 type Step = { compound: string; under: ' > ' | ' ' };
 
-/**
- * How a path is written below its block: each step pinned to its spot as a
- * direct child, or loose, by what it is anywhere below.
- */
-type PathShape = {
-  toStep: (lookAlikes: LookAlikes) => string;
-  under: Step['under'];
-};
-
-const PINNED: PathShape = { toStep: getPositionedStep, under: ' > ' };
-
-const LOOSE: PathShape = { toStep: ({ own }) => own, under: ' ' };
-
 const toSelector = (path: Array<Step>): string =>
   path
     .map(({ compound, under }, i) => (i ? `${under}${compound}` : compound))
@@ -94,10 +81,11 @@ const dropUnneededPositions = (
  */
 const getPathFromBlock = (
   block: string,
-  steps: Array<string>,
-  under: Step['under']
+  steps: Array<string>
 ): string | null => {
-  const path = [block, ...steps].map((compound): Step => ({ compound, under }));
+  const path = [block, ...steps].map(
+    (compound): Step => ({ compound, under: ' > ' })
+  );
   const count = countMatches(toSelector(path));
   if (count < 2) {
     return null;
@@ -120,15 +108,13 @@ const getRepeatedBlockName = (
 
 /**
  * Climbs from `el` to the first ancestor `nameBlock` names whose path down
- * to `el`, written in `shape`, stays simple enough to keep working, and
- * returns that path.
+ * to `el` stays simple enough to keep working, and returns that path.
  */
 const findPathFromNearestBlock = (
   el: HTMLElement,
-  nameBlock: (ancestor: HTMLElement, lookAlikes: LookAlikes) => string | null,
-  { toStep, under }: PathShape = PINNED
+  nameBlock: (ancestor: HTMLElement, lookAlikes: LookAlikes) => string | null
 ): string | null => {
-  const steps = [toStep(getLookAlikes(el))];
+  const steps = [getPositionedStep(getLookAlikes(el))];
   let ancestor = el.parentElement;
 
   for (let level = 0; ancestor && level < MAX_LEVELS_UP; level++) {
@@ -138,13 +124,13 @@ const findPathFromNearestBlock = (
 
     const lookAlikes = getLookAlikes(ancestor);
     const block = nameBlock(ancestor, lookAlikes);
-    const path = block && getPathFromBlock(block, steps, under);
+    const path = block && getPathFromBlock(block, steps);
 
     if (path && isSimpleSelector(path)) {
       return path;
     }
 
-    steps.unshift(toStep(lookAlikes));
+    steps.unshift(getPositionedStep(lookAlikes));
     ancestor = ancestor.parentElement;
   }
 
@@ -233,15 +219,17 @@ const getHook = (el: HTMLElement): string | null => {
 export const getHookScopedSelector = (el: HTMLElement): string | null =>
   findPathFromNearestBlock(el, getHook);
 
-// Bare wrappers say nothing about what they hold, so scoping by them alone
-// would sweep most of an area.
+// Bare wrappers say nothing about what they hold.
 const CONTAINER_TAGS = new Set(['div', 'span']);
 
+const kindOrTag = (el: HTMLElement): string =>
+  getKindSelector(el) ?? el.tagName.toLowerCase();
+
 /**
- * The nearest ancestor below body named for what it is, by a test id,
- * authored class or form name, like an infobox's or article body's class.
+ * The nearest ancestor below body named for what it is, like
+ * `table.infobox`.
  */
-const findNamedAncestor = (
+const findNamedArea = (
   el: HTMLElement
 ): { node: HTMLElement; selector: string } | null => {
   for (let node = el.parentElement; node; node = node.parentElement) {
@@ -259,36 +247,42 @@ const findNamedAncestor = (
 };
 
 /**
- * Elements like `el` in parents like its own anywhere under the nearest
- * named area, e.g. `div.mw-content-ltr p a` for every link in an article's
- * paragraphs or `table.infobox th.infobox-label` for an infobox with bare
- * rows; a fallback for when no block repeats.
+ * Elements like `el` under the nearest named area, e.g. `article.post p a`,
+ * naming its parent too when that narrows it. A fallback for blocks with no
+ * name of their own.
  */
 export const getNamedScopeSelector = (el: HTMLElement): string | null => {
-  const named = findNamedAncestor(el);
-  const own = getLookAlikes(el).own;
-  if (!named || CONTAINER_TAGS.has(own)) {
+  const area = findNamedArea(el);
+  const own = kindOrTag(el);
+  if (!area || CONTAINER_TAGS.has(own)) {
     return null;
   }
 
-  return findPathFromNearestBlock(
-    el,
-    ancestor => (ancestor === named.node ? named.selector : null),
-    LOOSE
-  );
+  const inArea = `${area.selector} ${own}`;
+  const parent = el.parentElement as HTMLElement;
+  const parentStep = kindOrTag(parent);
+  if (parent === area.node || CONTAINER_TAGS.has(parentStep)) {
+    return inArea;
+  }
+
+  const inParent = `${area.selector} ${parentStep} ${own}`;
+  if (countMatches(inParent) < countMatches(inArea)) {
+    return inParent;
+  }
+
+  return inArea;
 };
 
 /**
- * Every element of `el`'s tag in its nearest named area, e.g. every link
- * in the article, as the wide fallback. None for a bare div or span, or
- * outside any named area, which would sweep the page.
+ * Every element of `el`'s tag in its nearest named area, e.g.
+ * `table.infobox th`. None for a bare div or span.
  */
 export const getTagInScopeSelector = (el: HTMLElement): string | null => {
   const tag = el.tagName.toLowerCase();
-  const named = findNamedAncestor(el);
-  if (!named || CONTAINER_TAGS.has(tag)) {
+  const area = findNamedArea(el);
+  if (!area || CONTAINER_TAGS.has(tag)) {
     return null;
   }
 
-  return `${named.selector} ${tag}`;
+  return `${area.selector} ${tag}`;
 };
