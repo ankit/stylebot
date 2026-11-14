@@ -11,13 +11,7 @@
     v-else
     ref="panel"
     class="stylebot stylebot-docked"
-    :class="[
-      floating ? 'floating' : dockedRight ? 'right' : 'left',
-      {
-        'stylebot-resizing': dragging || moving,
-        'stylebot-capturing': capturing,
-      },
-    ]"
+    :class="[placement, { 'stylebot-resizing': busy, 'stylebot-capturing': capturing }]"
     :style="panelStyle"
     @pointerdown="onMoveStart"
     @lostpointercapture="onMoveEnd"
@@ -193,20 +187,23 @@ export default Vue.extend({
       return this.$store.state.capturing;
     },
 
-    dragging(): boolean {
-      return this.drag !== null || this.resize !== null;
-    },
-
-    moving(): boolean {
-      return Boolean(this.move?.bounds);
+    busy(): boolean {
+      return Boolean(this.drag || this.resize || this.move?.bounds);
     },
 
     floating(): boolean {
       return (
-        this.moving ||
-        Boolean(this.resize?.bounds) ||
+        Boolean(this.move?.bounds || this.resize?.bounds) ||
         this.layout.dockLocation === 'floating'
       );
+    },
+
+    placement(): 'floating' | 'left' | 'right' {
+      if (this.floating) {
+        return 'floating';
+      }
+
+      return this.dockedRight ? 'right' : 'left';
     },
 
     floatingBounds(): FloatingPanelBounds {
