@@ -221,7 +221,7 @@ class MonacEditorIframe {
       lineDecorationsWidth: isOptions ? undefined : 4,
       // Lets the scrollbar reach the container's true edges instead of an
       // outer CSS padding clipping it; no horizontal equivalent in Monaco.
-      padding: isOptions ? { top: 14, bottom: 18 } : undefined,
+      padding: isOptions ? { top: 14, bottom: 18 } : { top: 12, bottom: 12 },
       minimap: {
         enabled: false,
       },
