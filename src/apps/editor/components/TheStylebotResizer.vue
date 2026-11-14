@@ -36,9 +36,9 @@
     />
 
     <div
-      v-if="snapTarget"
+      v-if="snap"
       class="stylebot-snap-preview"
-      :class="snapTarget"
+      :class="[snap.side, { armed: snap.armed }]"
       :style="{ width: `${width}px` }"
     ></div>
   </div>
@@ -61,11 +61,11 @@ import {
   defaultFloatingBounds,
   fitBounds,
   resizeBounds,
-  snapTargetAt,
+  snapFor,
 } from './panel/floating-bounds';
 import type {
   ResizeDirection,
-  SnapTarget,
+  Snap,
   Viewport,
 } from './panel/floating-bounds';
 
@@ -88,14 +88,14 @@ export default Vue.extend({
     viewport: Viewport;
     previewWidth: number | null;
     gesture: Gesture | null;
-    snapTarget: SnapTarget;
+    snap: Snap | null;
     headerDrag: HeaderDrag | null;
   } {
     return {
       viewport: { width: window.innerWidth, height: window.innerHeight },
       previewWidth: null,
       gesture: null,
-      snapTarget: null,
+      snap: null,
       headerDrag: null,
     };
   },
@@ -257,22 +257,22 @@ export default Vue.extend({
         left: start.left + dx,
         top: start.top + dy,
       };
-      this.snapTarget = snapTargetAt(x, this.viewport);
+      this.snap = snapFor(this.gesture.bounds, x, this.viewport);
     },
 
     onMoveEnd(dragged: boolean): void {
-      const { gesture, snapTarget } = this;
+      const { gesture, snap } = this;
       this.gesture = null;
-      this.snapTarget = null;
+      this.snap = null;
 
       if (!dragged || !gesture?.bounds) {
         return;
       }
 
-      if (snapTarget) {
+      if (snap?.armed) {
         this.$store.dispatch('setLayout', {
           ...this.layout,
-          dockLocation: snapTarget,
+          dockLocation: snap.side,
         });
 
         return;
@@ -429,8 +429,13 @@ export default Vue.extend({
   z-index: -1;
   background: var(--accent);
   border-radius: 14px;
-  opacity: 0.18;
+  opacity: 0.06;
   pointer-events: none;
+  transition: opacity 0.12s ease;
+
+  &.armed {
+    opacity: 0.2;
+  }
 
   &.left {
     left: 12px;

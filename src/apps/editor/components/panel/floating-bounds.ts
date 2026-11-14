@@ -4,10 +4,11 @@ export const MARGIN = 12;
 export const MIN_WIDTH = 360;
 export const MIN_HEIGHT = 280;
 export const DRAG_THRESHOLD = 4;
-const SNAP_DISTANCE = 32;
+const POINTER_SNAP_DISTANCE = 32;
+const PUSH_DISTANCE = 24;
 
 export type Viewport = { width: number; height: number };
-export type SnapTarget = 'left' | 'right' | null;
+export type Snap = { side: 'left' | 'right'; armed: boolean };
 export type ResizeDirection = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw';
 
 export const RESIZE_DIRECTIONS: Array<ResizeDirection> = [
@@ -100,15 +101,32 @@ export const resizeBounds = (
 };
 
 /**
- * The side the panel docks to when dropped with the pointer at x.
+ * Which side a panel being moved to bounds would dock to, and whether
+ * letting go now docks it: once it's pushed past the margin far enough, or
+ * the pointer reaches the window's edge. Touching the margin only hints.
  */
-export const snapTargetAt = (x: number, viewport: Viewport): SnapTarget => {
-  if (x <= SNAP_DISTANCE) {
-    return 'left';
+export const snapFor = (
+  bounds: FloatingPanelBounds,
+  x: number,
+  viewport: Viewport
+): Snap | null => {
+  const pastLeft = MARGIN - bounds.left;
+  const pastRight = bounds.left + bounds.width - (viewport.width - MARGIN);
+
+  if (pastLeft >= 0 || x <= POINTER_SNAP_DISTANCE) {
+    return {
+      side: 'left',
+      armed: pastLeft >= PUSH_DISTANCE || x <= POINTER_SNAP_DISTANCE,
+    };
   }
 
-  if (x >= viewport.width - SNAP_DISTANCE) {
-    return 'right';
+  if (pastRight >= 0 || x >= viewport.width - POINTER_SNAP_DISTANCE) {
+    return {
+      side: 'right',
+      armed:
+        pastRight >= PUSH_DISTANCE ||
+        x >= viewport.width - POINTER_SNAP_DISTANCE,
+    };
   }
 
   return null;
