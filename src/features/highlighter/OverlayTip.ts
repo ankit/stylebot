@@ -76,7 +76,7 @@ export default class OverlayTip {
             avoidHorizontal,
             tipRect.width,
             8,
-            window.innerWidth
+            bounds.width
           );
         }
       }

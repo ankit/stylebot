@@ -167,14 +167,17 @@ export default class Overlay {
     );
 
     const panelRect = panelEl?.getBoundingClientRect() ?? null;
+    // The visual viewport leaves out the page's scrollbars, which clip a
+    // fixed card that runs under them.
+    const viewport = window.visualViewport;
 
     tip.updatePosition(
       toBox(anchor),
       {
         top: docRect.top + window.scrollY,
         left: docRect.left + window.scrollX,
-        height: window.innerHeight,
-        width: window.innerWidth,
+        height: viewport?.height ?? window.innerHeight,
+        width: viewport?.width ?? window.innerWidth,
       },
       panelRect && { left: panelRect.left, right: panelRect.right }
     );

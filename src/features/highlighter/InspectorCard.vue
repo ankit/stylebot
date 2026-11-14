@@ -95,7 +95,7 @@ export default Vue.extend({
   align-items: center;
   gap: 10px;
   width: max-content;
-  max-width: min(480px, calc(100vw - 16px));
+  max-width: min(480px, calc(100% - 24px));
   min-height: 17px;
   --card-edge: color-mix(in srgb, var(--text-primary) 18%, var(--menu-surface));
 

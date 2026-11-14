@@ -47,6 +47,7 @@ export function findTipPos(
   const tipHeight = Math.max(tipSize.height, 20);
   const tipWidth = Math.max(tipSize.width, 60);
   const margin = 8;
+  const edge = 12;
 
   let top;
   let placement: TipPlacement;
@@ -69,10 +70,10 @@ export function findTipPos(
   // vertical gap only).
   let left = dims.left;
   if (dims.left < bounds.left) {
-    left = bounds.left + margin;
+    left = bounds.left + edge;
   }
-  if (dims.left + tipWidth > bounds.left + bounds.width) {
-    left = bounds.left + bounds.width - tipWidth - margin;
+  if (dims.left + tipWidth > bounds.left + bounds.width - edge) {
+    left = bounds.left + bounds.width - tipWidth - edge;
   }
 
   return { top, left, placement };

@@ -37,13 +37,13 @@ describe('findTipPos', () => {
   it('keeps the tip inside the left edge', () => {
     const el = { top: 100, left: -20, width: 200, height: 40 };
 
-    expect(findTipPos(el, bounds, tip).left).toEqual(8);
+    expect(findTipPos(el, bounds, tip).left).toEqual(12);
   });
 
   it('keeps the tip inside the right edge', () => {
     const el = { top: 100, left: 900, width: 50, height: 40 };
 
-    expect(findTipPos(el, bounds, tip).left).toEqual(692);
+    expect(findTipPos(el, bounds, tip).left).toEqual(688);
   });
 });
 
