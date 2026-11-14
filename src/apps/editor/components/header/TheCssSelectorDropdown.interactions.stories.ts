@@ -60,9 +60,6 @@ export const TypingCommitsSelector: StoryObj = {
         document.querySelectorAll('#stylebot-overlay .stylebot-overlay-rect')
       ).toHaveLength(2)
     );
-    await expect(
-      document.querySelectorAll('#stylebot-overlay .stylebot-overlay-hint')
-    ).toHaveLength(0);
 
     // Picking leaves the field, which shows the selector as chips again.
     await user.click(items(canvasElement)[0]);

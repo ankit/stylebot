@@ -1,7 +1,7 @@
 import type Vue from 'vue';
 
 import InspectorCard from './InspectorCard.vue';
-import { findTipPos, leftBesidePanel } from './tip-position';
+import { findArrowLeft, findTipPos, leftBesidePanel } from './tip-position';
 import type { Box, TipPlacement } from './types';
 
 /**
@@ -9,16 +9,17 @@ import type { Box, TipPlacement } from './types';
  * `.vue` imports generically), for what's driven imperatively here.
  */
 type InspectorCardInstance = Vue & {
-  name: string;
-  ruleCount: number;
+  nameParts: Array<string>;
+  size: string;
   top: number;
   left: number;
+  arrowLeft: number;
   placement: TipPlacement;
 };
 
 export type TipSummary = {
-  name: string;
-  ruleCount: number;
+  nameParts: Array<string>;
+  size: string;
 };
 
 /**
@@ -41,8 +42,8 @@ export default class OverlayTip {
   }
 
   showSummary(summary: TipSummary): void {
-    this.vm.name = summary.name;
-    this.vm.ruleCount = summary.ruleCount;
+    this.vm.nameParts = summary.nameParts;
+    this.vm.size = summary.size;
   }
 
   /**
@@ -75,13 +76,14 @@ export default class OverlayTip {
             avoidHorizontal,
             tipRect.width,
             8,
-            window.innerWidth
+            bounds.width
           );
         }
       }
 
       this.vm.top = tipPos.top;
       this.vm.left = left;
+      this.vm.arrowLeft = findArrowLeft(dims, left, tipRect.width);
       this.vm.placement = tipPos.placement;
     });
   }

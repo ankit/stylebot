@@ -1,6 +1,7 @@
 import Overlay from './Overlay';
 import { getSelector, splitSelectorList } from '@stylebot/css';
 import { queryWithShadowRoots } from '@stylebot/stylesheets';
+import { describeElement, describeSize } from './describe-element';
 
 // What the inspector takes from the keyboard: climb, descend and pick.
 export const INSPECT_KEYS = [
@@ -49,7 +50,6 @@ class Highlighter {
   overlay: Overlay | null;
   onSelect: (selector: string) => void;
   onHover?: (selector: string) => void;
-  countRules?: (selector: string) => number;
   getExistingSelector?: (el: HTMLElement) => string | null;
   getMountRoot?: () => HTMLElement | undefined;
   currentElement: HTMLElement | null;
@@ -71,7 +71,6 @@ class Highlighter {
   constructor({
     onSelect,
     onHover,
-    countRules,
     getExistingSelector,
     getMountRoot,
   }: {
@@ -80,10 +79,6 @@ class Highlighter {
      * Called as the inspector moves onto an element, before it's picked.
      */
     onHover?: (selector: string) => void;
-    /**
-     * How many declarations the user's style has for a selector, for the card.
-     */
-    countRules?: (selector: string) => number;
     getExistingSelector?: (el: HTMLElement) => string | null;
     /**
      * The editor's theme-provider element, for the on-page tip to mount into.
@@ -93,7 +88,6 @@ class Highlighter {
     this.overlay = null;
     this.onSelect = onSelect;
     this.onHover = onHover;
-    this.countRules = countRules;
     this.getExistingSelector = getExistingSelector;
     this.getMountRoot = getMountRoot;
     this.currentElement = null;
@@ -442,15 +436,10 @@ class Highlighter {
   showOverlay = (el: HTMLElement): void => {
     const selector = this.getSelectorFor(el);
 
-    this.ensureOverlay().inspect(
-      this.queryMatches(selector),
-      selector,
-      undefined,
-      {
-        primary: el,
-        ruleCount: this.countRules?.(selector) ?? 0,
-      }
-    );
+    this.ensureOverlay().inspect([el], describeElement(el), undefined, {
+      primary: el,
+      size: describeSize(el),
+    });
 
     this.onHover?.(selector);
   };

@@ -10,7 +10,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import OverlayHint from './OverlayHint';
 import OverlayRect from './OverlayRect';
 import OverlayTip from './OverlayTip';
 import type { Rect, Dimensions } from './utils';
@@ -21,7 +20,7 @@ type Edges = { top: number; right: number; bottom: number; left: number };
 
 type PickingOptions = {
   primary?: HTMLElement;
-  ruleCount?: number;
+  size?: string;
 };
 
 // A safety net against pathological cases, not a design choice.
@@ -37,33 +36,6 @@ const emptyEdges = (): Edges => ({
   bottom: Number.NEGATIVE_INFINITY,
   left: Number.POSITIVE_INFINITY,
 });
-
-const TILED_THRESHOLD = 8;
-
-const visibleBoxes = (elements: Array<HTMLElement>): Array<Rect> =>
-  elements
-    .map(element => getNestedBoundingClientRect(element, window))
-    .filter(
-      box =>
-        box.top + box.height > 0 &&
-        box.top < window.innerHeight &&
-        box.left + box.width > 0 &&
-        box.left < window.innerWidth
-    );
-
-const touches = (a: Rect, b: Rect): boolean =>
-  a.left <= b.left + b.width + 1 &&
-  b.left <= a.left + a.width + 1 &&
-  a.top <= b.top + b.height + 1 &&
-  b.top <= a.top + a.height + 1;
-
-/**
- * How many boxes touch or overlap at least one other.
- */
-const countTouching = (boxes: Array<Rect>): number =>
-  boxes.filter((box, i) =>
-    boxes.some((other, j) => i !== j && touches(box, other))
-  ).length;
 
 const isEmpty = (edges: Edges) => edges.left === Number.POSITIVE_INFINITY;
 
@@ -92,7 +64,6 @@ export default class Overlay {
   mountRoot?: HTMLElement;
   tip: OverlayTip | null;
   rects: Array<OverlayRect>;
-  hints: Array<OverlayHint>;
 
   /**
    * The tip is Vue-rendered into mountRoot so it inherits the editor's theme;
@@ -110,7 +81,6 @@ export default class Overlay {
     this.mountRoot = mountRoot;
     this.tip = null;
     this.rects = [];
-    this.hints = [];
   }
 
   remove(): void {
@@ -120,8 +90,6 @@ export default class Overlay {
     });
 
     this.rects.length = 0;
-    this.hints.forEach(hint => hint.remove());
-    this.hints.length = 0;
     if (this.container.parentNode) {
       this.container.parentNode.removeChild(this.container);
     }
@@ -143,7 +111,6 @@ export default class Overlay {
    * fainter than a hovered element's so the matches' content shows through.
    */
   outline(nodes: Array<HTMLElement>): void {
-    this.drawHints([]);
     this.drawRects(nodes.slice(0, MAX_ELEMENTS));
     this.rects.forEach(rect => {
       rect.node.style.opacity = MATCHES_OPACITY;
@@ -152,7 +119,7 @@ export default class Overlay {
 
   inspect(
     nodes: Array<HTMLElement>,
-    cssSelector: string,
+    label: Array<string>,
     property?: LayoutProperty,
     picking?: PickingOptions
   ): void {
@@ -162,24 +129,8 @@ export default class Overlay {
       node => node.nodeType === Node.ELEMENT_NODE
     ) as Array<HTMLElement>;
 
-    // Only a hovered element gets the full box; every other match gets a
-    // faint tint.
-    const hinting = !property && primary !== undefined;
-    let elements: Array<HTMLElement> = [];
-    if (primary) {
-      elements = [primary];
-    } else if (!hinting) {
-      elements = candidates.slice(0, MAX_ELEMENTS);
-    }
-    const others = hinting
-      ? candidates.filter(node => node !== primary).slice(0, MAX_ELEMENTS)
-      : [];
-    // Matches that tile together (stacked rows) would tint the page into one
-    // sheet, so only the hovered one is highlighted.
-    const tiled =
-      primary !== undefined &&
-      countTouching(visibleBoxes([primary, ...others])) > TILED_THRESHOLD;
-    this.drawHints(tiled ? [] : others);
+    // A hovered element is boxed alone, not with the selector's other matches.
+    const elements = primary ? [primary] : candidates.slice(0, MAX_ELEMENTS);
 
     if (elements.length === 0) {
       this.drawRects([], property);
@@ -198,8 +149,8 @@ export default class Overlay {
     const tip = this.ensureTip();
 
     tip.showSummary({
-      name: cssSelector,
-      ruleCount: picking?.ruleCount ?? 0,
+      nameParts: label,
+      size: picking?.size ?? '',
     });
 
     const panelEl =
@@ -216,35 +167,20 @@ export default class Overlay {
     );
 
     const panelRect = panelEl?.getBoundingClientRect() ?? null;
+    // The visual viewport leaves out the page's scrollbars, which clip a
+    // fixed card that runs under them.
+    const viewport = window.visualViewport;
 
     tip.updatePosition(
       toBox(anchor),
       {
         top: docRect.top + window.scrollY,
         left: docRect.left + window.scrollX,
-        height: window.innerHeight,
-        width: window.innerWidth,
+        height: viewport?.height ?? window.innerHeight,
+        width: viewport?.width ?? window.innerWidth,
       },
       panelRect && { left: panelRect.left, right: panelRect.right }
     );
-  }
-
-  /**
-   * Tints each element that's in the viewport, reusing existing hints;
-   * off-screen matches aren't drawn at all.
-   */
-  drawHints(elements: Array<HTMLElement>): void {
-    const boxes = visibleBoxes(elements);
-
-    while (this.hints.length > boxes.length) {
-      this.hints.pop()?.remove();
-    }
-
-    while (this.hints.length < boxes.length) {
-      this.hints.push(new OverlayHint(window.document, this.container));
-    }
-
-    boxes.forEach((box, index) => this.hints[index].update(box));
   }
 
   /**

@@ -5,7 +5,6 @@ import {
   removeCSSFromDocument,
   removeEmptyRules,
   validateSelector,
-  getDeclarationsForSelector,
   getExistingSelector,
   getBodyChildSelectors,
 } from '@stylebot/css';
@@ -92,8 +91,6 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
         this.hoveredElement = this.inspector.currentElement;
         this.emit('hover', selector);
       },
-      countRules: selector =>
-        getDeclarationsForSelector(getStylebotCss(), selector)?.length ?? 0,
       getExistingSelector: el => getExistingSelector(el, getStylebotCss()),
       getMountRoot,
     });

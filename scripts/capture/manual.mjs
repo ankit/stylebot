@@ -244,7 +244,7 @@ const SHOTS = [
         .nth(2);
       await link.click();
       await wait(1200);
-      // Back to inspecting, to show a hovered element's selector too.
+      // Back to inspecting, to show a hovered element's card too.
       await panel.locator('button.stylebot-inspector').click();
       await wait(600);
       await panel.evaluate(() => document.activeElement?.blur());
