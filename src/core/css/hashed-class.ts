@@ -44,7 +44,7 @@ export function getClassNameSpans(className: string): Array<ClassNameSpan> {
 /**
  * Generated classes with no authored part: CSS-in-JS prefixes, React Native
  * Web's atomic classes (X), Instagram's legacy `_a6hd`, vanilla-extract's
- * `_7uluu50`, the Google bar's `gb_Ra`, Svelte/Astro scoping, next/font,
+ * `_7uluu50`, CSS Modules' hex `_a1b2c3d`, the Google bar's `gb_Ra`, Svelte/Astro scoping, next/font,
  * JSS counters, and Angular's animation classes.
  */
 const GENERATED_CLASS_PATTERNS = [
@@ -53,6 +53,7 @@ const GENERATED_CLASS_PATTERNS = [
   /^r-(?=[a-z]*\d)[0-9a-z]{5,7}$/,
   /^_(?=[a-z]*\d)[0-9a-z]{4}$/,
   /^_\d[0-9a-z]{4,9}$/,
+  /^_(?=[a-f]*\d)[0-9a-f]{5,}$/i,
   /^gb_[0-9A-Za-z]{1,3}$/,
   /^(svelte|astro)-[0-9a-z]{5,8}$/i,
   /^__(className|variable)_[0-9a-f]{6}$/,
@@ -186,7 +187,7 @@ export function looksHashed(className: string): boolean {
     return false;
   }
 
-  // A hex-like hash, e.g. CSS Modules' "_1a2b3c".
+  // A hex-like hash, e.g. "a1b2c3d".
   if (/^_?[0-9a-f]{5,}$/i.test(className)) {
     return true;
   }

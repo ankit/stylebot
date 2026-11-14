@@ -84,7 +84,7 @@ Every class name falls into one of four kinds:
 | next/font                      | `__className_a64ecd`                            | hashed        |                                             |
 | JSS, Material UI v4            | `jss123`, `makeStyles-root-12`                  | hashed        |                                             |
 | Angular animations             | `ng-tns-c3784233582-0`                          | hashed        |                                             |
-| CSS Modules, hex hash          | `_1a2b3c`                                       | hashed        |                                             |
+| CSS Modules, hex hash          | `_1a2b3c`, `_a1b2c3d`                           | hashed        |                                             |
 | styled-components style hash   | `kZxyAb`                                        | hashed        | on a page using styled-components           |
 | Google (Closure Compiler)      | `LC20lb`, `VwiC3b`, `m5k28`                     | minified      |                                             |
 | Other short, case-mixed names  | `MjjYud`, `WwrzSb`                              | minified      |                                             |
