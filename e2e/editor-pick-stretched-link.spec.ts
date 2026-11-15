@@ -15,6 +15,11 @@ const PAGE_HTML = `
           position: absolute;
           inset: 0;
         }
+        .spilling-label {
+          display: inline-block;
+          width: 40px;
+          white-space: nowrap;
+        }
       </style>
     </head>
     <body>
@@ -30,6 +35,9 @@ const PAGE_HTML = `
         <h3><a class="plain-link" href="#">Plain headline</a></h3>
         <p>Another summary.</p>
       </div>
+      <p>
+        <span class="spilling-label">A label whose text spills out of its box</span>
+      </p>
     </body>
   </html>
 `;
@@ -55,15 +63,23 @@ const openInspector = async (
   return { page, editorRoot };
 };
 
-const moveTo = async (page: Page, selector: string): Promise<void> => {
+const moveTo = async (
+  page: Page,
+  selector: string,
+  offsetX = 5
+): Promise<void> => {
   const box = await page.locator(selector).boundingBox();
-  await page.mouse.move(box!.x + 5, box!.y + 5);
+  await page.mouse.move(box!.x + offsetX, box!.y + 5);
 };
 
-const pickAt = async (page: Page, selector: string): Promise<void> => {
+const pickAt = async (
+  page: Page,
+  selector: string,
+  offsetX = 5
+): Promise<void> => {
   const box = await page.locator(selector).boundingBox();
-  await page.mouse.move(box!.x + 5, box!.y + 5);
-  await page.mouse.click(box!.x + 5, box!.y + 5);
+  await page.mouse.move(box!.x + offsetX, box!.y + 5);
+  await page.mouse.click(box!.x + offsetX, box!.y + 5);
 };
 
 const pickedSelector = (editorRoot: Locator): Locator =>
@@ -112,4 +128,30 @@ test('moving from the headline down onto the summary follows the pointer', async
   await pickAt(page, '.card-summary');
 
   await expect(pickedSelector(editorRoot)).toHaveText(/\.card-summary$/);
+});
+
+test('climbing from the headline text reaches its link', async ({
+  context,
+  openPopup,
+}) => {
+  const { page, editorRoot } = await openInspector(context, openPopup);
+
+  await moveTo(page, '.card-title');
+  await page.keyboard.press('ArrowUp');
+  await page.keyboard.press('ArrowUp');
+  await moveTo(page, '.card-title', 6);
+  await page.keyboard.press('Enter');
+
+  await expect(pickedSelector(editorRoot)).toHaveText(/\.card-link$/);
+});
+
+test('picking text that spills out of its box picks its own element', async ({
+  context,
+  openPopup,
+}) => {
+  const { page, editorRoot } = await openInspector(context, openPopup);
+
+  await pickAt(page, '.spilling-label', 100);
+
+  await expect(pickedSelector(editorRoot)).toHaveText(/\.spilling-label$/);
 });

@@ -1,4 +1,5 @@
 import { getDefaultSelector } from '@stylebot/css';
+import { canCoverOthers, getVisibleElementAt } from '@stylebot/highlighter';
 import { inspectElement } from '@stylebot/page-bridge';
 import { queryWithShadowRoots } from '@stylebot/stylesheets';
 import type { PointerAction, PointerResult } from '@stylebot/types';
@@ -153,7 +154,16 @@ export const usePointer = (action: PointerAction): PointerResult => {
   const point = { x: Math.round(x), y: Math.round(y) };
 
   if (action.kind === 'inspect') {
-    return { ...point, ...inspectElement(el as HTMLElement, action.css ?? '') };
+    // At a point, report what's seen there, like the editor's inspector does.
+    const seen =
+      action.selector === undefined && canCoverOthers(el as HTMLElement)
+        ? getVisibleElementAt(el as HTMLElement, x, y)
+        : el;
+
+    return {
+      ...point,
+      ...inspectElement(seen as HTMLElement, action.css ?? ''),
+    };
   }
 
   hover(el, x, y);

@@ -3,6 +3,7 @@ import { getSelector, splitSelectorList } from '@stylebot/css';
 import { queryWithShadowRoots } from '@stylebot/stylesheets';
 import { describeElement } from './describe-element';
 import { getParentElement, getPathUpTo, snapPastWrappers } from './snap';
+import { canCoverOthers, getVisibleElementAt } from './visible-element';
 
 // What the inspector takes from the keyboard: climb, descend and pick.
 export const INSPECT_KEYS = [
@@ -34,30 +35,6 @@ const isInsideDisabledControl = (el: HTMLElement): boolean =>
     'button:disabled, input:disabled, select:disabled, textarea:disabled'
   );
 
-/**
- * Whether the element's own border box, leaving out its pseudo-elements,
- * holds the point.
- */
-const boxHolds = (el: Element, x: number, y: number): boolean => {
-  const box = el.getBoundingClientRect();
-
-  return x >= box.left && x <= box.right && y >= box.top && y <= box.bottom;
-};
-
-/**
- * Whether the element draws a positioned ::before or ::after, which can lie
- * on top of its own children.
- */
-const hasPositionedPseudo = (el: Element): boolean =>
-  ['::before', '::after'].some(pseudo => {
-    const style = getComputedStyle(el, pseudo);
-
-    return (
-      style.content !== 'none' &&
-      (style.position === 'absolute' || style.position === 'fixed')
-    );
-  });
-
 class Highlighter {
   overlay: Overlay | null;
   onSelect: (selector: string) => void;
@@ -70,14 +47,10 @@ class Highlighter {
    */
   pointerElement: HTMLElement | null;
   /**
-   * What the pointer showed there, looking through overlays on top.
+   * What the pointer showed through the element under it, when that element
+   * may cover others, so it can change without the pointer leaving it.
    */
   seenElement: HTMLElement | null;
-  /**
-   * Whether the element under the pointer draws a positioned pseudo-element,
-   * so what's seen there can change without the pointer leaving it.
-   */
-  pointerOverlaid: boolean;
   drillStack: Array<HTMLElement>;
   /**
    * Element/value currently suppressed by suppressTitle, if any.
@@ -114,7 +87,6 @@ class Highlighter {
     this.currentElement = null;
     this.pointerElement = null;
     this.seenElement = null;
-    this.pointerOverlaid = false;
     this.drillStack = [];
     this.titleSuppressedElement = null;
     this.suppressedTitleValue = null;
@@ -386,12 +358,20 @@ class Highlighter {
 
     const el = getComposedTarget(event);
 
-    // Across a card-wide overlay the target stays put while what's seen changes.
-    if (
-      el !== this.pointerElement ||
-      (this.pointerOverlaid && this.see(el, event) !== this.seenElement)
-    ) {
+    if (el !== this.pointerElement) {
       this.hoverElement(el, event);
+      return;
+    }
+
+    if (!this.seenElement) {
+      return;
+    }
+
+    const seen = this.getVisibleElementAt(el, event);
+
+    if (seen !== this.seenElement) {
+      this.seenElement = seen;
+      this.showSeen(seen);
     }
   };
 
@@ -412,9 +392,27 @@ class Highlighter {
 
   hoverElement = (el: HTMLElement, point?: MouseEvent): void => {
     this.pointerElement = el;
-    this.pointerOverlaid = hasPositionedPseudo(el);
-    const seen = point ? this.see(el, point) : el;
-    this.seenElement = seen;
+    this.seenElement = null;
+
+    if (point && canCoverOthers(el)) {
+      this.seenElement = this.getVisibleElementAt(el, point);
+    }
+
+    this.showSeen(this.seenElement ?? el);
+  };
+
+  getVisibleElementAt = (el: HTMLElement, point: MouseEvent): HTMLElement =>
+    getVisibleElementAt(
+      el,
+      point.clientX,
+      point.clientY,
+      this.isStylebotElement
+    );
+
+  /**
+   * Inspects what the pointer shows, snapped past plain wrappers.
+   */
+  showSeen = (seen: HTMLElement): void => {
     const target = snapPastWrappers(seen);
 
     // Drilling down from a snapped pick leads back to what's under the pointer.
@@ -424,65 +422,6 @@ class Highlighter {
 
     this.setCurrentElement(target);
     this.showOverlay(target);
-  };
-
-  /**
-   * What the pointer shows at the event's point, looking through overlays
-   * and fully transparent elements on top.
-   */
-  see = (el: HTMLElement, point: MouseEvent): HTMLElement =>
-    this.seeThroughTransparent(this.seeThroughOverlay(el, point), point);
-
-  /**
-   * What the pointer shows under an element's positioned ::before or ::after,
-   * like a link's overlay across a whole story card: the topmost element whose
-   * own box holds the pointer, kept to the element's own children while the
-   * pointer is inside it; else `el`.
-   */
-  seeThroughOverlay = (el: HTMLElement, point: MouseEvent): HTMLElement => {
-    const { clientX: x, clientY: y } = point;
-    const inside = boxHolds(el, x, y);
-
-    if (inside && !(el.firstElementChild && hasPositionedPseudo(el))) {
-      return el;
-    }
-
-    const root = el.getRootNode() as Document | ShadowRoot;
-    const under = root
-      .elementsFromPoint(x, y)
-      .find(
-        node =>
-          node !== el &&
-          (!inside || el.contains(node)) &&
-          !this.isStylebotElement(node) &&
-          boxHolds(node, x, y)
-      );
-
-    return (under as HTMLElement | undefined) ?? el;
-  };
-
-  /**
-   * What the pointer shows when the element on top is fully transparent,
-   * like the invisible checkbox over a menu button: the first visible
-   * element under it, else `el`.
-   */
-  seeThroughTransparent = (el: HTMLElement, point: MouseEvent): HTMLElement => {
-    if (el.checkVisibility({ opacityProperty: true })) {
-      return el;
-    }
-
-    const visible = el.ownerDocument
-      .elementsFromPoint(point.clientX, point.clientY)
-      .find(
-        node =>
-          !this.isStylebotElement(node) &&
-          node.checkVisibility({
-            opacityProperty: true,
-            visibilityProperty: true,
-          })
-      );
-
-    return (visible as HTMLElement | undefined) ?? el;
   };
 
   onPointerUp = (event: MouseEvent): void => {

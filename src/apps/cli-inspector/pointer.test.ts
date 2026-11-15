@@ -82,6 +82,28 @@ describe('usePointer', () => {
     expect(events).toEqual([]);
   });
 
+  it("inspects what's under a link's overlay stretched past its box", () => {
+    const link = document.getElementById('link')!;
+    const intro = document.getElementById('intro')!;
+    const getStyle = window.getComputedStyle;
+    jest
+      .spyOn(window, 'getComputedStyle')
+      .mockImplementation((el, pseudo) =>
+        el === link && pseudo
+          ? ({ content: '""', position: 'absolute' } as CSSStyleDeclaration)
+          : getStyle(el, pseudo)
+      );
+    document.elementFromPoint = () => link;
+    document.elementsFromPoint = () => [link, intro, document.body];
+
+    const inspected = usePointer({ kind: 'inspect', x: 5, y: 110 });
+    const hovered = usePointer({ kind: 'hover', x: 5, y: 110 });
+
+    expect(inspected.selector).toBe('#intro');
+    expect(hovered.selector).toBe('#link');
+    jest.restoreAllMocks();
+  });
+
   it("prefers a selector the style's css already has", () => {
     document.getElementById('link')!.className = 'docs';
 
