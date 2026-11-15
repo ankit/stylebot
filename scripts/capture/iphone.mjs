@@ -14,7 +14,13 @@ import {
   syncState,
   wait,
 } from './browser.mjs';
-import { hackerNews, history, listedGallery, openOptions } from './shots.mjs';
+import {
+  hackerNews,
+  history,
+  listedGallery,
+  openOptions,
+  wikipediaLooks,
+} from './shots.mjs';
 
 /**
  * An iPhone 17 Pro Max's screen in points; its 3x pixels are the size the App
@@ -176,17 +182,20 @@ export const IPHONE_SHOTS = [
   },
   {
     name: '2-profiles',
-    about: 'Profiles in the popup: Hacker News in Newspaper',
+    about: 'Profiles in the popup: Wikipedia in Reader',
     appearance: 'light',
     slide: { title: 'Switch *looks* in a tap.', accent: 'yellow' },
     run: async (browser, file, options) => {
+      // Reader styles Wikipedia's desktop skin, which an iPhone gets by
+      // asking for it by name.
       await seed(browser, {
-        styles: { 'news.ycombinator.com': hackerNews('Newspaper') },
+        styles: { 'en.wikipedia.org': await wikipediaLooks() },
       });
       const page = await openSite(
         browser.context,
-        'https://news.ycombinator.com/'
+        'https://en.wikipedia.org/wiki/Bonsai?useskin=vector-2022'
       );
+      await page.addStyleTag({ content: '#centralNotice { display: none; }' });
       const sheet = await openSheet(browser, page);
       await page.bringToFront();
       await wait(500);

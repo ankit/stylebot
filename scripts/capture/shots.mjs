@@ -141,16 +141,20 @@ export const openOptions = async (
 };
 
 /**
- * Wikipedia's Slate and Parchment profiles, in Parchment.
+ * Wikipedia's looks as profiles, in the Gallery's Wikipedia Reader, with
+ * Slate and Parchment to switch to.
  */
-const wikipediaLooks = () => ({
-  ...profiles(
+export const wikipediaLooks = async () => {
+  const reader = (await listedGallery('en.wikipedia.org')).find(
+    ({ name }) => name === 'Wikipedia Reader'
+  );
+
+  return profiles(
+    { name: 'Reader', css: reader.css },
     { name: 'Slate', css: gallery('wikipedia', 'slate') },
     { name: 'Parchment', css: gallery('wikipedia', 'parchment') }
-  ),
-  css: gallery('wikipedia', 'parchment'),
-  activeProfile: 'profile-1',
-});
+  );
+};
 
 export const SHOTS = [
   {
@@ -298,7 +302,7 @@ export const SHOTS = [
   },
   {
     name: '6-profiles',
-    about: 'Profiles: Wikipedia in Parchment',
+    about: 'Profiles: Wikipedia in Reader',
     appearance: 'light',
     slide: {
       title: 'Switch *looks* in a click.',
@@ -310,16 +314,8 @@ export const SHOTS = [
     // Touchscreens switch from the popup, which Safari on iPad shows below
     // its toolbar.
     touchRun: async (browser, file, options) => {
-      const reader = (await listedGallery('en.wikipedia.org')).find(
-        ({ name }) => name === 'Wikipedia Reader'
-      );
-      const looks = [
-        { name: 'Reader', css: reader.css },
-        { name: 'Slate', css: gallery('wikipedia', 'slate') },
-        { name: 'Parchment', css: gallery('wikipedia', 'parchment') },
-      ];
       await seed(browser, {
-        styles: { 'en.wikipedia.org': profiles(...looks) },
+        styles: { 'en.wikipedia.org': await wikipediaLooks() },
       });
       const page = await openSite(
         browser.context,
@@ -337,7 +333,9 @@ export const SHOTS = [
       });
     },
     run: async (browser, file, options) => {
-      await seed(browser, { styles: { 'en.wikipedia.org': wikipediaLooks() } });
+      await seed(browser, {
+        styles: { 'en.wikipedia.org': await wikipediaLooks() },
+      });
       const page = await openSite(
         browser.context,
         'https://en.wikipedia.org/wiki/Bonsai',
