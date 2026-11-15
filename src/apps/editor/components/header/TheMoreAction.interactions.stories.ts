@@ -28,7 +28,7 @@ export const OpeningStopsInspecting: StoryObj = {
 
 export const MenuContents: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'the Options menu offers Position, Theme, Publish to Gallery, Keyboard shortcuts, Options and Send feedback',
+  name: 'the Options menu offers Undo, Redo, Position, Theme, Publish to Gallery, Keyboard shortcuts, Options and Send feedback',
   play: async ({ canvasElement }) => {
     const menu = within(await openEditorMenu(within(canvasElement), 'Options'));
 
@@ -53,6 +53,8 @@ export const MenuContents: StoryObj = {
 
     const items = menu.getAllByRole('menuitem');
     await expect(items.map(item => item.textContent?.trim())).toEqual([
+      expect.stringMatching(/^Undo/),
+      expect.stringMatching(/^Redo/),
       'Publish to Gallery',
       expect.stringMatching(/^Keyboard shortcuts/),
       'Options',

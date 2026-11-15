@@ -153,11 +153,11 @@ export default Vue.extend({
   height: 32px;
   border-radius: 8px !important;
   cursor: pointer;
-  background: var(--field-surface);
+  background: color-mix(in srgb, var(--text-primary) 12%, transparent);
   color: var(--text-primary);
 
   &:hover:not(:disabled):not(.active) {
-    background: var(--field-surface-hover);
+    background: color-mix(in srgb, var(--text-primary) 20%, transparent);
   }
 
   &:disabled {

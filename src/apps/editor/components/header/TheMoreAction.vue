@@ -8,6 +8,22 @@
 
     <template #default="{ close }">
       <s-menu dense size="small" class="more-menu">
+        <s-menu-item :disabled="!canUndo" @click="undo">
+          <span class="menu-item-row">
+            <span>{{ t('undo') }}</span>
+            <s-shortcut-kbd small :value="undoShortcuts.undo" />
+          </span>
+        </s-menu-item>
+
+        <s-menu-item :disabled="!canRedo" @click="redo">
+          <span class="menu-item-row">
+            <span>{{ t('redo') }}</span>
+            <s-shortcut-kbd small :value="undoShortcuts.redo" />
+          </span>
+        </s-menu-item>
+
+        <s-menu-divider class="more-menu-divider" />
+
         <div class="dock-row">
           <s-text>{{ t('position') }}</s-text>
 
@@ -91,6 +107,7 @@ import {
   SMenuDivider,
   SIconButton,
   SSegmentedControl,
+  SShortcutKbd,
   SText,
 } from '@stylebot/components';
 import {
@@ -111,8 +128,9 @@ import type {
   StylebotDockLocation,
 } from '@stylebot/types';
 
-import { openOptionsPage, openFeedbackPage } from '@stylebot/utils';
+import { isMac, openOptionsPage, openFeedbackPage } from '@stylebot/utils';
 
+import { undoShortcuts } from '../../store/undo-stack';
 import { hasSidePanel } from '../../utils/side-panel';
 import TheGalleryMenuItem from './TheGalleryMenuItem.vue';
 
@@ -133,6 +151,7 @@ export default Vue.extend({
     SMenuDivider,
     SIconButton,
     SSegmentedControl,
+    SShortcutKbd,
     SText,
     MoreIcon,
     DockLeftIcon,
@@ -146,6 +165,18 @@ export default Vue.extend({
   },
 
   computed: {
+    canUndo(): boolean {
+      return this.$store.getters.canUndo;
+    },
+
+    canRedo(): boolean {
+      return this.$store.getters.canRedo;
+    },
+
+    undoShortcuts(): { undo: string; redo: string } {
+      return undoShortcuts(isMac());
+    },
+
     hasCss(): boolean {
       return Boolean(this.$store.state.css.trim());
     },
@@ -227,6 +258,14 @@ export default Vue.extend({
   },
 
   methods: {
+    undo(): void {
+      this.$store.dispatch('undo');
+    },
+
+    redo(): void {
+      this.$store.dispatch('redo');
+    },
+
     onOpen(): void {
       this.$store.commit('setInspecting', false);
       this.$store.dispatch('loadPublishedGalleryStyle');
@@ -264,8 +303,12 @@ export default Vue.extend({
 }
 
 .more-menu .text,
-.more-menu .menu-item {
+.more-menu .menu-item:not(:disabled) {
   color: var(--text-body);
+}
+
+.more-menu .menu-item:not(:disabled) .shortcut-kbd {
+  color: var(--text-muted);
 }
 
 .dock-row {

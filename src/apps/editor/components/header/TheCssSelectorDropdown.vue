@@ -34,13 +34,13 @@
         <span class="selector-text">
           <s-inline-list
             mono
-            :parts="splitTail(parts).head"
+            :parts="splitTail(shownParts(parts)).head"
             class="selector-head"
           />
           <span
-            v-if="splitTail(parts).tail"
+            v-if="splitTail(shownParts(parts)).tail"
             class="selector-tail"
-            v-text="splitTail(parts).tail"
+            v-text="splitTail(shownParts(parts)).tail"
           />
         </span>
       </s-tooltip>
@@ -61,6 +61,7 @@
 import Vue from 'vue';
 import { SAutocomplete, SInlineList, STooltip } from '@stylebot/components';
 import type { StylebotEditingMode } from '@stylebot/types';
+import { splitSelectorList, splitSelectorSteps } from '@stylebot/css';
 
 import type { CssSelectorMetadata } from '../../store';
 import { getPageBridge } from '@stylebot/page-bridge';
@@ -74,7 +75,25 @@ import TheCssSelectorDropdownItem from './TheCssSelectorDropdownItem.vue';
 const TAIL_MAX = 20;
 const TAIL_MIN = 8;
 const BOUNDARY = /[\s>+~.#[:"-]/;
+const STARTS_TOKEN = /[.#[:]/;
+const ENDS_WORD = /[-_"'=]/;
 
+/**
+ * Where an ancestor could be cut to keep its end, longest first: before a
+ * class, id, attribute or pseudo-class, or after a hyphen, quote or `=`.
+ */
+function partialStarts(step: string): Array<number> {
+  const first = step.search(/[^\s>+~]/);
+  const starts: Array<number> = [];
+
+  for (let i = first + 1; i < step.length; i++) {
+    if (STARTS_TOKEN.test(step[i]) || ENDS_WORD.test(step[i - 1])) {
+      starts.push(i);
+    }
+  }
+
+  return starts;
+}
 /**
  * Splits off the end of the last selector so it stays in view when the field
  * is too narrow, cutting at a boundary within its last few characters.
@@ -129,12 +148,20 @@ export default Vue.extend({
     focused: boolean;
     hovered: boolean;
     truncated: boolean;
+    droppedAncestors: number;
+    partialStart: number;
+    fitRun: number;
+    resizeObserver: ResizeObserver | null;
     openingSelector: string;
   } {
     return {
       focused: false,
       hovered: false,
       truncated: false,
+      droppedAncestors: 0,
+      partialStart: 0,
+      fitRun: 0,
+      resizeObserver: null,
       // The selector as it was when editing began; until it's changed, the
       // suggestions list everything rather than filtering by it.
       openingSelector: '',
@@ -188,19 +215,101 @@ export default Vue.extend({
     // Re-preview on every keystroke while focused, not just on select —
     // setSelector already updates activeSelector as the user types.
     activeSelector(): void {
+      this.fitSelector();
+
       if (this.focused) {
         this.previewMatches();
       }
     },
+
+    focused: 'fitSelector',
+  },
+
+  mounted() {
+    this.resizeObserver = new ResizeObserver(() => this.fitSelector());
+    this.resizeObserver.observe(this.$el);
+    this.fitSelector();
   },
 
   beforeDestroy() {
+    this.resizeObserver?.disconnect();
     stopPeek();
     getPageBridge().unhighlight();
   },
 
   methods: {
     splitTail,
+
+    /**
+     * The selector as the chips show it: with its leading ancestors swapped
+     * for an ellipsis once there are too many to fit.
+     */
+    shownParts(parts: Array<string>): Array<string> {
+      if (parts.length !== 1 || !this.droppedAncestors) {
+        return parts;
+      }
+
+      const steps = splitSelectorSteps(parts[0]);
+      const kept = steps.slice(this.droppedAncestors).join('');
+      const partial = this.partialStart
+        ? steps[this.droppedAncestors - 1].slice(this.partialStart)
+        : '';
+
+      return [`…${partial}${kept}`];
+    },
+
+    /**
+     * Drops whole leading ancestors, one at a time, until the selector fits
+     * the field. Once only the last element is left, keeps as much of the
+     * nearest ancestor's end as fits, so it's never just `… a`.
+     */
+    async fitSelector(): Promise<void> {
+      const run = ++this.fitRun;
+      const stale = () => run !== this.fitRun;
+
+      this.droppedAncestors = 0;
+      this.partialStart = 0;
+      await this.$nextTick();
+
+      const parts = splitSelectorList(this.activeSelector);
+
+      if (parts.length !== 1) {
+        return;
+      }
+
+      const steps = splitSelectorSteps(parts[0]);
+      const ancestors = steps.length - 1;
+
+      while (this.droppedAncestors < ancestors && this.overflows()) {
+        this.droppedAncestors++;
+        await this.$nextTick();
+
+        if (stale()) {
+          return;
+        }
+      }
+
+      if (stale() || !ancestors || this.droppedAncestors < ancestors) {
+        return;
+      }
+
+      for (const start of partialStarts(steps[ancestors - 1])) {
+        this.partialStart = start;
+        await this.$nextTick();
+
+        if (stale() || !this.overflows()) {
+          return;
+        }
+      }
+
+      this.partialStart = 0;
+    },
+
+    overflows(): boolean {
+      const text = this.$el.querySelector('.selector-head');
+
+      return !!text && text.scrollWidth > text.clientWidth;
+    },
 
     setSelector(value: string): void {
       this.$store.commit('setActiveSelector', value);
@@ -217,7 +326,9 @@ export default Vue.extend({
     measureTruncation(): void {
       const text = this.$el.querySelector('.selector-head');
 
-      this.truncated = !!text && text.scrollWidth > text.clientWidth;
+      this.truncated =
+        this.droppedAncestors > 0 ||
+        (!!text && text.scrollWidth > text.clientWidth);
     },
 
     stopInspecting(): void {
@@ -300,6 +411,28 @@ export default Vue.extend({
   ::v-deep
   .autocomplete-clear {
   visibility: hidden;
+}
+
+.selector-autocomplete ::v-deep .autocomplete-chips ~ .autocomplete-clear {
+  position: relative;
+  width: 36px;
+  margin-left: -36px;
+  padding-left: 14px;
+  background: linear-gradient(to right, transparent, var(--clear-fade) 14px);
+}
+
+.selector-autocomplete ::v-deep .autocomplete-pill {
+  --clear-fade: var(--field-surface);
+
+  .autocomplete-chips,
+  .autocomplete-input {
+    font-size: 12px;
+  }
+
+  &:hover:not(.disabled),
+  &:has(.autocomplete-chips:focus-visible:not(.quiet)) {
+    --clear-fade: var(--field-surface-hover);
+  }
 }
 
 .selector-text {

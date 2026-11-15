@@ -388,16 +388,21 @@ const tooltipAnchor = (root: HTMLElement) =>
 
 export const LongSelectorOnOneLine: StoryObj = {
   ...editor({ css: RULE_CSS, activeSelector: LONG_SELECTOR }),
-  name: 'a long selector stays on one line, in full in a tooltip and while editing',
+  name: 'a long selector drops whole ancestors to stay on one line, in full in a tooltip and while editing',
   play: async ({ canvasElement, step }) => {
     const text = () =>
-      chips(canvasElement).querySelector('.selector-head') as HTMLElement;
+      chips(canvasElement).querySelector('.selector-text') as HTMLElement;
 
-    await step('the field cuts the selector short on one line', async () => {
-      await expect(text().scrollWidth).toBeGreaterThan(text().clientWidth);
-      await expect(text().getClientRects()).toHaveLength(1);
-      await expect(text().offsetHeight).toBeLessThan(24);
-    });
+    await step(
+      'the field swaps leading ancestors for an ellipsis on one line',
+      async () => {
+        await waitFor(() => expect(text().innerText).toMatch(/^…/));
+        await expect(text().innerText.replace(/\n/g, '')).toMatch(
+          / li\.mw-list-item$/
+        );
+        await expect(text().offsetHeight).toBeLessThan(24);
+      }
+    );
 
     await step('hovering shows the whole selector', async () => {
       await user.hover(tooltipAnchor(canvasElement));
@@ -424,8 +429,25 @@ export const SpacesAroundCombinators: StoryObj = {
       '.selector-text'
     ) as HTMLElement;
 
-    await expect(text.innerText.replace(/\n/g, '')).toBe(
-      'td.title > span.titleline > a'
+    await expect(text.innerText.replace(/\n/g, '')).toMatch(
+      /^(td\.title|…) > span\.titleline > a$/
+    );
+  },
+};
+
+export const LongLoneAncestor: StoryObj = {
+  ...editor({
+    css: RULE_CSS,
+    activeSelector: '[data-testid="latest-commit-html-and-more"] a',
+  }),
+  name: 'a long lone ancestor keeps its end in view rather than leaving just the last element',
+  play: async ({ canvasElement }) => {
+    const text = chips(canvasElement).querySelector(
+      '.selector-text'
+    ) as HTMLElement;
+
+    await waitFor(() =>
+      expect(text.innerText.replace(/\n/g, '')).toMatch(/^…\S.*"\] a$/)
     );
   },
 };

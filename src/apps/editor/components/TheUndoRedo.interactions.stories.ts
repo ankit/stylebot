@@ -5,6 +5,7 @@ import TheStylebotApp from './TheStylebotApp.vue';
 import { editor, WITH_RULE } from '@stylebot/storybook/fixtures/editor';
 import {
   declaration,
+  openEditorMenu,
   pageStyle,
   propertyControl,
   setRange,
@@ -119,56 +120,79 @@ export const ClearAllInCodeMode: StoryObj = {
   },
 };
 
-export const UndoRedoButtons: StoryObj = {
-  ...editor(WITH_RULE),
-  name: 'undo and redo buttons appear once there is history and enable only when they can act',
-  play: async ({ canvasElement, step }) => {
-    const canvas = within(canvasElement);
-    const store = storeOf(canvasElement);
-    const control = propertyControl(canvas, 'Opacity');
+/**
+ * Opens the editor's Options menu and returns its Undo and Redo items.
+ */
+const undoItems = async (canvasElement: HTMLElement) => {
+  const canvas = within(canvasElement);
 
-    await expect(canvas.queryByRole('button', { name: 'Undo' })).toBeNull();
-    await expect(canvas.queryByRole('button', { name: 'Redo' })).toBeNull();
+  await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
+
+  const menu = within(await openEditorMenu(canvas, 'Options'));
+
+  return {
+    undo: menu.getByRole('menuitem', { name: /^Undo/ }),
+    redo: menu.getByRole('menuitem', { name: /^Redo/ }),
+  };
+};
+
+const closeMenu = () => user.keyboard('{Escape}');
+
+export const UndoRedoMenuItems: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'undo and redo sit in the Options menu, enabled only when they can act',
+  play: async ({ canvasElement, step }) => {
+    const store = storeOf(canvasElement);
+    const control = propertyControl(within(canvasElement), 'Opacity');
+
+    await step('both are disabled before any change', async () => {
+      const { undo, redo } = await undoItems(canvasElement);
+
+      await expect(undo).toBeDisabled();
+      await expect(redo).toBeDisabled();
+      await closeMenu();
+    });
 
     await setRange(slider(control), 0.5);
-
-    const undo = await canvas.findByRole('button', { name: 'Undo' });
-    const redo = canvas.getByRole('button', { name: 'Redo' });
-    await expect(undo).toBeEnabled();
-    await expect(redo).toBeDisabled();
+    await waitFor(() => expect(store.getters.canUndo).toBe(true));
 
     await step('undo', async () => {
-      await user.click(undo);
+      await user.click((await undoItems(canvasElement)).undo);
 
       await expect(declaration(store, 'h1', 'opacity')).toBe('0.9');
-      await waitFor(() => expect(undo).toBeDisabled());
+
+      const { undo, redo } = await undoItems(canvasElement);
+
+      await expect(undo).toBeDisabled();
       await expect(redo).toBeEnabled();
+      await user.click(redo);
     });
 
     await step('redo', async () => {
-      await user.click(redo);
-
       await expect(declaration(store, 'h1', 'opacity')).toBe('0.5');
-      await waitFor(() => expect(redo).toBeDisabled());
-      await expect(undo).toBeEnabled();
+
+      const { redo } = await undoItems(canvasElement);
+
+      await expect(redo).toBeDisabled();
+      await closeMenu();
     });
   },
 };
 
-export const UndoRedoButtonsInCodeMode: StoryObj = {
+export const UndoRedoMenuInCodeMode: StoryObj = {
   ...editor({ ...WITH_RULE, options: { mode: 'code' } }),
-  name: 'undo and redo buttons stay in the header outside Basic mode',
+  name: 'undo in the Options menu works outside Basic mode',
   play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
     const before = store.state.css;
 
     typeInCodeEditor('');
     await waitFor(() => expect(store.state.css).toBe(''));
 
-    await user.click(await canvas.findByRole('button', { name: 'Undo' }));
+    await user.click((await undoItems(canvasElement)).undo);
 
     await expect(store.state.css).toBe(before);
-    await expect(canvas.getByRole('button', { name: 'Redo' })).toBeEnabled();
+    await expect((await undoItems(canvasElement)).redo).toBeEnabled();
+    await closeMenu();
   },
 };
