@@ -31,7 +31,18 @@
         <template #text>
           <span class="selector-tooltip">{{ activeSelector }}</span>
         </template>
-        <s-inline-list mono :parts="parts" class="selector-text" />
+        <span class="selector-text">
+          <s-inline-list
+            mono
+            :parts="splitTail(parts).head"
+            class="selector-head"
+          />
+          <span
+            v-if="splitTail(parts).tail"
+            class="selector-tail"
+            v-text="splitTail(parts).tail"
+          />
+        </span>
       </s-tooltip>
     </template>
 
@@ -59,6 +70,40 @@ import {
   stopPeek,
 } from '../../utils/selector-peek';
 import TheCssSelectorDropdownItem from './TheCssSelectorDropdownItem.vue';
+
+const TAIL_MAX = 20;
+const TAIL_MIN = 8;
+const BOUNDARY = /[\s>+~.#[:"-]/;
+
+/**
+ * Splits off the end of the last selector so it stays in view when the field
+ * is too narrow, cutting at a boundary within its last few characters.
+ */
+function splitTail(parts: Array<string>): {
+  head: Array<string>;
+  tail: string;
+} {
+  const last = parts[parts.length - 1] ?? '';
+  if (last.length <= TAIL_MAX) {
+    return { head: parts, tail: '' };
+  }
+
+  const end = last.length - TAIL_MIN;
+  let cut = last.length - TAIL_MAX;
+
+  while (cut < end && !BOUNDARY.test(last[cut])) {
+    cut++;
+  }
+
+  if (cut >= end) {
+    cut = last.length - TAIL_MAX;
+  }
+
+  return {
+    head: [...parts.slice(0, -1), last.slice(0, cut)],
+    tail: last.slice(cut),
+  };
+}
 
 type DropdownEntry = {
   id: string;
@@ -150,6 +195,8 @@ export default Vue.extend({
   },
 
   methods: {
+    splitTail,
+
     setSelector(value: string): void {
       this.$store.commit('setActiveSelector', value);
     },
@@ -163,7 +210,7 @@ export default Vue.extend({
      * when there's more to read.
      */
     measureTruncation(): void {
-      const text = this.$el.querySelector('.selector-text');
+      const text = this.$el.querySelector('.selector-head');
 
       this.truncated = !!text && text.scrollWidth > text.clientWidth;
     },
@@ -251,10 +298,20 @@ export default Vue.extend({
 }
 
 .selector-text {
-  @include truncate;
-
-  display: block;
+  display: flex;
+  min-width: 0;
   contain: inline-size;
+}
+
+.selector-head {
+  @include truncate;
+}
+
+.selector-tail {
+  flex: none;
+  font-family: var(--font-mono);
+  color: var(--field-ink);
+  white-space: pre;
 }
 
 .selector-tooltip {

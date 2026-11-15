@@ -391,7 +391,7 @@ export const LongSelectorOnOneLine: StoryObj = {
   name: 'a long selector stays on one line, in full in a tooltip and while editing',
   play: async ({ canvasElement, step }) => {
     const text = () =>
-      chips(canvasElement).querySelector('.selector-text') as HTMLElement;
+      chips(canvasElement).querySelector('.selector-head') as HTMLElement;
 
     await step('the field cuts the selector short on one line', async () => {
       await expect(text().scrollWidth).toBeGreaterThan(text().clientWidth);

@@ -45,13 +45,13 @@ export default class OverlayTip {
   }
 
   /**
-   * avoidHorizontal (the editor panel's left/right) shifts the card to
-   * whichever side has more room when it would land on top of the panel.
+   * avoid (the editor panel's rect) shifts the card to whichever side has
+   * more room when it would land on top of the panel.
    */
   updatePosition(
     dims: Box,
     bounds: Box,
-    avoidHorizontal?: { left: number; right: number } | null
+    avoid?: { left: number; right: number; top: number; bottom: number } | null
   ): void {
     // Vue patches the content set above asynchronously — wait a tick so
     // the size measured below reflects it, not the previous hover.
@@ -64,18 +64,15 @@ export default class OverlayTip {
 
       let left = tipPos.left;
 
-      if (avoidHorizontal) {
+      if (avoid) {
         const overlaps =
-          left < avoidHorizontal.right &&
-          left + tipRect.width > avoidHorizontal.left;
+          left < avoid.right &&
+          left + tipRect.width > avoid.left &&
+          tipPos.top < avoid.bottom &&
+          tipPos.top + tipRect.height > avoid.top;
 
         if (overlaps) {
-          left = leftBesidePanel(
-            avoidHorizontal,
-            tipRect.width,
-            8,
-            bounds.width
-          );
+          left = leftBesidePanel(avoid, tipRect.width, 8, bounds.width);
         }
       }
 
