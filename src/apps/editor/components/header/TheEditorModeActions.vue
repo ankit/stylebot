@@ -75,7 +75,7 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .mode-actions {
-  margin-top: 16px;
+  margin-top: 8px;
   margin-bottom: -1px;
 }
 

@@ -1,5 +1,6 @@
 import {
   countSelectorSteps,
+  splitSelectorSteps,
   isSimpleSelector,
   validateSelector,
 } from './selector-text';
@@ -32,6 +33,29 @@ describe('selector-text', () => {
       ['tr td.subtext a:nth-of-type(2)', 3],
     ])('counts %s as %d steps', (selector, steps) => {
       expect(countSelectorSteps(selector)).toBe(steps);
+    });
+  });
+
+  describe('splitSelectorSteps', () => {
+    it.each([
+      ['a', ['a']],
+      ['#menu li > a', ['#menu', ' li', ' > a']],
+      ['td.title>span.titleline', ['td.title', '>span.titleline']],
+      ['h2 + p ~ ul', ['h2', ' + p', ' ~ ul']],
+      [
+        'div.radio:has(> input[value="2"]) span',
+        ['div.radio:has(> input[value="2"])', ' span'],
+      ],
+      ['a[title="Top stories"] b', ['a[title="Top stories"]', ' b']],
+      ['.a\\ b c', ['.a\\ b', ' c']],
+      ['  a  b  ', ['  a', '  b  ']],
+      ['', []],
+      ['   ', []],
+    ])('splits %s into its steps', (selector, steps) => {
+      expect(splitSelectorSteps(selector)).toEqual(steps);
+      expect(splitSelectorSteps(selector).join('')).toBe(
+        selector.trim() ? selector : ''
+      );
     });
   });
 

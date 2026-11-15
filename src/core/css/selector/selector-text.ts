@@ -32,17 +32,26 @@ export const splitSelectorList = (selector: string): Array<string> =>
   splitCommaList(selector);
 
 /**
- * How many compound steps a selector chains, e.g. 3 for `#menu li > a`,
- * not counting what sits inside brackets, parentheses or quotes.
+ * The compound steps a selector chains, each after the first starting with
+ * the combinator before it: `#menu li > a` gives `#menu`, ` li` and ` > a`.
+ * What sits inside brackets, parentheses, quotes or after a backslash never splits.
  */
-export const countSelectorSteps = (selector: string): number => {
-  let steps = 0;
+export const splitSelectorSteps = (selector: string): Array<string> => {
+  const steps: Array<string> = [];
+  let current = '';
+  let between = '';
   let depth = 0;
   let quote = '';
-  let inStep = false;
+  let escaped = false;
 
   for (const char of selector) {
-    if (quote) {
+    const separates = !escaped && !quote && depth === 0 && /[\s>+~]/.test(char);
+
+    if (escaped) {
+      escaped = false;
+    } else if (char === '\\') {
+      escaped = true;
+    } else if (quote) {
       quote = char === quote ? '' : quote;
     } else if (char === '"' || char === "'") {
       quote = char;
@@ -52,18 +61,31 @@ export const countSelectorSteps = (selector: string): number => {
       depth--;
     }
 
-    const separates = !quote && depth === 0 && /[\s>+~]/.test(char);
-
     if (separates) {
-      inStep = false;
-    } else if (!inStep) {
-      inStep = true;
-      steps++;
+      between += char;
+    } else if (between && current.trim()) {
+      steps.push(current);
+      current = between + char;
+      between = '';
+    } else {
+      current += between + char;
+      between = '';
     }
   }
 
-  return steps;
+  if (!current.trim()) {
+    return steps;
+  }
+
+  return [...steps, current + between];
 };
+
+/**
+ * How many compound steps a selector chains, e.g. 3 for `#menu li > a`,
+ * not counting what sits inside brackets, parentheses or quotes.
+ */
+export const countSelectorSteps = (selector: string): number =>
+  splitSelectorSteps(selector).length;
 
 // Beyond this many steps a selector is too tied to the page's structure to
 // keep working as the site changes.

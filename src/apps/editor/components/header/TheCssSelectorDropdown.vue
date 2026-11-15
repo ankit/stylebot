@@ -27,20 +27,39 @@
         :disabled="!truncated"
         grow
         @mouseenter.native="measureTruncation"
+        @hook:mounted="fitSelector"
       >
         <template #text>
           <span class="selector-tooltip">{{ activeSelector }}</span>
         </template>
         <span class="selector-text">
+          <span
+            v-if="droppedAncestors && !headClipped"
+            class="selector-ellipsis"
+            aria-hidden="true"
+          >
+            <more-icon :size="14" />
+          </span>
           <s-inline-list
             mono
-            :parts="splitTail(parts).head"
+            :parts="splitTail(shownParts(parts)).head"
             class="selector-head"
+            :class="{ clipped: headClipped }"
+            :style="
+              headWidth ? { flex: 'none', width: `${headWidth}px` } : null
+            "
           />
           <span
-            v-if="splitTail(parts).tail"
+            v-if="headClipped"
+            class="selector-ellipsis middle"
+            aria-hidden="true"
+          >
+            <more-icon :size="14" />
+          </span>
+          <span
+            v-if="splitTail(shownParts(parts)).tail"
             class="selector-tail"
-            v-text="splitTail(parts).tail"
+            v-text="splitTail(shownParts(parts)).tail"
           />
         </span>
       </s-tooltip>
@@ -60,7 +79,9 @@
 <script lang="ts">
 import Vue from 'vue';
 import { SAutocomplete, SInlineList, STooltip } from '@stylebot/components';
+import { MoreIcon } from '@stylebot/icons';
 import type { StylebotEditingMode } from '@stylebot/types';
+import { splitSelectorList, splitSelectorSteps } from '@stylebot/css';
 
 import type { CssSelectorMetadata } from '../../store';
 import { getPageBridge } from '@stylebot/page-bridge';
@@ -74,7 +95,34 @@ import TheCssSelectorDropdownItem from './TheCssSelectorDropdownItem.vue';
 const TAIL_MAX = 20;
 const TAIL_MIN = 8;
 const BOUNDARY = /[\s>+~.#[:"-]/;
+const STARTS_TOKEN = /[.#[:]/;
+const ENDS_WORD = /[-_"'=]/;
+const NOT_A_START = /[-_"'=\])]/;
 
+/**
+ * Whether a step says more than a bare tag name, like `div` or `> span`.
+ */
+const isDistinctive = (step: string): boolean => STARTS_TOKEN.test(step);
+
+/**
+ * Where an ancestor could be cut to keep its end, longest first: before a
+ * class, id, attribute or pseudo-class, or after a hyphen, quote or `=`.
+ */
+function partialStarts(step: string): Array<number> {
+  const first = step.search(/[^\s>+~]/);
+  const starts: Array<number> = [];
+
+  for (let i = first + 1; i < step.length; i++) {
+    const startsWord =
+      ENDS_WORD.test(step[i - 1]) && !NOT_A_START.test(step[i]);
+
+    if (STARTS_TOKEN.test(step[i]) || startsWord) {
+      starts.push(i);
+    }
+  }
+
+  return starts;
+}
 /**
  * Splits off the end of the last selector so it stays in view when the field
  * is too narrow, cutting at a boundary within its last few characters.
@@ -119,6 +167,7 @@ export default Vue.extend({
   name: 'TheCssSelectorDropdown',
 
   components: {
+    MoreIcon,
     SAutocomplete,
     SInlineList,
     STooltip,
@@ -129,12 +178,24 @@ export default Vue.extend({
     focused: boolean;
     hovered: boolean;
     truncated: boolean;
+    droppedAncestors: number;
+    partialStart: number;
+    headClipped: boolean;
+    headWidth: number;
+    fitRun: number;
+    resizeObserver: ResizeObserver | null;
     openingSelector: string;
   } {
     return {
       focused: false,
       hovered: false,
       truncated: false,
+      droppedAncestors: 0,
+      partialStart: 0,
+      headClipped: false,
+      headWidth: 0,
+      fitRun: 0,
+      resizeObserver: null,
       // The selector as it was when editing began; until it's changed, the
       // suggestions list everything rather than filtering by it.
       openingSelector: '',
@@ -188,19 +249,151 @@ export default Vue.extend({
     // Re-preview on every keystroke while focused, not just on select —
     // setSelector already updates activeSelector as the user types.
     activeSelector(): void {
+      this.fitSelector();
+
       if (this.focused) {
         this.previewMatches();
       }
     },
+
+    focused: 'fitSelector',
+  },
+
+  mounted() {
+    this.resizeObserver = new ResizeObserver(() => this.fitSelector());
+    this.resizeObserver.observe(this.$el);
+    document.fonts?.addEventListener('loadingdone', this.fitSelector);
+    this.fitSelector();
   },
 
   beforeDestroy() {
+    this.resizeObserver?.disconnect();
+    document.fonts?.removeEventListener('loadingdone', this.fitSelector);
     stopPeek();
     getPageBridge().unhighlight();
   },
 
   methods: {
     splitTail,
+
+    /**
+     * The selector as the chips show it: without the leading ancestors that
+     * don't fit, which an ellipsis stands in for.
+     */
+    shownParts(parts: Array<string>): Array<string> {
+      if (parts.length !== 1 || !this.droppedAncestors) {
+        return parts;
+      }
+
+      const steps = splitSelectorSteps(parts[0]);
+      const kept = steps.slice(this.droppedAncestors).join('');
+      const partial = this.partialStart
+        ? steps[this.droppedAncestors - 1].slice(this.partialStart)
+        : '';
+
+      return [`${partial}${kept}`.trimStart()];
+    },
+
+    /**
+     * Drops whole leading ancestors, one at a time, until the selector fits
+     * the field. When no ancestor left in view has a class, id, attribute or
+     * pseudo-class, keeps as much of the last dropped one's end as fits, so
+     * it's never just `… a` or `… div button`. What still doesn't fit is
+     * cut in the middle instead, the only cut shown.
+     */
+    async fitSelector(): Promise<void> {
+      const run = ++this.fitRun;
+      const stale = () => run !== this.fitRun;
+
+      this.droppedAncestors = 0;
+      this.partialStart = 0;
+      this.headClipped = false;
+      this.headWidth = 0;
+      await this.$nextTick();
+
+      if (stale() || !this.$el.querySelector('.selector-head')) {
+        return;
+      }
+
+      await this.fitSteps(stale);
+
+      if (stale() || !this.overflows()) {
+        return;
+      }
+
+      this.headClipped = true;
+      this.partialStart = 0;
+      await this.$nextTick();
+
+      if (!stale()) {
+        this.headWidth = this.wholeCharacterWidth();
+      }
+    },
+
+    /**
+     * The widest the selector's start can be while ending on a whole
+     * character, as a text ellipsis would; the font is monospaced.
+     */
+    wholeCharacterWidth(): number {
+      const head = this.$el.querySelector('.selector-head');
+      const length = head?.textContent?.length;
+
+      if (!head || !length) {
+        return 0;
+      }
+
+      const character = head.scrollWidth / length;
+
+      return Math.floor(head.clientWidth / character) * character;
+    },
+
+    /**
+     * Drops whole leading ancestors until the selector fits, then fills any
+     * room left with the end of the last one dropped.
+     */
+    async fitSteps(stale: () => boolean): Promise<void> {
+      const parts = splitSelectorList(this.activeSelector);
+
+      if (parts.length !== 1) {
+        return;
+      }
+
+      const steps = splitSelectorSteps(parts[0]);
+      const ancestors = steps.length - 1;
+
+      while (this.droppedAncestors < ancestors && this.overflows()) {
+        this.droppedAncestors++;
+        await this.$nextTick();
+
+        if (stale()) {
+          return;
+        }
+      }
+
+      const dropped = this.droppedAncestors;
+      const shownAncestors = steps.slice(dropped, ancestors);
+
+      if (stale() || !dropped || shownAncestors.some(isDistinctive)) {
+        return;
+      }
+
+      for (const start of partialStarts(steps[dropped - 1])) {
+        this.partialStart = start;
+        await this.$nextTick();
+
+        if (stale() || !this.overflows()) {
+          return;
+        }
+      }
+
+      this.partialStart = 0;
+    },
+
+    overflows(): boolean {
+      const text = this.$el.querySelector('.selector-head');
+
+      return !!text && text.scrollWidth > text.clientWidth;
+    },
 
     setSelector(value: string): void {
       this.$store.commit('setActiveSelector', value);
@@ -217,7 +410,9 @@ export default Vue.extend({
     measureTruncation(): void {
       const text = this.$el.querySelector('.selector-head');
 
-      this.truncated = !!text && text.scrollWidth > text.clientWidth;
+      this.truncated =
+        this.droppedAncestors > 0 ||
+        (!!text && text.scrollWidth > text.clientWidth);
     },
 
     stopInspecting(): void {
@@ -302,6 +497,28 @@ export default Vue.extend({
   visibility: hidden;
 }
 
+.selector-autocomplete ::v-deep .autocomplete-chips ~ .autocomplete-clear {
+  position: relative;
+  width: 36px;
+  margin-left: -36px;
+  padding-left: 14px;
+  background: linear-gradient(to right, transparent, var(--clear-fade) 14px);
+}
+
+.selector-autocomplete ::v-deep .autocomplete-pill {
+  --clear-fade: var(--field-surface);
+
+  .autocomplete-chips,
+  .autocomplete-input {
+    font-size: 12px;
+  }
+
+  &:hover:not(.disabled),
+  &:has(.autocomplete-chips:focus-visible:not(.quiet)) {
+    --clear-fade: var(--field-surface-hover);
+  }
+}
+
 .selector-text {
   display: flex;
   min-width: 0;
@@ -310,6 +527,23 @@ export default Vue.extend({
 
 .selector-head {
   @include truncate;
+
+  &.clipped {
+    text-overflow: clip;
+  }
+}
+
+.selector-ellipsis {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 5px;
+  color: var(--text-secondary);
+  transform: translateY(3px);
+
+  &.middle {
+    margin: 0 1px;
+  }
 }
 
 .selector-tail {

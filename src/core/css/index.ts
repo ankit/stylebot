@@ -49,6 +49,7 @@ export {
   isPageWideSelector,
   isSimpleSelector,
   splitSelectorList,
+  splitSelectorSteps,
   validateSelector,
 } from './selector/selector-text';
 export {
