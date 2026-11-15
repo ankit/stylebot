@@ -1,6 +1,6 @@
 ---
 name: capture-store
-description: Retake the Chrome Web Store and Edge Add-ons screenshots in store/screenshots/, or the Mac App Store ones in store/safari/, with `yarn capture:store`, then check each one by eye before committing. Use when the UI has changed and the listing's screenshots are out of date, before a release, or when the user asks to "update the store screenshots", "retake the store shots", or change what one of them shows.
+description: Retake the Chrome Web Store and Edge Add-ons screenshots in store/screenshots/, or the App Store ones (Mac, iPhone, iPad) in store/safari/, with `yarn capture:store`, then check each one by eye before committing. Use when the UI has changed and the listing's screenshots are out of date, before a release, or when the user asks to "update the store screenshots", "retake the store shots", or change what one of them shows.
 ---
 
 # Capture the store screenshots
@@ -20,6 +20,7 @@ yarn capture:store
 
 - `--only 8-readability 2` retakes some shots, by name or number; `--no-build` reuses `dist/`.
 - `--safari` takes the Mac App Store set into `store/safari/` instead: every shot but the CLI, which Safari builds don't carry, at 2560×1600. Safari can't be automated with an extension loaded, so these are rendered in headless Chrome too; no browser UI shows, and the panel looks the same.
+- `--iphone` and `--ipad` take the App Store's sets into `store/safari/iphone/` (1320×2868) and `store/safari/ipad/` (2752×2064). Chrome emulates a touchscreen, and for iPhone Safari's user agent, so the popup and Options take their touch and iPhone layouts. iPhone has no editor, so its set is its own: the popup as a sheet, Readability and Options. iPad takes the Mac set, with touch wording in two titles.
 - `--phone` cuts the same screens out for the feature tour on stylebot.dev's phone layout, into `captures/tour/` (or `--out <dir>`) as WebP, for the site's repo's `src/assets/tour/`: the panel at Chrome's narrowest side panel width plus a strip of the page, with no headline (the site shows each as translated text, in `home.tour`). Each shot's `phone` entry sets its layout; check that panel text still reads at a phone's card width.
 - It takes about a minute. A shot that fails says why and the others still run.
 - The command line shot drives the real CLI in a temporary HOME, as its e2e spec does, so
