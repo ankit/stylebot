@@ -15,6 +15,16 @@ export const INSPECT_KEYS = [
 
 const WHOLE_PAGE_SELECTORS = ['*', 'body', 'html', ':root'];
 
+// Kept from the page while inspecting, so its hover menus hold still.
+const HOVER_EVENTS = [
+  'mousemove',
+  'mouseout',
+  'mouseenter',
+  'mouseleave',
+  'pointerenter',
+  'pointerleave',
+] as const;
+
 const isWholePageSelector = (selector: string): boolean =>
   splitSelectorList(selector).some(part => WHOLE_PAGE_SELECTORS.includes(part));
 
@@ -220,6 +230,10 @@ class Highlighter {
     window.addEventListener('pointerout', this.onPointerOut, true);
     window.addEventListener('pointerup', this.onPointerUp, true);
     window.addEventListener('keydown', this.onKeyDown, true);
+
+    for (const type of HOVER_EVENTS) {
+      window.addEventListener(type, this.onMouseEvent, true);
+    }
   };
 
   removeWindowListeners = (): void => {
@@ -233,6 +247,10 @@ class Highlighter {
     window.removeEventListener('pointerout', this.onPointerOut, true);
     window.removeEventListener('pointerup', this.onPointerUp, true);
     window.removeEventListener('keydown', this.onKeyDown, true);
+
+    for (const type of HOVER_EVENTS) {
+      window.removeEventListener(type, this.onMouseEvent, true);
+    }
   };
 
   selectElement = (el: HTMLElement): void => {
@@ -348,6 +366,7 @@ class Highlighter {
       return;
     }
 
+    event.stopPropagation();
     const el = getComposedTarget(event);
 
     if (el !== this.pointerElement) {
@@ -360,6 +379,10 @@ class Highlighter {
    * or pop-out window. The element stays current so keys typed there still work.
    */
   onPointerOut = (event: PointerEvent): void => {
+    if (!this.isStylebotElement(event.target)) {
+      event.stopPropagation();
+    }
+
     // Moving into an iframe's own document has no related target either.
     if (event.relatedTarget || event.target instanceof HTMLIFrameElement) {
       return;
