@@ -625,6 +625,11 @@ export default Vue.extend({
     color: var(--field-placeholder);
   }
 
+  &.mono::placeholder {
+    font-family: var(--font-ui, 'Geist', system-ui, sans-serif);
+    font-size: 13px;
+  }
+
   &:disabled {
     cursor: default;
   }

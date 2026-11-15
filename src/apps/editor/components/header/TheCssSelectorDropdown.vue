@@ -10,7 +10,7 @@
     :items="entries"
     :disabled="disabled"
     :min-width="300"
-    :placeholder="t('pick_an_element')"
+    :placeholder="t('pick_anything_on_the_page')"
     :clear-label="t('clear_selector')"
     :show-chevron="hasOtherRules"
     @input="setSelector"

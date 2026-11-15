@@ -28,7 +28,7 @@ test('a color picked in the popover applies to the page and is remembered as rec
 
   // Enables the (otherwise disabled) property fields — ColorPicker.vue reads
   // `activeSelector` to gate itself, same as every other property control.
-  await page.getByPlaceholder('Pick an element').fill('h1');
+  await page.getByPlaceholder('Pick anything on the page').fill('h1');
 
   // page-scoped, not editorRoot-scoped: chaining .filter({ has }) off a
   // locator that's already pierced the #stylebot shadow root once breaks
