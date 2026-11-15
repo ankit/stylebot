@@ -34,7 +34,7 @@
         </template>
         <span class="selector-text">
           <span
-            v-if="droppedAncestors"
+            v-if="droppedAncestors && !headClipped"
             class="selector-ellipsis"
             aria-hidden="true"
           >
@@ -299,7 +299,7 @@ export default Vue.extend({
      * the field. When no ancestor left in view has a class, id, attribute or
      * pseudo-class, keeps as much of the last dropped one's end as fits, so
      * it's never just `… a` or `… div button`. What still doesn't fit is
-     * cut in the middle, with the same dots marking the cut.
+     * cut in the middle instead, the only cut shown.
      */
     async fitSelector(): Promise<void> {
       const run = ++this.fitRun;
@@ -322,6 +322,7 @@ export default Vue.extend({
       }
 
       this.headClipped = true;
+      this.partialStart = 0;
       await this.$nextTick();
 
       if (!stale()) {
@@ -541,7 +542,7 @@ export default Vue.extend({
   transform: translateY(3px);
 
   &.middle {
-    margin: 0 3px 0 1px;
+    margin: 0 1px;
   }
 }
 

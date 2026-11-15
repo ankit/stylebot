@@ -482,6 +482,28 @@ export const BareTagsAfterLongAncestor: StoryObj = {
   },
 };
 
+export const LongLastElement: StoryObj = {
+  ...editor({
+    css: RULE_CSS,
+    activeSelector:
+      'div.Overlay-body > button span[class*="prc-Button-ButtonContent-"]',
+  }),
+  name: 'a last element too long to fit alone is cut once, in its middle, without a leading ellipsis',
+  play: async ({ canvasElement }) => {
+    const text = chips(canvasElement).querySelector(
+      '.selector-text'
+    ) as HTMLElement;
+
+    await waitFor(() =>
+      expect(text.querySelector('.selector-ellipsis.middle')).not.toBeNull()
+    );
+    await expect(text.querySelectorAll('.selector-ellipsis')).toHaveLength(1);
+    await expect(text.innerText.replace(/\n/g, '')).toMatch(
+      /^span\[class\*="prc-.*-ButtonContent-"\]$/
+    );
+  },
+};
+
 export const ShortSelectorWithoutTooltip: StoryObj = {
   ...editor(WITH_RULE),
   name: 'a selector that fits shows no tooltip on hover',
