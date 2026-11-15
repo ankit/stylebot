@@ -396,7 +396,11 @@ export const LongSelectorOnOneLine: StoryObj = {
     await step(
       'the field swaps leading ancestors for an ellipsis on one line',
       async () => {
-        await waitFor(() => expect(text().innerText).toMatch(/^…/));
+        await waitFor(() =>
+          expect(
+            chips(canvasElement).querySelector('.selector-ellipsis')
+          ).not.toBeNull()
+        );
         await expect(text().innerText.replace(/\n/g, '')).toMatch(
           / li\.mw-list-item$/
         );
@@ -430,7 +434,7 @@ export const SpacesAroundCombinators: StoryObj = {
     ) as HTMLElement;
 
     await expect(text.innerText.replace(/\n/g, '')).toMatch(
-      /^(td\.title |…)> span\.titleline > a$/
+      /^(td\.title )?> span\.titleline > a$/
     );
   },
 };
@@ -447,7 +451,10 @@ export const LongLoneAncestor: StoryObj = {
     ) as HTMLElement;
 
     await waitFor(() =>
-      expect(text.innerText.replace(/\n/g, '')).toMatch(/^…\S.*"\] a$/)
+      expect(text.querySelector('.selector-ellipsis')).not.toBeNull()
+    );
+    await waitFor(() =>
+      expect(text.innerText.replace(/\n/g, '')).toMatch(/^[^\s"\]].*"\] a$/)
     );
   },
 };
@@ -465,8 +472,11 @@ export const BareTagsAfterLongAncestor: StoryObj = {
     ) as HTMLElement;
 
     await waitFor(() =>
+      expect(text.querySelector('.selector-ellipsis')).not.toBeNull()
+    );
+    await waitFor(() =>
       expect(text.innerText.replace(/\n/g, '')).toMatch(
-        /^…[^"\]].*"\] div button$/
+        /^[^"\]].*"\] div button$/
       )
     );
   },

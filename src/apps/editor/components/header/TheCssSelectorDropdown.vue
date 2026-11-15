@@ -36,8 +36,9 @@
             v-if="droppedAncestors"
             class="selector-ellipsis"
             aria-hidden="true"
-            v-text="'…'"
-          />
+          >
+            <more-icon :size="12" />
+          </span>
           <s-inline-list
             mono
             :parts="splitTail(shownParts(parts)).head"
@@ -66,6 +67,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { SAutocomplete, SInlineList, STooltip } from '@stylebot/components';
+import { MoreIcon } from '@stylebot/icons';
 import type { StylebotEditingMode } from '@stylebot/types';
 import { splitSelectorList, splitSelectorSteps } from '@stylebot/css';
 
@@ -153,6 +155,7 @@ export default Vue.extend({
   name: 'TheCssSelectorDropdown',
 
   components: {
+    MoreIcon,
     SAutocomplete,
     SInlineList,
     STooltip,
@@ -466,11 +469,21 @@ export default Vue.extend({
 
 .selector-ellipsis {
   flex: none;
-  margin-right: 4px;
-  font-family: var(--font-ui);
-  font-size: 13px;
-  font-weight: 600;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 16px;
+  margin-right: 6px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--text-primary) 12%, transparent);
   color: var(--text-secondary);
+}
+
+.selector-autocomplete:hover .selector-ellipsis {
+  background: color-mix(in srgb, var(--text-primary) 18%, transparent);
+  color: var(--text-primary);
 }
 
 .selector-tail {
