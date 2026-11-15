@@ -3,6 +3,7 @@ import { getSelector, splitSelectorList } from '@stylebot/css';
 import { queryWithShadowRoots } from '@stylebot/stylesheets';
 import { describeElement } from './describe-element';
 import { getParentElement, getPathUpTo, snapPastWrappers } from './snap';
+import { canCoverOthers, getVisibleElementAt } from './visible-element';
 
 // What the inspector takes from the keyboard: climb, descend and pick.
 export const INSPECT_KEYS = [
@@ -45,6 +46,11 @@ class Highlighter {
    * The element last found under the pointer, which drilling leaves behind.
    */
   pointerElement: HTMLElement | null;
+  /**
+   * What the pointer showed through the element under it, when that element
+   * may cover others, so it can change without the pointer leaving it.
+   */
+  seenElement: HTMLElement | null;
   drillStack: Array<HTMLElement>;
   /**
    * Element/value currently suppressed by suppressTitle, if any.
@@ -80,6 +86,7 @@ class Highlighter {
     this.getMountRoot = getMountRoot;
     this.currentElement = null;
     this.pointerElement = null;
+    this.seenElement = null;
     this.drillStack = [];
     this.titleSuppressedElement = null;
     this.suppressedTitleValue = null;
@@ -105,6 +112,7 @@ class Highlighter {
     this.drillStack = [];
     this.currentElement = null;
     this.pointerElement = null;
+    this.seenElement = null;
     this.restoreSuppressedTitle();
     this.restoreCursor();
   };
@@ -352,6 +360,18 @@ class Highlighter {
 
     if (el !== this.pointerElement) {
       this.hoverElement(el, event);
+      return;
+    }
+
+    if (!this.seenElement) {
+      return;
+    }
+
+    const seen = this.getVisibleElementAt(el, event);
+
+    if (seen !== this.seenElement) {
+      this.seenElement = seen;
+      this.showSeen(seen);
     }
   };
 
@@ -366,12 +386,33 @@ class Highlighter {
     }
 
     this.pointerElement = null;
+    this.seenElement = null;
     this.hideOverlay();
   };
 
   hoverElement = (el: HTMLElement, point?: MouseEvent): void => {
     this.pointerElement = el;
-    const seen = point ? this.seeThroughTransparent(el, point) : el;
+    this.seenElement = null;
+
+    if (point && canCoverOthers(el)) {
+      this.seenElement = this.getVisibleElementAt(el, point);
+    }
+
+    this.showSeen(this.seenElement ?? el);
+  };
+
+  getVisibleElementAt = (el: HTMLElement, point: MouseEvent): HTMLElement =>
+    getVisibleElementAt(
+      el,
+      point.clientX,
+      point.clientY,
+      this.isStylebotElement
+    );
+
+  /**
+   * Inspects what the pointer shows, snapped past plain wrappers.
+   */
+  showSeen = (seen: HTMLElement): void => {
     const target = snapPastWrappers(seen);
 
     // Drilling down from a snapped pick leads back to what's under the pointer.
@@ -381,30 +422,6 @@ class Highlighter {
 
     this.setCurrentElement(target);
     this.showOverlay(target);
-  };
-
-  /**
-   * What the pointer shows when the element on top is fully transparent,
-   * like the invisible checkbox over a menu button: the first visible
-   * element under it, else `el`.
-   */
-  seeThroughTransparent = (el: HTMLElement, point: MouseEvent): HTMLElement => {
-    if (el.checkVisibility({ opacityProperty: true })) {
-      return el;
-    }
-
-    const visible = el.ownerDocument
-      .elementsFromPoint(point.clientX, point.clientY)
-      .find(
-        node =>
-          !this.isStylebotElement(node) &&
-          node.checkVisibility({
-            opacityProperty: true,
-            visibilityProperty: true,
-          })
-      );
-
-    return (visible as HTMLElement | undefined) ?? el;
   };
 
   onPointerUp = (event: MouseEvent): void => {
