@@ -46,12 +46,3 @@ export const describeElement = (el: Element): Array<NamePart> => {
     ...classes,
   ];
 };
-
-/**
- * The element's rendered size in css pixels, e.g. `120 × 24`.
- */
-export const describeSize = (el: Element): string => {
-  const { width, height } = el.getBoundingClientRect();
-
-  return `${Math.round(width)} × ${Math.round(height)}`;
-};
