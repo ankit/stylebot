@@ -311,9 +311,8 @@ export const SHOTS = [
       pageWidth: 400,
     },
     phone: { pageWidth: 400 },
-    // Touchscreens switch from the popup, which Safari on iPad shows below
-    // its toolbar.
-    touchRun: async (browser, file, options) => {
+    // Safari's slides switch from the popup, which it shows below its toolbar.
+    safariRun: async (browser, file, options) => {
       await seed(browser, {
         styles: { 'en.wikipedia.org': await wikipediaLooks() },
       });
