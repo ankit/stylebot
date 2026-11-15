@@ -31,11 +31,16 @@ export const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
  * Chrome launch options shared by the extension browser and the CLI's: hi-dpi,
  * so the shots are sharp once scaled to the store's size.
  */
-export const launchOptions = ({ appearance, env }) => ({
+// Blink's pointer types: hover none, coarse pointer, as on a touchscreen.
+const TOUCH_ARGS = [
+  '--blink-settings=primaryHoverType=1,availableHoverTypes=1,primaryPointerType=2,availablePointerTypes=2',
+];
+
+export const launchOptions = ({ appearance, env, scale = 2, touch }) => ({
   headless: true,
   channel: 'chrome',
   viewport: { width: WIDTH, height: HEIGHT },
-  deviceScaleFactor: 2,
+  deviceScaleFactor: scale,
   colorScheme: appearance,
   env,
   ignoreDefaultArgs: ['--disable-extensions', '--enable-automation'],
@@ -43,6 +48,7 @@ export const launchOptions = ({ appearance, env }) => ({
     '--enable-unsafe-extension-debugging',
     '--window-size=1400,900',
     '--hide-scrollbars',
+    ...(touch ? TOUCH_ARGS : []),
   ],
 });
 
@@ -67,16 +73,41 @@ export const closeWelcomeTabs = context =>
     })
   );
 
+export const IPHONE_USER_AGENT =
+  'Mozilla/5.0 (iPhone; CPU iPhone OS 26_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.1 Mobile/15E148 Safari/604.1';
+
 /**
- * A fresh browser and profile with dist/ loaded, in light or dark mode.
+ * Has every page the context opens report Safari on iPhone's user agent.
  */
-export const launch = async ({ appearance }) => {
+const emulateIPhone = context => {
+  const newPage = context.newPage.bind(context);
+
+  context.newPage = async () => {
+    const page = await newPage();
+    const cdp = await context.newCDPSession(page);
+    await cdp.send('Emulation.setUserAgentOverride', {
+      userAgent: IPHONE_USER_AGENT,
+      platform: 'iPhone',
+    });
+    return page;
+  };
+};
+
+/**
+ * A fresh browser and profile with dist/ loaded, in light or dark mode, and
+ * as an iPhone or iPad when given a `device`.
+ */
+export const launch = async ({ appearance, device, scale }) => {
   const userDataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'stylebot-store-'));
   const context = await chromium.launchPersistentContext(
     userDataDir,
-    launchOptions({ appearance })
+    launchOptions({ appearance, scale, touch: Boolean(device) })
   );
   closeWelcomeTabs(context);
+
+  if (device === 'iphone') {
+    emulateIPhone(context);
+  }
 
   const id = await loadExtension(context, path.join(rootDir, 'dist'));
   const worker =
@@ -335,40 +366,60 @@ export const WINDOW = {
 };
 
 /**
+ * A slide's title as HTML, with `*word*` marked in the accent.
+ */
+export const markTitle = (title, accent) =>
+  // Punctuation after the mark tucks in against its padding.
+  title.replace(
+    /\*(.+?)\*([.,!?]?)/,
+    (_, word, mark) =>
+      `<mark style="background:${
+        ACCENTS[accent]
+      }40;color:inherit;padding:0 8px;margin:0 ${
+        mark ? -6 : -2
+      }px 0 -2px;border-radius:8px">${word}</mark>${mark}`
+  );
+
+export const SLIDE_BACKGROUND = '#f6f3ee';
+
+/**
  * Renders a screen as a listing slide: the title above, the screen from `crop`
  * on enlarged into a window below, or with `whole`, all of it scaled to fit.
- * `*word*` in the title is marked.
+ * `canvas` sizes the slide when it isn't the Chrome Web Store's.
  */
 export const slide = (
   context,
   { image, width },
   file,
-  { title, accent, crop = {}, whole, scale }
+  { title, accent, crop = {}, whole, scale, canvas }
 ) => {
   const { x = 0, y = 0 } = whole ? {} : crop;
-  const zoom = whole
-    ? (WINDOW.height - WINDOW.top / 2) / HEIGHT
-    : WINDOW.width / (crop.width ?? width - x);
+  const size = canvas ?? { width: WIDTH, height: HEIGHT };
+  let zoom = WINDOW.width / (crop.width ?? width - x);
+
+  if (whole && canvas) {
+    zoom = Math.min(
+      (canvas.width - WINDOW.side * 2) / width,
+      (canvas.height - WINDOW.top - WINDOW.side) / HEIGHT
+    );
+  } else if (whole) {
+    zoom = (WINDOW.height - WINDOW.top / 2) / HEIGHT;
+  }
+
   const frame = whole
     ? {
-        left: (WIDTH - width * zoom) / 2,
+        left: (size.width - width * zoom) / 2,
         width: width * zoom,
         height: HEIGHT * zoom - WINDOW.radius,
       }
     : { left: WINDOW.side, width: WINDOW.width, height: WINDOW.height };
-  const color = ACCENTS[accent];
-  // Punctuation after the mark tucks in against its padding.
-  const heading = title.replace(
-    /\*(.+?)\*([.,!?]?)/,
-    (_, word, mark) =>
-      `<mark style="background:${color}40;color:inherit;padding:0 8px;margin:0 ${
-        mark ? -6 : -2
-      }px 0 -2px;border-radius:8px">${word}</mark>${mark}`
-  );
+  const heading = markTitle(title, accent);
 
   return render(
     context,
-    `<body style="margin:0;height:${HEIGHT}px;overflow:hidden;background:#f6f3ee;font-family:-apple-system,system-ui,sans-serif">
+    `<body style="margin:0;height:${
+      size.height
+    }px;overflow:hidden;background:${SLIDE_BACKGROUND};font-family:-apple-system,system-ui,sans-serif">
       <h1 style="margin:0;padding-top:56px;text-align:center;font-size:56px;line-height:1.1;font-weight:700;letter-spacing:-0.03em;color:#16171a">${heading}</h1>
       <div style="position:absolute;top:${WINDOW.top}px;left:${
       frame.left
@@ -385,7 +436,7 @@ export const slide = (
       </div>
     </body>`,
     file,
-    { scale }
+    { scale, ...size }
   );
 };
 

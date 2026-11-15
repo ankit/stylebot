@@ -28,9 +28,19 @@ const phonePopup: StoryObj = {
   }),
 };
 
-export const FillsPhone: StoryObj = {
+const iPhonePopup: StoryObj = {
   ...phonePopup,
-  name: 'on a phone the popup fills the sheet and shows each profile’s actions without hover',
+  // Before render, since the popup reads it once as it starts.
+  loaders: [
+    () => {
+      spyOn(navigator, 'userAgent', 'get').mockReturnValue(IPHONE_USER_AGENT);
+    },
+  ],
+};
+
+export const FillsPhone: StoryObj = {
+  ...iPhonePopup,
+  name: 'on iPhone the popup fills the sheet and shows each profile’s actions without hover',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const popupRoot = canvasElement.querySelector('.popup') as HTMLElement;
@@ -58,14 +68,21 @@ export const FillsPhone: StoryObj = {
   },
 };
 
-export const NoEditorOnIPhone: StoryObj = {
+export const KeepsWidthOnIPad: StoryObj = {
   ...phonePopup,
-  // Before render, since the popup reads it once as it starts.
-  loaders: [
-    () => {
-      spyOn(navigator, 'userAgent', 'get').mockReturnValue(IPHONE_USER_AGENT);
-    },
-  ],
+  name: 'on iPad the popup keeps its width in a narrow popover rather than shrinking to its content',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const popupRoot = canvasElement.querySelector('.popup') as HTMLElement;
+
+    await canvas.findByRole('radio', { name: 'Default' });
+
+    await expect(popupRoot.getBoundingClientRect().width).toBe(320);
+  },
+};
+
+export const NoEditorOnIPhone: StoryObj = {
+  ...iPhonePopup,
   name: 'on iPhone the popup offers no way into the editor: no Edit button, Edit item or Create profile',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
