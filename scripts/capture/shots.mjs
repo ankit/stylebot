@@ -310,7 +310,17 @@ export const SHOTS = [
     // Touchscreens switch from the popup, which Safari on iPad shows below
     // its toolbar.
     touchRun: async (browser, file, options) => {
-      await seed(browser, { styles: { 'en.wikipedia.org': wikipediaLooks() } });
+      const reader = (await listedGallery('en.wikipedia.org')).find(
+        ({ name }) => name === 'Wikipedia Reader'
+      );
+      const looks = [
+        { name: 'Reader', css: reader.css },
+        { name: 'Slate', css: gallery('wikipedia', 'slate') },
+        { name: 'Parchment', css: gallery('wikipedia', 'parchment') },
+      ];
+      await seed(browser, {
+        styles: { 'en.wikipedia.org': profiles(...looks) },
+      });
       const page = await openSite(
         browser.context,
         'https://en.wikipedia.org/wiki/Bonsai',
