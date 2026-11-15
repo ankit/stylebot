@@ -9,30 +9,40 @@
 
   <div
     v-else
+    ref="panel"
     class="stylebot stylebot-docked"
     :class="[
-      dockedRight ? 'right' : 'left',
-      { 'stylebot-resizing': dragging, 'stylebot-capturing': capturing },
+      placement,
+      { 'stylebot-resizing': busy, 'stylebot-capturing': capturing },
     ]"
-    :style="{ width: `${width}px` }"
+    :style="panelStyle"
   >
     <slot></slot>
 
+    <panel-resize-handles
+      :floating="floating"
+      @start="onResizeStart"
+      @resize="onResize"
+      @end="onResizeEnd"
+    />
+
+    <panel-width-edge
+      v-if="!floating"
+      :width="width"
+      :min="minWidth"
+      :max="maxWidth"
+      :side="placement === 'right' ? 'left' : 'right'"
+      @start="onWidthStart"
+      @preview="previewWidth = $event"
+      @change="saveWidth"
+      @reset="saveWidth(defaultWidth)"
+    />
+
     <div
-      class="stylebot-resize-edge"
-      role="separator"
-      tabindex="0"
-      aria-orientation="vertical"
-      :aria-label="t('resize_the_panel')"
-      :aria-valuenow="width"
-      :aria-valuemin="minWidth"
-      :aria-valuemax="maxWidth"
-      @pointerdown="onPointerDown"
-      @pointermove="onPointerMove"
-      @pointerup="onPointerUp"
-      @pointercancel="onPointerUp"
-      @dblclick="onReset"
-      @keydown="onKeydown"
+      v-if="snap"
+      class="stylebot-snap-preview"
+      :class="[snap.side, { armed: snap.armed }]"
+      :style="{ width: `${width}px` }"
     ></div>
   </div>
 </template>
@@ -41,22 +51,51 @@
 import Vue from 'vue';
 
 import { defaultOptions } from '@stylebot/settings';
-import type { StylebotLayout } from '@stylebot/types';
+import type { FloatingPanelBounds, StylebotLayout } from '@stylebot/types';
 
-const MARGIN = 12;
-const MIN_WIDTH = 360;
+import PanelResizeHandles from './panel/PanelResizeHandles.vue';
+import PanelWidthEdge from './panel/PanelWidthEdge.vue';
+import { HeaderDrag } from './panel/header-drag';
+import { reservePageSpace } from './panel/page-layout';
+import {
+  MARGIN,
+  MIN_WIDTH,
+  boundsOf,
+  defaultFloatingBounds,
+  fitBounds,
+  resizeBounds,
+  snapFor,
+} from './panel/floating-bounds';
+import type { ResizeDirection, Snap, Viewport } from './panel/floating-bounds';
+
 const MAX_WIDTH_RATIO = 0.6;
-const KEYBOARD_STEP = 16;
 
-type Drag = { startX: number; startWidth: number; width: number };
+type Gesture = {
+  start: FloatingPanelBounds;
+  bounds: FloatingPanelBounds | null;
+};
 
 export default Vue.extend({
   name: 'TheStylebotResizer',
 
-  data(): { windowWidth: number; drag: Drag | null } {
+  components: {
+    PanelResizeHandles,
+    PanelWidthEdge,
+  },
+
+  data(): {
+    viewport: Viewport;
+    previewWidth: number | null;
+    gesture: Gesture | null;
+    snap: Snap | null;
+    headerDrag: HeaderDrag | null;
+  } {
     return {
-      windowWidth: window.innerWidth,
-      drag: null,
+      viewport: { width: window.innerWidth, height: window.innerHeight },
+      previewWidth: null,
+      gesture: null,
+      snap: null,
+      headerDrag: null,
     };
   },
 
@@ -77,13 +116,51 @@ export default Vue.extend({
       return this.$store.state.capturing;
     },
 
-    dragging(): boolean {
-      return this.drag !== null;
+    busy(): boolean {
+      return this.previewWidth !== null || this.gesture !== null;
+    },
+
+    floating(): boolean {
+      return (
+        Boolean(this.gesture?.bounds) || this.layout.dockLocation === 'floating'
+      );
     },
 
     // In the page only as the side panel's fallback, the panel sits on the right.
-    dockedRight(): boolean {
-      return this.layout.dockLocation !== 'left';
+    placement(): 'floating' | 'left' | 'right' {
+      if (this.floating) {
+        return 'floating';
+      }
+
+      return this.layout.dockLocation === 'left' ? 'left' : 'right';
+    },
+
+    floatingBounds(): FloatingPanelBounds {
+      const bounds =
+        this.gesture?.bounds ??
+        this.layout.floating ??
+        defaultFloatingBounds(this.layout.width, this.viewport);
+
+      return fitBounds(bounds, this.viewport);
+    },
+
+    panelStyle(): Record<string, string> {
+      if (!this.floating) {
+        return { width: `${this.width}px` };
+      }
+
+      const { left, top, width, height } = this.floatingBounds;
+
+      return {
+        left: `${left}px`,
+        top: `${top}px`,
+        width: `${width}px`,
+        height: `${height}px`,
+      };
+    },
+
+    defaultWidth(): number {
+      return defaultOptions.layout.width;
     },
 
     minWidth(): number {
@@ -93,17 +170,21 @@ export default Vue.extend({
     maxWidth(): number {
       return Math.max(
         MIN_WIDTH,
-        Math.round(this.windowWidth * MAX_WIDTH_RATIO)
+        Math.round(this.viewport.width * MAX_WIDTH_RATIO)
       );
     },
 
     width(): number {
-      return this.clamp(this.drag ? this.drag.width : this.layout.width);
+      return this.clampWidth(this.previewWidth ?? this.layout.width);
     },
   },
 
   watch: {
     layout() {
+      this.adjustPageLayout();
+    },
+
+    floating() {
       this.adjustPageLayout();
     },
 
@@ -121,105 +202,161 @@ export default Vue.extend({
     window.addEventListener('resize', this.onWindowResize);
   },
 
+  mounted() {
+    const panel = this.$refs.panel as HTMLElement | undefined;
+
+    if (panel) {
+      this.headerDrag = new HeaderDrag(panel, {
+        start: this.onMoveStart,
+        move: this.onMove,
+        end: this.onMoveEnd,
+      });
+    }
+  },
+
   destroyed() {
     this.adjustPageLayout();
     window.removeEventListener('resize', this.onWindowResize);
+    this.headerDrag?.destroy();
   },
 
   methods: {
-    clamp(width: number): number {
+    /**
+     * Starts a move or resize from where the panel is on screen, docked or not.
+     */
+    beginGesture(): void {
+      this.$store.commit('setInspecting', false);
+      this.gesture = {
+        start: boundsOf(this.$refs.panel as HTMLElement),
+        bounds: null,
+      };
+    },
+
+    saveFloating(bounds: FloatingPanelBounds): void {
+      this.$store.dispatch('setLayout', {
+        ...this.layout,
+        dockLocation: 'floating',
+        floating: fitBounds(bounds, this.viewport),
+      });
+    },
+
+    onMoveStart(): void {
+      this.beginGesture();
+    },
+
+    onMove(dx: number, dy: number, x: number): void {
+      if (!this.gesture) {
+        return;
+      }
+
+      const { start } = this.gesture;
+      this.gesture.bounds = {
+        ...start,
+        left: start.left + dx,
+        top: start.top + dy,
+      };
+      this.snap = snapFor(this.gesture.bounds, x, this.viewport);
+    },
+
+    onMoveEnd(dragged: boolean): void {
+      const { gesture, snap } = this;
+      this.gesture = null;
+      this.snap = null;
+
+      if (!dragged || !gesture?.bounds) {
+        return;
+      }
+
+      if (snap?.armed) {
+        this.$store.dispatch('setLayout', {
+          ...this.layout,
+          dockLocation: snap.side,
+        });
+
+        return;
+      }
+
+      this.saveFloating(gesture.bounds);
+    },
+
+    onResizeStart(): void {
+      this.beginGesture();
+    },
+
+    onResize(direction: ResizeDirection, dx: number, dy: number): void {
+      if (!this.gesture) {
+        return;
+      }
+
+      this.gesture.bounds = fitBounds(
+        resizeBounds(this.gesture.start, direction, dx, dy, this.viewport),
+        this.viewport
+      );
+    },
+
+    /**
+     * Shortening a docked panel undocks it, so there's one resizable box to
+     * remember. A docked panel only made wider or narrower stays docked.
+     */
+    onResizeEnd(): void {
+      const { gesture } = this;
+      this.gesture = null;
+
+      if (!gesture?.bounds) {
+        return;
+      }
+
+      const { start, bounds } = gesture;
+      const sameHeight =
+        bounds.top === Math.round(start.top) &&
+        bounds.height === Math.round(start.height);
+
+      if (this.layout.dockLocation !== 'floating' && sameHeight) {
+        this.saveWidth(bounds.width);
+
+        return;
+      }
+
+      this.saveFloating(bounds);
+    },
+
+    onWidthStart(): void {
+      this.$store.commit('setInspecting', false);
+    },
+
+    clampWidth(width: number): number {
       return Math.min(Math.max(Math.round(width), MIN_WIDTH), this.maxWidth);
     },
 
     saveWidth(width: number): void {
+      this.previewWidth = null;
       this.$store.dispatch('setLayout', {
         ...this.layout,
-        width: this.clamp(width),
+        width: this.clampWidth(width),
       });
     },
 
-    onWindowResize() {
-      this.windowWidth = window.innerWidth;
+    onWindowResize(): void {
+      this.viewport = { width: window.innerWidth, height: window.innerHeight };
       this.adjustPageLayout();
     },
 
-    onPointerDown(event: PointerEvent) {
-      if (event.button !== 0) {
-        return;
-      }
-
-      event.preventDefault();
-      (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
-      this.$store.commit('setInspecting', false);
-
-      this.drag = {
-        startX: event.clientX,
-        startWidth: this.width,
-        width: this.width,
-      };
-    },
-
-    onPointerMove(event: PointerEvent) {
-      if (!this.drag) {
-        return;
-      }
-
-      const delta = event.clientX - this.drag.startX;
-      this.drag.width =
-        this.drag.startWidth + (this.dockedRight ? -delta : delta);
-    },
-
-    onPointerUp() {
-      if (!this.drag) {
-        return;
-      }
-
-      const { width } = this.drag;
-      this.drag = null;
-      this.saveWidth(width);
-    },
-
-    onReset() {
-      this.saveWidth(defaultOptions.layout.width);
-    },
-
-    onKeydown(event: KeyboardEvent) {
-      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') {
-        return;
-      }
-
-      event.preventDefault();
-      event.stopPropagation();
-
-      const grows = (event.key === 'ArrowLeft') === this.dockedRight;
-      this.saveWidth(this.width + (grows ? KEYBOARD_STEP : -KEYBOARD_STEP));
-    },
-
-    adjustPageLayout() {
+    adjustPageLayout(): void {
       if (this.host !== 'page') {
         return;
       }
 
       // todo: this needs a lot of work to be more robust.
-      if (this.layout.adjustPageLayout && this.visible && !this.capturing) {
-        const reserved = this.width + MARGIN;
+      const reserve =
+        this.layout.adjustPageLayout &&
+        this.visible &&
+        !this.capturing &&
+        !this.floating;
 
-        if (this.layout.dockLocation === 'left') {
-          document.body.style.width = ``;
-          document.body.style.marginRight = ``;
-          document.body.style.marginLeft = `${reserved}px`;
-        } else {
-          document.body.style.marginLeft = ``;
-          // An RTL page resolves the over-constrained body from its right
-          // edge, so the explicit margin (not just the width) keeps the gap on the right.
-          document.body.style.marginRight = `${reserved}px`;
-          document.body.style.width = `calc(100% - ${reserved}px)`;
-        }
-      } else {
-        document.body.style.width = ``;
-        document.body.style.marginLeft = ``;
-        document.body.style.marginRight = ``;
-      }
+      reservePageSpace(
+        reserve ? (this.placement as 'left' | 'right') : null,
+        this.width + MARGIN
+      );
     },
   },
 });
@@ -254,9 +391,29 @@ export default Vue.extend({
     &.right {
       right: 12px;
     }
+
+    &.floating {
+      right: auto;
+      bottom: auto;
+      transition: opacity 0.22s ease;
+    }
+
+    .stylebot-drag-handle {
+      cursor: grab;
+
+      input,
+      textarea {
+        cursor: text;
+      }
+    }
   }
 
   &.stylebot-capturing {
+    &.floating {
+      pointer-events: none;
+      opacity: 0;
+    }
+
     &.right {
       transform: translateX(calc(100% + 64px));
     }
@@ -269,43 +426,37 @@ export default Vue.extend({
   &.stylebot-resizing {
     user-select: none;
 
+    .stylebot-drag-handle {
+      cursor: grabbing;
+    }
+
     .stylebot-content {
       pointer-events: none;
     }
   }
 }
 
-.stylebot-resize-edge {
-  position: absolute;
-  top: 14px;
-  bottom: 14px;
-  width: 8px;
-  cursor: col-resize;
-  touch-action: none;
-  outline: none;
+.stylebot-snap-preview {
+  position: fixed;
+  top: 12px;
+  bottom: 12px;
+  z-index: -1;
+  background: var(--accent);
+  border-radius: 14px;
+  opacity: 0.06;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
 
-  &::after {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 3px;
-    width: 2px;
-    background: var(--accent);
-    border-radius: 1px;
-    opacity: 0;
-    content: '';
+  &.armed {
+    opacity: 0.2;
   }
 
-  &:focus-visible::after {
-    opacity: 1;
+  &.left {
+    left: 12px;
   }
 
-  .right > & {
-    left: -5px;
-  }
-
-  .left > & {
-    right: -5px;
+  &.right {
+    right: 12px;
   }
 }
 </style>

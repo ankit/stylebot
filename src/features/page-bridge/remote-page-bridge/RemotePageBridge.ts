@@ -290,7 +290,7 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
     return this.request('getPageDeclarations', selector);
   }
 
-  openInPage(dockLocation: 'left' | 'right'): void {
+  openInPage(dockLocation: 'left' | 'right' | 'floating'): void {
     this.send({ type: 'openInPage', dockLocation });
   }
 

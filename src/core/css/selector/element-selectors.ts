@@ -27,42 +27,58 @@ const TEST_ID_ATTRIBUTES = [
 const isPerItemTestId = (value: string): boolean =>
   /\d{3,}|(^|[-_:.])\d+($|[-_:.])/.test(value) || looksGeneratedId(value);
 
-export const getTestIdBasedSelector = (el: HTMLElement): string | null => {
-  for (const attribute of TEST_ID_ATTRIBUTES) {
-    const value = el.getAttribute(attribute);
+export type NamingAttribute = { name: string; value: string };
+
+/**
+ * An attribute as a selector on the element's tag, e.g. `input[name="q"]`.
+ */
+const attributeSelector = (
+  el: Element,
+  attribute: NamingAttribute | null
+): string | null =>
+  attribute
+    ? `${el.tagName.toLowerCase()}[${attribute.name}="${escapeAttributeValue(
+        attribute.value
+      )}"]`
+    : null;
+
+const getTestIdAttribute = (el: Element): NamingAttribute | null => {
+  for (const name of TEST_ID_ATTRIBUTES) {
+    const value = el.getAttribute(name);
     if (value) {
-      return `${el.tagName.toLowerCase()}[${attribute}="${escapeAttributeValue(
-        value
-      )}"]`;
+      return { name, value };
     }
   }
 
   return null;
 };
 
+export const getTestIdBasedSelector = (el: HTMLElement): string | null =>
+  attributeSelector(el, getTestIdAttribute(el));
+
 /**
  * The element's test id, unless it was made for this one item.
  */
 export const getSharedTestIdSelector = (el: HTMLElement): string | null => {
-  const value = TEST_ID_ATTRIBUTES.map(name => el.getAttribute(name)).find(
-    Boolean
-  );
+  const attribute = getTestIdAttribute(el);
 
-  return value && !isPerItemTestId(value) ? getTestIdBasedSelector(el) : null;
+  return attribute && !isPerItemTestId(attribute.value)
+    ? attributeSelector(el, attribute)
+    : null;
 };
 
 /**
  * `name` predates data-testid but serves the same role on form elements:
  * an identifier, not a human/screen-reader description like aria-label.
  */
-export const getNameBasedSelector = (el: HTMLElement): string | null => {
-  const name = el.getAttribute('name');
-  if (name) {
-    return `${el.tagName.toLowerCase()}[name="${escapeAttributeValue(name)}"]`;
-  }
+const getNameAttribute = (el: Element): NamingAttribute | null => {
+  const value = el.getAttribute('name');
 
-  return null;
+  return value ? { name: 'name', value } : null;
 };
+
+export const getNameBasedSelector = (el: HTMLElement): string | null =>
+  attributeSelector(el, getNameAttribute(el));
 
 /**
  * An aria-label that reads the same for everyone: a single line with no
@@ -83,7 +99,7 @@ const NAVIGATION =
 /**
  * A link's address, when it's a same-site path of words like `/section/world`.
  */
-const getLinkPath = (el: HTMLElement): string | null => {
+const getLinkPath = (el: Element): string | null => {
   const href = el.getAttribute('href');
   if (!href || href.length > MAX_LINK_LENGTH || /[?#]/.test(href)) {
     return null;
@@ -103,23 +119,36 @@ const getLinkPath = (el: HTMLElement): string | null => {
 };
 
 /**
- * A navigation link by its address or any element by its aria-label, e.g.
- * `a[href="/section/world"]` or `button[aria-label="Search"]`.
+ * A navigation link's address or any element's aria-label.
  */
-export const getLabelBasedSelector = (el: HTMLElement): string | null => {
-  const tag = el.tagName.toLowerCase();
-  const inNavigation = tag === 'a' && el.closest(NAVIGATION) !== null;
+const getLabelAttribute = (el: Element): NamingAttribute | null => {
+  const inNavigation =
+    el.tagName.toLowerCase() === 'a' && el.closest(NAVIGATION) !== null;
   const path = inNavigation ? getLinkPath(el) : null;
   if (path) {
-    return `${tag}[href="${escapeAttributeValue(path)}"]`;
+    return { name: 'href', value: path };
   }
 
   const label = el.getAttribute('aria-label');
 
   return label && isSharedLabel(label)
-    ? `${tag}[aria-label="${escapeAttributeValue(label)}"]`
+    ? { name: 'aria-label', value: label }
     : null;
 };
+
+/**
+ * A navigation link by its address or any element by its aria-label, e.g.
+ * `a[href="/section/world"]` or `button[aria-label="Search"]`.
+ */
+export const getLabelBasedSelector = (el: HTMLElement): string | null =>
+  attributeSelector(el, getLabelAttribute(el));
+
+/**
+ * The attribute a selector would name the element by when it has no
+ * authored id or class: its test id, form name, or label.
+ */
+export const getNamingAttribute = (el: Element): NamingAttribute | null =>
+  getTestIdAttribute(el) ?? getNameAttribute(el) ?? getLabelAttribute(el);
 
 export const getClassNames = (el: HTMLElement): Array<string> =>
   (el.getAttribute('class') ?? '').split(/\s+/).filter(Boolean);

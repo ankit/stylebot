@@ -104,4 +104,59 @@ describe('describeElement', () => {
       marked(describeElement(element('<li class="css-1q2w3e item"></li>')))
     ).toBe('li[.css-1q2w3e].item');
   });
+  it('names the attribute a selector would use when nothing is authored', () => {
+    expect(
+      marked(
+        describeElement(
+          element(
+            '<button aria-label="Grok actions" class="css-g5y9jx r-5zmota r-u8s1dx"></button>'
+          )
+        )
+      )
+    ).toBe('button[aria-label="Grok actions"]');
+
+    expect(
+      marked(
+        describeElement(
+          element('<div data-testid="tweet" data-v-7ba5bd90></div>')
+        )
+      )
+    ).toBe('div[data-testid="tweet"]');
+  });
+
+  it('prefers a test id over a label', () => {
+    expect(
+      text(
+        describeElement(
+          element('<button data-testid="send" aria-label="Send"></button>')
+        )
+      )
+    ).toBe('button[data-testid="send"]');
+  });
+
+  it('leaves the attribute out when the element has an authored name', () => {
+    expect(
+      text(
+        describeElement(
+          element('<button class="search" aria-label="Search"></button>')
+        )
+      )
+    ).toBe('button.search');
+
+    expect(text(describeElement(element('<input id="q" name="q" />')))).toBe(
+      'input#q'
+    );
+  });
+
+  it('cuts a long attribute value short', () => {
+    expect(
+      text(
+        describeElement(
+          element(
+            '<button aria-label="Open the settings for this conversation"></button>'
+          )
+        )
+      )
+    ).toBe('button[aria-label="Open the settings for t…"]');
+  });
 });
