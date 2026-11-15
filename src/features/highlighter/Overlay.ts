@@ -176,7 +176,7 @@ export default class Overlay {
         height: viewport?.height ?? window.innerHeight,
         width: viewport?.width ?? window.innerWidth,
       },
-      panelRect && { left: panelRect.left, right: panelRect.right }
+      panelRect
     );
   }
 
