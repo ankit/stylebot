@@ -37,20 +37,23 @@
             class="selector-ellipsis"
             aria-hidden="true"
           >
-            <more-icon :size="12" />
+            <more-icon :size="14" />
           </span>
           <s-inline-list
             mono
             :parts="splitTail(shownParts(parts)).head"
             class="selector-head"
             :class="{ clipped: headClipped }"
+            :style="
+              headWidth ? { flex: 'none', width: `${headWidth}px` } : null
+            "
           />
           <span
             v-if="headClipped"
             class="selector-ellipsis middle"
             aria-hidden="true"
           >
-            <more-icon :size="12" />
+            <more-icon :size="14" />
           </span>
           <span
             v-if="splitTail(shownParts(parts)).tail"
@@ -177,6 +180,7 @@ export default Vue.extend({
     droppedAncestors: number;
     partialStart: number;
     headClipped: boolean;
+    headWidth: number;
     fitRun: number;
     resizeObserver: ResizeObserver | null;
     openingSelector: string;
@@ -188,6 +192,7 @@ export default Vue.extend({
       droppedAncestors: 0,
       partialStart: 0,
       headClipped: false,
+      headWidth: 0,
       fitRun: 0,
       resizeObserver: null,
       // The selector as it was when editing began; until it's changed, the
@@ -298,11 +303,36 @@ export default Vue.extend({
       const stale = () => run !== this.fitRun;
 
       this.headClipped = false;
+      this.headWidth = 0;
       await this.fitSteps(stale);
 
-      if (!stale()) {
-        this.headClipped = this.overflows();
+      if (stale() || !this.overflows()) {
+        return;
       }
+
+      this.headClipped = true;
+      await this.$nextTick();
+
+      if (!stale()) {
+        this.headWidth = this.wholeCharacterWidth();
+      }
+    },
+
+    /**
+     * The widest the selector's start can be while ending on a whole
+     * character, as a text ellipsis would; the font is monospaced.
+     */
+    wholeCharacterWidth(): number {
+      const head = this.$el.querySelector('.selector-head');
+      const length = head?.textContent?.length;
+
+      if (!head || !length) {
+        return 0;
+      }
+
+      const character = head.scrollWidth / length;
+
+      return Math.floor(head.clientWidth / character) * character;
     },
 
     /**
@@ -492,31 +522,20 @@ export default Vue.extend({
 
   &.clipped {
     text-overflow: clip;
-    mask-image: linear-gradient(to right, #000 calc(100% - 16px), transparent);
   }
 }
 
 .selector-ellipsis {
   flex: none;
-  align-self: center;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 16px;
-  margin-right: 6px;
-  border-radius: 4px;
+  margin-right: 5px;
+  color: var(--text-secondary);
+  transform: translateY(3px);
 
   &.middle {
-    margin-left: 4px;
+    margin: 0 3px 0 1px;
   }
-  background: color-mix(in srgb, var(--text-primary) 12%, transparent);
-  color: var(--text-secondary);
-}
-
-.selector-autocomplete:hover .selector-ellipsis {
-  background: color-mix(in srgb, var(--text-primary) 18%, transparent);
-  color: var(--text-primary);
 }
 
 .selector-tail {
