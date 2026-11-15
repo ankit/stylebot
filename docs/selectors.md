@@ -35,17 +35,15 @@ a selector for the element; the selector field offers all of them.
 7. **Its `#id`** — never one generated per load, like
    `tsuid_hsLJaqLJBPu9ruEP7uOYkAo_91` or React Native Web's
    `id__g3bmvlaotyb`.
-8. **Its link address or aria-label** — `a[href="/section/world"]`,
-   `button[aria-label="Search"]`. An address only for a navigation link to
-   a same-site path of words, and no email address or line break in the
-   label.
+8. **Its aria-label** — `button[aria-label="Search"]`, with no email
+   address or line break in it. Never a link's address, which names one
+   page rather than every link of its kind.
 9. **Its hashed class** — `h3.css-1q2w3e`.
 10. **An ancestor's hashed class** — `section.css-1q2w3e a`.
 11. **Only this element** — its path from the nearest ancestor with a
     unique `#id`, leaving out steps that don't narrow it. Look-alike
-    siblings are told apart by their test id, name, aria-label or link
-    address, as above (`input[name="last"]`), and only failing that by
-    position (`#nav li:nth-of-type(2) a`), which breaks when a list
+    siblings are told apart by their test id, name or aria-label, as
+    above (`input[name="last"]`), and only failing that by position (`#nav li:nth-of-type(2) a`), which breaks when a list
     reorders.
 
 A selector that would sweep the page is skipped: one ending in a bare `div`

@@ -87,37 +87,6 @@ export const getNameBasedSelector = (el: HTMLElement): string | null =>
 const isSharedLabel = (label: string): boolean =>
   !/[\r\n]|\S@\S+\.\S/.test(label);
 
-const MAX_LINK_LENGTH = 80;
-
-// A path part that reads as a word or words, like `section` or `Valheim`.
-const WORD = /^[a-z][a-z_.-]*$/i;
-
-// Where a site's links name its places rather than its content.
-const NAVIGATION =
-  'nav, header, footer, [role="navigation"], [role="banner"], [role="contentinfo"]';
-
-/**
- * A link's address, when it's a same-site path of words like `/section/world`.
- */
-const getLinkPath = (el: Element): string | null => {
-  const href = el.getAttribute('href');
-  if (!href || href.length > MAX_LINK_LENGTH || /[?#]/.test(href)) {
-    return null;
-  }
-
-  let url: URL;
-  try {
-    url = new URL(href, location.href);
-  } catch {
-    return null;
-  }
-
-  const parts = url.pathname.split('/').filter(Boolean);
-  const named = parts.length > 0 && parts.every(part => WORD.test(part));
-
-  return url.origin === location.origin && named ? href : null;
-};
-
 const getAriaLabelAttribute = (el: Element): NamingAttribute | null => {
   const label = el.getAttribute('aria-label');
 
@@ -127,25 +96,10 @@ const getAriaLabelAttribute = (el: Element): NamingAttribute | null => {
 };
 
 /**
- * A navigation link's address or any element's aria-label.
- */
-const getLabelAttribute = (el: Element): NamingAttribute | null => {
-  const inNavigation =
-    el.tagName.toLowerCase() === 'a' && el.closest(NAVIGATION) !== null;
-  const path = inNavigation ? getLinkPath(el) : null;
-  if (path) {
-    return { name: 'href', value: path };
-  }
-
-  return getAriaLabelAttribute(el);
-};
-
-/**
- * A navigation link by its address or any element by its aria-label, e.g.
- * `a[href="/section/world"]` or `button[aria-label="Search"]`.
+ * An element by its aria-label, e.g. `button[aria-label="Search"]`.
  */
 export const getLabelBasedSelector = (el: HTMLElement): string | null =>
-  attributeSelector(el, getLabelAttribute(el));
+  attributeSelector(el, getAriaLabelAttribute(el));
 
 /**
  * The attribute to name an element by when it has no authored id or class:

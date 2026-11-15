@@ -288,57 +288,11 @@ describe('element-selectors', () => {
       return document.body.firstElementChild as HTMLElement;
     };
 
-    const navLink = (html: string) =>
-      page(`<nav>${html}</nav>`).firstElementChild as HTMLElement;
-
-    it('selects a navigation link by its path', () => {
-      const el = navLink('<a class="css-abc12d" href="/section/world">');
-
-      expect(getLabelBasedSelector(el)).toBe('a[href="/section/world"]');
-    });
-
-    it('selects a same-site absolute or relative link by its address', () => {
-      const absolute = navLink(`<a href="${location.origin}/newest">`);
-      expect(getLabelBasedSelector(absolute)).toBe(
-        `a[href="${location.origin}/newest"]`
-      );
-      expect(getLabelBasedSelector(navLink('<a href="newcomments">'))).toBe(
-        'a[href="newcomments"]'
-      );
-    });
-
-    it('skips a link in the content, like an author profile', () => {
-      const el = page('<article><a href="/YukariSakamoto">')
+    it('never selects a link by its address', () => {
+      const el = page('<nav><a class="css-abc12d" href="/section/world">')
         .firstElementChild as HTMLElement;
 
       expect(getLabelBasedSelector(el)).toBeNull();
-    });
-
-    it('skips a link to another site', () => {
-      const el = navLink('<a href="https://www.githubstatus.com/incidents">');
-
-      expect(getLabelBasedSelector(el)).toBeNull();
-    });
-
-    it('skips a link with a query or hash', () => {
-      expect(getLabelBasedSelector(navLink('<a href="/s?x=1">'))).toBeNull();
-      expect(getLabelBasedSelector(navLink('<a href="/s#top">'))).toBeNull();
-    });
-
-    it('skips a link path with an id or date in it', () => {
-      expect(
-        getLabelBasedSelector(navLink('<a href="/2026/10/08/story.html">'))
-      ).toBeNull();
-      expect(
-        getLabelBasedSelector(navLink('<a href="/incidents/dvy0t3mvh1lg">'))
-      ).toBeNull();
-    });
-
-    it('skips the home link and non-page schemes', () => {
-      expect(getLabelBasedSelector(navLink('<a href="/">'))).toBeNull();
-      expect(
-        getLabelBasedSelector(navLink('<a href="mailto:a@b.c">'))
-      ).toBeNull();
     });
 
     it('selects an element by its aria-label', () => {
