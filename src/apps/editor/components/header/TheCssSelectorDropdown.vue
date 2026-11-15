@@ -32,6 +32,12 @@
           <span class="selector-tooltip">{{ activeSelector }}</span>
         </template>
         <span class="selector-text">
+          <span
+            v-if="droppedAncestors"
+            class="selector-ellipsis"
+            aria-hidden="true"
+            v-text="'…'"
+          />
           <s-inline-list
             mono
             :parts="splitTail(shownParts(parts)).head"
@@ -250,8 +256,8 @@ export default Vue.extend({
     splitTail,
 
     /**
-     * The selector as the chips show it: with its leading ancestors swapped
-     * for an ellipsis once there are too many to fit.
+     * The selector as the chips show it: without the leading ancestors that
+     * don't fit, which an ellipsis stands in for.
      */
     shownParts(parts: Array<string>): Array<string> {
       if (parts.length !== 1 || !this.droppedAncestors) {
@@ -264,7 +270,7 @@ export default Vue.extend({
         ? steps[this.droppedAncestors - 1].slice(this.partialStart)
         : '';
 
-      return [`…${partial}${kept}`];
+      return [`${partial}${kept}`.trimStart()];
     },
 
     /**
@@ -456,6 +462,15 @@ export default Vue.extend({
 
 .selector-head {
   @include truncate;
+}
+
+.selector-ellipsis {
+  flex: none;
+  margin-right: 4px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
 .selector-tail {

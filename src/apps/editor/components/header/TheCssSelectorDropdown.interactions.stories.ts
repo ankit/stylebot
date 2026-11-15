@@ -430,7 +430,7 @@ export const SpacesAroundCombinators: StoryObj = {
     ) as HTMLElement;
 
     await expect(text.innerText.replace(/\n/g, '')).toMatch(
-      /^(td\.title|…) > span\.titleline > a$/
+      /^(td\.title |…)> span\.titleline > a$/
     );
   },
 };
