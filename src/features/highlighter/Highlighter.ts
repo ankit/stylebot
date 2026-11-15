@@ -39,6 +39,7 @@ class Highlighter {
   overlay: Overlay | null;
   onSelect: (selector: string) => void;
   onHover?: (selector: string) => void;
+  onLeave?: () => void;
   getExistingSelector?: (el: HTMLElement) => string | null;
   getMountRoot?: () => HTMLElement | undefined;
   currentElement: HTMLElement | null;
@@ -65,6 +66,7 @@ class Highlighter {
   constructor({
     onSelect,
     onHover,
+    onLeave,
     getExistingSelector,
     getMountRoot,
   }: {
@@ -73,6 +75,11 @@ class Highlighter {
      * Called as the inspector moves onto an element, before it's picked.
      */
     onHover?: (selector: string) => void;
+    /**
+     * Called as the pointer leaves the page's elements, for the panel or
+     * out of the window.
+     */
+    onLeave?: () => void;
     getExistingSelector?: (el: HTMLElement) => string | null;
     /**
      * The editor's theme-provider element, for the on-page tip to mount into.
@@ -82,6 +89,7 @@ class Highlighter {
     this.overlay = null;
     this.onSelect = onSelect;
     this.onHover = onHover;
+    this.onLeave = onLeave;
     this.getExistingSelector = getExistingSelector;
     this.getMountRoot = getMountRoot;
     this.currentElement = null;
@@ -337,7 +345,7 @@ class Highlighter {
 
   onPointerOver = (event: MouseEvent): void => {
     if (this.isStylebotPanel(event.target)) {
-      this.hideOverlay();
+      this.leavePage();
       return;
     }
 
@@ -395,9 +403,23 @@ class Highlighter {
       return;
     }
 
+    this.leavePage();
+  };
+
+  /**
+   * Forgets what the pointer was over and hides the overlay. Only reports
+   * leaving once, since every move over the panel comes back here.
+   */
+  leavePage = (): void => {
+    const wasShown = this.overlay !== null;
+
     this.pointerElement = null;
     this.seenElement = null;
     this.hideOverlay();
+
+    if (wasShown) {
+      this.onLeave?.();
+    }
   };
 
   hoverElement = (el: HTMLElement, point?: MouseEvent): void => {

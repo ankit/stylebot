@@ -91,6 +91,10 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
         this.hoveredElement = this.inspector.currentElement;
         this.emit('hover', selector);
       },
+      onLeave: () => {
+        this.hoveredElement = null;
+        this.emit('hover', '');
+      },
       getExistingSelector: el => getExistingSelector(el, getStylebotCss()),
       getMountRoot,
     });
