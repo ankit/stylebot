@@ -16,8 +16,34 @@ const watchHoverEnd = (
     return null;
   }
 
-  element.addEventListener('mouseleave', onHoverEnd, { once: true });
-  return () => element.removeEventListener('mouseleave', onHoverEnd);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+
+  /**
+   * Listens on window, where the inspector's blocking of the page's hover
+   * events can't reach, and checks :hover once the move has settled.
+   */
+  const onMouseOut = (event: MouseEvent): void => {
+    if (!event.composedPath().includes(element)) {
+      return;
+    }
+
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      if (!element.matches(':hover')) {
+        unwatch();
+        onHoverEnd();
+      }
+    });
+  };
+
+  const unwatch = (): void => {
+    clearTimeout(timer);
+    window.removeEventListener('mouseout', onMouseOut, true);
+  };
+
+  window.addEventListener('mouseout', onMouseOut, true);
+
+  return unwatch;
 };
 
 /**

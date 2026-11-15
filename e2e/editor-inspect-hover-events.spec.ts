@@ -23,6 +23,11 @@ const PAGE_HTML = `
         <span class="menu-item">Item</span>
       </nav>
       <p class="other" style="margin-top: 100px">Elsewhere</p>
+      <style>
+        .grows { font-size: 16px; }
+        .grows:hover { font-size: 30px; }
+      </style>
+      <a class="grows" href="#">Grows on hover</a>
       <script>
         window.hoverEvents = [];
         const menu = document.querySelector('.menu');
@@ -79,4 +84,27 @@ test('inspecting keeps hover events from the page, so its menus hold still', asy
   await expect(
     editorRoot.locator('.autocomplete-chips .part').first()
   ).toHaveText(/\.other$/);
+});
+
+test('moving from a hovered element onto the panel reads its styles without :hover', async ({
+  context,
+  openPopup,
+}) => {
+  const page = await context.newPage();
+  await page.goto(server.baseUrl);
+
+  const editorRoot = await openEditor(page, openPopup);
+  const inspector = editorRoot.locator('.stylebot-inspector');
+  await expect(inspector).toHaveClass(/active/);
+
+  const size = editorRoot
+    .locator('.property-row', { hasText: 'Size' })
+    .locator('.number-input');
+  const link = await page.locator('.grows').boundingBox();
+  await page.mouse.move(link!.x + 5, link!.y + 5, { steps: 5 });
+  await expect(size).toHaveAttribute('placeholder', '30');
+
+  const panel = await inspector.boundingBox();
+  await page.mouse.move(panel!.x + 5, panel!.y + 5);
+  await expect(size).toHaveAttribute('placeholder', '16');
 });

@@ -24,17 +24,48 @@ describe('getComputedStyles', () => {
   });
 
   it('calls back once the pointer leaves a hovered element', () => {
-    document.body.innerHTML = '<a>link</a>';
+    jest.useFakeTimers();
+    document.body.innerHTML = '<a><span>link</span></a>';
     const link = document.querySelector('a') as Element;
-    jest.spyOn(link, 'matches').mockReturnValue(true);
+    const hovered = jest.spyOn(link, 'matches').mockReturnValue(true);
     const onHoverEnd = jest.fn();
+    const mouseOut = (from: Element): void => {
+      from.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }));
+      jest.runAllTimers();
+    };
 
     const { unwatch } = getComputedStyles('a', ['font-size'], onHoverEnd);
     expect(unwatch).not.toBeNull();
 
-    link.dispatchEvent(new MouseEvent('mouseleave'));
-    link.dispatchEvent(new MouseEvent('mouseleave'));
+    mouseOut(link.querySelector('span') as Element);
+    expect(onHoverEnd).not.toHaveBeenCalled();
+
+    hovered.mockReturnValue(false);
+    mouseOut(link);
+    mouseOut(link);
     expect(onHoverEnd).toHaveBeenCalledTimes(1);
+    jest.useRealTimers();
+  });
+
+  it('hears the pointer leave even when the page’s listeners are stopped', () => {
+    jest.useFakeTimers();
+    document.body.innerHTML = '<a>link</a>';
+    const link = document.querySelector('a') as Element;
+    jest
+      .spyOn(link, 'matches')
+      .mockReturnValueOnce(true)
+      .mockReturnValue(false);
+    const onHoverEnd = jest.fn();
+    const stop = (event: Event): void => event.stopPropagation();
+    window.addEventListener('mouseout', stop, true);
+
+    getComputedStyles('a', ['font-size'], onHoverEnd);
+    link.dispatchEvent(new MouseEvent('mouseout', { bubbles: true }));
+    jest.runAllTimers();
+
+    expect(onHoverEnd).toHaveBeenCalledTimes(1);
+    window.removeEventListener('mouseout', stop, true);
+    jest.useRealTimers();
   });
 
   it('skips the editor host’s ancestors, which stay hovered', () => {
