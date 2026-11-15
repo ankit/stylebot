@@ -11,7 +11,6 @@ import type { Box, TipPlacement } from './types';
  */
 type InspectorCardInstance = Vue & {
   nameParts: Array<NamePart>;
-  size: string;
   top: number;
   left: number;
   arrowLeft: number;
@@ -20,7 +19,6 @@ type InspectorCardInstance = Vue & {
 
 export type TipSummary = {
   nameParts: Array<NamePart>;
-  size: string;
 };
 
 /**
@@ -44,7 +42,6 @@ export default class OverlayTip {
 
   showSummary(summary: TipSummary): void {
     this.vm.nameParts = summary.nameParts;
-    this.vm.size = summary.size;
   }
 
   /**

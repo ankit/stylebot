@@ -21,7 +21,6 @@ type Edges = { top: number; right: number; bottom: number; left: number };
 
 type PickingOptions = {
   primary?: HTMLElement;
-  size?: string;
 };
 
 // A safety net against pathological cases, not a design choice.
@@ -149,10 +148,7 @@ export default class Overlay {
 
     const tip = this.ensureTip();
 
-    tip.showSummary({
-      nameParts: label,
-      size: picking?.size ?? '',
-    });
+    tip.showSummary({ nameParts: label });
 
     const panelEl =
       this.mountRoot?.querySelector<HTMLElement>('.stylebot') ?? null;

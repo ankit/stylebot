@@ -34,8 +34,6 @@ const lastChipText = (root: ParentNode, scope: string) =>
 
 const hoverLabel = () =>
   (document.querySelector('.inspect-card .name')?.textContent ?? '').trim();
-const hoverSize = () =>
-  (document.querySelector('.inspect-card .size')?.textContent ?? '').trim();
 const selectorChip = (root: HTMLElement) =>
   lastChipText(root, '.selector-autocomplete .autocomplete-chips');
 
@@ -154,14 +152,9 @@ export const ArrowKeysClimbAncestors: StoryObj = {
     const store = storeOf(canvasElement);
     const link = canvas.getByRole('link', { name: 'Learn more' });
 
-    await step('hovering shows the element and its size', async () => {
+    await step('hovering names the element', async () => {
       await hoverPage(link);
       await waitFor(() => expect(hoverLabel()).toBe('a'));
-
-      const { width, height } = link.getBoundingClientRect();
-      await expect(hoverSize()).toBe(
-        `${Math.round(width)} × ${Math.round(height)}`
-      );
     });
 
     await step('ArrowUp climbs, ArrowDown descends', async () => {
