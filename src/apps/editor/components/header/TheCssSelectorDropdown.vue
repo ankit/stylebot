@@ -37,9 +37,11 @@
             :parts="splitTail(parts).head"
             class="selector-head"
           />
-          <span v-if="splitTail(parts).tail" class="selector-tail">
-            {{ splitTail(parts).tail }}
-          </span>
+          <span
+            v-if="splitTail(parts).tail"
+            class="selector-tail"
+            v-text="splitTail(parts).tail"
+          />
         </span>
       </s-tooltip>
     </template>
