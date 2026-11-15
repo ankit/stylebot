@@ -27,6 +27,7 @@
         :disabled="!truncated"
         grow
         @mouseenter.native="measureTruncation"
+        @hook:mounted="fitSelector"
       >
         <template #text>
           <span class="selector-tooltip">{{ activeSelector }}</span>
@@ -261,11 +262,13 @@ export default Vue.extend({
   mounted() {
     this.resizeObserver = new ResizeObserver(() => this.fitSelector());
     this.resizeObserver.observe(this.$el);
+    document.fonts?.addEventListener('loadingdone', this.fitSelector);
     this.fitSelector();
   },
 
   beforeDestroy() {
     this.resizeObserver?.disconnect();
+    document.fonts?.removeEventListener('loadingdone', this.fitSelector);
     stopPeek();
     getPageBridge().unhighlight();
   },
@@ -302,8 +305,16 @@ export default Vue.extend({
       const run = ++this.fitRun;
       const stale = () => run !== this.fitRun;
 
+      this.droppedAncestors = 0;
+      this.partialStart = 0;
       this.headClipped = false;
       this.headWidth = 0;
+      await this.$nextTick();
+
+      if (stale() || !this.$el.querySelector('.selector-head')) {
+        return;
+      }
+
       await this.fitSteps(stale);
 
       if (stale() || !this.overflows()) {
@@ -340,10 +351,6 @@ export default Vue.extend({
      * room left with the end of the last one dropped.
      */
     async fitSteps(stale: () => boolean): Promise<void> {
-      this.droppedAncestors = 0;
-      this.partialStart = 0;
-      await this.$nextTick();
-
       const parts = splitSelectorList(this.activeSelector);
 
       if (parts.length !== 1) {
