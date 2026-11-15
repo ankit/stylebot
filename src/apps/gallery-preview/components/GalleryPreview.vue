@@ -1,5 +1,9 @@
 <template>
-  <s-theme-provider class="root" :mode="appearance">
+  <s-theme-provider
+    class="root"
+    :class="{ 'root--done': phase === 'done' }"
+    :mode="appearance"
+  >
     <div
       ref="card"
       class="preview"
@@ -360,6 +364,12 @@ export default Vue.extend({
   width: 340px;
   max-width: calc(100vw - 40px);
   background: none;
+
+  &--done {
+    width: max-content;
+    min-width: 340px;
+    max-width: min(440px, 100vw - 40px);
+  }
 }
 
 .preview {

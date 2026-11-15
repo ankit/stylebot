@@ -111,6 +111,14 @@ export default Vue.extend({
   @include focus-ring;
 }
 
+.confirming .name {
+  display: -webkit-box;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
 .status {
   @include truncate;
 
