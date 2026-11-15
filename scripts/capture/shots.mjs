@@ -43,7 +43,7 @@ const GALLERY_API = 'https://api.stylebot.dev/v1';
  * A site's styles as the Gallery lists them, each with its CSS, so the
  * slide shows what someone would really find there.
  */
-const listedGallery = async site => {
+export const listedGallery = async site => {
   const fetchJson = async url => {
     const response = await fetch(url);
 
@@ -77,7 +77,7 @@ const pageWidth = options => (options.slide ?? options.phone)?.pageWidth;
 const openPanelFor = (browser, page, options) =>
   openPanel(browser, page, options.phone && PHONE.panel);
 
-const hackerNews = active => {
+export const hackerNews = active => {
   const list = [
     { name: 'Night Shift', css: gallery('hn', 'night-shift') },
     { name: 'Modern', css: hnModern() },
@@ -92,7 +92,7 @@ const hackerNews = active => {
   };
 };
 
-const history = () => {
+export const history = () => {
   const at = (hours, minutes) => {
     const date = new Date();
     date.setHours(hours, minutes, 0, 0);
@@ -120,9 +120,14 @@ const history = () => {
  * Opens a page of Options, hiding the version an unreleased build reports,
  * which is still the last release's.
  */
-const openOptions = async (browser, route, width = WIDTH) => {
+export const openOptions = async (
+  browser,
+  route,
+  width = WIDTH,
+  height = HEIGHT
+) => {
   const page = await browser.context.newPage();
-  await page.setViewportSize({ width, height: HEIGHT });
+  await page.setViewportSize({ width, height });
   await page.goto(`chrome-extension://${browser.id}/options.html#/${route}`);
   await wait(1500);
   await page.evaluate(() => {
@@ -247,6 +252,7 @@ export const SHOTS = [
     appearance: 'dark',
     slide: {
       title: 'Your styles, on *every computer*.',
+      touchTitle: 'Your styles, on *every device*.',
       accent: 'yellow',
       pageWidth: 740,
     },
@@ -284,6 +290,7 @@ export const SHOTS = [
     appearance: 'light',
     slide: {
       title: 'Switch *looks* in a click.',
+      touchTitle: 'Switch *looks* in a tap.',
       accent: 'yellow',
       pageWidth: 400,
     },
