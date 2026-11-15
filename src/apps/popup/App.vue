@@ -1,5 +1,9 @@
 <template>
-  <s-theme-provider class="popup" :mode="appearance">
+  <s-theme-provider
+    class="popup"
+    :class="{ 'popup--iphone': onIPhone }"
+    :mode="appearance"
+  >
     <div
       v-if="tab && pageSupport && pageSupport !== 'supported'"
       class="popup-unsupported"
@@ -260,6 +264,8 @@ export default Vue.extend({
     publishItems: Record<string, GalleryMenuItem | null>;
     // iPhone has no editor, so nothing here opens it.
     editingEnabled: boolean;
+    // Safari on iPhone shows the popup as a sheet as wide as the screen.
+    onIPhone: boolean;
   } {
     return {
       styles: [],
@@ -280,6 +286,7 @@ export default Vue.extend({
       galleryBrowsing: false,
       publishItems: {},
       editingEnabled: !isIPhone(),
+      onIPhone: isIPhone(),
     };
   },
 
@@ -677,11 +684,11 @@ body {
     --popup-menu-button-size: 32px;
     --popup-row-actions-shown: 1;
     --popup-shortcut-display: none;
+  }
 
-    @media (max-width: 600px) {
-      width: auto;
-      zoom: 1.2;
-    }
+  &--iphone {
+    width: auto;
+    zoom: 1.2;
   }
 }
 
