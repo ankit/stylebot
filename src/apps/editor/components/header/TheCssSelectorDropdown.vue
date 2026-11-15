@@ -77,6 +77,12 @@ const TAIL_MIN = 8;
 const BOUNDARY = /[\s>+~.#[:"-]/;
 const STARTS_TOKEN = /[.#[:]/;
 const ENDS_WORD = /[-_"'=]/;
+const NOT_A_START = /[-_"'=\])]/;
+
+/**
+ * Whether a step says more than a bare tag name, like `div` or `> span`.
+ */
+const isDistinctive = (step: string): boolean => STARTS_TOKEN.test(step);
 
 /**
  * Where an ancestor could be cut to keep its end, longest first: before a
@@ -87,7 +93,10 @@ function partialStarts(step: string): Array<number> {
   const starts: Array<number> = [];
 
   for (let i = first + 1; i < step.length; i++) {
-    if (STARTS_TOKEN.test(step[i]) || ENDS_WORD.test(step[i - 1])) {
+    const startsWord =
+      ENDS_WORD.test(step[i - 1]) && !NOT_A_START.test(step[i]);
+
+    if (STARTS_TOKEN.test(step[i]) || startsWord) {
       starts.push(i);
     }
   }
@@ -260,8 +269,9 @@ export default Vue.extend({
 
     /**
      * Drops whole leading ancestors, one at a time, until the selector fits
-     * the field. Once only the last element is left, keeps as much of the
-     * nearest ancestor's end as fits, so it's never just `… a`.
+     * the field. When no ancestor left in view has a class, id, attribute or
+     * pseudo-class, keeps as much of the last dropped one's end as fits, so
+     * it's never just `… a` or `… div button`.
      */
     async fitSelector(): Promise<void> {
       const run = ++this.fitRun;
@@ -289,11 +299,14 @@ export default Vue.extend({
         }
       }
 
-      if (stale() || !ancestors || this.droppedAncestors < ancestors) {
+      const dropped = this.droppedAncestors;
+      const shownAncestors = steps.slice(dropped, ancestors);
+
+      if (stale() || !dropped || shownAncestors.some(isDistinctive)) {
         return;
       }
 
-      for (const start of partialStarts(steps[ancestors - 1])) {
+      for (const start of partialStarts(steps[dropped - 1])) {
         this.partialStart = start;
         await this.$nextTick();
 

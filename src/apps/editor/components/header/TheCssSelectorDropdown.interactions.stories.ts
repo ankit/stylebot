@@ -452,6 +452,26 @@ export const LongLoneAncestor: StoryObj = {
   },
 };
 
+export const BareTagsAfterLongAncestor: StoryObj = {
+  ...editor({
+    css: RULE_CSS,
+    activeSelector:
+      'div[class*="OverviewContent-module_"][class*="_Box_7"] div button',
+  }),
+  name: 'bare tags left after dropping an ancestor keep the end of that ancestor in view',
+  play: async ({ canvasElement }) => {
+    const text = chips(canvasElement).querySelector(
+      '.selector-text'
+    ) as HTMLElement;
+
+    await waitFor(() =>
+      expect(text.innerText.replace(/\n/g, '')).toMatch(
+        /^…[^"\]].*"\] div button$/
+      )
+    );
+  },
+};
+
 export const ShortSelectorWithoutTooltip: StoryObj = {
   ...editor(WITH_RULE),
   name: 'a selector that fits shows no tooltip on hover',
