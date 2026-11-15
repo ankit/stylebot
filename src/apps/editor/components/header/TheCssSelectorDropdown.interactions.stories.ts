@@ -416,6 +416,20 @@ export const LongSelectorOnOneLine: StoryObj = {
   },
 };
 
+export const SpacesAroundCombinators: StoryObj = {
+  ...editor({ css: RULE_CSS, activeSelector: 'td.title > span.titleline > a' }),
+  name: 'the field keeps the spaces around a combinator where it splits off the end',
+  play: async ({ canvasElement }) => {
+    const text = chips(canvasElement).querySelector(
+      '.selector-text'
+    ) as HTMLElement;
+
+    await expect(text.innerText.replace(/\n/g, '')).toBe(
+      'td.title > span.titleline > a'
+    );
+  },
+};
+
 export const ShortSelectorWithoutTooltip: StoryObj = {
   ...editor(WITH_RULE),
   name: 'a selector that fits shows no tooltip on hover',

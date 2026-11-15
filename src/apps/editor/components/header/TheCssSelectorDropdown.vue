@@ -99,6 +99,11 @@ function splitTail(parts: Array<string>): {
     cut = last.length - TAIL_MAX;
   }
 
+  // The head drops trailing spaces at its end, so they go to the tail.
+  while (cut > 0 && /\s/.test(last[cut - 1])) {
+    cut--;
+  }
+
   return {
     head: [...parts.slice(0, -1), last.slice(0, cut)],
     tail: last.slice(cut),
