@@ -118,6 +118,14 @@ const getLinkPath = (el: Element): string | null => {
   return url.origin === location.origin && named ? href : null;
 };
 
+const getAriaLabelAttribute = (el: Element): NamingAttribute | null => {
+  const label = el.getAttribute('aria-label');
+
+  return label && isSharedLabel(label)
+    ? { name: 'aria-label', value: label }
+    : null;
+};
+
 /**
  * A navigation link's address or any element's aria-label.
  */
@@ -129,11 +137,7 @@ const getLabelAttribute = (el: Element): NamingAttribute | null => {
     return { name: 'href', value: path };
   }
 
-  const label = el.getAttribute('aria-label');
-
-  return label && isSharedLabel(label)
-    ? { name: 'aria-label', value: label }
-    : null;
+  return getAriaLabelAttribute(el);
 };
 
 /**
@@ -144,11 +148,11 @@ export const getLabelBasedSelector = (el: HTMLElement): string | null =>
   attributeSelector(el, getLabelAttribute(el));
 
 /**
- * The attribute a selector would name the element by when it has no
- * authored id or class: its test id, form name, or label.
+ * The attribute to name an element by when it has no authored id or class:
+ * its test id, form name, or aria-label.
  */
 export const getNamingAttribute = (el: Element): NamingAttribute | null =>
-  getTestIdAttribute(el) ?? getNameAttribute(el) ?? getLabelAttribute(el);
+  getTestIdAttribute(el) ?? getNameAttribute(el) ?? getAriaLabelAttribute(el);
 
 export const getClassNames = (el: HTMLElement): Array<string> =>
   (el.getAttribute('class') ?? '').split(/\s+/).filter(Boolean);
