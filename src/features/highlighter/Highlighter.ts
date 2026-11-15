@@ -55,6 +55,10 @@ class Highlighter {
    * The element last found under the pointer, which drilling leaves behind.
    */
   pointerElement: HTMLElement | null;
+  /**
+   * What the pointer showed there, looking through overlays on top.
+   */
+  seenElement: HTMLElement | null;
   drillStack: Array<HTMLElement>;
   /**
    * Element/value currently suppressed by suppressTitle, if any.
@@ -90,6 +94,7 @@ class Highlighter {
     this.getMountRoot = getMountRoot;
     this.currentElement = null;
     this.pointerElement = null;
+    this.seenElement = null;
     this.drillStack = [];
     this.titleSuppressedElement = null;
     this.suppressedTitleValue = null;
@@ -115,6 +120,7 @@ class Highlighter {
     this.drillStack = [];
     this.currentElement = null;
     this.pointerElement = null;
+    this.seenElement = null;
     this.restoreSuppressedTitle();
     this.restoreCursor();
   };
@@ -360,7 +366,11 @@ class Highlighter {
 
     const el = getComposedTarget(event);
 
-    if (el !== this.pointerElement) {
+    // Across a card-wide overlay the target stays put while what's seen changes.
+    if (
+      el !== this.pointerElement ||
+      this.see(el, event) !== this.seenElement
+    ) {
       this.hoverElement(el, event);
     }
   };
@@ -376,14 +386,14 @@ class Highlighter {
     }
 
     this.pointerElement = null;
+    this.seenElement = null;
     this.hideOverlay();
   };
 
   hoverElement = (el: HTMLElement, point?: MouseEvent): void => {
     this.pointerElement = el;
-    const seen = point
-      ? this.seeThroughTransparent(this.seeThroughOverlay(el, point), point)
-      : el;
+    const seen = point ? this.see(el, point) : el;
+    this.seenElement = seen;
     const target = snapPastWrappers(seen);
 
     // Drilling down from a snapped pick leads back to what's under the pointer.
@@ -394,6 +404,13 @@ class Highlighter {
     this.setCurrentElement(target);
     this.showOverlay(target);
   };
+
+  /**
+   * What the pointer shows at the event's point, looking through overlays
+   * and fully transparent elements on top.
+   */
+  see = (el: HTMLElement, point: MouseEvent): HTMLElement =>
+    this.seeThroughTransparent(this.seeThroughOverlay(el, point), point);
 
   /**
    * What the pointer shows when it's over an element's ::before or ::after

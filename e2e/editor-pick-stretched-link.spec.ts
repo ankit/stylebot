@@ -73,3 +73,22 @@ test('picking the headline itself still picks its link', async ({
     editorRoot.locator('.autocomplete-chips .part').first()
   ).toHaveText(/\.card-link$/);
 });
+
+test('moving from the headline down onto the summary follows the pointer', async ({
+  context,
+  openPopup,
+}) => {
+  const page = await context.newPage();
+  await page.goto(server.baseUrl);
+
+  const editorRoot = await openEditor(page, openPopup);
+  await expect(editorRoot.locator('.stylebot-inspector')).toHaveClass(/active/);
+
+  const headline = await page.locator('.card-link').boundingBox();
+  await page.mouse.move(headline!.x + 5, headline!.y + 5);
+  await pickAt(page, '.card-summary');
+
+  await expect(
+    editorRoot.locator('.autocomplete-chips .part').first()
+  ).toHaveText(/\.card-summary$/);
+});
