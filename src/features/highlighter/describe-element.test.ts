@@ -1,5 +1,5 @@
 import type { NamePart } from './describe-element';
-import { describeElement, describeSize } from './describe-element';
+import { describeElement } from './describe-element';
 
 const element = (html: string): Element => {
   const container = document.createElement('div');
@@ -103,15 +103,5 @@ describe('describeElement', () => {
     expect(
       marked(describeElement(element('<li class="css-1q2w3e item"></li>')))
     ).toBe('li[.css-1q2w3e].item');
-  });
-});
-
-describe('describeSize', () => {
-  it('rounds the rendered size', () => {
-    const el = document.createElement('div');
-    el.getBoundingClientRect = () =>
-      ({ width: 120.4, height: 23.6 } as DOMRect);
-
-    expect(describeSize(el)).toBe('120 × 24');
   });
 });

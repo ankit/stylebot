@@ -23,9 +23,6 @@
         />
       </span>
     </s-text>
-    <s-text v-if="size" as="span" size="label" class="size">
-      {{ size }}
-    </s-text>
   </div>
 </template>
 
@@ -51,7 +48,6 @@ export default Vue.extend({
 
   data(): {
     nameParts: Array<NamePart>;
-    size: string;
     top: number;
     left: number;
     arrowLeft: number;
@@ -59,7 +55,6 @@ export default Vue.extend({
   } {
     return {
       nameParts: [],
-      size: '',
       top: 0,
       left: 0,
       arrowLeft: 12,
@@ -157,14 +152,5 @@ export default Vue.extend({
 
 .generated {
   color: var(--text-secondary);
-}
-
-.size {
-  flex-shrink: 0;
-  text-box: trim-both cap alphabetic;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--text-secondary);
-  font-variant-numeric: tabular-nums;
 }
 </style>
