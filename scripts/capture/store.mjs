@@ -130,7 +130,7 @@ for (const shot of shots) {
 
     await (shot.standalone
       ? shot.run(file, shotOptions)
-      : shot.run(browser, file, shotOptions));
+      : ((ipad && shot.touchRun) || shot.run)(browser, file, shotOptions));
     console.log(`✓ ${shot.name}`);
   } catch (error) {
     failed++;

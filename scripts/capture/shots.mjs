@@ -140,6 +140,18 @@ export const openOptions = async (
   return page;
 };
 
+/**
+ * Wikipedia's Slate and Parchment profiles, in Parchment.
+ */
+const wikipediaLooks = () => ({
+  ...profiles(
+    { name: 'Slate', css: gallery('wikipedia', 'slate') },
+    { name: 'Parchment', css: gallery('wikipedia', 'parchment') }
+  ),
+  css: gallery('wikipedia', 'parchment'),
+  activeProfile: 'profile-1',
+});
+
 export const SHOTS = [
   {
     name: '1-pick-element',
@@ -295,19 +307,27 @@ export const SHOTS = [
       pageWidth: 400,
     },
     phone: { pageWidth: 400 },
-    run: async (browser, file, options) => {
-      await seed(browser, {
-        styles: {
-          'en.wikipedia.org': {
-            ...profiles(
-              { name: 'Slate', css: gallery('wikipedia', 'slate') },
-              { name: 'Parchment', css: gallery('wikipedia', 'parchment') }
-            ),
-            css: gallery('wikipedia', 'parchment'),
-            activeProfile: 'profile-1',
-          },
-        },
+    // Touchscreens switch from the popup, which Safari on iPad shows below
+    // its toolbar.
+    touchRun: async (browser, file, options) => {
+      await seed(browser, { styles: { 'en.wikipedia.org': wikipediaLooks() } });
+      const page = await openSite(
+        browser.context,
+        'https://en.wikipedia.org/wiki/Bonsai',
+        { full: true }
+      );
+      await page.addStyleTag({ content: '#centralNotice { display: none; }' });
+      const popup = await openPopup(browser, page);
+      await fitPopup(popup);
+      await page.bringToFront();
+      await wait(500);
+      await capturePopup(browser.context, file, page, popup, {
+        appearance: 'light',
+        ...options,
       });
+    },
+    run: async (browser, file, options) => {
+      await seed(browser, { styles: { 'en.wikipedia.org': wikipediaLooks() } });
       const page = await openSite(
         browser.context,
         'https://en.wikipedia.org/wiki/Bonsai',
