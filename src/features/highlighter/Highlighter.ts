@@ -102,13 +102,13 @@ class Highlighter {
   };
 
   startInspecting = (): void => {
-    this.addWindowListeners();
+    this.listenOnWindow(true);
     this.suppressCursor();
   };
 
   stopInspecting = (): void => {
     this.hideOverlay();
-    this.removeWindowListeners();
+    this.listenOnWindow(false);
     this.drillStack = [];
     this.currentElement = null;
     this.pointerElement = null;
@@ -217,30 +217,35 @@ class Highlighter {
     this.hideOverlay();
   };
 
-  addWindowListeners = (): void => {
-    window.addEventListener('click', this.onClick, true);
-    window.addEventListener('mousedown', this.onMouseEvent, true);
-    window.addEventListener('mouseover', this.onMouseEvent, true);
-    window.addEventListener('mouseup', this.onMouseEvent, true);
-    window.addEventListener('pointerdown', this.onPointerDown, true);
-    window.addEventListener('pointerover', this.onPointerOver, true);
-    window.addEventListener('pointermove', this.onPointerMove, true);
-    window.addEventListener('pointerout', this.onPointerOut, true);
-    window.addEventListener('pointerup', this.onPointerUp, true);
-    window.addEventListener('keydown', this.onKeyDown, true);
-  };
+  /**
+   * The window listeners inspecting adds. Every mouse and pointer event stops
+   * there, so the page's own hover menus hold still while picking.
+   */
+  getWindowListeners = (): Array<[string, (event: never) => void]> => [
+    ['click', this.onClick],
+    ['mousedown', this.onMouseEvent],
+    ['mouseover', this.onMouseEvent],
+    ['mouseup', this.onMouseEvent],
+    ['mousemove', this.onMouseEvent],
+    ['mouseout', this.onMouseEvent],
+    ['mouseenter', this.onMouseEvent],
+    ['mouseleave', this.onMouseEvent],
+    ['pointerenter', this.onMouseEvent],
+    ['pointerleave', this.onMouseEvent],
+    ['pointerdown', this.onPointerDown],
+    ['pointerover', this.onPointerOver],
+    ['pointermove', this.onPointerMove],
+    ['pointerout', this.onPointerOut],
+    ['pointerup', this.onPointerUp],
+    ['keydown', this.onKeyDown],
+  ];
 
-  removeWindowListeners = (): void => {
-    window.removeEventListener('click', this.onClick, true);
-    window.removeEventListener('mousedown', this.onMouseEvent, true);
-    window.removeEventListener('mouseover', this.onMouseEvent, true);
-    window.removeEventListener('mouseup', this.onMouseEvent, true);
-    window.removeEventListener('pointerdown', this.onPointerDown, true);
-    window.removeEventListener('pointerover', this.onPointerOver, true);
-    window.removeEventListener('pointermove', this.onPointerMove, true);
-    window.removeEventListener('pointerout', this.onPointerOut, true);
-    window.removeEventListener('pointerup', this.onPointerUp, true);
-    window.removeEventListener('keydown', this.onKeyDown, true);
+  listenOnWindow = (on: boolean): void => {
+    const method = on ? 'addEventListener' : 'removeEventListener';
+
+    for (const [type, listener] of this.getWindowListeners()) {
+      window[method](type, listener as EventListener, true);
+    }
   };
 
   selectElement = (el: HTMLElement): void => {
@@ -356,6 +361,7 @@ class Highlighter {
       return;
     }
 
+    event.stopPropagation();
     const el = getComposedTarget(event);
 
     if (el !== this.pointerElement) {
@@ -380,6 +386,10 @@ class Highlighter {
    * or pop-out window. The element stays current so keys typed there still work.
    */
   onPointerOut = (event: PointerEvent): void => {
+    if (!this.isStylebotElement(event.target)) {
+      event.stopPropagation();
+    }
+
     // Moving into an iframe's own document has no related target either.
     if (event.relatedTarget || event.target instanceof HTMLIFrameElement) {
       return;
