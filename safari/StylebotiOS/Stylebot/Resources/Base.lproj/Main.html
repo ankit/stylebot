@@ -1,18 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'" />
 
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1, user-scalable=no"
+      content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no"
     />
 
     <link rel="stylesheet" href="../Style.css" />
   </head>
   <body>
-    <img src="../Icon.png" width="128" height="128" alt="Stylebot Icon" />
-    <p>You can turn on Stylebot’s Safari extension in Settings.</p>
+    <main>
+      <header>
+        <img src="../Icon.png" width="96" height="96" alt="" />
+        <h1>Stylebot</h1>
+        <p class="tagline" data-i18n="change_how_any_website_looks_in_safari">
+          Change how any website looks in Safari.
+        </p>
+      </header>
+
+      <section class="setup">
+        <h2 data-i18n="turn_on_stylebot_in_safari">
+          Turn on Stylebot in Safari
+        </h2>
+        <ol class="steps">
+          <li>
+            <span class="label" data-i18n="open_any_website_in_safari">
+              Open any website in *Safari*.
+            </span>
+          </li>
+          <li class="phone-only">
+            <span
+              class="label"
+              data-i18n="tap_the_page_menu_then_manage_extensions_and_turn_on_stylebot"
+            >
+              Tap the page menu on the left of the address bar, then *Manage
+              Extensions*, and turn on *Stylebot*.
+            </span>
+          </li>
+          <li class="pad-only">
+            <span
+              class="label"
+              data-i18n="tap_the_extensions_button_and_turn_on_stylebot"
+            >
+              Tap the extensions button in the address bar and turn on
+              *Stylebot*.
+            </span>
+          </li>
+          <li>
+            <span
+              class="label"
+              data-i18n="when_safari_asks_for_access_to_websites_allow_it_on_every_website"
+            >
+              When Safari asks for access to websites, allow it on every
+              website.
+            </span>
+          </li>
+        </ol>
+        <a
+          class="button"
+          href="https://en.wikipedia.org/"
+          data-i18n="open_safari"
+        >
+          Open Safari
+        </a>
+      </section>
+
+      <p class="hint">
+        <span
+          data-i18n="then_open_stylebot_from_the_same_menu_to_restyle_the_page"
+        >
+          Then open Stylebot from the same menu to restyle the page.
+        </span>
+        <br />
+        <span data-i18n="or_turn_it_on_in_settings_apps_safari_extensions">
+          Or turn it on in Settings › Apps › Safari › Extensions.
+        </span>
+      </p>
+
+      <a class="learn-more" href="https://stylebot.dev/">stylebot.dev</a>
+    </main>
+    <script src="../Script.js"></script>
   </body>
 </html>

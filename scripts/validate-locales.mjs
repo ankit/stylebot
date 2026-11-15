@@ -17,17 +17,17 @@ const rootDir = path.resolve(
 );
 const localesDir = path.join(rootDir, 'src/assets/_locales');
 const srcDir = path.join(rootDir, 'src');
-// The Safari wrapper app shows the extension's messages too.
-const safariAppScript = path.join(
-  rootDir,
-  'safari/Stylebot/Stylebot/Resources/Script.js'
-);
+// The Safari wrapper apps show the extension's messages too.
+const safariAppFiles = [
+  'safari/Stylebot/Stylebot/Resources/Script.js',
+  'safari/StylebotiOS/Stylebot/Resources/Base.lproj/Main.html',
+].map(file => path.join(rootDir, file));
 const manifestPath = path.join(rootDir, 'src/assets/manifest/manifest.json');
-// The App Store lists the languages the Safari app declares here.
-const safariAppInfoPlist = path.join(
-  rootDir,
-  'safari/Stylebot/Stylebot/Info.plist'
-);
+// The App Store lists the languages the Safari apps declare here.
+const safariAppInfoPlists = [
+  'safari/Stylebot/Stylebot/Info.plist',
+  'safari/StylebotiOS/Stylebot/Info.plist',
+].map(file => path.join(rootDir, file));
 
 // Extension locales whose Apple language ID isn't the locale with a hyphen.
 const APPLE_LANGUAGE_IDS = {
@@ -149,7 +149,7 @@ function collectUsedKeys() {
   const quoted = new Set();
   const patterns = [];
 
-  for (const file of [...walk(srcDir), safariAppScript]) {
+  for (const file of [...walk(srcDir), ...safariAppFiles]) {
     const text = readFileSync(file, 'utf8');
     const found = findReferencedKeys(text);
 
@@ -411,23 +411,28 @@ function main() {
     }
   }
 
-  const safariLanguages = new Set(
-    [
-      ...readFileSync(safariAppInfoPlist, 'utf8')
-        .split('<key>CFBundleLocalizations</key>')[1]
-        .split('</array>')[0]
-        .matchAll(/<string>([^<]+)<\/string>/g),
-    ].map(m => m[1])
-  );
-
-  Object.keys(parsedByLocale)
-    .map(locale => APPLE_LANGUAGE_IDS[locale] ?? locale.replace('_', '-'))
-    .filter(language => !safariLanguages.has(language))
-    .forEach(language =>
-      errors.push(
-        `Safari app Info.plist: CFBundleLocalizations is missing "${language}"`
-      )
+  for (const plist of safariAppInfoPlists) {
+    const safariLanguages = new Set(
+      [
+        ...readFileSync(plist, 'utf8')
+          .split('<key>CFBundleLocalizations</key>')[1]
+          .split('</array>')[0]
+          .matchAll(/<string>([^<]+)<\/string>/g),
+      ].map(m => m[1])
     );
+
+    Object.keys(parsedByLocale)
+      .map(locale => APPLE_LANGUAGE_IDS[locale] ?? locale.replace('_', '-'))
+      .filter(language => !safariLanguages.has(language))
+      .forEach(language =>
+        errors.push(
+          `${path.relative(
+            rootDir,
+            plist
+          )}: CFBundleLocalizations is missing "${language}"`
+        )
+      );
+  }
 
   if (dynamicCalls.length > 0) {
     console.log(
