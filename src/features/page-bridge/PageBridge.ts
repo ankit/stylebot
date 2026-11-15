@@ -136,7 +136,7 @@ export type PageBridge = {
    * Asks the page to show its own panel again, docked on the given side;
    * a no-op for the in-page host.
    */
-  openInPage(dockLocation: 'left' | 'right'): void;
+  openInPage(dockLocation: 'left' | 'right' | 'floating'): void;
 
   /**
    * Brings the page's tab and window to the front; a no-op in-page.

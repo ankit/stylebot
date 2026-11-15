@@ -61,7 +61,7 @@ export type RemotePageBridgeMessageToPage =
   | { type: 'handleInspectKey'; key: string }
   | { type: 'highlight'; selector: string }
   | { type: 'unhighlight' }
-  | { type: 'openInPage'; dockLocation: 'left' | 'right' };
+  | { type: 'openInPage'; dockLocation: 'left' | 'right' | 'floating' };
 
 // What the page sends the window.
 export type RemotePageBridgeMessageToWindow =
