@@ -377,7 +377,7 @@ export default Vue.extend({
   border: 1px solid var(--field-border);
   border-radius: 16px;
   background: var(--panel-surface);
-  box-shadow: 0 16px 48px rgb(0 0 0 / 34%), 0 2px 6px rgb(0 0 0 / 20%);
+  box-shadow: 0 14px 40px var(--panel-shadow);
   pointer-events: auto;
   animation: rise 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
 
