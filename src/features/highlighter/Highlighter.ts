@@ -34,6 +34,16 @@ const isInsideDisabledControl = (el: HTMLElement): boolean =>
     'button:disabled, input:disabled, select:disabled, textarea:disabled'
   );
 
+/**
+ * Whether the element's own border box, leaving out its pseudo-elements,
+ * holds the point.
+ */
+const boxHolds = (el: Element, x: number, y: number): boolean => {
+  const box = el.getBoundingClientRect();
+
+  return x >= box.left && x <= box.right && y >= box.top && y <= box.bottom;
+};
+
 class Highlighter {
   overlay: Overlay | null;
   onSelect: (selector: string) => void;
@@ -371,7 +381,9 @@ class Highlighter {
 
   hoverElement = (el: HTMLElement, point?: MouseEvent): void => {
     this.pointerElement = el;
-    const seen = point ? this.seeThroughTransparent(el, point) : el;
+    const seen = point
+      ? this.seeThroughTransparent(this.seeThroughOverlay(el, point), point)
+      : el;
     const target = snapPastWrappers(seen);
 
     // Drilling down from a snapped pick leads back to what's under the pointer.
@@ -381,6 +393,29 @@ class Highlighter {
 
     this.setCurrentElement(target);
     this.showOverlay(target);
+  };
+
+  /**
+   * What the pointer shows when it's over an element's ::before or ::after
+   * stretched past its own box, like a link's overlay across a whole story
+   * card: the topmost element under the pointer whose own box holds it, else `el`.
+   */
+  seeThroughOverlay = (el: HTMLElement, point: MouseEvent): HTMLElement => {
+    const { clientX: x, clientY: y } = point;
+
+    if (boxHolds(el, x, y)) {
+      return el;
+    }
+
+    const root = el.getRootNode() as Document | ShadowRoot;
+    const under = root
+      .elementsFromPoint(x, y)
+      .find(
+        node =>
+          node !== el && !this.isStylebotElement(node) && boxHolds(node, x, y)
+      );
+
+    return (under as HTMLElement | undefined) ?? el;
   };
 
   /**
