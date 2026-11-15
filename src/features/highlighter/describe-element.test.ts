@@ -148,6 +148,14 @@ describe('describeElement', () => {
     );
   });
 
+  it("leaves a navigation link's address out", () => {
+    const link = element(
+      '<nav><a href="/section/business" class="css-1wjnrbv"></a></nav>'
+    ).firstElementChild as Element;
+
+    expect(marked(describeElement(link))).toBe('a[.css-1wjnrbv]');
+  });
+
   it('cuts a long attribute value short', () => {
     expect(
       text(
