@@ -43,7 +43,15 @@
             mono
             :parts="splitTail(shownParts(parts)).head"
             class="selector-head"
+            :class="{ clipped: headClipped }"
           />
+          <span
+            v-if="headClipped"
+            class="selector-ellipsis middle"
+            aria-hidden="true"
+          >
+            <more-icon :size="12" />
+          </span>
           <span
             v-if="splitTail(shownParts(parts)).tail"
             class="selector-tail"
@@ -168,6 +176,7 @@ export default Vue.extend({
     truncated: boolean;
     droppedAncestors: number;
     partialStart: number;
+    headClipped: boolean;
     fitRun: number;
     resizeObserver: ResizeObserver | null;
     openingSelector: string;
@@ -178,6 +187,7 @@ export default Vue.extend({
       truncated: false,
       droppedAncestors: 0,
       partialStart: 0,
+      headClipped: false,
       fitRun: 0,
       resizeObserver: null,
       // The selector as it was when editing began; until it's changed, the
@@ -280,12 +290,26 @@ export default Vue.extend({
      * Drops whole leading ancestors, one at a time, until the selector fits
      * the field. When no ancestor left in view has a class, id, attribute or
      * pseudo-class, keeps as much of the last dropped one's end as fits, so
-     * it's never just `… a` or `… div button`.
+     * it's never just `… a` or `… div button`. What still doesn't fit is
+     * cut in the middle, with the same dots marking the cut.
      */
     async fitSelector(): Promise<void> {
       const run = ++this.fitRun;
       const stale = () => run !== this.fitRun;
 
+      this.headClipped = false;
+      await this.fitSteps(stale);
+
+      if (!stale()) {
+        this.headClipped = this.overflows();
+      }
+    },
+
+    /**
+     * Drops whole leading ancestors until the selector fits, then fills any
+     * room left with the end of the last one dropped.
+     */
+    async fitSteps(stale: () => boolean): Promise<void> {
       this.droppedAncestors = 0;
       this.partialStart = 0;
       await this.$nextTick();
@@ -465,6 +489,11 @@ export default Vue.extend({
 
 .selector-head {
   @include truncate;
+
+  &.clipped {
+    text-overflow: clip;
+    mask-image: linear-gradient(to right, #000 calc(100% - 16px), transparent);
+  }
 }
 
 .selector-ellipsis {
@@ -477,6 +506,10 @@ export default Vue.extend({
   height: 16px;
   margin-right: 6px;
   border-radius: 4px;
+
+  &.middle {
+    margin-left: 4px;
+  }
   background: color-mix(in srgb, var(--text-primary) 12%, transparent);
   color: var(--text-secondary);
 }
