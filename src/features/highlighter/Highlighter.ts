@@ -44,6 +44,20 @@ const boxHolds = (el: Element, x: number, y: number): boolean => {
   return x >= box.left && x <= box.right && y >= box.top && y <= box.bottom;
 };
 
+/**
+ * Whether the element draws a positioned ::before or ::after, which can lie
+ * on top of its own children.
+ */
+const hasPositionedPseudo = (el: Element): boolean =>
+  ['::before', '::after'].some(pseudo => {
+    const style = getComputedStyle(el, pseudo);
+
+    return (
+      style.content !== 'none' &&
+      (style.position === 'absolute' || style.position === 'fixed')
+    );
+  });
+
 class Highlighter {
   overlay: Overlay | null;
   onSelect: (selector: string) => void;
@@ -59,6 +73,11 @@ class Highlighter {
    * What the pointer showed there, looking through overlays on top.
    */
   seenElement: HTMLElement | null;
+  /**
+   * Whether the element under the pointer draws a positioned pseudo-element,
+   * so what's seen there can change without the pointer leaving it.
+   */
+  pointerOverlaid: boolean;
   drillStack: Array<HTMLElement>;
   /**
    * Element/value currently suppressed by suppressTitle, if any.
@@ -95,6 +114,7 @@ class Highlighter {
     this.currentElement = null;
     this.pointerElement = null;
     this.seenElement = null;
+    this.pointerOverlaid = false;
     this.drillStack = [];
     this.titleSuppressedElement = null;
     this.suppressedTitleValue = null;
@@ -369,7 +389,7 @@ class Highlighter {
     // Across a card-wide overlay the target stays put while what's seen changes.
     if (
       el !== this.pointerElement ||
-      this.see(el, event) !== this.seenElement
+      (this.pointerOverlaid && this.see(el, event) !== this.seenElement)
     ) {
       this.hoverElement(el, event);
     }
@@ -392,6 +412,7 @@ class Highlighter {
 
   hoverElement = (el: HTMLElement, point?: MouseEvent): void => {
     this.pointerElement = el;
+    this.pointerOverlaid = hasPositionedPseudo(el);
     const seen = point ? this.see(el, point) : el;
     this.seenElement = seen;
     const target = snapPastWrappers(seen);
@@ -413,14 +434,16 @@ class Highlighter {
     this.seeThroughTransparent(this.seeThroughOverlay(el, point), point);
 
   /**
-   * What the pointer shows when it's over an element's ::before or ::after
-   * stretched past its own box, like a link's overlay across a whole story
-   * card: the topmost element under the pointer whose own box holds it, else `el`.
+   * What the pointer shows under an element's positioned ::before or ::after,
+   * like a link's overlay across a whole story card: the topmost element whose
+   * own box holds the pointer, kept to the element's own children while the
+   * pointer is inside it; else `el`.
    */
   seeThroughOverlay = (el: HTMLElement, point: MouseEvent): HTMLElement => {
     const { clientX: x, clientY: y } = point;
+    const inside = boxHolds(el, x, y);
 
-    if (boxHolds(el, x, y)) {
+    if (inside && !(el.firstElementChild && hasPositionedPseudo(el))) {
       return el;
     }
 
@@ -429,7 +452,10 @@ class Highlighter {
       .elementsFromPoint(x, y)
       .find(
         node =>
-          node !== el && !this.isStylebotElement(node) && boxHolds(node, x, y)
+          node !== el &&
+          (!inside || el.contains(node)) &&
+          !this.isStylebotElement(node) &&
+          boxHolds(node, x, y)
       );
 
     return (under as HTMLElement | undefined) ?? el;
