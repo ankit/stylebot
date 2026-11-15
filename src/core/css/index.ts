@@ -22,7 +22,11 @@ export type {
   ScopeSlots,
   SelectorAlternatives,
 } from './selector/selector-scopes';
-export { getStableClassMatcher } from './selector/element-selectors';
+export {
+  getNamingAttribute,
+  getStableClassMatcher,
+} from './selector/element-selectors';
+export type { NamingAttribute } from './selector/element-selectors';
 export { getUniqueSelector } from './selector/unique-selectors';
 export {
   buildSelectorAlternatives,
