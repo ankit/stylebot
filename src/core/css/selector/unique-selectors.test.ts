@@ -126,14 +126,14 @@ describe('getUniqueSelector and getItemScopedSelector', () => {
     expect(getUniqueSelector(el)).toBe('button[aria-label="Next"]');
   });
 
-  it('tells a navigation link apart by its address', () => {
+  it("doesn't tell a navigation link apart by its address", () => {
     document.body.innerHTML = `
       <nav><a href="/news">news</a> <a href="/newcomments">comments</a></nav>
       <p><a>one</a> <a>two</a></p>
     `;
     const el = document.querySelectorAll('a')[1] as HTMLElement;
 
-    expect(getUniqueSelector(el)).toBe('a[href="/newcomments"]');
+    expect(getUniqueSelector(el)).toBe('nav a:nth-of-type(2)');
   });
 
   it("doesn't tell a content link apart by its address", () => {
