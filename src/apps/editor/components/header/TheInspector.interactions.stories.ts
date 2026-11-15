@@ -207,7 +207,7 @@ export const ClickOnIframeSelectsIt: StoryObj = {
     const frame = canvasElement.querySelector('iframe') as HTMLElement;
 
     await hoverPage(frame);
-    await waitFor(() => expect(hoverLabel()).toBe('iframe'));
+    await waitFor(() => expect(hoverLabel()).toBe('iframe[name="ad"]'));
 
     // The overlay rect shields the frame so the click stays in this
     // document instead of reaching the ad inside.
