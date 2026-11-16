@@ -81,6 +81,12 @@ const CATEGORY_QUERIES: Record<string, GoogleFontCategory> = {
 };
 
 /**
+ * The Google Fonts category a query names ("serif", "mono"), if any.
+ */
+export const getFontCategory = (query: string): GoogleFontCategory | null =>
+  CATEGORY_QUERIES[query.trim().toLowerCase()] ?? null;
+
+/**
  * Returns up to `limit` fonts for the query, in the list's own order: a
  * category name ("serif", "mono") lists that category, anything else matches
  * family names.
@@ -90,7 +96,7 @@ export const matchGoogleFonts = (
   fonts: Array<GoogleFont>,
   limit = 8
 ): Array<GoogleFont> => {
-  const category = CATEGORY_QUERIES[query.trim().toLowerCase()];
+  const category = getFontCategory(query);
   const matches = category
     ? (font: GoogleFont) => font.category === category
     : (font: GoogleFont) => matchesFontQuery(font.family, query);

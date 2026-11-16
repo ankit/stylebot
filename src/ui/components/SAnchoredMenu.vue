@@ -76,9 +76,8 @@ export default Vue.extend({
       default: () => null,
     },
 
-    // The item standing for the current choice, if any: scrolled into view
-    // on open, and where the arrow keys start from while focus is in the
-    // trigger field.
+    // The item standing for the current choice, if any, scrolled into view
+    // on open.
     currentItem: {
       type: Function as PropType<() => HTMLElement | null | undefined>,
       default: () => null,
@@ -345,16 +344,6 @@ export default Vue.extend({
           ).length - 1;
       }
       const delta = event.key === 'ArrowDown' ? 1 : -1;
-
-      // From the field, move on from the current choice rather than the top.
-      const current = field && active === field ? this.currentItem() : null;
-      const currentItemIndex = current ? items.indexOf(current) : -1;
-
-      if (currentItemIndex !== -1) {
-        const next = (currentItemIndex + delta + items.length) % items.length;
-        items[next].focus();
-        return;
-      }
 
       if (currentIndex === -1) {
         // Nothing in the cycle has focus yet: enter it at the first or last item.

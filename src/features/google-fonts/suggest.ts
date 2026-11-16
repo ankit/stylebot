@@ -1,7 +1,8 @@
 import { getTokenAtCaret, replaceToken } from '@stylebot/css';
 
 import type { GoogleFont, GoogleFontCategory } from './fonts';
-import { matchGoogleFonts, matchesFontQuery } from './fonts';
+import { getFontCategory, matchGoogleFonts, matchesFontQuery } from './fonts';
+import { isGenericFamily } from './installed';
 
 export type FontSuggestion =
   | { kind: 'default'; value: '' }
@@ -29,12 +30,10 @@ export const isDefaultFont = (text: string, defaultLabel: string): boolean =>
   defaultNames(defaultLabel).includes(text.trim().toLowerCase());
 
 /**
- * Rows for the font picker. While the text is empty or still the applied
- * value: the default plus the recently used fonts. Once edited: completions
- * for the family being typed (the last comma-separated segment) from the
- * recents and then Google Fonts, followed by the raw text as-is so local
- * fonts and stacks can be entered directly. Typing the start of the Default
- * label (or "default") offers the default first.
+ * Rows for the font picker: the default and recents until the text is edited;
+ * then the default if the text starts its name, completions of the last
+ * family typed (recents, then Google Fonts), and the text itself unless it
+ * only names a category like "mono".
  */
 export const suggestFonts = (
   text: string,
@@ -84,12 +83,18 @@ export const suggestFonts = (
     add(family, replaceToken(text, token, family));
 
   recents.filter(font => matchesFontQuery(font, token.value)).forEach(complete);
-  matchGoogleFonts(token.value, googleFonts).forEach(font =>
+  // A category is browsed in full; a name only needs its closest matches.
+  const limit = getFontCategory(token.value) ? Infinity : undefined;
+
+  matchGoogleFonts(token.value, googleFonts, limit).forEach(font =>
     complete(font.family)
   );
 
+  const namesCategoryOnly = !!getFontCategory(raw) && !isGenericFamily(raw);
+
   if (
     query !== DEFAULT_KEYWORD &&
+    !namesCategoryOnly &&
     !rows.some(row => row.value.toLowerCase() === query)
   ) {
     rows.push({ kind: 'custom', value: raw });

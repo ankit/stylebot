@@ -208,13 +208,13 @@ test('highlighting a font previews it on the page until the picker is dismissed'
   expect(await savedCss(page)).not.toContain('Playfair');
   expect((await readRecentFonts(extension))?.[0]).not.toBe('Playfair Display');
 
-  // Escape reverts the typed text; Down lists the recents again.
+  // Escape reverts the typed text; Down lists the popular fonts again.
   await expect(font.locator('.autocomplete-input')).toHaveValue('');
   await page.keyboard.press('ArrowDown');
-  await menuItem(page, 'Lora').hover();
+  await menuItem(page, 'Merriweather').hover();
 
-  await expect.poll(() => previewCss(page)).toContain('Lora');
-  await expect(heading).toHaveCSS('font-family', /Lora/);
+  await expect.poll(() => previewCss(page)).toContain('Merriweather');
+  await expect(heading).toHaveCSS('font-family', /Merriweather/);
 
   // Rows that aren't fonts (Default) preview nothing.
   await menuItem(page, 'Default').hover();
