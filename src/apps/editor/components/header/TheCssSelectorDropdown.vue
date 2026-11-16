@@ -6,7 +6,7 @@
     chips
     blur-on-commit
     class="selector-autocomplete"
-    :value="activeSelector"
+    :value="fieldValue"
     :items="entries"
     :disabled="disabled"
     :min-width="300"
@@ -15,6 +15,7 @@
     :show-chevron="hasOtherRules"
     @input="setSelector"
     @select="pickSelector"
+    @submit="commitDraft"
     @click.native="stopInspecting"
     @focus="onFocus"
     @blur="onBlur"
@@ -185,8 +186,12 @@ export default Vue.extend({
     fitRun: number;
     resizeObserver: ResizeObserver | null;
     openingSelector: string;
+    draft: string | null;
   } {
     return {
+      // What's typed in Code mode, applied once committed: every selector
+      // applied there adds an empty rule to the stylesheet.
+      draft: null,
       focused: false,
       hovered: false,
       truncated: false,
@@ -211,6 +216,10 @@ export default Vue.extend({
       return this.$store.state.activeSelector;
     },
 
+    fieldValue(): string {
+      return this.draft ?? this.activeSelector;
+    },
+
     selectors(): Array<CssSelectorMetadata> {
       return this.$store.state.selectors;
     },
@@ -228,8 +237,8 @@ export default Vue.extend({
     },
 
     entries(): Array<DropdownEntry> {
-      const query = this.activeSelector.trim().toLowerCase();
-      const filtering = !!query && this.activeSelector !== this.openingSelector;
+      const query = this.fieldValue.trim().toLowerCase();
+      const filtering = !!query && this.fieldValue !== this.openingSelector;
       const matches = (selector: string) => {
         const value = selector.toLowerCase();
         return !filtering || (value.includes(query) && value !== query);
@@ -241,16 +250,18 @@ export default Vue.extend({
     },
 
     disabled(): boolean {
-      return this.mode !== 'basic';
+      return this.mode !== 'basic' && this.mode !== 'code';
     },
   },
 
   watch: {
-    // Re-preview on every keystroke while focused, not just on select —
-    // setSelector already updates activeSelector as the user types.
     activeSelector(): void {
       this.fitSelector();
+    },
 
+    // Re-preview on every keystroke while focused, not just on select —
+    // setSelector already updates the field's value as the user types.
+    fieldValue(): void {
       if (this.focused) {
         this.previewMatches();
       }
@@ -396,11 +407,26 @@ export default Vue.extend({
     },
 
     setSelector(value: string): void {
+      if (this.mode === 'code') {
+        this.draft = value;
+        return;
+      }
+
       this.$store.commit('setActiveSelector', value);
     },
 
     pickSelector(item: DropdownEntry): void {
+      this.draft = null;
       this.$store.commit('setActiveSelector', item.value);
+    },
+
+    commitDraft(): void {
+      const { draft } = this;
+      this.draft = null;
+
+      if (draft !== null && draft !== this.activeSelector) {
+        this.$store.commit('setActiveSelector', draft);
+      }
     },
 
     /**
@@ -427,6 +453,7 @@ export default Vue.extend({
 
     onBlur(): void {
       this.focused = false;
+      this.commitDraft();
 
       if (!this.hovered && !this.disabled && !isPeeking()) {
         getPageBridge().unhighlight();
@@ -478,7 +505,7 @@ export default Vue.extend({
         return;
       }
 
-      const selector = this.activeSelector.trim();
+      const selector = this.fieldValue.trim();
 
       if (selector) {
         getPageBridge().highlight(selector);

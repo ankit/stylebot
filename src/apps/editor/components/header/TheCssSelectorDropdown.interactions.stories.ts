@@ -144,22 +144,45 @@ export const ArrowKeysBetweenFieldAndList: StoryObj = {
   },
 };
 
-export const DisabledOutsideBasicMode: StoryObj = {
+export const DisabledInMagicMode: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'the selector field is disabled outside Basic mode',
+  name: 'the selector field is disabled in Magic mode and enabled in Code mode',
   play: async ({ canvasElement }) => {
+    const pill = () => field(canvasElement).querySelector('.autocomplete-pill');
+
+    await pressKey('p');
+    await waitFor(() => expect(pill()).toHaveClass('disabled'));
+
+    await pressKey('c');
+    await waitFor(() => expect(pill()).not.toHaveClass('disabled'));
+  },
+};
+
+export const CodeModeAppliesOnEnter: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'in Code mode, a typed selector applies on Enter rather than per keystroke',
+  play: async ({ canvasElement }) => {
+    const store = storeOf(canvasElement);
+    const selector = store.state.activeSelector;
+
     await pressKey('c');
     await waitFor(() =>
       expect(
         field(canvasElement).querySelector('.autocomplete-pill')
-      ).toHaveClass('disabled')
+      ).not.toHaveClass('disabled')
     );
 
-    await pressKey('b');
+    await user.click(chips(canvasElement));
+    await waitFor(() => expect(input(canvasElement)).toHaveFocus());
+    await user.clear(input(canvasElement));
+    await user.type(input(canvasElement), 'main p');
+    await expect(store.state.activeSelector).toBe(selector);
+    await expect(store.state.css).not.toContain('main p');
+
+    await user.keyboard('{Enter}');
+    await expect(store.state.activeSelector).toBe('main p');
     await waitFor(() =>
-      expect(
-        field(canvasElement).querySelector('.autocomplete-pill')
-      ).not.toHaveClass('disabled')
+      expect(chips(canvasElement)).toHaveTextContent('main p')
     );
   },
 };
