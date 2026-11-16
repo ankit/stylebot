@@ -120,8 +120,10 @@ export const ArrowKeysBetweenFieldAndList: StoryObj = {
     await expect(input(canvasElement)).toHaveValue('h1');
     await expect(items(canvasElement)).toHaveLength(2);
 
-    // The active selector's row is highlighted, and Down moves on from it.
+    // The active selector's row is highlighted; Down starts from the top.
     await expect(items(canvasElement)[0]).toHaveClass('current');
+    await pressKey('ArrowDown');
+    await waitFor(() => expect(items(canvasElement)[0]).toHaveFocus());
     await pressKey('ArrowDown');
     await waitFor(() => expect(items(canvasElement)[1]).toHaveFocus());
 

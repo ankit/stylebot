@@ -44,9 +44,16 @@ const openPicker = async (root: HTMLElement) => {
 const chipsControl = (root: HTMLElement) =>
   field(root).querySelector('.autocomplete-chips') as HTMLElement | null;
 
+const categories = (root: HTMLElement) =>
+  within(root.querySelector('.font-categories') as HTMLElement);
+
 // Default's row also names the font it resolves to.
 const menuItem = (canvas: Canvas, name: string) =>
   canvas.findByRole('menuitem', { name: new RegExp(`^${name}$`) });
+
+// The row that applies the typed text also notes whether it's installed.
+const useRow = (canvas: Canvas, value: string) =>
+  canvas.findByRole('menuitem', { name: new RegExp(`^Use "${value}"`) });
 
 export const EscapeClosesPickerNotEditor: StoryObj = {
   ...editor(WITH_RULE),
@@ -144,7 +151,7 @@ export const CustomValue: StoryObj = {
 
     await openPicker(canvasElement);
     await user.keyboard('Nonexistent Font');
-    await menuItem(canvas, 'Use "Nonexistent Font"');
+    await useRow(canvas, 'Nonexistent Font');
 
     await pressKey('Enter');
 
@@ -185,11 +192,8 @@ export const ArrowKeys: StoryObj = {
 
     await step('Up from the field wraps to the last row', async () => {
       await pressKey('ArrowUp');
-      await waitFor(() =>
-        expect(
-          canvas.getByRole('menuitem', { name: 'Use "playfa"' })
-        ).toHaveFocus()
-      );
+      const useTyped = await useRow(canvas, 'playfa');
+      await waitFor(() => expect(useTyped).toHaveFocus());
       await pressKey('ArrowDown');
       await waitFor(() => expect(text).toHaveFocus());
     });
@@ -421,10 +425,11 @@ export const DefaultPickKeepsFocus: StoryObj = {
 
     await openPicker(canvasElement);
     await pressKey('Backspace');
-    await waitFor(() =>
-      expect(canvas.getAllByRole('menuitem')[0]).toHaveTextContent(/^Default/)
-    );
+    const defaultRow = await menuItem(canvas, 'Default');
+    // The category strip comes first, then Default.
     await pressKey('ArrowDown');
+    await pressKey('ArrowDown');
+    await waitFor(() => expect(defaultRow).toHaveFocus());
     await pressKey('Enter');
 
     await waitFor(() =>
@@ -437,34 +442,38 @@ export const DefaultPickKeepsFocus: StoryObj = {
 
 const RECENTS = ['Lora', 'Merriweather', 'Playfair Display', 'Roboto'];
 
-export const ArrowsStartFromSelected: StoryObj = {
+export const ArrowsFollowMenuOrder: StoryObj = {
   ...editor({
     ...WITH_RULE,
     options: { fonts: RECENTS },
   }),
-  name: 'arrow keys start from the applied font until the text is edited',
+  name: 'arrow keys follow the menu from the top, even with a font applied',
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
     const text = await openPicker(canvasElement);
     await findOpenMenu(canvas);
 
-    await step('Down moves to the font after the applied one', async () => {
+    await step('Down moves to the categories, then Default', async () => {
       await pressKey('ArrowDown');
       await waitFor(() =>
         expect(
-          canvas.getByRole('menuitem', { name: /^Playfair Display/ })
+          categories(canvasElement).getByRole('button', { name: 'All' })
         ).toHaveFocus()
+      );
+      await pressKey('ArrowDown');
+      await waitFor(async () =>
+        expect(await menuItem(canvas, 'Default')).toHaveFocus()
       );
     });
 
-    await step('Up from the field moves to the font before it', async () => {
+    await step('Up from the field moves to the last row', async () => {
       await pressKey('Escape');
       await waitFor(() => expect(text).toHaveFocus());
       await pressKey('ArrowDown');
       await findOpenMenu(canvas);
       await pressKey('ArrowUp');
       await waitFor(() =>
-        expect(canvas.getByRole('menuitem', { name: /^Lora/ })).toHaveFocus()
+        expect(canvas.getAllByRole('menuitem').at(-1)).toHaveFocus()
       );
     });
 
@@ -576,7 +585,7 @@ export const StackEditing: StoryObj = {
         // ArrowRight collapses the pre-selected value to its end.
         await pressKey('ArrowRight');
         await user.keyboard(', Georgia, serif');
-        await menuItem(canvas, 'Use "Lora, Georgia, serif"');
+        await useRow(canvas, 'Lora, Georgia, serif');
         await pressKey('Enter');
         await expect(declaration(store, 'h1', 'font-family')).toBe(
           'Lora, Georgia, serif'
@@ -594,6 +603,60 @@ export const StackEditing: StoryObj = {
       await expect(declaration(store, 'h1', 'font-family')).toBe(
         'Lora, Georgia, serif, "Playfair Display"'
       );
+    });
+  },
+};
+
+export const CategoriesByKeyboard: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'the arrow keys reach the categories, and Enter lists one without touching the text',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const text = await openPicker(canvasElement);
+    await findOpenMenu(canvas);
+    const strip = categories(canvasElement);
+    const all = strip.getByRole('button', { name: 'All' });
+    const serif = strip.getByRole('button', { name: 'Serif' });
+
+    await step('Down from the field stops on the strip, at All', async () => {
+      await expect(all).toHaveAttribute('aria-pressed', 'true');
+      await pressKey('ArrowDown');
+      await waitFor(() => expect(all).toHaveFocus());
+    });
+
+    await step('Right moves along, Enter lists the category', async () => {
+      await pressKey('ArrowRight');
+      await pressKey('ArrowRight');
+      await expect(serif).toHaveFocus();
+
+      await pressKey('Enter');
+      await waitFor(() =>
+        expect(serif).toHaveAttribute('aria-pressed', 'true')
+      );
+      await expect(text).toHaveValue('Merriweather');
+      await menuItem(canvas, 'Playfair Display');
+      await expect(
+        canvas.queryByRole('menuitem', { name: /^Roboto$/ })
+      ).toBeNull();
+    });
+
+    await step('Down goes into the list, Up back to the category', async () => {
+      await pressKey('ArrowDown');
+      await waitFor(async () =>
+        expect(await menuItem(canvas, 'Playfair Display')).toHaveFocus()
+      );
+
+      await pressKey('ArrowUp');
+      await expect(serif).toHaveFocus();
+    });
+
+    await step('All goes back to every font', async () => {
+      await pressKey('ArrowLeft');
+      await pressKey('ArrowLeft');
+      await pressKey('Enter');
+      await waitFor(() => expect(all).toHaveAttribute('aria-pressed', 'true'));
+      await menuItem(canvas, 'Roboto');
+      await menuItem(canvas, 'Default');
     });
   },
 };

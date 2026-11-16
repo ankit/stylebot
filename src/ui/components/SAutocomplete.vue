@@ -89,6 +89,7 @@
       class="autocomplete-menu"
       @pointerdown.native="pointerPick = true"
       @keydown.native="pointerPick = false"
+      @mouseleave.native="$emit('menu-leave')"
     >
       <slot name="header" />
 

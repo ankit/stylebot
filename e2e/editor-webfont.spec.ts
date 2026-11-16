@@ -80,7 +80,7 @@ const selectMontserrat = async (
   await textCard
     .locator('.font-family-autocomplete .autocomplete-chevron')
     .click();
-  await page.getByRole('menuitem', { name: /^Montserrat/ }).click();
+  await page.getByRole('menuitem', { name: 'Montserrat', exact: true }).click();
 };
 
 test('selecting a font inlines its @font-face despite the page CSP', async ({
