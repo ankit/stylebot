@@ -1,13 +1,13 @@
 /*
  * Built from the logo's colors: pink selectors, cyan properties, amber
- * values and blue at-rules, with URLs and punctuation in quiet grey.
+ * values, blue at-rules and green strings, with punctuation and comments in grey.
  */
 export default {
   base: 'vs',
   inherit: true,
   rules: [
     { token: '', foreground: '3a3f47' },
-    { token: 'comment', foreground: '9aa0aa', fontStyle: 'italic' },
+    { token: 'comment', foreground: '7a808a', fontStyle: 'italic' },
     { token: 'keyword', foreground: '5b7bd6' },
     { token: 'tag', foreground: 'c0507f' },
     { token: 'attribute.name', foreground: '2f86a6' },
@@ -15,10 +15,10 @@ export default {
     { token: 'attribute.value.number.css', foreground: 'a8742c' },
     { token: 'attribute.value.unit.css', foreground: 'a8742c' },
     { token: 'attribute.value.hex.css', foreground: 'a8742c' },
-    { token: 'string', foreground: '9aa0aa' },
-    { token: 'delimiter', foreground: '9aa0aa' },
-    { token: 'delimiter.bracket', foreground: '9aa0aa' },
-    { token: 'delimiter.parenthesis', foreground: '9aa0aa' },
+    { token: 'string', foreground: '527a35' },
+    { token: 'delimiter', foreground: '6b717b' },
+    { token: 'delimiter.bracket', foreground: '6b717b' },
+    { token: 'delimiter.parenthesis', foreground: '6b717b' },
   ],
   colors: {
     'editor.background': '#fcfcfd',
@@ -52,11 +52,11 @@ export default {
     'editorLineNumber.activeForeground': '#6b7280',
     'editorBracketMatch.background': '#2a5fd614',
     'editorBracketMatch.border': '#2a5fd600',
-    'editorBracketHighlight.foreground1': '#9aa0aa',
-    'editorBracketHighlight.foreground2': '#9aa0aa',
-    'editorBracketHighlight.foreground3': '#9aa0aa',
-    'editorBracketHighlight.foreground4': '#9aa0aa',
-    'editorBracketHighlight.foreground5': '#9aa0aa',
-    'editorBracketHighlight.foreground6': '#9aa0aa',
+    'editorBracketHighlight.foreground1': '#6b717b',
+    'editorBracketHighlight.foreground2': '#6b717b',
+    'editorBracketHighlight.foreground3': '#6b717b',
+    'editorBracketHighlight.foreground4': '#6b717b',
+    'editorBracketHighlight.foreground5': '#6b717b',
+    'editorBracketHighlight.foreground6': '#6b717b',
   },
 };
