@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue';
-import { expect, waitFor, within } from '@storybook/test';
+import { expect, fireEvent, waitFor, within } from '@storybook/test';
 
 import TheBasicEditor from './TheBasicEditor.vue';
 import {
@@ -12,9 +12,12 @@ import {
   cardHeader,
   collapseAllCards,
   declaration,
+  hoverPage,
+  numberInput,
   pageStyle,
   pick,
   pressKey,
+  propertyControl,
   storeOf,
   user,
 } from '@stylebot/storybook/story-helpers';
@@ -262,5 +265,37 @@ export const OverriddenOnThisElement: StoryObj = {
         name: 'Overridden by .title on this element',
       })
     ).toBeVisible();
+  },
+};
+
+export const HoverPreviewClearsOnLeave: StoryObj = {
+  ...editor({ inspecting: true }, { page: PANEL_STATE_PAGE }),
+  name: "the hovered element's values clear once the pointer leaves the page",
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const heading = canvas.getByRole('heading', { level: 1 });
+    const size = numberInput(propertyControl(canvas, 'Size'));
+    const sizeShown = () => size.getAttribute('placeholder');
+    const blank = sizeShown();
+
+    await step('hovering an element previews its values', async () => {
+      await hoverPage(heading);
+      await waitFor(() => expect(sizeShown()).not.toBe(blank));
+    });
+
+    await step('moving into the panel clears them', async () => {
+      await user.hover(size);
+      await waitFor(() => expect(sizeShown()).toBe(blank));
+    });
+
+    await step('hovering the page again brings them back', async () => {
+      await hoverPage(heading);
+      await waitFor(() => expect(sizeShown()).not.toBe(blank));
+    });
+
+    await step('leaving the window clears them', async () => {
+      await fireEvent.pointerOut(heading, { relatedTarget: null });
+      await waitFor(() => expect(sizeShown()).toBe(blank));
+    });
   },
 };

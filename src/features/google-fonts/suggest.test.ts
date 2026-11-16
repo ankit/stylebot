@@ -89,6 +89,15 @@ describe('suggestFonts', () => {
       suggestFonts('lora', '', recents, google).map(row => row.kind)
     ).toEqual(['font']);
   });
+
+  it('lists a whole category, without offering its name as a font', () => {
+    const serif = suggestFonts('serif', '', [], google);
+    const display = suggestFonts('display', '', [], google);
+
+    expect(serif.filter(row => row.kind === 'font')).toHaveLength(3);
+    expect(serif.at(-1)).toEqual({ kind: 'custom', value: 'serif' });
+    expect(display.some(row => row.kind === 'custom')).toBe(false);
+  });
 });
 
 describe('isDefaultFont', () => {

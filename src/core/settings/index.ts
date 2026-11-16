@@ -7,16 +7,7 @@ import type {
 export const defaultOptions: StylebotOptions = {
   mode: 'basic',
   contextMenu: true,
-  fonts: [
-    'Inter',
-    'Source Sans 3',
-    'Montserrat',
-    'Lora',
-    'Playfair Display',
-    'JetBrains Mono',
-    'system-ui',
-    'Georgia',
-  ],
+  fonts: [],
   basicModeOpenedSections: {
     text: false,
     colors: false,

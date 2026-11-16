@@ -7,7 +7,7 @@
       select-on-focus
       blur-on-commit
       class="font-family-autocomplete"
-      :items="rows"
+      :items="items"
       :disabled="disabled"
       :min-width="184"
       :placeholder="placeholder"
@@ -16,13 +16,29 @@
       @submit="submit($event, true)"
       @leave="submit"
       @cancel="cancel"
+      @menu-leave="clearPreview"
+      @input="pickedCategory = null"
     >
       <template #chips="{ parts }">
         <s-inline-list :parts="parts" />
       </template>
 
+      <template #header>
+        <font-categories
+          v-if="!query || category"
+          :active="category"
+          @browse="browse"
+          @mouseenter.native="clearPreview"
+        />
+      </template>
+
       <template #item="{ item, select }">
+        <div v-if="item.kind === 'heading'" class="font-heading">
+          {{ item.label }}
+        </div>
+
         <s-menu-item
+          v-else
           class="font-row"
           :selected="item.value === value"
           @click="select"
@@ -36,6 +52,14 @@
               :class="{ 'font-row-match': part.match }"
               v-text="part.text"
             />
+          </span>
+
+          <span v-if="item.kind === 'custom'" class="font-row-note">
+            {{
+              item.available
+                ? t('on_this_computer')
+                : t('not_found_on_this_computer')
+            }}
           </span>
         </s-menu-item>
       </template>
@@ -54,17 +78,41 @@ import {
 } from '@stylebot/css';
 import type { Debounced } from '@stylebot/utils';
 import { debounce } from '@stylebot/utils';
-import type { FontSuggestion, GoogleFont } from '@stylebot/google-fonts';
+import type {
+  FontHeading,
+  FontSuggestion,
+  GoogleFont,
+  GoogleFontCategory,
+} from '@stylebot/google-fonts';
 import {
+  allFonts,
+  categoryFonts,
+  getFontCategory,
+  groupFontRows,
   isDefaultFont,
+  isFontAvailable,
   loadGoogleFonts,
   suggestFonts,
 } from '@stylebot/google-fonts';
 
+import FontCategories from './FontCategories.vue';
 import PropertyRow from '../basic/PropertyRow.vue';
 import { computedFontPlaceholder } from '../../utils/computed-placeholder';
 
-type Row = FontSuggestion;
+type Row = FontSuggestion & { available?: boolean };
+
+/**
+ * Notes on the row for the typed text whether its font is on this computer.
+ */
+const withAvailability = (row: FontSuggestion): Row => {
+  if (row.kind !== 'custom') {
+    return row;
+  }
+
+  const family = unquoteFamily(getPrimaryFontFamily(row.value));
+
+  return { ...row, available: isFontAvailable(family) };
+};
 
 const PREVIEW_DELAY = 150;
 
@@ -72,6 +120,7 @@ export default Vue.extend({
   name: 'FontFamily',
 
   components: {
+    FontCategories,
     SAutocomplete,
     SInlineList,
     SMenuItem,
@@ -80,11 +129,16 @@ export default Vue.extend({
 
   data(): {
     draft: string;
+    pickedCategory: GoogleFontCategory | null;
     googleFonts: Array<GoogleFont>;
     previewFont: Debounced<[string]>;
   } {
     return {
       draft: '',
+      // The category picked in the menu, listed in full until the text is
+      // edited or the menu closes; the text itself is left alone. Null is
+      // All: every font.
+      pickedCategory: null,
       googleFonts: [],
       // Hovering or arrowing through rows previews them on the page, but
       // not so eagerly that sweeping the list loads every font.
@@ -125,14 +179,43 @@ export default Vue.extend({
       return this.draft.split(',').pop()?.trim().toLowerCase() ?? '';
     },
 
+    // The category the menu lists in full: the one picked in the strip, or
+    // the one the typed text names ("serif", "mono").
+    category(): GoogleFontCategory | null {
+      if (this.pickedCategory) {
+        return this.pickedCategory;
+      }
+
+      return this.query ? getFontCategory(this.query) : null;
+    },
+
+    recents(): Array<string> {
+      return this.$store.state.options.fonts;
+    },
+
+    // Before anything is typed, every Google Font follows the recents.
     rows(): Array<Row> {
-      return suggestFonts(
+      if (this.pickedCategory) {
+        return categoryFonts(this.pickedCategory, this.googleFonts);
+      }
+
+      const suggestions = suggestFonts(
         this.draft,
         this.value,
-        this.$store.state.options.fonts,
+        this.recents,
         this.googleFonts,
         this.t('default')
       );
+      const more = this.query ? [] : allFonts(this.googleFonts, this.recents);
+
+      return [...suggestions, ...more].map(withAvailability);
+    },
+
+    items(): Array<Row | FontHeading> {
+      return groupFontRows(this.rows, this.recents, {
+        recent: this.t('recent'),
+        google: this.t('google_fonts'),
+      });
     },
   },
 
@@ -157,6 +240,20 @@ export default Vue.extend({
 
   methods: {
     unquoteFamily,
+
+    // Lists a category's Google Fonts, or every font for All (null). The
+    // page drops any preview, whose font the new list may not have.
+    browse(category: GoogleFontCategory | null): void {
+      this.pickedCategory = category;
+      this.draft = this.value;
+      this.clearPreview();
+
+      // The new list starts from its most popular fonts, not the old one's
+      // scroll position.
+      this.$nextTick(() => {
+        this.$el.querySelector('.autocomplete-menu')?.scrollTo({ top: 0 });
+      });
+    },
 
     labelParts(row: Row): Array<{ text: string; match: boolean }> {
       const text = this.label(row);
@@ -189,6 +286,7 @@ export default Vue.extend({
     },
 
     apply(value: string, remember: boolean): void {
+      this.pickedCategory = null;
       this.previewFont.cancel();
       this.$store.dispatch('applyFontFamily', { value, remember });
     },
@@ -202,6 +300,8 @@ export default Vue.extend({
     // it's already the applied value there's nothing to apply, so any
     // preview goes. Typing the Default choice's name picks the default.
     submit(text: string, remember = false): void {
+      this.pickedCategory = null;
+
       const value = isDefaultFont(text, this.t('default')) ? '' : text.trim();
 
       if (value !== this.value) {
@@ -214,6 +314,8 @@ export default Vue.extend({
     // Escape backs out of the edit: the typed text goes along with any
     // preview. Clicking away only drops the preview, as leaving applies.
     cancel(reason: 'escape' | 'outside'): void {
+      this.pickedCategory = null;
+
       if (reason === 'escape') {
         this.draft = this.value;
       }
@@ -241,7 +343,8 @@ export default Vue.extend({
 }
 
 .font-family-autocomplete ::v-deep .autocomplete-menu {
-  width: 100%;
+  width: 284px;
+  scroll-padding-top: 40px;
 }
 
 .font-row-label {
@@ -254,5 +357,21 @@ export default Vue.extend({
 
 .font-row-match {
   font-weight: 600;
+}
+
+.font-row-note {
+  @include truncate;
+
+  flex: none;
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.font-heading {
+  padding: 8px 10px 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-faint);
 }
 </style>

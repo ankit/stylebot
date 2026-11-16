@@ -19,7 +19,8 @@ export type PageSnapshot = {
 export type PageBridgeEvents = {
   // The inspector picked an element on the page.
   select: (selector: string) => void;
-  // The inspector moved onto an element, before picking it.
+  // The inspector moved onto an element, before picking it; an empty
+  // selector once the pointer leaves the page.
   hover: (selector: string) => void;
   // The page came within reach or dropped away; always reachable in-page.
   connection: (connected: boolean) => void;
