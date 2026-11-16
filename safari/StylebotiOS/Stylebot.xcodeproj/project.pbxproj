@@ -11,6 +11,7 @@
 		BC9C94D63098050A00622417 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = BC9C94D43098050A00622417 /* Main.html */; };
 		BC9C94D83098050A00622417 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = BC9C94D73098050A00622417 /* Icon.png */; };
 		BC9C94DA3098050A00622417 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = BC9C94D93098050A00622417 /* Style.css */; };
+		3F08C70D6D1109C720E87F2A /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = 92E885CE7D0CFEC9D0071890 /* Script.js */; };
 		BC9C94DC3098050A00622417 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC9C94DB3098050A00622417 /* SceneDelegate.swift */; };
 		BC9C94DE3098050A00622417 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC9C94DD3098050A00622417 /* ViewController.swift */; };
 		BC9C94E13098050A00622417 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BC9C94DF3098050A00622417 /* LaunchScreen.storyboard */; };
@@ -50,6 +51,7 @@
 		BC9C94D53098050A00622417 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
 		BC9C94D73098050A00622417 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
 		BC9C94D93098050A00622417 /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		92E885CE7D0CFEC9D0071890 /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
 		BC9C94DB3098050A00622417 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		BC9C94DD3098050A00622417 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		BC9C94E03098050A00622417 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 				BC9C94D43098050A00622417 /* Main.html */,
 				BC9C94D73098050A00622417 /* Icon.png */,
 				BC9C94D93098050A00622417 /* Style.css */,
+				92E885CE7D0CFEC9D0071890 /* Script.js */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -226,6 +229,7 @@
 				BC9C94D63098050A00622417 /* Main.html in Resources */,
 				BC9C94F33098050C00622417 /* Assets.xcassets in Resources */,
 				BC9C94DA3098050A00622417 /* Style.css in Resources */,
+				3F08C70D6D1109C720E87F2A /* Script.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
