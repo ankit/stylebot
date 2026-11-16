@@ -72,6 +72,7 @@ h1 {
 }
 
 .tagline {
+  text-wrap: balance;
   margin: 8px 0 0;
   color: var(--muted);
   font: -apple-system-title3;
@@ -124,6 +125,7 @@ h2 {
 }
 
 .label {
+  text-wrap: pretty;
   padding-top: 2px;
   line-height: 1.35;
 }
@@ -148,6 +150,7 @@ b {
 }
 
 .hint {
+  text-wrap: balance;
   margin: 0;
   color: var(--muted);
   font: -apple-system-subheadline;
