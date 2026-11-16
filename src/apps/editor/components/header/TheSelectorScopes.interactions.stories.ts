@@ -129,6 +129,26 @@ export const ClickingAllSetsField: StoryObj = {
   },
 };
 
+export const PillsInCodeMode: StoryObj = {
+  ...editor({ inspecting: true }, { page: SCOPES_PAGE }),
+  name: 'in Code mode, the pills stay and clicking one switches the rule',
+  play: async ({ canvasElement }) => {
+    const store = storeOf(canvasElement);
+
+    await pickHome(canvasElement);
+    await pressKey('c');
+    await waitFor(() => expect(store.state.options.mode).toBe('code'));
+    await expect(pills(canvasElement)).toHaveLength(3);
+
+    await user.click(pill(canvasElement, 'All'));
+    const selector = store.state.activeSelector;
+    await expect(document.querySelectorAll(selector)).toHaveLength(6);
+    await waitFor(() =>
+      expect(pill(canvasElement, 'All')).toHaveAttribute('aria-pressed', 'true')
+    );
+  },
+};
+
 export const PickingPeeksAtMatches: StoryObj = {
   ...editor({ inspecting: true }, { page: SCOPES_PAGE }),
   name: 'picking an element boxes what its scope matches for a moment',

@@ -25,8 +25,27 @@ const createFakeEditor = () => {
       getModel: () => ({
         getValue: () => value,
         getFullModelRange: () => ({}),
-        findNextMatch: () => null,
+        findNextMatch: (regex: string) => {
+          const lines = value.split('\n');
+          const match = new RegExp(regex, 'm').exec(value);
+          if (!match) {
+            return null;
+          }
+
+          const endLineNumber = value
+            .slice(0, match.index + match[0].length)
+            .split('\n').length;
+
+          return {
+            range: {
+              endLineNumber,
+              endColumn: lines[endLineNumber - 1].length + 1,
+            },
+          };
+        },
       }),
+      revealRangeInCenter: jest.fn(),
+      setSelection: jest.fn(),
       pushUndoStop: jest.fn(),
       focus: jest.fn(),
       layout: jest.fn(),
@@ -111,6 +130,33 @@ describe('MonacoEditorIframe', () => {
     expect(cssUpdates()).toEqual([
       { type: 'stylebotMonacoIframeCssUpdated', css: 'a { color: blue; }' },
     ]);
+  });
+
+  describe('moving to the active rule', () => {
+    const CSS = [
+      'h1 {\n  color: red;\n}',
+      'li:nth-child(1) > a {\n  \n}',
+      '[class*="title_"] a {\n  \n}',
+    ].join('\n\n');
+
+    const selectRule = (selector: string) =>
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { type: 'stylebotCssUpdate', css: CSS, selector },
+        })
+      );
+
+    it.each([
+      ['h1', 2],
+      ['li:nth-child(1) > a', 6],
+      ['[class*="title_"] a', 10],
+    ])('puts the caret inside %s', (selector, line) => {
+      selectRule(selector);
+
+      expect(fake.editor.setSelection).toHaveBeenCalledWith(
+        expect.objectContaining({ startLineNumber: line })
+      );
+    });
   });
 
   describe('save shortcut', () => {
