@@ -1,6 +1,6 @@
 /*
  * Built from the logo's colors: pink selectors, cyan properties, amber
- * values and blue at-rules, with URLs and punctuation in quiet grey.
+ * values, blue at-rules and green strings, with punctuation and comments in grey.
  */
 export default {
   base: 'vs-dark',
@@ -15,10 +15,10 @@ export default {
     { token: 'attribute.value.number.css', foreground: 'f1d08f' },
     { token: 'attribute.value.unit.css', foreground: 'f1d08f' },
     { token: 'attribute.value.hex.css', foreground: 'f1d08f' },
-    { token: 'string', foreground: '8a8f98' },
-    { token: 'delimiter', foreground: '8a8f98' },
-    { token: 'delimiter.bracket', foreground: '8a8f98' },
-    { token: 'delimiter.parenthesis', foreground: '8a8f98' },
+    { token: 'string', foreground: 'a3c49a' },
+    { token: 'delimiter', foreground: 'a3a8b1' },
+    { token: 'delimiter.bracket', foreground: 'a3a8b1' },
+    { token: 'delimiter.parenthesis', foreground: 'a3a8b1' },
   ],
   colors: {
     'editor.background': '#1a1b1e',
@@ -52,11 +52,11 @@ export default {
     'editorLineNumber.activeForeground': '#9aa1ae',
     'editorBracketMatch.background': '#7aa2f71f',
     'editorBracketMatch.border': '#7aa2f700',
-    'editorBracketHighlight.foreground1': '#8a8f98',
-    'editorBracketHighlight.foreground2': '#8a8f98',
-    'editorBracketHighlight.foreground3': '#8a8f98',
-    'editorBracketHighlight.foreground4': '#8a8f98',
-    'editorBracketHighlight.foreground5': '#8a8f98',
-    'editorBracketHighlight.foreground6': '#8a8f98',
+    'editorBracketHighlight.foreground1': '#a3a8b1',
+    'editorBracketHighlight.foreground2': '#a3a8b1',
+    'editorBracketHighlight.foreground3': '#a3a8b1',
+    'editorBracketHighlight.foreground4': '#a3a8b1',
+    'editorBracketHighlight.foreground5': '#a3a8b1',
+    'editorBracketHighlight.foreground6': '#a3a8b1',
   },
 };
