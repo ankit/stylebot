@@ -97,6 +97,9 @@ export default Vue.extend({
         type: 'stylebotThemeUpdate',
         theme,
         codeTheme: this.codeTheme,
+        gutter: getComputedStyle(this.$el)
+          .getPropertyValue('--panel-gutter')
+          .trim(),
       };
       (this.$refs.iframe as HTMLIFrameElement).contentWindow?.postMessage(
         message,

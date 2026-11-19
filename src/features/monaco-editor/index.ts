@@ -51,6 +51,7 @@ export type ParentThemeUpdateMessage = {
   type: 'stylebotThemeUpdate';
   theme: 'light' | 'dark';
   codeTheme?: StylebotCodeTheme;
+  gutter?: string;
 };
 
 export type ParentMessage =
