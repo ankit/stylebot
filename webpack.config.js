@@ -25,6 +25,9 @@ const englishMessages = () =>
   ).messages;
 const { SRC_DIR, packageDirs } = require('./scripts/lib/src-packages');
 
+// Shiki's packages need esbuild; see scripts/webpack/esbuild-bundle-loader.
+const shikiModule = path.join(SRC_DIR, 'apps/monaco-iframe/shiki.ts');
+
 const isPreview = process.env.STYLEBOT_PREVIEW === '1';
 const isCLISupported = supportsCLI(process.env.BROWSER);
 // Lets app code check for the CLI, and minifying drops it where it's false.
@@ -163,9 +166,16 @@ const config = {
         sideEffects: true,
       },
       {
+        test: shikiModule,
+        loader: path.resolve(
+          __dirname,
+          'scripts/webpack/esbuild-bundle-loader'
+        ),
+      },
+      {
         test: /\.ts$/,
         loader: 'ts-loader',
-        exclude: /node_modules/,
+        exclude: [/node_modules/, shikiModule],
         options: {
           transpileOnly: true,
           appendTsSuffixTo: [/\.vue$/],

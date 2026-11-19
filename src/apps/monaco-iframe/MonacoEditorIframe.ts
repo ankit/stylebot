@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import CustomLight from './themes/CustomLight';
-import CustomDark from './themes/CustomDark';
+import type { ThemeRegistration } from '@shikijs/primitive';
 import type { IframeMessage, ParentMessage } from '@stylebot/monaco-editor';
 import { isSaveShortcut } from '@stylebot/utils';
 
@@ -30,6 +29,21 @@ class MonacEditorIframe {
     new URLSearchParams(window.location.search).get('theme') === 'dark'
       ? 'dark'
       : 'light';
+  // Set once Shiki colours CSS, after which Monaco can switch between themes.
+  highlighted = false;
+  // Fetched alongside Monaco rather than bundled, so the entry stays small.
+  shiki = Promise.all([
+    import(/* webpackChunkName: "monaco-editor/iframe/shiki" */ './shiki'),
+    import(
+      /* webpackChunkName: "monaco-editor/iframe/shiki" */ '@shikijs/langs/dist/css.mjs'
+    ),
+    import(
+      /* webpackChunkName: "monaco-editor/iframe/shiki" */ './themes/stylebot-light.json'
+    ),
+    import(
+      /* webpackChunkName: "monaco-editor/iframe/shiki" */ './themes/stylebot-dark.json'
+    ),
+  ]);
 
   constructor(variant: MonacoEditorVariant = 'default') {
     this.variant = variant;
@@ -40,9 +54,9 @@ class MonacEditorIframe {
         this.setTheme(message.data.theme);
       }
     });
-    this.loadEditor(() => {
+    this.loadEditor(async () => {
+      await this.highlightCss();
       this.attachWindowListeners();
-      this.defineThemes();
       this.configureCssLanguage();
       this.initEditor();
       this.postMessage({ type: 'stylebotMonacoIframeLoaded' });
@@ -113,20 +127,35 @@ class MonacEditorIframe {
     window.require(['vs/editor/editor.main'], callback);
   }
 
-  defineThemes(): void {
-    window.monaco.editor.defineTheme('custom-light', CustomLight);
-    window.monaco.editor.defineTheme('custom-dark', CustomDark);
+  /**
+   * Colours CSS with VS Code's grammar and Stylebot's light and dark themes,
+   * before the editor's model exists so it never shows uncoloured.
+   */
+  async highlightCss(): Promise<void> {
+    try {
+      const [{ highlightCss }, css, light, dark] = await this.shiki;
+
+      highlightCss(window.monaco, css.default, [
+        { ...(light.default as ThemeRegistration), name: 'stylebot-light' },
+        { ...(dark.default as ThemeRegistration), name: 'stylebot-dark' },
+      ]);
+      this.highlighted = true;
+    } catch (error) {
+      console.error(error);
+    }
   }
 
-  getMonacoTheme(): 'custom-light' | 'custom-dark' {
-    return this.theme === 'dark' ? 'custom-dark' : 'custom-light';
+  getMonacoTheme(): 'stylebot-light' | 'stylebot-dark' {
+    return this.theme === 'dark' ? 'stylebot-dark' : 'stylebot-light';
   }
 
   setTheme(theme: 'light' | 'dark'): void {
     this.theme = theme;
     // Keeps the pre-Monaco-load background (see theme-init.js) in sync too.
     document.documentElement.classList.toggle('theme-dark', theme === 'dark');
-    window.monaco?.editor.setTheme(this.getMonacoTheme());
+    if (this.highlighted) {
+      window.monaco.editor.setTheme(this.getMonacoTheme());
+    }
   }
 
   configureCssLanguage(): void {
