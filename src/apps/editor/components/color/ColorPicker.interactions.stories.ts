@@ -28,21 +28,20 @@ export default meta;
 // The pick-an-element state: the panel is enabled but nothing is styled yet.
 const noRule = { activeSelector: 'h1' };
 
-// Both the Text and Background cards label their row "Color", so a picker
-// goes by its card.
-const picker = (canvas: Canvas, card: string) =>
-  propertyControl(within(propertyCard(canvas, card)), 'Color');
-const hexField = (canvas: Canvas, card: string) =>
-  picker(canvas, card).querySelector('.color-hex') as HTMLInputElement;
-const swatch = (canvas: Canvas, card: string) =>
-  picker(canvas, card).querySelector('.color-swatch') as HTMLElement;
+// The Colors card has a Text row and a Background row; a picker goes by its row.
+const picker = (canvas: Canvas, row: string) =>
+  propertyControl(within(propertyCard(canvas, 'Colors')), row);
+const hexField = (canvas: Canvas, row: string) =>
+  picker(canvas, row).querySelector('.color-hex') as HTMLInputElement;
+const swatch = (canvas: Canvas, row: string) =>
+  picker(canvas, row).querySelector('.color-swatch') as HTMLElement;
 const popover = (root: HTMLElement) =>
   root.querySelector('.color-picker-popover') as HTMLElement | null;
 const popoverHex = (panel: HTMLElement) =>
   panel.querySelector('.hex-input') as HTMLInputElement;
 
-const openPopover = async (root: HTMLElement, card: string) => {
-  await user.click(swatch(within(root), card));
+const openPopover = async (root: HTMLElement, row: string) => {
+  await user.click(swatch(within(root), row));
   return waitFor(() => {
     const el = popover(root);
     expect(el).toBeVisible();
@@ -50,10 +49,10 @@ const openPopover = async (root: HTMLElement, card: string) => {
   });
 };
 
-const reopenPopover = async (root: HTMLElement, card: string) => {
-  await user.click(swatch(within(root), card));
+const reopenPopover = async (root: HTMLElement, row: string) => {
+  await user.click(swatch(within(root), row));
   await waitFor(() => expect(popover(root)).toBeNull());
-  return openPopover(root, card);
+  return openPopover(root, row);
 };
 
 // Set in one go, as a paste would: typing it out would apply the partial

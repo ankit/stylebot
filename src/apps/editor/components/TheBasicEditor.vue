@@ -12,7 +12,7 @@
     </property-card>
 
     <property-card
-      :label="t('background')"
+      :label="t('colors')"
       :collapsed="!open.colors"
       :count="colorCount"
       @toggle="toggle('colors')"
