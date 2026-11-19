@@ -361,13 +361,18 @@ export default Vue.extend({
   box-sizing: border-box;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
   min-width: 96px;
   height: 28px;
-  padding: 0 0 0 8px;
+  padding: 0 0 0 3px;
 
   // Only the hex text field highlights the whole pill — the swatch button
   // (which opens the picker) gets its own focus ring instead.
+  &:has(.color-hex:placeholder-shown) {
+    background: transparent;
+    border-color: var(--field-fill-border);
+  }
+
   &:has(.color-hex:focus),
   &.open {
     @include field-active-border;
@@ -382,9 +387,9 @@ export default Vue.extend({
   @include button-reset;
 
   flex: none;
-  width: 14px;
-  height: 14px;
-  border-radius: 4px;
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
   outline: none;
   cursor: pointer;
   // A literal black ring reads fine on a light panel but vanishes on a dark

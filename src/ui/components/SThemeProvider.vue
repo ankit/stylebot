@@ -72,6 +72,7 @@ export default Vue.extend({
   --field-ink: #e4e6eb;
   --field-placeholder: #7d838e;
   --field-border: #3a3e46;
+  --field-fill-border: #31343b;
   --field-border-hover: #4a4f58;
   --field-border-selector: #3a3e46;
   --field-fill: #15171a;
@@ -170,6 +171,7 @@ export default Vue.extend({
   --field-ink: #191b1f;
   --field-placeholder: #8f949e;
   --field-border: #dcdfe5;
+  --field-fill-border: #e5e7eb;
   --field-border-hover: #b9bec8;
   --field-border-selector: #d3d6dd;
   --field-fill: transparent;

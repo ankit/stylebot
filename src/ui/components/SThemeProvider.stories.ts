@@ -49,6 +49,7 @@ const TOKEN_GROUPS: Array<{ label: string; tokens: Array<string> }> = [
       'field-border',
       'field-border-hover',
       'field-border-selector',
+      'field-fill-border',
       'field-fill',
       'field-divider',
       'slider-track',

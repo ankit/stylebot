@@ -564,6 +564,11 @@ export default Vue.extend({
 
   @include field-fill;
 
+  &:has(.autocomplete-input:placeholder-shown) {
+    background: transparent;
+    border-color: var(--field-fill-border);
+  }
+
   &:hover:not(.disabled) {
     background: var(--field-surface-hover);
   }

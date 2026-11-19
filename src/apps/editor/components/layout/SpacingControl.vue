@@ -358,11 +358,11 @@ export default Vue.extend({
 .spacing-grid {
   display: grid;
   gap: 4px;
-  padding: 2px 0 4px;
+  padding: 2px 0 4px 104px;
 
   &.mode-xy {
     grid-template-columns: repeat(2, 88px);
-    justify-content: end;
+    justify-content: start;
   }
 
   &.mode-individual {

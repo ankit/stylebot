@@ -129,6 +129,8 @@ export default Vue.extend({
   cursor: pointer;
 
   &.muted {
+    background: transparent;
+    border-color: var(--field-fill-border);
     color: var(--field-placeholder);
   }
 

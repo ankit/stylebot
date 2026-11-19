@@ -2,7 +2,7 @@
   <div class="filter">
     <property-row :label="t('filter')">
       <s-segmented-control
-        fit
+        class="filter-type"
         :value="type === 'none' ? '' : type"
         placeholder="none"
         :options="options"
@@ -13,6 +13,7 @@
 
     <property-row v-if="type !== 'none'" :label="amountLabel">
       <s-number-field
+        class="compact-field"
         :unit="config.unit"
         :value="String(amount)"
         :disabled="disabled"
@@ -135,3 +136,14 @@ export default Vue.extend({
   },
 });
 </script>
+
+<style lang="scss" scoped>
+.filter-type {
+  flex: 1;
+  min-width: 0;
+}
+
+.compact-field.number-field {
+  width: 64px;
+}
+</style>
