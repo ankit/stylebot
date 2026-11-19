@@ -52,6 +52,15 @@
     }
   }
 
+  .sticky-widget {
+    border-bottom: 1px solid
+      var(
+        --vscode-editorStickyScroll-border,
+        color-mix(in srgb, var(--vscode-editor-foreground) 14%, transparent)
+      );
+    box-shadow: none;
+  }
+
   .monaco-resizable-hover:has(.colorpicker-widget) {
     border-color: #dcdfe5;
     border-radius: 11px;
@@ -170,7 +179,13 @@
   justify-content: flex-end;
   height: 22px;
   border-top: 1px solid
-    var(--status-bar-border, var(--vscode-editorStickyScroll-border));
+    var(
+      --status-bar-border,
+      var(
+        --vscode-editorStickyScroll-border,
+        color-mix(in srgb, var(--vscode-editor-foreground) 14%, transparent)
+      )
+    );
   background: var(--status-bar-background, var(--vscode-editor-background));
   color: var(
     --status-bar-foreground,
@@ -183,7 +198,7 @@
   align-items: center;
   gap: 5px;
   height: 100%;
-  padding: 0 10px;
+  padding: 0 var(--panel-gutter, 10px);
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -209,7 +224,7 @@
 
 .code-theme-list {
   position: fixed;
-  right: 8px;
+  right: calc(var(--panel-gutter, 10px) - 2px);
   bottom: 26px;
   z-index: 60;
   box-sizing: border-box;

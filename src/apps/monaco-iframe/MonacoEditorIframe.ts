@@ -60,6 +60,13 @@ class MonacEditorIframe {
         if (message.data.codeTheme) {
           this.setCodeTheme(message.data.codeTheme);
         }
+
+        if (message.data.gutter) {
+          document.documentElement.style.setProperty(
+            '--panel-gutter',
+            message.data.gutter
+          );
+        }
       }
     });
     this.loadEditor(async () => {
