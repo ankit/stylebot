@@ -123,7 +123,6 @@ export default Vue.extend({
           rows: [
             { label: this.t('basic_mode'), key: keys.basic },
             { label: this.t('code_mode'), key: keys.code },
-            { label: this.t('presets_mode'), key: keys.magic },
           ],
         },
         hasSidePanel()

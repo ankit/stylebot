@@ -144,16 +144,18 @@ export const ArrowKeysBetweenFieldAndList: StoryObj = {
   },
 };
 
-export const DisabledInMagicMode: StoryObj = {
+export const DisabledWhileReading: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'the selector field is disabled in Magic mode and enabled in Code mode',
+  name: 'the selector field is disabled while readability is on',
   play: async ({ canvasElement }) => {
+    const store = storeOf(canvasElement);
     const pill = () => field(canvasElement).querySelector('.autocomplete-pill');
 
-    await pressKey('p');
+    store.commit('setPage', { ...store.state.page, readerable: true });
+    store.dispatch('applyReadability', true);
     await waitFor(() => expect(pill()).toHaveClass('disabled'));
 
-    await pressKey('c');
+    store.dispatch('applyReadability', false);
     await waitFor(() => expect(pill()).not.toHaveClass('disabled'));
   },
 };

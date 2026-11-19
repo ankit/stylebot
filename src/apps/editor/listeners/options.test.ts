@@ -44,17 +44,17 @@ describe('initOptionsListener', () => {
       {
         options: {
           oldValue: { ...store.state.options, mode: 'code' },
-          newValue: { ...store.state.options, mode: 'magic' },
+          newValue: { ...store.state.options, mode: 'basic' },
         },
       },
       'local'
     );
 
-    expect(store.state.options.mode).toBe('magic');
+    expect(store.state.options.mode).toBe('basic');
   });
 
   it('keeps a local mode override when another option changes', () => {
-    const store = buildStore({ mode: 'magic' });
+    const store = buildStore({ mode: 'basic' });
     initOptionsListener(store);
 
     const stored = { ...store.state.options, mode: 'code' as const };
@@ -71,7 +71,7 @@ describe('initOptionsListener', () => {
       'local'
     );
 
-    expect(store.state.options.mode).toBe('magic');
+    expect(store.state.options.mode).toBe('basic');
     expect(store.state.options.layout.dockLocation).toBe('left');
   });
 });

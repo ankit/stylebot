@@ -194,7 +194,11 @@ test('docking back from the window shows the panel in the page, in the mode pick
 
   const editorRoot = await openEditor(page, openPopup);
   const popout = await popOutEditor(context, page, editorRoot);
-  await switchEditorMode(popout.locator('.stylebot-app'), 'presets');
+  await switchEditorMode(popout.locator('.stylebot-app'), 'code');
+  // Monaco takes focus as it loads, which would close a menu opened first.
+  await expect(
+    popout.frameLocator('iframe').locator('.monaco-editor')
+  ).toBeVisible();
 
   const closed = popout.waitForEvent('close');
   await popout.getByRole('button', { name: 'Options' }).click();
@@ -203,7 +207,7 @@ test('docking back from the window shows the panel in the page, in the mode pick
 
   await expect(editorRoot.locator('.stylebot.left')).toBeVisible();
   await expect(
-    editorRoot.getByRole('tab', { name: 'Presets', exact: true })
+    editorRoot.getByRole('tab', { name: 'Code', exact: true })
   ).toHaveAttribute('aria-selected', 'true');
 });
 

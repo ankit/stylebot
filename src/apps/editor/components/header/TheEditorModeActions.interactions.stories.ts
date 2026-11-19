@@ -21,7 +21,7 @@ export default meta;
 
 export const TabsSwitchMode: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'the tabs switch between Basic, Code and Presets',
+  name: 'the tabs switch between Basic and Code',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
@@ -33,12 +33,6 @@ export const TabsSwitchMode: StoryObj = {
     );
     await expect(canvasElement.querySelector('.basic-editor')).toBeNull();
 
-    await user.click(canvas.getByRole('tab', { name: 'Presets' }));
-    await expect(store.state.options.mode).toBe('magic');
-    await expect(
-      canvasElement.querySelector('.presets-editor')
-    ).toBeInTheDocument();
-
     await user.click(canvas.getByRole('tab', { name: 'Basic' }));
     await expect(store.state.options.mode).toBe('basic');
     await expect(
@@ -49,7 +43,7 @@ export const TabsSwitchMode: StoryObj = {
 
 export const ShortcutsSwitchMode: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'b, c and p switch modes; i inspects in Basic and Code',
+  name: 'b and c switch modes; i inspects in both',
   play: async ({ canvasElement }) => {
     const store = storeOf(canvasElement);
 
@@ -58,10 +52,6 @@ export const ShortcutsSwitchMode: StoryObj = {
 
     await pressKey('i');
     await expect(store.state.inspecting).toBe(true);
-
-    await pressKey('p');
-    await expect(store.state.options.mode).toBe('magic');
-    await expect(store.state.inspecting).toBe(false);
 
     await pressKey('i');
     await expect(store.state.inspecting).toBe(false);
@@ -75,41 +65,46 @@ export const ShortcutsSwitchMode: StoryObj = {
 };
 
 export const ReadabilityDisablesTabs: StoryObj = {
-  ...editor({ readability: true, options: { mode: 'magic' } }),
-  name: 'Basic and Code are disabled while readability is on',
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    await expect(canvas.getByRole('tab', { name: 'Basic' })).toBeDisabled();
-    await expect(canvas.getByRole('tab', { name: 'Code' })).toBeDisabled();
-
-    const presets = canvas.getByRole('tab', { name: 'Presets' });
-    await expect(presets).toBeEnabled();
-    await expect(presets).toHaveAttribute('aria-selected', 'true');
-  },
-};
-
-export const ReadabilityToggleForcesPresets: StoryObj = {
-  ...editor(WITH_RULE),
-  name: 'turning readability on forces Presets mode and disables the other tabs',
+  ...editor({ readability: true }),
+  name: 'Basic and Code are disabled and the reader panel shows while readability is on',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
 
-    await user.click(canvas.getByRole('tab', { name: 'Presets' }));
-    const readability = featureSwitch(canvas, 'Readability');
-
-    await user.click(readability);
-    await expect(store.state.readability).toBe(true);
+    store.commit('setPage', { ...store.state.page, readerable: true });
     await waitFor(() =>
       expect(canvas.getByRole('tab', { name: 'Basic' })).toBeDisabled()
     );
     await expect(canvas.getByRole('tab', { name: 'Code' })).toBeDisabled();
+    await expect(
+      canvasElement.querySelector('.reader-panel')
+    ).toBeInTheDocument();
+    await expect(canvasElement.querySelector('.basic-editor')).toBeNull();
+  },
+};
 
-    await user.click(readability);
+export const ReadabilityTogglesReaderPanel: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'turning readability on swaps in the reader panel, and its switch turns it back off',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+
+    store.commit('setPage', { ...store.state.page, readerable: true });
+    store.dispatch('applyReadability', true);
+    await waitFor(() =>
+      expect(canvas.getByRole('tab', { name: 'Basic' })).toBeDisabled()
+    );
+    await expect(canvas.getByRole('tab', { name: 'Code' })).toBeDisabled();
+    await expect(store.state.options.mode).toBe('basic');
+
+    await user.click(featureSwitch(canvas, 'Readability'));
     await expect(store.state.readability).toBe(false);
     await waitFor(() =>
       expect(canvas.getByRole('tab', { name: 'Basic' })).toBeEnabled()
     );
+    await expect(
+      canvasElement.querySelector('.basic-editor')
+    ).toBeInTheDocument();
   },
 };

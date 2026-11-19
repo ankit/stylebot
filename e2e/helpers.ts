@@ -177,7 +177,6 @@ export const pickElement = async (
 const MODE_LABEL = {
   basic: 'Basic',
   code: 'Code',
-  presets: 'Presets',
 } as const;
 
 export const switchEditorMode = async (
@@ -332,4 +331,35 @@ export const dockToSidePanel = (extension: Extension) =>
         },
       },
     })
+  );
+
+// The content script answers once it has registered its listener.
+export const waitForContentScript = (extension: Extension) =>
+  expect
+    .poll(() =>
+      extension
+        .evaluate(async url => {
+          const tabs = await chrome.tabs.query({});
+          const tab = tabs.find(candidate => candidate.url?.startsWith(url));
+          const open = await chrome.tabs.sendMessage(tab?.id as number, {
+            name: 'GetIsStylebotOpen',
+          });
+          return typeof open === 'boolean';
+        }, PAGE_URL)
+        .catch(() => false)
+    )
+    .toBe(true);
+
+// What the background sends the page when the browser reports a command.
+export const runCommand = (extension: Extension, command: string) =>
+  extension.evaluate(
+    async ([url, name]) => {
+      const tabs = await chrome.tabs.query({});
+      const tab = tabs.find(candidate => candidate.url?.startsWith(url));
+      await chrome.tabs.sendMessage(tab?.id as number, {
+        name: 'RunCommand',
+        command: name,
+      });
+    },
+    [PAGE_URL, command]
   );

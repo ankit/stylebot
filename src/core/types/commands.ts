@@ -11,7 +11,6 @@ export type StylebotCommands = {
 export type StylebotEditorCommandName =
   | 'inspect'
   | 'basic'
-  | 'magic'
   | 'code'
   | 'help'
   | 'hide'

@@ -10,18 +10,18 @@
 
         <div
           class="stylebot-body"
-          :class="{ 'stable-gutter': mode === 'basic' }"
+          :class="{ 'stable-gutter': mode === 'basic' && !readability }"
           :style="
             colorPickerVisible || !pageConnected ? 'pointer-events: none' : ''
           "
         >
-          <the-basic-editor v-if="mode === 'basic'" />
-          <the-presets-editor v-else-if="mode === 'magic'" />
+          <the-reader-panel v-if="readability" />
+          <the-basic-editor v-else-if="mode === 'basic'" />
 
           <!-- Stays mounted (just hidden) once opened — Monaco is too expensive to reload on every mode switch. -->
           <the-code-editor
             v-if="codeEditorMounted"
-            v-show="mode === 'code'"
+            v-show="mode === 'code' && !readability"
             @leave="onCodeEditorLeave"
           />
         </div>
@@ -38,7 +38,7 @@ import Vue from 'vue';
 import TheHeader from './TheHeader.vue';
 import TheCodeEditor from './TheCodeEditor.vue';
 import TheBasicEditor from './TheBasicEditor.vue';
-import ThePresetsEditor from './ThePresetsEditor.vue';
+import TheReaderPanel from './TheReaderPanel.vue';
 import TheStylebotResizer from './TheStylebotResizer.vue';
 import TheWindowStatus from './TheWindowStatus.vue';
 import TheKeyboardShortcutsView from './shortcuts/TheKeyboardShortcutsView.vue';
@@ -54,7 +54,7 @@ export default Vue.extend({
   components: {
     TheHeader,
     TheBasicEditor,
-    ThePresetsEditor,
+    TheReaderPanel,
     TheCodeEditor,
     TheStylebotResizer,
     TheWindowStatus,
@@ -79,6 +79,11 @@ export default Vue.extend({
 
     mode(): StylebotEditingMode {
       return this.$store.state.options.mode;
+    },
+
+    // Page CSS has no effect on the reader view, so it replaces the editor.
+    readability(): boolean {
+      return this.$store.getters.readabilityActive;
     },
 
     colorPickerVisible(): boolean {

@@ -222,13 +222,11 @@ export default {
 
     commit('setVisible', true);
 
-    // Show Magic instead of the useless Basic/Code panel, without
-    // persisting over the user's actual mode preference elsewhere.
-    if (getters.readabilityActive && state.options.mode !== 'magic') {
-      commit('setOptions', { ...state.options, mode: 'magic' });
-    }
-
-    if (state.options.mode === 'basic' && inspect) {
+    if (
+      state.options.mode === 'basic' &&
+      inspect &&
+      !getters.readabilityActive
+    ) {
       commit('setInspecting', true);
     }
   },
@@ -919,14 +917,6 @@ export default {
   ): void {
     getPageBridge().applyReadability(value);
     setReadability(state.url, value);
-
-    // Editing page CSS has no effect while readability is running — its DOM
-    // is detached from the document, not just hidden. Switch the panel to
-    // Magic locally without persisting over the user's global mode
-    // preference (mirrors openStylebot's readabilityActive handling above).
-    if (value && ['basic', 'code'].includes(state.options.mode)) {
-      commit('setOptions', { ...state.options, mode: 'magic' });
-    }
 
     commit('setReadability', value);
   },

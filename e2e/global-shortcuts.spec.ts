@@ -1,5 +1,11 @@
-import { test, expect, type Extension } from './fixtures';
-import { PAGE_URL, seedStyles, servePage } from './helpers';
+import { test, expect } from './fixtures';
+import {
+  PAGE_URL,
+  runCommand,
+  seedStyles,
+  servePage,
+  waitForContentScript,
+} from './helpers';
 
 /*
  * Playwright can't press a browser-level shortcut, so these cover the parts
@@ -15,37 +21,6 @@ const PAGE_HTML = `
     </body>
   </html>
 `;
-
-// The content script answers once it has registered its listener.
-const waitForContentScript = (extension: Extension) =>
-  expect
-    .poll(() =>
-      extension
-        .evaluate(async url => {
-          const tabs = await chrome.tabs.query({});
-          const tab = tabs.find(candidate => candidate.url?.startsWith(url));
-          const open = await chrome.tabs.sendMessage(tab?.id as number, {
-            name: 'GetIsStylebotOpen',
-          });
-          return typeof open === 'boolean';
-        }, PAGE_URL)
-        .catch(() => false)
-    )
-    .toBe(true);
-
-// What the background sends the page when the browser reports a command.
-const runCommand = (extension: Extension, command: string) =>
-  extension.evaluate(
-    async ([url, name]) => {
-      const tabs = await chrome.tabs.query({});
-      const tab = tabs.find(candidate => candidate.url?.startsWith(url));
-      await chrome.tabs.sendMessage(tab?.id as number, {
-        name: 'RunCommand',
-        command: name,
-      });
-    },
-    [PAGE_URL, command]
-  );
 
 test('the global shortcuts are registered with the browser, two of them with keys', async ({
   extension,
