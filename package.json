@@ -136,6 +136,10 @@
     "@testing-library/jest-dom": "6.9.1"
   },
   "dependencies": {
+    "@shikijs/engine-javascript": "^4.6.0",
+    "@shikijs/langs": "^4.6.0",
+    "@shikijs/monaco": "^4.6.0",
+    "@shikijs/primitive": "^4.6.0",
     "date-fns": "^2.16.1",
     "defuddle": "^0.19.3",
     "monaco-editor": "^0.56.0",

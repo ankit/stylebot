@@ -41,6 +41,30 @@ test('typing CSS into the code-mode Monaco editor applies live and persists', as
   await expect(page.locator('h1')).toHaveCSS('color', 'rgb(255, 0, 128)');
 });
 
+test('the code editor colours CSS custom properties as variables', async ({
+  context,
+  openPopup,
+}) => {
+  test.slow();
+
+  await servePage(context, PAGE_HTML);
+
+  const page = await context.newPage();
+  await page.goto(PAGE_URL);
+
+  const editorRoot = await openEditor(page, openPopup);
+  await switchEditorMode(editorRoot, 'code');
+
+  const monaco = getMonacoFrame(page);
+  await monaco.locator('.monaco-editor').click();
+  await page.keyboard.type(':root { --gap: 4px; }');
+
+  // Stylebot's violet for variables, in its light or dark variant.
+  await expect(
+    monaco.locator('.view-line span span', { hasText: '--gap' })
+  ).toHaveCSS('color', /rgb\((116, 100, 159|191, 181, 226)\)/);
+});
+
 test('toggling the panel appearance updates the Monaco editor theme immediately', async ({
   context,
   openPopup,

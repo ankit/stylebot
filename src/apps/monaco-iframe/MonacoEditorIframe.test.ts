@@ -1,5 +1,11 @@
 import MonacoEditorIframe from './MonacoEditorIframe';
 
+jest.mock('./shiki', () => ({ highlightCss: jest.fn() }));
+// Jest follows the package's exports map, which leaves this path out.
+jest.mock('@shikijs/langs/dist/css.mjs', () => ({ default: [] }), {
+  virtual: true,
+});
+
 /**
  * A stand-in for Monaco's editor that holds plain text and reports every
  * change synchronously, as Monaco does.
@@ -66,7 +72,10 @@ describe('MonacoEditorIframe', () => {
   let fake: ReturnType<typeof createFakeEditor>;
   let posted: Array<{ type: string; css?: string }>;
 
-  beforeEach(() => {
+  // Setup finishes once Shiki is ready, a few promise turns later.
+  const settle = () => new Promise(resolve => setTimeout(resolve));
+
+  beforeEach(async () => {
     fake = createFakeEditor();
     posted = [];
     document.body.innerHTML = '<div id="container"></div>';
@@ -106,6 +115,7 @@ describe('MonacoEditorIframe', () => {
       .mockImplementation(message => posted.push(message));
 
     new MonacoEditorIframe();
+    await settle();
   });
 
   afterEach(() => {
@@ -181,8 +191,9 @@ describe('MonacoEditorIframe', () => {
       expect(event.defaultPrevented).toBe(false);
     });
 
-    it('asks the options page to save instead of the browser saving the page', () => {
+    it('asks the options page to save instead of the browser saving the page', async () => {
       new MonacoEditorIframe('options');
+      await settle();
       const event = pressSave();
 
       expect(saves()).toEqual([{ type: 'stylebotSavePressed' }]);

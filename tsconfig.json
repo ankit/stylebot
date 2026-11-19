@@ -10,6 +10,7 @@
     "downlevelIteration": true,
     "moduleResolution": "node",
     "esModuleInterop": true,
+    "resolveJsonModule": true,
     "types": ["chrome", "jest", "node"],
     "baseUrl": "src",
     "paths": {
