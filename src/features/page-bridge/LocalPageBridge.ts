@@ -23,7 +23,7 @@ import {
   writeCache,
 } from '@stylebot/stylesheets';
 
-import type { PageBridge, PageSnapshot } from './PageBridge';
+import type { HighlightLayer, PageBridge, PageSnapshot } from './PageBridge';
 import { PageBridgeEmitter } from './PageBridgeEmitter';
 import { getPageColors } from './page-colors';
 import { getComputedStyles } from './computed-styles';
@@ -202,9 +202,15 @@ export class LocalPageBridge extends PageBridgeEmitter implements PageBridge {
     this.inspector.handleKey(key);
   }
 
-  highlight(selector: string): void {
+  highlight(selector: string, layer?: HighlightLayer): void {
     if (validateSelector(selector)) {
-      this.previewer.highlight(selector);
+      const property = layer === 'content' ? 'width' : layer;
+
+      if (property) {
+        this.previewer.highlight(selector, property);
+      } else {
+        this.previewer.highlight(selector);
+      }
     } else {
       this.previewer.unhighlight();
     }

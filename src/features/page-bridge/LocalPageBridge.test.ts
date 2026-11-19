@@ -232,6 +232,16 @@ describe('LocalPageBridge', () => {
       expect(mockHighlighter.highlight).toBeCalledWith('a');
     });
 
+    it('passes one layer through, with content as the element size', () => {
+      jest.spyOn(stylebotCss, 'validateSelector').mockReturnValue(true);
+
+      bridge.highlight('a', 'padding');
+      expect(mockHighlighter.highlight).toBeCalledWith('a', 'padding');
+
+      bridge.highlight('a', 'content');
+      expect(mockHighlighter.highlight).toBeCalledWith('a', 'width');
+    });
+
     it('clears the preview for an invalid selector', () => {
       jest.spyOn(stylebotCss, 'validateSelector').mockReturnValue(false);
 

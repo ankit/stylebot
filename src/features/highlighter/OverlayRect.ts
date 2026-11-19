@@ -126,6 +126,9 @@ export default class OverlayRect {
     });
 
     this.content.style.backgroundColor = overlayStyles.background;
+    this.node.style.borderColor = overlayStyles.margin;
+    this.border.style.borderColor = overlayStyles.border;
+    this.padding.style.borderColor = overlayStyles.padding;
 
     if (property) {
       if (property !== 'height' && property !== 'width') {

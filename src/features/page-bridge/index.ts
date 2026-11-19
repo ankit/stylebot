@@ -1,5 +1,7 @@
 import type { PageBridge } from './PageBridge';
 
+export type { HighlightLayer } from './PageBridge';
+
 let bridge: PageBridge | null = null;
 
 export const setPageBridge = (value: PageBridge): void => {

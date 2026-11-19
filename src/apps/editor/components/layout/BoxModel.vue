@@ -1,5 +1,11 @@
 <template>
-  <div class="box-model">
+  <div
+    class="box-model"
+    @mouseover="hoverLayer = layerAt($event.target)"
+    @mouseleave="hoverLayer = null"
+    @focusin="focusLayer = layerAt($event.target)"
+    @focusout="onFocusOut"
+  >
     <box-model-ring kind="margin" :label="t('margin')">
       <box-model-ring kind="padding" :label="t('padding')" class="padding">
         <div class="box-model-content">
@@ -24,6 +30,8 @@
 
 <script lang="ts">
 import Vue from 'vue';
+import { getPageBridge } from '@stylebot/page-bridge';
+import type { HighlightLayer } from '@stylebot/page-bridge';
 import { XIcon } from '@stylebot/icons';
 
 import Length from '../Length.vue';
@@ -36,6 +44,82 @@ export default Vue.extend({
     BoxModelRing,
     Length,
     XIcon,
+  },
+
+  data(): {
+    hoverLayer: HighlightLayer | null;
+    focusLayer: HighlightLayer | null;
+    drawn: boolean;
+  } {
+    return { hoverLayer: null, focusLayer: null, drawn: false };
+  },
+
+  computed: {
+    // A field being edited wins over wherever the pointer has drifted.
+    layer(): HighlightLayer | null {
+      return this.activeSelector ? this.focusLayer ?? this.hoverLayer : null;
+    },
+
+    activeSelector(): string {
+      return this.$store.state.activeSelector;
+    },
+  },
+
+  watch: {
+    layer(): void {
+      this.syncHighlight();
+    },
+
+    activeSelector(): void {
+      this.syncHighlight();
+    },
+
+    // Edits land as fresh computed styles, so the boxes follow the new sizes.
+    '$store.state.computedStyles'(): void {
+      this.syncHighlight();
+    },
+  },
+
+  beforeDestroy() {
+    if (this.drawn) {
+      getPageBridge().unhighlight();
+    }
+  },
+
+  methods: {
+    /**
+     * Draws the box while the diagram is in use, and clears only a box it
+     * drew, so other highlights like a pick's brief peek are left alone.
+     */
+    syncHighlight(): void {
+      if (this.layer) {
+        getPageBridge().highlight(this.activeSelector, this.layer);
+        this.drawn = true;
+      } else if (this.drawn) {
+        getPageBridge().unhighlight();
+        this.drawn = false;
+      }
+    },
+
+    layerAt(target: EventTarget | null): HighlightLayer | null {
+      const el = target as Element | null;
+
+      if (el?.closest('.box-model-content')) {
+        return 'content';
+      }
+
+      if (el?.closest('.box-ring-padding')) {
+        return 'padding';
+      }
+
+      return el?.closest('.box-ring-margin') ? 'margin' : null;
+    },
+
+    onFocusOut(event: FocusEvent): void {
+      const next = event.relatedTarget as Node | null;
+      this.focusLayer =
+        next && this.$el.contains(next) ? this.layerAt(next) : null;
+    },
   },
 });
 </script>

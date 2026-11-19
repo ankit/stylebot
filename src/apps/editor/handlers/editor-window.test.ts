@@ -276,6 +276,9 @@ describe('createEditorWindowHandler', () => {
     port.send({ type: 'highlight', selector: 'h1' });
     expect(bridge.highlight).toBeCalledWith('h1');
 
+    port.send({ type: 'highlight', selector: 'h1', layer: 'margin' });
+    expect(bridge.highlight).toBeCalledWith('h1', 'margin');
+
     const preview = {
       css: 'h1 { font-family: Inter; }',
       forceImportant: false,

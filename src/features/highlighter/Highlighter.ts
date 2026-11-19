@@ -4,6 +4,7 @@ import { queryWithShadowRoots } from '@stylebot/stylesheets';
 import { describeElement } from './describe-element';
 import { getParentElement, getPathUpTo, snapPastWrappers } from './snap';
 import { canCoverOthers, getVisibleElementAt } from './visible-element';
+import type { LayoutProperty } from './types';
 
 // What the inspector takes from the keyboard: climb, descend and pick.
 export const INSPECT_KEYS = [
@@ -210,14 +211,15 @@ class Highlighter {
     );
   };
 
-  highlight = (selector: string): void => {
+  highlight = (selector: string, property?: LayoutProperty): void => {
     if (!selector) {
       return;
     }
 
     // Boxing a whole-page selector just floods the page.
     this.ensureOverlay().outline(
-      isWholePageSelector(selector) ? [] : this.queryMatches(selector)
+      isWholePageSelector(selector) ? [] : this.queryMatches(selector),
+      property
     );
   };
 
