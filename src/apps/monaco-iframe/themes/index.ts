@@ -96,6 +96,18 @@ const loaders: Record<StylebotCodeTheme, () => Promise<CodeThemeVariants>> = {
   },
 };
 
+/**
+ * The code editor's themes, in the order they're offered, with their names.
+ */
+export const codeThemes: Array<{ value: StylebotCodeTheme; name: string }> = [
+  { value: 'stylebot', name: 'Stylebot' },
+  { value: 'catppuccin', name: 'Catppuccin' },
+  { value: 'github', name: 'GitHub' },
+  { value: 'gruvbox', name: 'Gruvbox' },
+  { value: 'rose-pine', name: 'Rosé Pine' },
+  { value: 'solarized', name: 'Solarized' },
+];
+
 export const isCodeTheme = (name: unknown): name is StylebotCodeTheme =>
   typeof name === 'string' && Object.hasOwn(loaders, name);
 
