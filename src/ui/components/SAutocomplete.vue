@@ -594,7 +594,7 @@ export default Vue.extend({
   gap: 6px;
   padding: 5px 8px 5px 10px;
   font-size: 13px;
-  line-height: 1.3;
+  line-height: 16px;
   cursor: text;
   outline: none;
 }
