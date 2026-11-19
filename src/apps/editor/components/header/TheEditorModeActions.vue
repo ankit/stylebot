@@ -50,13 +50,6 @@ export default Vue.extend({
           shortcut: 'c',
           disabled: this.readability,
         },
-        {
-          value: 'magic',
-          label: this.t('presets_mode'),
-          title: this.t('presets_mode_description'),
-          shortcut: 'p',
-          disabled: false,
-        },
       ];
     },
   },

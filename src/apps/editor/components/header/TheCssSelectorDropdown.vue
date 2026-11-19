@@ -250,7 +250,7 @@ export default Vue.extend({
     },
 
     disabled(): boolean {
-      return this.mode !== 'basic' && this.mode !== 'code';
+      return this.$store.getters.readabilityActive;
     },
   },
 

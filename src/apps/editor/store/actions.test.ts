@@ -281,41 +281,10 @@ describe('actions', () => {
       expect(mockCommit).toBeCalledWith('setReadability', true);
     });
 
-    it('switches out of basic/code mode since editing page CSS has no effect there, without persisting the mode change', () => {
+    it('leaves the editing mode alone, since the reader panel replaces it', () => {
       actions.applyReadability({ commit: mockCommit, state: mockState }, true);
 
-      expect(mockCommit).toBeCalledWith('setOptions', {
-        ...mockState.options,
-        mode: 'magic',
-      });
-      expect(chromeUtils.setOption).not.toBeCalledWith('mode', 'magic');
-    });
-
-    it('leaves the mode alone when turning readability off', () => {
-      actions.applyReadability({ commit: mockCommit, state: mockState }, false);
-
-      expect(mockCommit).not.toBeCalledWith(
-        'setOptions',
-        expect.objectContaining({ mode: 'magic' })
-      );
-    });
-
-    it('leaves the mode alone when already in magic mode', () => {
-      actions.applyReadability(
-        {
-          commit: mockCommit,
-          state: {
-            ...mockState,
-            options: { ...mockState.options, mode: 'magic' },
-          },
-        },
-        true
-      );
-
-      expect(mockCommit).not.toBeCalledWith(
-        'setOptions',
-        expect.objectContaining({ mode: 'magic' })
-      );
+      expect(mockCommit).not.toBeCalledWith('setOptions', expect.anything());
     });
   });
 

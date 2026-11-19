@@ -1,10 +1,10 @@
 import { test, expect } from './fixtures';
 import {
   PAGE_URL,
-  openEditor,
+  runCommand,
   seedStyles,
   servePage,
-  switchEditorMode,
+  waitForContentScript,
 } from './helpers';
 
 // The filter effect attaches to body's element children, so the styled element
@@ -29,13 +29,11 @@ const UNIDENTIFIED_PAGE_HTML = `
   </html>
 `;
 
-// The toggle's own behaviour is covered by the Storybook interaction tests;
-// this proves the filter lands on the live page and the saved style survives
-// a reload with the rest of the rule intact.
-test('taking grayscale back to 0 keeps the rest of the rule in the saved style', async ({
+// Proves the grayscale command's filter lands on the live page and that
+// taking it off keeps the rest of the rule, live and after a reload.
+test('taking grayscale back off keeps the rest of the rule in the saved style', async ({
   context,
   extension,
-  openPopup,
 }) => {
   await servePage(context, PAGE_HTML);
   await seedStyles(extension, {
@@ -47,27 +45,13 @@ test('taking grayscale back to 0 keeps the rest of the rule in the saved style',
 
   const article = page.locator('div.article-body');
   await expect(article).toHaveCSS('color', 'rgb(255, 0, 128)');
+  await waitForContentScript(extension);
 
-  const editorRoot = await openEditor(page, openPopup);
-  await switchEditorMode(editorRoot, 'presets');
-
-  // page-scoped, not editorRoot-scoped: see e2e/color-picker.spec.ts.
-  const grayscaleCard = page.locator('.feature-card').filter({
-    has: page.locator('h3', { hasText: /^\s*Grayscale\s*$/ }),
-  });
-  const toggle = grayscaleCard.locator('.switch input[type="checkbox"]');
-
-  // Switching the preset on applies the last-used percentage (100 by default);
-  // switching it off takes grayscale back to 0.
-  await toggle.click({ force: true });
+  await runCommand(extension, 'grayscale');
   await expect(article).toHaveCSS('filter', 'grayscale(1)');
-  // Under load the second click can land before the switch has re-rendered as
-  // checked, so wait for it — a click on a still-unchecked switch turns it on again.
-  await expect(toggle).toBeChecked();
 
-  await toggle.click({ force: true });
+  await runCommand(extension, 'grayscale');
   await expect(article).toHaveCSS('filter', 'none');
-  await expect(toggle).not.toBeChecked();
 
   // The colour has to outlive the filter both live and in the persisted style.
   await expect(article).toHaveCSS('color', 'rgb(255, 0, 128)');
@@ -79,7 +63,7 @@ test('taking grayscale back to 0 keeps the rest of the rule in the saved style',
 
 test('grayscale applies on a page whose body child has no class or id', async ({
   context,
-  openPopup,
+  extension,
 }) => {
   await servePage(context, UNIDENTIFIED_PAGE_HTML);
 
@@ -87,22 +71,11 @@ test('grayscale applies on a page whose body child has no class or id', async ({
   await page.goto(PAGE_URL);
 
   const wrapper = page.locator('center');
-  const editorRoot = await openEditor(page, openPopup);
+  await waitForContentScript(extension);
 
-  await switchEditorMode(editorRoot, 'presets');
-
-  const grayscaleCard = page.locator('.feature-card').filter({
-    has: page.locator('h3', { hasText: /^\s*Grayscale\s*$/ }),
-  });
-  const toggle = grayscaleCard.locator('.switch input[type="checkbox"]');
-
-  await toggle.click({ force: true });
+  await runCommand(extension, 'grayscale');
   await expect(wrapper).toHaveCSS('filter', 'grayscale(1)');
-  // Under load the second click can land before the switch has re-rendered as
-  // checked, so wait for it — a click on a still-unchecked switch turns it on again.
-  await expect(toggle).toBeChecked();
 
-  await toggle.click({ force: true });
+  await runCommand(extension, 'grayscale');
   await expect(wrapper).toHaveCSS('filter', 'none');
-  await expect(toggle).not.toBeChecked();
 });

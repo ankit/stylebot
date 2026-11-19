@@ -16,7 +16,7 @@ import type { SelectorAlternatives } from '@stylebot/css';
 import type { PageSnapshot } from '@stylebot/page-bridge';
 import type { AppliedDeclaration } from '@stylebot/page-bridge';
 
-const EDITING_MODES: Array<StylebotEditingMode> = ['basic', 'magic', 'code'];
+const EDITING_MODES: Array<StylebotEditingMode> = ['basic', 'code'];
 
 export default {
   setVisible(state: State, visible: boolean): void {

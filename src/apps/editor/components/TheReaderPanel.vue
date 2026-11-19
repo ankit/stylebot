@@ -1,26 +1,22 @@
 <template>
-  <div class="presets-editor">
+  <div class="reader-panel">
     <the-readability />
-    <the-grayscale />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
-import TheGrayscale from './presets/TheGrayscale.vue';
-import TheReadability from './presets/TheReadability.vue';
+import TheReadability from './reader/TheReadability.vue';
 
 export default Vue.extend({
-  name: 'ThePresetsEditor',
+  name: 'TheReaderPanel',
 
   components: {
-    TheGrayscale,
     TheReadability,
   },
 
-  // Readerability and the body children grayscale attaches to can have
-  // changed since the store last looked.
+  // Whether the page is readerable can have changed since the store looked.
   created() {
     this.$store.dispatch('refreshPage');
   },
@@ -28,7 +24,7 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.presets-editor {
+.reader-panel {
   box-sizing: border-box;
   display: flex;
   flex-direction: column;

@@ -73,8 +73,7 @@ export default Vue.extend({
      * The scopes that have a selector, narrowest first.
      */
     options(): Array<ScopeOption> {
-      const { mode } = this.$store.state.options;
-      const shown = (mode === 'basic' || mode === 'code') && this.showing;
+      const shown = !this.$store.getters.readabilityActive && this.showing;
       if (!shown) {
         return [];
       }

@@ -79,7 +79,7 @@ export default Vue.extend({
     },
 
     toggleInspect(): void {
-      if (this.mode === 'basic' || this.mode === 'code') {
+      if (!this.$store.getters.readabilityActive) {
         this.$store.commit('setInspecting', !this.inspecting);
       }
     },
@@ -223,14 +223,6 @@ export default Vue.extend({
         event.stopPropagation();
 
         this.$store.dispatch('setMode', 'code');
-      }
-
-      // Switch to magic editor
-      if (event.key === this.editorCommands.magic) {
-        event.preventDefault();
-        event.stopPropagation();
-
-        this.$store.dispatch('setMode', 'magic');
       }
 
       // Show shortcut help
