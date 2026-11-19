@@ -24,7 +24,9 @@ const FONT_STYLES = [
  * final colour and style, so a theme that sets them in separate rules (Rosé
  * Pine's italic comments) would otherwise lose that token's colour.
  */
-const withEveryColourStyle = (theme: ThemeRegistration): ThemeRegistration => {
+const withColorStyleFallbacks = (
+  theme: ThemeRegistration
+): ThemeRegistration => {
   const rules = theme.tokenColors ?? theme.settings ?? [];
   const colours = new Set(
     rules
@@ -57,7 +59,7 @@ export const highlightCss = (
 ): CssHighlighting => {
   const highlighter = createShikiPrimitive({
     langs: css,
-    themes: themes.map(withEveryColourStyle),
+    themes: themes.map(withColorStyleFallbacks),
     engine: createJavaScriptRegexEngine(),
   });
   const { setTheme, create } = monaco.editor;
@@ -87,7 +89,7 @@ export const highlightCss = (
 
   return {
     addThemes: (newThemes: Array<ThemeRegistration>) => {
-      highlighter.loadThemeSync(...newThemes.map(withEveryColourStyle));
+      highlighter.loadThemeSync(...newThemes.map(withColorStyleFallbacks));
       register();
     },
   };
