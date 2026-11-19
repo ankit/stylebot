@@ -4,6 +4,7 @@ export type StylebotBasicModeSection =
   | 'text'
   | 'colors'
   | 'layout'
+  | 'border'
   | 'effects'
   | 'more';
 

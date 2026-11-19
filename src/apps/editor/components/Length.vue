@@ -41,6 +41,12 @@ export default Vue.extend({
       default: 'px',
     },
 
+    // Other properties that take the same value, e.g. a border's other sides.
+    mirror: {
+      type: Array as PropType<Array<string>>,
+      default: () => [],
+    },
+
     // Raw value of a shorthand property (e.g. border: 1px solid red) to
     // pull a length from when `property` itself isn't declared.
     fallback: {
@@ -78,10 +84,18 @@ export default Vue.extend({
       set(length: string): void {
         const value = length ? `${length}px` : '';
 
-        this.$store.dispatch('applyDeclaration', {
-          property: this.property,
-          value,
-        });
+        if (this.mirror.length === 0) {
+          this.$store.dispatch('applyDeclaration', {
+            property: this.property,
+            value,
+          });
+          return;
+        }
+
+        this.$store.dispatch(
+          'applyDeclarations',
+          [this.property, ...this.mirror].map(property => ({ property, value }))
+        );
       },
     },
 

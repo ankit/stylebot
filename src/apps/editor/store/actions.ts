@@ -788,6 +788,32 @@ export default {
     });
   },
 
+  /**
+   * Applies several declarations to the active rule as one change, so a
+   * multi-property edit is a single undo step.
+   */
+  applyDeclarations(
+    { state, dispatch }: { state: State; dispatch: Dispatch },
+    declarations: Array<{ property: string; value: string }>
+  ): void {
+    if (!state.activeSelector || declarations.length === 0) {
+      return;
+    }
+
+    const css = declarations.reduce(
+      (acc, { property, value }) =>
+        addDeclaration(property, value, state.activeSelector, acc),
+      state.css
+    );
+
+    dispatch('applyCss', {
+      css,
+      source: `declarations:${state.activeSelector}:${declarations
+        .map(({ property }) => property)
+        .join(',')}`,
+    });
+  },
+
   resetActiveRule({
     state,
     dispatch,
@@ -892,7 +918,11 @@ export default {
    */
   previewDeclaration(
     { state }: { state: State },
-    { property, value }: { property: string; value: string }
+    {
+      property,
+      value,
+      mirror = [],
+    }: { property: string; value: string; mirror?: Array<string> }
   ): void {
     ++previewRequest;
 
@@ -905,8 +935,12 @@ export default {
       return;
     }
 
+    const body = [property, ...mirror]
+      .map(prop => `${prop}: ${value};`)
+      .join(' ');
+
     getPageBridge().setPreviewCss({
-      css: `${state.activeSelector} { ${property}: ${value}; }`,
+      css: `${state.activeSelector} { ${body} }`,
       forceImportant: state.forceImportant,
     });
   },

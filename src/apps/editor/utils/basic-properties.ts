@@ -22,10 +22,19 @@ export const LAYOUT_PROPERTIES = [
   'margin-right',
   'margin-bottom',
   'margin-left',
+];
+
+export const BORDER_PROPERTIES = [
   'border',
   'border-style',
   'border-width',
   'border-color',
+  ...['top', 'right', 'bottom', 'left'].flatMap(side => [
+    `border-${side}`,
+    `border-${side}-style`,
+    `border-${side}-width`,
+    `border-${side}-color`,
+  ]),
   'border-radius',
 ];
 
@@ -38,6 +47,7 @@ export const KNOWN_PROPERTIES = [
   ...TEXT_PROPERTIES,
   ...COLOR_PROPERTIES,
   ...LAYOUT_PROPERTIES,
+  ...BORDER_PROPERTIES,
   ...EFFECTS_PROPERTIES,
   ...OTHER_KNOWN_PROPERTIES,
 ];
