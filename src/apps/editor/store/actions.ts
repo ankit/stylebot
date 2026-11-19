@@ -27,7 +27,7 @@ import type {
   StylebotEditingMode,
   FilterEffect,
   ReadabilitySettings,
-  StylebotBasicModeSections,
+  StylebotCollapsedSections,
   StylebotLayout,
   StylebotDockLocation,
   StylebotAppearance,
@@ -464,12 +464,12 @@ export default {
     commit('setOptions', { ...state.options, codeTheme });
   },
 
-  setBasicModeOpenedSections(
+  setBasicModeCollapsedSections(
     { state, commit }: { state: State; commit: Commit },
-    basicModeOpenedSections: StylebotBasicModeSections
+    basicModeCollapsedSections: StylebotCollapsedSections
   ): void {
-    setOption('basicModeOpenedSections', basicModeOpenedSections);
-    commit('setOptions', { ...state.options, basicModeOpenedSections });
+    setOption('basicModeCollapsedSections', basicModeCollapsedSections);
+    commit('setOptions', { ...state.options, basicModeCollapsedSections });
   },
 
   setLastColorSet(

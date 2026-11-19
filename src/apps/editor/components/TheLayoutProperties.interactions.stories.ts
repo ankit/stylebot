@@ -5,7 +5,6 @@ import TheLayoutProperties from './TheLayoutProperties.vue';
 import { editor, WITH_RULE } from '@stylebot/storybook/fixtures/editor';
 import type { Canvas } from '@stylebot/storybook/story-helpers';
 import {
-  cardHeader,
   declaration,
   findOpenMenu,
   numberInput,
@@ -101,7 +100,6 @@ export const SpacingPlaceholders: StoryObj = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
-    await user.click(cardHeader(canvas, 'Box'));
     const margin = spacing(canvas, 'Margin');
 
     await pickMode(canvas, margin, 'Individual');

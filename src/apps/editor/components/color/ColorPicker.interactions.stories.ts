@@ -5,8 +5,6 @@ import ColorPicker from './ColorPicker.vue';
 import { editor, WITH_RULE } from '@stylebot/storybook/fixtures/editor';
 import type { Canvas } from '@stylebot/storybook/story-helpers';
 import {
-  cardCollapse,
-  cardHeader,
   declaration,
   findOpenMenu,
   pageStyle,
@@ -84,11 +82,6 @@ export const HexFieldApplies: StoryObj = {
       'rgb(17, 34, 51)'
     );
 
-    // Background is collapsed for a rule without one; open it first.
-    await user.click(cardHeader(canvas, 'Background'));
-    await waitFor(() =>
-      expect(cardCollapse(canvas, 'Background')).not.toHaveClass('collapsed')
-    );
     await user.type(hexField(canvas, 'Background'), '#fafafa');
     await waitFor(() =>
       expect(declaration(store, 'h1', 'background-color')).toBe('#fafafa')
@@ -331,11 +324,6 @@ export const OpeningAnotherClosesFirst: StoryObj = {
     const store = storeOf(canvasElement);
     const popovers = () =>
       canvasElement.querySelectorAll('.color-picker-popover');
-
-    await user.click(cardHeader(canvas, 'Background'));
-    await waitFor(() =>
-      expect(cardCollapse(canvas, 'Background')).not.toHaveClass('collapsed')
-    );
 
     await openPopover(canvasElement, 'Text');
     await user.click(swatch(canvas, 'Background'));
