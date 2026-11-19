@@ -1,24 +1,6 @@
 <template>
   <div class="layout-properties">
-    <spacing-control
-      :label="t('padding')"
-      :properties="{
-        top: 'padding-top',
-        right: 'padding-right',
-        bottom: 'padding-bottom',
-        left: 'padding-left',
-      }"
-    />
-
-    <spacing-control
-      :label="t('margin')"
-      :properties="{
-        top: 'margin-top',
-        right: 'margin-right',
-        bottom: 'margin-bottom',
-        left: 'margin-left',
-      }"
-    />
+    <box-model />
 
     <border-control />
 
@@ -28,7 +10,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import SpacingControl from './layout/SpacingControl.vue';
+import BoxModel from './layout/BoxModel.vue';
 import BorderControl from './layout/BorderControl.vue';
 import Radius from './layout/Radius.vue';
 
@@ -36,7 +18,7 @@ export default Vue.extend({
   name: 'TheLayoutProperties',
 
   components: {
-    SpacingControl,
+    BoxModel,
     BorderControl,
     Radius,
   },

@@ -19,6 +19,8 @@ const LONGHANDS: Record<string, Array<string>> = {
   'text-decoration': ['text-decoration-line'],
 };
 
+const SIZE_PROPERTIES = ['width', 'height'];
+
 // Computed keywords that mean the same as a control's option.
 const KEYWORD_ALIASES: Record<string, Record<string, string>> = {
   'text-align': { start: 'left', end: 'right' },
@@ -27,6 +29,8 @@ const KEYWORD_ALIASES: Record<string, Record<string, string>> = {
 export const PLACEHOLDER_PROPERTIES = [
   'font-size',
   'line-height',
+  'width',
+  'height',
   ...SIDES.map(side => `padding-${side}`),
   ...SIDES.map(side => `margin-${side}`),
   ...LONGHANDS['border-width'],
@@ -70,11 +74,16 @@ export const computedPlaceholder = (
     return Number.isNaN(fontSize) ? '' : toPlaceholder(`${fontSize * 1.2}px`);
   }
 
-  return toPlaceholder(
+  const placeholder = toPlaceholder(
     sharedValue(
       ...(LONGHANDS[property] ?? [property]).map(prop => styles[prop] ?? '')
     )
   );
+
+  // Sizes run to four digits, so a decimal would overflow their fields.
+  return SIZE_PROPERTIES.includes(property) && placeholder
+    ? `${Math.round(parseFloat(placeholder))}`
+    : placeholder;
 };
 
 /**

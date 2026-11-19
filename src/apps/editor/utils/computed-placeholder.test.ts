@@ -42,6 +42,11 @@ describe('computed-placeholder', () => {
       'border-bottom-left-radius': b,
     });
 
+    it('rounds a size to whole pixels so it fits its field', () => {
+      expect(computedPlaceholder({ width: '1003.52px' }, 'width')).toBe('1004');
+      expect(computedPlaceholder({ height: '38.4px' }, 'height')).toBe('38');
+    });
+
     it('reads a plain property', () => {
       expect(computedPlaceholder({ 'font-size': '18px' }, 'font-size')).toBe(
         '18'
