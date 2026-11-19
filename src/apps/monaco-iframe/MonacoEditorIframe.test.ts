@@ -1,5 +1,12 @@
 import MonacoEditorIframe from './MonacoEditorIframe';
 
+type Range = {
+  startLineNumber: number;
+  startColumn: number;
+  endLineNumber: number;
+  endColumn: number;
+};
+
 /**
  * A stand-in for Monaco's editor that holds plain text and reports every
  * change synchronously, as Monaco does.
@@ -7,6 +14,12 @@ import MonacoEditorIframe from './MonacoEditorIframe';
 const createFakeEditor = () => {
   let value = '';
   const listeners: Array<() => void> = [];
+
+  const getOffsetAt = (lineNumber: number, column: number) =>
+    value
+      .split('\n')
+      .slice(0, lineNumber - 1)
+      .reduce((offset, line) => offset + line.length + 1, column - 1);
 
   const change = (text: string) => {
     value = text;
@@ -20,11 +33,28 @@ const createFakeEditor = () => {
         listeners.push(listener),
       getValue: () => value,
       setValue: change,
-      executeEdits: (_source: string, edits: Array<{ text: string }>) =>
-        change(edits[0].text),
+      executeEdits: (
+        _source: string,
+        [{ range, text }]: Array<{ range: Range; text: string }>
+      ) =>
+        change(
+          value.slice(
+            0,
+            getOffsetAt(range.startLineNumber, range.startColumn)
+          ) +
+            text +
+            value.slice(getOffsetAt(range.endLineNumber, range.endColumn))
+        ),
       getModel: () => ({
         getValue: () => value,
-        getFullModelRange: () => ({}),
+        getPositionAt: (offset: number) => {
+          const lines = value.slice(0, offset).split('\n');
+
+          return {
+            lineNumber: lines.length,
+            column: lines[lines.length - 1].length + 1,
+          };
+        },
         findNextMatch: (regex: string) => {
           const lines = value.split('\n');
           const match = new RegExp(regex, 'm').exec(value);
@@ -44,6 +74,7 @@ const createFakeEditor = () => {
           };
         },
       }),
+      getContribution: () => null,
       revealRangeInCenter: jest.fn(),
       setSelection: jest.fn(),
       pushUndoStop: jest.fn(),
@@ -121,6 +152,28 @@ describe('MonacoEditorIframe', () => {
 
     expect(fake.editor.getValue()).toBe('a { color: red; } b { color: blue; }');
     expect(cssUpdates()).toEqual([]);
+  });
+
+  it('replaces only what the panel changed, so a folded header stays folded', () => {
+    const header =
+      '/* ==Stylebot==\n@var color c "Color" red\n==/Stylebot== */';
+    const executeEdits = jest.spyOn(fake.editor, 'executeEdits');
+
+    sendCss(`${header}\na { color: red; }`);
+    sendCss(`${header}\na { color: blue; }`);
+
+    expect(fake.editor.getValue()).toBe(`${header}\na { color: blue; }`);
+    expect(executeEdits).toHaveBeenCalledWith('stylebot', [
+      {
+        range: {
+          startLineNumber: 4,
+          startColumn: 12,
+          endLineNumber: 4,
+          endColumn: 15,
+        },
+        text: 'blue',
+      },
+    ]);
   });
 
   it('reports what the user types', () => {

@@ -3,6 +3,7 @@ import CustomLight from './themes/CustomLight';
 import CustomDark from './themes/CustomDark';
 import type { IframeMessage, ParentMessage } from '@stylebot/monaco-editor';
 import { isSaveShortcut } from '@stylebot/utils';
+import { getChangedSpan, getHeaderRange, getHeaderText } from './header-fold';
 
 declare global {
   // Must stay an interface: augmenting Window relies on declaration merging.
@@ -24,6 +25,9 @@ class MonacEditorIframe {
   populated = false;
   // Set while the panel's css is written in, so only typing is reported back.
   applyingParentCss = false;
+  // The header still to fold once Monaco reports its range.
+  pendingHeaderFold: { css: string; line: number } | null = null;
+  watchedFoldingModel?: any;
   // Seeded from the url, then kept current from the very first message, so
   // a theme sent while Monaco is still loading isn't lost.
   theme: 'light' | 'dark' =
@@ -247,6 +251,9 @@ class MonacEditorIframe {
    */
   handleStylebotCssUpdate(css: string, selector?: string, focus = true): void {
     const model = this.editor.getModel();
+    const previousCss = model.getValue();
+    const shouldFoldHeader =
+      !this.populated || getHeaderText(previousCss) !== getHeaderText(css);
 
     this.applyingParentCss = true;
 
@@ -254,15 +261,32 @@ class MonacEditorIframe {
       if (!this.populated) {
         this.populated = true;
         this.editor.setValue(css);
-      } else if (model.getValue() !== css) {
+      } else if (previousCss !== css) {
+        // Replacing only what changed keeps the folds above and below it.
+        const { start, end, text } = getChangedSpan(previousCss, css);
+        const from = model.getPositionAt(start);
+        const to = model.getPositionAt(end);
+
         this.editor.pushUndoStop();
         this.editor.executeEdits('stylebot', [
-          { range: model.getFullModelRange(), text: css },
+          {
+            range: {
+              startLineNumber: from.lineNumber,
+              startColumn: from.column,
+              endLineNumber: to.lineNumber,
+              endColumn: to.column,
+            },
+            text,
+          },
         ]);
         this.editor.pushUndoStop();
       }
     } finally {
       this.applyingParentCss = false;
+    }
+
+    if (shouldFoldHeader) {
+      this.foldHeader(css);
     }
 
     if (focus) {
@@ -292,6 +316,56 @@ class MonacEditorIframe {
           endLineNumber: match.range.endLineNumber,
         });
       }
+    }
+  }
+
+  /**
+   * Folds the metadata header of css the panel just sent. Its range comes
+   * from the css worker, so it is folded once Monaco reports it, unless the
+   * user has typed since.
+   */
+  async foldHeader(css: string): Promise<void> {
+    const range = getHeaderRange(css);
+    const controller = this.editor.getContribution('editor.contrib.folding');
+
+    this.pendingHeaderFold = range ? { css, line: range.start } : null;
+
+    const foldingModel = await controller?.getFoldingModel();
+
+    if (!foldingModel) {
+      return;
+    }
+
+    if (foldingModel !== this.watchedFoldingModel) {
+      this.watchedFoldingModel = foldingModel;
+      foldingModel.onDidChange(() => this.applyHeaderFold(foldingModel));
+    }
+
+    this.applyHeaderFold(foldingModel);
+  }
+
+  applyHeaderFold(foldingModel: any): void {
+    const pending = this.pendingHeaderFold;
+
+    if (!pending) {
+      return;
+    }
+
+    if (this.editor.getValue() !== pending.css) {
+      this.pendingHeaderFold = null;
+      return;
+    }
+
+    const region = foldingModel.getRegionAtLine(pending.line);
+
+    if (region?.startLineNumber !== pending.line) {
+      return;
+    }
+
+    this.pendingHeaderFold = null;
+
+    if (!region.isCollapsed) {
+      foldingModel.toggleCollapseState([region]);
     }
   }
 
