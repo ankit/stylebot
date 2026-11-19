@@ -27,7 +27,9 @@
         class="property-card-body"
         :class="{ 'clip-while-animating': !settled }"
       >
-        <slot />
+        <div class="property-card-content">
+          <slot />
+        </div>
       </div>
     </div>
   </div>
@@ -155,7 +157,7 @@ export default Vue.extend({
 .property-card-chevron {
   flex: none;
   color: var(--text-muted);
-  transition: transform 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.26s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:not(.collapsed) {
     transform: rotate(180deg);
@@ -165,7 +167,7 @@ export default Vue.extend({
 .property-card-collapse {
   display: grid;
   grid-template-rows: 1fr;
-  transition: grid-template-rows 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: grid-template-rows 0.26s cubic-bezier(0.4, 0, 0.2, 1);
 
   &.collapsed {
     grid-template-rows: 0fr;
@@ -180,22 +182,25 @@ export default Vue.extend({
   min-height: 0;
   min-width: 0;
   margin: 0 -8px;
-  padding: 0 8px 12px;
+  padding: 0 8px;
   opacity: 1;
-  transition: opacity 0.16s ease 0.08s;
+  transition: opacity 0.2s ease 0.06s;
 
   &.clip-while-animating {
     overflow: hidden;
   }
 
   .property-card-collapse.collapsed & {
-    padding-bottom: 0;
     opacity: 0;
-    transition: opacity 0.1s ease;
+    transition: opacity 0.2s ease;
   }
 
   @media (prefers-reduced-motion: reduce) {
     transition: none;
   }
+}
+
+.property-card-content {
+  padding-bottom: 12px;
 }
 </style>
