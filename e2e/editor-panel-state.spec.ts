@@ -27,9 +27,9 @@ const card = (page: Page, label: string) =>
 const collapse = (page: Page, label: string) =>
   card(page, label).locator('.property-card-collapse');
 
-// How the opened panels follow element picks is covered by the Storybook
+// How sections stay put across picks is covered by the Storybook
 // interaction tests; this only proves the preference survives a reload.
-test('a manually opened panel stays open across reloads', async ({
+test('a collapsed panel stays collapsed across reloads', async ({
   context,
   openPopup,
 }) => {
@@ -43,14 +43,14 @@ test('a manually opened panel stays open across reloads', async ({
   let editorRoot = await openEditor(page, openPopup);
   await pickElement(page, editorRoot, 'h1');
 
-  // Nothing is styled yet, so only Text auto-expands.
-  await expect(collapse(page, 'Box')).toHaveClass(/collapsed/);
+  // Every section starts open.
+  await expect(collapse(page, 'Box')).not.toHaveClass(/collapsed/);
 
   await card(page, 'Box').locator('.property-card-header').click();
-  await expect(collapse(page, 'Box')).not.toHaveClass(/collapsed/);
+  await expect(collapse(page, 'Box')).toHaveClass(/collapsed/);
 
   await page.reload();
   editorRoot = await openEditor(page, openPopup);
   await pickElement(page, editorRoot, 'h1');
-  await expect(collapse(page, 'Box')).not.toHaveClass(/collapsed/);
+  await expect(collapse(page, 'Box')).toHaveClass(/collapsed/);
 });

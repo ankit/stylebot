@@ -21,8 +21,8 @@ export const BasicEmpty = editor();
 
 export const BasicWithRule = editor(WITH_RULE);
 
-/* Picking an element auto-opens the sections it has declarations in, so
-   collapsing has to happen through the headers, as a user would. */
+/* Sections remember being collapsed, so it happens through the headers,
+   as a user would. */
 export const BasicSectionsCollapsed: StoryObj = {
   ...editor(WITH_RULE),
   play: ({ canvasElement }) => collapseAllCards(canvasElement),

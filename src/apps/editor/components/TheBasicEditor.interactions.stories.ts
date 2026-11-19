@@ -84,100 +84,59 @@ export const ResetDisabledWithoutRule: StoryObj = {
   },
 };
 
-export const PanelsAutoExpandPerElement: StoryObj = {
+export const SectionsStayAsLeft: StoryObj = {
   ...editor(
     { css: 'div.sb-page h1 { margin: 10px; }', inspecting: true },
     { page: PANEL_STATE_PAGE }
   ),
-  name: 'panels with declarations auto-expand and collapse per element',
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-
-    // The heading has a Box declaration, so Box opens and Text stays shut.
-    await pick(canvas.getByRole('heading', { level: 1 }));
-    await waitFor(() =>
-      expect(cardCollapse(canvas, 'Box')).not.toHaveClass('collapsed')
-    );
-    await expect(cardCollapse(canvas, 'Text')).toHaveClass('collapsed');
-
-    // The quote has nothing styled: Text opens as the default, Box shuts.
-    await pressKey('i');
-    await pick(canvas.getByText('Pick an element to start.'));
-    await waitFor(() =>
-      expect(cardCollapse(canvas, 'Box')).toHaveClass('collapsed')
-    );
-    await expect(cardCollapse(canvas, 'Text')).not.toHaveClass('collapsed');
-  },
-};
-
-export const ManualOpenPersistsAcrossPicks: StoryObj = {
-  ...editor({ inspecting: true }, { page: PANEL_STATE_PAGE }),
-  name: 'a manually opened panel stays open across element picks until closed by hand',
+  name: 'sections start open and stay as the user leaves them across picks',
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
     const heading = canvas.getByRole('heading', { level: 1 });
     const quote = canvas.getByText('Pick an element to start.');
-    const boxHeader = () => cardHeader(canvas, 'Box');
 
-    await step('an unstyled element opens only Text', async () => {
+    await step('every section starts open', async () => {
       await pick(heading);
-      await waitFor(() =>
-        expect(cardCollapse(canvas, 'Text')).not.toHaveClass('collapsed')
-      );
-      await expect(cardCollapse(canvas, 'Box')).toHaveClass('collapsed');
-    });
-
-    await step('opening Box by hand is remembered', async () => {
-      await user.click(boxHeader());
       await waitFor(() =>
         expect(cardCollapse(canvas, 'Box')).not.toHaveClass('collapsed')
       );
-      await expect(store.state.options.basicModeOpenedSections.layout).toBe(
+      await expect(cardCollapse(canvas, 'Text')).not.toHaveClass('collapsed');
+    });
+
+    await step('collapsing Box is remembered', async () => {
+      await user.click(cardHeader(canvas, 'Box'));
+      await waitFor(() =>
+        expect(cardCollapse(canvas, 'Box')).toHaveClass('collapsed')
+      );
+      await expect(store.state.options.basicModeCollapsedSections.layout).toBe(
         true
       );
     });
 
-    await step('so it stays open for the next element', async () => {
+    await step('so it stays collapsed for the next element', async () => {
       await pressKey('i');
       await pick(quote);
-      await waitFor(() =>
-        expect(cardCollapse(canvas, 'Text')).not.toHaveClass('collapsed')
-      );
-      await expect(cardCollapse(canvas, 'Box')).not.toHaveClass('collapsed');
-    });
-
-    await step('closing it by hand forgets the preference', async () => {
-      await user.click(boxHeader());
-      await waitFor(() =>
-        expect(cardCollapse(canvas, 'Box')).toHaveClass('collapsed')
-      );
-      await expect(store.state.options.basicModeOpenedSections.layout).toBe(
-        false
-      );
-
       await pressKey('i');
       await pick(heading);
-      await pressKey('i');
-      await pick(quote);
-      await waitFor(() =>
-        expect(cardCollapse(canvas, 'Text')).not.toHaveClass('collapsed')
-      );
       await expect(cardCollapse(canvas, 'Box')).toHaveClass('collapsed');
+      await expect(cardCollapse(canvas, 'Text')).not.toHaveClass('collapsed');
     });
   },
 };
 
 export const CollapseAll: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'every panel can be collapsed and none stays remembered as open',
+  name: 'every section can be collapsed and each is remembered as collapsed',
   play: async ({ canvasElement }) => {
     const store = storeOf(canvasElement);
 
     await collapseAllCards(canvasElement);
     await expect(
-      Object.values(store.state.options.basicModeOpenedSections)
-    ).not.toContain(true);
+      Object.values(store.state.options.basicModeCollapsedSections).filter(
+        Boolean
+      )
+    ).toHaveLength(5);
   },
 };
 

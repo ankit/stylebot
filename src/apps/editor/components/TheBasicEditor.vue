@@ -52,7 +52,10 @@
 <script lang="ts">
 import Vue from 'vue';
 import type { Declaration, Rule } from 'postcss';
-import type { StylebotBasicModeSections } from '@stylebot/types';
+import type {
+  StylebotBasicModeSection,
+  StylebotCollapsedSections,
+} from '@stylebot/types';
 import { getPageBridge } from '@stylebot/page-bridge';
 
 import PropertyCard from './basic/PropertyCard.vue';
@@ -85,28 +88,26 @@ export default Vue.extend({
   },
 
   data(): {
-    open: StylebotBasicModeSections;
     unsubscribeComputedStyles: (() => void) | null;
   } {
     return {
       unsubscribeComputedStyles: null,
-      open: {
-        text: false,
-        colors: false,
-        layout: false,
-        effects: false,
-        more: false,
-      },
     };
   },
 
   computed: {
-    activeSelector(): string {
-      return this.$store.state.activeSelector;
-    },
+    // Only collapsed sections are saved, so any other section is open.
+    open(): Record<StylebotBasicModeSection, boolean> {
+      const collapsed: StylebotCollapsedSections =
+        this.$store.state.options.basicModeCollapsedSections;
 
-    userOpened(): StylebotBasicModeSections {
-      return this.$store.state.options.basicModeOpenedSections;
+      return {
+        text: !collapsed.text,
+        colors: !collapsed.colors,
+        layout: !collapsed.layout,
+        effects: !collapsed.effects,
+        more: !collapsed.more,
+      };
     },
 
     activeRule(): Rule | null {
@@ -142,16 +143,6 @@ export default Vue.extend({
   },
 
   watch: {
-    // Reflect what's actually styled on the newly picked element: open the
-    // panels with matching declarations (Text alone when nothing is styled
-    // yet), plus whichever panels the user opened by hand.
-    activeSelector: {
-      immediate: true,
-      handler(): void {
-        this.autoExpandSections();
-      },
-    },
-
     computedStylesInputs: {
       immediate: true,
       handler(): void {
@@ -191,29 +182,10 @@ export default Vue.extend({
       return count;
     },
 
-    autoExpandSections(): void {
-      const text = this.textCount > 0;
-      const colors = this.colorCount > 0;
-      const layout = this.layoutCount > 0;
-      const effects = this.effectsCount > 0;
-      const more = this.moreCount > 0;
-      const styled = text || colors || layout || effects || more;
-
-      this.open = {
-        text: (styled ? text : true) || this.userOpened.text,
-        colors: colors || this.userOpened.colors,
-        layout: layout || this.userOpened.layout,
-        effects: effects || this.userOpened.effects,
-        more: more || this.userOpened.more,
-      };
-    },
-
-    toggle(name: keyof StylebotBasicModeSections): void {
-      const next = !this.open[name];
-      this.open = { ...this.open, [name]: next };
-      this.$store.dispatch('setBasicModeOpenedSections', {
-        ...this.userOpened,
-        [name]: next,
+    toggle(name: StylebotBasicModeSection): void {
+      this.$store.dispatch('setBasicModeCollapsedSections', {
+        ...this.$store.state.options.basicModeCollapsedSections,
+        [name]: this.open[name],
       });
     },
   },

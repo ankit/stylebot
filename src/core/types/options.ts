@@ -1,12 +1,16 @@
 export type StylebotEditingMode = 'basic' | 'magic' | 'code';
 
-export type StylebotBasicModeSections = {
-  text: boolean;
-  colors: boolean;
-  layout: boolean;
-  effects: boolean;
-  more: boolean;
-};
+export type StylebotBasicModeSection =
+  | 'text'
+  | 'colors'
+  | 'layout'
+  | 'effects'
+  | 'more';
+
+// The Basic tab sections the user collapsed; every other section is open.
+export type StylebotCollapsedSections = Partial<
+  Record<StylebotBasicModeSection, boolean>
+>;
 
 export type EditorWindowBounds = {
   width: number;
@@ -54,7 +58,7 @@ export type StylebotOptions = {
   fonts: StylebotFonts;
   layout: StylebotLayout;
   mode: StylebotEditingMode;
-  basicModeOpenedSections: StylebotBasicModeSections;
+  basicModeCollapsedSections: StylebotCollapsedSections;
   appearance: StylebotAppearance;
   // Colour theme for the code editor, shown in its light or dark variant.
   codeTheme: StylebotCodeTheme;

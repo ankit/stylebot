@@ -8,13 +8,7 @@ export const defaultOptions: StylebotOptions = {
   mode: 'basic',
   contextMenu: true,
   fonts: [],
-  basicModeOpenedSections: {
-    text: false,
-    colors: false,
-    layout: false,
-    effects: false,
-    more: false,
-  },
+  basicModeCollapsedSections: {},
   layout: {
     width: 360,
     adjustPageLayout: false,
