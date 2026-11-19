@@ -103,7 +103,7 @@ export default Vue.extend({
 
 <style lang="scss">
 .stylebot-code-editor-iframe {
-  height: calc(100% - 5px);
+  height: 100%;
   position: relative;
 
   iframe {
