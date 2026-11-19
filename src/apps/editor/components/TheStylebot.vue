@@ -10,6 +10,7 @@
 
         <div
           class="stylebot-body"
+          :class="{ 'stable-gutter': mode === 'basic' }"
           :style="
             colorPickerVisible || !pageConnected ? 'pointer-events: none' : ''
           "
@@ -148,6 +149,10 @@ export default Vue.extend({
   flex-direction: column;
   min-height: 0;
   overflow: auto;
+
+  &.stable-gutter {
+    scrollbar-gutter: stable;
+  }
 
   @include thin-scrollbar;
 }

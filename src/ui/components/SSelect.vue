@@ -123,7 +123,7 @@ export default Vue.extend({
   min-width: 108px;
   padding: 5px 8px 5px 10px;
   font-size: 13px;
-  line-height: 1.2;
+  line-height: 16px;
   color: var(--select-ink, var(--field-ink));
   outline: none;
   cursor: pointer;
