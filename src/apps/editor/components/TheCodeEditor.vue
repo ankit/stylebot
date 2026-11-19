@@ -173,6 +173,10 @@ export default Vue.extend({
           this.handleIframeCssUpdate(message.data.css);
           break;
 
+        case 'stylebotCodeThemePicked':
+          this.$store.dispatch('setCodeTheme', message.data.codeTheme);
+          break;
+
         case 'stylebotEscapePressed':
           this.applyTypedCss.flush();
           this.$emit('leave');

@@ -31,6 +31,7 @@ import type {
   StylebotLayout,
   StylebotDockLocation,
   StylebotAppearance,
+  StylebotCodeTheme,
   GalleryScreenshotResponse,
   ResetGalleryProfileResponse,
 } from '@stylebot/types';
@@ -453,6 +454,14 @@ export default {
   ): void {
     setOption('appearance', appearance);
     commit('setOptions', { ...state.options, appearance });
+  },
+
+  setCodeTheme(
+    { state, commit }: { state: State; commit: Commit },
+    codeTheme: StylebotCodeTheme
+  ): void {
+    setOption('codeTheme', codeTheme);
+    commit('setOptions', { ...state.options, codeTheme });
   },
 
   setBasicModeOpenedSections(

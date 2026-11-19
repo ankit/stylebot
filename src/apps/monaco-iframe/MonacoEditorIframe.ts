@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { ThemeRegistration } from '@shikijs/primitive';
+import { type CodeThemeMenu, createCodeThemeMenu } from './CodeThemeMenu';
+import type { CssHighlighting } from './shiki';
+import { isCodeTheme, loadCodeTheme } from './themes';
 import type { IframeMessage, ParentMessage } from '@stylebot/monaco-editor';
+import { t } from '@stylebot/i18n';
+import type { StylebotCodeTheme } from '@stylebot/types';
 import { isSaveShortcut } from '@stylebot/utils';
 
 declare global {
@@ -29,19 +33,19 @@ class MonacEditorIframe {
     new URLSearchParams(window.location.search).get('theme') === 'dark'
       ? 'dark'
       : 'light';
-  // Set once Shiki colours CSS, after which Monaco can switch between themes.
-  highlighted = false;
+  codeTheme: StylebotCodeTheme = this.getInitialCodeTheme();
+  definedCodeThemes = new Set<StylebotCodeTheme>();
+  highlighting?: CssHighlighting;
+  codeThemeMenu?: CodeThemeMenu;
+  // Each Monaco theme's status bar colours, which Monaco itself ignores.
+  statusBarColors = new Map<string, Record<string, string>>();
+  // Shown while arrowing through the code theme picker, before it's kept.
+  previewedCodeTheme?: StylebotCodeTheme;
   // Fetched alongside Monaco rather than bundled, so the entry stays small.
   shiki = Promise.all([
     import(/* webpackChunkName: "monaco-editor/iframe/shiki" */ './shiki'),
     import(
       /* webpackChunkName: "monaco-editor/iframe/shiki" */ '@shikijs/langs/dist/css.mjs'
-    ),
-    import(
-      /* webpackChunkName: "monaco-editor/iframe/shiki" */ './themes/stylebot-light.json'
-    ),
-    import(
-      /* webpackChunkName: "monaco-editor/iframe/shiki" */ './themes/stylebot-dark.json'
     ),
   ]);
 
@@ -52,10 +56,14 @@ class MonacEditorIframe {
     window.addEventListener('message', (message: { data: ParentMessage }) => {
       if (message.data.type === 'stylebotThemeUpdate') {
         this.setTheme(message.data.theme);
+
+        if (message.data.codeTheme) {
+          this.setCodeTheme(message.data.codeTheme);
+        }
       }
     });
     this.loadEditor(async () => {
-      await this.highlightCss();
+      await this.defineCodeTheme(this.codeTheme);
       this.attachWindowListeners();
       this.configureCssLanguage();
       this.initEditor();
@@ -127,34 +135,141 @@ class MonacEditorIframe {
     window.require(['vs/editor/editor.main'], callback);
   }
 
-  /**
-   * Colours CSS with VS Code's grammar and Stylebot's light and dark themes,
-   * before the editor's model exists so it never shows uncoloured.
-   */
-  async highlightCss(): Promise<void> {
-    try {
-      const [{ highlightCss }, css, light, dark] = await this.shiki;
+  getInitialCodeTheme(): StylebotCodeTheme {
+    const name = new URLSearchParams(window.location.search).get('codeTheme');
 
-      highlightCss(window.monaco, css.default, [
-        { ...(light.default as ThemeRegistration), name: 'stylebot-light' },
-        { ...(dark.default as ThemeRegistration), name: 'stylebot-dark' },
+    return isCodeTheme(name) ? name : 'stylebot';
+  }
+
+  /**
+   * Registers both variants of a code theme with Monaco, fetching them first
+   * if they aren't bundled. Falls back to Stylebot's own if the fetch fails.
+   * The first theme also starts Shiki, which colours every CSS model.
+   */
+  async defineCodeTheme(name: StylebotCodeTheme): Promise<void> {
+    if (this.definedCodeThemes.has(name)) {
+      return;
+    }
+
+    try {
+      const [{ light, dark }, [{ highlightCss }, css]] = await Promise.all([
+        loadCodeTheme(name),
+        this.shiki,
       ]);
-      this.highlighted = true;
+
+      [light, dark].forEach(({ name: id, colors = {} }) =>
+        this.statusBarColors.set(id as string, colors)
+      );
+
+      if (this.highlighting) {
+        this.highlighting.addThemes([light, dark]);
+      } else {
+        this.highlighting = highlightCss(window.monaco, css.default, [
+          light,
+          dark,
+        ]);
+      }
+
+      this.definedCodeThemes.add(name);
     } catch (error) {
       console.error(error);
+
+      if (name !== 'stylebot' && this.codeTheme === name) {
+        this.codeTheme = 'stylebot';
+        await this.defineCodeTheme('stylebot');
+      }
     }
   }
 
-  getMonacoTheme(): 'stylebot-light' | 'stylebot-dark' {
-    return this.theme === 'dark' ? 'stylebot-dark' : 'stylebot-light';
+  getMonacoTheme(): string {
+    return `${this.codeTheme}-${this.theme}`;
+  }
+
+  async setCodeTheme(name: StylebotCodeTheme): Promise<void> {
+    if (name === this.codeTheme) {
+      return;
+    }
+
+    this.codeTheme = name;
+
+    if (!window.monaco) {
+      return;
+    }
+
+    await this.defineCodeTheme(name);
+
+    // A newer pick may have landed while this one was loading.
+    if (this.codeTheme === name) {
+      this.applyMonacoTheme(this.getMonacoTheme());
+    }
+
+    this.codeThemeMenu?.refresh();
+  }
+
+  async previewCodeTheme(name: StylebotCodeTheme): Promise<void> {
+    this.previewedCodeTheme = name;
+    await this.defineCodeTheme(name);
+
+    if (this.previewedCodeTheme === name && this.definedCodeThemes.has(name)) {
+      this.applyMonacoTheme(`${name}-${this.theme}`);
+    }
+  }
+
+  endCodeThemePreview(): void {
+    this.previewedCodeTheme = undefined;
+    this.applyMonacoTheme(this.getMonacoTheme());
+    this.editor.focus();
+  }
+
+  /**
+   * Keeps a theme picked in the editor and asks the panel to save it, which
+   * the panel's own setting then echoes back.
+   */
+  async pickCodeTheme(name: StylebotCodeTheme): Promise<void> {
+    this.postMessage({ type: 'stylebotCodeThemePicked', codeTheme: name });
+
+    if (name === this.codeTheme) {
+      this.endCodeThemePreview();
+      return;
+    }
+
+    this.previewedCodeTheme = undefined;
+    this.editor.focus();
+    await this.setCodeTheme(name);
+  }
+
+  /**
+   * Switches Monaco's theme and colours the status bar under the editor
+   * from the same theme file.
+   */
+  applyMonacoTheme(id: string): void {
+    window.monaco.editor.setTheme(id);
+    this.colorStatusBar(id);
+  }
+
+  colorStatusBar(id: string): void {
+    const colors = this.statusBarColors.get(id) ?? {};
+    const { style } = document.documentElement;
+
+    [
+      ['--status-bar-background', 'statusBar.background'],
+      ['--status-bar-foreground', 'statusBar.foreground'],
+      ['--status-bar-border', 'statusBar.border'],
+      ['--status-bar-item-hover', 'statusBarItem.hoverBackground'],
+    ].forEach(([variable, key]) =>
+      colors[key]
+        ? style.setProperty(variable, colors[key])
+        : style.removeProperty(variable)
+    );
   }
 
   setTheme(theme: 'light' | 'dark'): void {
     this.theme = theme;
     // Keeps the pre-Monaco-load background (see theme-init.js) in sync too.
     document.documentElement.classList.toggle('theme-dark', theme === 'dark');
-    if (this.highlighted) {
-      window.monaco.editor.setTheme(this.getMonacoTheme());
+
+    if (window.monaco && this.definedCodeThemes.has(this.codeTheme)) {
+      this.applyMonacoTheme(this.getMonacoTheme());
     }
   }
 
@@ -179,6 +294,21 @@ class MonacEditorIframe {
     const editorOptions = this.getEditorOptions();
 
     this.editor = window.monaco.editor.create(container, editorOptions);
+    this.colorStatusBar(editorOptions.theme);
+
+    this.codeThemeMenu = createCodeThemeMenu({
+      codeTheme: () => this.codeTheme,
+      previewCodeTheme: name => this.previewCodeTheme(name),
+      pickCodeTheme: name => this.pickCodeTheme(name),
+      cancel: () => this.endCodeThemePreview(),
+    });
+
+    this.editor.addAction({
+      id: 'stylebot.codeTheme',
+      label: t('code_theme'),
+      contextMenuGroupId: 'z_stylebot',
+      run: () => this.codeThemeMenu?.open(),
+    });
     this.editor.onDidChangeModelContent(() => {
       // A late echo of css the panel has since replaced would be applied
       // over the newer css.
