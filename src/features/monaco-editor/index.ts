@@ -1,3 +1,5 @@
+import type { StylebotCodeTheme } from '@stylebot/types';
+
 export { default as MonacoEditor } from './MonacoEditor.vue';
 
 export type IframeCssUpdatedMessage = {
@@ -17,7 +19,13 @@ export type IframeSaveMessage = {
   type: 'stylebotSavePressed';
 };
 
+export type IframeCodeThemePickedMessage = {
+  type: 'stylebotCodeThemePicked';
+  codeTheme: StylebotCodeTheme;
+};
+
 export type IframeMessage =
+  | IframeCodeThemePickedMessage
   | IframeCssUpdatedMessage
   | IframeLoadedMessage
   | IframeEscapeMessage
@@ -42,6 +50,7 @@ export type ParentFocusEditorMessage = {
 export type ParentThemeUpdateMessage = {
   type: 'stylebotThemeUpdate';
   theme: 'light' | 'dark';
+  codeTheme?: StylebotCodeTheme;
 };
 
 export type ParentMessage =

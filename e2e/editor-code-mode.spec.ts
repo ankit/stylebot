@@ -65,6 +65,40 @@ test('the code editor colours CSS custom properties as variables', async ({
   ).toHaveCSS('color', /rgb\((116, 100, 159|191, 181, 226)\)/);
 });
 
+test('a code theme picked from the code editor’s status bar is saved', async ({
+  context,
+  openPopup,
+}) => {
+  test.slow();
+
+  await servePage(context, PAGE_HTML);
+
+  const page = await context.newPage();
+  await page.goto(PAGE_URL);
+
+  let editorRoot = await openEditor(page, openPopup);
+  await switchEditorMode(editorRoot, 'code');
+
+  // Solarized's background, in its light or dark variant.
+  const solarized = /rgb\((253, 246, 227|0, 43, 54)\)/;
+  let monaco = getMonacoFrame(page);
+  await monaco.getByRole('button', { name: 'Code theme' }).click();
+  await monaco.getByRole('option', { name: 'Solarized' }).click();
+  await expect(monaco.locator('.monaco-editor-background').first()).toHaveCSS(
+    'background-color',
+    solarized
+  );
+
+  await page.reload();
+  editorRoot = await openEditor(page, openPopup);
+  await switchEditorMode(editorRoot, 'code');
+  monaco = getMonacoFrame(page);
+  await expect(monaco.locator('.monaco-editor-background').first()).toHaveCSS(
+    'background-color',
+    solarized
+  );
+});
+
 test('toggling the panel appearance updates the Monaco editor theme immediately', async ({
   context,
   openPopup,

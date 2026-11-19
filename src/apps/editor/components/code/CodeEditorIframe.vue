@@ -11,7 +11,7 @@ import type {
   ParentThemeUpdateMessage,
 } from '@stylebot/monaco-editor';
 import { resolveAppearance, getSystemPreference } from '@stylebot/utils';
-import type { StylebotAppearance } from '@stylebot/types';
+import type { StylebotAppearance, StylebotCodeTheme } from '@stylebot/types';
 
 export default Vue.extend({
   name: 'CodeEditorIframe',
@@ -27,10 +27,11 @@ export default Vue.extend({
     // changes are pushed live — see the resolvedTheme watcher below.
     const appearance = this.$store.state.options?.appearance ?? 'system';
     const theme = resolveAppearance(appearance, getSystemPreference());
+    const codeTheme = this.$store.state.options?.codeTheme ?? 'stylebot';
 
     return {
       src: chrome.runtime.getURL(
-        `monaco-editor/iframe/index.html?theme=${theme}`
+        `monaco-editor/iframe/index.html?theme=${theme}&codeTheme=${codeTheme}`
       ),
       ready: false,
       systemPreference: getSystemPreference(),
@@ -46,11 +47,19 @@ export default Vue.extend({
     resolvedTheme(): 'light' | 'dark' {
       return resolveAppearance(this.appearance, this.systemPreference);
     },
+
+    codeTheme(): StylebotCodeTheme {
+      return this.$store.state.options?.codeTheme ?? 'stylebot';
+    },
   },
 
   watch: {
     resolvedTheme(theme: 'light' | 'dark') {
       this.postTheme(theme);
+    },
+
+    codeTheme() {
+      this.postTheme(this.resolvedTheme);
     },
   },
 
@@ -87,6 +96,7 @@ export default Vue.extend({
       const message: ParentThemeUpdateMessage = {
         type: 'stylebotThemeUpdate',
         theme,
+        codeTheme: this.codeTheme,
       };
       (this.$refs.iframe as HTMLIFrameElement).contentWindow?.postMessage(
         message,

@@ -36,7 +36,11 @@
     "editorBracketMatch.border": "#7aa2f700",
     "editorBracketHighlight.foreground1": "#a8bff7",
     "editorBracketHighlight.foreground2": "#bfb5e2",
-    "editorBracketHighlight.foreground3": "#88c6da"
+    "editorBracketHighlight.foreground3": "#88c6da",
+    "statusBar.background": "#161719",
+    "statusBar.foreground": "#9aa1ae",
+    "statusBar.border": "#2c2e33",
+    "statusBarItem.hoverBackground": "#ffffff12"
   },
   "tokenColors": [
     {

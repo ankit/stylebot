@@ -1,10 +1,19 @@
 import MonacoEditorIframe from './MonacoEditorIframe';
 
-jest.mock('./shiki', () => ({ highlightCss: jest.fn() }));
+jest.mock('./shiki', () => ({
+  highlightCss: () => ({ addThemes: jest.fn() }),
+}));
 // Jest follows the package's exports map, which leaves this path out.
 jest.mock('@shikijs/langs/dist/css.mjs', () => ({ default: [] }), {
   virtual: true,
 });
+jest.mock('./themes', () => ({
+  ...jest.requireActual('./themes'),
+  loadCodeTheme: async (name: string) => ({
+    light: { name: `${name}-light` },
+    dark: { name: `${name}-dark` },
+  }),
+}));
 
 /**
  * A stand-in for Monaco's editor that holds plain text and reports every
@@ -57,6 +66,7 @@ const createFakeEditor = () => {
       layout: jest.fn(),
       updateOptions: jest.fn(),
       deltaDecorations: () => [],
+      addAction: jest.fn(),
     },
   };
 };
@@ -72,16 +82,14 @@ describe('MonacoEditorIframe', () => {
   let fake: ReturnType<typeof createFakeEditor>;
   let posted: Array<{ type: string; css?: string }>;
 
-  // Setup finishes once Shiki is ready, a few promise turns later.
-  const settle = () => new Promise(resolve => setTimeout(resolve));
-
-  beforeEach(async () => {
+  beforeEach(() => {
     fake = createFakeEditor();
     posted = [];
     document.body.innerHTML = '<div id="container"></div>';
 
     (global as unknown as { chrome: unknown }).chrome = {
       runtime: { getURL: (path: string) => path },
+      i18n: { getMessage: (key: string) => key },
     };
     (global as unknown as { ResizeObserver: unknown }).ResizeObserver = class {
       observe() {
@@ -115,7 +123,6 @@ describe('MonacoEditorIframe', () => {
       .mockImplementation(message => posted.push(message));
 
     new MonacoEditorIframe();
-    await settle();
   });
 
   afterEach(() => {
@@ -193,11 +200,48 @@ describe('MonacoEditorIframe', () => {
 
     it('asks the options page to save instead of the browser saving the page', async () => {
       new MonacoEditorIframe('options');
-      await settle();
+      // Setup finishes once the code theme has loaded.
+      await new Promise(resolve => setTimeout(resolve));
       const event = pressSave();
 
       expect(saves()).toEqual([{ type: 'stylebotSavePressed' }]);
       expect(event.defaultPrevented).toBe(true);
+    });
+  });
+
+  describe('code theme', () => {
+    const settle = () => new Promise(resolve => setTimeout(resolve, 10));
+
+    afterEach(() => {
+      window.history.replaceState({}, '', '/');
+    });
+
+    it('opens in the picked theme and switches when the panel picks another', async () => {
+      window.history.replaceState({}, '', '/?theme=dark&codeTheme=solarized');
+      const create = jest.spyOn(window.monaco.editor, 'create');
+
+      new MonacoEditorIframe();
+      await settle();
+
+      expect(create).toHaveBeenCalledWith(
+        expect.anything(),
+        expect.objectContaining({ theme: 'solarized-dark' })
+      );
+
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: {
+            type: 'stylebotThemeUpdate',
+            theme: 'light',
+            codeTheme: 'github',
+          },
+        })
+      );
+      await settle();
+
+      expect(window.monaco.editor.setTheme).toHaveBeenLastCalledWith(
+        'github-light'
+      );
     });
   });
 });

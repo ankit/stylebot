@@ -12,15 +12,10 @@
     max-width: none !important;
     margin-top: 0;
     border: 0;
-    border-bottom: 1px solid #eceef1;
+    border-bottom: 1px solid var(--vscode-editorStickyScroll-border);
     border-radius: 0;
     box-shadow: none;
-    background: #fcfcfd;
-
-    html.theme-dark & {
-      border-bottom-color: #2c2e33;
-      background: #1a1b1e;
-    }
+    background: var(--vscode-editor-background);
 
     > .find-part .monaco-findInput {
       max-width: 360px;
@@ -33,11 +28,7 @@
     }
 
     .matchesCount {
-      color: #9aa0aa;
-
-      html.theme-dark & {
-        color: #8a8f98;
-      }
+      color: var(--vscode-editorLineNumber-activeForeground);
     }
 
     &.reduced-find-widget .matchesCount {
@@ -165,6 +156,116 @@
         box-shadow: 0 0 0 2px #fff, 0 0 0 3px rgb(0 0 0 / 25%),
           0 1px 3px rgb(0 0 0 / 40%);
       }
+    }
+  }
+}
+
+.code-editor-footer {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: flex-end;
+  height: 22px;
+  border-top: 1px solid
+    var(--status-bar-border, var(--vscode-editorStickyScroll-border));
+  background: var(--status-bar-background, var(--vscode-editor-background));
+  color: var(
+    --status-bar-foreground,
+    var(--vscode-editorLineNumber-activeForeground)
+  );
+}
+
+.code-theme-button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 100%;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font: 11px/1 Geist, system-ui, sans-serif;
+  color: color-mix(
+    in srgb,
+    currentcolor 60%,
+    var(--status-bar-background, var(--vscode-editor-background))
+  );
+  cursor: pointer;
+
+  &:hover,
+  &[aria-expanded='true'] {
+    background: var(--status-bar-item-hover, rgb(128 128 128 / 16%));
+    color: inherit;
+  }
+
+  &:focus-visible {
+    outline: 1px solid var(--vscode-focusBorder);
+    outline-offset: -1px;
+  }
+}
+
+.code-theme-list {
+  position: fixed;
+  right: 8px;
+  bottom: 26px;
+  z-index: 60;
+  box-sizing: border-box;
+  width: 168px;
+  max-height: calc(100vh - 36px);
+  overflow-y: auto;
+  padding: 4px;
+  border: 1px solid #dcdfe5;
+  border-radius: 11px;
+  background: #fff;
+  box-shadow: 0 14px 32px rgb(0 0 0 / 20%);
+  font: 13px/1.2 Geist, system-ui, sans-serif;
+  color: #3a3f47;
+  outline: none;
+
+  &[hidden] {
+    display: none;
+  }
+
+  html.theme-dark & {
+    border-color: #3a3e46;
+    background: #23262b;
+    box-shadow: 0 14px 32px rgb(0 0 0 / 45%);
+    color: #d7dae0;
+  }
+}
+
+.code-theme-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 8px;
+  border-radius: 7px;
+  cursor: pointer;
+
+  svg {
+    visibility: hidden;
+    color: #2a5fd6;
+  }
+
+  &[aria-selected='true'] svg {
+    visibility: visible;
+  }
+
+  &.active {
+    background: rgb(0 0 0 / 6%);
+  }
+
+  html.theme-dark & {
+    svg {
+      color: #7aa2f7;
+    }
+
+    &.active {
+      background: rgb(255 255 255 / 8%);
     }
   }
 }

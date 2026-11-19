@@ -21,6 +21,7 @@ export const defaultOptions: StylebotOptions = {
     dockLocation: 'right',
   },
   appearance: 'system',
+  codeTheme: 'stylebot',
   lastColorSet: 'neutrals',
   cliAccess: false,
   gallerySuggestions: true,

@@ -41,6 +41,13 @@ export type StylebotLayout = {
 
 export type StylebotFonts = Array<string>;
 export type StylebotAppearance = 'light' | 'dark' | 'system';
+export type StylebotCodeTheme =
+  | 'stylebot'
+  | 'catppuccin'
+  | 'github'
+  | 'gruvbox'
+  | 'rose-pine'
+  | 'solarized';
 
 export type StylebotOptions = {
   contextMenu: boolean;
@@ -49,6 +56,8 @@ export type StylebotOptions = {
   mode: StylebotEditingMode;
   basicModeOpenedSections: StylebotBasicModeSections;
   appearance: StylebotAppearance;
+  // Colour theme for the code editor, shown in its light or dark variant.
+  codeTheme: StylebotCodeTheme;
   // Key of the last-picked Palette option — a built-in set, or a scheme name from color-schemes.ts.
   lastColorSet: string;
   // Lets the stylebot CLI connect, while its optional permissions are granted too.
