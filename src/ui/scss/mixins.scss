@@ -62,9 +62,9 @@
   border-radius: $radius;
 }
 
-// Borderless filled variant of field-border, for the Basic panel's controls.
+// Filled variant of field-border with a subtler edge, for the Basic panel's controls.
 @mixin field-fill($radius: 7px) {
-  border: 1px solid transparent;
+  border: 1px solid var(--field-fill-border);
   border-radius: $radius;
   background: var(--field-surface);
 }

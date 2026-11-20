@@ -2,9 +2,6 @@
   <div class="property-row">
     <div class="property-row-main">
       <div class="property-row-heading">
-        <s-text size="label" variant="muted" class="property-row-label">
-          {{ label }}
-        </s-text>
         <other-rule-hint v-if="otherRule" :selector="otherRule.selector" />
         <other-rule-hint
           v-else-if="overridingRule"
@@ -12,6 +9,9 @@
           :everywhere="overridingRule.everywhere"
           overrides
         />
+        <s-text size="label" variant="muted" class="property-row-label">
+          {{ label }}
+        </s-text>
       </div>
       <div class="property-row-control"><slot /></div>
     </div>
@@ -70,18 +70,19 @@ export default Vue.extend({
 
 .property-row-main {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   min-height: 28px;
   gap: 4px 6px;
 }
 
 .property-row-heading {
-  flex: 0 1 auto;
+  flex: 0 0 92px;
   min-width: 0;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 4px;
+  margin-right: 6px;
 }
 
 .property-row-label {
@@ -95,11 +96,10 @@ export default Vue.extend({
 }
 
 .property-row-control {
-  flex: none;
-  margin-left: auto;
+  flex: 1 1 auto;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
-  min-width: 108px;
+  justify-content: flex-start;
+  min-width: 0;
 }
 </style>

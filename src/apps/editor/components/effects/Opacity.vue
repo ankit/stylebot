@@ -12,6 +12,7 @@
       />
 
       <s-number-field
+        class="compact-field"
         unit="%"
         placeholder="100"
         :value="percent"
@@ -82,13 +83,20 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .opacity-control {
+  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
 .opacity-slider {
+  flex: 1;
+  min-width: 60px;
+}
+
+.compact-field.number-field {
   flex: none;
-  width: 100px;
+  width: 64px;
 }
 </style>

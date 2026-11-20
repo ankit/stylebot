@@ -209,6 +209,11 @@ export default Vue.extend({
 
   // Only the numeric input highlights the whole field — the chevron button
   // gets its own focus ring instead (see .number-chevron).
+  &:has(.number-input:placeholder-shown) {
+    background: transparent;
+    border-color: var(--field-fill-border);
+  }
+
   &:has(.number-input:focus) {
     @include field-active-border;
   }
