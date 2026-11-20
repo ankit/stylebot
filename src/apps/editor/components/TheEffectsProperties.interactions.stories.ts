@@ -11,6 +11,7 @@ import {
   setRange,
   storeOf,
   user,
+  openCard,
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
@@ -29,6 +30,7 @@ export const OpacitySlider: StoryObj = {
   ...editor(WITH_RULE),
   name: 'the opacity slider clears at 1 and applies other values',
   play: async ({ canvasElement }) => {
+    await openCard(within(canvasElement), 'Effects');
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
     const control = propertyControl(canvas, 'Opacity');
@@ -49,6 +51,7 @@ export const FilterControl: StoryObj = {
   ...editor(WITH_RULE),
   name: 'picking a filter applies its default amount, its amount field or slider adjusts it, None clears it',
   play: async ({ canvasElement }) => {
+    await openCard(within(canvasElement), 'Effects');
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
     const control = propertyControl(canvas, 'Filter');

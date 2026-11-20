@@ -11,6 +11,7 @@ import {
   propertyControl,
   storeOf,
   user,
+  openCard,
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
@@ -66,6 +67,7 @@ export const BorderControls: StoryObj = {
   ...editor(WITH_RULE),
   name: 'the border controls read through the shorthand and update style and width',
   play: async ({ canvasElement }) => {
+    await openCard(within(canvasElement), 'Border');
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
     const control = propertyControl(canvas, 'Style');
@@ -101,6 +103,7 @@ export const BorderWidthOnly: StoryObj = {
   ...editor({ css: 'h1 { border-width: 2px; }', activeSelector: 'h1' }),
   name: 'a border-width alone shows its width with no style selected',
   play: async ({ canvasElement }) => {
+    await openCard(within(canvasElement), 'Border');
     const canvas = within(canvasElement);
     const control = propertyControl(canvas, 'Style');
 
@@ -115,6 +118,7 @@ export const BorderSides: StoryObj = {
   ...editor(WITH_RULE),
   name: 'picking sides moves the border onto them, and width edits reach every picked side',
   play: async ({ canvasElement, step }) => {
+    await openCard(within(canvasElement), 'Border');
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
     const side = (name: string) => canvas.getByRole('button', { name });
@@ -161,6 +165,7 @@ export const RadiusField: StoryObj = {
   ...editor(WITH_RULE),
   name: 'the radius field applies typed values',
   play: async ({ canvasElement }) => {
+    await openCard(within(canvasElement), 'Border');
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
     const input = numberInput(propertyControl(canvas, 'Radius'));

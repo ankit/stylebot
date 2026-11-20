@@ -8,6 +8,7 @@ import {
   propertyCard,
   storeOf,
   user,
+  openCard,
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
@@ -33,6 +34,7 @@ export const ListsUnknownDeclarations: StoryObj = {
   ...editor(WITH_RULE),
   name: 'lists the declarations no other panel edits',
   play: async ({ canvasElement }) => {
+    await openCard(within(canvasElement), 'More properties');
     const card = propertyCard(within(canvasElement), 'More properties');
 
     // Only what no other panel edits shows up here.
@@ -44,6 +46,7 @@ export const EditInPlace: StoryObj = {
   ...editor(WITH_RULE),
   name: 'a value edits in place and Escape reverts it',
   play: async ({ canvasElement }) => {
+    await openCard(within(canvasElement), 'More properties');
     const store = storeOf(canvasElement);
     const card = within(propertyCard(within(canvasElement), 'More properties'));
     const value = card.getByLabelText('letter-spacing') as HTMLInputElement;
@@ -63,6 +66,7 @@ export const AddProperty: StoryObj = {
   ...editor(WITH_RULE),
   name: 'Enter adds a typed property and Escape abandons one',
   play: async ({ canvasElement }) => {
+    await openCard(within(canvasElement), 'More properties');
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
     const card = within(propertyCard(canvas, 'More properties'));
@@ -95,6 +99,7 @@ export const RemoveProperty: StoryObj = {
   ...editor(WITH_RULE),
   name: 'removing a property keeps the rest of the rule',
   play: async ({ canvasElement }) => {
+    await openCard(within(canvasElement), 'More properties');
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
     const card = within(propertyCard(canvas, 'More properties'));
@@ -124,6 +129,7 @@ export const PageRows: StoryObj = {
   ...editor(WITH_RULE),
   name: "the page's own values show dimmed and typing one adds it to the rule",
   play: async ({ canvasElement, step }) => {
+    await openCard(within(canvasElement), 'More properties');
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
     const pageRows = () =>
@@ -163,6 +169,7 @@ export const TruncatedRowTooltip: StoryObj = {
   ...editor(WITH_RULE),
   name: 'a row whose name is cut off shows the whole declaration on hover',
   play: async ({ canvasElement }) => {
+    await openCard(within(canvasElement), 'More properties');
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
     const long = '-webkit-tap-highlight-color-and-then-some-more';

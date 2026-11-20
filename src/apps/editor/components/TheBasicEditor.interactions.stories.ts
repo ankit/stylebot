@@ -89,20 +89,32 @@ export const SectionsStayAsLeft: StoryObj = {
     { css: 'div.sb-page h1 { margin: 10px; }', inspecting: true },
     { page: PANEL_STATE_PAGE }
   ),
-  name: 'sections start open and stay as the user leaves them across picks',
+  name: 'the common sections start open, the rest collapsed, and each stays as the user leaves it across picks',
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
     const heading = canvas.getByRole('heading', { level: 1 });
     const quote = canvas.getByText('Pick an element to start.');
 
-    await step('every section starts open', async () => {
-      await pick(heading);
-      await waitFor(() =>
-        expect(cardCollapse(canvas, 'Layout')).not.toHaveClass('collapsed')
-      );
-      await expect(cardCollapse(canvas, 'Text')).not.toHaveClass('collapsed');
-    });
+    await step(
+      'Text, Colors and Layout start open, the rest collapsed',
+      async () => {
+        await pick(heading);
+        await waitFor(() =>
+          expect(cardCollapse(canvas, 'Layout')).not.toHaveClass('collapsed')
+        );
+
+        for (const label of ['Text', 'Colors']) {
+          await expect(cardCollapse(canvas, label)).not.toHaveClass(
+            'collapsed'
+          );
+        }
+
+        for (const label of ['Border', 'Effects', 'More properties']) {
+          await expect(cardCollapse(canvas, label)).toHaveClass('collapsed');
+        }
+      }
+    );
 
     await step('collapsing Layout is remembered', async () => {
       await user.click(cardHeader(canvas, 'Layout'));
