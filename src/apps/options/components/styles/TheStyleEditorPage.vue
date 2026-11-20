@@ -24,7 +24,7 @@
 
       <s-toggle-switch
         v-if="existingStyle"
-        class="enabled-toggle"
+        class="header-toggle"
         :value="existingStyle.enabled"
         @change="onToggleEnabled"
       >
@@ -61,6 +61,18 @@
           </span>
         </button>
       </div>
+
+      <s-tooltip :text="t('stylebot_adds_important_automatically')">
+        <s-toggle-switch
+          class="override-toggle"
+          :value="forceImportant"
+          @change="onToggleForceImportant"
+        >
+          <s-text as="span" size="label" medium>
+            <s-code-text :text="forceImportantLabel" code="!important" />
+          </s-text>
+        </s-toggle-switch>
+      </s-tooltip>
 
       <s-button class="create-button" variant="ghost" @click="dialog = 'new'">
         <plus-icon :size="12" />
@@ -224,6 +236,7 @@ import type { GalleryListing, StyleWithoutUrl } from '@stylebot/types';
 import {
   SAnchoredMenu,
   SButton,
+  SCodeText,
   SConfirmDialog,
   SMenu,
   SMenuItem,
@@ -231,8 +244,13 @@ import {
   SStatusDot,
   SText,
   SToggleSwitch,
+  STooltip,
 } from '@stylebot/components';
-import { countRules } from '@stylebot/css';
+import {
+  countRules,
+  isForceImportantCss,
+  setForceImportantCss,
+} from '@stylebot/css';
 import { ChevronLeftIcon, PlusIcon } from '@stylebot/icons';
 import { DEFAULT_PROFILE_ID, expandProfiles } from '@stylebot/saved-styles';
 import type { ExpandedProfiles } from '@stylebot/saved-styles';
@@ -251,8 +269,10 @@ export default Vue.extend({
   name: 'TheStyleEditorPage',
 
   components: {
+    SCodeText,
     SStatusDot,
     SToggleSwitch,
+    STooltip,
     ChevronLeftIcon,
     PlusIcon,
     SiteIcon,
@@ -326,6 +346,14 @@ export default Vue.extend({
   computed: {
     existingStyle(): StyleWithoutUrl | undefined {
       return this.$store.state.styles[this.initialUrl];
+    },
+
+    forceImportantLabel(): string {
+      return this.t('force_important', ['!important']);
+    },
+
+    forceImportant(): boolean {
+      return isForceImportantCss(this.css);
     },
 
     expanded(): ExpandedProfiles {
@@ -525,6 +553,10 @@ export default Vue.extend({
         enabled ? 'enableStyle' : 'disableStyle',
         this.initialUrl
       );
+    },
+
+    onToggleForceImportant(forceImportant: boolean): void {
+      this.css = setForceImportantCss(this.css, forceImportant);
     },
 
     openSite(): void {
@@ -727,7 +759,7 @@ export default Vue.extend({
   }
 }
 
-.switch.enabled-toggle {
+.switch.header-toggle {
   flex: none;
   width: auto;
   height: 36px;
@@ -798,6 +830,18 @@ export default Vue.extend({
   @include truncate;
 
   max-width: 200px;
+}
+
+.switch.override-toggle {
+  flex: none;
+  width: auto;
+  gap: 8px;
+  padding: 0 8px;
+  color: var(--text-primary);
+
+  ::v-deep .label {
+    order: -1;
+  }
 }
 
 .create-button {

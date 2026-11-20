@@ -2,6 +2,8 @@ export { debounce } from './debounce';
 export type { Debounced } from './debounce';
 export { throttle } from './throttle';
 export { splitCommaList } from './split-comma-list';
+export { splitAround } from './split-around';
+export type { TextPart } from './split-around';
 export { isMac } from './is-mac';
 export { isSaveShortcut } from './save-shortcut';
 export { isSafari } from './is-safari';

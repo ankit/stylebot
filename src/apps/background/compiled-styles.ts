@@ -1,9 +1,12 @@
-import { compileStyle, getPageStyleOptions } from '@stylebot/css';
+import {
+  compileStyle,
+  getPageStyleOptions,
+  isForceImportantCss,
+} from '@stylebot/css';
 import {
   COMPILED_STYLES_VERSION,
   DEFAULT_PROFILE_ID,
   getProfileOptions,
-  isForceImportant,
 } from '@stylebot/saved-styles';
 import type {
   CompiledStyleMap,
@@ -28,7 +31,7 @@ const compile = (css: string, forceImportant: boolean): Compiled => {
 /**
  * Builds the injectable copy of a style map, stamped with the revision of the
  * styles it was built from. Given the previous styles and their compiled copy,
- * a style whose css and !important setting are unchanged reuses its entry.
+ * a style whose css is unchanged reuses its entry.
  */
 export const compileStyles = (
   styles: StyleMap,
@@ -39,14 +42,12 @@ export const compileStyles = (
 
   for (const url in styles) {
     const style = styles[url];
-    const force = isForceImportant(style);
     const before = previous?.styles[url];
     const reusable =
-      before?.css === style.css && isForceImportant(before) === force
-        ? previous?.compiled[url]
-        : undefined;
+      before?.css === style.css ? previous?.compiled[url] : undefined;
 
-    const { css, importUrls } = reusable || compile(style.css, force);
+    const { css, importUrls } =
+      reusable || compile(style.css, isForceImportantCss(style.css));
 
     const options = getPageStyleOptions(
       style.css,

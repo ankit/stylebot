@@ -324,7 +324,6 @@ describe('saves', () => {
       'example.com',
       'h1 { color: red; }',
       false,
-      undefined,
       'dark'
     );
     expect(applyStylesToAllTabs).toHaveBeenCalled();

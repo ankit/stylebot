@@ -5,6 +5,7 @@ export {
 
 export { injectCSSIntoDocument, removeCSSFromDocument } from './inject-style';
 export { compileStyle } from './compile';
+export { isForceImportantCss, setForceImportantCss } from './force-important';
 
 export { getCssWithExpandedImports } from './import';
 

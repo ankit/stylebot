@@ -43,7 +43,7 @@ const hasProfileFields = (styles: StyleMap) =>
 describe('styles without profiles', () => {
   const legacy: StyleMap = {
     'a.com': style('a { color: red; }'),
-    'b.com': style('b {}', T1, { enabled: false, forceImportant: false }),
+    'b.com': style('b {}', T1, { enabled: false }),
     '*': style('* { font-family: serif; }', T1, { readability: true }),
   };
 

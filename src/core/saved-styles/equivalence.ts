@@ -1,6 +1,5 @@
 import type { StyleMap, StyleWithoutUrl } from '@stylebot/types';
 
-import { isForceImportant } from './force-important';
 import {
   expandProfiles,
   hasSameUnknownFields,
@@ -74,7 +73,6 @@ export const isEquivalentStyle = (
   return (
     a.enabled === b.enabled &&
     a.readability === b.readability &&
-    isForceImportant(a) === isForceImportant(b) &&
     hasEquivalentProfiles(a, b, options)
   );
 };

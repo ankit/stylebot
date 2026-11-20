@@ -27,7 +27,7 @@ Keeping the applied CSS in `css` means everything that compiles, injects and cac
 - **Once a style has profiles, the field stays**, even when only one is left. A style that loses it was saved by an older Stylebot, which sync uses (below).
 - **Ids are random**, apart from `default`. Names are unique within a style, ignoring case, though a sync merge can produce two with the same name.
 - **Order** is the default profile first, then the order profiles were added in, so renaming one doesn't move it. Each profile records when it was added, since browser storage doesn't keep the order keys were added in. Profiles from before that was recorded come first, by name.
-- **Per style, not per profile:** on/off, Readability and Override site styles.
+- **Per style, not per profile:** on/off and Readability. Force !important lives in each profile's CSS (see [Style options](style-options.md)), so it's per profile.
 
 A style map read from outside the extension, an imported backup or the synced file, has its profiles repaired before use: entries without a name are dropped, an unknown applied id falls back to a profile, and any CSS stored against the applied profile is discarded in favour of `css`.
 

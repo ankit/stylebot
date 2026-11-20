@@ -97,27 +97,6 @@ describe('set', () => {
     expect(styles['example.com'].enabled).toBe(true);
   });
 
-  it('keeps Use !important off when a save leaves the setting out', async () => {
-    (store.styles as Record<string, { forceImportant?: boolean }>)[
-      'example.com'
-    ].forceImportant = false;
-
-    await set('example.com', 'body { color: blue; }', false);
-
-    const styles = store.styles as Record<string, { forceImportant?: boolean }>;
-    expect(styles['example.com'].forceImportant).toBe(false);
-  });
-
-  it('stores the setting a save passes, dropping the field when true', async () => {
-    await set('example.com', 'body { color: blue; }', false, false);
-    let styles = store.styles as Record<string, object>;
-    expect(styles['example.com']).toHaveProperty('forceImportant', false);
-
-    await set('example.com', 'body { color: blue; }', false, true);
-    styles = store.styles as Record<string, object>;
-    expect(styles['example.com']).not.toHaveProperty('forceImportant');
-  });
-
   it('keeps fields it does not know about', async () => {
     (store.styles as Record<string, Record<string, unknown>>)[
       'example.com'
@@ -620,7 +599,7 @@ describe('style edits', () => {
       activate: false,
     });
 
-    await set('example.com', 'a {}', false, undefined, id);
+    await set('example.com', 'a {}', false, id);
     expect(stored('example.com')).toMatchObject({
       css: 'body { color: red; }',
       profiles: { [id]: { css: 'a {}' } },
@@ -629,7 +608,7 @@ describe('style edits', () => {
     await set('example.com', '', false);
     expect(stored('example.com')).toMatchObject({ css: '' });
 
-    await set('example.com', '', false, undefined, id);
+    await set('example.com', '', false, id);
     expect(stored('example.com')).toBeUndefined();
   });
 
@@ -651,7 +630,7 @@ describe('style edits', () => {
   });
 
   it('drops a save to a profile that no longer exists', async () => {
-    await set('example.com', 'a {}', false, undefined, 'gone');
+    await set('example.com', 'a {}', false, 'gone');
 
     expect(writes()).toBe(0);
   });

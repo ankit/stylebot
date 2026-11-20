@@ -133,13 +133,7 @@ export const undoSave = async (session: Session, id: number): Promise<void> => {
   }
 
   session.saves.delete(id);
-  await set(
-    saved.url,
-    saved.before,
-    saved.readability,
-    undefined,
-    saved.profileId
-  );
+  await set(saved.url, saved.before, saved.readability, saved.profileId);
   await applyStylesToAllTabs();
 
   session.thread.forEach(entry =>

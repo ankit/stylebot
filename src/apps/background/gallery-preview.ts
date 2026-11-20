@@ -9,7 +9,11 @@ import {
   type GalleryStyleToInstall,
   type ListedProfile,
 } from '@stylebot/gallery';
-import { compileStyle, parseStyleOptions } from '@stylebot/css';
+import {
+  compileStyle,
+  isForceImportantCss,
+  parseStyleOptions,
+} from '@stylebot/css';
 import { expandProfiles, getStylesForPage } from '@stylebot/saved-styles';
 import type {
   GalleryPreview,
@@ -171,7 +175,9 @@ export const startGalleryPreview = async (
   latestRequests.set(tabId, request);
 
   const { css: source, ...style } = await getStyle(id);
-  const { css, importUrls } = compileStyle(source, { forceImportant: true });
+  const { css, importUrls } = compileStyle(source, {
+    forceImportant: isForceImportantCss(source),
+  });
 
   if (latestRequests.get(tabId) !== request) {
     return null;

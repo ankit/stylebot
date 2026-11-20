@@ -37,5 +37,6 @@ export { default as SSlider } from './SSlider.vue';
 export { default as SChip } from './SChip.vue';
 export { default as SInlineList } from './SInlineList.vue';
 export { default as STooltip } from './STooltip.vue';
+export { default as SCodeText } from './SCodeText.vue';
 export { isMac } from './utils/format-shortcut';
 export { default as SStyleOptions } from './SStyleOptions.vue';

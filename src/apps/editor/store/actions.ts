@@ -15,8 +15,10 @@ import {
   getDefaultScope,
   getPrimaryFontFamily,
   getCssAfterApplyingFilterEffectToPage,
+  isForceImportantCss,
   removeEmptyRules,
   removeRule,
+  setForceImportantCss,
 } from '@stylebot/css';
 
 import { resolveGoogleFont } from '@stylebot/google-fonts';
@@ -69,7 +71,7 @@ import type { AppliedDeclaration } from '@stylebot/page-bridge';
 
 import { PLACEHOLDER_PROPERTIES } from '../utils/computed-placeholder';
 import { loadSidePanelSupport } from '../utils/side-panel';
-import { expandProfiles, isForceImportant } from '@stylebot/saved-styles';
+import { expandProfiles } from '@stylebot/saved-styles';
 
 import {
   emptyUndoStack,
@@ -149,7 +151,7 @@ export default {
     defaultStyle: Style
   ): void {
     const { url, enabled, css, readability } = defaultStyle;
-    const forceImportant = isForceImportant(defaultStyle);
+    const forceImportant = isForceImportantCss(css);
     const { active, sheets } = expandProfiles(defaultStyle);
 
     dispatch('syncFromPage', {
@@ -507,18 +509,22 @@ export default {
 
     try {
       const root = postcss.parse(css);
+      const forceImportant = isForceImportantCss(css);
+
+      if (forceImportant !== state.forceImportant) {
+        commit('setForceImportant', forceImportant);
+      }
 
       getPageBridge().applyCss({
         url: state.url,
         css,
         enabled: state.enabled,
-        forceImportant: state.forceImportant,
+        forceImportant,
       });
       setStyle(
         state.url,
         removeEmptyRules(css),
         state.readability,
-        state.forceImportant,
         state.activeProfile
       );
 
@@ -579,22 +585,14 @@ export default {
 
   /**
    * Switches whether the style has `!important` forced onto every
-   * declaration or is applied exactly as written, and reapplies it.
+   * declaration or is applied exactly as written, by writing the choice into
+   * its css's metadata block, and reapplies it.
    */
   setForceImportant(
-    {
-      state,
-      commit,
-      dispatch,
-    }: {
-      state: State;
-      commit: Commit;
-      dispatch: Dispatch;
-    },
+    { state, dispatch }: { state: State; dispatch: Dispatch },
     value: boolean
   ): void {
-    commit('setForceImportant', value);
-    dispatch('applyCss', { css: state.css });
+    dispatch('applyCss', { css: setForceImportantCss(state.css, value) });
   },
 
   /**

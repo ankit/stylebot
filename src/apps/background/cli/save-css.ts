@@ -183,7 +183,7 @@ const writeStylesheet = async (
 ): Promise<void> => {
   const readability = sheet.style?.readability ?? false;
 
-  await set(sheet.url, css, readability, undefined, sheet.profileId);
+  await set(sheet.url, css, readability, sheet.profileId);
   await applyStylesToAllTabs();
   await onCliSave({
     url: sheet.url,

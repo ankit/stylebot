@@ -62,7 +62,6 @@ export const setStyle = (
   url: string,
   css: string,
   readability: boolean,
-  forceImportant: boolean,
   profileId?: string
 ): void => {
   const message: SetStyle = {
@@ -70,7 +69,6 @@ export const setStyle = (
     url,
     css,
     readability,
-    forceImportant,
     profileId,
   };
 
