@@ -1,3 +1,21 @@
+## Version 4.5.0 (November 2026)
+
+- Editor
+  - Improved usability and layout of the Basic tab, with a box diagram for margin, padding and size (#1361)
+  - New controls for italic, letter case, and borders on some sides only (#1363)
+  - Move and resize the panel (#1327)
+  - Choose whether a change applies to just the element you picked, others like it, or every match on the page (#1370)
+  - Code tab themes: Catppuccin, GitHub, Gruvbox, Rosé Pine and Solarized (#1352)
+  - Browse fonts by category (#1345)
+  - Presets tab removed: reader mode is in the popup, grayscale under Effects (#1358)
+- Inspector
+  - Shows each element's tag, id and classes, like dev tools (#1315)
+  - Picks the link or button you meant, even under overlays (#1320)
+- Options: turn off auto-apply of `!important` for a style (#1377)
+- Selectors: styles hold up on sites whose class names keep changing, like GitHub and X (#1316)
+- CLI: works with Firefox (#1294)
+- Fixed: some pages turning white even with no style saved for the site (#1325)
+
 ## Version 4.4.1 (November 2026)
 
 - Fix the Gallery preview card showing "of styles" instead of the style count in Safari (#1285)
