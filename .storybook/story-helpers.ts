@@ -294,6 +294,23 @@ export const cardCollapse = (canvas: Canvas, label: string): HTMLElement =>
   ) as HTMLElement;
 
 /**
+ * Opens a property card through its header, as a user would, when it
+ * starts collapsed.
+ */
+export const openCard = async (
+  canvas: Canvas,
+  label: string
+): Promise<void> => {
+  if (cardCollapse(canvas, label).classList.contains('collapsed')) {
+    await user.click(cardHeader(canvas, label));
+  }
+
+  await waitFor(() =>
+    expect(cardCollapse(canvas, label)).not.toHaveClass('collapsed')
+  );
+};
+
+/**
  * Collapses every open property card through its header, as a user
  * would, and waits until none is left open.
  */

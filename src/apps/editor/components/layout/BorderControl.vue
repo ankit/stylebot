@@ -51,6 +51,7 @@
     <property-row :label="t('sides')">
       <border-sides-picker
         :value="sides"
+        :unset="!hasBorder"
         :disabled="disabled"
         @input="selectSides"
       />
@@ -125,9 +126,8 @@ export default Vue.extend({
   },
 
   computed: {
-    // The sides the rule already borders: all of them for any all-sides
-    // declaration (or none at all), else whichever sides it names.
-    ruleSides(): Array<Side> {
+    // Whether the rule borders every side, and which sides it names.
+    ruleBorders(): { allSides: boolean; named: Set<Side> } {
       const rule = this.$store.getters.activeRule;
       const named = new Set<Side>();
       let allSides = false;
@@ -143,6 +143,19 @@ export default Vue.extend({
           named.add(match[1] as Side);
         }
       });
+
+      return { allSides, named };
+    },
+
+    hasBorder(): boolean {
+      const { allSides, named } = this.ruleBorders;
+      return allSides || named.size > 0;
+    },
+
+    // All sides for an all-sides declaration (or none at all), else the
+    // sides the rule names.
+    ruleSides(): Array<Side> {
+      const { allSides, named } = this.ruleBorders;
 
       return allSides || named.size === 0
         ? [...SIDES]
