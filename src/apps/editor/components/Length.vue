@@ -17,6 +17,8 @@ import { getDeclarationValue } from '@stylebot/css';
 import { extractLength } from '../utils/css-value';
 import { computedPlaceholder } from '../utils/computed-placeholder';
 
+const PX_LENGTH = /^(-?(?:\d+\.?\d*|\.\d+))px$/i;
+
 export default Vue.extend({
   name: 'Length',
 
@@ -70,15 +72,11 @@ export default Vue.extend({
           return '';
         }
 
-        const [length, unit] = value.split(/(-?\d+)/).filter(Boolean);
+        const match = value.trim().match(PX_LENGTH);
 
         // todo: support other units.
         // currently, we render empty input and overwrite on edit
-        if (unit !== 'px') {
-          return '';
-        }
-
-        return length;
+        return match ? match[1] : '';
       },
 
       set(length: string): void {
