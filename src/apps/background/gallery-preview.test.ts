@@ -89,6 +89,18 @@ describe('gallery preview', () => {
     );
   });
 
+  it('previews a style whose css turns Force !important off as written', async () => {
+    styleResponse(
+      '/* ==Stylebot==\n@force-important false\n==/Stylebot== */\na { color: red; }'
+    );
+
+    await startGalleryPreview(TAB_ID, style.id);
+
+    const preview = await getGalleryPreview(TAB_ID);
+    expect(preview?.css).toContain('a { color: red; }');
+    expect(preview?.css).not.toContain('!important');
+  });
+
   it('carries the options a style declares, at their defaults', async () => {
     styleResponse(dedent`
       /**

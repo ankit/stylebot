@@ -8,8 +8,6 @@ import {
   STYLES_METADATA_KEY,
   getStylesForPage,
   isCompiledStylesCurrent,
-  isForceImportant,
-  withForceImportant,
   hasAnyCss,
   listProfiles,
   setProfileCss,
@@ -312,14 +310,12 @@ const updateStyle = (
 /**
  * Saves a profile's css for a url, the active one unless profileId names
  * another, and removes the style once no profile has css left. Skips the
- * write when profileId no longer exists. An undefined forceImportant keeps
- * the stored style's current value.
+ * write when profileId no longer exists.
  */
 export const set = (
   url: string,
   css: string,
   readability: boolean,
-  forceImportant?: boolean,
   profileId?: string
 ): Promise<void> =>
   update(styles => {
@@ -336,15 +332,12 @@ export const set = (
       return undefined;
     }
 
-    const style = withForceImportant(
-      {
-        ...setProfileCss(existing, id as string, css),
-        readability,
-        enabled: true,
-        modifiedTime: getCurrentTimestamp(),
-      },
-      forceImportant ?? isForceImportant(styles[url])
-    );
+    const style = {
+      ...setProfileCss(existing, id as string, css),
+      readability,
+      enabled: true,
+      modifiedTime: getCurrentTimestamp(),
+    };
 
     if (hasAnyCss(style)) {
       styles[url] = style;

@@ -42,6 +42,21 @@ Keys other than `@option` and `@var`, such as `@name`, `@author` or `@preprocess
 
 Stylebot doesn't act on it. The gallery (gallery.stylebot.dev) reads it to badge the style as "Light and dark", since a style that follows the site's theme can't be told apart from its CSS. A style that declares `scheme` doesn't need it: the gallery already treats that as light and dark.
 
+## Force !important
+
+Stylebot marks every declaration `!important` when it applies a style, so the style wins over the site's own rules. A style that should apply exactly as written, with the normal cascade, says so in its metadata block:
+
+```css
+/* ==Stylebot==
+@force-important false
+==/Stylebot== */
+```
+
+- **Only `false` is written.** Without the key, or with `true`, every declaration is forced. Any other value is skipped with a warning.
+- **The switch writes it.** Force !important in the editor's profile menu and on a style's page in the options page adds this line to the profile's CSS, in its existing block or a new one at the top, and turning it back on removes it, and the block if nothing else is in it.
+- **It travels with the CSS**, so each profile has its own, and it reaches the Gallery, backups and anything else that copies the CSS. The Gallery's preview and install honour it. `!important` itself is never written into the CSS.
+- An older Stylebot skips the key and forces `!important` as before.
+
 ## What the page gets
 
 While a style declaring options is applied, Stylebot gives the page each option's choice two ways:

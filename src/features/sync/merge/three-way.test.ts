@@ -109,27 +109,6 @@ describe('mergeThreeWay', () => {
     expect(styles['a.com'].css).toContain('a { color: green; }\n\n/*');
   });
 
-  it('takes a change to Use !important made on one side', () => {
-    const unforced = style(X.css, T2, { forceImportant: false });
-
-    expect(
-      merge({ 'a.com': X }, { 'a.com': X }, { 'a.com': unforced })
-    ).toEqual({ styles: { 'a.com': unforced }, conflicts: [] });
-  });
-
-  it("gives the newer edit's Use !important setting when both sides changed", () => {
-    const local = style('a { color: blue; }', T1);
-    const remote = style('a { color: green; }', T2, { forceImportant: false });
-
-    const { styles } = merge(
-      { 'a.com': X },
-      { 'a.com': local },
-      { 'a.com': remote }
-    );
-
-    expect(styles['a.com'].forceImportant).toBe(false);
-  });
-
   it('keeps fields it does not know about when both sides changed', () => {
     const newer = {
       ...style('a { color: green; }', '2024-03-01T00:00:00.000Z'),

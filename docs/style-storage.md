@@ -39,7 +39,6 @@ Every style lives in one map in the extension's local storage, under `styles`, k
 | `enabled`        | The style's on/off switch                                                                                    |
 | `readability`    | Whether the site opens in the reader view                                                                    |
 | `modifiedTime`   | When it was last edited. Sync uses it to tell which copy is newer; switches and choices don't change it      |
-| `forceImportant` | Override site styles. Missing means on; only `false` is stored                                               |
 | `profiles`       | The other profiles, and the applied one's name. Missing for a style that never had more than one             |
 | `activeProfile`  | Which profile is applied, on this device                                                                     |
 | `profileOptions` | Choices for options the profiles' CSS declares, by profile, on this device. Missing until something's chosen |
@@ -60,7 +59,7 @@ A pattern is one of:
 
 ## The copies kept for applying
 
-Turning a user's CSS into what gets injected means parsing it, taking out `@import`s and, unless the style opts out, marking every declaration `!important`. That's too slow to do as each page loads, so Stylebot keeps two copies ahead of time.
+Turning a user's CSS into what gets injected means parsing it, taking out `@import`s and, unless its CSS opts out with `@force-important false`, marking every declaration `!important`. That's too slow to do as each page loads, so Stylebot keeps two copies ahead of time.
 
 **A compiled copy of the map**, under `styles-compiled`, rebuilt on every write: each style's injectable CSS, import urls, flags and the choices for its options. It's stamped with the last write's time from `styles-metadata` and a format version, and rebuilt when either doesn't match, so a stale copy is never injected.
 

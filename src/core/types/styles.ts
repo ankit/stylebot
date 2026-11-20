@@ -38,9 +38,6 @@ export type Style = {
   enabled: boolean;
   readability: boolean;
   modifiedTime: Timestamp;
-  // Whether `!important` is forced onto every declaration. Missing means
-  // true; only false is ever stored.
-  forceImportant?: boolean;
   // Missing means one unnamed profile holding css.
   profiles?: StyleProfiles;
   activeProfile?: string;

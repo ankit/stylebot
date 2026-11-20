@@ -131,13 +131,7 @@ export const EnableStyle = async (message: EnableStyleType): Promise<void> => {
 };
 
 export const SetStyle = (message: SetStyleType): Promise<void> =>
-  set(
-    message.url,
-    message.css,
-    message.readability,
-    message.forceImportant,
-    message.profileId
-  );
+  set(message.url, message.css, message.readability, message.profileId);
 
 export const SetActiveProfile = async (
   message: SetActiveProfileType

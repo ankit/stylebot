@@ -12,22 +12,14 @@
     </button>
 
     <template #text>
-      <template v-for="(part, index) in tooltipParts">
-        <code
-          v-if="part.selector"
-          :key="index"
-          class="other-rule-selector"
-          v-text="part.text"
-        />
-        <span v-else :key="index" v-text="part.text" />
-      </template>
+      <s-code-text :text="tooltip" :code="selector" />
     </template>
   </s-tooltip>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { STooltip } from '@stylebot/components';
+import { SCodeText, STooltip } from '@stylebot/components';
 import { AlertTriangleIcon, ArrowUpRightIcon } from '@stylebot/icons';
 
 /**
@@ -42,6 +34,7 @@ export default Vue.extend({
   components: {
     AlertTriangleIcon,
     ArrowUpRightIcon,
+    SCodeText,
     STooltip,
   },
 
@@ -75,16 +68,6 @@ export default Vue.extend({
           : 'overridden_by_selector_on_this_element',
         [this.selector]
       );
-    },
-
-    // Splits the sentence around the selector so it can be set in mono.
-    tooltipParts(): Array<{ text: string; selector: boolean }> {
-      const [before, after = ''] = this.tooltip.split(this.selector);
-      return [
-        { text: before, selector: false },
-        { text: this.selector, selector: true },
-        { text: after, selector: false },
-      ].filter(part => part.text);
     },
   },
 
@@ -123,8 +106,5 @@ export default Vue.extend({
   }
 
   @include focus-ring;
-}
-.other-rule-selector {
-  font-family: var(--font-mono);
 }
 </style>

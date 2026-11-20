@@ -59,7 +59,6 @@ type SeededStyle = {
   css: string;
   enabled: boolean;
   readability?: boolean;
-  forceImportant?: boolean;
   profiles?: Record<string, { name: string; css?: string }>;
   activeProfile?: string;
 };
@@ -81,9 +80,6 @@ export const seedStyles = async (
             enabled: style.enabled,
             readability: style.readability ?? false,
             modifiedTime: new Date().toISOString(),
-            ...(style.forceImportant === false
-              ? { forceImportant: false }
-              : {}),
             ...(style.profiles
               ? { profiles: style.profiles, activeProfile: style.activeProfile }
               : {}),

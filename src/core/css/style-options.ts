@@ -7,7 +7,7 @@ import type {
   StyleOptionValues,
 } from '@stylebot/types';
 
-const BLOCKS =
+export const METADATA_BLOCKS =
   /\/\*[\s*]*==(Stylebot|UserStyle)==([\s\S]*?)==\/\1==[\s*]*\*\//g;
 const OPTION_LINE = /^@option\s+(\S+)\s+(\S+)\s+(.*)$/;
 const VAR_LINE = /^@var\s+(\S+)\s+(\S+)\s+("[^"]*"|'[^']*'|\S+)\s+([\s\S]+)$/;
@@ -311,7 +311,7 @@ export const parseStyleOptions = (css: string): StyleOptionDeclarations => {
     return options;
   }
 
-  for (const block of css.matchAll(BLOCKS)) {
+  for (const block of css.matchAll(METADATA_BLOCKS)) {
     for (const line of getLines(block[2])) {
       const option = parseLine(line);
 

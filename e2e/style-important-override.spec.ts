@@ -82,9 +82,8 @@ test('applies a style with Use !important off exactly as written, on first and r
 }) => {
   await seedStyles(extension, {
     localhost: {
-      css: 'h1 { color: rgb(0, 0, 255); font-style: italic !important; }',
+      css: '/* ==Stylebot==\n@force-important false\n==/Stylebot== */\nh1 { color: rgb(0, 0, 255); font-style: italic !important; }',
       enabled: true,
-      forceImportant: false,
     },
   });
 

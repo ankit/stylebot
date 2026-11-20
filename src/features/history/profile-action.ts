@@ -25,8 +25,7 @@ export const getProfileAction = (
 
   if (
     before.enabled !== after.enabled ||
-    before.readability !== after.readability ||
-    before.forceImportant !== after.forceImportant
+    before.readability !== after.readability
   ) {
     return null;
   }

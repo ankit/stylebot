@@ -1,6 +1,6 @@
 import type { Store, Dispatch } from 'vuex';
 import type { State } from 'apps/editor/store';
-import { injectCSSIntoDocument } from '@stylebot/css';
+import { injectCSSIntoDocument, isForceImportantCss } from '@stylebot/css';
 import type { Style } from '@stylebot/types';
 
 import {
@@ -9,7 +9,6 @@ import {
   requestEditorSidePanel,
 } from '../utils/chrome';
 import { initEditor } from '../utils/init-editor';
-import { isForceImportant } from '@stylebot/saved-styles';
 
 /**
  * Whether opening the editor for this page means its separate window: the
@@ -122,7 +121,7 @@ export const applyStyles = (
   styles.forEach(style => {
     if (style.enabled) {
       injectCSSIntoDocument(style.css, style.url, {
-        forceImportant: isForceImportant(style),
+        forceImportant: isForceImportantCss(style.css),
       });
     } else {
       injectCSSIntoDocument('', style.url);

@@ -5,6 +5,9 @@ jest.mock('@stylebot/css', () => {
   return { ...actual, compileStyle: jest.fn(actual.compileStyle) };
 });
 
+const AS_WRITTEN =
+  '/* ==Stylebot==\n@force-important false\n==/Stylebot== */\n';
+
 const style = (css: string, extra: Partial<StyleMap[string]> = {}) => ({
   css,
   enabled: true,
@@ -42,13 +45,13 @@ describe('compileStyles', () => {
     });
   });
 
-  it('leaves a style that turned Use !important off as written', () => {
+  it('leaves a style whose css turns Use !important off as written', () => {
     const compiled = compileStyles(
-      { 'a.com': style('a { color: red; }', { forceImportant: false }) },
+      { 'a.com': style(`${AS_WRITTEN}a { color: red; }`) },
       'rev-1'
     );
 
-    expect(compiled.styles['a.com'].css).toBe('a { color: red; }');
+    expect(compiled.styles['a.com'].css).toContain('a { color: red; }');
   });
 
   it("carries each style's enabled and readability flags", () => {
@@ -96,17 +99,17 @@ describe('compileStyles', () => {
     });
   });
 
-  it('recompiles a style whose !important setting changed', () => {
+  it('recompiles a style whose css turned Use !important off', () => {
     const styles: StyleMap = { 'a.com': style('a { color: red; }') };
     const previous = compileStyles(styles, 'rev-1');
 
     const next = compileStyles(
-      { 'a.com': style('a { color: red; }', { forceImportant: false }) },
+      { 'a.com': style(`${AS_WRITTEN}a { color: red; }`) },
       'rev-2',
       { styles, compiled: previous.styles }
     );
 
-    expect(next.styles['a.com'].css).toBe('a { color: red; }');
+    expect(next.styles['a.com'].css).toContain('a { color: red; }');
   });
 
   describe('options', () => {

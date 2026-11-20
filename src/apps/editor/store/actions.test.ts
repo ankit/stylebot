@@ -9,7 +9,15 @@ import * as page from '@stylebot/page-bridge';
 import * as galleryUtils from '../utils/gallery';
 
 jest.mock('postcss');
-jest.mock('@stylebot/css');
+jest.mock('@stylebot/css', () => {
+  const actual = jest.requireActual('@stylebot/css');
+
+  return {
+    ...jest.createMockFromModule<object>('@stylebot/css'),
+    isForceImportantCss: actual.isForceImportantCss,
+    setForceImportantCss: actual.setForceImportantCss,
+  };
+});
 jest.mock('@stylebot/google-fonts');
 jest.mock('../utils/chrome');
 jest.mock('@stylebot/page-bridge');
@@ -85,7 +93,6 @@ describe('actions', () => {
         mockState.url,
         'clean',
         mockState.readability,
-        true,
         'default'
       );
       expect(mockCommit).toHaveBeenNthCalledWith(1, 'setUndoStack', {
@@ -236,39 +243,33 @@ describe('actions', () => {
         state.url,
         '',
         false,
-        true,
         'default'
       );
     });
 
-    it('applies and persists a style with Use !important off', () => {
-      const state = { ...mockState, forceImportant: false };
-      jest.spyOn(stylebotCss, 'removeEmptyRules').mockReturnValue('clean');
+    it('applies a style whose css turns Use !important off as written', () => {
+      const css =
+        '/* ==Stylebot==\n@force-important false\n==/Stylebot== */\na {}';
 
-      actions.applyCss({ commit: mockCommit, state }, { css: 'a {}' });
+      actions.applyCss({ commit: mockCommit, state: mockState }, { css });
 
+      expect(mockCommit).toBeCalledWith('setForceImportant', false);
       expect(mockBridge.applyCss).toBeCalledWith(
         expect.objectContaining({ forceImportant: false })
-      );
-      expect(chromeUtils.setStyle).toBeCalledWith(
-        state.url,
-        'clean',
-        state.readability,
-        false,
-        'default'
       );
     });
   });
 
   describe('setForceImportant', () => {
-    it('commits the setting and reapplies the current css with it', () => {
+    it('writes the setting into the css header and reapplies it', () => {
       const state = { ...mockState, css: 'a { color: red; }' };
       const dispatch = jest.fn();
 
-      actions.setForceImportant({ state, commit: mockCommit, dispatch }, false);
+      actions.setForceImportant({ state, dispatch }, false);
 
-      expect(mockCommit).toBeCalledWith('setForceImportant', false);
-      expect(dispatch).toBeCalledWith('applyCss', { css: 'a { color: red; }' });
+      expect(dispatch).toBeCalledWith('applyCss', {
+        css: '/* ==Stylebot==\n@force-important false\n==/Stylebot== */\n\na { color: red; }',
+      });
     });
   });
 

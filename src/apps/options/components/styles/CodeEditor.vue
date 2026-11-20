@@ -33,6 +33,19 @@ export default Vue.extend({
     },
   },
 
+  data(): { iframeCss: string } {
+    return { iframeCss: '' };
+  },
+
+  watch: {
+    // Edits made outside the editor, such as the Force !important switch.
+    css(css: string): void {
+      if (css !== this.iframeCss) {
+        this.sendCss(false);
+      }
+    },
+  },
+
   created() {
     window.addEventListener('message', this.handleMessage);
   },
@@ -73,10 +86,14 @@ export default Vue.extend({
     },
 
     handleIframeLoaded(): void {
+      this.sendCss(this.autofocus);
+    },
+
+    sendCss(focus: boolean): void {
       const message: ParentUpdateCssMessage = {
         css: this.css,
         type: 'stylebotCssUpdate',
-        focus: this.autofocus,
+        focus,
       };
 
       const contentWindow = this.getIframeContentWindow();
@@ -85,10 +102,12 @@ export default Vue.extend({
         return;
       }
 
+      this.iframeCss = this.css;
       contentWindow.postMessage(message, chrome.runtime.getURL('*'));
     },
 
     handleIframeCssUpdate(css: string): void {
+      this.iframeCss = css;
       this.$emit('update', css);
     },
   },

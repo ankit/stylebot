@@ -5,7 +5,6 @@ export {
   isEquivalentStyle,
   isEquivalentStyleMap,
 } from './equivalence';
-export { isForceImportant, withForceImportant } from './force-important';
 export {
   STYLES_KEY,
   STYLES_METADATA_KEY,

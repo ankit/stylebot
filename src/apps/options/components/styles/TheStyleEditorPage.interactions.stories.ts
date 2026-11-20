@@ -370,3 +370,37 @@ export const UseAndCreateProfile: StoryObj = {
     });
   },
 };
+
+export const ForceImportant: StoryObj = {
+  ...profiledStyleEditor,
+  name: "Force !important writes the setting into the selected profile's css, saved with Save, leaving the other profiles alone",
+  play: async context => {
+    await profiledStyleEditor.play?.(context);
+    const { canvasElement } = context;
+
+    const canvas = within(canvasElement);
+    const store = optionsStore(canvasElement);
+    const toggle = () =>
+      canvas.getByRole('checkbox', { name: 'Force !important' });
+    const save = () => canvas.getByRole('button', { name: 'Save' });
+    const nightCss = () => store.state.styles[URL].profiles?.night.css ?? '';
+
+    await user.click(canvas.getByRole('tab', { name: 'Night' }));
+    await expect(toggle()).toBeChecked();
+
+    await user.click(toggle());
+    await expect(toggle()).not.toBeChecked();
+    await expect(save()).toBeEnabled();
+
+    await user.click(save());
+    await waitFor(() => expect(nightCss()).toContain('@force-important false'));
+
+    await user.click(canvas.getByRole('tab', { name: /^Default/ }));
+    await expect(toggle()).toBeChecked();
+
+    await user.click(canvas.getByRole('tab', { name: 'Night' }));
+    await user.click(toggle());
+    await user.click(save());
+    await waitFor(() => expect(nightCss()).not.toContain('@force-important'));
+  },
+};

@@ -9,8 +9,6 @@ export type SetStyle = {
   url: string;
   css: string;
   readability: boolean;
-  // Left out, the stored style keeps its current value.
-  forceImportant?: boolean;
   // Left out, the css goes to the active profile.
   profileId?: string;
 };
