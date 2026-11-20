@@ -67,6 +67,14 @@ export const Variants = matrix({
       label: 'placeholder',
       attrs: ':options="iconOptions" value="" placeholder="left"',
     },
+    {
+      label: 'outline unset',
+      attrs: ':options="iconOptions" value="" placeholder="left" outline-unset',
+    },
+    {
+      label: 'outline set',
+      attrs: ':options="iconOptions" value="center" outline-unset',
+    },
   ],
   columns: [
     {
