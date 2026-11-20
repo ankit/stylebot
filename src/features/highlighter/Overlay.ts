@@ -110,8 +110,8 @@ export default class Overlay {
    * Boxes every match of a selector previewed from the panel, with no card,
    * fainter than a hovered element's so the matches' content shows through.
    */
-  outline(nodes: Array<HTMLElement>): void {
-    this.drawRects(nodes.slice(0, MAX_ELEMENTS));
+  outline(nodes: Array<HTMLElement>, property?: LayoutProperty): void {
+    this.drawRects(nodes.slice(0, MAX_ELEMENTS), property);
     this.rects.forEach(rect => {
       rect.node.style.opacity = MATCHES_OPACITY;
     });

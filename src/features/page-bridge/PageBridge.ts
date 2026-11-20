@@ -16,6 +16,9 @@ export type PageSnapshot = {
   bodyChildSelectors: Array<string>;
 };
 
+// One layer of an element's box, for highlighting just what's being edited.
+export type HighlightLayer = 'margin' | 'padding' | 'content';
+
 export type PageBridgeEvents = {
   // The inspector picked an element on the page.
   select: (selector: string) => void;
@@ -88,7 +91,7 @@ export type PageBridge = {
    * Outlines what a selector matches on the page; an invalid selector
    * clears the outline instead.
    */
-  highlight(selector: string): void;
+  highlight(selector: string, layer?: HighlightLayer): void;
 
   /**
    * Removes the selector outline.

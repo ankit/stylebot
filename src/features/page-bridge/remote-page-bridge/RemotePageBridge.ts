@@ -2,7 +2,7 @@ import type { AppliedDeclaration } from '../applied-declarations';
 import type { RoleColorGroups, SelectorAlternatives } from '@stylebot/css';
 import type { CssDeclaration } from '@stylebot/types';
 
-import type { PageBridge, PageSnapshot } from '../PageBridge';
+import type { HighlightLayer, PageBridge, PageSnapshot } from '../PageBridge';
 import { PageBridgeEmitter } from '../PageBridgeEmitter';
 import {
   REMOTE_PAGE_BRIDGE_PORT,
@@ -255,8 +255,8 @@ export class RemotePageBridge extends PageBridgeEmitter implements PageBridge {
     this.send({ type: 'handleInspectKey', key });
   }
 
-  highlight(selector: string): void {
-    this.send({ type: 'highlight', selector });
+  highlight(selector: string, layer?: HighlightLayer): void {
+    this.send({ type: 'highlight', selector, layer });
   }
 
   unhighlight(): void {

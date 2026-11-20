@@ -227,7 +227,11 @@ export const createEditorWindowHandler = (
           break;
 
         case 'highlight':
-          bridge.highlight(message.selector);
+          if (message.layer) {
+            bridge.highlight(message.selector, message.layer);
+          } else {
+            bridge.highlight(message.selector);
+          }
           break;
 
         case 'unhighlight':

@@ -1,7 +1,7 @@
 import type { RoleColorGroups, SelectorAlternatives } from '@stylebot/css';
 import type { CssDeclaration } from '@stylebot/types';
 import type { AppliedDeclaration } from '../applied-declarations';
-import type { PageSnapshot } from '../PageBridge';
+import type { HighlightLayer, PageSnapshot } from '../PageBridge';
 
 /**
  * The slice of editor state the page owns and the window mirrors.
@@ -59,7 +59,7 @@ export type RemotePageBridgeMessageToPage =
   | { type: 'startInspecting' }
   | { type: 'stopInspecting' }
   | { type: 'handleInspectKey'; key: string }
-  | { type: 'highlight'; selector: string }
+  | { type: 'highlight'; selector: string; layer?: HighlightLayer }
   | { type: 'unhighlight' }
   | { type: 'openInPage'; dockLocation: 'left' | 'right' | 'floating' };
 
