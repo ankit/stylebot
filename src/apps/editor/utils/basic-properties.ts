@@ -2,8 +2,10 @@ export const TEXT_PROPERTIES = [
   'font-family',
   'font-size',
   'font-weight',
+  'font-style',
   'line-height',
   'text-decoration',
+  'text-transform',
   'text-align',
 ];
 

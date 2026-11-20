@@ -5,6 +5,7 @@
     <font-weight />
     <line-height />
     <text-decoration />
+    <text-transform />
     <text-align />
   </div>
 </template>
@@ -18,6 +19,7 @@ import LineHeight from './text/LineHeight.vue';
 import FontFamily from './text/FontFamily.vue';
 import TextDecoration from './text/TextDecoration.vue';
 import TextAlign from './text/TextAlign.vue';
+import TextTransform from './text/TextTransform.vue';
 
 export default Vue.extend({
   name: 'TheTextProperties',
@@ -27,6 +29,7 @@ export default Vue.extend({
     FontWeight,
     LineHeight,
     TextDecoration,
+    TextTransform,
     TextAlign,
   },
 });
