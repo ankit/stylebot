@@ -39,6 +39,7 @@ export const PLACEHOLDER_PROPERTIES = [
   ...LONGHANDS['border-style'],
   'text-decoration-line',
   'text-align',
+  'text-transform',
   'font-family',
   'font-weight',
   'font-style',

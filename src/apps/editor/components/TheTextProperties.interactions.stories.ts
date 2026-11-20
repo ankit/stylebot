@@ -224,3 +224,27 @@ export const ItalicToggle: StoryObj = {
     await waitFor(() => expect(group).toHaveClass('unset'));
   },
 };
+
+export const CaseSegmented: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'a case applies on click, marks the page’s own faintly and clears on a second click',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const control = propertyControl(canvas, 'Case');
+    const option = (name: string) =>
+      within(control).getByRole('button', { name });
+
+    await waitFor(() => expect(option('None')).toHaveClass('placeholder'));
+
+    await user.click(option('Uppercase'));
+    await expect(declaration(store, 'h1', 'text-transform')).toBe('uppercase');
+    await expect(pageStyle(canvasElement, 'h1', 'text-transform')).toBe(
+      'uppercase'
+    );
+    await waitFor(() => expect(option('Uppercase')).toHaveClass('active'));
+
+    await user.click(option('Uppercase'));
+    await expect(declaration(store, 'h1', 'text-transform')).toBeUndefined();
+  },
+};
