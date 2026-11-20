@@ -99,3 +99,37 @@ export const StaysInsideBoundary: StoryObj = {
     );
   },
 };
+
+export const ClosesOnFirstPressOutside: StoryObj = {
+  render: () => ({
+    components: { SAnchoredMenu, SMenu, SMenuItem, SButton },
+    template: `
+      <div style="padding-bottom: 140px">
+        <p class="outside">Outside</p>
+        <s-anchored-menu align="start">
+          <template #trigger="{ toggle }">
+            <s-button variant="ghost" @click="toggle">Open menu</s-button>
+          </template>
+          <s-menu dense>
+            <s-menu-item>Item</s-menu-item>
+          </s-menu>
+        </s-anchored-menu>
+      </div>
+    `,
+  }),
+  name: 'the first press outside closes a menu opened by a click, even when focus stays put as in Safari',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await user.click(canvas.getByRole('button', { name: 'Open menu' }));
+    await findOpenMenu(canvas);
+
+    canvasElement
+      .querySelector('.outside')
+      ?.dispatchEvent(
+        new MouseEvent('mousedown', { bubbles: true, composed: true })
+      );
+
+    await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
+  },
+};
