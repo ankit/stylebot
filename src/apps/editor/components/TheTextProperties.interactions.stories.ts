@@ -106,9 +106,9 @@ export const FontWeightSelect: StoryObj = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
-    const trigger = within(propertyControl(canvas, 'Weight')).getByRole(
-      'button'
-    );
+    const trigger = propertyControl(canvas, 'Weight').querySelector(
+      '.select-trigger'
+    ) as HTMLElement;
 
     await waitFor(() => expect(trigger).toHaveTextContent('Semibold'));
 
@@ -138,9 +138,9 @@ export const FontWeightHoverPreviews: StoryObj = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
-    const trigger = within(propertyControl(canvas, 'Weight')).getByRole(
-      'button'
-    );
+    const trigger = propertyControl(canvas, 'Weight').querySelector(
+      '.select-trigger'
+    ) as HTMLElement;
     const pageWeight = pageStyle(canvasElement, 'h1', 'font-weight');
 
     await user.click(trigger);
@@ -200,5 +200,51 @@ export const TextDecorationSegmented: StoryObj = {
 
     await user.click(underline);
     await expect(declaration(store, 'h1', 'text-decoration')).toBeUndefined();
+  },
+};
+
+export const ItalicToggle: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'the italic toggle beside Weight sets italic, outlined until it does, and clears on a second click',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const italic = canvas.getByRole('button', { name: 'Italic' });
+    const group = italic.closest('.segmented') as HTMLElement;
+
+    await expect(group).toHaveClass('unset');
+
+    await user.click(italic);
+    await expect(declaration(store, 'h1', 'font-style')).toBe('italic');
+    await expect(pageStyle(canvasElement, 'h1', 'font-style')).toBe('italic');
+    await waitFor(() => expect(group).not.toHaveClass('unset'));
+
+    await user.click(italic);
+    await expect(declaration(store, 'h1', 'font-style')).toBeUndefined();
+    await waitFor(() => expect(group).toHaveClass('unset'));
+  },
+};
+
+export const CaseSegmented: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'a case applies on click, marks the page’s own faintly and clears on a second click',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const control = propertyControl(canvas, 'Case');
+    const option = (name: string) =>
+      within(control).getByRole('button', { name });
+
+    await waitFor(() => expect(option('None')).toHaveClass('placeholder'));
+
+    await user.click(option('Uppercase'));
+    await expect(declaration(store, 'h1', 'text-transform')).toBe('uppercase');
+    await expect(pageStyle(canvasElement, 'h1', 'text-transform')).toBe(
+      'uppercase'
+    );
+    await waitFor(() => expect(option('Uppercase')).toHaveClass('active'));
+
+    await user.click(option('Uppercase'));
+    await expect(declaration(store, 'h1', 'text-transform')).toBeUndefined();
   },
 };

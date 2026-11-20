@@ -40,6 +40,12 @@
         </s-menu-item>
       </template>
     </s-select>
+
+    <css-property-value-group
+      property="font-style"
+      :options="styleOptions"
+      class="font-style"
+    />
   </property-row>
 </template>
 
@@ -51,6 +57,7 @@ import type { Debounced } from '@stylebot/utils';
 import { debounce } from '@stylebot/utils';
 
 import PropertyRow from '../basic/PropertyRow.vue';
+import CssPropertyValueGroup from '../CssPropertyValueGroup.vue';
 import { computedKeywordPlaceholder } from '../../utils/computed-placeholder';
 
 const KEYWORDS: Record<string, string> = { normal: '400', bold: '700' };
@@ -60,6 +67,7 @@ export default Vue.extend({
   name: 'FontWeight',
 
   components: {
+    CssPropertyValueGroup,
     PropertyRow,
     SSelect,
     SMenuItem,
@@ -67,6 +75,7 @@ export default Vue.extend({
 
   data(): {
     options: Array<{ title: string; value: string }>;
+    styleOptions: Array<{ title: string; html: string; value: string }>;
     previewWeight: Debounced<[string]>;
     applying: boolean;
   } {
@@ -81,6 +90,13 @@ export default Vue.extend({
         PREVIEW_DELAY
       ),
       applying: false,
+      styleOptions: [
+        {
+          title: this.t('italic'),
+          html: '<span class="italic-glyph">I</span>',
+          value: 'italic',
+        },
+      ],
       options: [
         { title: this.t('thin'), value: '100' },
         { title: this.t('extra_light'), value: '200' },
@@ -163,6 +179,16 @@ export default Vue.extend({
 .font-weight ::v-deep .select-trigger {
   min-width: 0;
   width: 128px;
+}
+
+.font-style {
+  margin-left: 8px;
+
+  ::v-deep .italic-glyph {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 15px;
+    font-style: italic;
+  }
 }
 
 .font-weight-option {
