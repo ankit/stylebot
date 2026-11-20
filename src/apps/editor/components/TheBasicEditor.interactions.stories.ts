@@ -99,15 +99,15 @@ export const SectionsStayAsLeft: StoryObj = {
     await step('every section starts open', async () => {
       await pick(heading);
       await waitFor(() =>
-        expect(cardCollapse(canvas, 'Box')).not.toHaveClass('collapsed')
+        expect(cardCollapse(canvas, 'Layout')).not.toHaveClass('collapsed')
       );
       await expect(cardCollapse(canvas, 'Text')).not.toHaveClass('collapsed');
     });
 
-    await step('collapsing Box is remembered', async () => {
-      await user.click(cardHeader(canvas, 'Box'));
+    await step('collapsing Layout is remembered', async () => {
+      await user.click(cardHeader(canvas, 'Layout'));
       await waitFor(() =>
-        expect(cardCollapse(canvas, 'Box')).toHaveClass('collapsed')
+        expect(cardCollapse(canvas, 'Layout')).toHaveClass('collapsed')
       );
       await expect(store.state.options.basicModeCollapsedSections.layout).toBe(
         true
@@ -119,7 +119,7 @@ export const SectionsStayAsLeft: StoryObj = {
       await pick(quote);
       await pressKey('i');
       await pick(heading);
-      await expect(cardCollapse(canvas, 'Box')).toHaveClass('collapsed');
+      await expect(cardCollapse(canvas, 'Layout')).toHaveClass('collapsed');
       await expect(cardCollapse(canvas, 'Text')).not.toHaveClass('collapsed');
     });
   },

@@ -1,7 +1,7 @@
 <template>
   <s-number-field
     :value="length"
-    unit="px"
+    :unit="unit"
     :presets="sizes"
     :placeholder="placeholder"
     :disabled="disabled"
@@ -34,6 +34,11 @@ export default Vue.extend({
     property: {
       type: String,
       required: true,
+    },
+
+    unit: {
+      type: String,
+      default: 'px',
     },
 
     // Raw value of a shorthand property (e.g. border: 1px solid red) to

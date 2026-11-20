@@ -44,13 +44,13 @@ test('a collapsed panel stays collapsed across reloads', async ({
   await pickElement(page, editorRoot, 'h1');
 
   // Every section starts open.
-  await expect(collapse(page, 'Box')).not.toHaveClass(/collapsed/);
+  await expect(collapse(page, 'Layout')).not.toHaveClass(/collapsed/);
 
-  await card(page, 'Box').locator('.property-card-header').click();
-  await expect(collapse(page, 'Box')).toHaveClass(/collapsed/);
+  await card(page, 'Layout').locator('.property-card-header').click();
+  await expect(collapse(page, 'Layout')).toHaveClass(/collapsed/);
 
   await page.reload();
   editorRoot = await openEditor(page, openPopup);
   await pickElement(page, editorRoot, 'h1');
-  await expect(collapse(page, 'Box')).toHaveClass(/collapsed/);
+  await expect(collapse(page, 'Layout')).toHaveClass(/collapsed/);
 });

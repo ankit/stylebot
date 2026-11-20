@@ -10,6 +10,8 @@ export const TEXT_PROPERTIES = [
 export const COLOR_PROPERTIES = ['color', 'background-color'];
 
 export const LAYOUT_PROPERTIES = [
+  'width',
+  'height',
   'padding',
   'padding-top',
   'padding-right',

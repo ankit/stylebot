@@ -21,7 +21,7 @@
     </property-card>
 
     <property-card
-      :label="t('box')"
+      :label="t('layout')"
       :collapsed="!open.layout"
       :count="layoutCount"
       @toggle="toggle('layout')"
