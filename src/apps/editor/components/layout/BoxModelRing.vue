@@ -161,13 +161,11 @@ export default Vue.extend({
 }
 
 .box-ring-margin {
-  border: 1px dashed var(--box-margin-edge);
   background: var(--box-margin);
 }
 
 .box-ring-padding {
   column-gap: 6px;
-  border: 1px solid var(--box-padding-edge);
   background: var(--box-padding);
 }
 
