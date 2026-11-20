@@ -347,13 +347,20 @@ export default Vue.extend({
      */
     wholeCharacterWidth(): number {
       const head = this.$el.querySelector('.selector-head');
-      const length = head?.textContent?.length;
+      // Whitespace between the list's elements isn't drawn.
+      const length = head?.textContent?.trim().length;
 
       if (!head || !length) {
         return 0;
       }
 
-      const character = head.scrollWidth / length;
+      // Rounded widths like scrollWidth would cut a sliver off the last one.
+      const range = document.createRange();
+      range.selectNodeContents(head);
+      const zoom = (head as Element & { currentCSSZoom?: number })
+        .currentCSSZoom;
+      const character =
+        range.getBoundingClientRect().width / length / (zoom || 1);
 
       return Math.floor(head.clientWidth / character) * character;
     },
@@ -520,7 +527,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .selector-autocomplete:not(:hover):not(:focus-within)
   ::v-deep
-  .autocomplete-clear {
+  :is(.autocomplete-clear, .autocomplete-chevron:not(.open)) {
   visibility: hidden;
 }
 
@@ -530,6 +537,23 @@ export default Vue.extend({
   margin-left: -36px;
   padding-left: 14px;
   background: linear-gradient(to right, transparent, var(--clear-fade) 14px);
+
+  &:has(+ .autocomplete-chevron) {
+    margin-left: -64px;
+  }
+}
+
+.selector-autocomplete ::v-deep .autocomplete-chips ~ .autocomplete-chevron {
+  position: relative;
+  background-color: var(--clear-fade);
+
+  &:not(:disabled):hover {
+    background-image: linear-gradient(var(--hover-tint), var(--hover-tint));
+  }
+}
+
+.selector-autocomplete ::v-deep .autocomplete-chips + .autocomplete-chevron {
+  margin-left: -28px;
 }
 
 .selector-autocomplete ::v-deep .autocomplete-pill {
