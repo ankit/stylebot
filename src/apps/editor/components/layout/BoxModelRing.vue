@@ -105,8 +105,24 @@ export default Vue.extend({
       };
     },
 
+    // The page's spacing in whole pixels, with zeros left empty so its real
+    // spacing stands out.
     placeholders(): Sides {
-      return computedSides(this.$store.state.computedStyles, this.properties);
+      const sides = computedSides(
+        this.$store.state.computedStyles,
+        this.properties
+      );
+      const shown = (value: string): string => {
+        const rounded = Math.round(parseFloat(value));
+        return Number.isNaN(rounded) || rounded === 0 ? '' : `${rounded}`;
+      };
+
+      return {
+        top: shown(sides.top),
+        right: shown(sides.right),
+        bottom: shown(sides.bottom),
+        left: shown(sides.left),
+      };
     },
   },
 
