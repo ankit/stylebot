@@ -156,7 +156,10 @@ export default Vue.extend({
   overflow: auto;
 
   &.stable-gutter {
+    --scrollbar-gutter: 8px;
+
     scrollbar-gutter: stable;
+    background: var(--tab-surface);
   }
 
   @include thin-scrollbar;

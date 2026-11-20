@@ -2,7 +2,7 @@
   <div
     ref="root"
     class="segmented"
-    :class="[{ fit, disabled }, size]"
+    :class="[{ fit, disabled, unset: outlineUnset && value === '' }, size]"
     role="group"
   >
     <span
@@ -103,6 +103,12 @@ export default Vue.extend({
       type: [String, Number],
       default: '',
     },
+
+    // Outlined instead of filled while no value is set, like the editor's fields.
+    outlineUnset: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   data(): {
@@ -194,6 +200,11 @@ export default Vue.extend({
   padding: 2px;
   border-radius: 7px;
   background: var(--field-surface);
+
+  &.unset {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--field-fill-border);
+  }
 
   &.disabled {
     opacity: 0.6;

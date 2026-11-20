@@ -8,14 +8,26 @@
 
     <template #default="{ close }">
       <s-menu dense size="small" class="more-menu">
-        <s-menu-item :disabled="!canUndo" @click="undo">
+        <s-menu-item
+          :disabled="!canUndo"
+          @click="
+            undo();
+            close();
+          "
+        >
           <span class="menu-item-row">
             <span>{{ t('undo') }}</span>
             <s-shortcut-kbd small :value="undoShortcuts.undo" />
           </span>
         </s-menu-item>
 
-        <s-menu-item :disabled="!canRedo" @click="redo">
+        <s-menu-item
+          :disabled="!canRedo"
+          @click="
+            redo();
+            close();
+          "
+        >
           <span class="menu-item-row">
             <span>{{ t('redo') }}</span>
             <s-shortcut-kbd small :value="undoShortcuts.redo" />

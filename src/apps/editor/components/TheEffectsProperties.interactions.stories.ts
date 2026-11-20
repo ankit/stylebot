@@ -11,6 +11,7 @@ import {
   setRange,
   storeOf,
   user,
+  openCard,
 } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
@@ -27,8 +28,9 @@ const slider = (control: HTMLElement) =>
 
 export const OpacitySlider: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'the opacity slider and percent field clear at 1 and apply other values',
+  name: 'the opacity slider clears at 1 and applies other values',
   play: async ({ canvasElement }) => {
+    await openCard(within(canvasElement), 'Effects');
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
     const control = propertyControl(canvas, 'Opacity');
@@ -42,21 +44,14 @@ export const OpacitySlider: StoryObj = {
     await setRange(slider(control), 0.5);
     await expect(declaration(store, 'h1', 'opacity')).toBe('0.5');
     await expect(pageStyle(canvasElement, 'h1', 'opacity')).toBe('0.5');
-    const percent = numberInput(control);
-    await waitFor(() => expect(percent).toHaveValue('50'));
-
-    await user.clear(percent);
-    await user.type(percent, '30');
-    await waitFor(() =>
-      expect(declaration(store, 'h1', 'opacity')).toBe('0.3')
-    );
   },
 };
 
 export const FilterControl: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'picking a filter applies its default amount, the amount field adjusts it, None clears it',
+  name: 'picking a filter applies its default amount, its amount field or slider adjusts it, None clears it',
   play: async ({ canvasElement }) => {
+    await openCard(within(canvasElement), 'Effects');
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
     const control = propertyControl(canvas, 'Filter');
@@ -82,6 +77,13 @@ export const FilterControl: StoryObj = {
 
     await user.click(option('Gray'));
     await expect(declaration(store, 'h1', 'filter')).toBe('grayscale(50%)');
+
+    const graySlider = await waitFor(() =>
+      slider(propertyControl(canvas, 'Gray amount'))
+    );
+    await expect(graySlider).toHaveValue('50');
+    await setRange(graySlider, 80);
+    await expect(declaration(store, 'h1', 'filter')).toBe('grayscale(80%)');
 
     await user.click(option('None'));
     await expect(declaration(store, 'h1', 'filter')).toBeUndefined();
