@@ -41,6 +41,7 @@ export const PLACEHOLDER_PROPERTIES = [
   'text-align',
   'font-family',
   'font-weight',
+  'font-style',
   'color',
   'background-color',
 ];
