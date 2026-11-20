@@ -13,7 +13,19 @@
     </property-row>
 
     <property-row v-if="type !== 'none'" :label="amountLabel">
+      <s-slider
+        v-if="config.slider"
+        class="filter-slider"
+        :value="amount"
+        :min="config.min"
+        :max="config.max"
+        :step="config.step"
+        :disabled="disabled"
+        @input="setAmount"
+      />
+
       <s-number-field
+        v-else
         class="compact-field"
         :unit="config.unit"
         :value="String(amount)"
@@ -27,7 +39,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import { t } from '@stylebot/i18n';
-import { SNumberField, SSegmentedControl } from '@stylebot/components';
+import { SNumberField, SSegmentedControl, SSlider } from '@stylebot/components';
 import { getDeclarationValue } from '@stylebot/css';
 
 import PropertyRow from '../basic/PropertyRow.vue';
@@ -40,12 +52,20 @@ type FilterConfig = {
   step: number;
   default: number;
   unit: string;
+  slider: boolean;
 };
 
 const FILTER_CONFIG: Record<Exclude<FilterType, 'none'>, FilterConfig> = {
-  grayscale: { min: 0, max: 100, step: 1, default: 50, unit: '%' },
-  invert: { min: 0, max: 100, step: 1, default: 50, unit: '%' },
-  blur: { min: 0, max: 20, step: 1, default: 4, unit: 'px' },
+  grayscale: {
+    min: 0,
+    max: 100,
+    step: 5,
+    default: 50,
+    unit: '%',
+    slider: true,
+  },
+  invert: { min: 0, max: 100, step: 5, default: 50, unit: '%', slider: true },
+  blur: { min: 0, max: 20, step: 1, default: 4, unit: 'px', slider: false },
 };
 
 const FILTER_VALUE_REGEX = /^(grayscale|invert|blur)\(([\d.]+)(%|px)?\)$/;
@@ -57,6 +77,7 @@ export default Vue.extend({
     PropertyRow,
     SNumberField,
     SSegmentedControl,
+    SSlider,
   },
 
   data(): { options: Array<{ label: string; value: FilterType }> } {
@@ -142,6 +163,11 @@ export default Vue.extend({
 .filter-type {
   flex: 1;
   min-width: 0;
+}
+
+.filter-slider {
+  flex: 1;
+  min-width: 60px;
 }
 
 .compact-field.number-field {
