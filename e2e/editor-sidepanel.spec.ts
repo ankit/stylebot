@@ -78,7 +78,7 @@ test('moving the panel to the side panel hides it in the page', async ({
   await page.goto(`${baseUrl}/`);
 
   const editorRoot = await openEditor(page, openPopup);
-  await editorRoot.getByRole('button', { name: 'Options' }).click();
+  await editorRoot.getByRole('button', { name: 'More actions' }).click();
   await editorRoot.getByRole('button', { name: 'Open in side panel' }).click();
   await waitForSidePanel(context, extension);
 
@@ -225,7 +225,7 @@ test('moving from the side panel to a window closes the panel', async ({
       p.url().includes('/editor-window/index.html') &&
       !p.url().includes('host=sidepanel')
   );
-  await panel.evaluate(`${byLabel('Options')}.click()`);
+  await panel.evaluate(`${byLabel('More actions')}.click()`);
   await expect
     .poll(() => panel.evaluate(`!!${byLabel('Open in separate window')}`))
     .toBe(true);
@@ -250,7 +250,7 @@ test('docking in the page from the side panel closes the panel', async ({
   await page.goto(`${baseUrl}/`);
   const panel = await openSidePanel(page, context, extension, openPopup);
 
-  await panel.evaluate(`${byLabel('Options')}.click()`);
+  await panel.evaluate(`${byLabel('More actions')}.click()`);
   await expect
     .poll(() => panel.evaluate(`!!${byLabel('Dock right in page')}`))
     .toBe(true);

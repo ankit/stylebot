@@ -177,7 +177,7 @@ test('moving from the window to the side panel closes the window', async ({
   const popout = await popOutEditor(context, page, editorRoot);
 
   const closed = popout.waitForEvent('close');
-  await popout.getByRole('button', { name: 'Options' }).click();
+  await popout.getByRole('button', { name: 'More actions' }).click();
   await popout.getByRole('button', { name: 'Open in side panel' }).click();
   await closed;
 
@@ -201,7 +201,7 @@ test('docking back from the window shows the panel in the page, in the mode pick
   ).toBeVisible();
 
   const closed = popout.waitForEvent('close');
-  await popout.getByRole('button', { name: 'Options' }).click();
+  await popout.getByRole('button', { name: 'More actions' }).click();
   await popout.getByRole('button', { name: 'Dock left in page' }).click();
   await closed;
 

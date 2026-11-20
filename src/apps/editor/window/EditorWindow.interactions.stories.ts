@@ -39,7 +39,7 @@ export const DockToWindowFromMenu: StoryObj = {
     const store = storeOf(canvasElement);
     const sendMessage = sentMessages();
 
-    const menu = await openEditorMenu(canvas, 'Options');
+    const menu = await openEditorMenu(canvas, 'More actions');
     await user.click(
       within(menu).getByRole('button', { name: 'Open in separate window' })
     );
@@ -78,7 +78,7 @@ export const DockToSidePanelFromWindow: StoryObj = {
     const store = storeOf(canvasElement);
     const sendMessage = sentMessages();
 
-    const menu = await openEditorMenu(canvas, 'Options');
+    const menu = await openEditorMenu(canvas, 'More actions');
     await user.click(
       within(menu).getByRole('button', { name: 'Open in side panel' })
     );
@@ -106,7 +106,7 @@ export const DockBackFromWindow: StoryObj = {
     const store = storeOf(canvasElement);
     const openInPage = spyOn(getPageBridge(), 'openInPage');
 
-    const menu = await openEditorMenu(canvas, 'Options');
+    const menu = await openEditorMenu(canvas, 'More actions');
     await user.click(
       within(menu).getByRole('button', { name: 'Dock left in page' })
     );

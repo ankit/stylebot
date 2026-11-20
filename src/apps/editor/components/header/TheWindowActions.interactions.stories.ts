@@ -32,7 +32,7 @@ export const DockFromOptionsMenu: StoryObj = {
     const store = storeOf(canvasElement);
     const sendMessage = spyOn(chrome.runtime, 'sendMessage');
 
-    const menu = await openEditorMenu(canvas, 'Options');
+    const menu = await openEditorMenu(canvas, 'More actions');
     await user.click(
       within(menu).getByRole('button', { name: 'Open in side panel' })
     );
@@ -64,14 +64,14 @@ export const SidePanelShortcut: StoryObj = {
 
 export const DockInPageFromOptionsMenu: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'docks the panel left or right in the page from the Options menu',
+  name: 'docks the panel left or right in the page from the More actions menu',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
 
     await expect(panel(canvasElement)).toHaveClass('right');
 
-    const menu = await openEditorMenu(canvas, 'Options');
+    const menu = await openEditorMenu(canvas, 'More actions');
     await user.click(
       within(menu).getByRole('button', { name: 'Dock left in page' })
     );
@@ -80,7 +80,7 @@ export const DockInPageFromOptionsMenu: StoryObj = {
     await waitFor(() => expect(panel(canvasElement)).toHaveClass('left'));
     await expect(canvas.queryByRole('menu')).toBeNull();
 
-    await openEditorMenu(canvas, 'Options');
+    await openEditorMenu(canvas, 'More actions');
     await user.click(
       canvas.getByRole('button', { name: 'Dock right in page' })
     );
@@ -127,13 +127,13 @@ export const AdjustPageLayout: StoryObj = {
 
 export const AppearanceMenu: StoryObj = {
   ...editor(WITH_RULE),
-  name: "the Options menu's Theme row switches the panel between light, dark and system",
+  name: "the More actions menu's Theme row switches the panel between light, dark and system",
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
     const app = canvasElement.querySelector('.stylebot-app') as HTMLElement;
 
-    const menu = await openEditorMenu(canvas, 'Options');
+    const menu = await openEditorMenu(canvas, 'More actions');
 
     for (const [item, appearance] of [
       ['Dark', 'dark'],
@@ -182,7 +182,7 @@ export const EscapeClosesMenuBeforeEditor: StoryObj = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    await openEditorMenu(canvas, 'Options');
+    await openEditorMenu(canvas, 'More actions');
 
     await pressKey('Escape');
     await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
@@ -214,11 +214,11 @@ export const ShortcutsViewViaShortcut: StoryObj = {
 
 export const ShortcutsViewViaMenu: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'the Options menu opens the shortcuts view and its back button dismisses it',
+  name: 'the More actions menu opens the shortcuts view and its back button dismisses it',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    const menu = await openEditorMenu(canvas, 'Options');
+    const menu = await openEditorMenu(canvas, 'More actions');
     await user.click(
       within(menu).getByRole('menuitem', { name: /Keyboard shortcuts/ })
     );

@@ -9,7 +9,7 @@ import {
   WITH_RULE,
 } from '@stylebot/storybook/fixtures/editor';
 import { gallerySuggestions } from '@stylebot/storybook/fixtures/popup';
-import { openEditorMenu, user } from '@stylebot/storybook/story-helpers';
+import { user } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
   title: 'Tests/Editor/Gallery',
@@ -48,16 +48,16 @@ const sentDrafts = async (send: { mock: { calls: Array<Array<unknown>> } }) => {
   return drafts();
 };
 
-export const PublishFromMenu: StoryObj = {
+export const PublishUpdate: StoryObj = {
   ...editor(WITH_RULE),
-  name: "Publish to Gallery captures the page and hands the profile's CSS and screenshot to the gallery site",
+  parameters: published('h1 { color: red; }'),
+  name: "a published profile with edits shows Unpublished changes, and Publish captures the page and hands the profile's CSS and screenshot to the gallery site",
   play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
     const send = spyOn(chrome.runtime, 'sendMessage');
-    const menu = within(await openEditorMenu(within(canvasElement), 'Options'));
 
-    await user.click(
-      menu.getByRole('menuitem', { name: 'Publish to Gallery' })
-    );
+    await expect(await canvas.findByText('Unpublished changes')).toBeVisible();
+    await user.click(canvas.getByRole('button', { name: 'Publish' }));
 
     await expect(await sentDrafts(send)).toEqual([
       {
@@ -76,43 +76,29 @@ export const PublishWithoutScreenshot: StoryObj = {
   ...editor(WITH_RULE),
   parameters: {
     chrome: {
-      gallery: { capture: { ok: false, errorKey: 'gallery_error_unknown' } },
+      gallery: {
+        ...published('h1 { color: red; }').chrome.gallery,
+        capture: { ok: false, errorKey: 'gallery_error_unknown' },
+      },
     },
   },
   name: 'a capture that fails still opens the gallery site, without a screenshot, so it asks for one',
   play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
     const send = spyOn(chrome.runtime, 'sendMessage');
-    const menu = within(await openEditorMenu(within(canvasElement), 'Options'));
 
-    await user.click(
-      menu.getByRole('menuitem', { name: 'Publish to Gallery' })
-    );
+    await canvas.findByText('Unpublished changes');
+    await user.click(canvas.getByRole('button', { name: 'Publish' }));
 
     const [draft] = await sentDrafts(send);
     await expect(draft).toMatchObject({ screenshot: null });
   },
 };
 
-export const PublishUpdate: StoryObj = {
-  ...editor(WITH_RULE),
-  parameters: published('h1 { color: red; }'),
-  name: 'a published profile with edits shows Unpublished changes, and Publish hands them to the gallery site',
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const send = spyOn(chrome.runtime, 'sendMessage');
-
-    await expect(await canvas.findByText('Unpublished changes')).toBeVisible();
-    await user.click(canvas.getByRole('button', { name: 'Publish' }));
-
-    const [draft] = await sentDrafts(send);
-    await expect(draft).toMatchObject({ css: RULE_CSS });
-  },
-};
-
 export const ManagePublished: StoryObj = {
   ...editor(WITH_RULE),
   parameters: published(RULE_CSS),
-  name: 'a published profile without edits says Published, with Manage opening its edit form on the gallery site, and the menu leaves out Publish to Gallery',
+  name: 'a published profile without edits says Published, with Manage opening its edit form on the gallery site',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
@@ -121,9 +107,6 @@ export const ManagePublished: StoryObj = {
       'href',
       getGalleryEditUrl(7)
     );
-
-    const menu = within(await openEditorMenu(canvas, 'Options'));
-    await expect(menu.queryByRole('menuitem', { name: /Gallery/ })).toBeNull();
   },
 };
 
@@ -137,7 +120,7 @@ export const FromGallery: StoryObj = {
       },
     },
   },
-  name: 'a profile installed from the Gallery names its author, with View opening its Gallery page, and the menu leaves out Publish to Gallery',
+  name: 'a profile installed from the Gallery names its author, with View opening its Gallery page',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
@@ -148,9 +131,6 @@ export const FromGallery: StoryObj = {
       'href',
       expect.stringMatching(/\/style\/1\/tokyo-night$/)
     );
-
-    const menu = within(await openEditorMenu(canvas, 'Options'));
-    await expect(menu.queryByRole('menuitem', { name: /Gallery/ })).toBeNull();
   },
 };
 

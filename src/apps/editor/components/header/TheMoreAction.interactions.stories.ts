@@ -6,7 +6,7 @@ import { editor, WITH_RULE } from '@stylebot/storybook/fixtures/editor';
 import { openEditorMenu, storeOf } from '@stylebot/storybook/story-helpers';
 
 const meta: Meta = {
-  title: 'Tests/Editor/Options menu',
+  title: 'Tests/Editor/More actions menu',
   tags: ['test'],
   component: TheMoreAction,
   parameters: { padded: false },
@@ -16,21 +16,23 @@ export default meta;
 
 export const OpeningStopsInspecting: StoryObj = {
   ...editor({ ...WITH_RULE, inspecting: true }),
-  name: 'opening the Options menu stops inspecting, so a click on the page to close it doesn’t pick an element',
+  name: 'opening the More actions menu stops inspecting, so a click on the page to close it doesn’t pick an element',
   play: async ({ canvasElement }) => {
     const store = storeOf(canvasElement);
 
     await expect(store.state.inspecting).toBe(true);
-    await openEditorMenu(within(canvasElement), 'Options');
+    await openEditorMenu(within(canvasElement), 'More actions');
     await expect(store.state.inspecting).toBe(false);
   },
 };
 
 export const MenuContents: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'the Options menu offers Undo, Redo, Position, Theme, Publish to Gallery, Keyboard shortcuts, Options and Send feedback',
+  name: 'the More actions menu offers Undo, Redo, Position, Theme, Keyboard shortcuts, Options and Send feedback',
   play: async ({ canvasElement }) => {
-    const menu = within(await openEditorMenu(within(canvasElement), 'Options'));
+    const menu = within(
+      await openEditorMenu(within(canvasElement), 'More actions')
+    );
 
     await expect(menu.getByText('Position')).toBeVisible();
     await expect(menu.getByText('Theme')).toBeVisible();
@@ -55,7 +57,6 @@ export const MenuContents: StoryObj = {
     await expect(items.map(item => item.textContent?.trim())).toEqual([
       expect.stringMatching(/^Undo/),
       expect.stringMatching(/^Redo/),
-      'Publish to Gallery',
       expect.stringMatching(/^Keyboard shortcuts/),
       'Options',
       'Send feedback',

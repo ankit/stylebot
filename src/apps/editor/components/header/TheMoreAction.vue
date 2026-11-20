@@ -1,7 +1,7 @@
 <template>
   <s-anchored-menu class="more-action-anchor" @open="onOpen">
     <template #trigger="{ toggle }">
-      <s-icon-button :size="24" :tooltip="t('view_options')" @click="toggle">
+      <s-icon-button :size="24" :tooltip="t('more_actions')" @click="toggle">
         <more-icon :size="16" />
       </s-icon-button>
     </template>
@@ -17,7 +17,7 @@
         >
           <span class="menu-item-row">
             <span>{{ t('undo') }}</span>
-            <s-shortcut-kbd small :value="undoShortcuts.undo" />
+            <s-shortcut-chip small :value="undoShortcuts.undo" />
           </span>
         </s-menu-item>
 
@@ -30,7 +30,7 @@
         >
           <span class="menu-item-row">
             <span>{{ t('redo') }}</span>
-            <s-shortcut-kbd small :value="undoShortcuts.redo" />
+            <s-shortcut-chip small :value="undoShortcuts.redo" />
           </span>
         </s-menu-item>
 
@@ -71,8 +71,6 @@
 
         <s-menu-divider class="more-menu-divider" />
 
-        <the-gallery-menu-item v-if="hasCss" @click="close()" />
-
         <s-menu-item
           @click="
             keyboardShortcuts();
@@ -81,7 +79,7 @@
         >
           <span class="menu-item-row">
             <span>{{ t('keyboard_shortcuts') }}</span>
-            <span class="menu-item-hint">{{ editorCommands.help }}</span>
+            <s-shortcut-chip small :value="editorCommands.help" />
           </span>
         </s-menu-item>
 
@@ -100,10 +98,7 @@
             close();
           "
         >
-          <span class="menu-item-row">
-            <span>{{ t('send_feedback') }}</span>
-            <arrow-up-right-icon :size="12" class="menu-item-hint-icon" />
-          </span>
+          {{ t('send_feedback') }}
         </s-menu-item>
       </s-menu>
     </template>
@@ -119,7 +114,7 @@ import {
   SMenuDivider,
   SIconButton,
   SSegmentedControl,
-  SShortcutKbd,
+  SShortcutChip,
   SText,
 } from '@stylebot/components';
 import {
@@ -144,7 +139,6 @@ import { isMac, openOptionsPage, openFeedbackPage } from '@stylebot/utils';
 
 import { undoShortcuts } from '../../store/undo-stack';
 import { hasSidePanel } from '../../utils/side-panel';
-import TheGalleryMenuItem from './TheGalleryMenuItem.vue';
 
 type DockOption = {
   value: StylebotDockLocation;
@@ -163,7 +157,7 @@ export default Vue.extend({
     SMenuDivider,
     SIconButton,
     SSegmentedControl,
-    SShortcutKbd,
+    SShortcutChip,
     SText,
     MoreIcon,
     DockLeftIcon,
@@ -173,7 +167,6 @@ export default Vue.extend({
     SunIcon,
     MoonIcon,
     MonitorIcon,
-    TheGalleryMenuItem,
   },
 
   computed: {
@@ -187,10 +180,6 @@ export default Vue.extend({
 
     undoShortcuts(): { undo: string; redo: string } {
       return undoShortcuts(isMac());
-    },
-
-    hasCss(): boolean {
-      return Boolean(this.$store.state.css.trim());
     },
 
     layout(): StylebotLayout {
@@ -280,7 +269,6 @@ export default Vue.extend({
 
     onOpen(): void {
       this.$store.commit('setInspecting', false);
-      this.$store.dispatch('loadPublishedGalleryStyle');
     },
 
     dock(dockLocation: StylebotDockLocation): void {
@@ -319,10 +307,6 @@ export default Vue.extend({
   color: var(--text-body);
 }
 
-.more-menu .menu-item:not(:disabled) .shortcut-kbd {
-  color: var(--text-muted);
-}
-
 .dock-row {
   box-sizing: border-box;
   display: flex;
@@ -338,18 +322,16 @@ export default Vue.extend({
   margin: 4px 8px;
 }
 
+.more-menu .menu-item:disabled .chip {
+  opacity: 0.5;
+}
+
 .menu-item-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   width: 100%;
-}
-
-.menu-item-hint {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--text-muted);
 }
 
 .more-menu .menu-item {
