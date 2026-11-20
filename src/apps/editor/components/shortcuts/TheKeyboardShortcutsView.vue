@@ -45,10 +45,6 @@
           {{ t('change_shortcuts_in_safari_settings_extensions') }}
         </s-text>
       </section>
-
-      <s-text size="caption" variant="muted" class="footer">
-        {{ t('panel_keys_work_outside_text_fields') }}
-      </s-text>
     </div>
   </div>
 </template>
@@ -278,9 +274,5 @@ export default Vue.extend({
 .key-chip {
   min-width: 22px;
   justify-content: center;
-}
-
-.footer {
-  padding: 4px 4px 0;
 }
 </style>

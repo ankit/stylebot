@@ -121,14 +121,14 @@ export const ClearAllInCodeMode: StoryObj = {
 };
 
 /**
- * Opens the editor's Options menu and returns its Undo and Redo items.
+ * Opens the editor's More actions menu and returns its Undo and Redo items.
  */
 const undoItems = async (canvasElement: HTMLElement) => {
   const canvas = within(canvasElement);
 
   await waitFor(() => expect(canvas.queryByRole('menu')).toBeNull());
 
-  const menu = within(await openEditorMenu(canvas, 'Options'));
+  const menu = within(await openEditorMenu(canvas, 'More actions'));
 
   return {
     undo: menu.getByRole('menuitem', { name: /^Undo/ }),
@@ -140,7 +140,7 @@ const closeMenu = () => user.keyboard('{Escape}');
 
 export const UndoRedoMenuItems: StoryObj = {
   ...editor(WITH_RULE),
-  name: 'undo and redo sit in the Options menu, enabled only when they can act',
+  name: 'undo and redo sit in the More actions menu, enabled only when they can act',
   play: async ({ canvasElement, step }) => {
     const store = storeOf(canvasElement);
     const control = propertyControl(within(canvasElement), 'Opacity');
@@ -181,7 +181,7 @@ export const UndoRedoMenuItems: StoryObj = {
 
 export const UndoRedoMenuInCodeMode: StoryObj = {
   ...editor({ ...WITH_RULE, options: { mode: 'code' } }),
-  name: 'undo in the Options menu works outside Basic mode',
+  name: 'undo in the More actions menu works outside Basic mode',
   play: async ({ canvasElement }) => {
     const store = storeOf(canvasElement);
     const before = store.state.css;

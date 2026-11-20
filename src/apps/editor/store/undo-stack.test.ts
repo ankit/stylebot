@@ -151,7 +151,7 @@ describe('undo stack', () => {
     it('spells the combos for the platform', () => {
       expect(undoShortcuts(true)).toEqual({
         undo: 'command+z',
-        redo: 'command+shift+z',
+        redo: 'shift+command+z',
       });
       expect(undoShortcuts(false)).toEqual({
         undo: 'ctrl+z',

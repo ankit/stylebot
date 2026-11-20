@@ -116,7 +116,7 @@ export const redoChange = (
  */
 export const undoShortcuts = (mac: boolean): { undo: string; redo: string } =>
   mac
-    ? { undo: 'command+z', redo: 'command+shift+z' }
+    ? { undo: 'command+z', redo: 'shift+command+z' }
     : { undo: 'ctrl+z', redo: 'ctrl+shift+z' };
 
 export type UndoKey = 'undo' | 'redo' | null;

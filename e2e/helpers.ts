@@ -205,7 +205,7 @@ export const popOutEditor = async (
     p.url().includes('/editor-window/index.html')
   );
 
-  await editorRoot.getByRole('button', { name: 'Options' }).click();
+  await editorRoot.getByRole('button', { name: 'More actions' }).click();
   await editorRoot
     .getByRole('button', { name: 'Open in separate window' })
     .click();
