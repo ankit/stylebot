@@ -3,6 +3,7 @@
     <property-row :label="t('filter')">
       <s-segmented-control
         class="filter-type"
+        outline-unset
         :value="type === 'none' ? '' : type"
         placeholder="none"
         :options="options"
