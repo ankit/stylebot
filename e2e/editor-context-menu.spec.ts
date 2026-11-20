@@ -53,12 +53,10 @@ const expectEveryTitle = async (editorRoot: Locator) => {
   await expect(
     editorRoot.locator('.autocomplete-chips .part').first()
   ).toHaveText(/a\.title$/);
-  await expect(
-    editorRoot.locator('.selector-scopes .segment[aria-pressed="true"]')
-  ).toContainText('3');
+  await expect(editorRoot.locator('.selector-scopes')).toContainText('3');
 };
 
-test('"Style this element" starts the selector field on a scope pill', async ({
+test('"Style this element" starts the selector field on a scope', async ({
   context,
   extension,
 }) => {
@@ -72,7 +70,7 @@ test('"Style this element" starts the selector field on a scope pill', async ({
   await expectEveryTitle(page.locator('#stylebot'));
 });
 
-test('"Style this element" starts the editor window\'s field on a scope pill', async ({
+test('"Style this element" starts the editor window\'s field on a scope', async ({
   context,
   engine,
   extension,

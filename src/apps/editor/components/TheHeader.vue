@@ -12,9 +12,11 @@
       <the-inspector ref="inspector" @select="inspect($event)" />
       <the-css-selector-dropdown ref="selectorField" />
     </div>
-    <the-selector-scopes class="scopes-row" />
 
-    <the-editor-mode-actions ref="modeActions" />
+    <div class="mode-row">
+      <the-editor-mode-actions ref="modeActions" class="mode-tabs" />
+      <the-selector-scopes class="scopes" />
+    </div>
   </div>
 </template>
 
@@ -111,7 +113,18 @@ export default Vue.extend({
   gap: 8px;
   padding: 4px var(--panel-gutter);
 }
-.scopes-row {
-  padding: 0 var(--panel-gutter) 4px calc(var(--panel-gutter) + 40px);
+.mode-row {
+  display: flex;
+  align-items: center;
+}
+
+.mode-tabs {
+  flex: 1;
+  min-width: 0;
+}
+
+.scopes {
+  flex: none;
+  margin: 8px calc(var(--panel-gutter) - 7px) 0 0;
 }
 </style>
