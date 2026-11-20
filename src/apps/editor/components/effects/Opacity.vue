@@ -1,31 +1,20 @@
 <template>
   <property-row :label="t('opacity')">
-    <div class="opacity-control">
-      <s-slider
-        class="opacity-slider"
-        :value="value"
-        :min="0"
-        :max="1"
-        :step="0.05"
-        :disabled="disabled"
-        @input="apply"
-      />
-
-      <s-number-field
-        class="compact-field"
-        unit="%"
-        placeholder="100"
-        :value="percent"
-        :disabled="disabled"
-        @input="applyPercent"
-      />
-    </div>
+    <s-slider
+      class="opacity-slider"
+      :value="value"
+      :min="0"
+      :max="1"
+      :step="0.05"
+      :disabled="disabled"
+      @input="apply"
+    />
   </property-row>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { SNumberField, SSlider } from '@stylebot/components';
+import { SSlider } from '@stylebot/components';
 import { getDeclarationValue } from '@stylebot/css';
 
 import PropertyRow from '../basic/PropertyRow.vue';
@@ -35,7 +24,6 @@ export default Vue.extend({
 
   components: {
     PropertyRow,
-    SNumberField,
     SSlider,
   },
 
@@ -49,26 +37,12 @@ export default Vue.extend({
       return Number.isNaN(parsed) ? 1 : parsed;
     },
 
-    // Empty while opacity is unset, so clearing the field reads as "none".
-    percent(): string {
-      const declared = getDeclarationValue(
-        this.$store.getters.activeRule,
-        'opacity'
-      );
-      return declared ? String(Math.round(this.value * 100)) : '';
-    },
-
     disabled(): boolean {
       return !this.$store.state.activeSelector;
     },
   },
 
   methods: {
-    applyPercent(percent: string): void {
-      const parsed = parseFloat(percent);
-      this.apply(Number.isNaN(parsed) ? 1 : Math.min(100, parsed) / 100);
-    },
-
     apply(value: number): void {
       const rounded = Math.round(value * 100) / 100;
 
@@ -82,21 +56,8 @@ export default Vue.extend({
 </script>
 
 <style lang="scss" scoped>
-.opacity-control {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
 .opacity-slider {
   flex: 1;
   min-width: 60px;
-}
-
-.compact-field.number-field {
-  flex: none;
-  width: 64px;
 }
 </style>
