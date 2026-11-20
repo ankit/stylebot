@@ -17,13 +17,14 @@ import {
   openSite,
   profiles,
   seed,
+  sharp,
   showTab,
   style,
   stubGallery,
   syncState,
   wait,
 } from './browser.mjs';
-import { captureCli } from './cli-shot.mjs';
+import { captureCliMode } from './cli-shot.mjs';
 import { gallery } from './themes.mjs';
 
 /**
@@ -62,9 +63,34 @@ export const listedGallery = async site => {
   );
 };
 
-// GitHub wraps the repo's last-commit row at the panel's width, so it's laid
-// out a little wider and scaled into the space.
-const GITHUB_WIDTH = 1012;
+/**
+ * Scrolls the Code tab's editor until the line starting with `text` is at
+ * the top.
+ */
+const scrollCodeTo = async (panel, text) => {
+  const code = panel.frameLocator('iframe');
+  const editor = await code.locator('.monaco-editor').boundingBox();
+  await panel.mouse.move(
+    editor.x + editor.width / 2,
+    editor.y + editor.height / 2
+  );
+
+  for (let i = 0; i < 20; i++) {
+    const line = code.locator('.view-line', { hasText: text }).first();
+    const box = (await line.count()) ? await line.boundingBox() : null;
+    const offset = box ? box.y - editor.y - 18 : editor.height / 2;
+
+    if (Math.abs(offset) < 2) {
+      break;
+    }
+
+    await panel.mouse.wheel(0, offset);
+    // Lets the editor's smooth scrolling finish before measuring again.
+    await wait(600);
+  }
+
+  await wait(300);
+};
 
 /**
  * The width a store slide or the phone tour lays the page out at, if either.
@@ -114,6 +140,44 @@ export const history = () => {
     source: 'local',
     before: { [url]: style(`body { color: #33${i}; }`) },
   }));
+};
+
+/**
+ * A Gallery style as it's listed, with its CSS and screenshots.
+ */
+const listedStyle = async (site, name) =>
+  (await listedGallery(site)).find(listed => listed.name === name);
+
+/**
+ * One of a listed style's screenshots, at 2x, for a site that keeps headless
+ * Chrome out. `crop` cuts it to a column, padded to 3:4 with its own
+ * background.
+ */
+const snapshot = async (style, index, crop) => {
+  const response = await fetch(new URL(style.screenshots[index], GALLERY_API));
+  const image = Buffer.from(await response.arrayBuffer());
+
+  if (!crop) {
+    return image;
+  }
+
+  const { height } = await sharp(image).metadata();
+  const { data } = await sharp(image)
+    .extract({ left: crop.x, top: height - 1, width: 1, height: 1 })
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const background = { r: data[0], g: data[1], b: data[2] };
+  const extra = Math.max(0, Math.round((crop.width * 4) / 3) - height);
+
+  return sharp(image)
+    .extract({ left: crop.x, top: 0, width: crop.width, height })
+    .extend({
+      top: Math.round(extra / 3),
+      bottom: extra - Math.round(extra / 3),
+      background,
+    })
+    .png()
+    .toBuffer();
 };
 
 /**
@@ -195,41 +259,35 @@ export const SHOTS = [
   },
   {
     name: '2-code',
-    about: 'The Code tab: GitHub in Dracula',
+    about: 'The Code tab: ChatGPT in ChatGPT Slate',
     appearance: 'dark',
     slide: {
       title: 'Write *CSS* when you want to.',
       accent: 'blue',
-      pageWidth: 380,
+      // Fits ChatGPT's conversation column at the screenshot's 3:4.
+      pageWidth: 600,
     },
-    phone: { pageWidth: 400 },
+    phone: { pageWidth: 600 },
     run: async (browser, file, options) => {
+      const site = 'chatgpt.com';
+      const style = await listedStyle(site, 'ChatGPT Slate');
       await seed(browser, {
-        styles: {
-          'github.com': profiles(
-            { name: 'Dracula', css: gallery('github', 'dracula') },
-            { name: 'Solarized', css: gallery('github', 'solarized') },
-            { name: 'Terminal', css: gallery('github', 'terminal') }
-          ),
-        },
+        styles: { [site]: profiles({ name: style.name, css: style.css }) },
       });
-      const page = await openSite(
-        browser.context,
-        'https://github.com/ankit/stylebot',
-        pageWidth(options)
-          ? { space: pageWidth(options) }
-          : { width: GITHUB_WIDTH }
-      );
-      // The repo's topics name Chrome, which the Mac App Store doesn't allow.
-      await page.addStyleTag({
-        content:
-          'header.HeaderMktg, [class*="TopicTagGroup"] { display: none !important; }',
+      // ChatGPT shows headless Chrome a bot check, so the page is the style's
+      // dark Gallery screenshot, cut to the conversation; the tab is only for
+      // the panel to connect to.
+      const page = await openSite(browser.context, `https://${site}/`, {
+        space: pageWidth(options),
       });
       const panel = await openPanelFor(browser, page, options);
       await showTab(panel, 'Code');
       await wait(1500);
+      // Past the font imports, to where the theme describes itself.
+      await scrollCodeTo(panel, 'GPT Slate');
       await capture(browser.context, file, page, panel, {
         appearance: 'dark',
+        pageImage: await snapshot(style, 0, { x: 920, width: 1420 }),
         ...options,
       });
     },
@@ -287,18 +345,23 @@ export const SHOTS = [
   },
   {
     name: '5-cli',
-    about: 'The CLI restyling Hacker News from a terminal',
+    about:
+      "CLI mode answering a note, over the Gallery's light Reddit Zen screenshot",
     appearance: 'light',
     slide: {
-      title: 'Restyle from the *command line*.',
+      title: 'Mark it. Let your *agent* restyle it.',
       accent: 'indigo',
     },
     // Runs its own browser, set up for the CLI.
     standalone: true,
     // Safari builds don't carry the CLI.
     cli: true,
-    run: (file, options) =>
-      captureCli(file, gallery('hn', 'newspaper'), options),
+    run: async (file, options) =>
+      captureCliMode(
+        file,
+        options,
+        await snapshot(await listedStyle('reddit.com', 'Reddit Zen'), 1)
+      ),
   },
   {
     name: '6-profiles',
