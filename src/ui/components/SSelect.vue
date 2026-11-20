@@ -148,7 +148,6 @@ export default Vue.extend({
   &:disabled {
     cursor: default;
     opacity: 0.6;
-    color: var(--field-placeholder);
   }
 }
 
