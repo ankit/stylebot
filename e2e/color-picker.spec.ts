@@ -33,10 +33,11 @@ test('a color picked in the popover applies to the page and is remembered as rec
   // page-scoped, not editorRoot-scoped: chaining .filter({ has }) off a
   // locator that's already pierced the #stylebot shadow root once breaks
   // the containment check across that boundary a second time.
-  const textCard = page.locator('.property-card').filter({
-    has: page.locator('.property-card-label', { hasText: /^Text$/ }),
+  const colorsCard = page.locator('.property-card').filter({
+    has: page.locator('.property-card-label', { hasText: /^Colors$/ }),
   });
-  const swatch = textCard.locator('.color-swatch');
+  // Text color is the Colors card's first row.
+  const swatch = colorsCard.locator('.color-swatch').first();
 
   await swatch.click();
 

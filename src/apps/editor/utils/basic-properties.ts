@@ -3,12 +3,11 @@ export const TEXT_PROPERTIES = [
   'font-size',
   'font-weight',
   'line-height',
-  'color',
   'text-decoration',
   'text-align',
 ];
 
-export const COLOR_PROPERTIES = ['background-color'];
+export const COLOR_PROPERTIES = ['color', 'background-color'];
 
 export const LAYOUT_PROPERTIES = [
   'padding',
