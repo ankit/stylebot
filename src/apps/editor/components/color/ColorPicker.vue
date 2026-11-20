@@ -45,6 +45,7 @@
 </template>
 
 <script lang="ts">
+import type { PropType } from 'vue';
 import Vue from 'vue';
 import { getDeclarationValue } from '@stylebot/css';
 import type { Debounced } from '@stylebot/utils';
@@ -74,6 +75,12 @@ export default Vue.extend({
   },
 
   props: {
+    // Other properties that take the same color, e.g. a border's other sides.
+    mirror: {
+      type: Array as PropType<Array<string>>,
+      default: () => [],
+    },
+
     property: {
       type: String,
       required: true,
@@ -161,10 +168,18 @@ export default Vue.extend({
       },
 
       set(value: string): void {
-        this.$store.dispatch('applyDeclaration', {
-          property: this.property,
-          value,
-        });
+        if (this.mirror.length === 0) {
+          this.$store.dispatch('applyDeclaration', {
+            property: this.property,
+            value,
+          });
+          return;
+        }
+
+        this.$store.dispatch(
+          'applyDeclarations',
+          [this.property, ...this.mirror].map(property => ({ property, value }))
+        );
       },
     },
 
@@ -204,6 +219,7 @@ export default Vue.extend({
       this.$store.dispatch('previewDeclaration', {
         property: this.property,
         value,
+        mirror: this.mirror,
       });
     },
 

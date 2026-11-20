@@ -136,7 +136,7 @@ export const CollapseAll: StoryObj = {
       Object.values(store.state.options.basicModeCollapsedSections).filter(
         Boolean
       )
-    ).toHaveLength(5);
+    ).toHaveLength(6);
   },
 };
 

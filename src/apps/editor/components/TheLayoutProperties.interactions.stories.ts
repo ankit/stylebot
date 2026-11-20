@@ -68,7 +68,7 @@ export const BorderControls: StoryObj = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
-    const control = propertyControl(canvas, 'Border');
+    const control = propertyControl(canvas, 'Style');
     const style = control.querySelector('.border-style button') as HTMLElement;
 
     // Reads through the `border` shorthand.
@@ -102,12 +102,58 @@ export const BorderWidthOnly: StoryObj = {
   name: 'a border-width alone shows its width with no style selected',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const control = propertyControl(canvas, 'Border');
+    const control = propertyControl(canvas, 'Style');
 
     await expect(numberInput(control)).toHaveValue('2');
     await expect(control.querySelector('.border-style button')).toHaveClass(
       'muted'
     );
+  },
+};
+
+export const BorderSides: StoryObj = {
+  ...editor(WITH_RULE),
+  name: 'picking sides moves the border onto them, and width edits reach every picked side',
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const side = (name: string) => canvas.getByRole('button', { name });
+
+    await step('bottom alone takes over the border', async () => {
+      await user.click(side('Bottom'));
+      await waitFor(() =>
+        expect(declaration(store, 'h1', 'border-bottom-style')).toBe('solid')
+      );
+      await expect(declaration(store, 'h1', 'border')).toBeUndefined();
+      await expect(pageStyle(canvasElement, 'h1', 'border-top-style')).toBe(
+        'none'
+      );
+    });
+
+    await step('adding top shares it, and width edits both', async () => {
+      await user.click(side('Top'));
+      await waitFor(() =>
+        expect(declaration(store, 'h1', 'border-top-style')).toBe('solid')
+      );
+
+      const width = numberInput(propertyControl(canvas, 'Style'));
+      await user.clear(width);
+      await user.type(width, '3');
+      await waitFor(() =>
+        expect(declaration(store, 'h1', 'border-top-width')).toBe('3px')
+      );
+      await expect(declaration(store, 'h1', 'border-bottom-width')).toBe('3px');
+    });
+
+    await step('all sides folds it back into one border', async () => {
+      await user.click(side('All sides'));
+      await waitFor(() =>
+        expect(declaration(store, 'h1', 'border')).toBe('3px solid #dcdfe5')
+      );
+      await expect(
+        declaration(store, 'h1', 'border-top-width')
+      ).toBeUndefined();
+    });
   },
 };
 

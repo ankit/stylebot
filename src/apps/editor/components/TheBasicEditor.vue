@@ -30,6 +30,15 @@
     </property-card>
 
     <property-card
+      :label="t('border')"
+      :collapsed="!open.border"
+      :count="borderCount"
+      @toggle="toggle('border')"
+    >
+      <the-border-properties />
+    </property-card>
+
+    <property-card
       :label="t('effects_properties')"
       :collapsed="!open.effects"
       :count="effectsCount"
@@ -63,6 +72,7 @@ import TheBasicEditorActions from './basic/TheBasicEditorActions.vue';
 import TheTextProperties from './TheTextProperties.vue';
 import TheColorProperties from './TheColorProperties.vue';
 import TheLayoutProperties from './TheLayoutProperties.vue';
+import TheBorderProperties from './TheBorderProperties.vue';
 import TheEffectsProperties from './TheEffectsProperties.vue';
 import TheMoreProperties from './TheMoreProperties.vue';
 
@@ -70,6 +80,7 @@ import {
   TEXT_PROPERTIES,
   COLOR_PROPERTIES,
   LAYOUT_PROPERTIES,
+  BORDER_PROPERTIES,
   EFFECTS_PROPERTIES,
   KNOWN_PROPERTIES,
 } from '../utils/basic-properties';
@@ -83,6 +94,7 @@ export default Vue.extend({
     TheTextProperties,
     TheColorProperties,
     TheLayoutProperties,
+    TheBorderProperties,
     TheEffectsProperties,
     TheMoreProperties,
   },
@@ -105,6 +117,7 @@ export default Vue.extend({
         text: !collapsed.text,
         colors: !collapsed.colors,
         layout: !collapsed.layout,
+        border: !collapsed.border,
         effects: !collapsed.effects,
         more: !collapsed.more,
       };
@@ -124,6 +137,10 @@ export default Vue.extend({
 
     layoutCount(): number {
       return this.countDeclarations(prop => LAYOUT_PROPERTIES.includes(prop));
+    },
+
+    borderCount(): number {
+      return this.countDeclarations(prop => BORDER_PROPERTIES.includes(prop));
     },
 
     effectsCount(): number {
