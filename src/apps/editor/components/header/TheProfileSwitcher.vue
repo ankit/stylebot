@@ -61,19 +61,6 @@
               @pick="startCreate"
               @submit="submitEdit(close)"
             />
-
-            <s-menu-divider />
-
-            <s-tooltip grow :text="t('stylebot_adds_important_automatically')">
-              <s-toggle-switch
-                class="override-row"
-                track-end
-                :value="forceImportant"
-                @change="setForceImportant"
-              >
-                <s-code-text :text="forceImportantLabel" code="!important" />
-              </s-toggle-switch>
-            </s-tooltip>
           </s-menu>
 
           <profile-menu
@@ -107,11 +94,8 @@ import Vue from 'vue';
 import {
   SAnchoredMenu,
   SMenu,
-  SCodeText,
   SMenuDivider,
   SConfirmDialog,
-  SToggleSwitch,
-  STooltip,
 } from '@stylebot/components';
 import { ChevronDownIcon } from '@stylebot/icons';
 import { freeProfileName, isProfileNameTaken } from '@stylebot/saved-styles';
@@ -129,11 +113,8 @@ export default Vue.extend({
   components: {
     SAnchoredMenu,
     SMenu,
-    SCodeText,
     SMenuDivider,
     SConfirmDialog,
-    SToggleSwitch,
-    STooltip,
     ChevronDownIcon,
     Profile,
     ProfileMenu,
@@ -164,14 +145,6 @@ export default Vue.extend({
 
     activeProfile(): string {
       return this.$store.state.activeProfile;
-    },
-
-    forceImportant(): boolean {
-      return this.$store.state.forceImportant;
-    },
-
-    forceImportantLabel(): string {
-      return this.t('force_important', ['!important']);
     },
 
     activeName(): string {
@@ -235,10 +208,6 @@ export default Vue.extend({
       } else {
         this.editing = null;
       }
-    },
-
-    setForceImportant(value: boolean): void {
-      this.$store.dispatch('setForceImportant', value);
     },
 
     onPanelMousedown(event: MouseEvent): void {
@@ -425,12 +394,5 @@ export default Vue.extend({
 .profile-list {
   box-sizing: border-box;
   width: 220px;
-}
-
-.switch.override-row {
-  height: 28px;
-  padding: 0 8px;
-  font-size: 13px;
-  color: var(--text-body);
 }
 </style>
