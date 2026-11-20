@@ -72,25 +72,57 @@ export const DecimalFontSize: StoryObj = {
   },
 };
 
-/* Only px is editable; a unitless or other-unit value renders empty and is
-   replaced on edit. */
 export const LineHeightField: StoryObj = {
   ...editor({ ...WITH_RULE, activeSelector: '.article-body' }),
-  name: 'a non-px line height renders empty and is replaced on edit',
+  name: 'a unitless line height shows as is, keeps no unit and steps by 0.1',
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const store = storeOf(canvasElement);
     const input = numberInput(propertyControl(canvas, 'Line Height'));
 
-    await expect(declaration(store, '.article-body', 'line-height')).toBe(
-      '1.6'
-    );
-    await expect(input).toHaveValue('');
+    await expect(input).toHaveValue('1.6');
 
-    await user.type(input, '24');
+    await user.click(input);
+    await pressKey('ArrowUp');
+    await expect(declaration(store, '.article-body', 'line-height')).toBe(
+      '1.7'
+    );
+
+    await user.clear(input);
+    await user.type(input, '24px');
     await waitFor(() =>
       expect(declaration(store, '.article-body', 'line-height')).toBe('24px')
     );
+  },
+};
+
+export const EmFontSize: StoryObj = {
+  ...editor({
+    ...WITH_RULE,
+    css: `h1 {
+  font-size: 1.5em;
+}`,
+  }),
+  name: 'an em size keeps its unit, steps by 0.1 and takes a typed px value',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const control = propertyControl(canvas, 'Size');
+    const input = numberInput(control);
+
+    await expect(input).toHaveValue('1.5');
+    await expect(control).toHaveTextContent('em');
+
+    await user.click(input);
+    await pressKey('ArrowUp');
+    await expect(declaration(store, 'h1', 'font-size')).toBe('1.6em');
+
+    await user.clear(input);
+    await user.type(input, '20px');
+    await waitFor(() =>
+      expect(declaration(store, 'h1', 'font-size')).toBe('20px')
+    );
+    await expect(control).toHaveTextContent('px');
   },
 };
 

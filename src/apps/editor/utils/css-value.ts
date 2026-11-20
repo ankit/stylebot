@@ -1,4 +1,5 @@
 const LENGTH_REGEX = /-?\d*\.?\d+px/;
+const LENGTH_VALUE_REGEX = /^(-?(?:\d+\.?\d*|\.\d+))([a-z%]*)$/i;
 const COLOR_FUNCTION_REGEX = /\b(?:rgb|rgba|hsl|hsla)\([^)]*\)/i;
 const HEX_COLOR_REGEX = /#[0-9a-fA-F]{3,8}\b/;
 
@@ -19,6 +20,27 @@ const BORDER_STYLE_KEYWORDS = [
 export const extractLength = (value: string): string => {
   const match = value.match(LENGTH_REGEX);
   return match ? match[0] : '';
+};
+
+export type ParsedLength = { length: string; unit: string };
+
+/**
+ * Splits a length into its number and unit, reading a unitless zero as px.
+ */
+export const parseLength = (value: string): ParsedLength | null => {
+  const match = value.trim().match(LENGTH_VALUE_REGEX);
+
+  if (!match) {
+    return null;
+  }
+
+  const [, length, unit] = match;
+
+  if (unit) {
+    return { length, unit };
+  }
+
+  return { length, unit: parseFloat(length) === 0 ? 'px' : '' };
 };
 
 // Pulls a color (hex or an rgb/rgba/hsl/hsla function) out of a shorthand

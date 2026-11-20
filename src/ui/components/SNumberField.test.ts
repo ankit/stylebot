@@ -59,4 +59,11 @@ describe('SNumberField.vue', () => {
 
     expect(emitted()).toEqual(['0.1']);
   });
+
+  it('steps by its step size', async () => {
+    await wrapper.setProps({ value: '1.6', step: 0.1 });
+    await input().trigger('keydown', { key: 'ArrowUp' });
+
+    expect(emitted()).toEqual(['1.7']);
+  });
 });

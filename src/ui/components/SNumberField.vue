@@ -107,6 +107,12 @@ export default Vue.extend({
       default: false,
     },
 
+    // How far an arrow key moves the value.
+    step: {
+      type: Number,
+      default: 1,
+    },
+
     menuMinWidth: {
       type: Number,
       default: 108,
@@ -165,11 +171,12 @@ export default Vue.extend({
       this.$emit('input', `${value}`);
     },
 
-    step(delta: number): void {
+    stepBy(direction: number): void {
+      const delta = direction * this.step;
       const current = this.shownValue;
       const base = current
         ? parseFloat(current)
-        : Math.round(parseFloat(this.placeholder));
+        : Math.round(parseFloat(this.placeholder) / this.step) * this.step;
       const next = Number.isNaN(base)
         ? delta
         : Math.round((base + delta) * 1000) / 1000;
@@ -185,11 +192,11 @@ export default Vue.extend({
       } else if (event.key === 'ArrowUp') {
         event.preventDefault();
         event.stopPropagation();
-        this.step(1);
+        this.stepBy(1);
       } else if (event.key === 'ArrowDown') {
         event.preventDefault();
         event.stopPropagation();
-        this.step(-1);
+        this.stepBy(-1);
       }
     },
   },
