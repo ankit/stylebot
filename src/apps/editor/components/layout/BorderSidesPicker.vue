@@ -1,5 +1,10 @@
 <template>
-  <div class="border-sides" role="group" :aria-label="t('sides')">
+  <div
+    class="border-sides"
+    :class="{ unset }"
+    role="group"
+    :aria-label="t('sides')"
+  >
     <s-tooltip
       v-for="option in options"
       :key="option.value"
@@ -64,6 +69,12 @@ export default Vue.extend({
       required: true,
     },
 
+    // Outlined, with the selection shown faintly, while the rule has no border.
+    unset: {
+      type: Boolean,
+      default: false,
+    },
+
     disabled: {
       type: Boolean,
       default: false,
@@ -121,11 +132,16 @@ export default Vue.extend({
 
 <style lang="scss" scoped>
 .border-sides {
-  @include field-fill;
-
   display: flex;
   gap: 2px;
   padding: 2px;
+  border-radius: 7px;
+  background: var(--field-surface);
+
+  &.unset {
+    background: transparent;
+    box-shadow: inset 0 0 0 1px var(--field-fill-border);
+  }
 }
 
 .border-side {
@@ -135,19 +151,35 @@ export default Vue.extend({
   align-items: center;
   justify-content: center;
   width: 30px;
-  height: 22px;
+  height: 24px;
   border-radius: 5px;
   color: var(--text-muted);
   cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
 
-  &:hover:not(:disabled) {
-    color: var(--text-primary);
+  &:hover:not(.on):not(:disabled) {
+    background: color-mix(in srgb, var(--text-primary) 6%, transparent);
   }
 
   &.on {
-    background: var(--card-surface);
+    background: var(--field-surface-active);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 18%), 0 0 0 1px rgb(0 0 0 / 6%);
     color: var(--text-primary);
-    box-shadow: 0 0 0 1px var(--field-fill-border);
+  }
+
+  .unset &.on {
+    background: color-mix(
+      in srgb,
+      var(--field-surface-active) 70%,
+      transparent
+    );
+    box-shadow: none;
+    color: var(--text-secondary);
+
+    @include dark-mode {
+      background: color-mix(in srgb, var(--text-primary) 5%, transparent);
+      color: var(--text-body);
+    }
   }
 
   &:disabled {

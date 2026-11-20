@@ -1,5 +1,6 @@
 <template>
   <s-segmented-control
+    outline-unset
     fit
     :value="value"
     :placeholder="placeholder"
