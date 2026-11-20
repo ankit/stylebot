@@ -169,19 +169,12 @@ export default Vue.extend({
   background: var(--box-padding);
 }
 
-.box-ring-margin > .box-ring-label {
-  color: var(--box-margin-label);
-}
-
-.box-ring-padding > .box-ring-label {
-  color: var(--box-padding-label);
-}
-
 .box-ring-label {
   position: absolute;
   top: 4px;
   left: 7px;
   font-size: 12px;
+  color: var(--box-label);
   pointer-events: none;
 }
 
