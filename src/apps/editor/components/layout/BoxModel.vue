@@ -129,8 +129,6 @@ export default Vue.extend({
   --box-margin: #fbe1c4;
   --box-padding: #dce6b5;
   --box-content: #c2dbe2;
-  --box-margin-label: #8a5a26;
-  --box-padding-label: #5a6a24;
   --box-label: #5f5a52;
   --box-value: var(--field-placeholder);
 
@@ -140,8 +138,6 @@ export default Vue.extend({
     --box-margin: #2f251c;
     --box-padding: #232c1d;
     --box-content: #1b2a33;
-    --box-margin-label: #d9a066;
-    --box-padding-label: #a3c47e;
     --box-label: #9aa3ae;
     --box-value: #a3aab6;
   }
