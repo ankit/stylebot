@@ -4,7 +4,7 @@ import TheSelectorScopes from './TheSelectorScopes.vue';
 import { editor } from '@stylebot/storybook/fixtures/editor';
 
 const meta: Meta = {
-  title: 'Editor/Scope pills',
+  title: 'Editor/Scope menu',
   component: TheSelectorScopes,
   parameters: { padded: false },
 };

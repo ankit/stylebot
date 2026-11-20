@@ -1,29 +1,77 @@
 <template>
-  <div
-    v-if="options.length"
-    class="selector-scopes"
-    @mouseover="preview"
-    @mouseleave="clearPreview"
-  >
-    <s-segmented-control
-      fit
-      size="medium"
-      :aria-label="t('how_much_to_style')"
-      :value="activeSelector"
-      :options="options"
-      @change="pick"
+  <div v-if="options.length === 1" class="selector-scopes">
+    <span
+      v-if="current.count"
+      class="scope-trigger single"
+      @mouseenter="preview(current.value)"
+      @mouseleave="clearPreview"
     >
-      <template #option="{ option }">
-        {{ option.label }}
-        <span class="scope-count">{{ option.count }}</span>
-      </template>
-    </s-segmented-control>
+      {{ elementsCount }}
+    </span>
   </div>
+
+  <s-anchored-menu
+    v-else-if="options.length"
+    class="selector-scopes"
+    @close="clearPreview"
+  >
+    <template #trigger="{ toggle, open }">
+      <s-tooltip :text="t('how_much_to_style')" :disabled="open">
+        <button
+          type="button"
+          class="scope-trigger"
+          :class="{ open }"
+          aria-haspopup="menu"
+          :aria-expanded="open ? 'true' : 'false'"
+          @click="toggle"
+        >
+          <span class="scope-label">{{ current.title }}</span>
+          <span v-if="current.count" class="scope-count">
+            {{ current.count }}
+          </span>
+          <chevron-down-icon :size="10" class="scope-chevron" />
+        </button>
+      </s-tooltip>
+    </template>
+
+    <template #default="{ close }">
+      <s-menu
+        :aria-label="t('how_much_to_style')"
+        dense
+        size="small"
+        :min-width="170"
+        @mouseleave.native="clearPreview"
+      >
+        <s-menu-item
+          v-for="option in options"
+          :key="option.value"
+          :selected="option.value === activeSelector"
+          @mouseenter.native="preview(option.value)"
+          @focus.native="preview(option.value)"
+          @click="
+            pick(option.value);
+            close();
+          "
+        >
+          <span class="scope-option">
+            <span class="scope-label">{{ option.title }}</span>
+            <span class="scope-count">{{ option.count }}</span>
+          </span>
+        </s-menu-item>
+      </s-menu>
+    </template>
+  </s-anchored-menu>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import { SSegmentedControl } from '@stylebot/components';
+import {
+  SAnchoredMenu,
+  SMenu,
+  SMenuItem,
+  STooltip,
+} from '@stylebot/components';
+import { ChevronDownIcon } from '@stylebot/icons';
 import { getPageBridge } from '@stylebot/page-bridge';
 
 import { getScopeSlots } from '@stylebot/css';
@@ -31,15 +79,25 @@ import type { ScopeSlots, SelectorAlternatives } from '@stylebot/css';
 
 import { isPeeking, stopPeek } from '../../utils/selector-peek';
 
-type ScopeOption = { value: string; label: string; count: string };
+type Slot = keyof ScopeSlots;
 
-const SLOTS: Array<keyof ScopeSlots> = ['only', 'similar', 'all'];
+type ScopeOption = {
+  value: string;
+  title: string;
+  count: string;
+};
+
+const SLOTS: Array<Slot> = ['only', 'similar', 'all'];
 
 export default Vue.extend({
   name: 'TheSelectorScopes',
 
   components: {
-    SSegmentedControl,
+    ChevronDownIcon,
+    SAnchoredMenu,
+    SMenu,
+    SMenuItem,
+    STooltip,
   },
 
   data(): { previewing: string | null } {
@@ -87,11 +145,28 @@ export default Vue.extend({
         return [
           {
             value: selector,
-            label: this.t(`selector_scope_${slot}`),
+            title: this.t(`selector_scope_${slot}`),
             count: String(this.alternatives.counts?.[selector] ?? ''),
           },
         ];
       });
+    },
+
+    // The single scope's reach in words, e.g. "30 elements".
+    elementsCount(): string {
+      const count = Number(this.current.count);
+
+      return this.t(
+        count === 1 ? 'elements_count_one' : 'elements_count_other',
+        [this.current.count]
+      );
+    },
+
+    current(): ScopeOption {
+      return (
+        this.options.find(option => option.value === this.activeSelector) ??
+        this.options[0]
+      );
     },
   },
 
@@ -105,30 +180,16 @@ export default Vue.extend({
     },
 
     /**
-     * Highlights what the hovered pill would style, redrawing only when the
-     * pill changes, and clears it once the pointer is past the pills; the
-     * gaps between them keep it, so crossing one doesn't flicker.
+     * Highlights what the hovered scope would style, unless the field is
+     * already peeking at that selector.
      */
-    preview(event: MouseEvent): void {
-      const target = event.target as HTMLElement;
-      const segment = target.closest('.segment');
-      const segments = Array.from(this.$el.querySelectorAll('.segment'));
-      const option = this.options[segments.indexOf(segment as Element)];
+    preview(selector: string): void {
+      const peeking = isPeeking() && selector === this.activeSelector;
 
-      if (option) {
-        const peeking = isPeeking() && option.value === this.activeSelector;
-
-        if (option.value !== this.previewing && !peeking) {
-          stopPeek();
-          this.previewing = option.value;
-          getPageBridge().highlight(option.value);
-        }
-
-        return;
-      }
-
-      if (!target.closest('.segmented')) {
-        this.clearPreview();
+      if (selector !== this.previewing && !peeking) {
+        stopPeek();
+        this.previewing = selector;
+        getPageBridge().highlight(selector);
       }
     },
 
@@ -145,50 +206,66 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .selector-scopes {
   display: flex;
-  min-width: 0;
+}
 
-  ::v-deep .segmented {
-    gap: 2px;
-    padding: 0;
-    background: transparent;
+.scope-trigger {
+  @include button-reset;
+
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 7px 0 8px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+
+  &:hover:not(.single),
+  &.open {
+    background: var(--hover-tint);
+    color: var(--text-primary);
   }
 
-  ::v-deep .segmented .segment-indicator {
-    display: none;
+  &:hover .scope-chevron,
+  &.open .scope-chevron {
+    color: var(--text-primary);
   }
 
-  ::v-deep .segmented .segment {
-    justify-items: start;
-    height: 24px;
-    padding: 0 11px;
-    border-radius: 6px;
-    background: transparent;
-    font-size: 12.5px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    cursor: pointer;
-
-    &:hover:not(.active) {
-      background: color-mix(in srgb, var(--text-primary) 7%, transparent);
-      color: var(--text-primary);
-    }
-
-    .scope-count {
-      margin-left: 4px;
-      font-variant-numeric: tabular-nums;
-      font-weight: 400;
-      color: var(--text-muted);
-    }
-
-    &.active {
-      background: var(--field-surface-hover);
-      color: var(--text-primary);
-      font-weight: 500;
-
-      @include dark-mode {
-        background: var(--field-surface-active);
-      }
-    }
+  &.single {
+    padding-right: 7px;
+    font-weight: 400;
+    color: var(--text-muted);
+    cursor: default;
   }
+
+  @include focus-ring($target: ':not(.open)');
+}
+
+.scope-count {
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.scope-chevron {
+  flex: none;
+  color: var(--text-muted);
+}
+
+.scope-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+
+  .scope-label {
+    flex: 1;
+  }
+}
+
+.menu-item:not(.selected) .scope-option .scope-count {
+  margin-right: 20px;
 }
 </style>

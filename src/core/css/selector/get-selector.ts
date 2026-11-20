@@ -109,7 +109,7 @@ export const getSelector = (el: HTMLElement): string => {
 
 /**
  * Every selector in the list that suits the element, plus the scoped
- * ones, each described by how much it covers for the scope pills.
+ * ones, each described by how much it covers for the scope menu.
  */
 export const getSelectorSuggestions = (el: HTMLElement): Array<Suggestion> => {
   const scopedStrategies: Array<ScopedStrategy> = [

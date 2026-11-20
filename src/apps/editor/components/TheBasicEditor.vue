@@ -216,7 +216,8 @@ export default Vue.extend({
   flex-direction: column;
   flex: 1 0 auto;
   gap: 8px;
-  padding: 12px var(--panel-gutter);
+  padding: 12px calc(var(--panel-gutter) - var(--scrollbar-gutter, 0px)) 12px
+    var(--panel-gutter);
   background: var(--tab-surface);
 }
 </style>

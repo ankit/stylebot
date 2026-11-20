@@ -127,11 +127,8 @@ export default Vue.extend({
 <style lang="scss" scoped>
 .box-model {
   --box-margin: #fbe1c4;
-  --box-margin-edge: #e8b47c;
   --box-padding: #dce6b5;
-  --box-padding-edge: #a9b86c;
   --box-content: #c2dbe2;
-  --box-content-edge: #7fa9b4;
   --box-margin-label: #8a5a26;
   --box-padding-label: #5a6a24;
   --box-label: #5f5a52;
@@ -141,11 +138,8 @@ export default Vue.extend({
 
   @include dark-mode {
     --box-margin: #2f251c;
-    --box-margin-edge: #8a6339;
     --box-padding: #232c1d;
-    --box-padding-edge: #5d7a3f;
     --box-content: #1b2a33;
-    --box-content-edge: #3f6e86;
     --box-margin-label: #d9a066;
     --box-padding-label: #a3c47e;
     --box-label: #9aa3ae;
@@ -165,7 +159,6 @@ export default Vue.extend({
   justify-content: center;
   gap: 2px;
   padding: 6px 3px;
-  border: 1px solid var(--box-content-edge);
   border-radius: 4px;
   background: var(--box-content);
 }

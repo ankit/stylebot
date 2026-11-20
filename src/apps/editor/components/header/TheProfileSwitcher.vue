@@ -1,6 +1,6 @@
 <template>
   <div class="profile-switcher">
-    <span class="separator" aria-hidden="true">/</span>
+    <span class="separator" aria-hidden="true">·</span>
 
     <s-anchored-menu
       class="profile-anchor"
