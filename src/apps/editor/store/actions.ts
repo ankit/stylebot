@@ -18,7 +18,6 @@ import {
   isForceImportantCss,
   removeEmptyRules,
   removeRule,
-  setForceImportantCss,
 } from '@stylebot/css';
 
 import { resolveGoogleFont } from '@stylebot/google-fonts';
@@ -581,18 +580,6 @@ export default {
 
   deleteProfile({ state }: { state: State }, id: string): void {
     deleteProfile(state.url, id);
-  },
-
-  /**
-   * Switches whether the style has `!important` forced onto every
-   * declaration or is applied exactly as written, by writing the choice into
-   * its css's metadata block, and reapplies it.
-   */
-  setForceImportant(
-    { state, dispatch }: { state: State; dispatch: Dispatch },
-    value: boolean
-  ): void {
-    dispatch('applyCss', { css: setForceImportantCss(state.css, value) });
   },
 
   /**

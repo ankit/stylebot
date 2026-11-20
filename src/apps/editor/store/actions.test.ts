@@ -15,7 +15,6 @@ jest.mock('@stylebot/css', () => {
   return {
     ...jest.createMockFromModule<object>('@stylebot/css'),
     isForceImportantCss: actual.isForceImportantCss,
-    setForceImportantCss: actual.setForceImportantCss,
   };
 });
 jest.mock('@stylebot/google-fonts');
@@ -257,19 +256,6 @@ describe('actions', () => {
       expect(mockBridge.applyCss).toBeCalledWith(
         expect.objectContaining({ forceImportant: false })
       );
-    });
-  });
-
-  describe('setForceImportant', () => {
-    it('writes the setting into the css header and reapplies it', () => {
-      const state = { ...mockState, css: 'a { color: red; }' };
-      const dispatch = jest.fn();
-
-      actions.setForceImportant({ state, dispatch }, false);
-
-      expect(dispatch).toBeCalledWith('applyCss', {
-        css: '/* ==Stylebot==\n@force-important false\n==/Stylebot== */\n\na { color: red; }',
-      });
     });
   });
 

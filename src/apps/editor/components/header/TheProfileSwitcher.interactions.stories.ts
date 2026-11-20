@@ -197,38 +197,6 @@ export const EditsGoToActiveProfile: StoryObj = {
   },
 };
 
-export const ForceImportant: StoryObj = {
-  ...editor({ ...WITH_PROFILES, activeProfile: 'dark' }),
-  name: "Force !important in the menu writes the setting into the shown profile's css and keeps the menu open",
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const store = storeOf(canvasElement);
-    const sendMessage = sentMessages();
-
-    const menu = await openSwitcher(canvas);
-    const toggle = within(menu).getByRole('checkbox', {
-      name: 'Force !important',
-    });
-    await expect(toggle).toBeChecked();
-
-    await user.click(toggle);
-
-    await expect(store.state.forceImportant).toBe(false);
-    await expect(store.state.css).toContain('@force-important false');
-    await expect(toggle).not.toBeChecked();
-    await expect(menu).toBeVisible();
-    await waitFor(() =>
-      expect(sendMessage).toHaveBeenCalledWith(
-        expect.objectContaining({
-          name: 'SetStyle',
-          css: expect.stringContaining('@force-important false'),
-          profileId: 'dark',
-        })
-      )
-    );
-  },
-};
-
 export const CreateProfile: StoryObj = {
   ...editor(WITH_PROFILES),
   name: 'Create profile names the new profile in place, starting from Untitled, and refuses a taken name',

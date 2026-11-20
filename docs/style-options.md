@@ -53,7 +53,7 @@ Stylebot marks every declaration `!important` when it applies a style, so the st
 ```
 
 - **Only `false` is written.** Without the key, or with `true`, every declaration is forced. Any other value is skipped with a warning.
-- **The switch writes it.** Force !important in the editor's profile menu and on a style's page in the options page adds this line to the profile's CSS, in its existing block or a new one at the top, and turning it back on removes it, and the block if nothing else is in it.
+- **The switch writes it.** Force !important on a style's page in the options page adds this line to the profile's CSS, in its existing block or a new one at the top, and turning it back on removes it, and the block if nothing else is in it.
 - **It travels with the CSS**, so each profile has its own, and it reaches the Gallery, backups and anything else that copies the CSS. The Gallery's preview and install honour it. `!important` itself is never written into the CSS.
 - An older Stylebot skips the key and forces `!important` as before.
 
