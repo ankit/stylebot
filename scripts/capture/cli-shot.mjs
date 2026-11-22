@@ -1,5 +1,5 @@
-// The command line shot: the real CLI restyles Hacker News in a browser of its
-// own, and its output is shown as a Claude Code session beside the page.
+// The command line shot: a real CLI mode terminal, from a browser of its own
+// with the CLI connected, over a page it restyled.
 
 import { createRequire } from 'node:module';
 import { execFile } from 'node:child_process';
@@ -9,49 +9,22 @@ import path from 'node:path';
 
 import { rootDir } from '../lib/cli.mjs';
 import {
-  HEIGHT,
-  WIDTH,
   WINDOW,
   closeWelcomeTabs,
   launchOptions,
   loadExtension,
   render,
+  sharp,
   slide,
   wait,
 } from './browser.mjs';
+import { URL, runCliMode, terminalImage } from './cli-mode-steps.mjs';
 
 const require = createRequire(import.meta.url);
 const { chromium } = require('@playwright/test');
 
-const SITE = 'news.ycombinator.com';
-const PROFILE = 'Newspaper';
-const CSS_FILE = '~/.stylebot/work/hn.css';
-const PROMPT = '/stylebot make Hacker News look like a newspaper';
-// What the agent says it did; rewrite it when the theme changes.
-const SUMMARY = `Hacker News is now a broadsheet: a Playfair Display masthead with a dateline, small-caps section links, Old Standard type on newsprint, and a rule between stories. It’s saved as the “${PROFILE}” profile, so your own style is one switch away.`;
-
-// A slide shows the session at its own size, in larger type, so it lays the
-// two out in the slide's window and folds tool output further.
-const LAYOUTS = {
-  shot: {
-    width: WIDTH,
-    height: HEIGHT,
-    terminal: 620,
-    font: 13.5,
-    gap: 16,
-    keep: 3,
-  },
-  slide: {
-    width: WINDOW.width,
-    height: WINDOW.height,
-    terminal: 600,
-    font: 15,
-    gap: 12,
-    keep: 0,
-  },
-};
-
-const escape = text => text.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+// The tab CLI mode runs in, which the shot doesn't show.
+const VIEWPORT = { width: 1120, height: 760 };
 
 /**
  * Starts a browser whose HOME is a temporary folder, with the CLI's host
@@ -145,147 +118,74 @@ export const startCliBrowser = async () => {
   };
 };
 
-/**
- * Lines of a tool call's output, folded as Claude Code folds them.
- */
-const fold = (out, keep) => {
-  const lines = out.split('\n');
-  return lines.length > keep + 1
-    ? [
-        ...lines.slice(0, keep),
-        `… +${lines.length - keep} lines (ctrl+o to expand)`,
-      ]
-    : lines;
-};
+// What the note asks of the Gallery screenshot under the terminal, and the
+// agent's answer; rewrite both if that screenshot changes.
+const NOTE = 'set posts in a serif, soften the colours, hide the sidebar';
+const REPLY =
+  'Posts are in Literata now, on soft off-white paper, and the right sidebar is hidden. Press Z to undo.';
 
-const toolCall = (name, args, lines) => `
-  <div class="step"><span class="ok">⏺</span> <b>${name}</b>(${escape(args)
-  .split(' ')
-  .map(word => `<span class="word">${word}</span>`)
-  .join(' ')})</div>
-  ${lines
-    .map(
-      (line, i) =>
-        `<div class="out">${i ? '&nbsp;&nbsp;&nbsp;' : '⎿&nbsp;&nbsp;'}${escape(
-          line
-        )}</div>`
-    )
-    .join('')}`;
-
-const terminal = ({ tab, steps, pageImage, layout }) => `
-<html><head><style>
-  body { margin: 0; display: flex; gap: 1px; height: ${
-    layout.height
-  }px; background: #000; font-family: Menlo, monospace; }
-  .term { width: ${
-    layout.terminal
-  }px; background: #1a1a1a; color: #e6e6e6; font-size: ${
-  layout.font
-}px; line-height: 1.6; display: flex; flex-direction: column; }
-  .bar { height: 34px; display: flex; align-items: center; gap: 8px; padding: 0 14px; background: #262626; color: #9a9a9a; font: 12px -apple-system, system-ui, sans-serif; }
-  .bar i { width: 12px; height: 12px; border-radius: 50%; }
-  .bar span { flex: 1; text-align: center; margin-right: 52px; }
-  .body { padding: 16px 18px; overflow: hidden; }
-  .ask { color: #fff; background: #2a2a2a; padding: 6px 10px; border-radius: 4px; margin-bottom: 16px; }
-  .step { margin-top: ${layout.gap}px; padding-left: 18px; text-indent: -18px; }
-  .step b { color: #fff; }
-  .word { white-space: nowrap; }
-  .ok { color: #4eba65; }
-  .out { color: #9a9a9a; white-space: pre; padding-left: 16px; overflow: hidden; text-overflow: ellipsis; }
-  .say { display: flex; gap: 9px; margin-top: 20px; }
-  .prompt { border: 1px solid #444; border-radius: 6px; padding: 8px 10px; color: #777; margin-top: 18px; }
-  img { display: block; width: ${pageWidth(layout)}px; height: ${
-  layout.height
-}px; }
-</style></head><body>
-  <div class="term">
-    <div class="bar"><i style="background:#ff5f57"></i><i style="background:#febc2e"></i><i style="background:#28c840"></i><span>Terminal</span></div>
-    <div class="body">
-      <div class="ask">&gt; ${escape(PROMPT)}</div>
-      ${toolCall('Bash', `stylebot open ${SITE}`, steps.open.split('\n'))}
-      ${toolCall(
-        'Bash',
-        `stylebot outline ${tab}`,
-        fold(steps.outline, layout.keep)
-      )}
-      ${toolCall('Write', CSS_FILE, [
-        `Wrote ${steps.cssLines} lines to ${CSS_FILE}`,
-      ])}
-      ${toolCall(
-        'Bash',
-        `stylebot profile create "${PROFILE}" ${SITE} --use`,
-        steps.profile.split('\n')
-      )}
-      ${toolCall(
-        'Bash',
-        `stylebot css set ${SITE} --file ${CSS_FILE}`,
-        fold(steps.css, layout.keep)
-      )}
-      <div class="say"><span>⏺</span><span>${escape(SUMMARY)}</span></div>
-      <div class="prompt">&gt;</div>
-    </div>
-  </div>
-  <img src="data:image/png;base64,${pageImage}">
-</body></html>`;
-
-const pageWidth = layout => layout.width - layout.terminal - 1;
+const MARGIN = 24;
 
 /**
- * Restyles Hacker News with `css` through the CLI and saves the session
- * beside the restyled page, as a slide when given one.
+ * Takes CLI mode as a slide: a real CLI mode terminal, after the agent's
+ * answer, over `page`, a 2x screenshot of the page it describes, cut from
+ * `left` past Reddit's left nav to the window's right edge, where the empty
+ * right rail holds the terminal. Reddit keeps headless Chrome out, so the
+ * terminal runs on Hacker News.
  */
-export const captureCli = async (file, css, { slide: frame } = {}) => {
-  const layout = LAYOUTS[frame ? 'slide' : 'shot'];
+export const captureCliMode = async (
+  file,
+  { slide: frame, scale },
+  { image: page, left }
+) => {
   const browser = await startCliBrowser();
 
   try {
-    const open = (await browser.cli(['open', SITE])).out;
-    const tab = open.match(/\d{5,}/)?.[0];
-    if (!tab) {
-      throw new Error(`stylebot open printed no tab: ${open}`);
-    }
-    await wait(2500);
-    const outline = (await browser.cli(['outline', tab])).out;
-    const profile = (
-      await browser.cli(['profile', 'create', PROFILE, SITE, '--use'])
-    ).out;
-
-    const cssFile = path.join(browser.home, 'hn.css');
-    fs.writeFileSync(cssFile, css);
-    const cssOut = (await browser.cli(['css', 'set', SITE, '--file', cssFile]))
-      .out;
-    await wait(2500);
-
-    const page = browser.context.pages().find(p => p.url().includes(SITE));
-    await page.setViewportSize({
-      width: pageWidth(layout),
-      height: layout.height,
-    });
+    const tab = await browser.context.newPage();
+    await tab.setViewportSize(VIEWPORT);
+    await tab.goto(URL, { waitUntil: 'load' });
+    await tab.bringToFront();
     await wait(1500);
-    const pageImage = (await page.screenshot()).toString('base64');
+
+    let terminal;
+    await runCliMode(
+      browser,
+      tab,
+      async moment => {
+        if (moment === 'reply') {
+          terminal = await terminalImage(tab);
+        }
+      },
+      { note: NOTE, reply: REPLY }
+    );
+
+    const pageSize = await sharp(page).metadata();
+    const terminalSize = await sharp(terminal).metadata();
+    const width = pageSize.width / 2 - left;
+    const height = Math.round((width * WINDOW.height) / WINDOW.width);
+    const dataUrl = (image, type) =>
+      `data:image/${type};base64,${image.toString('base64')}`;
 
     const image = await render(
       browser.context,
-      terminal({
-        tab,
-        pageImage,
-        layout,
-        steps: {
-          open,
-          outline,
-          profile,
-          css: cssOut,
-          cssLines: css.trimEnd().split('\n').length,
-        },
-      }),
-      frame ? null : file,
-      frame
-        ? { scale: 'device', width: layout.width, height: layout.height }
-        : {}
+      `<body style="margin:0;position:relative;overflow:hidden;height:${height}px">
+        <img src="${dataUrl(
+          page,
+          pageSize.format
+        )}" style="display:block;width:${
+        pageSize.width / 2
+      }px;margin-left:${-left}px">
+        <img src="${dataUrl(
+          terminal,
+          'png'
+        )}" style="position:absolute;right:${MARGIN}px;bottom:${MARGIN}px;width:${
+        terminalSize.width / 2
+      }px">
+      </body>`,
+      null,
+      { scale: 'device', width, height }
     );
-    if (frame) {
-      await slide(browser.context, { image, width: layout.width }, file, frame);
-    }
+    await slide(browser.context, { image, width }, file, { ...frame, scale });
   } finally {
     await browser.close();
   }

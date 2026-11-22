@@ -1,10 +1,12 @@
 // Takes the store listing's screenshots from the current build, on live sites,
 // into store/screenshots/:
 //
-//   yarn capture:store [--safari | --iphone | --ipad | --phone] [--only <name>...] [--out <dir>] [--no-build]
+//   yarn capture:store [--safari | --firefox | --iphone | --ipad | --phone] [--only <name>...] [--out <dir>] [--no-build]
 //
 // With --safari, the Mac App Store's set goes into store/safari/ instead, at
-// 2560×1600, without the CLI, each slide showing the whole window. --iphone
+// 2560×1600, without the CLI, each slide showing the whole window. --firefox
+// takes the same slides as the Chrome Web Store's at 2560×1600 for AMO, which
+// shows screenshots larger, into store/firefox/. --iphone
 // and --ipad take the App Store's sets for those, into store/safari/iphone/
 // and store/safari/ipad/. With --phone, the same screens are cut out,
 // without their headlines, for the tour on stylebot.dev's phone layout, into
@@ -18,10 +20,12 @@ import { IPHONE, IPHONE_SHOTS } from './iphone.mjs';
 import { SHOTS } from './shots.mjs';
 import { capturesDir, shownPath, takeOutput } from './output.mjs';
 
-const USAGE = `usage: yarn capture:store [--safari | --iphone | --ipad | --phone] [--only <name>...] [--out <dir>] [--no-build]
+const USAGE = `usage: yarn capture:store [--safari | --firefox | --iphone | --ipad | --phone] [--only <name>...] [--out <dir>] [--no-build]
 
   --safari    take the Mac App Store's set, at 2560×1600 with whole
               windows, into store/safari/
+  --firefox   take the listing's slides at 2560×1600 for AMO, into
+              store/firefox/
   --iphone    take the App Store's iPhone set, at 1320×2868, into
               store/safari/iphone/
   --ipad      take the App Store's iPad set, at 2752×2064, into
@@ -50,6 +54,7 @@ const iphone = args.includes('--iphone');
 const ipad = args.includes('--ipad');
 const safari = args.includes('--safari') || ipad;
 const phone = args.includes('--phone');
+const firefox = args.includes('--firefox');
 
 /**
  * Where the shots go unless --out says otherwise.
@@ -63,12 +68,16 @@ const defaultDir = () => {
     return path.join(rootDir, 'store', 'safari', iphone ? 'iphone' : 'ipad');
   }
 
+  if (firefox) {
+    return path.join(rootDir, 'store', 'firefox');
+  }
+
   return path.join(rootDir, 'store', safari ? 'safari' : 'screenshots');
 };
 
 const { outDir, rest } = takeOutput(args, defaultDir());
-// Drawn at 2x either way; Safari keeps those pixels for the App Store.
-const options = safari ? { scale: 'device' } : {};
+// Drawn at 2x either way; Safari and AMO keep those pixels.
+const options = safari || firefox ? { scale: 'device' } : {};
 // A 13" iPad's screen, landscape, in points; drawn at 2x.
 const IPAD = { width: 1376, height: 1032 };
 const device = (iphone && 'iphone') || (ipad && 'ipad') || undefined;

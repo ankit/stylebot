@@ -460,16 +460,20 @@ export const cutOut = async (context, { image, width }, file, crop) => {
 /**
  * Saves the page, with the panel beside it when there is one, as one shot, as
  * a slide when given one, or cut out for the phone tour. The page takes the
- * space openSite gave it.
+ * space openSite gave it. `pageImage` shows a screenshot taken elsewhere in
+ * the page's place.
  */
 export const capture = async (
   context,
   file,
   page,
   panel,
-  { appearance, scale, slide: frame, phone }
+  { appearance, scale, slide: frame, phone, pageImage }
 ) => {
-  const [site, side] = await Promise.all([png(page), panel && png(panel)]);
+  const [site, side] = await Promise.all([
+    pageImage ? pageImage.toString('base64') : png(page),
+    panel && png(panel),
+  ]);
   const viewport = page.viewportSize();
   const space = Math.round((viewport.width * HEIGHT) / viewport.height);
   const panelWidth = panel?.viewportSize().width ?? 0;
