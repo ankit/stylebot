@@ -274,11 +274,11 @@ export const SHOTS = [
       // Wikipedia's fundraising and campaign banners come and go.
       await page.addStyleTag({ content: '#centralNotice { display: none; }' });
       const panel = await openPanelFor(browser, page, options);
-      // Whole-window slides show the Colors section, where the title has a
-      // value another rule overrides; the opening paragraph has none.
-      await (options.slide?.whole
-        ? page.locator('#mw-content-text p', { hasText: 'reason for being' })
-        : page.locator('#firstHeading')
+      // Only the Chrome slide's crop hides the Colors section, where the
+      // title has a value another rule overrides; the opening paragraph has none.
+      await (options.slide && !options.slide.whole
+        ? page.locator('#firstHeading')
+        : page.locator('#mw-content-text p', { hasText: 'reason for being' })
       ).hover();
       await wait(900);
       await capture(browser.context, file, page, panel, {
