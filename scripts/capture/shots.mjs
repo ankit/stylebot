@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import {
   WIDTH,
   HEIGHT,
+  PAGE_WIDTH,
   PHONE,
   capture,
   capturePopup,
@@ -25,6 +26,7 @@ import {
   wait,
 } from './browser.mjs';
 import { captureCliMode } from './cli-shot.mjs';
+import { capturesDir } from './output.mjs';
 import { gallery } from './themes.mjs';
 
 /**
@@ -150,34 +152,57 @@ const listedStyle = async (site, name) =>
 
 /**
  * One of a listed style's screenshots, at 2x, for a site that keeps headless
- * Chrome out. `crop` cuts it to a column, padded to 3:4 with its own
- * background.
+ * Chrome out.
  */
-const snapshot = async (style, index, crop) => {
+const snapshot = async (style, index) => {
   const response = await fetch(new URL(style.screenshots[index], GALLERY_API));
-  const image = Buffer.from(await response.arrayBuffer());
 
-  if (!crop) {
-    return image;
-  }
+  return Buffer.from(await response.arrayBuffer());
+};
 
-  const { height } = await sharp(image).metadata();
+/**
+ * Cuts a 2x page screenshot to a column centred on `center`, below `top`,
+ * shaped to fill `space` CSS pixels of a shot's height, padded with the
+ * page's own background where it runs short.
+ */
+const column = async (image, { center, top }, space) => {
+  const aspect = space / HEIGHT;
+  const meta = await sharp(image).metadata();
+  const height = meta.height - top;
+  const width = Math.min(
+    meta.width,
+    Math.max(1440, Math.round(height * aspect))
+  );
+  const left = Math.max(
+    0,
+    Math.min(meta.width - width, Math.round(center - width / 2))
+  );
   const { data } = await sharp(image)
-    .extract({ left: crop.x, top: height - 1, width: 1, height: 1 })
+    .extract({ left, top: meta.height - 1, width: 1, height: 1 })
     .raw()
     .toBuffer({ resolveWithObject: true });
-  const background = { r: data[0], g: data[1], b: data[2] };
-  const extra = Math.max(0, Math.round((crop.width * 4) / 3) - height);
+  const extra = Math.max(0, Math.round(width / aspect) - height);
 
   return sharp(image)
-    .extract({ left: crop.x, top: 0, width: crop.width, height })
+    .extract({ left, top, width, height })
     .extend({
-      top: Math.round(extra / 3),
-      bottom: extra - Math.round(extra / 3),
-      background,
+      top: Math.round(extra / 2),
+      bottom: extra - Math.round(extra / 2),
+      background: { r: data[0], g: data[1], b: data[2] },
     })
     .png()
     .toBuffer();
+};
+
+/**
+ * A page screenshot kept in captures/store/, sharper than the Gallery's, or
+ * `fallback` when there isn't one, taken in a real browser at 2x. `use` adapts
+ * it to what the shot takes.
+ */
+const localOr = async (name, fallback, use = image => image) => {
+  const file = path.join(capturesDir('store'), name);
+
+  return fs.existsSync(file) ? use(fs.readFileSync(file)) : fallback();
 };
 
 /**
@@ -223,7 +248,8 @@ export const wikipediaLooks = async () => {
 export const SHOTS = [
   {
     name: '1-pick-element',
-    about: 'Picking an element: Wikipedia in Slate',
+    about:
+      "Picking an element: Wikipedia in the Gallery's Wikipedia Reader, dark",
     appearance: 'dark',
     slide: {
       title: 'Point at *anything*. Restyle it.',
@@ -234,13 +260,12 @@ export const SHOTS = [
     run: async (browser, file, options) => {
       await seed(browser, {
         styles: {
-          'en.wikipedia.org': profiles(
-            { name: 'Slate', css: gallery('wikipedia', 'slate') },
-            { name: 'Parchment', css: gallery('wikipedia', 'parchment') }
-          ),
+          'en.wikipedia.org': {
+            ...(await wikipediaLooks()),
+            profileOptions: { default: { scheme: 'dark' } },
+          },
         },
       });
-      // An article without images up top, so Slate's two columns stay full.
       const page = await openSite(
         browser.context,
         'https://en.wikipedia.org/wiki/Ikigai',
@@ -249,7 +274,12 @@ export const SHOTS = [
       // Wikipedia's fundraising and campaign banners come and go.
       await page.addStyleTag({ content: '#centralNotice { display: none; }' });
       const panel = await openPanelFor(browser, page, options);
-      await page.locator('#firstHeading').hover();
+      // Whole-window slides show the Colors section, where the title has a
+      // value another rule overrides; the opening paragraph has none.
+      await (options.slide?.whole
+        ? page.locator('#mw-content-text p', { hasText: 'reason for being' })
+        : page.locator('#firstHeading')
+      ).hover();
       await wait(900);
       await capture(browser.context, file, page, panel, {
         appearance: 'dark',
@@ -274,11 +304,11 @@ export const SHOTS = [
       await seed(browser, {
         styles: { [site]: profiles({ name: style.name, css: style.css }) },
       });
-      // ChatGPT shows headless Chrome a bot check, so the page is the style's
-      // dark Gallery screenshot, cut to the conversation; the tab is only for
-      // the panel to connect to.
+      // ChatGPT shows headless Chrome a bot check, so the page is a screenshot
+      // cut to the conversation; the tab is only for the panel to connect to.
+      const space = options.slide?.whole ? PAGE_WIDTH : 600;
       const page = await openSite(browser.context, `https://${site}/`, {
-        space: pageWidth(options),
+        space,
       });
       const panel = await openPanelFor(browser, page, options);
       await showTab(panel, 'Code');
@@ -287,7 +317,14 @@ export const SHOTS = [
       await scrollCodeTo(panel, 'GPT Slate');
       await capture(browser.context, file, page, panel, {
         appearance: 'dark',
-        pageImage: await snapshot(style, 0, { x: 920, width: 1420 }),
+        pageImage: await column(
+          ...(await localOr(
+            'chatgpt.png',
+            async () => [await snapshot(style, 0), { center: 1631, top: 100 }],
+            image => [image, { center: 1930, top: 110 }]
+          )),
+          space
+        ),
         ...options,
       });
     },
@@ -300,6 +337,26 @@ export const SHOTS = [
       title: 'Try styles from the *Gallery*.',
       accent: 'pink',
       crop: { x: 380 },
+    },
+    // Safari's slides show the page alone, with the preview card the popup
+    // started.
+    safariRun: async (browser, file, options) => {
+      const site = 'news.ycombinator.com';
+
+      await stubGallery(browser, site, await listedGallery(site));
+      const page = await openSite(browser.context, `https://${site}/`, {
+        full: true,
+      });
+      const popup = await openPopup(browser, page);
+      await popup.getByRole('button', { name: /Daily HN Edition/ }).click();
+      await wait(2500);
+      await popup.close();
+      await page.bringToFront();
+      await wait(800);
+      await capture(browser.context, file, page, null, {
+        appearance: 'dark',
+        ...options,
+      });
     },
     run: async (browser, file, options) => {
       const site = 'news.ycombinator.com';
@@ -357,11 +414,13 @@ export const SHOTS = [
     // Safari builds don't carry the CLI.
     cli: true,
     run: async (file, options) =>
-      captureCliMode(
-        file,
-        options,
-        await snapshot(await listedStyle('reddit.com', 'Reddit Zen'), 1)
-      ),
+      captureCliMode(file, options, {
+        image: await localOr('reddit.png', async () =>
+          snapshot(await listedStyle('reddit.com', 'Reddit Zen'), 1)
+        ),
+        // Past Reddit's left nav, in a window about 1,325px wide.
+        left: 292,
+      }),
   },
   {
     name: '6-profiles',

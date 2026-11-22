@@ -124,17 +124,20 @@ const NOTE = 'set posts in a serif, soften the colours, hide the sidebar';
 const REPLY =
   'Posts are in Literata now, on soft off-white paper, and the right sidebar is hidden. Press Z to undo.';
 
-// Where the page screenshot is cut: past Reddit's left nav, so the posts and
-// the empty right rail, where the terminal sits, fill the slide.
-const PAGE_LEFT = 276;
 const MARGIN = 24;
 
 /**
  * Takes CLI mode as a slide: a real CLI mode terminal, after the agent's
- * answer, over `page`, a 2x screenshot of the page it describes. Reddit
- * keeps headless Chrome out, so the terminal runs on Hacker News.
+ * answer, over `page`, a 2x screenshot of the page it describes, cut from
+ * `left` past Reddit's left nav to the window's right edge, where the empty
+ * right rail holds the terminal. Reddit keeps headless Chrome out, so the
+ * terminal runs on Hacker News.
  */
-export const captureCliMode = async (file, { slide: frame }, page) => {
+export const captureCliMode = async (
+  file,
+  { slide: frame, scale },
+  { image: page, left }
+) => {
   const browser = await startCliBrowser();
 
   try {
@@ -158,7 +161,7 @@ export const captureCliMode = async (file, { slide: frame }, page) => {
 
     const pageSize = await sharp(page).metadata();
     const terminalSize = await sharp(terminal).metadata();
-    const width = pageSize.width / 2 - PAGE_LEFT;
+    const width = pageSize.width / 2 - left;
     const height = Math.round((width * WINDOW.height) / WINDOW.width);
     const dataUrl = (image, type) =>
       `data:image/${type};base64,${image.toString('base64')}`;
@@ -171,7 +174,7 @@ export const captureCliMode = async (file, { slide: frame }, page) => {
           pageSize.format
         )}" style="display:block;width:${
         pageSize.width / 2
-      }px;margin-left:${-PAGE_LEFT}px">
+      }px;margin-left:${-left}px">
         <img src="${dataUrl(
           terminal,
           'png'
@@ -182,7 +185,7 @@ export const captureCliMode = async (file, { slide: frame }, page) => {
       null,
       { scale: 'device', width, height }
     );
-    await slide(browser.context, { image, width }, file, frame);
+    await slide(browser.context, { image, width }, file, { ...frame, scale });
   } finally {
     await browser.close();
   }
