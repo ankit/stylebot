@@ -17,6 +17,8 @@ import { getDeclarationValue } from '@stylebot/css';
 import { extractLength } from '../utils/css-value';
 import { computedPlaceholder } from '../utils/computed-placeholder';
 
+// todo: support other units.
+// currently, we render empty input and overwrite on edit
 const PX_LENGTH = /^(-?(?:\d+\.?\d*|\.\d+))px$/i;
 
 export default Vue.extend({
@@ -74,8 +76,6 @@ export default Vue.extend({
 
         const match = value.trim().match(PX_LENGTH);
 
-        // todo: support other units.
-        // currently, we render empty input and overwrite on edit
         return match ? match[1] : '';
       },
 
