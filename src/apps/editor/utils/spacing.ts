@@ -3,17 +3,6 @@ export type Sides = Record<Side, string>;
 
 export const EMPTY_SIDES: Sides = { top: '', right: '', bottom: '', left: '' };
 
-// Strips the unit from a length value (e.g. '4px' -> '4'), returning ''
-// for anything that isn't a plain px value (todo: support other units).
-export const parseLength = (value: string): string => {
-  if (!value) {
-    return '';
-  }
-
-  const [length, unit] = value.split(/(-?\d+)/).filter(Boolean);
-  return unit === 'px' ? length : '';
-};
-
 // Expands the 1-4 value shorthand syntax (e.g. padding: 2px 4px) into
 // each side, mirroring the CSS spec's top/right/bottom/left fallback rules.
 export const expandShorthand = (value: string): Sides | null => {

@@ -1,7 +1,8 @@
 <template>
   <s-number-field
     :value="length"
-    :unit="unit"
+    :unit="shownUnit"
+    :step="step"
     :presets="sizes"
     :placeholder="placeholder"
     :disabled="disabled"
@@ -14,12 +15,11 @@ import type { PropType } from 'vue';
 import Vue from 'vue';
 import { SNumberField } from '@stylebot/components';
 import { getDeclarationValue } from '@stylebot/css';
-import { extractLength } from '../utils/css-value';
+import type { ParsedLength } from '../utils/css-value';
+import { extractLength, parseLength } from '../utils/css-value';
 import { computedPlaceholder } from '../utils/computed-placeholder';
 
-// todo: support other units.
-// currently, we render empty input and overwrite on edit
-const PX_LENGTH = /^(-?(?:\d+\.?\d*|\.\d+))px$/i;
+const FINE_STEP_UNITS = ['', 'em', 'rem'];
 
 export default Vue.extend({
   name: 'Length',
@@ -60,27 +60,54 @@ export default Vue.extend({
   },
 
   computed: {
+    declared(): ParsedLength | null {
+      let value = getDeclarationValue(
+        this.$store.getters.activeRule,
+        this.property
+      );
+
+      if (!value && this.fallback) {
+        value = extractLength(this.fallback);
+      }
+
+      const parsed = value ? parseLength(value) : null;
+
+      // A field without a unit label can only show px values truthfully.
+      if (!parsed || (!this.unit && parsed.unit !== 'px')) {
+        return null;
+      }
+
+      return parsed;
+    },
+
+    currentUnit(): string {
+      return this.declared ? this.declared.unit : 'px';
+    },
+
+    // The box diagram's fields pass an empty unit to hide the label.
+    shownUnit(): string {
+      return this.unit && this.declared ? this.declared.unit : this.unit;
+    },
+
+    step(): number {
+      return FINE_STEP_UNITS.includes(this.currentUnit) ? 0.1 : 1;
+    },
+
     length: {
       get(): string {
-        let value = getDeclarationValue(
-          this.$store.getters.activeRule,
-          this.property
-        );
-        if (!value && this.fallback) {
-          value = extractLength(this.fallback);
-        }
-
-        if (!value) {
-          return '';
-        }
-
-        const match = value.trim().match(PX_LENGTH);
-
-        return match ? match[1] : '';
+        return this.declared ? this.declared.number : '';
       },
 
-      set(length: string): void {
-        const value = length ? `${length}px` : '';
+      set(input: string): void {
+        const length = parseLength(input);
+        const hasUnit = /[a-z%]$/i.test(input.trim());
+        let value = '';
+
+        if (length && hasUnit) {
+          value = `${length.number}${length.unit}`;
+        } else if (input) {
+          value = `${input.trim()}${this.currentUnit}`;
+        }
 
         if (this.mirror.length === 0) {
           this.$store.dispatch('applyDeclaration', {
