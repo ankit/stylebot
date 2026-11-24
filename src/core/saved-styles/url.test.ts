@@ -1,4 +1,4 @@
-import { isStylableDocument, matchesUrlPattern } from './url';
+import { getNewStyleUrl, isStylableDocument, matchesUrlPattern } from './url';
 
 describe('matchesUrlPattern with urls', () => {
   describe('matches', () => {
@@ -295,5 +295,28 @@ describe('isStylableDocument', () => {
     expect(isStylableDocument('application/json')).toBe(false);
     expect(isStylableDocument('text/xml')).toBe(false);
     expect(isStylableDocument('image/svg+xml')).toBe(false);
+  });
+});
+
+describe('getNewStyleUrl', () => {
+  it('is the hostname for a web page', () => {
+    expect(getNewStyleUrl('https://news.ycombinator.com/item?id=1#c')).toBe(
+      'news.ycombinator.com'
+    );
+  });
+
+  it('is the full path for a file, which the style then matches', () => {
+    const page = 'file:///C:/TEMP/sample/001.html?a=1#top';
+    const url = getNewStyleUrl(page);
+
+    expect(url).toBe('file:///C:/TEMP/sample/001.html');
+    expect(matchesUrlPattern(page, url)).toBe(true);
+    expect(matchesUrlPattern('file:///C:/TEMP/sample/002.html', url)).toBe(
+      false
+    );
+  });
+
+  it('is empty for a malformed url', () => {
+    expect(getNewStyleUrl('')).toBe('');
   });
 });
