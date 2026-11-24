@@ -51,6 +51,27 @@ export const FontSizeField: StoryObj = {
   },
 };
 
+export const DecimalFontSize: StoryObj = {
+  ...editor({
+    ...WITH_RULE,
+    css: `h1 {
+  font-size: 15.5px;
+}`,
+  }),
+  name: 'a decimal px size shows as is and arrows step from it',
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const store = storeOf(canvasElement);
+    const input = numberInput(propertyControl(canvas, 'Size'));
+
+    await expect(input).toHaveValue('15.5');
+
+    await user.click(input);
+    await pressKey('ArrowUp');
+    await expect(declaration(store, 'h1', 'font-size')).toBe('16.5px');
+  },
+};
+
 /* Only px is editable; a unitless or other-unit value renders empty and is
    replaced on edit. */
 export const LineHeightField: StoryObj = {

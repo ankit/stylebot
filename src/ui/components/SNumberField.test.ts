@@ -45,4 +45,18 @@ describe('SNumberField.vue', () => {
     await input().trigger('keyup', { key: 'ArrowUp' });
     expect(emitted()).toEqual(['11', '15']);
   });
+
+  it('steps a decimal value without rounding it first', async () => {
+    await wrapper.setProps({ value: '15.5' });
+    await input().trigger('keydown', { key: 'ArrowUp' });
+
+    expect(emitted()).toEqual(['16.5']);
+  });
+
+  it('steps without float noise', async () => {
+    await wrapper.setProps({ value: '1.1' });
+    await input().trigger('keydown', { key: 'ArrowDown' });
+
+    expect(emitted()).toEqual(['0.1']);
+  });
 });

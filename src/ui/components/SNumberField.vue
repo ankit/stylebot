@@ -168,9 +168,11 @@ export default Vue.extend({
     step(delta: number): void {
       const current = this.shownValue;
       const base = current
-        ? parseInt(current, 10)
+        ? parseFloat(current)
         : Math.round(parseFloat(this.placeholder));
-      const next = Number.isNaN(base) ? delta : base + delta;
+      const next = Number.isNaN(base)
+        ? delta
+        : Math.round((base + delta) * 1000) / 1000;
 
       this.emitAfterTyping.cancel();
       this.draft = `${next}`;
