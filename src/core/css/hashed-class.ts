@@ -137,6 +137,24 @@ function isGoogleObfuscated(className: string): boolean {
 }
 
 /**
+ * css-loader's default CSS Modules name, a 20-character URL-safe base64
+ * hash like DuckDuckGo's `fOCEb2mA3YZTJXXjpgdS` or `wLL07_0Xnd1QZpzpfR4W`,
+ * whose `-` and `_` are part of the hash rather than separators.
+ */
+function isCssLoaderHash(className: string): boolean {
+  if (!/^(?:_(?=\d))?[\w-]{20}$/.test(className)) {
+    return false;
+  }
+
+  const pieces = className.split(/[-_]/).filter(Boolean);
+  const hasNonWord = pieces.some(
+    piece => !/^([A-Z]+|[A-Z]?[a-z]+(?:[A-Z][a-z]+)*|\d+)$/.test(piece)
+  );
+
+  return hasNonWord && caseTransitionRatio(className) >= 0.25;
+}
+
+/**
  * The hashed-class rules before partly hashed and site-specific classes were
  * recognized, kept so selectors for page-wide effects still match the ones
  * already saved.
@@ -179,6 +197,10 @@ export function looksHashed(className: string): boolean {
   }
 
   if (getStableClassParts(className)) {
+    return true;
+  }
+
+  if (isCssLoaderHash(className)) {
     return true;
   }
 
