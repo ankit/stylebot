@@ -19,7 +19,7 @@ import type { ParsedLength } from '../utils/css-value';
 import { extractLength, parseLength } from '../utils/css-value';
 import { computedPlaceholder } from '../utils/computed-placeholder';
 
-const FINE_UNITS = ['', 'em', 'rem'];
+const FINE_STEP_UNITS = ['', 'em', 'rem'];
 
 export default Vue.extend({
   name: 'Length',
@@ -88,7 +88,7 @@ export default Vue.extend({
     },
 
     step(): number {
-      return FINE_UNITS.includes(this.currentUnit) ? 0.1 : 1;
+      return FINE_STEP_UNITS.includes(this.currentUnit) ? 0.1 : 1;
     },
 
     length: {
