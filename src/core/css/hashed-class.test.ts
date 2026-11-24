@@ -131,6 +131,11 @@ describe('hashed-class', () => {
       'makeStyles-root-12',
       'ng-tns-c3784233582-0',
       'Header_nav__a1B2c',
+      'fOCEb2mA3YZTJXXjpgdS',
+      'Rn_JXVtoPVAFyGkcaXyK',
+      'wLL07_0Xnd1QZpzpfR4W',
+      'kY2IgmnCmOGjharHErah',
+      '_0Xnd1QZpzpfR4WwLL07',
     ])('treats %s as generated', className => {
       expect(looksHashed(className)).toBe(true);
     });
@@ -162,6 +167,12 @@ describe('hashed-class', () => {
       'my_class',
       '_a1b2c3d_title',
       'Foo-module_header_title',
+      'SearchResultsWrapper',
+      'headerNavigationLink',
+      'search-results__item',
+      'MuiButtonBase-root-1',
+      'col-md-6-offset-lg-2',
+      'navItemXL-active-big',
     ])('treats %s as authored', className => {
       expect(looksHashed(className)).toBe(false);
     });
