@@ -1,6 +1,5 @@
 import type { Sides } from './spacing';
 import {
-  parseLength,
   expandShorthand,
   collapseToShorthand,
   resolveSpacingDeclarations,
@@ -13,22 +12,6 @@ const properties: Sides = {
   bottom: 'padding-bottom',
   left: 'padding-left',
 };
-
-describe('parseLength', () => {
-  it('strips the px unit', () => {
-    expect(parseLength('4px')).toBe('4');
-    expect(parseLength('-4px')).toBe('-4');
-  });
-
-  it('returns empty for a non-px unit', () => {
-    expect(parseLength('4em')).toBe('');
-    expect(parseLength('4%')).toBe('');
-  });
-
-  it('returns empty for an empty value', () => {
-    expect(parseLength('')).toBe('');
-  });
-});
 
 describe('expandShorthand', () => {
   it('expands a 1-value shorthand to all sides', () => {

@@ -65,6 +65,7 @@ export default Vue.extend({
         this.$store.getters.activeRule,
         this.property
       );
+
       if (!value && this.fallback) {
         value = extractLength(this.fallback);
       }
@@ -83,6 +84,7 @@ export default Vue.extend({
       return this.declared ? this.declared.unit : 'px';
     },
 
+    // The box diagram's fields pass an empty unit to hide the label.
     shownUnit(): string {
       return this.unit && this.declared ? this.declared.unit : this.unit;
     },
@@ -93,17 +95,18 @@ export default Vue.extend({
 
     length: {
       get(): string {
-        return this.declared ? this.declared.length : '';
+        return this.declared ? this.declared.number : '';
       },
 
-      set(length: string): void {
-        const typed = parseLength(length);
+      set(input: string): void {
+        const length = parseLength(input);
+        const hasUnit = /[a-z%]$/i.test(input.trim());
         let value = '';
 
-        if (typed && /[a-z%]$/i.test(length.trim())) {
-          value = `${typed.length}${typed.unit}`;
-        } else if (length) {
-          value = `${length.trim()}${this.currentUnit}`;
+        if (length && hasUnit) {
+          value = `${length.number}${length.unit}`;
+        } else if (input) {
+          value = `${input.trim()}${this.currentUnit}`;
         }
 
         if (this.mirror.length === 0) {

@@ -22,7 +22,7 @@ export const extractLength = (value: string): string => {
   return match ? match[0] : '';
 };
 
-export type ParsedLength = { length: string; unit: string };
+export type ParsedLength = { number: string; unit: string };
 
 /**
  * Splits a length into its number and unit, reading a unitless zero as px.
@@ -34,13 +34,24 @@ export const parseLength = (value: string): ParsedLength | null => {
     return null;
   }
 
-  const [, length, unit] = match;
+  const [, number, unit] = match;
 
   if (unit) {
-    return { length, unit };
+    return { number, unit };
   }
 
-  return { length, unit: parseFloat(length) === 0 ? 'px' : '' };
+  const defaultUnit = parseFloat(number) === 0 ? 'px' : '';
+
+  return { number, unit: defaultUnit };
+};
+
+/**
+ * The number of a px length (e.g. '4px' -> '4'), or empty for anything else.
+ */
+export const parsePx = (value: string): string => {
+  const length = parseLength(value);
+
+  return length?.unit === 'px' ? length.number : '';
 };
 
 // Pulls a color (hex or an rgb/rgba/hsl/hsla function) out of a shorthand

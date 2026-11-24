@@ -28,8 +28,8 @@ import { SNumberField } from '@stylebot/components';
 
 import { computedSides } from '../../utils/computed-placeholder';
 import type { Side, Sides } from '../../utils/spacing';
+import { parsePx } from '../../utils/css-value';
 import {
-  parseLength,
   expandShorthand,
   resolveSpacingDeclarations,
 } from '../../utils/spacing';
@@ -98,10 +98,10 @@ export default Vue.extend({
       });
 
       return {
-        top: parseLength(sides.top),
-        right: parseLength(sides.right),
-        bottom: parseLength(sides.bottom),
-        left: parseLength(sides.left),
+        top: parsePx(sides.top),
+        right: parsePx(sides.right),
+        bottom: parsePx(sides.bottom),
+        left: parsePx(sides.left),
       };
     },
 
