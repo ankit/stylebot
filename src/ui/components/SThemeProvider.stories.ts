@@ -72,6 +72,11 @@ const TOKEN_GROUPS: Array<{ label: string; tokens: Array<string> }> = [
 ];
 
 /* Every color token as a swatch — a cheap tripwire for palette changes. */
+const swatchStyle = (token: string) =>
+  token === 'panel-shadow'
+    ? { background: 'var(--panel-surface)', boxShadow: 'var(--panel-shadow)' }
+    : { background: `var(--${token})` };
+
 export const Tokens = fromTemplate(
   { SHeading },
   `
@@ -80,14 +85,14 @@ export const Tokens = fromTemplate(
       <s-heading as="h2" size="sm">{{ group.label }}</s-heading>
       <div class="sb-tokens">
         <div v-for="token in group.tokens" :key="token" class="sb-token">
-          <span class="sb-swatch" :style="{ background: 'var(--' + token + ')' }" />
+          <span class="sb-swatch" :style="swatchStyle(token)" />
           <code>--{{ token }}</code>
         </div>
       </div>
     </section>
   </div>
 `,
-  { data: () => ({ groups: TOKEN_GROUPS }) }
+  { data: () => ({ groups: TOKEN_GROUPS, swatchStyle }) }
 );
 
 /* The paragraph pre-selected, so the highlight is visible in both themes. */
