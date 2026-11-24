@@ -10,6 +10,7 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+import { showAsManualPopover } from '@stylebot/utils';
 import OverlayRect from './OverlayRect';
 import OverlayTip from './OverlayTip';
 import type { Rect, Dimensions } from './utils';
@@ -59,6 +60,39 @@ const toBox = (edges: Edges): Box => ({
   width: edges.right - edges.left,
 });
 
+/**
+ * Appends the container as a viewport-sized, click-through layer, lifted
+ * above page modals so the boxes show on them too.
+ */
+const mountLayer = (container: HTMLElement): void => {
+  const set = (property: string, value: string) =>
+    container.style.setProperty(property, value, 'important');
+
+  set('position', 'fixed');
+  set('inset', '0');
+  set('width', 'auto');
+  set('height', 'auto');
+  set('margin', '0');
+  set('padding', '0');
+  set('border', '0');
+  set('background', 'transparent');
+  set('overflow', 'visible');
+  set('pointer-events', 'none');
+  set('z-index', '2147483647');
+  set('direction', 'ltr');
+
+  window.document.body.appendChild(container);
+  showAsManualPopover(container);
+};
+
+/**
+ * A clip-path for a viewport-sized layer that leaves a hole over the rect.
+ */
+const clipOut = ({ left, top, right, bottom }: DOMRect): string =>
+  `polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0, ` +
+  `${left}px ${top}px, ${right}px ${top}px, ${right}px ${bottom}px, ` +
+  `${left}px ${bottom}px, ${left}px ${top}px)`;
+
 export default class Overlay {
   container: HTMLElement;
   mountRoot?: HTMLElement;
@@ -74,11 +108,8 @@ export default class Overlay {
 
     this.container = doc.createElement('div');
     this.container.id = 'stylebot-overlay';
-    this.container.style.zIndex = '10000000';
-    this.container.style.direction = 'ltr';
-    doc.body.appendChild(this.container);
-
     this.mountRoot = mountRoot;
+    mountLayer(this.container);
     this.tip = null;
     this.rects = [];
   }
@@ -93,6 +124,25 @@ export default class Overlay {
     if (this.container.parentNode) {
       this.container.parentNode.removeChild(this.container);
     }
+  }
+
+  getPanel(): HTMLElement | null {
+    return this.mountRoot?.querySelector<HTMLElement>('.stylebot') ?? null;
+  }
+
+  /**
+   * Keeps boxes off the editor panel, which the overlay, lifted after it,
+   * would otherwise cover.
+   */
+  clipAroundPanel(): void {
+    const panelRect = this.getPanel()?.getBoundingClientRect();
+    const hasPanel = !!panelRect && panelRect.width > 0 && panelRect.height > 0;
+
+    this.container.style.setProperty(
+      'clip-path',
+      hasPanel ? clipOut(panelRect) : 'none',
+      'important'
+    );
   }
 
   /**
@@ -150,8 +200,7 @@ export default class Overlay {
 
     tip.showSummary({ nameParts: label });
 
-    const panelEl =
-      this.mountRoot?.querySelector<HTMLElement>('.stylebot') ?? null;
+    const panelEl = this.getPanel();
 
     // Anchors to the primary element itself, not the union of every
     // match, so scattered matches don't fling the tooltip around.
@@ -189,6 +238,8 @@ export default class Overlay {
     property?: LayoutProperty,
     primary?: HTMLElement
   ): { outer: Edges; primaryEdges: Edges | null } {
+    this.clipAroundPanel();
+
     while (this.rects.length > elements.length) {
       this.rects.pop()?.remove();
     }
