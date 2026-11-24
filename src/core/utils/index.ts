@@ -65,3 +65,4 @@ export {
   setBrowserCommand,
 } from './browser-commands';
 export { injectFontFaces } from './inject-font-faces';
+export { showAsManualPopover } from './popover';
