@@ -1,4 +1,5 @@
 import { removeReadability } from '@stylebot/readability';
+import { getNewStyleUrl } from '@stylebot/saved-styles';
 import { readCache, writeCache } from '@stylebot/stylesheets';
 
 import type {
@@ -19,7 +20,7 @@ const getExistingStyleUrl = async (): Promise<string> => {
     GetStylesForPageResponse
   >(message);
 
-  return response?.defaultStyle?.url ?? document.domain;
+  return response?.defaultStyle?.url ?? getNewStyleUrl(window.location.href);
 };
 
 /**

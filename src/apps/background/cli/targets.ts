@@ -1,4 +1,4 @@
-import { getStylesForPage } from '@stylebot/saved-styles';
+import { getNewStyleUrl, getStylesForPage } from '@stylebot/saved-styles';
 import type { InspectPage, PageInspection } from '@stylebot/types';
 
 import { restoreTab } from '../restore-tabs';
@@ -54,7 +54,7 @@ export const resolveStyleUrl = async (target: unknown): Promise<string> => {
   const url = tab.url ?? '';
   const { defaultStyle } = getStylesForPage(url, await getAll());
 
-  return defaultStyle?.url ?? new URL(url).hostname;
+  return defaultStyle?.url ?? getNewStyleUrl(url);
 };
 
 /**

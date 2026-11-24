@@ -197,6 +197,7 @@ import { getStyleOptionValue, parseStyleOptions } from '@stylebot/css';
 import {
   addProfile,
   expandProfiles,
+  getNewStyleUrl,
   getProfileOptions,
   hasAnyCss,
   listProfiles,
@@ -292,11 +293,7 @@ export default Vue.extend({
 
   computed: {
     domain(): string {
-      try {
-        return this.tab?.url ? new URL(this.tab.url).hostname : '';
-      } catch {
-        return '';
-      }
+      return getNewStyleUrl(this.tab?.url ?? '');
     },
 
     siteProfiles(): Array<ProfileSummary> {
