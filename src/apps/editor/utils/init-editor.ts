@@ -1,7 +1,11 @@
 import Vue from 'vue';
 import type { Store } from 'vuex';
 import { t } from '@stylebot/i18n';
-import { injectFontFaces, isFieldTarget } from '@stylebot/utils';
+import {
+  injectFontFaces,
+  isFieldTarget,
+  showAsManualPopover,
+} from '@stylebot/utils';
 
 import type { State } from '../store';
 import TheStylebotApp from '../components/TheStylebotApp.vue';
@@ -121,6 +125,7 @@ const initEditor = (store: Store<State>): void => {
   stylebotAppHost.lang = t('language_code');
 
   document.body.appendChild(stylebotAppHost);
+  showAsManualPopover(stylebotAppHost);
   isolateFieldKeys(stylebotAppHost);
 
   const shadowRoot = stylebotAppHost.attachShadow({ mode: 'open' });

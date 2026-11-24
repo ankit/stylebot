@@ -39,8 +39,13 @@ Open each PNG and check, before saying they're done:
 - **The slide's crop shows what its headline is about.** Every store gets slides: a
   headline over an enlarged crop of the screen, so the UI reads at the size
   the store shows its images. Nothing that matters should be cut at the window's edges.
-- **The terminal's last line still describes the page beside it.** It's written by hand
-  (`SUMMARY` in `cli-shot.mjs`); rewrite it whenever the Newspaper theme changes.
+- **Two shots show a Gallery screenshot instead of the live site**, which keeps headless
+  Chrome out: the Code shot (ChatGPT Slate's, with its Gallery CSS in the editor) and
+  CLI mode (Reddit Zen's, under a real terminal). Republish the style to change them,
+  and check the note and reply in `cli-shot.mjs` still describe the Reddit screenshot.
+  The Code shot uses `captures/store/chatgpt.png` instead when it's there: a sharper
+  2x page from `yarn stylebot screenshot <tab> --scale 2` on a ChatGPT tab with
+  ChatGPT Slate on, cut to the conversation at 3:4, with no account name or chat list.
 
 Send the user the images in order, then commit them once they're happy.
 
