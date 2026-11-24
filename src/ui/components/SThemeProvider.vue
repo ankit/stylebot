@@ -135,8 +135,7 @@ export default Vue.extend({
   --inset-button-hover: #fff;
   --inset-button-hover-border: #b9bec7;
   --inset-button-hover-shadow: 0 1px 2px rgb(0 0 0 / 8%);
-  --panel-shadow: 0 2px 6px rgb(16 24 40 / 4%),
-    0 8px 24px -8px rgb(16 24 40 / 10%);
+  --panel-shadow: 0 4px 16px rgb(0 0 0 / 6%);
 
   // Text
   --text-primary: #191b1f;
