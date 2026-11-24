@@ -1,4 +1,5 @@
 import { setPageBridge, LocalPageBridge } from '@stylebot/page-bridge';
+import { getNewStyleUrl } from '@stylebot/saved-styles';
 
 import { createCommandHandler } from './handlers/command';
 import { createContextMenuHandler } from './handlers/context-menu';
@@ -12,7 +13,7 @@ import { getStylesForPage } from './utils/chrome';
 import { preloadEditorCss } from './utils/init-editor';
 
 const store = createStore('page');
-store.commit('setUrl', document.domain);
+store.commit('setUrl', getNewStyleUrl(window.location.href));
 const bridge = new LocalPageBridge({ getStylebotCss: () => store.state.css });
 setPageBridge(bridge);
 

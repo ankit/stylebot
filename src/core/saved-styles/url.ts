@@ -141,3 +141,17 @@ export const isStylableDocument = (contentType: string): boolean =>
   contentType === 'text/plain' ||
   (/^(image|video|audio)\//.test(contentType) &&
     contentType !== 'image/svg+xml');
+
+/**
+ * The url a new style for a page is saved under: its hostname, or for a page
+ * with no host, like a file, its full path without query or hash.
+ */
+export const getNewStyleUrl = (pageUrl: string): string => {
+  try {
+    const { protocol, host, hostname, pathname } = new URL(pageUrl);
+
+    return hostname || `${protocol}//${host}${pathname}`;
+  } catch {
+    return '';
+  }
+};
