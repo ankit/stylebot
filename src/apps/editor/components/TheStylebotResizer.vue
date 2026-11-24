@@ -381,7 +381,7 @@ export default Vue.extend({
     z-index: 100000000;
     border: 1px solid var(--panel-border);
     border-radius: 14px;
-    box-shadow: 0 14px 40px var(--panel-shadow);
+    box-shadow: var(--panel-shadow);
     transition: transform 0.22s ease;
 
     &.left {
