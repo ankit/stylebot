@@ -1,11 +1,8 @@
-// Fills in the Mac App Store version that's being prepared, adding one when
-// there's none: its version number, every language's listing from
-// store/safari/listing/ (run `yarn store:safari-text` first), its What's New
-// from store/safari/whats-new/<version>/<locale>.txt, the screenshots
-// in store/safari/, and the newest processed build of package.json's version. Signs with the API key
-// that APP_STORE_CONNECT_KEY_PATH, _KEY_ID and _ISSUER_ID point to.
+// Fills in the App Store version being prepared for macOS, or iOS with --ios:
+// listing, What's New, screenshots and build. Run `yarn store:safari-text` first.
 //
 //   yarn upload:safari-listing
+//   yarn upload:safari-ios-listing
 
 import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
@@ -51,6 +48,28 @@ const rootDir = path.resolve(
 const listingDir = path.join(rootDir, 'store/safari/listing');
 const whatsNewDir = path.join(rootDir, 'store/safari/whats-new');
 const screenshotsDir = path.join(rootDir, 'store/safari');
+
+// Each platform's screenshot folders, by the display type they're shown for.
+const PLATFORMS = {
+  macOS: {
+    id: 'MAC_OS',
+    screenshots: { APP_DESKTOP: screenshotsDir },
+  },
+  iOS: {
+    id: 'IOS',
+    screenshots: {
+      APP_IPHONE_67: path.join(screenshotsDir, 'iphone'),
+      APP_IPAD_PRO_3GEN_129: path.join(screenshotsDir, 'ipad'),
+    },
+  },
+};
+
+let platform = 'macOS';
+if (process.argv.includes('--ios')) {
+  platform = 'iOS';
+}
+
+const platformId = PLATFORMS[platform].id;
 const { version } = JSON.parse(
   readFileSync(path.join(rootDir, 'package.json'), 'utf8')
 );
@@ -114,11 +133,11 @@ const findEditable = async (pathname, label) => {
 };
 
 /**
- * The macOS version being prepared, created for package.json's version when
- * there's none, as after a release.
+ * The platform's version being prepared, created for package.json's version
+ * when there's none, as after a release.
  */
 const findOrCreateVersion = async appId => {
-  const pathname = `/v1/apps/${appId}/appStoreVersions?filter[platform]=MAC_OS`;
+  const pathname = `/v1/apps/${appId}/appStoreVersions?filter[platform]=${platformId}`;
   const versions = await getAll(pathname);
   const editable = versions.some(item =>
     EDITABLE_STATES.includes(item.attributes.appStoreState)
@@ -128,14 +147,14 @@ const findOrCreateVersion = async appId => {
     await request('POST', '/v1/appStoreVersions', {
       data: {
         type: 'appStoreVersions',
-        attributes: { platform: 'MAC_OS', versionString: version },
+        attributes: { platform: platformId, versionString: version },
         relationships: { app: { data: { type: 'apps', id: appId } } },
       },
     });
     console.log(`✓ created version ${version}`);
   }
 
-  return findEditable(pathname, 'macOS version');
+  return findEditable(pathname, `${platform} version`);
 };
 
 const updateVersion = async versionId => {
@@ -251,26 +270,26 @@ const uploadScreenshot = async (setId, fileName, buffer) => {
 };
 
 /**
- * Uploads store/safari/'s screenshots to the primary language, which the
- * other languages fall back to. Skips ones already there unchanged and
- * removes ones that aren't in the folder any more.
+ * Uploads a folder's screenshots to the primary language's set for a display
+ * type, which the other languages fall back to. Skips ones already there
+ * unchanged and removes ones that aren't in the folder any more.
  */
-const updateScreenshots = async localizationId => {
-  const files = readdirSync(screenshotsDir)
+const updateScreenshots = async (localizationId, displayType, dir) => {
+  const files = readdirSync(dir)
     .filter(file => file.endsWith('.png'))
     .sort();
   const sets = await getAll(
     `/v1/appStoreVersionLocalizations/${localizationId}/appScreenshotSets`
   );
   let set = sets.find(
-    item => item.attributes.screenshotDisplayType === 'APP_DESKTOP'
+    item => item.attributes.screenshotDisplayType === displayType
   );
 
   if (!set) {
     ({ data: set } = await request('POST', '/v1/appScreenshotSets', {
       data: {
         type: 'appScreenshotSets',
-        attributes: { screenshotDisplayType: 'APP_DESKTOP' },
+        attributes: { screenshotDisplayType: displayType },
         relationships: {
           appStoreVersionLocalization: {
             data: { type: 'appStoreVersionLocalizations', id: localizationId },
@@ -284,7 +303,7 @@ const updateScreenshots = async localizationId => {
     `/v1/appScreenshotSets/${set.id}/appScreenshots`
   );
   const matches = files.map(file => {
-    const buffer = readFileSync(path.join(screenshotsDir, file));
+    const buffer = readFileSync(path.join(dir, file));
     const match = existing.find(
       item =>
         item.attributes.fileName === file &&
@@ -299,14 +318,14 @@ const updateScreenshots = async localizationId => {
     item => !matches.some(({ match }) => match === item)
   )) {
     await request('DELETE', `/v1/appScreenshots/${item.id}`);
-    console.log(`✓ removed ${item.attributes.fileName}`);
+    console.log(`✓ removed ${displayType} ${item.attributes.fileName}`);
   }
 
   const ids = [];
 
   for (const { file, buffer, match } of matches) {
     ids.push(match ? match.id : await uploadScreenshot(set.id, file, buffer));
-    console.log(`✓ ${file}${match ? ' (unchanged)' : ''}`);
+    console.log(`✓ ${displayType} ${file}${match ? ' (unchanged)' : ''}`);
   }
 
   await request(
@@ -319,6 +338,7 @@ const updateScreenshots = async localizationId => {
 const attachBuild = async (appId, versionId) => {
   const builds = await getAll(
     `/v1/builds?filter[app]=${appId}&filter[preReleaseVersion.version]=${version}` +
+      `&filter[preReleaseVersion.platform]=${platformId}` +
       '&filter[processingState]=VALID&sort=-uploadedDate&limit=1'
   );
   const [build] = builds;
@@ -367,10 +387,17 @@ console.log('✓ category and content rights');
 
 await updateVersion(appVersion.id);
 const localizations = await updateLocalizations(appInfo.id, appVersion.id);
-await updateScreenshots(localizations[app.attributes.primaryLocale].id);
+const primaryLocalization = localizations[app.attributes.primaryLocale];
+
+for (const [displayType, dir] of Object.entries(
+  PLATFORMS[platform].screenshots
+)) {
+  await updateScreenshots(primaryLocalization.id, displayType, dir);
+}
+
 await attachBuild(app.id, appVersion.id);
 
 console.log(`
-Filled in ${version}. App Privacy, the age rating, pricing and the review
+Filled in ${platform} ${version}. App Privacy, the age rating, pricing and the review
 notes are set in App Store Connect itself.
 `);

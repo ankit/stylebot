@@ -32,6 +32,7 @@
     "upload:safari": "node scripts/safari/upload.mjs",
     "upload:safari-ios": "node scripts/safari/upload.mjs --ios",
     "upload:safari-listing": "node scripts/safari/upload-listing.mjs",
+    "upload:safari-ios-listing": "node scripts/safari/upload-listing.mjs --ios",
     "start:chrome": "node scripts/launch-chrome.mjs",
     "start:edge": "cross-env STYLEBOT_BROWSER=edge node scripts/launch-chrome.mjs",
     "dev:chrome": "yarn install && (yarn watch & cross-env STYLEBOT_FRESH_BUILD=1 yarn start:chrome; kill 0)",
