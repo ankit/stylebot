@@ -61,6 +61,37 @@ describe('site bridge', () => {
     });
   });
 
+  it('publishes a profile saved here right after a click, by its url and id', async () => {
+    clicked(true);
+    sendMessage.mockResolvedValue({ ok: true });
+
+    expect(
+      await handleSiteRequest({
+        type: 'stylebot:publish',
+        id: 'p',
+        url: 'github.com',
+        profileId: 'night',
+      })
+    ).toEqual({ type: 'stylebot:publish:result', id: 'p', ok: true });
+    expect(sendMessage).toHaveBeenCalledWith({
+      name: 'PublishGalleryProfile',
+      url: 'github.com',
+      profileId: 'night',
+    });
+
+    clicked(false);
+    sendMessage.mockClear();
+    expect(
+      await handleSiteRequest({
+        type: 'stylebot:publish',
+        id: 'p',
+        url: 'github.com',
+        profileId: 'night',
+      })
+    ).toEqual({ type: 'stylebot:publish:result', id: 'p', ok: false });
+    expect(sendMessage).not.toHaveBeenCalled();
+  });
+
   it('lists the styles saved here, or none when the background can’t say', async () => {
     const styles = [
       {

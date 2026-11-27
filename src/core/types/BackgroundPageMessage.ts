@@ -369,6 +369,14 @@ export type PublishGalleryStyleUpdate = {
   styleId: number;
 };
 
+// Sent by the site bridge on the gallery: takes its tab to the publish page,
+// on a profile saved here, published or not.
+export type PublishGalleryProfile = {
+  name: 'PublishGalleryProfile';
+  url: string;
+  profileId: string;
+};
+
 // Sent by the site bridge on the gallery: every profile saved here that
 // could go on the gallery.
 export type GetGallerySavedProfiles = {
@@ -476,6 +484,7 @@ type BackgroundPageMessage =
   | UndoGalleryInstall
   | GetGalleryInstallStatus
   | PublishGalleryStyleUpdate
+  | PublishGalleryProfile
   | GetGallerySavedProfiles
   | CliModeEvent;
 
