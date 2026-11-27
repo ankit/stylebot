@@ -7,6 +7,8 @@ import type {
   GetGalleryDraftResponse,
   GetGalleryInstallStatus,
   GetGalleryInstallStatusResponse,
+  GetGallerySavedProfiles,
+  GetGallerySavedProfilesResponse,
   InstallStyle,
   InstallStyleResponse,
   OpenGalleryPreview,
@@ -95,6 +97,23 @@ const handlers: { [T in SiteRequestType]: Handler<T> } = {
       .catch((): null => null);
 
     return { type: 'stylebot:publish:result', id, ok: Boolean(response?.ok) };
+  },
+
+  'stylebot:styles': async ({ id }) => {
+    const message: GetGallerySavedProfiles = {
+      name: 'GetGallerySavedProfiles',
+    };
+    const response = await chrome.runtime
+      .sendMessage<GetGallerySavedProfiles, GetGallerySavedProfilesResponse>(
+        message
+      )
+      .catch((): null => null);
+
+    return {
+      type: 'stylebot:styles:result',
+      id,
+      styles: response?.profiles ?? [],
+    };
   },
 
   'stylebot:draft': async ({ id }) => {

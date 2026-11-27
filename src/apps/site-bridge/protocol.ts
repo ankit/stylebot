@@ -5,7 +5,11 @@
  * ping → pong and install → installed predate this and stay for stylebot.dev.
  */
 
-import type { GalleryDraft, GalleryPublishStatus } from '@stylebot/types';
+import type {
+  GalleryDraft,
+  GalleryPublishStatus,
+  GallerySavedProfile,
+} from '@stylebot/types';
 
 // The protocol's version, which the bridge marks on <html>.
 export const BRIDGE_VERSION = '1';
@@ -61,6 +65,15 @@ export type PublishResult = {
   ok: boolean;
 };
 
+// Every profile saved here that could go on the gallery.
+export type StylesRequest = { type: 'stylebot:styles'; id: string };
+
+export type StylesResult = {
+  type: 'stylebot:styles:result';
+  id: string;
+  styles: Array<GallerySavedProfile>;
+};
+
 export type DraftRequest = { type: 'stylebot:draft'; id: string };
 
 export type DraftResult = {
@@ -104,6 +117,7 @@ export type SiteMessages = {
   'stylebot:draft': { request: DraftRequest; reply: DraftResult };
   'stylebot:published': { request: PublishedRequest; reply: PublishedResult };
   'stylebot:deleted': { request: DeletedRequest; reply: DeletedResult };
+  'stylebot:styles': { request: StylesRequest; reply: StylesResult };
 };
 
 export type SiteRequestType = keyof SiteMessages;

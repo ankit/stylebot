@@ -19,6 +19,7 @@ import {
   GalleryStyleDeleted,
   GetGalleryDraft,
   GetGalleryInstallStatus,
+  GetGallerySavedProfiles,
   GetGallerySuggestions,
   GetPublishedGalleryStyle,
   OpenGalleryDraft,
@@ -560,6 +561,7 @@ describe('gallery messages', () => {
       });
     });
 
+
     it('turns down a publish that names no gallery style', async () => {
       const id = await openDraft();
 
@@ -958,6 +960,47 @@ describe('gallery messages', () => {
       expect(await status(ids, 'https://stylebot.dev/')).toEqual({
         installed: {},
         published: {},
+      });
+    });
+  });
+
+  describe('saved profiles', () => {
+    const savedProfiles = (url: string) =>
+      respond(send =>
+        GetGallerySavedProfiles(
+          { name: 'GetGallerySavedProfiles' },
+          { id: 'stylebot', url },
+          send
+        )
+      );
+
+    beforeEach(() => {
+      (global.chrome as { runtime?: unknown }).runtime = { id: 'stylebot' };
+      mockStyles = {
+        'github.com': { ...savedStyle(), css: 'a {}', modifiedTime: '5' },
+      };
+    });
+
+    it('lists them for the gallery', async () => {
+      expect(await savedProfiles('https://gallery.stylebot.dev/mine')).toEqual({
+        profiles: [
+          {
+            url: 'github.com',
+            profileId: 'default',
+            profileName: '',
+            modifiedTime: '5',
+            gallery: null,
+          },
+        ],
+      });
+    });
+
+    it('tells other sites nothing', async () => {
+      expect(await savedProfiles('https://stylebot.dev/')).toEqual({
+        profiles: [],
+      });
+      expect(await savedProfiles('https://example.com/')).toEqual({
+        profiles: [],
       });
     });
   });

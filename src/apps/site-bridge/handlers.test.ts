@@ -60,4 +60,29 @@ describe('site bridge', () => {
       published: { 8: { version: 2, changed: true } },
     });
   });
+
+  it('lists the styles saved here, or none when the background can’t say', async () => {
+    const styles = [
+      {
+        url: 'github.com',
+        profileId: 'default',
+        profileName: '',
+        modifiedTime: '5',
+        gallery: null,
+      },
+    ];
+    sendMessage.mockResolvedValue({ profiles: styles });
+
+    expect(
+      await handleSiteRequest({ type: 'stylebot:styles', id: 's' })
+    ).toEqual({ type: 'stylebot:styles:result', id: 's', styles });
+    expect(sendMessage).toHaveBeenCalledWith({
+      name: 'GetGallerySavedProfiles',
+    });
+
+    sendMessage.mockRejectedValue(new Error('No receiver'));
+    expect(
+      await handleSiteRequest({ type: 'stylebot:styles', id: 's' })
+    ).toEqual({ type: 'stylebot:styles:result', id: 's', styles: [] });
+  });
 });

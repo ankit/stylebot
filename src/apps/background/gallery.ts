@@ -13,6 +13,7 @@ import {
   getStyleSite,
   getPublishedProfile,
   getPublishedStatus,
+  getSavedProfiles,
   hashCss,
   isGalleryStyleDeleted,
   isGalleryStyleId,
@@ -54,6 +55,8 @@ import type {
   GetPublishedGalleryStyle as GetPublishedGalleryStyleType,
   GetPublishedGalleryStyleResponse,
   PublishGalleryStyleUpdate as PublishGalleryStyleUpdateType,
+  GetGallerySavedProfiles as GetGallerySavedProfilesType,
+  GetGallerySavedProfilesResponse,
   ResetGalleryProfile as ResetGalleryProfileType,
   ResetGalleryProfileResponse,
   GalleryScreenshotResponse,
@@ -304,6 +307,23 @@ export const PublishGalleryStyleUpdate = async (
   } catch (e) {
     sendResponse(fail(e));
   }
+};
+
+/**
+ * Every profile saved here that could go on the gallery, for its Your styles
+ * page.
+ */
+export const GetGallerySavedProfiles = async (
+  _message: GetGallerySavedProfilesType,
+  sender: chrome.runtime.MessageSender,
+  sendResponse: (response: GetGallerySavedProfilesResponse) => void
+): Promise<void> => {
+  if (!isFromGallery(sender)) {
+    sendResponse({ profiles: [] });
+    return;
+  }
+
+  sendResponse({ profiles: getSavedProfiles(await getAll()) });
 };
 
 /**

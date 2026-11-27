@@ -5,6 +5,7 @@ import {
   getStyleSite,
   hashCss,
   isPublicSite,
+  isShareableStyleUrl,
   toGallerySite,
 } from './utils';
 
@@ -66,6 +67,27 @@ describe('isPublicSite', () => {
     expect(isPublic('https://app.test/')).toBe(false);
     expect(isPublic('https://github.com:8443/')).toBe(false);
     expect(isPublic('file:///Users/me/page.html')).toBe(false);
+  });
+});
+
+describe('isShareableStyleUrl', () => {
+  it('takes saved styles for websites on the web', () => {
+    expect(isShareableStyleUrl('github.com')).toBe(true);
+    expect(isShareableStyleUrl('github.com/ankit*')).toBe(true);
+    expect(isShareableStyleUrl('https://news.ycombinator.com/*')).toBe(true);
+    expect(isShareableStyleUrl('^https?://(www\\.)?github\\.com')).toBe(true);
+  });
+
+  it('leaves out local addresses, IPs, files and other pages', () => {
+    expect(isShareableStyleUrl('localhost')).toBe(false);
+    expect(isShareableStyleUrl('localhost:3000')).toBe(false);
+    expect(isShareableStyleUrl('http://localhost:8080/*')).toBe(false);
+    expect(isShareableStyleUrl('192.168.1.1')).toBe(false);
+    expect(isShareableStyleUrl('http://10.0.0.8/admin')).toBe(false);
+    expect(isShareableStyleUrl('file:///Users/me/page.html')).toBe(false);
+    expect(isShareableStyleUrl('chrome-extension://abc/page.html')).toBe(false);
+    expect(isShareableStyleUrl('printer.local')).toBe(false);
+    expect(isShareableStyleUrl('*')).toBe(false);
   });
 });
 

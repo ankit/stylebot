@@ -7,6 +7,7 @@ import {
   getProfileGalleryListing,
   getPublishedProfile,
   getPublishedStatus,
+  getSavedProfiles,
 } from './profile-listings';
 import { hashCss } from './utils';
 
@@ -147,5 +148,67 @@ describe('profile listings', () => {
         2: { version: 2, changed: true },
       });
     });
+  });
+
+  it('lists profiles with css saved for public websites, with their gallery style and whether they were edited', () => {
+    const saved: StyleMap = {
+      'github.com': {
+        ...styles['github.com'],
+        modifiedTime: '9',
+        profiles: {
+          ...styles['github.com'].profiles,
+          p4: { name: 'Empty', css: '  ' },
+          p5: {
+            name: 'Kept',
+            css: 'd {}',
+            galleryListing: { ...listing(MINE, 3), cssHash: hashCss('d {}') },
+          },
+        },
+      },
+      localhost: { ...styles['github.com'], profiles: undefined },
+      'file:///page.html': { ...styles['github.com'], profiles: undefined },
+    };
+
+    const byProfileId = getSavedProfiles(saved).sort((a, b) =>
+      a.profileId.localeCompare(b.profileId)
+    );
+
+    expect(byProfileId).toEqual([
+      {
+        url: 'github.com',
+        profileId: 'default',
+        profileName: '',
+        modifiedTime: '9',
+        gallery: null,
+      },
+      {
+        url: 'github.com',
+        profileId: 'p1',
+        profileName: 'Night',
+        modifiedTime: '9',
+        gallery: {
+          styleId: NIGHT,
+          version: 1,
+          slug: `style-${NIGHT}`,
+          published: false,
+          edited: true,
+        },
+      },
+      expect.objectContaining({ profileId: 'p2' }),
+      expect.objectContaining({ profileId: 'p3' }),
+      {
+        url: 'github.com',
+        profileId: 'p5',
+        profileName: 'Kept',
+        modifiedTime: '9',
+        gallery: {
+          styleId: MINE,
+          version: 3,
+          slug: `style-${MINE}`,
+          published: false,
+          edited: false,
+        },
+      },
+    ]);
   });
 });

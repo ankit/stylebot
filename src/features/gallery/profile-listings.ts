@@ -2,11 +2,12 @@ import { expandProfiles } from '@stylebot/saved-styles';
 import type {
   GalleryListing,
   GalleryPublishStatus,
+  GallerySavedProfile,
   StyleMap,
   StyleWithoutUrl,
 } from '@stylebot/types';
 
-import { hashCss } from './utils';
+import { hashCss, isShareableStyleUrl } from './utils';
 
 /**
  * A profile with a gallery listing, with where it is and its css.
@@ -138,3 +139,32 @@ export const getProfileGalleryListing = (
     (style && expandProfiles(style).sheets[profileId]?.galleryListing) ?? null
   );
 };
+
+/**
+ * Every profile with CSS saved for a public website, which the gallery's Your
+ * styles page lists as published, installed or never published.
+ */
+export const getSavedProfiles = (
+  styles: StyleMap
+): Array<GallerySavedProfile> =>
+  Object.entries(styles)
+    .filter(([url]) => isShareableStyleUrl(url))
+    .flatMap(([url, style]) =>
+      Object.entries(expandProfiles(style).sheets)
+        .filter(([, { css }]) => css.trim() !== '')
+        .map(([profileId, { name, css, galleryListing }]) => ({
+          url,
+          profileId,
+          profileName: name,
+          modifiedTime: style.modifiedTime,
+          gallery: galleryListing
+            ? {
+                styleId: galleryListing.styleId,
+                version: galleryListing.version,
+                slug: galleryListing.slug,
+                published: galleryListing.published,
+                edited: hashCss(css) !== galleryListing.cssHash,
+              }
+            : null,
+        }))
+    );
