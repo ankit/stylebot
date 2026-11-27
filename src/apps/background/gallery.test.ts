@@ -561,7 +561,6 @@ describe('gallery messages', () => {
       });
     });
 
-
     it('turns down a publish that names no gallery style', async () => {
       const id = await openDraft();
 
