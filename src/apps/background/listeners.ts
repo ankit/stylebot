@@ -90,6 +90,7 @@ import {
   UndoGalleryInstall,
   GetGalleryInstallStatus,
   PublishGalleryStyleUpdate,
+  PublishGalleryProfile,
   GetGallerySavedProfiles,
 } from './gallery';
 import {
@@ -509,6 +510,9 @@ export const initListeners = (): void => {
           return true;
         case 'PublishGalleryStyleUpdate':
           PublishGalleryStyleUpdate(message, sender, sendResponse);
+          return true;
+        case 'PublishGalleryProfile':
+          PublishGalleryProfile(message, sender, sendResponse);
           return true;
         case 'GetGallerySavedProfiles':
           GetGallerySavedProfiles(message, sender, sendResponse);

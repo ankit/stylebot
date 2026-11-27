@@ -56,12 +56,15 @@ export type StatusResult = {
   published: Record<string, GalleryPublishStatus>;
 };
 
-// Publishes the edits to the style, by its id, from the requesting tab.
-export type PublishRequest = { type: 'stylebot:publish'; id: number };
+// Publishes from the requesting tab the edits to a style, by its id, or a
+// profile saved here, by its url and id, with an id of the request's own.
+export type PublishRequest =
+  | { type: 'stylebot:publish'; id: number }
+  | { type: 'stylebot:publish'; id: string; url: string; profileId: string };
 
 export type PublishResult = {
   type: 'stylebot:publish:result';
-  id: number;
+  id: number | string;
   ok: boolean;
 };
 

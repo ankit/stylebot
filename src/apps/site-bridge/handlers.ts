@@ -14,6 +14,7 @@ import type {
   OpenGalleryPreview,
   OpenGalleryDraftResponse,
   PreviewGalleryStyleResponse,
+  PublishGalleryProfile,
   PublishGalleryStyleUpdate,
 } from '@stylebot/types';
 
@@ -82,18 +83,24 @@ const handlers: { [T in SiteRequestType]: Handler<T> } = {
     };
   },
 
-  'stylebot:publish': async ({ id }) => {
+  'stylebot:publish': async request => {
+    const { id } = request;
+
     // It leaves the page, so only right after the user clicked.
     if (!navigator.userActivation?.isActive) {
       return { type: 'stylebot:publish:result', id, ok: false };
     }
 
-    const message: PublishGalleryStyleUpdate = {
-      name: 'PublishGalleryStyleUpdate',
-      styleId: id,
-    };
+    const message: PublishGalleryStyleUpdate | PublishGalleryProfile =
+      'url' in request
+        ? {
+            name: 'PublishGalleryProfile',
+            url: request.url,
+            profileId: request.profileId,
+          }
+        : { name: 'PublishGalleryStyleUpdate', styleId: request.id };
     const response = await chrome.runtime
-      .sendMessage<PublishGalleryStyleUpdate, OpenGalleryDraftResponse>(message)
+      .sendMessage<typeof message, OpenGalleryDraftResponse>(message)
       .catch((): null => null);
 
     return { type: 'stylebot:publish:result', id, ok: Boolean(response?.ok) };

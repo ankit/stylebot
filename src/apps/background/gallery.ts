@@ -18,11 +18,13 @@ import {
   isGalleryStyleDeleted,
   isGalleryStyleId,
   isPublicSite,
+  isShareableStyleUrl,
   newGalleryDraftId,
   getSuggestionSites,
   saveGalleryDraft,
   toGalleryFailure,
   toGallerySite,
+  type ListedProfile,
 } from '@stylebot/gallery';
 import { expandProfiles } from '@stylebot/saved-styles';
 import type {
@@ -55,6 +57,7 @@ import type {
   GetPublishedGalleryStyle as GetPublishedGalleryStyleType,
   GetPublishedGalleryStyleResponse,
   PublishGalleryStyleUpdate as PublishGalleryStyleUpdateType,
+  PublishGalleryProfile as PublishGalleryProfileType,
   GetGallerySavedProfiles as GetGallerySavedProfilesType,
   GetGallerySavedProfilesResponse,
   ResetGalleryProfile as ResetGalleryProfileType,
@@ -268,8 +271,29 @@ export const PublishProfileToGallery = async (
 };
 
 /**
+ * Takes the gallery's tab a message came from to the publish page on a
+ * profile, without a screenshot: the gallery keeps a published style's own,
+ * and asks for one for a new style.
+ */
+const openDraftInGalleryTab = async (
+  sender: chrome.runtime.MessageSender,
+  { url, profileId, name, css }: Omit<ListedProfile, 'galleryListing'>
+): Promise<void> => {
+  const tabId = sender.tab?.id;
+
+  if (tabId === undefined) {
+    throw new Error('No tab to publish from');
+  }
+
+  await openDraft(
+    { url, profileId, css, profileName: name, screenshot: null },
+    publishUrl => chrome.tabs.update(tabId, { url: publishUrl })
+  );
+};
+
+/**
  * Takes the gallery's tab to the publish page on the profile published as a
- * style, without a screenshot: the gallery keeps the style's own.
+ * style.
  */
 export const PublishGalleryStyleUpdate = async (
   { styleId }: PublishGalleryStyleUpdateType,
@@ -281,28 +305,52 @@ export const PublishGalleryStyleUpdate = async (
       throw new Error('Publish refused');
     }
 
-    const tabId = sender.tab?.id;
-
-    if (tabId === undefined) {
-      throw new Error('No tab to publish from');
-    }
-
     const profile = getPublishedProfile(await getAll(), styleId);
 
     if (!profile) {
       throw new Error('No single profile published as the style');
     }
 
-    await openDraft(
-      {
-        url: profile.url,
-        profileId: profile.profileId,
-        css: profile.css,
-        profileName: profile.name,
-        screenshot: null,
-      },
-      url => chrome.tabs.update(tabId, { url })
-    );
+    await openDraftInGalleryTab(sender, profile);
+    sendResponse({ ok: true });
+  } catch (e) {
+    sendResponse(fail(e));
+  }
+};
+
+/**
+ * Takes the gallery's tab to the publish page on a profile saved here for a
+ * public website, to publish it as a new style or update the one it was
+ * published as.
+ */
+export const PublishGalleryProfile = async (
+  { url, profileId }: PublishGalleryProfileType,
+  sender: chrome.runtime.MessageSender,
+  sendResponse: (response: OpenGalleryDraftResponse) => void
+): Promise<void> => {
+  try {
+    if (
+      !isFromGallery(sender) ||
+      typeof url !== 'string' ||
+      typeof profileId !== 'string' ||
+      !isShareableStyleUrl(url)
+    ) {
+      throw new Error('Publish refused');
+    }
+
+    const style = (await getAll())[url];
+    const sheet = style && expandProfiles(style).sheets[profileId];
+
+    if (!sheet || sheet.css.trim() === '') {
+      throw new Error('No profile to publish');
+    }
+
+    await openDraftInGalleryTab(sender, {
+      url,
+      profileId,
+      name: sheet.name,
+      css: sheet.css,
+    });
     sendResponse({ ok: true });
   } catch (e) {
     sendResponse(fail(e));

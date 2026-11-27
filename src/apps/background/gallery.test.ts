@@ -23,6 +23,7 @@ import {
   GetGallerySuggestions,
   GetPublishedGalleryStyle,
   OpenGalleryDraft,
+  PublishGalleryProfile,
   PublishGalleryStyleUpdate,
   PublishProfileToGallery,
   ResetGalleryProfile,
@@ -557,6 +558,80 @@ describe('gallery messages', () => {
           })
         ).toMatchObject({ ok: false });
         expect(await publishUpdate(8, GALLERY)).toMatchObject({ ok: false });
+        expect(updateTab).not.toHaveBeenCalled();
+      });
+    });
+
+    describe("the gallery's Publish of a saved profile", () => {
+      const GALLERY_TAB = { ...GALLERY, tab: { id: 5 } as chrome.tabs.Tab };
+
+      const publishProfile = (
+        url: string,
+        profileId: string,
+        sender: chrome.runtime.MessageSender = GALLERY_TAB
+      ) =>
+        respond(send =>
+          PublishGalleryProfile(
+            { name: 'PublishGalleryProfile', url, profileId },
+            sender,
+            send
+          )
+        );
+
+      beforeEach(() => {
+        mockStyles = {
+          'github.com': savedStyle({
+            default: { name: '' },
+            mine: { name: 'Mine', css: CSS },
+          }),
+          localhost: { ...savedStyle(), css: CSS },
+        };
+      });
+
+      it("takes the gallery's tab to the publish page, on a draft of the profile as a new style", async () => {
+        expect(await publishProfile('github.com', 'mine')).toEqual({
+          ok: true,
+        });
+
+        const [tabId, { url }] = updateTab.mock.calls[0] as [
+          number,
+          { url: string }
+        ];
+        const id = new URL(url).searchParams.get('draft') as string;
+
+        expect(tabId).toBe(5);
+        expect(await getDraft(id)).toEqual({
+          draft: {
+            site: 'github.com',
+            urlPattern: null,
+            css: CSS,
+            name: 'Mine',
+            screenshot: null,
+            styleId: null,
+          },
+        });
+      });
+
+      it('turns down empty, missing and local profiles, other sites, and messages without a tab', async () => {
+        expect(await publishProfile('github.com', 'default')).toMatchObject({
+          ok: false,
+        });
+        expect(await publishProfile('github.com', 'gone')).toMatchObject({
+          ok: false,
+        });
+        expect(await publishProfile('localhost', 'default')).toMatchObject({
+          ok: false,
+        });
+        expect(
+          await publishProfile('github.com', 'mine', {
+            id: 'stylebot',
+            url: 'https://stylebot.dev/',
+            tab: GALLERY_TAB.tab,
+          })
+        ).toMatchObject({ ok: false });
+        expect(
+          await publishProfile('github.com', 'mine', GALLERY)
+        ).toMatchObject({ ok: false });
         expect(updateTab).not.toHaveBeenCalled();
       });
     });
