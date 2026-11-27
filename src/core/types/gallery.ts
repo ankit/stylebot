@@ -1,3 +1,4 @@
+import type { Timestamp } from './shared';
 import type { StyleOptionDeclarations, StyleOptionValues } from './styles';
 
 /**
@@ -75,6 +76,26 @@ export type GalleryInstalled = {
 export type GalleryPublishStatus = {
   version: number;
   changed: boolean;
+};
+
+/**
+ * A profile saved here that could go on the gallery, for its Your styles
+ * page, with the gallery style it was installed from or published as, and
+ * whether its CSS was edited since.
+ */
+export type GallerySavedProfile = {
+  url: string;
+  profileId: string;
+  profileName: string;
+  // When the profile's saved style last changed.
+  modifiedTime: Timestamp;
+  gallery: {
+    styleId: number;
+    version: number;
+    slug: string;
+    published: boolean;
+    edited: boolean;
+  } | null;
 };
 
 /**

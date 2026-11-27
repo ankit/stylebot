@@ -44,6 +44,28 @@ export const isPublicSite = ({ protocol, hostname, port }: URL): boolean =>
   !/^\d+(\.\d+){3}$/.test(hostname) &&
   !PRIVATE_SUFFIX.test(hostname.replace(/\.$/, ''));
 
+const SCHEME = /^([a-z][a-z0-9+.-]*):/i;
+
+/**
+ * Whether a saved style's url is for a public website, so it can be shared
+ * on the gallery: not a local address, an IP, a file or a non-web page.
+ */
+export const isShareableStyleUrl = (url: string): boolean => {
+  const scheme = url.match(SCHEME)?.[1].toLowerCase();
+
+  if (scheme !== undefined && scheme !== 'http' && scheme !== 'https') {
+    return false;
+  }
+
+  try {
+    const page = new URL(scheme ? url : `https://${getStyleSite(url)}`);
+
+    return isPublicSite(page);
+  } catch {
+    return false;
+  }
+};
+
 /**
  * Decodes a data URL into a blob of its type, without fetch, which a page's
  * content security policy can block.

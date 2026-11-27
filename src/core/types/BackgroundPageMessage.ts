@@ -369,6 +369,12 @@ export type PublishGalleryStyleUpdate = {
   styleId: number;
 };
 
+// Sent by the site bridge on the gallery: every profile saved here that
+// could go on the gallery.
+export type GetGallerySavedProfiles = {
+  name: 'GetGallerySavedProfiles';
+};
+
 // A tab's gallery preview: the popup's tab, or the page's own.
 export type GetGalleryPreview = {
   name: 'GetGalleryPreview';
@@ -470,6 +476,7 @@ type BackgroundPageMessage =
   | UndoGalleryInstall
   | GetGalleryInstallStatus
   | PublishGalleryStyleUpdate
+  | GetGallerySavedProfiles
   | CliModeEvent;
 
 export default BackgroundPageMessage;

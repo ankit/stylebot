@@ -6,6 +6,7 @@ import type { GoogleDriveSyncMetadata } from './sync';
 import type { RestoreResult, VersionHistory } from './history';
 import type {
   GalleryDraft,
+  GallerySavedProfile,
   GalleryInstalled,
   GalleryPublished,
   GalleryPublishStatus,
@@ -109,6 +110,9 @@ export type GetGalleryInstallStatusResponse = {
   installed: Record<string, string>;
   published: Record<string, GalleryPublishStatus>;
 };
+export type GetGallerySavedProfilesResponse = {
+  profiles: Array<GallerySavedProfile>;
+};
 export type InstallGalleryPreviewResponse = GalleryResult<{
   profileName: string;
 }>;
@@ -150,6 +154,7 @@ type BackgroundPageMessageResponse =
   | GetGalleryPreviewResponse
   | InstallGalleryPreviewResponse
   | UndoGalleryInstallResponse
-  | GetGalleryInstallStatusResponse;
+  | GetGalleryInstallStatusResponse
+  | GetGallerySavedProfilesResponse;
 
 export default BackgroundPageMessageResponse;
