@@ -113,6 +113,8 @@ export type GetGalleryInstallStatusResponse = {
 export type GetGallerySavedProfilesResponse = {
   profiles: Array<GallerySavedProfile>;
 };
+// The version the profiles are at now.
+export type UpdateGalleryInstallResponse = GalleryResult<{ version: number }>;
 export type InstallGalleryPreviewResponse = GalleryResult<{
   profileName: string;
 }>;
@@ -155,6 +157,7 @@ type BackgroundPageMessageResponse =
   | InstallGalleryPreviewResponse
   | UndoGalleryInstallResponse
   | GetGalleryInstallStatusResponse
-  | GetGallerySavedProfilesResponse;
+  | GetGallerySavedProfilesResponse
+  | UpdateGalleryInstallResponse;
 
 export default BackgroundPageMessageResponse;

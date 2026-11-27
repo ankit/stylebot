@@ -6,12 +6,14 @@ import type { GalleryListing, StyleMap } from '@stylebot/types';
 
 import {
   scheduleGalleryUpdates,
+  updateGalleryInstall,
   updateGalleryInstalls,
 } from './gallery-updates';
 import {
   applyStylesToAllTabs,
   getAll,
   removeStyleGalleryListings,
+  resetGalleryProfile,
   setGalleryListing,
   updateGalleryProfile,
 } from './styles';
@@ -21,6 +23,7 @@ jest.mock('./styles', () => ({
   updateGalleryProfile: jest.fn(async () => undefined),
   setGalleryListing: jest.fn(async () => undefined),
   removeStyleGalleryListings: jest.fn(async () => undefined),
+  resetGalleryProfile: jest.fn(async () => undefined),
   applyStylesToAllTabs: jest.fn(async () => undefined),
 }));
 
@@ -193,5 +196,79 @@ describe('gallery updates', () => {
     alarms.get.mockResolvedValueOnce({ name: 'gallery-updates' });
     await scheduleGalleryUpdates();
     expect(alarms.create).toHaveBeenCalledTimes(1);
+  });
+
+  describe('updating one style on request', () => {
+    it('updates an unedited install to the latest version, applies it and gives the version', async () => {
+      installed(1, 'a {}', 'a {}');
+      fetchMock.mockResponseOnce(JSON.stringify({ ...style, css: 'b {}' }));
+
+      expect(await updateGalleryInstall(style.id, false)).toBe(style.version);
+      expect(updateGalleryProfile).toHaveBeenCalledWith(
+        'github.com',
+        'night',
+        'b {}',
+        listing(style.version, 'b {}')
+      );
+      expect(resetGalleryProfile).not.toHaveBeenCalled();
+      expect(applyStylesToAllTabs).toHaveBeenCalled();
+    });
+
+    it('refuses an edited install without asking the gallery', async () => {
+      installed(1, 'a {}', 'a { color: red; }');
+
+      await expect(updateGalleryInstall(style.id, false)).rejects.toThrow();
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(updateGalleryProfile).not.toHaveBeenCalled();
+    });
+
+    it('drops the edits when asked to', async () => {
+      installed(style.version, 'a {}', 'a { color: red; }');
+      fetchMock.mockResponseOnce(JSON.stringify({ ...style, css: 'a {}' }));
+
+      expect(await updateGalleryInstall(style.id, true)).toBe(style.version);
+      expect(resetGalleryProfile).toHaveBeenCalledWith(
+        'github.com',
+        'night',
+        'a {}',
+        listing(style.version, 'a {}')
+      );
+      expect(applyStylesToAllTabs).toHaveBeenCalled();
+    });
+
+    it('refuses a style that isn’t installed here, or was published from here', async () => {
+      installed(1, 'a {}', 'a {}');
+      await expect(updateGalleryInstall(99, false)).rejects.toThrow();
+
+      (getAll as jest.Mock).mockResolvedValue({
+        'github.com': {
+          css: 'a {}',
+          enabled: true,
+          readability: false,
+          modifiedTime: '1',
+          profiles: {
+            mine: {
+              name: 'Mine',
+              galleryListing: { ...listing(1, 'a {}'), published: true },
+            },
+          },
+          activeProfile: 'mine',
+        },
+      } as StyleMap);
+      await expect(updateGalleryInstall(style.id, false)).rejects.toThrow();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('drops the listings of a style the gallery deleted, and fails', async () => {
+      installed(1, 'a {}', 'a {}');
+      fetchMock.mockResponseOnce(
+        JSON.stringify({ error: 'No such style', code: 'style_deleted' }),
+        { status: 404 }
+      );
+
+      await expect(updateGalleryInstall(style.id, false)).rejects.toThrow();
+      expect(removeStyleGalleryListings).toHaveBeenCalledWith(style.id);
+      expect(updateGalleryProfile).not.toHaveBeenCalled();
+    });
   });
 });

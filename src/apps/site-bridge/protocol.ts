@@ -77,6 +77,22 @@ export type StylesResult = {
   styles: Array<GallerySavedProfile>;
 };
 
+// Updates the profiles a style, by its id, was installed as to its latest
+// version. Edited ones are refused unless their edits are to be dropped.
+export type UpdateRequest = {
+  type: 'stylebot:update';
+  id: number;
+  discardEdits?: boolean;
+};
+
+export type UpdateResult = {
+  type: 'stylebot:update:result';
+  id: number;
+  ok: boolean;
+  // The version the profiles are at now.
+  version?: number;
+};
+
 export type DraftRequest = { type: 'stylebot:draft'; id: string };
 
 export type DraftResult = {
@@ -121,6 +137,7 @@ export type SiteMessages = {
   'stylebot:published': { request: PublishedRequest; reply: PublishedResult };
   'stylebot:deleted': { request: DeletedRequest; reply: DeletedResult };
   'stylebot:styles': { request: StylesRequest; reply: StylesResult };
+  'stylebot:update': { request: UpdateRequest; reply: UpdateResult };
 };
 
 export type SiteRequestType = keyof SiteMessages;
