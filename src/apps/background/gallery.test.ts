@@ -27,7 +27,9 @@ import {
   PublishGalleryStyleUpdate,
   PublishProfileToGallery,
   ResetGalleryProfile,
+  UpdateGalleryInstall,
 } from './gallery';
+import { updateGalleryInstall } from './gallery-updates';
 import {
   applyStylesToAllTabs,
   removeStyleGalleryListings,
@@ -35,6 +37,7 @@ import {
 } from './styles';
 
 jest.mock('./capture-tab', () => ({ captureTab: jest.fn() }));
+jest.mock('./gallery-updates', () => ({ updateGalleryInstall: jest.fn() }));
 jest.mock('./gallery-preview', () => ({
   getLatestVersionListing:
     jest.requireActual('./gallery-preview').getLatestVersionListing,
@@ -1076,6 +1079,53 @@ describe('gallery messages', () => {
       expect(await savedProfiles('https://example.com/')).toEqual({
         profiles: [],
       });
+    });
+  });
+
+  describe('updating an install from the gallery', () => {
+    const update = (
+      styleId: unknown,
+      url = 'https://gallery.stylebot.dev/mine'
+    ) =>
+      respond(send =>
+        UpdateGalleryInstall(
+          {
+            name: 'UpdateGalleryInstall',
+            styleId: styleId as number,
+            discardEdits: true,
+          },
+          { id: 'stylebot', url },
+          send
+        )
+      );
+
+    beforeEach(() => {
+      (global.chrome as { runtime?: unknown }).runtime = { id: 'stylebot' };
+      (updateGalleryInstall as jest.Mock).mockReset();
+    });
+
+    it('updates it and gives the version it is at now', async () => {
+      (updateGalleryInstall as jest.Mock).mockResolvedValue(3);
+
+      expect(await update(7)).toEqual({ ok: true, version: 3 });
+      expect(updateGalleryInstall).toHaveBeenCalledWith(7, true);
+    });
+
+    it('fails when the update does', async () => {
+      (updateGalleryInstall as jest.Mock).mockRejectedValue(
+        new Error('The style was edited')
+      );
+
+      expect(await update(7)).toMatchObject({ ok: false });
+    });
+
+    it('turns down other sites and ids that name no gallery style', async () => {
+      expect(await update(7, 'https://stylebot.dev/')).toMatchObject({
+        ok: false,
+      });
+      expect(await update(-1)).toMatchObject({ ok: false });
+      expect(await update('7')).toMatchObject({ ok: false });
+      expect(updateGalleryInstall).not.toHaveBeenCalled();
     });
   });
 

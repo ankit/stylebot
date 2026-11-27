@@ -16,6 +16,8 @@ import type {
   PreviewGalleryStyleResponse,
   PublishGalleryProfile,
   PublishGalleryStyleUpdate,
+  UpdateGalleryInstall,
+  UpdateGalleryInstallResponse,
 } from '@stylebot/types';
 
 import type {
@@ -121,6 +123,31 @@ const handlers: { [T in SiteRequestType]: Handler<T> } = {
       id,
       styles: response?.profiles ?? [],
     };
+  },
+
+  'stylebot:update': async ({ id, discardEdits }) => {
+    // It changes saved styles, so only right after the user clicked.
+    if (!navigator.userActivation?.isActive) {
+      return { type: 'stylebot:update:result', id, ok: false };
+    }
+
+    const message: UpdateGalleryInstall = {
+      name: 'UpdateGalleryInstall',
+      styleId: id,
+      discardEdits: discardEdits === true,
+    };
+    const response = await chrome.runtime
+      .sendMessage<UpdateGalleryInstall, UpdateGalleryInstallResponse>(message)
+      .catch((): null => null);
+
+    return response?.ok
+      ? {
+          type: 'stylebot:update:result',
+          id,
+          ok: true,
+          version: response.version,
+        }
+      : { type: 'stylebot:update:result', id, ok: false };
   },
 
   'stylebot:draft': async ({ id }) => {

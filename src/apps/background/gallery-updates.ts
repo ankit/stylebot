@@ -1,10 +1,12 @@
 import {
+  galleryApiError,
   getListedProfiles,
   getListedStyleIds,
   getStyle,
   hashCss,
   isGalleryStyleDeleted,
   type GalleryStyleWithCss,
+  type ListedProfile,
 } from '@stylebot/gallery';
 
 import { getLatestVersionListing } from './gallery-preview';
@@ -12,6 +14,7 @@ import {
   applyStylesToAllTabs,
   getAll,
   removeStyleGalleryListings,
+  resetGalleryProfile,
   setGalleryListing,
   updateGalleryProfile,
 } from './styles';
@@ -103,4 +106,57 @@ export const updateGalleryInstalls = async (): Promise<void> => {
   if (updated) {
     await applyStylesToAllTabs();
   }
+};
+
+/**
+ * Whether a profile's CSS changed since it was installed or last updated.
+ */
+const isEdited = ({ css, galleryListing }: ListedProfile): boolean =>
+  hashCss(css) !== galleryListing.cssHash;
+
+/**
+ * Updates the profiles a gallery style was installed as to its latest
+ * version and applies it, resolving with that version. Refuses edited
+ * profiles unless their edits are to be dropped.
+ */
+export const updateGalleryInstall = async (
+  styleId: number,
+  discardEdits: boolean
+): Promise<number> => {
+  const installed = getListedProfiles(await getAll(), styleId).filter(
+    ({ galleryListing }) => !galleryListing.published
+  );
+
+  if (installed.length === 0) {
+    throw new Error('The style isn’t installed');
+  }
+
+  if (!discardEdits && installed.some(isEdited)) {
+    throw new Error('The style was edited since it was installed');
+  }
+
+  const latest = await getStyle(styleId).catch(async e => {
+    if (isGalleryStyleDeleted(e)) {
+      await removeStyleGalleryListings(styleId);
+    }
+
+    throw e;
+  });
+
+  // Versions only grow, so an older one means the id now names another style.
+  if (latest.version < installed[0].galleryListing.version) {
+    await removeStyleGalleryListings(styleId);
+    throw galleryApiError('The style is gone from the gallery', 404);
+  }
+
+  const galleryListing = getLatestVersionListing(latest, latest);
+  const update = discardEdits ? resetGalleryProfile : updateGalleryProfile;
+
+  for (const { url, profileId } of installed) {
+    await update(url, profileId, latest.css, galleryListing);
+  }
+
+  await applyStylesToAllTabs();
+
+  return latest.version;
 };

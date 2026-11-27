@@ -116,4 +116,46 @@ describe('site bridge', () => {
       await handleSiteRequest({ type: 'stylebot:styles', id: 's' })
     ).toEqual({ type: 'stylebot:styles:result', id: 's', styles: [] });
   });
+
+  it('updates an installed style right after a click, with the version it’s at now', async () => {
+    clicked(true);
+    sendMessage.mockResolvedValue({ ok: true, version: 3 });
+
+    expect(
+      await handleSiteRequest({
+        type: 'stylebot:update',
+        id: 7,
+        discardEdits: true,
+      })
+    ).toEqual({ type: 'stylebot:update:result', id: 7, ok: true, version: 3 });
+    expect(sendMessage).toHaveBeenCalledWith({
+      name: 'UpdateGalleryInstall',
+      styleId: 7,
+      discardEdits: true,
+    });
+
+    await handleSiteRequest({ type: 'stylebot:update', id: 7 });
+    expect(sendMessage).toHaveBeenLastCalledWith({
+      name: 'UpdateGalleryInstall',
+      styleId: 7,
+      discardEdits: false,
+    });
+  });
+
+  it('turns down an update without a click, or that the background refuses', async () => {
+    clicked(false);
+    expect(await handleSiteRequest({ type: 'stylebot:update', id: 7 })).toEqual(
+      { type: 'stylebot:update:result', id: 7, ok: false }
+    );
+    expect(sendMessage).not.toHaveBeenCalled();
+
+    clicked(true);
+    sendMessage.mockResolvedValue({
+      ok: false,
+      errorKey: 'gallery_error_unknown',
+    });
+    expect(await handleSiteRequest({ type: 'stylebot:update', id: 7 })).toEqual(
+      { type: 'stylebot:update:result', id: 7, ok: false }
+    );
+  });
 });

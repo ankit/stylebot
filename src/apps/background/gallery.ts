@@ -60,6 +60,8 @@ import type {
   PublishGalleryProfile as PublishGalleryProfileType,
   GetGallerySavedProfiles as GetGallerySavedProfilesType,
   GetGallerySavedProfilesResponse,
+  UpdateGalleryInstall as UpdateGalleryInstallType,
+  UpdateGalleryInstallResponse,
   ResetGalleryProfile as ResetGalleryProfileType,
   ResetGalleryProfileResponse,
   GalleryScreenshotResponse,
@@ -86,6 +88,7 @@ import {
   startGalleryPreview,
   undoGalleryInstall,
 } from './gallery-preview';
+import { updateGalleryInstall } from './gallery-updates';
 import { isGallerySite, isStylebotSite } from './is-stylebot-site';
 import { get as getOption } from './options';
 
@@ -372,6 +375,27 @@ export const GetGallerySavedProfiles = async (
   }
 
   sendResponse({ profiles: getSavedProfiles(await getAll()) });
+};
+
+/**
+ * Updates the profiles a gallery style was installed as to its latest
+ * version, for the gallery's Your styles page.
+ */
+export const UpdateGalleryInstall = async (
+  { styleId, discardEdits }: UpdateGalleryInstallType,
+  sender: chrome.runtime.MessageSender,
+  sendResponse: (response: UpdateGalleryInstallResponse) => void
+): Promise<void> => {
+  try {
+    if (!isFromGallery(sender) || !isGalleryStyleId(styleId)) {
+      throw new Error('Update refused');
+    }
+
+    const version = await updateGalleryInstall(styleId, discardEdits === true);
+    sendResponse({ ok: true, version });
+  } catch (e) {
+    sendResponse(fail(e));
+  }
 };
 
 /**

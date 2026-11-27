@@ -383,6 +383,14 @@ export type GetGallerySavedProfiles = {
   name: 'GetGallerySavedProfiles';
 };
 
+// Sent by the site bridge on the gallery: updates the profiles a gallery
+// style was installed as to its latest version, dropping edits if asked to.
+export type UpdateGalleryInstall = {
+  name: 'UpdateGalleryInstall';
+  styleId: number;
+  discardEdits: boolean;
+};
+
 // A tab's gallery preview: the popup's tab, or the page's own.
 export type GetGalleryPreview = {
   name: 'GetGalleryPreview';
@@ -486,6 +494,7 @@ type BackgroundPageMessage =
   | PublishGalleryStyleUpdate
   | PublishGalleryProfile
   | GetGallerySavedProfiles
+  | UpdateGalleryInstall
   | CliModeEvent;
 
 export default BackgroundPageMessage;
