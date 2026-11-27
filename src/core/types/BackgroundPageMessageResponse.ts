@@ -69,6 +69,7 @@ export type UndoRestoreResponse = { ok: boolean };
 export type GetRecentColorsResponse = Array<string>;
 export type AddRecentColorResponse = Array<string>;
 export type GetIsEditorWindowOpenResponse = boolean;
+export type GetSupportsEditorWindowResponse = boolean;
 export type OpenEditorSidePanelResponse = boolean;
 export type RestoreTabResponse = { ok: true };
 
@@ -134,6 +135,7 @@ type BackgroundPageMessageResponse =
   | GetRecentColorsResponse
   | AddRecentColorResponse
   | GetIsEditorWindowOpenResponse
+  | GetSupportsEditorWindowResponse
   | OpenEditorSidePanelResponse
   | RestoreTabResponse
   | GalleryScreenshotResponse

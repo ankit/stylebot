@@ -3,6 +3,7 @@ import { defaultOptions } from '@stylebot/settings';
 import {
   getChromiumVariant,
   doesSidePanelWorkInChromiumVariant,
+  supportsEditorWindow,
 } from '@stylebot/utils';
 import { supportsEditorSidePanel } from '@stylebot/side-panel';
 
@@ -13,8 +14,18 @@ import { supportsEditorSidePanel } from '@stylebot/side-panel';
 export const getAll = async (): Promise<StylebotOptions> => {
   const items = await chrome.storage.local.get('options');
   const options: StylebotOptions = { ...defaultOptions, ...items['options'] };
+  const { dockLocation } = options.layout;
+  const inPage = {
+    ...options,
+    layout: { ...options.layout, dockLocation: 'right' as const },
+  };
 
-  if (options.layout.dockLocation !== 'sidepanel') {
+  // Without a windows API (Safari on iPad) the editor docks in the page.
+  if (dockLocation === 'window' && !supportsEditorWindow()) {
+    return inPage;
+  }
+
+  if (dockLocation !== 'sidepanel') {
     return options;
   }
 
@@ -27,7 +38,7 @@ export const getAll = async (): Promise<StylebotOptions> => {
   }
 
   // Without a side panel the editor docks in the page, where it used to.
-  return { ...options, layout: { ...options.layout, dockLocation: 'right' } };
+  return inPage;
 };
 
 export const get = async (

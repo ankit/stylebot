@@ -139,6 +139,7 @@ import { isMac, openOptionsPage, openFeedbackPage } from '@stylebot/utils';
 
 import { undoShortcuts } from '../../store/undo-stack';
 import { hasSidePanel } from '../../utils/side-panel';
+import { hasEditorWindow } from '../../utils/editor-window';
 
 type DockOption = {
   value: StylebotDockLocation;
@@ -191,12 +192,16 @@ export default Vue.extend({
     },
 
     dockOptions(): Array<DockOption> {
-      const separateWindow: DockOption = {
-        value: 'window',
-        icon: 'undock-icon',
-        title: this.t('open_in_separate_window'),
-        shortcut: this.editorCommands.dockWindow,
-      };
+      const separateWindow: Array<DockOption> = hasEditorWindow()
+        ? [
+            {
+              value: 'window',
+              icon: 'undock-icon',
+              title: this.t('open_in_separate_window'),
+              shortcut: this.editorCommands.dockWindow,
+            },
+          ]
+        : [];
 
       const inPage: Array<DockOption> = [
         {
@@ -214,7 +219,7 @@ export default Vue.extend({
       ];
 
       if (!hasSidePanel()) {
-        return [...inPage, separateWindow];
+        return [...inPage, ...separateWindow];
       }
 
       return [
@@ -224,7 +229,7 @@ export default Vue.extend({
           title: this.t('open_in_side_panel'),
           shortcut: this.editorCommands.dockSidePanel,
         },
-        separateWindow,
+        ...separateWindow,
         ...inPage,
       ];
     },

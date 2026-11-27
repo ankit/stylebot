@@ -221,6 +221,7 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     UndoRestore: () => ({ ok: true }),
 
     OpenEditorSidePanel: () => true,
+    GetSupportsEditorWindow: () => true,
 
     GetPublishedGalleryStyle: () => ({
       published: gallery.published ?? null,
@@ -332,6 +333,7 @@ export const installChrome = (overrides: ChromeShimOptions = {}): void => {
     windows: {
       getCurrent: (_info: unknown, callback?: Callback) =>
         respond(callback, { tabs: [tab] }),
+      create: () => Promise.resolve({}),
     },
 
     sidePanel: {

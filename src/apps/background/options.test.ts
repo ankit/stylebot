@@ -141,6 +141,27 @@ describe('getAll', () => {
 
     expect((await getAll()).layout.dockLocation).toBe('right');
   });
+
+  it('docks right for a saved window where the browser has no windows API', async () => {
+    store = {
+      options: {
+        layout: { width: 360, adjustPageLayout: false, dockLocation: 'window' },
+      },
+    };
+
+    expect((await getAll()).layout.dockLocation).toBe('right');
+  });
+
+  it('keeps a saved window where the browser can open windows', async () => {
+    store = {
+      options: {
+        layout: { width: 360, adjustPageLayout: false, dockLocation: 'window' },
+      },
+    };
+    (chrome as unknown as { windows: object }).windows = { create: jest.fn() };
+
+    expect((await getAll()).layout.dockLocation).toBe('window');
+  });
 });
 
 describe('pruneRetired', () => {

@@ -28,6 +28,8 @@ import type {
   CloseEditorWindow,
   GetIsEditorWindowOpen,
   GetIsEditorWindowOpenResponse,
+  GetSupportsEditorWindow,
+  GetSupportsEditorWindowResponse,
   OpenEditorSidePanel,
   OpenEditorSidePanelResponse,
   CloseEditorSidePanel,
@@ -244,6 +246,18 @@ export const getIsEditorWindowOpen = (
  * Asks the background to open the tab's side panel. Must be sent without
  * awaiting anything first, so the background still has the user's gesture.
  */
+export const getSupportsEditorWindow =
+  (): Promise<GetSupportsEditorWindowResponse> => {
+    const message: GetSupportsEditorWindow = {
+      name: 'GetSupportsEditorWindow',
+    };
+
+    return chrome.runtime.sendMessage<
+      GetSupportsEditorWindow,
+      GetSupportsEditorWindowResponse
+    >(message);
+  };
+
 export const requestEditorSidePanel = (
   tabId?: number
 ): Promise<OpenEditorSidePanelResponse> => {

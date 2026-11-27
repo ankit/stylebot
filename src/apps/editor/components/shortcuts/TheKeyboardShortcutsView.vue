@@ -57,6 +57,7 @@ import { isMac, isSafari, openShortcutsPage } from '@stylebot/utils';
 
 import { undoShortcuts } from '../../store/undo-stack';
 import { hasSidePanel } from '../../utils/side-panel';
+import { hasEditorWindow } from '../../utils/editor-window';
 import SubviewHeader from '../SubviewHeader.vue';
 
 type ShortcutRow = { label: string; key: string };
@@ -134,11 +135,13 @@ export default Vue.extend({
             }
           : {
               label: this.t('position'),
-              columns: 3,
+              columns: hasEditorWindow() ? 3 : 2,
               rows: [
                 { label: this.t('left'), key: keys.dockLeft },
                 { label: this.t('right'), key: keys.dockRight },
-                { label: this.t('window'), key: keys.dockWindow },
+                ...(hasEditorWindow()
+                  ? [{ label: this.t('window'), key: keys.dockWindow }]
+                  : []),
               ],
             },
         {
