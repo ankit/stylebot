@@ -17,6 +17,7 @@ import { getPageBridge } from '@stylebot/page-bridge';
 
 import { undoKeyFor } from '../../store/undo-stack';
 import { hasSidePanel } from '../../utils/side-panel';
+import { hasEditorWindow } from '../../utils/editor-window';
 
 export default Vue.extend({
   name: 'TheKeyboardShortcuts',
@@ -250,7 +251,7 @@ export default Vue.extend({
       }
 
       // Move stylebot into its own window
-      if (event.key === this.editorCommands.dockWindow) {
+      if (event.key === this.editorCommands.dockWindow && hasEditorWindow()) {
         event.preventDefault();
         event.stopPropagation();
 

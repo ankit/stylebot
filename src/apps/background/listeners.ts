@@ -52,6 +52,7 @@ import {
   ToggleEditorWindow,
   CloseEditorWindow,
   GetIsEditorWindowOpen,
+  GetSupportsEditorWindow,
   OpenEditorSidePanel,
   CloseEditorSidePanel,
 } from './messages';
@@ -428,6 +429,9 @@ export const initListeners = (): void => {
           break;
         case 'GetIsEditorWindowOpen':
           GetIsEditorWindowOpen(message, sender, sendResponse);
+          return true;
+        case 'GetSupportsEditorWindow':
+          GetSupportsEditorWindow(sendResponse);
           return true;
         case 'OpenEditorSidePanel':
           OpenEditorSidePanel(message, sender, sendResponse);

@@ -265,6 +265,10 @@ export type GetIsEditorWindowOpen = {
   tabId?: number;
 };
 
+export type GetSupportsEditorWindow = {
+  name: 'GetSupportsEditorWindow';
+};
+
 export type RestoreTab = {
   name: 'RestoreTab';
   tabId: number;
@@ -441,6 +445,7 @@ type BackgroundPageMessage =
   | ToggleEditorWindow
   | CloseEditorWindow
   | GetIsEditorWindowOpen
+  | GetSupportsEditorWindow
   | OpenEditorSidePanel
   | CloseEditorSidePanel
   | EditorSidePanelOpened

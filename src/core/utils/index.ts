@@ -8,6 +8,7 @@ export { isMac } from './is-mac';
 export { isSaveShortcut } from './save-shortcut';
 export { isSafari } from './is-safari';
 export { isIPhone } from './is-iphone';
+export { supportsEditorWindow } from './editor-window-support';
 export {
   getPageSupport,
   getRestorePendingKey,

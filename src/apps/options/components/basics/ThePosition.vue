@@ -43,6 +43,7 @@ import {
   detectChromiumVariant,
   getChromiumVariant,
   doesSidePanelWorkInChromiumVariant,
+  supportsEditorWindow,
 } from '@stylebot/utils';
 import {
   isSidePanelGranted,
@@ -109,11 +110,9 @@ export default Vue.extend({
     },
 
     dockOptions(): Array<DockOption> {
-      const separateWindow: DockOption = {
-        value: 'window',
-        icon: 'undock-icon',
-        label: this.t('window'),
-      };
+      const separateWindow: Array<DockOption> = supportsEditorWindow()
+        ? [{ value: 'window', icon: 'undock-icon', label: this.t('window') }]
+        : [];
 
       const inPage: Array<DockOption> = [
         { value: 'left', icon: 'dock-left-icon', label: this.t('left') },
@@ -121,7 +120,7 @@ export default Vue.extend({
       ];
 
       if (!this.hasSidePanel) {
-        return [...inPage, separateWindow];
+        return [...inPage, ...separateWindow];
       }
 
       return [
@@ -130,7 +129,7 @@ export default Vue.extend({
           icon: 'side-panel-icon',
           label: this.t('side_panel'),
         },
-        separateWindow,
+        ...separateWindow,
         ...inPage,
       ];
     },

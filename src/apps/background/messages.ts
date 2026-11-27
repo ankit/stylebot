@@ -20,7 +20,7 @@ import {
   deleteProfile,
   deleteStyle,
 } from './styles';
-import { getFeedbackUrl } from '@stylebot/utils';
+import { getFeedbackUrl, supportsEditorWindow } from '@stylebot/utils';
 
 import * as styleStorage from './styles';
 import { isStylebotSite } from './is-stylebot-site';
@@ -66,6 +66,7 @@ import type {
   CloseEditorWindow as CloseEditorWindowType,
   GetIsEditorWindowOpen as GetIsEditorWindowOpenType,
   GetIsEditorWindowOpenResponse,
+  GetSupportsEditorWindowResponse,
   OpenEditorSidePanel as OpenEditorSidePanelType,
   CloseEditorSidePanel as CloseEditorSidePanelType,
   OpenEditorSidePanelResponse,
@@ -552,4 +553,10 @@ export const GetIsEditorWindowOpen = async (
   const isSidePanelOpen = await isEditorSidePanelOpen(tabId);
 
   sendResponse(isWindowOpen || isSidePanelOpen);
+};
+
+export const GetSupportsEditorWindow = (
+  sendResponse: (response: GetSupportsEditorWindowResponse) => void
+): void => {
+  sendResponse(supportsEditorWindow());
 };

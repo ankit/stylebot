@@ -70,6 +70,7 @@ import type { AppliedDeclaration } from '@stylebot/page-bridge';
 
 import { PLACEHOLDER_PROPERTIES } from '../utils/computed-placeholder';
 import { loadSidePanelSupport } from '../utils/side-panel';
+import { loadEditorWindowSupport } from '../utils/editor-window';
 import { expandProfiles } from '@stylebot/saved-styles';
 
 import {
@@ -126,6 +127,7 @@ export default {
       getCommands(),
       getReadabilitySettings(),
       loadSidePanelSupport(),
+      loadEditorWindowSupport(),
     ]);
 
     commit('setOptions', options);
